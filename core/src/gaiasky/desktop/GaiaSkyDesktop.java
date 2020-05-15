@@ -56,15 +56,15 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /*
-     * Source version to compare to config file and datasets.
-     * This is usually tag where each chunk takes 2 spaces.
-     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
-     * Version = major * 10000 + minor * 100 + rev
-     * So 1.2.5 -> 10205
-     *    2.1.7 -> 20107
-     *
-     * Leading zeroes are omitted to avoid octal literal interpretation.
-     */
+    * Source version to compare to config file and datasets.
+    * This is usually tag where each chunk takes 2 spaces.
+    * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
+    * Version = major * 10000 + minor * 100 + rev
+    * So 1.2.5 -> 10205
+    *    2.1.7 -> 20107
+    *
+    * Leading zeroes are omitted to avoid octal literal interpretation.
+    */
     public static int SOURCE_VERSION = 20206;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
@@ -78,23 +78,32 @@ public class GaiaSkyDesktop implements IObserver {
      * Program arguments
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
+        private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
+        @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
+        private boolean version = false;
 
-        @Parameter(names = { "-d", "--ds-download" }, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2) private boolean download = false;
+        @Parameter(names = {"-d", "--ds-download"}, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2)
+        private boolean download = false;
 
-        @Parameter(names = { "-c", "--cat-chooser" }, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3) private boolean catalogChooser = false;
+        @Parameter(names = {"-c", "--cat-chooser"}, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3)
+        private boolean catalogChooser = false;
 
-        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
+        private String propertiesFile = null;
 
-        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5) private String assetsLocation = null;
+        @Parameter(names = {"-a", "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
+        private String assetsLocation = null;
 
-        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6) private boolean vr = false;
+        @Parameter(names = {"-vr", "--openvr"}, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6)
+        private boolean vr = false;
 
-        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
+        @Parameter(names = {"-e", "--externalview"}, description = "Create a window with a view of the scene and no UI.", order = 7)
+        private boolean externalView = false;
 
-        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
+        @Parameter(names = {"-n", "--noscript"}, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
+        private boolean noScriptingServer = false;
     }
 
     /**
@@ -338,43 +347,43 @@ public class GaiaSkyDesktop implements IObserver {
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case SCENE_GRAPH_LOADED:
-            if (REST_ENABLED) {
-                /*
-                 * Notify REST server that GUI is loaded and everything should be in a
-                 * well-defined state
-                 */
-                try {
-                    RESTServer.activate();
-                } catch (SecurityException | IllegalArgumentException e) {
-                    logger.error(e);
+            case SCENE_GRAPH_LOADED:
+                if (REST_ENABLED) {
+                    /*
+                     * Notify REST server that GUI is loaded and everything should be in a
+                     * well-defined state
+                     */
+                    try {
+                        RESTServer.activate();
+                    } catch (SecurityException | IllegalArgumentException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        case DISPOSE:
-            if (REST_ENABLED) {
-                /* Shutdown REST server thread on termination */
-                try {
-                    RESTServer.dispose();
-                } catch (SecurityException | IllegalArgumentException e) {
-                    logger.error(e);
+                break;
+            case DISPOSE:
+                if (REST_ENABLED) {
+                    /* Shutdown REST server thread on termination */
+                    try {
+                        RESTServer.dispose();
+                    } catch (SecurityException | IllegalArgumentException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
     }
 
     /**
      * Initialises the configuration file. Tries to load first the file in
-     * <code>$HOME/.gaiasky/global.properties</code>. Checks the
-     * <code>properties.version</code> key to determine whether the file is
-     * compatible or not. If it is, it uses the existing file. If it is not, it
-     * replaces it with the default file.
+     * <code>$GS_CONFIG_DIR/global.properties</code>. Checks the
+     * <code>properties.version</code> key and compares it with the version in
+     * the default configuration file of this release
+     * to determine whether the config file must be overwritten
      *
-     * @param ow Whether to overwrite
+     * @param ow Whether to force overwrite
      * @return The path of the file used
      * @throws IOException
      */
@@ -383,42 +392,38 @@ public class GaiaSkyDesktop implements IObserver {
         Path userFolderConfFile = SysUtils.getConfigDir().resolve(DesktopConfInit.getConfigFileName(vr));
 
         // Internal config
-        Path confFolder = Paths.get("conf");
+        Path confFolder = GlobalConf.assetsPath("conf");
         Path internalFolderConfFile = confFolder.resolve(DesktopConfInit.getConfigFileName(vr));
 
         boolean overwrite = ow;
-        if (Files.exists(userFolderConfFile)) {
-            Properties userprops = new Properties();
-            userprops.load(Files.newInputStream(userFolderConfFile));
-            int internalversion = SOURCE_VERSION;
+        boolean userConfExists = Files.exists(userFolderConfFile);
+        if (userConfExists) {
+            Properties userProps = new Properties();
+            userProps.load(Files.newInputStream(userFolderConfFile));
+            int internalVersion = 0;
             if (Files.exists(internalFolderConfFile)) {
-                Properties internalprops = new Properties();
-                internalprops.load(Files.newInputStream(internalFolderConfFile));
-                internalversion = Integer.parseInt(internalprops.getProperty("properties.version"));
+                Properties internalProps = new Properties();
+                internalProps.load(Files.newInputStream(internalFolderConfFile));
+                internalVersion = Integer.parseInt(internalProps.getProperty("properties.version"));
             }
 
             // Check latest version
-            if (!userprops.containsKey("properties.version")) {
-                System.out.println("Properties file version not found, overwriting with new version (" + internalversion + ")");
+            if (!userProps.containsKey("properties.version")) {
+                System.out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
                 overwrite = true;
-            } else if (Integer.parseInt(userprops.getProperty("properties.version")) < internalversion) {
-                System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userprops.getProperty("properties.version")) + ", required " + internalversion);
+            } else if (Integer.parseInt(userProps.getProperty("properties.version")) < internalVersion) {
+                System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userProps.getProperty("properties.version")) + ", required " + internalVersion);
                 overwrite = true;
             }
         }
 
-        if (overwrite || !Files.exists(userFolderConfFile)) {
+        if (overwrite || !userConfExists) {
             // Copy file
             if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
                 // Running released package
                 GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
             } else {
-                // Running from code?
-                Path assetsConf = Path.of(GlobalConf.ASSETS_LOC, "conf");
-                if (!Files.exists(assetsConf)) {
-                    throw new IOException("File " + assetsConf + " does not exist!");
-                }
-                GlobalResources.copyFile(assetsConf.resolve(DesktopConfInit.getConfigFileName(vr)), userFolderConfFile, overwrite);
+                logger.warn("Configuration folder does not exist: " + confFolder.toString());
             }
         }
         String props = userFolderConfFile.toAbsolutePath().toString();
