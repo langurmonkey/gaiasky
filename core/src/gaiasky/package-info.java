@@ -1,0 +1,4 @@
+/**
+ * Main package
+ */
+package gaiasky;
