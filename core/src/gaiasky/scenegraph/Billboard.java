@@ -6,8 +6,11 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
@@ -57,6 +60,13 @@ public class Billboard extends ModelBody {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
+        if(mc != null && mc.instance != null){
+            // Disable depth test
+            Array<Material> mats = mc.instance.materials;
+            for(Material mat : mats){
+                mat.set(new DepthTestAttribute(false));
+            }
+        }
     }
 
     @Override
