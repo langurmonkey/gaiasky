@@ -82,7 +82,6 @@ public class GlobalConf {
         }
     }
 
-
     // Interface scale factor (for HiDPI)
     public static float UI_SCALE_FACTOR = -1.0f;
 
@@ -194,16 +193,16 @@ public class GlobalConf {
 
         public Antialias getAntialias(int code) {
             switch (code) {
-                case 0:
-                    return Antialias.NONE;
-                case -1:
-                    return Antialias.FXAA;
-                case -2:
-                    return Antialias.NFAA;
-                case 1:
-                    return Antialias.SSAA;
-                default:
-                    return Antialias.NONE;
+            case 0:
+                return Antialias.NONE;
+            case -1:
+                return Antialias.FXAA;
+            case -2:
+                return Antialias.NFAA;
+            case 1:
+                return Antialias.SSAA;
+            default:
+                return Antialias.NONE;
             }
         }
 
@@ -275,63 +274,63 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-                case BLOOM_CMD:
-                    POSTPROCESS_BLOOM_INTENSITY = (float) data[0];
-                    break;
-                case LENS_FLARE_CMD:
-                    POSTPROCESS_LENS_FLARE = (Boolean) data[0];
-                    break;
-                case LIGHT_SCATTERING_CMD:
-                    POSTPROCESS_LIGHT_SCATTERING = (Boolean) data[0];
-                    break;
-                case MOTION_BLUR_CMD:
-                    POSTPROCESS_MOTION_BLUR = (Boolean) data[0];
-                    break;
-                case FISHEYE_CMD:
-                    POSTPROCESS_FISHEYE = (Boolean) data[0];
+            case BLOOM_CMD:
+                POSTPROCESS_BLOOM_INTENSITY = (float) data[0];
+                break;
+            case LENS_FLARE_CMD:
+                POSTPROCESS_LENS_FLARE = (Boolean) data[0];
+                break;
+            case LIGHT_SCATTERING_CMD:
+                POSTPROCESS_LIGHT_SCATTERING = (Boolean) data[0];
+                break;
+            case MOTION_BLUR_CMD:
+                POSTPROCESS_MOTION_BLUR = (Boolean) data[0];
+                break;
+            case FISHEYE_CMD:
+                POSTPROCESS_FISHEYE = (Boolean) data[0];
 
-                    // Post a message to the screen
-                    if (POSTPROCESS_FISHEYE) {
-                        ModePopupInfo mpi = new ModePopupInfo();
-                        mpi.title = "Planetarium mode";
-                        mpi.header = "You have entered Planetarium mode!";
-                        mpi.addMapping("Back to normal mode", "CTRL", "P");
-                        mpi.addMapping("Switch planetarium mode type", "CTRL", "SHIFT", "P");
+                // Post a message to the screen
+                if (POSTPROCESS_FISHEYE) {
+                    ModePopupInfo mpi = new ModePopupInfo();
+                    mpi.title = "Planetarium mode";
+                    mpi.header = "You have entered Planetarium mode!";
+                    mpi.addMapping("Back to normal mode", "CTRL", "P");
+                    mpi.addMapping("Switch planetarium mode type", "CTRL", "SHIFT", "P");
 
-                        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "planetarium", 120f);
-                    } else {
-                        EventManager.instance.post(Events.MODE_POPUP_CMD, null, "planetarium");
-                    }
-                    break;
-                case BRIGHTNESS_CMD:
-                    POSTPROCESS_BRIGHTNESS = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
-                    break;
-                case CONTRAST_CMD:
-                    POSTPROCESS_CONTRAST = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
-                    break;
-                case HUE_CMD:
-                    POSTPROCESS_HUE = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
-                    break;
-                case SATURATION_CMD:
-                    POSTPROCESS_SATURATION = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
-                    break;
-                case GAMMA_CMD:
-                    POSTPROCESS_GAMMA = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
-                    break;
-                case TONEMAPPING_TYPE_CMD:
-                    ToneMapping newTM;
-                    if (data[0] instanceof String) {
-                        newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
-                    } else {
-                        newTM = (ToneMapping) data[0];
-                    }
-                    POSTPROCESS_TONEMAPPING_TYPE = newTM;
-                    break;
-                case EXPOSURE_CMD:
-                    POSTPROCESS_EXPOSURE = MathUtilsd.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
-                    break;
-                default:
-                    break;
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "planetarium", 120f);
+                } else {
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, null, "planetarium");
+                }
+                break;
+            case BRIGHTNESS_CMD:
+                POSTPROCESS_BRIGHTNESS = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
+                break;
+            case CONTRAST_CMD:
+                POSTPROCESS_CONTRAST = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
+                break;
+            case HUE_CMD:
+                POSTPROCESS_HUE = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
+                break;
+            case SATURATION_CMD:
+                POSTPROCESS_SATURATION = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
+                break;
+            case GAMMA_CMD:
+                POSTPROCESS_GAMMA = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
+                break;
+            case TONEMAPPING_TYPE_CMD:
+                ToneMapping newTM;
+                if (data[0] instanceof String) {
+                    newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
+                } else {
+                    newTM = (ToneMapping) data[0];
+                }
+                POSTPROCESS_TONEMAPPING_TYPE = newTM;
+                break;
+            case EXPOSURE_CMD:
+                POSTPROCESS_EXPOSURE = MathUtilsd.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+                break;
+            default:
+                break;
             }
         }
 
@@ -452,44 +451,44 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-                case LIMIT_MAG_CMD:
-                    LIMIT_MAG_RUNTIME = (float) data[0];
-                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                    break;
+            case LIMIT_MAG_CMD:
+                LIMIT_MAG_RUNTIME = (float) data[0];
+                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                break;
 
-                case INPUT_ENABLED_CMD:
-                    INPUT_ENABLED = (boolean) data[0];
-                    break;
+            case INPUT_ENABLED_CMD:
+                INPUT_ENABLED = (boolean) data[0];
+                break;
 
-                case DISPLAY_GUI_CMD:
-                    DISPLAY_GUI = (boolean) data[0];
-                    break;
-                case DISPLAY_VR_GUI_CMD:
-                    if (data.length > 1) {
-                        Boolean val = (Boolean) data[1];
-                        DISPLAY_VR_GUI = val;
-                    } else {
-                        DISPLAY_VR_GUI = !DISPLAY_VR_GUI;
-                    }
-                    break;
-                case TOGGLE_UPDATEPAUSE:
-                    UPDATE_PAUSE = !UPDATE_PAUSE;
-                    EventManager.instance.post(Events.UPDATEPAUSE_CHANGED, UPDATE_PAUSE);
-                    break;
-                case TIME_STATE_CMD:
-                    toggleTimeOn((Boolean) data[0]);
-                    break;
-                case RECORD_CAMERA_CMD:
-                    toggleRecord((Boolean) data[0]);
-                    break;
-                case GRAV_WAVE_START:
-                    GRAVITATIONAL_WAVES = true;
-                    break;
-                case GRAV_WAVE_STOP:
-                    GRAVITATIONAL_WAVES = false;
-                    break;
-                default:
-                    break;
+            case DISPLAY_GUI_CMD:
+                DISPLAY_GUI = (boolean) data[0];
+                break;
+            case DISPLAY_VR_GUI_CMD:
+                if (data.length > 1) {
+                    Boolean val = (Boolean) data[1];
+                    DISPLAY_VR_GUI = val;
+                } else {
+                    DISPLAY_VR_GUI = !DISPLAY_VR_GUI;
+                }
+                break;
+            case TOGGLE_UPDATEPAUSE:
+                UPDATE_PAUSE = !UPDATE_PAUSE;
+                EventManager.instance.post(Events.UPDATEPAUSE_CHANGED, UPDATE_PAUSE);
+                break;
+            case TIME_STATE_CMD:
+                toggleTimeOn((Boolean) data[0]);
+                break;
+            case RECORD_CAMERA_CMD:
+                toggleRecord((Boolean) data[0]);
+                break;
+            case GRAV_WAVE_START:
+                GRAVITATIONAL_WAVES = true;
+                break;
+            case GRAV_WAVE_STOP:
+                GRAVITATIONAL_WAVES = false;
+                break;
+            default:
+                break;
 
             }
 
@@ -630,46 +629,46 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-                case CONFIG_FRAME_OUTPUT_CMD:
-                    boolean updateFrameSize = RENDER_WIDTH != (int) data[0] || RENDER_HEIGHT != (int) data[1];
-                    RENDER_WIDTH = (int) data[0];
-                    RENDER_HEIGHT = (int) data[1];
-                    RENDER_TARGET_FPS = (double) data[2];
-                    RENDER_FOLDER = (String) data[3];
-                    RENDER_FILE_NAME = (String) data[4];
+            case CONFIG_FRAME_OUTPUT_CMD:
+                boolean updateFrameSize = RENDER_WIDTH != (int) data[0] || RENDER_HEIGHT != (int) data[1];
+                RENDER_WIDTH = (int) data[0];
+                RENDER_HEIGHT = (int) data[1];
+                RENDER_TARGET_FPS = (double) data[2];
+                RENDER_FOLDER = (String) data[3];
+                RENDER_FILE_NAME = (String) data[4];
 
-                    if (updateFrameSize) {
-                        EventManager.instance.post(Events.FRAME_SIZE_UDPATE, RENDER_WIDTH, RENDER_HEIGHT);
+                if (updateFrameSize) {
+                    EventManager.instance.post(Events.FRAME_SIZE_UDPATE, RENDER_WIDTH, RENDER_HEIGHT);
+                }
+                break;
+            case FRAME_OUTPUT_MODE_CMD:
+                Object newMode = data[0];
+                ScreenshotMode mode = null;
+                if (newMode instanceof String) {
+                    try {
+                        mode = ScreenshotMode.valueOf((String) newMode);
+                    } catch (IllegalArgumentException e) {
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|redraw): '" + newMode + "'");
                     }
-                    break;
-                case FRAME_OUTPUT_MODE_CMD:
-                    Object newMode = data[0];
-                    ScreenshotMode mode = null;
-                    if (newMode instanceof String) {
-                        try {
-                            mode = ScreenshotMode.valueOf((String) newMode);
-                        } catch (IllegalArgumentException e) {
-                            logger.error("Given value is not a representation of ScreenshotMode (simple|redraw): '" + newMode + "'");
-                        }
-                    } else {
-                        mode = (ScreenshotMode) newMode;
-                    }
-                    if (mode != null) {
-                        FRAME_MODE = mode;
-                    }
-                    break;
-                case FRAME_OUTPUT_CMD:
-                    RENDER_OUTPUT = (Boolean) data[0];
-                    // Flush buffer if needed
-                    if (!RENDER_OUTPUT && GaiaSky.instance != null) {
-                        EventManager.instance.post(Events.FLUSH_FRAMES);
-                    }
-                    break;
-                case CAMRECORDER_FPS_CMD:
-                    CAMERA_REC_TARGET_FPS = (Double) data[0];
-                    break;
-                default:
-                    break;
+                } else {
+                    mode = (ScreenshotMode) newMode;
+                }
+                if (mode != null) {
+                    FRAME_MODE = mode;
+                }
+                break;
+            case FRAME_OUTPUT_CMD:
+                RENDER_OUTPUT = (Boolean) data[0];
+                // Flush buffer if needed
+                if (!RENDER_OUTPUT && GaiaSky.instance != null) {
+                    EventManager.instance.post(Events.FLUSH_FRAMES);
+                }
+                break;
+            case CAMRECORDER_FPS_CMD:
+                CAMERA_REC_TARGET_FPS = (Double) data[0];
+                break;
+            default:
+                break;
             }
         }
     }
@@ -815,11 +814,11 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-                case LIMIT_FPS_CMD:
-                    LIMIT_FPS = (Double) data[0];
-                    break;
-                default:
-                    break;
+            case LIMIT_FPS_CMD:
+                LIMIT_FPS = (Double) data[0];
+                break;
+            default:
+                break;
             }
         }
     }
@@ -827,7 +826,9 @@ public class GlobalConf {
     public static class ProgramConf implements IConf, IObserver {
 
         public enum ShowCriterion {
-            DEFAULT, ALWAYS, NEVER;
+            DEFAULT,
+            ALWAYS,
+            NEVER;
 
             public boolean always() {
                 return this.equals(ALWAYS);
@@ -972,8 +973,8 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE, List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG,
-                               float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, boolean eXIT_CONFIRMATION, ShowCriterion cATALOG_CHOOSER) {
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
+                List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, boolean eXIT_CONFIRMATION, ShowCriterion cATALOG_CHOOSER) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -1117,82 +1118,83 @@ public class GlobalConf {
 
         /**
          * Checks whether we are in fixed fov mode (slave, planetarium, panorama)
+         *
          * @return Whether we are in a fixed-fov mode
          */
-        public boolean isFixedFov(){
+        public boolean isFixedFov() {
             return isPanorama() || isPlanetarium();
         }
 
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-                case STEREOSCOPIC_CMD:
-                    if (!GaiaSky.instance.cam.mode.isGaiaFov()) {
-                        boolean stereomode = (Boolean) data[0];
-                        STEREOSCOPIC_MODE = stereomode;
-                        if (STEREOSCOPIC_MODE && CUBEMAP_MODE) {
-                            CUBEMAP_MODE = false;
-                            EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode"));
-                        }
+            case STEREOSCOPIC_CMD:
+                if (!GaiaSky.instance.cam.mode.isGaiaFov()) {
+                    boolean stereomode = (Boolean) data[0];
+                    STEREOSCOPIC_MODE = stereomode;
+                    if (STEREOSCOPIC_MODE && CUBEMAP_MODE) {
+                        CUBEMAP_MODE = false;
+                        EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode"));
                     }
-                    break;
-                case STEREO_PROFILE_CMD:
-                    STEREO_PROFILE = StereoProfile.values()[(Integer) data[0]];
-                    break;
-                case CUBEMAP_CMD:
-                    CUBEMAP_MODE = (Boolean) data[0];
-                    if (CUBEMAP_MODE) {
-                        CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[1];
+                }
+                break;
+            case STEREO_PROFILE_CMD:
+                STEREO_PROFILE = StereoProfile.values()[(Integer) data[0]];
+                break;
+            case CUBEMAP_CMD:
+                CUBEMAP_MODE = (Boolean) data[0];
+                if (CUBEMAP_MODE) {
+                    CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[1];
 
-                        // Post a message to the screen
-                        ModePopupInfo mpi = new ModePopupInfo();
-                        if (CUBEMAP_PROJECTION.isPanorama()) {
-                            mpi.title = "Panorama mode";
-                            mpi.header = "You have entered Panorama mode!";
-                            mpi.addMapping("Back to normal mode", "CTRL", "K");
-                            mpi.addMapping("Switch projection type", "CTRL", "SHIFT", "K");
-                        } else if (CUBEMAP_PROJECTION.isPlanetarium()) {
-                            mpi.title = "Planetarium mode";
-                            mpi.header = "You have entered Planetarium mode!";
-                            mpi.addMapping("Back to normal mode", "CTRL", "P");
-                        }
-
-                        EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "cubemap", 120f);
-                    } else {
-                        EventManager.instance.post(Events.MODE_POPUP_CMD, null, "cubemap");
-                    }
-                    break;
-                case CUBEMAP_PROJECTION_CMD:
-                    CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
-                    logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
-                    break;
-                case CUBEMAP_RESOLUTION_CMD:
-                    CUBEMAP_FACE_RESOLUTION = (int) data[0];
-                    break;
-                case SHOW_MINIMAP_ACTION:
-                    boolean show = (Boolean) data[0];
-                    DISPLAY_MINIMAP = show;
-                    break;
-                case TOGGLE_MINIMAP:
-                    DISPLAY_MINIMAP = !DISPLAY_MINIMAP;
-                    break;
-                case PLANETARIUM_APERTURE_CMD:
-                    PLANETARIUM_APERTURE = (float) data[0];
-                    break;
-                case POINTER_GUIDES_CMD:
-                    if (data.length > 0 && data[0] != null) {
-                        DISPLAY_POINTER_GUIDES = (boolean) data[0];
-                        if (data.length > 1 && data[1] != null) {
-                            POINTER_GUIDES_COLOR = (float[]) data[1];
-                            if (data.length > 2 && data[2] != null) {
-                                POINTER_GUIDES_WIDTH = (float) data[2];
-                            }
-                        }
+                    // Post a message to the screen
+                    ModePopupInfo mpi = new ModePopupInfo();
+                    if (CUBEMAP_PROJECTION.isPanorama()) {
+                        mpi.title = "Panorama mode";
+                        mpi.header = "You have entered Panorama mode!";
+                        mpi.addMapping("Back to normal mode", "CTRL", "K");
+                        mpi.addMapping("Switch projection type", "CTRL", "SHIFT", "K");
+                    } else if (CUBEMAP_PROJECTION.isPlanetarium()) {
+                        mpi.title = "Planetarium mode";
+                        mpi.header = "You have entered Planetarium mode!";
+                        mpi.addMapping("Back to normal mode", "CTRL", "P");
                     }
 
-                    break;
-                default:
-                    break;
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "cubemap", 120f);
+                } else {
+                    EventManager.instance.post(Events.MODE_POPUP_CMD, null, "cubemap");
+                }
+                break;
+            case CUBEMAP_PROJECTION_CMD:
+                CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[0];
+                logger.info("Cubemap projection set to " + CUBEMAP_PROJECTION.toString());
+                break;
+            case CUBEMAP_RESOLUTION_CMD:
+                CUBEMAP_FACE_RESOLUTION = (int) data[0];
+                break;
+            case SHOW_MINIMAP_ACTION:
+                boolean show = (Boolean) data[0];
+                DISPLAY_MINIMAP = show;
+                break;
+            case TOGGLE_MINIMAP:
+                DISPLAY_MINIMAP = !DISPLAY_MINIMAP;
+                break;
+            case PLANETARIUM_APERTURE_CMD:
+                PLANETARIUM_APERTURE = (float) data[0];
+                break;
+            case POINTER_GUIDES_CMD:
+                if (data.length > 0 && data[0] != null) {
+                    DISPLAY_POINTER_GUIDES = (boolean) data[0];
+                    if (data.length > 1 && data[1] != null) {
+                        POINTER_GUIDES_COLOR = (float[]) data[1];
+                        if (data.length > 2 && data[2] != null) {
+                            POINTER_GUIDES_WIDTH = (float) data[2];
+                        }
+                    }
+                }
+
+                break;
+            default:
+                break;
             }
         }
 
@@ -1520,12 +1522,12 @@ public class GlobalConf {
         public double DIST_SCALE_VR;
 
         public SceneConf() {
-            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
+            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.COMPUTE_GAIA_SCAN_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
         }
 
         public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, int sTAR_TEX_INDEX, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR, boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER,
-                               double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA,
-                               boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
+                double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST, boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT,
+                boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
             OBJECT_FADE_MS = oBJECT_FADE_MS;
@@ -1583,69 +1585,69 @@ public class GlobalConf {
 
         public void updateSpeedLimit() {
             switch (CAMERA_SPEED_LIMIT_IDX) {
-                case 0:
-                    // 100 km/h is 0.027 km/s
-                    CAMERA_SPEED_LIMIT = 0.0277777778 * Constants.KM_TO_U;
-                    break;
-                case 1:
-                    CAMERA_SPEED_LIMIT = 0.5 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 2:
-                    CAMERA_SPEED_LIMIT = 0.8 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 3:
-                    CAMERA_SPEED_LIMIT = 0.9 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 4:
-                    CAMERA_SPEED_LIMIT = 0.99 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 5:
-                    CAMERA_SPEED_LIMIT = 0.99999 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 6:
-                    CAMERA_SPEED_LIMIT = Constants.C * Constants.M_TO_U;
-                    break;
-                case 7:
-                    CAMERA_SPEED_LIMIT = 2.0 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 8:
-                    // 10 c
-                    CAMERA_SPEED_LIMIT = 10.0 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 9:
-                    // 1000 c
-                    CAMERA_SPEED_LIMIT = 1000.0 * Constants.C * Constants.M_TO_U;
-                    break;
-                case 10:
-                    CAMERA_SPEED_LIMIT = 1.0 * Constants.AU_TO_U;
-                    break;
-                case 11:
-                    CAMERA_SPEED_LIMIT = 10.0 * Constants.AU_TO_U;
-                    break;
-                case 12:
-                    CAMERA_SPEED_LIMIT = 1000.0 * Constants.AU_TO_U;
-                    break;
-                case 13:
-                    CAMERA_SPEED_LIMIT = 10000.0 * Constants.AU_TO_U;
-                    break;
-                case 14:
-                    CAMERA_SPEED_LIMIT = Constants.PC_TO_U;
-                    break;
-                case 15:
-                    CAMERA_SPEED_LIMIT = 2.0 * Constants.PC_TO_U;
-                    break;
-                case 16:
-                    // 10 pc/s
-                    CAMERA_SPEED_LIMIT = 10.0 * Constants.PC_TO_U;
-                    break;
-                case 17:
-                    // 1000 pc/s
-                    CAMERA_SPEED_LIMIT = 1000.0 * Constants.PC_TO_U;
-                    break;
-                case 18:
-                    // No limit
-                    CAMERA_SPEED_LIMIT = -1;
-                    break;
+            case 0:
+                // 100 km/h is 0.027 km/s
+                CAMERA_SPEED_LIMIT = 0.0277777778 * Constants.KM_TO_U;
+                break;
+            case 1:
+                CAMERA_SPEED_LIMIT = 0.5 * Constants.C * Constants.M_TO_U;
+                break;
+            case 2:
+                CAMERA_SPEED_LIMIT = 0.8 * Constants.C * Constants.M_TO_U;
+                break;
+            case 3:
+                CAMERA_SPEED_LIMIT = 0.9 * Constants.C * Constants.M_TO_U;
+                break;
+            case 4:
+                CAMERA_SPEED_LIMIT = 0.99 * Constants.C * Constants.M_TO_U;
+                break;
+            case 5:
+                CAMERA_SPEED_LIMIT = 0.99999 * Constants.C * Constants.M_TO_U;
+                break;
+            case 6:
+                CAMERA_SPEED_LIMIT = Constants.C * Constants.M_TO_U;
+                break;
+            case 7:
+                CAMERA_SPEED_LIMIT = 2.0 * Constants.C * Constants.M_TO_U;
+                break;
+            case 8:
+                // 10 c
+                CAMERA_SPEED_LIMIT = 10.0 * Constants.C * Constants.M_TO_U;
+                break;
+            case 9:
+                // 1000 c
+                CAMERA_SPEED_LIMIT = 1000.0 * Constants.C * Constants.M_TO_U;
+                break;
+            case 10:
+                CAMERA_SPEED_LIMIT = 1.0 * Constants.AU_TO_U;
+                break;
+            case 11:
+                CAMERA_SPEED_LIMIT = 10.0 * Constants.AU_TO_U;
+                break;
+            case 12:
+                CAMERA_SPEED_LIMIT = 1000.0 * Constants.AU_TO_U;
+                break;
+            case 13:
+                CAMERA_SPEED_LIMIT = 10000.0 * Constants.AU_TO_U;
+                break;
+            case 14:
+                CAMERA_SPEED_LIMIT = Constants.PC_TO_U;
+                break;
+            case 15:
+                CAMERA_SPEED_LIMIT = 2.0 * Constants.PC_TO_U;
+                break;
+            case 16:
+                // 10 pc/s
+                CAMERA_SPEED_LIMIT = 10.0 * Constants.PC_TO_U;
+                break;
+            case 17:
+                // 1000 pc/s
+                CAMERA_SPEED_LIMIT = 1000.0 * Constants.PC_TO_U;
+                break;
+            case 18:
+                // No limit
+                CAMERA_SPEED_LIMIT = -1;
+                break;
 
             }
         }
@@ -1653,122 +1655,125 @@ public class GlobalConf {
         @Override
         public void notify(Events event, Object... data) {
             switch (event) {
-                case TOGGLE_VISIBILITY_CMD:
-                    String key = (String) data[0];
-                    Boolean state = null;
-                    if (data.length > 2) {
-                        state = (Boolean) data[2];
-                    }
-                    ComponentType ct = ComponentType.getFromKey(key);
-                    if (ct != null) {
-                        VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
-                    }
-                    break;
-                case TRANSIT_COLOUR_CMD:
-                    STAR_COLOR_TRANSIT = (boolean) data[1];
-                    break;
-                case ONLY_OBSERVED_STARS_CMD:
-                    ONLY_OBSERVED_STARS = (boolean) data[1];
-                    break;
-                case COMPUTE_GAIA_SCAN_CMD:
-                    COMPUTE_GAIA_SCAN = (boolean) data[1];
-                    break;
-                case FOCUS_LOCK_CMD:
-                    FOCUS_LOCK = (boolean) data[1];
-                    break;
-                case ORIENTATION_LOCK_CMD:
-                    FOCUS_LOCK_ORIENTATION = (boolean) data[1];
-                    break;
-                case AMBIENT_LIGHT_CMD:
-                    AMBIENT_LIGHT = (float) data[0];
-                    break;
-                case STAR_BRIGHTNESS_CMD:
-                    STAR_BRIGHTNESS = Math.max(0.01f, (float) data[0]);
-                    break;
-                case FOV_CHANGED_CMD:
-                    if (!SlaveManager.projectionActive()) {
-                        boolean checkMax = data.length == 1 || (boolean) data[1];
-                        CAMERA_FOV = MathUtilsd.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
-                    }
-                    break;
-                case PM_NUM_FACTOR_CMD:
-                    PM_NUM_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
-                    break;
-                case PM_LEN_FACTOR_CMD:
-                    PM_LEN_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
-                    break;
-                case PM_COLOR_MODE_CMD:
-                    PM_COLOR_MODE = MathUtilsd.clamp((int) data[0], 0, 5);
-                    break;
-                case PM_ARROWHEADS_CMD:
-                    PM_ARROWHEADS = (boolean) data[0];
-                    break;
+            case TOGGLE_VISIBILITY_CMD:
+                String key = (String) data[0];
+                Boolean state = null;
+                if (data.length > 2) {
+                    state = (Boolean) data[2];
+                }
+                ComponentType ct = ComponentType.getFromKey(key);
+                if (ct != null) {
+                    VISIBILITY[ct.ordinal()] = (state != null ? state : !VISIBILITY[ct.ordinal()]);
+                }
+                break;
+            case TRANSIT_COLOUR_CMD:
+                STAR_COLOR_TRANSIT = (boolean) data[1];
+                break;
+            case ONLY_OBSERVED_STARS_CMD:
+                ONLY_OBSERVED_STARS = (boolean) data[1];
+                break;
+            case COMPUTE_GAIA_SCAN_CMD:
+                COMPUTE_GAIA_SCAN = (boolean) data[1];
+                break;
+            case FOCUS_LOCK_CMD:
+                FOCUS_LOCK = (boolean) data[1];
+                break;
+            case ORIENTATION_LOCK_CMD:
+                FOCUS_LOCK_ORIENTATION = (boolean) data[1];
+                break;
+            case AMBIENT_LIGHT_CMD:
+                AMBIENT_LIGHT = (float) data[0];
+                break;
+            case STAR_BRIGHTNESS_CMD:
+                STAR_BRIGHTNESS = MathUtilsd.clamp((float) data[0], Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS);
+                break;
+            case STAR_BRIGHTNESS_POW_CMD:
+                STAR_BRIGHTNESS_POWER = (float) data[0];
+                break;
+            case FOV_CHANGED_CMD:
+                if (!SlaveManager.projectionActive()) {
+                    boolean checkMax = data.length == 1 || (boolean) data[1];
+                    CAMERA_FOV = MathUtilsd.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
+                }
+                break;
+            case PM_NUM_FACTOR_CMD:
+                PM_NUM_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
+                break;
+            case PM_LEN_FACTOR_CMD:
+                PM_LEN_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
+                break;
+            case PM_COLOR_MODE_CMD:
+                PM_COLOR_MODE = MathUtilsd.clamp((int) data[0], 0, 5);
+                break;
+            case PM_ARROWHEADS_CMD:
+                PM_ARROWHEADS = (boolean) data[0];
+                break;
 
-                case CAMERA_SPEED_CMD:
-                    CAMERA_SPEED = (float) data[0];
-                    break;
-                case ROTATION_SPEED_CMD:
-                    ROTATION_SPEED = (float) data[0];
-                    break;
-                case TURNING_SPEED_CMD:
-                    TURNING_SPEED = (float) data[0];
-                    break;
-                case SPEED_LIMIT_CMD:
-                    CAMERA_SPEED_LIMIT_IDX = (Integer) data[0];
-                    updateSpeedLimit();
-                    break;
-                case OCTREE_PARTICLE_FADE_CMD:
-                    OCTREE_PARTICLE_FADE = (boolean) data[1];
-                    break;
-                case STAR_POINT_SIZE_CMD:
-                    STAR_POINT_SIZE = (float) data[0];
-                    break;
-                case STAR_POINT_SIZE_INCREASE_CMD:
-                    float size = Math.min(STAR_POINT_SIZE + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
-                    EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
-                    break;
-                case STAR_POINT_SIZE_DECREASE_CMD:
-                    size = Math.max(STAR_POINT_SIZE - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
-                    EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
-                    break;
-                case STAR_POINT_SIZE_RESET_CMD:
-                    STAR_POINT_SIZE = STAR_POINT_SIZE_BAK;
-                    break;
-                case STAR_MIN_OPACITY_CMD:
-                    STAR_MIN_OPACITY = (float) data[0];
-                    break;
-                case GALAXY_3D_CMD:
-                    GALAXY_3D = (boolean) data[0];
-                    break;
-                case CROSSHAIR_FOCUS_CMD:
-                    CROSSHAIR_FOCUS = (boolean) data[0];
-                    break;
-                case CROSSHAIR_CLOSEST_CMD:
-                    CROSSHAIR_CLOSEST = (boolean) data[0];
-                    break;
-                case CROSSHAIR_HOME_CMD:
-                    CROSSHAIR_HOME = (boolean) data[0];
-                    break;
-                case CAMERA_CINEMATIC_CMD:
-                    CINEMATIC_CAMERA = (boolean) data[0];
-                    break;
-                case LABEL_SIZE_CMD:
-                    LABEL_SIZE_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
-                    break;
-                case LINE_WIDTH_CMD:
-                    LINE_WIDTH_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
-                    break;
-                case ELEVATION_MUTLIPLIER_CMD:
-                    ELEVATION_MULTIPLIER = MathUtilsd.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
-                    break;
-                case ELEVATION_TYPE_CMD:
-                    ELEVATION_TYPE = (ElevationType) data[0];
-                    break;
-                case TESSELLATION_QUALITY_CMD:
-                    TESSELLATION_QUALITY = (float) data[0];
-                    break;
-                default:
-                    break;
+            case CAMERA_SPEED_CMD:
+                CAMERA_SPEED = (float) data[0];
+                break;
+            case ROTATION_SPEED_CMD:
+                ROTATION_SPEED = (float) data[0];
+                break;
+            case TURNING_SPEED_CMD:
+                TURNING_SPEED = (float) data[0];
+                break;
+            case SPEED_LIMIT_CMD:
+                CAMERA_SPEED_LIMIT_IDX = (Integer) data[0];
+                updateSpeedLimit();
+                break;
+            case OCTREE_PARTICLE_FADE_CMD:
+                OCTREE_PARTICLE_FADE = (boolean) data[1];
+                break;
+            case STAR_POINT_SIZE_CMD:
+                STAR_POINT_SIZE = (float) data[0];
+                break;
+            case STAR_POINT_SIZE_INCREASE_CMD:
+                float size = Math.min(STAR_POINT_SIZE + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
+                EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
+                break;
+            case STAR_POINT_SIZE_DECREASE_CMD:
+                size = Math.max(STAR_POINT_SIZE - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
+                EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
+                break;
+            case STAR_POINT_SIZE_RESET_CMD:
+                STAR_POINT_SIZE = STAR_POINT_SIZE_BAK;
+                break;
+            case STAR_MIN_OPACITY_CMD:
+                STAR_MIN_OPACITY = (float) data[0];
+                break;
+            case GALAXY_3D_CMD:
+                GALAXY_3D = (boolean) data[0];
+                break;
+            case CROSSHAIR_FOCUS_CMD:
+                CROSSHAIR_FOCUS = (boolean) data[0];
+                break;
+            case CROSSHAIR_CLOSEST_CMD:
+                CROSSHAIR_CLOSEST = (boolean) data[0];
+                break;
+            case CROSSHAIR_HOME_CMD:
+                CROSSHAIR_HOME = (boolean) data[0];
+                break;
+            case CAMERA_CINEMATIC_CMD:
+                CINEMATIC_CAMERA = (boolean) data[0];
+                break;
+            case LABEL_SIZE_CMD:
+                LABEL_SIZE_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
+                break;
+            case LINE_WIDTH_CMD:
+                LINE_WIDTH_FACTOR = MathUtilsd.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
+                break;
+            case ELEVATION_MUTLIPLIER_CMD:
+                ELEVATION_MULTIPLIER = MathUtilsd.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
+                break;
+            case ELEVATION_TYPE_CMD:
+                ELEVATION_TYPE = (ElevationType) data[0];
+                break;
+            case TESSELLATION_QUALITY_CMD:
+                TESSELLATION_QUALITY = (float) data[0];
+                break;
+            default:
+                break;
             }
         }
 

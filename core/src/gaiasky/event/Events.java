@@ -1051,6 +1051,11 @@ public enum Events {
      **/
     STAR_BRIGHTNESS_CMD,
     /**
+     * Contains the star brightness power and an optional boolean saying if
+     * it comes from the interface
+     **/
+    STAR_BRIGHTNESS_POW_CMD,
+    /**
      * Minimum star opacity. Contains the opacity in [0..100] and a boolean
      * whether it comes from the interface
      **/
@@ -1063,13 +1068,13 @@ public enum Events {
 
     /**
      * Decrease star point size by
-     * {@link gaiasky.util.Constants#STEP_STAR_POINT_SIZE}
+     * {@link gaiasky.util.Constants#SLIDER_STEP_TINY}
      **/
     STAR_POINT_SIZE_DECREASE_CMD,
 
     /**
      * Increase star point size by
-     * {@link gaiasky.util.Constants#STEP_STAR_POINT_SIZE}
+     * {@link gaiasky.util.Constants#SLIDER_STEP_TINY}
      **/
     STAR_POINT_SIZE_INCREASE_CMD,
 

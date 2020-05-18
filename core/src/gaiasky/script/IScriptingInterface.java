@@ -824,6 +824,13 @@ public interface IScriptingInterface {
     void setStarBrightness(float brightness);
 
     /**
+     * Sets the star brightness power profile value. This allows for adjusting
+     * the shape of the curve: <code>brightness = brightness^power</code>. Default value is 0.6.
+     * @param power The power value.
+     */
+    void setStarBrightnessPower(float power);
+
+    /**
      * Gets the current star size value in pixels.
      *
      * @return The size value, in pixels.

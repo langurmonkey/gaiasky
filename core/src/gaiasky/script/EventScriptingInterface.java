@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.cluster.StarClusterLoader;
@@ -759,7 +758,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarBrightness(final float brightness) {
         if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
-            GaiaSky.postRunnable(() -> em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS), false));
+            em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS), false);
+    }
+
+    @Override
+    public void setStarBrightnessPower(float power) {
+        if(checkFinite(power, "brightness-pow")){
+            em.post(Events.STAR_BRIGHTNESS_POW_CMD, power, false);
+        }
     }
 
     public void setStarBrightness(final int brightness) {
@@ -2839,6 +2845,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private boolean checkNum(double value, double min, double max, String name) {
         if (value < min || value > max) {
             logger.error(name + " must be between " + min + " and " + max + ": " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkFinite(float value, String name){
+        if(!Float.isFinite(value)){
+            logger.error(name + " must be finite: " + value);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkFinite(double value, String name){
+        if(!Double.isFinite(value)){
+            logger.error(name + " must be finite: " + value);
             return false;
         }
         return true;
