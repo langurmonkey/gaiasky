@@ -160,7 +160,6 @@ public class ModelComponent implements Disposable, IObserver {
         if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
             Pair<IntModel, Map<String, Material>> modmat = initModelFile();
             model = modmat.getFirst();
-            materials = modmat.getSecond();
         }
 
         // CREATE MAIN MODEL INSTANCE

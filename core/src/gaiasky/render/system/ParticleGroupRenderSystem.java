@@ -30,6 +30,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
 import java.util.Random;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
@@ -79,12 +80,12 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
             shaderProgram.begin();
-            for (IRenderable renderable : renderables) {
-                ParticleGroup particleGroup = (ParticleGroup) renderable;
+            renderables.forEach(rend -> {
+                ParticleGroup particleGroup = (ParticleGroup) rend;
                 synchronized (particleGroup) {
                     if (!particleGroup.disposed) {
                         boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
@@ -174,7 +175,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                         }
                     }
                 }
-            }
+            });
             shaderProgram.end();
         }
     }

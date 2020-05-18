@@ -24,6 +24,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class LineRenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
@@ -84,7 +85,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
 
         shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -95,9 +96,8 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         addEffectsUniforms(shaderProgram, camera);
 
         this.camera = camera;
-        int size = renderables.size;
-        for (int i = 0; i < size; i++) {
-            ILineRenderable renderable = (ILineRenderable) renderables.get(i);
+        renderables.forEach(r ->{
+            ILineRenderable renderable = (ILineRenderable) r;
             boolean rend = true;
             // TODO ugly hack
             if (renderable instanceof Particle && !SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors))
@@ -115,7 +115,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
 
                 meshd.clear();
             }
-        }
+        });
         shaderProgram.end();
 
         // Reset indices

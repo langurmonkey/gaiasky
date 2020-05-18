@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IQuadRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
@@ -20,6 +19,8 @@ import gaiasky.util.DecalUtils;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+
+import java.util.List;
 
 public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
@@ -113,7 +114,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 
@@ -134,11 +135,10 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
             // Global uniforms
             shaderProgram.setUniformf("u_time", (float) t);
 
-            int size = renderables.size;
-            for (int i = 0; i < size; i++) {
-                IQuadRenderable s = (IQuadRenderable) renderables.get(i);
+            renderables.forEach(r -> {
+                IQuadRenderable s = (IQuadRenderable) r;
                 s.render(shaderProgram, getAlpha(s), mesh, camera);
-            }
+            });
             shaderProgram.end();
         }
 

@@ -31,6 +31,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
     private Vector3 aux1;
     private Matrix4 maux;
@@ -75,14 +77,15 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0 && renderables.first().getOpacity() > 0) {
-            Orbit first = (Orbit) renderables.first();
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        int n = renderables.size();
+        if (n > 0 && renderables.get(0).getOpacity() > 0) {
+            Orbit first = (Orbit) renderables.get(0);
             if (!first.elemsInGpu) {
-                curr = meshes.get(addMeshData(renderables.size));
+                curr = meshes.get(addMeshData(n));
 
-                ensureTempVertsSize(renderables.size * curr.vertexSize);
-                for (IRenderable renderable : renderables) {
+                ensureTempVertsSize(n * curr.vertexSize);
+                renderables.forEach(renderable ->{
                     Orbit orbitElems = (Orbit) renderable;
 
                     if (!orbitElems.elemsInGpu) {
@@ -110,10 +113,9 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                         curr.vertexIdx += curr.vertexSize;
 
                         orbitElems.elemsInGpu = true;
-
                     }
-                }
-                count = renderables.size * curr.vertexSize;
+                });
+                count = n * curr.vertexSize;
                 curr.mesh.setVertices(tempVerts, 0, count);
             }
 

@@ -23,6 +23,8 @@ import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 /**
  * Renders vertices using a VBO.
  *
@@ -81,7 +83,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (isLine()) {
             // Enable GL_LINE_SMOOTH
             Gdx.gl20.glEnable(GL11.GL_LINE_SMOOTH);
@@ -91,10 +93,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         }
 
         this.camera = camera;
-        int size = renderables.size;
-
-        for (int i = 0; i < size; i++) {
-            T renderable = (T) renderables.get(i);
+        renderables.forEach(r ->{
+            T renderable = (T) r;
 
             /*
              * ADD LINES
@@ -153,9 +153,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
             shaderProgram.begin();
 
-            //renderable.blend();
-            //renderable.depth();
-
             // Regular
             if (isLine())
                 Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * GlobalConf.UI_SCALE_FACTOR * GlobalConf.scene.LINE_WIDTH_FACTOR);
@@ -177,7 +174,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             curr.mesh.render(shaderProgram, renderable.getGlPrimitive());
 
             shaderProgram.end();
-        }
+        });
     }
 
     protected VertexAttribute[] buildVertexAttributes() {

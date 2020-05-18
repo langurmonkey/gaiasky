@@ -27,6 +27,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
@@ -98,16 +100,15 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (POINT_UPDATE_FLAG) {
             // Reset variables
             curr.clear();
             
-            int size = renderables.size;
-            ensureTempVertsSize(size * curr.vertexSize);
-            for (int i = 0; i < size; i++) {
+            ensureTempVertsSize(renderables.size() * curr.vertexSize);
+            renderables.forEach(r->{
                 // 2 FPS gain
-                CelestialBody cb = (CelestialBody) renderables.get(i);
+                CelestialBody cb = (CelestialBody) r;
                 float[] col = starColorTransit ? cb.ccTransit : cb.cc;
 
                 // COLOR
@@ -129,7 +130,8 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
                 tempVerts[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ() * 0f;
 
                 curr.vertexIdx += curr.vertexSize;
-            }
+
+            });
             // Put flag down
             POINT_UPDATE_FLAG = false;
         }

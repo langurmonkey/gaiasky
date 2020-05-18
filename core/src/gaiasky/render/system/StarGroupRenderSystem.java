@@ -35,6 +35,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
@@ -103,16 +105,14 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        //renderables.sort(comp);
-        if (renderables.size > 0) {
-
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size() > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
             float starPointSize = GlobalConf.getStarPointSize();
 
             shaderProgram.begin();
-            for (IRenderable renderable : renderables) {
-                StarGroup starGroup = (StarGroup) renderable;
+            renderables.forEach(r -> {
+                StarGroup starGroup = (StarGroup) r;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
@@ -213,7 +213,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         }
                     }
                 }
-            }
+
+            });
             shaderProgram.end();
         }
     }

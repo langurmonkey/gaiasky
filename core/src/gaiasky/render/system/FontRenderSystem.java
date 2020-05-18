@@ -5,7 +5,6 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IAnnotationsRenderable;
@@ -19,6 +18,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.Comparator;
+import java.util.List;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
@@ -28,11 +28,11 @@ public class FontRenderSystem extends AbstractRenderSystem {
     private float[] red;
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
-        super(rg, alphas, new ExtShaderProgram[] { program });
+        super(rg, alphas, new ExtShaderProgram[]{program});
         this.batch = batch;
         // Init comparator
         comp = new DistToCameraComparator<>();
-        red = new float[] { 1f, 0f, 0f, 1f };
+        red = new float[]{1f, 0f, 0f, 1f};
     }
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
@@ -45,11 +45,11 @@ public class FontRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         renderables.sort(comp);
         batch.begin();
 
-        int size = renderables.size;
+        int size = renderables.size();
         ExtShaderProgram program = programs[0];
         if (program == null) {
             for (int i = 0; i < size; i++) {
@@ -60,8 +60,8 @@ public class FontRenderSystem extends AbstractRenderSystem {
         } else {
             float lalpha = alphas[ComponentType.Labels.ordinal()];
             fontDistanceField.getData().setScale(0.6f);
-            for (int i = 0; i < size; i++) {
-                I3DTextRenderable lr = (I3DTextRenderable) renderables.get(i);
+            renderables.forEach(r -> {
+                I3DTextRenderable lr = (I3DTextRenderable) r;
 
                 // Label color
                 program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
@@ -73,7 +73,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
                 addDepthBufferUniforms(program, camera);
 
                 lr.render(batch, program, this, rc, camera);
-            }
+            });
         }
         batch.end();
 

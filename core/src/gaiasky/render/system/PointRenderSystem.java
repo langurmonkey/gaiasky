@@ -19,6 +19,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+import java.util.List;
+
 public class PointRenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
     protected int glType;
@@ -82,17 +84,16 @@ public class PointRenderSystem extends ImmediateRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
-        int size = renderables.size;
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
         shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
         addEffectsUniforms(shaderProgram, camera);
 
-        for (int i = 0; i < size; i++) {
-            IPointRenderable renderable = (IPointRenderable) renderables.get(i);
+        renderables.forEach(r ->{
+            IPointRenderable renderable = (IPointRenderable) r;
             renderable.render(this, camera, getAlpha(renderable));
 
             renderable.blend();
@@ -105,7 +106,7 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
                 meshd.clear();
             }
-        }
+        });
         shaderProgram.end();
 
         // Reset indices

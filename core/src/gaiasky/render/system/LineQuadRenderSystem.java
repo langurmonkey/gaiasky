@@ -24,6 +24,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 
+import java.util.List;
+
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
  * Slower but higher quality.
@@ -83,10 +85,10 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     private void initVertices(int index) {
-        if (index >= meshes.size){
+        if (index >= meshes.size) {
             meshes.setSize(index + 1);
         }
-        if(meshes.get(index) == null) {
+        if (meshes.get(index) == null) {
             if (index > 0)
                 logger.info("Capacity too small, creating new meshdata: " + curr.capacity);
             currExt = new MeshDataExt();
@@ -131,7 +133,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     private boolean two = false;
     private Vector3d aux = new Vector3d();
 
-    public void breakLine(){
+    public void breakLine() {
         two = false;
     }
 
@@ -306,7 +308,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
         // Reset
@@ -314,16 +316,15 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         currExt = (MeshDataExt) meshes.get(0);
         curr = currExt;
 
-        int size = renderables.size;
-        for (int i = 0; i < size; i++) {
-            ILineRenderable renderable = (ILineRenderable) renderables.get(i);
+        renderables.forEach(r -> {
+            ILineRenderable renderable = (ILineRenderable) r;
             boolean rend = true;
             // TODO ugly hack
             if (renderable instanceof Particle && !SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors))
                 rend = false;
             if (rend)
                 renderable.render(this, camera, getAlpha(renderable));
-        }
+        });
 
         // Sort phase
         provisionalLines.sort(sorter);
@@ -377,7 +378,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     }
 
-    public void dispose(){
+    public void dispose() {
         super.dispose();
         currExt = null;
         provisionalLines.clear();

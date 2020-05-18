@@ -13,6 +13,8 @@ import gaiasky.render.IShapeRenderable;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 
+import java.util.List;
+
 public class ShapeRenderSystem extends AbstractRenderSystem {
 
     private ShapeRenderer shapeRenderer;
@@ -24,16 +26,13 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        int size = renderables.size;
-
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         shapeRenderer.begin(ShapeType.Line);
-        for (int i = 0; i < size; i++) {
-            IShapeRenderable sr = (IShapeRenderable) renderables.get(i);
-            sr.render(shapeRenderer, rc, getAlpha(sr), camera);
-        }
+        renderables.forEach(r ->{
+            IShapeRenderable sr = (IShapeRenderable) r;
+            sr.render(shapeRenderer, rc, getAlpha(r), camera);
+        });
         shapeRenderer.end();
-
     }
 
     @Override

@@ -14,6 +14,8 @@ import gaiasky.util.comp.ModelComparator;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
 
+import java.util.List;
+
 public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
     private IntModelBatch batch;
 
@@ -31,16 +33,15 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (mustRender()) {
             // Triangles for tessellation
             GL41.glPatchParameteri(GL41.GL_PATCH_VERTICES, 3);
             batch.begin(camera.getCamera());
-            int size = renderables.size;
-            for (int i = 0; i < size; i++) {
-                IModelRenderable s = (IModelRenderable) renderables.get(i);
+            renderables.forEach(r ->{
+                IModelRenderable s = (IModelRenderable) r;
                 s.render(batch, getAlpha(s), t, rc);
-            }
+            });
             batch.end();
 
         }
