@@ -780,7 +780,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarSize(final float size) {
         if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size"))
-            GaiaSky.postRunnable(() -> em.post(Events.STAR_POINT_SIZE_CMD, size, false));
+            em.post(Events.STAR_POINT_SIZE_CMD, size, false);
     }
 
     public void setStarSize(final int size) {
@@ -798,9 +798,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setMinStarOpacity(float opacity) {
-        if (checkNum(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "opacity"))
-            GaiaSky.postRunnable(() -> EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, MathUtilsd.lint(opacity, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY), false));
+    public void setMinStarOpacity(float minOpacity) {
+        if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
+            EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, minOpacity, false);
     }
 
     @Override

@@ -22,7 +22,7 @@ import gaiasky.util.scene2d.OwnSliderPlus;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
-    private OwnSliderPlus starBrightness, starSize, starOpacity, ambientLight, labelSize, lineWidth, elevMult;
+    private OwnSliderPlus starBrightness, starSize, starMinOpacity, ambientLight, labelSize, lineWidth, elevMult;
 
     boolean flag = true;
 
@@ -60,14 +60,14 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Star opacity **/
-        starOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
-        starOpacity.setName("star opacity");
-        starOpacity.setWidth(contentWidth);
-        starOpacity.setMappedValue(GlobalConf.scene.STAR_MIN_OPACITY);
-        starOpacity.addListener(event -> {
+        /** Star min opacity **/
+        starMinOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
+        starMinOpacity.setName("star min opacity");
+        starMinOpacity.setWidth(contentWidth);
+        starMinOpacity.setMappedValue(GlobalConf.scene.STAR_MIN_OPACITY);
+        starMinOpacity.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, starOpacity.getMappedValue(), true);
+                EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, starMinOpacity.getMappedValue(), true);
                 return true;
             }
             return false;
@@ -132,7 +132,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         lightingGroup.space(space6);
         lightingGroup.addActor(starBrightness);
         lightingGroup.addActor(starSize);
-        lightingGroup.addActor(starOpacity);
+        lightingGroup.addActor(starMinOpacity);
         lightingGroup.addActor(ambientLight);
         lightingGroup.addActor(lineWidth);
         lightingGroup.addActor(labelSize);
@@ -166,7 +166,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             if (!(boolean) data[1]) {
                 Float minopacity = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
-                starOpacity.setMappedValue(minopacity);
+                starMinOpacity.setMappedValue(minopacity);
                 hackProgrammaticChangeEvents = true;
             }
             break;

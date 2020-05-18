@@ -1056,8 +1056,8 @@ public enum Events {
      **/
     STAR_BRIGHTNESS_POW_CMD,
     /**
-     * Minimum star opacity. Contains the opacity in [0..100] and a boolean
-     * whether it comes from the interface
+     * Minimum star opacity. Contains the opacity in [0..1] and a boolean
+     * for whether it comes from the interface
      **/
     STAR_MIN_OPACITY_CMD,
     /**

@@ -301,7 +301,7 @@ public class MasterManager implements IObserver {
             }
             break;
         case STAR_MIN_OPACITY_CMD:
-            float opacity = MathUtilsd.lint((float) data[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+            float opacity = (float) data[0];
             String sop = Float.toString(opacity);
             i = 0;
             for (String slave : slaves) {

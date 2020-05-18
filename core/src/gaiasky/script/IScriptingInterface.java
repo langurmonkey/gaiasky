@@ -847,14 +847,14 @@ public interface IScriptingInterface {
     /**
      * Gets the minimum star opacity.
      *
-     * @return The minimum opacity value, between 0 and 100.
+     * @return The minimum opacity value.
      */
     float getMinStarOpacity();
 
     /**
      * Sets the minimum star opacity.
      *
-     * @param opacity The minimum opacity value, between 0 and 100.
+     * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and {@link Constants#MAX_STAR_MIN_OPACITY}.
      */
     void setMinStarOpacity(float opacity);
 
