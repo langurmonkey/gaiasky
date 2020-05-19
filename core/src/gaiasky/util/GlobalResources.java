@@ -130,10 +130,10 @@ public class GlobalResources {
             // m
             return new Pair<>((d * 1000), "m");
         }
-        if (Math.abs(d) < Nature.AU_TO_KM) {
+        if (Math.abs(d) < 0.1 * Nature.AU_TO_KM) {
             // km
             return new Pair<>(d, "km");
-        } else if (Math.abs(d) < Nature.PC_TO_KM) {
+        } else if (Math.abs(d) <  0.1 * Nature.PC_TO_KM) {
             // AU
             return new Pair<>(d * Nature.KM_TO_AU, "AU");
         } else {
