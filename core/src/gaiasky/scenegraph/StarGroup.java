@@ -398,14 +398,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
-        double thpointTimesFovfactor = GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor() * .5e-1f;
+        double thpointTimesFovfactor = GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
         double thupOverFovfactor = Constants.THRESHOLD_UP / camera.getFovFactor();
         double thdownOverFovfactor = Constants.THRESHOLD_DOWN / camera.getFovFactor();
         double innerRad = 0.006 + GlobalConf.scene.STAR_POINT_SIZE * 0.008;
         alpha = alpha * this.opacity;
 
         /** GENERAL UNIFORMS **/
-        shader.setUniformf("u_thpoint", (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor());
+        shader.setUniformf("u_thpoint", (float) thpointTimesFovfactor);
         // Light glow always disabled with star groups
         shader.setUniformi("u_lightScattering", 0);
         shader.setUniformf("u_inner_rad", (float) innerRad);
@@ -461,7 +461,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             computedSize = (size * (dist / radius) * Constants.THRESHOLD_DOWN);
         }
         // Change the factor at the end here to control the stray light of stars
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.5;
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.2;
 
         return computedSize;
     }
