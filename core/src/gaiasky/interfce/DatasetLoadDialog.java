@@ -125,8 +125,8 @@ public class DatasetLoadDialog extends GenericDialog {
         addLabelColor(container);
 
         // Magnitude multiplier
-        FloatValidator sclValidator = new FloatValidator(0.1f, 100f);
-        magnitudeScale = new OwnTextField("1.0", skin, sclValidator);
+        FloatValidator sclValidator = new FloatValidator(-100f, 100f);
+        magnitudeScale = new OwnTextField("0.0", skin, sclValidator);
         magnitudeScale.setWidth(fieldWidth);
         container.add(new OwnLabel(I18n.txt("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
@@ -363,7 +363,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         if (stars.isChecked()) {
             dops.type = DatasetOptions.DatasetLoadType.STARS;
-            dops.magnitudeScale = magnitudeScale.getDoubleValue(1);
+            dops.magnitudeScale = magnitudeScale.getDoubleValue(0);
         } else if(particles.isChecked()) {
             dops.type = DatasetOptions.DatasetLoadType.PARTICLES;
             dops.ct = componentType.getSelected();
