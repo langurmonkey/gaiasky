@@ -17,6 +17,7 @@ import gaiasky.data.OrbitRefresher;
 import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
+import gaiasky.data.util.PointCloudData;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -90,17 +91,21 @@ public class Orbit extends Polyline {
      **/
     public boolean elemsInGpu = false;
 
-    /** Point color **/
+    /**
+     * Point color
+     **/
     public float[] pointColor;
 
-    /** Point size **/
+    /**
+     * Point size
+     **/
     public float pointSize = 1f;
 
     private float distUp, distDown;
 
     public Orbit() {
         super();
-        pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
+        pointColor = new float[]{0.8f, 0.8f, 0.8f, 1f};
         localTransform = new Matrix4();
         localTransformD = new Matrix4d();
         prev = new Vector3d();
@@ -139,6 +144,10 @@ public class Orbit extends Polyline {
             params = new OrbitDataLoaderParameter(body.names[0], null, oc.period, 500);
             params.orbit = this;
         }
+    }
+
+    public void setPointCloudData(PointCloudData pcd) {
+        super.setPointCloudData(pcd);
     }
 
     public void initOrbitMetadata() {
@@ -222,7 +231,7 @@ public class Orbit extends Polyline {
             }
 
             if (pointCloudData == null || added) {
-                refreshOrbit();
+                refreshOrbit(false);
             }
         }
         // Orbital elements renderer
@@ -234,7 +243,6 @@ public class Orbit extends Polyline {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-
         if (!onlybody) {
             alpha *= this.alpha;
 
@@ -263,7 +271,7 @@ public class Orbit extends Polyline {
 
                 if (body != null) {
                     bodyPos.set(body.translation);
-                } else if(oc != null) {
+                } else if (oc != null) {
                     oc.loadDataPoint(bodyPos, currentTime);
                     bodyPos.mul(localTransformD);
                 }
@@ -315,8 +323,8 @@ public class Orbit extends Polyline {
         return (((idx % n) + n) % n);
     }
 
-    private void refreshOrbit() {
-        if (mustRefresh && !body.coordinatesTimeOverflow) {
+    public void refreshOrbit(boolean force) {
+        if ((force && params != null) || (mustRefresh && !body.coordinatesTimeOverflow)) {
             Instant currentTime = GaiaSky.instance.time.getTime();
             long currentMs = currentTime.toEpochMilli();
             if (pointCloudData == null || currentMs < orbitStartMs || currentMs > orbitEndMs) {
@@ -417,4 +425,5 @@ public class Orbit extends Polyline {
     public boolean mustAddToIndex() {
         return true;
     }
+
 }

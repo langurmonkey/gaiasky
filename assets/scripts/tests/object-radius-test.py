@@ -1,4 +1,4 @@
-# This script tests the positioning of the camera with relation to two objects.
+# This script tests the getObjectRadius(obj) API call.
 # Created by Toni Sagrista
 
 from py4j.clientserver import ClientServer, JavaParameters

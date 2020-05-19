@@ -388,16 +388,9 @@ public class AstroUtils {
             case "Pluto":
                 return new PlutoCoordinates().getEclipticSphericalCoordinates(instant, out);
             default:
-                double tau = tau(getJulianDateCache(instant));
-
                 iVSOP87 coor = VSOP87.instance.getVOSP87(body);
                 coor.setHighAccuracy(highAccuracy);
-                double L = (coor.L0(tau) + coor.L1(tau) + coor.L2(tau) + coor.L3(tau) + coor.L4(tau) + coor.L5(tau));
-                double B = (coor.B0(tau) + coor.B1(tau) + coor.B2(tau) + coor.B3(tau) + coor.B4(tau) + coor.B5(tau));
-                double R = (coor.R0(tau) + coor.R1(tau) + coor.R2(tau) + coor.R3(tau) + coor.R4(tau) + coor.R5(tau));
-                R = R * Constants.AU_TO_U;
-
-                out.set(L, B, R);
+                coor.getEclipticSphericalCoordinates(instant, out);
                 return out;
         }
     }

@@ -6,6 +6,10 @@
 package gaiasky.util.coord.vsop87;
 
 public class VenusVSOP87 extends AbstractVSOP87 {
+    public VenusVSOP87(){
+        super();
+    }
+
     /*
      * 
      * VENUS - VSOP87 Series Version D HELIOCENTRIC DYNAMICAL ECLIPTIC AND

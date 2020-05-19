@@ -1025,17 +1025,37 @@ public interface IScriptingInterface {
     /**
      * Sets the given size scaling factor to the object identified by
      * <code>name</code>. This method will only work with model objects such as
-     * planets, asteroids, satellites etc. It will not work with orbits, stars
+     * planets, asteroids, satellites, etc. It will not work with orbits, stars
      * or any other types.
      * <p>
      * Also, <strong>use this with caution</strong>, as scaling the size of
      * objects can have unintended side effects, and remember to set the scaling
      * back to 1.0 at the end of your script.
+     * </p>
      *
-     * @param name          The name or id (HIP, TYC, sourceId) of the object.
+     * @param name          The name or id of the object.
      * @param scalingFactor The scaling factor to scale the size of that object.
      */
     void setObjectSizeScaling(String name, double scalingFactor);
+
+    /**
+     * Sets the given orbit coordinates scaling factor to the AbstractOrbitCoordinates identified by
+     * <code>name</code>. See {@link gaiasky.util.coord.AbstractOrbitCoordinates} and its subclasses.
+     * <p>
+     * Also, <strong>use this with caution</strong>, as scaling coordinates
+     * may have unintended side effects, and remember to set the scaling
+     * back to 1.0 at the end of your script.
+     * </p>
+     *
+     * @param name The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, GaiaCoordinates, MoonAACoordinates).
+     * @param scalingFactor The scaling factor.
+     */
+    void setOrbitCoordinatesScaling(String name, double scalingFactor);
+
+    /**
+     * Forces all orbits to refresh immediately.
+     */
+    void refreshAllOrbits();
 
     /**
      * Gets the size of the object identified by <code>name</code>, in Km, by

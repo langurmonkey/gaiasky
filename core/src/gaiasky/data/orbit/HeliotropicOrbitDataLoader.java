@@ -232,7 +232,7 @@ public class HeliotropicOrbitDataLoader {
         bw.newLine();
         long iniTime = -1;
 
-        int n = data.x.size;
+        int n = data.x.size();
         for (int i = 0; i < n; i++) {
             Vector3d pos = new Vector3d(data.x.get(i), data.y.get(i), data.z.get(i));
             Instant t = data.time.get(i);

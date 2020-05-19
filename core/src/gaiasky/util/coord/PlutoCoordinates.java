@@ -11,6 +11,10 @@ import gaiasky.util.math.Vector3d;
 import java.time.Instant;
 
 public class PlutoCoordinates extends AbstractOrbitCoordinates {
+    public PlutoCoordinates() {
+        super();
+    }
+
     @Override
     public void doneLoading(Object... params) {
         super.doneLoading(params);
@@ -20,7 +24,7 @@ public class PlutoCoordinates extends AbstractOrbitCoordinates {
     public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
         AstroUtils.plutoEclipticCoordinates(date, out);
         // To internal units
-        out.z *= Constants.KM_TO_U;
+        out.z *= Constants.KM_TO_U * scaling;
         return out;
     }
 

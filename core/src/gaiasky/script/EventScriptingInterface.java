@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.cluster.StarClusterLoader;
@@ -34,6 +35,7 @@ import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.AttributeUCD;
 import gaiasky.util.filter.attrib.IAttribute;
@@ -763,7 +765,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setStarBrightnessPower(float power) {
-        if(checkFinite(power, "brightness-pow")){
+        if (checkFinite(power, "brightness-pow")) {
             em.post(Events.STAR_BRIGHTNESS_POW_CMD, power, false);
         }
     }
@@ -844,7 +846,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setLimitFps(double limitFps) {
-        if(checkNum(limitFps, Constants.MIN_FPS, Constants.MAX_FPS, "limitFps")){
+        if (checkNum(limitFps, Constants.MIN_FPS, Constants.MAX_FPS, "limitFps")) {
             em.post(Events.LIMIT_FPS_CMD, limitFps);
         }
 
@@ -953,6 +955,32 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         } else {
             logger.error("Object '" + name + "' is not a model object");
         }
+    }
+
+    @Override
+    public void setOrbitCoordinatesScaling(String name, double scalingFactor) {
+        int modified = 0;
+        List<AbstractOrbitCoordinates> aocs = AbstractOrbitCoordinates.getInstances();
+        for(AbstractOrbitCoordinates aoc : aocs){
+            if(aoc.getClass().getSimpleName().equalsIgnoreCase(name)){
+                aoc.setScaling(scalingFactor);
+                modified++;
+            }
+        }
+        logger.info("Modified scaling of " + modified + " orbits");
+    }
+
+    @Override
+    public void refreshAllOrbits() {
+        ISceneGraph sg = GaiaSky.instance.sg;
+        GaiaSky.postRunnable(() -> {
+            Array<SceneGraphNode> l = new Array<>();
+            sg.getRoot().getChildrenByType(Orbit.class, l);
+            for (SceneGraphNode sgn : l) {
+                Orbit o = (Orbit) sgn;
+                o.refreshOrbit(true);
+            }
+        });
     }
 
     @Override
@@ -1594,7 +1622,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraRecorderFps(double targetFps) {
-        if(checkNum(targetFps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")){
+        if (checkNum(targetFps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")) {
             em.post(Events.CAMRECORDER_FPS_CMD, targetFps);
         }
     }
@@ -1646,7 +1674,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void playCameraPath(String file, boolean sync){
+    public void playCameraPath(String file, boolean sync) {
         runCameraPath(file, sync);
     }
 
@@ -1684,7 +1712,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void playCameraPath(String file){
+    public void playCameraPath(String file) {
         runCameraPath(file);
     }
 
@@ -2474,7 +2502,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     // STAR CLUSTERS
                     GenericCatalog scc = new GenericCatalog();
                     scc.setName(dsName);
-                    scc.setDescription(ds instanceof FileDataSource ? ((FileDataSource)ds).getFile().getAbsolutePath() : dsName);
+                    scc.setDescription(ds instanceof FileDataSource ? ((FileDataSource) ds).getFile().getAbsolutePath() : dsName);
                     scc.setParent("Universe");
                     scc.setFadein(dops.fadeIn);
                     scc.setFadeout(dops.fadeOut);
@@ -2850,16 +2878,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return true;
     }
 
-    private boolean checkFinite(float value, String name){
-        if(!Float.isFinite(value)){
+    private boolean checkFinite(float value, String name) {
+        if (!Float.isFinite(value)) {
             logger.error(name + " must be finite: " + value);
             return false;
         }
         return true;
     }
 
-    private boolean checkFinite(double value, String name){
-        if(!Double.isFinite(value)){
+    private boolean checkFinite(double value, String name) {
+        if (!Double.isFinite(value)) {
             logger.error(name + " must be finite: " + value);
             return false;
         }

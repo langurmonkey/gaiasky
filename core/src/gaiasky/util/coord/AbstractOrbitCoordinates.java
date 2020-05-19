@@ -12,11 +12,26 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final Log logger = Logger.getLogger(AbstractOrbitCoordinates.class);
+    // Holds all instances
+    protected static final List<AbstractOrbitCoordinates> instances = new ArrayList<>();
     
     protected String orbitname;
     protected Orbit orbit;
+    protected double scaling = 1d;
+
+    public AbstractOrbitCoordinates(){
+        super();
+        instances.add(this);
+    }
+
+    public static List<AbstractOrbitCoordinates> getInstances(){
+        return instances;
+    }
 
     @Override
     public void doneLoading(Object... params) {
@@ -39,6 +54,10 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     @Override
     public Orbit getOrbitObject() {
         return orbit;
+    }
+
+    public void setScaling(double scaling){
+        this.scaling = scaling;
     }
 
 }

@@ -11,11 +11,12 @@ import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 public class PointCloudData {
     // Values of x, y, z in world coordinates
-    public Array<Double> x, y, z;
-    public Array<Instant> time;
+    public List<Double> x, y, z;
+    public List<Instant> time;
     // Period in days
     public double period = -1;
 
@@ -27,16 +28,18 @@ public class PointCloudData {
     }
 
     public PointCloudData(int capacity) {
-        x = new Array<>(capacity);
-        y = new Array<>(capacity);
-        z = new Array<>(capacity);
-        time = new Array<>(capacity);
+        x = new ArrayList<>(capacity);
+        y = new ArrayList<>(capacity);
+        z = new ArrayList<>(capacity);
+        time = new ArrayList<>(capacity);
 
         v0 = new Vector3d();
         v1 = new Vector3d();
     }
 
-    /** Clears all data **/
+    /**
+     * Clears all data
+     **/
     public void clear() {
         x.clear();
         y.clear();
@@ -46,7 +49,7 @@ public class PointCloudData {
         v1.setZero();
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return x.isEmpty() && y.isEmpty() && z.isEmpty();
     }
 
@@ -73,7 +76,7 @@ public class PointCloudData {
      *
      * @param points The points to add to this point cloud
      */
-    public void addPoints(ArrayList points){
+    public void addPoints(ArrayList points) {
         if (points.size() % 3 == 0) {
             int nPoints = points.size() / 3;
             for (int i = 0; i < nPoints; i++) {
@@ -97,11 +100,12 @@ public class PointCloudData {
 
     /**
      * Adds a single point to the cloud
+     *
      * @param x The x component
      * @param y The y component
      * @param z The z component
      */
-    public void addPoint(double x, double y, double z){
+    public void addPoint(double x, double y, double z) {
         this.x.add(x);
         this.y.add(y);
         this.z.add(z);
@@ -118,19 +122,19 @@ public class PointCloudData {
         v.set(x.get(index), y.get(index), z.get(index));
     }
 
-    public Instant loadTime(int index){
+    public Instant loadTime(int index) {
         return time.get(index);
     }
 
     public int getNumPoints() {
-        return x.size;
+        return x.size();
     }
 
     public double getX(int index) {
         return x.get(index);
     }
 
-    public void setX(int index, double value){
+    public void setX(int index, double value) {
         x.set(index, value);
     }
 
@@ -138,7 +142,7 @@ public class PointCloudData {
         return y.get(index);
     }
 
-    public void setY(int index, double value){
+    public void setY(int index, double value) {
         y.set(index, value);
     }
 
@@ -146,7 +150,7 @@ public class PointCloudData {
         return z.get(index);
     }
 
-    public void setZ(int index, double value){
+    public void setZ(int index, double value) {
         z.set(index, value);
     }
 
@@ -154,30 +158,28 @@ public class PointCloudData {
         return time.get(index);
     }
 
-    public Instant getStart(){
-        if(start == null){
+    public Instant getStart() {
+        if (start == null) {
             start = time.get(0);
         }
         return start;
     }
 
-    public long getStartMs(){
+    public long getStartMs() {
         return getStart().toEpochMilli();
     }
 
 
-    public Instant getEnd(){
-        if(end == null){
-            end = time.get(time.size - 1);
+    public Instant getEnd() {
+        if (end == null) {
+            end = time.get(time.size() - 1);
         }
         return end;
     }
 
-    public long getEndMs(){
+    public long getEndMs() {
         return getEnd().toEpochMilli();
     }
-
-
 
 
     /**
@@ -207,15 +209,15 @@ public class PointCloudData {
      * Returns a vector with the data point at the given time. It uses linear
      * interpolation. The time instant must be within the bounds of this point cloud's times
      *
-     * @param v       The vector
-     * @param timeMs  The time in milliseconds
+     * @param v      The vector
+     * @param timeMs The time in milliseconds
      * @return Whether the operation completes successfully
      */
-    public boolean loadPoint(Vector3d v, long timeMs){
+    public boolean loadPoint(Vector3d v, long timeMs) {
         // Data is sorted
         int idx = binarySearch(time, timeMs);
 
-        if (idx < 0 || idx >= time.size) {
+        if (idx < 0 || idx >= time.size()) {
             // No data for this time
             return false;
         }
@@ -236,11 +238,11 @@ public class PointCloudData {
 
     }
 
-    public Instant getWrapTime(Instant instant){
+    public Instant getWrapTime(Instant instant) {
         return Instant.ofEpochMilli(getWrapTimeMs(instant));
     }
 
-    public long getWrapTimeMs(Instant instant){
+    public long getWrapTimeMs(Instant instant) {
         long c = instant.toEpochMilli();
         long s = getStartMs();
         long e = getEndMs();
@@ -253,30 +255,31 @@ public class PointCloudData {
 
     /**
      * Gets the bounding indices for the given date. If the date is out of range, it wraps.
+     *
      * @param instant The date
      * @return The two indices
      */
-    public int getIndex(Instant instant){
+    public int getIndex(Instant instant) {
         return binarySearch(time, getWrapTimeMs(instant));
     }
 
-    public int getIndex(long wrappedTimeMs){
+    public int getIndex(long wrappedTimeMs) {
         return binarySearch(time, wrappedTimeMs);
     }
 
-    private int binarySearch(Array<Instant> times, Instant elem) {
+    private int binarySearch(List<Instant> times, Instant elem) {
         return binarySearch(times, elem.toEpochMilli());
     }
 
-    private int binarySearch(Array<Instant> times, long time){
-        if (time >= times.get(0).toEpochMilli() && time <= times.get(times.size - 1).toEpochMilli()) {
-            return binarySearch(times, time, 0, times.size - 1);
+    private int binarySearch(List<Instant> times, long time) {
+        if (time >= times.get(0).toEpochMilli() && time <= times.get(times.size() - 1).toEpochMilli()) {
+            return binarySearch(times, time, 0, times.size() - 1);
         } else {
             return -1;
         }
     }
 
-    private int binarySearch(Array<Instant> times, long time, int i0, int i1) {
+    private int binarySearch(List<Instant> times, long time, int i0, int i1) {
         if (i0 > i1) {
             return -1;
         } else if (i0 == i1) {

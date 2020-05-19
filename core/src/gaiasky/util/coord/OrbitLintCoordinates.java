@@ -19,6 +19,10 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     Matrix4d transf;
     Vector3d aux = new Vector3d();
 
+    public OrbitLintCoordinates() {
+        super();
+    }
+
     @Override
     public void doneLoading(Object... params) {
         if (params.length == 0) {
@@ -80,7 +84,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
             transf.rotate(0, 1, 0, 90);
         }
 
-        out.mul(transf);
+        out.mul(transf).scl(scaling);
         return out;
     }
 

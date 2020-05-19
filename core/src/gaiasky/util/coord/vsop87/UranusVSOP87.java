@@ -6,6 +6,9 @@
 package gaiasky.util.coord.vsop87;
 
 public class UranusVSOP87 extends AbstractVSOP87 {
+    public UranusVSOP87(){
+        super();
+    }
 
     /*
      * 

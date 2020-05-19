@@ -6,6 +6,9 @@
 package gaiasky.util.coord.vsop87;
 
 public class NeptuneVSOP87 extends AbstractVSOP87 {
+    public NeptuneVSOP87(){
+        super();
+    }
     /*
      * 
      * NEPTUNE - VSOP87 Series Version D HELIOCENTRIC DYNAMICAL ECLIPTIC AND

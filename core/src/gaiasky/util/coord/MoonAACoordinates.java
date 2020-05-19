@@ -18,6 +18,10 @@ import java.time.Instant;
  *
  */
 public class MoonAACoordinates extends AbstractOrbitCoordinates {
+    public MoonAACoordinates(){
+        super();
+    }
+
     @Override
     public void doneLoading(Object... params) {
         super.doneLoading(params);
@@ -29,7 +33,7 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
             return null;
         AstroUtils.moonEclipticCoordinates(date, out);
         // To internal units
-        out.z *= Constants.KM_TO_U;
+        out.z *= Constants.KM_TO_U * scaling;
         return out;
     }
 
