@@ -884,6 +884,12 @@ public interface IScriptingInterface {
     void setStarGroupBillboard(boolean flag);
 
     /**
+     * Sets the solid angle below which orbits fade and disappear.
+     * @param angle The threshold angle in degrees
+     */
+    void setOrbitSolidAngleThreshold(float angleDeg);
+
+    /**
      * Sets the projection yaw angle (if this is a slave instance), in degrees.
      * The yaw angle turns the camera to the right.
      * This function is intended for multi-projector setups, to configure

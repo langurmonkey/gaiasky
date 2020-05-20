@@ -832,6 +832,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setOrbitSolidAngleThreshold(float angleDeg) {
+        if(checkNum(angleDeg, 0.0f, 180f, "solid-angle")){
+            Orbit.setSolidAngleThreshold(angleDeg);
+        }
+    }
+
+    @Override
     public void setProjectionYaw(float yaw) {
         if (SlaveManager.projectionActive()) {
             GaiaSky.postRunnable(() -> {

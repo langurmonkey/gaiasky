@@ -48,9 +48,13 @@ public class Orbit extends Polyline {
     }
 
     /**
-     * Threshold angle
+     * Threshold solid angle
      **/
-    protected static final float ANGLE_LIMIT = (float) Math.toRadians(1.5);
+    protected static float SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(1.5);
+    public static void setSolidAngleThreshold(float angleDeg){
+        SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(angleDeg);
+    }
+
     /**
      * Special overlap factor
      */
@@ -206,7 +210,7 @@ public class Orbit extends Polyline {
                 return;
 
             boolean added = false;
-            float angleLimit = ANGLE_LIMIT * camera.getFovFactor();
+            float angleLimit = SOLID_ANGLE_THRESHOLD * camera.getFovFactor();
             if (viewAngle > angleLimit) {
                 if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
                     double alpha = MathUtilsd.lint(viewAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, cc[3]);
