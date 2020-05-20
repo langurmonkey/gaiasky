@@ -73,6 +73,7 @@ pickled_dict
 **.project
 **.pydevproject
 .PVS-Studio
+venv
 
 # Gradle cache #
 ################

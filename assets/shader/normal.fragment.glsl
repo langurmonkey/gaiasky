@@ -190,9 +190,9 @@ in vec3 v_ambientLight;
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5 + u_emissiveColor * 2.0
 #elif defined(emissiveTextureFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5
 #elif defined(emissiveColorFlag)
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
 #endif // emissiveTextureFlag && emissiveColorFlag
@@ -336,6 +336,10 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 #include shader/lib_velbuffer.frag.glsl
 #endif
 
+float luma(vec3 color){
+    return dot(color, vec3(0.2126, 0.7152, 0.0722));
+}
+
 void main() {
     vec2 texCoords = v_texCoord0;
 
@@ -359,6 +363,14 @@ void main() {
     vec3 night = fetchColorNight(texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
+
+    // Alpha value from textures
+    float texAlpha = 1.0;
+    #if defined(diffuseTextureFlag)
+    texAlpha = diffuse.a;
+    #elif defined(emissiveTextureFlag)
+    texAlpha = luma(emissive.rgb);
+    #endif
 
     #ifdef normalTextureFlag
         // Normal in tangent space
@@ -399,7 +411,7 @@ void main() {
     float shdw = clamp(getShadow(), 0.0, 1.0);
     vec3 nightColor = v_lightCol * night * max(0.0, 0.6 - NL) * shdw;
     vec3 dayColor = (v_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
-    fragColor = vec4(dayColor + nightColor + emissive.rgb + env, diffuse.a * v_opacity);
+    fragColor = vec4(dayColor + nightColor + emissive.rgb + env, texAlpha * v_opacity);
     fragColor.rgb += selfShadow * specular;
 
     #ifdef atmosphereGround
@@ -410,7 +422,7 @@ void main() {
     // Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-    if(fragColor.a == 0.0){
+    if(fragColor.a <= 0.0){
         discard;
     }
     // Logarithmic depth buffer

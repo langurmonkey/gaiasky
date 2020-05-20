@@ -22,7 +22,9 @@ public class MtlLoader {
 
     public Array<ModelMaterial> materials = new Array<>();
 
-    /** loads .mtl file */
+    /**
+     * loads .mtl file
+     */
     public void load(FileHandle file) {
         String line;
         String[] tokens;
@@ -63,13 +65,17 @@ public class MtlLoader {
                         if (tokens.length > 1) {
                             curMatName = tokens[1];
                             curMatName = curMatName.replace('.', '_');
-                        } else
+                        } else {
                             curMatName = "default";
+                        }
 
                         difcolor = Color.WHITE;
                         speccolor = Color.WHITE;
                         emicolor = Color.WHITE;
                         reflcolor = Color.BLACK;
+                        texDiffuseFilename = null;
+                        texEmissiveFilename = null;
+                        texNormalFilename = null;
                         opacity = 1.f;
                         shininess = 0.f;
                     } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr")) // diffuse, specular or emissive

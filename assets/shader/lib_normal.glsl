@@ -2,8 +2,8 @@ struct Normal {
     float t, b, r, l, tl, bl, br, tr;
 };
 
-float luma(vec3 v) {
-    return dot(v, vec3(0.212, 0.716, 0.072));
+float luma(vec3 color){
+    return dot(color, vec3(0.2126, 0.7152, 0.0722));
 }
 
 vec2 regular(Normal n){
