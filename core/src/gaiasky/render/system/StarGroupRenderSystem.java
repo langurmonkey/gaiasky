@@ -52,12 +52,12 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[3];
-        this.pointAlphaHl = new float[] { 2, 4 };
+        this.pointAlphaHl = new float[]{2, 4};
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(GlobalConf.scene.getStarTexture());
 
-        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH);
+        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -70,7 +70,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MAX_OPACITY};
+        pointAlpha = new float[]{GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MAX_OPACITY};
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -125,7 +125,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i)) {
                                     StarBean sb = (StarBean) starGroup.data().get(i);
-                                    if(!Double.isFinite(sb.size())){
+                                    if (!Double.isFinite(sb.size())) {
                                         logger.debug("Star " + sb.id + " has a non-finite size");
                                         continue;
                                     }
@@ -235,15 +235,18 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD:
-            pointAlpha[0] = (float) data[0];
-            break;
-        case DISPOSE_STAR_GROUP_GPU_MESH:
-            Integer meshIdx = (Integer) data[0];
-            clearMeshData(meshIdx);
-            break;
-        default:
-            break;
+            case STAR_MIN_OPACITY_CMD:
+                pointAlpha[0] = (float) data[0];
+                break;
+            case DISPOSE_STAR_GROUP_GPU_MESH:
+                Integer meshIdx = (Integer) data[0];
+                clearMeshData(meshIdx);
+                break;
+            case STAR_TEXTURE_IDX_CMD:
+                GaiaSky.postRunnable(()-> setStarTexture(GlobalConf.scene.getStarTexture()));
+                break;
+            default:
+                break;
         }
     }
 

@@ -795,14 +795,40 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public float getMinStarOpacity() {
+    public float getStarMinOpacity() {
         return MathUtilsd.lint(GlobalConf.scene.STAR_MIN_OPACITY, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
+    public float getMinStarOpacity() {
+        return getStarMinOpacity();
+    }
+
     @Override
-    public void setMinStarOpacity(float minOpacity) {
+    public void setStarMinOpacity(float minOpacity) {
         if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
             EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, minOpacity, false);
+    }
+    public void setMinStarOpacity(float minOpacity) {
+        setStarMinOpacity(minOpacity);
+    }
+
+    @Override
+    public void setStarTextureIndex(int index) {
+        if (checkNum(index, 1, 4, "index")) {
+            EventManager.instance.post(Events.STAR_TEXTURE_IDX_CMD, index, false);
+        }
+    }
+
+    @Override
+    public void setStarGroupNearestNumber(int n) {
+        if (checkNum(n, 1, 1000000, "nNearest")) {
+            EventManager.instance.post(Events.STAR_GROUP_NEAREST_CMD, n, false);
+        }
+    }
+
+    @Override
+    public void setStarGroupBillboard(boolean flag) {
+        EventManager.instance.post(Events.STAR_GROUP_BILLBOARD_CMD, flag, false);
     }
 
     @Override
@@ -961,8 +987,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setOrbitCoordinatesScaling(String name, double scalingFactor) {
         int modified = 0;
         List<AbstractOrbitCoordinates> aocs = AbstractOrbitCoordinates.getInstances();
-        for(AbstractOrbitCoordinates aoc : aocs){
-            if(aoc.getClass().getSimpleName().equalsIgnoreCase(name)){
+        for (AbstractOrbitCoordinates aoc : aocs) {
+            if (aoc.getClass().getSimpleName().equalsIgnoreCase(name)) {
                 aoc.setScaling(scalingFactor);
                 modified++;
             }

@@ -1084,6 +1084,21 @@ public enum Events {
     STAR_POINT_SIZE_RESET_CMD,
 
     /**
+     * Update the number of nearest stars in star groups
+     */
+    STAR_GROUP_NEAREST_CMD,
+
+    /**
+     * Set the flag to render stars as billboards or not
+     */
+    STAR_GROUP_BILLBOARD_CMD,
+
+    /**
+     * Set the texture index for stars
+     */
+    STAR_TEXTURE_IDX_CMD,
+
+    /**
      * Stereoscopic vision, side by side rendering. Contains the state boolean
      * and another boolean indicating whether it comes from the interface.
      **/

@@ -849,14 +849,39 @@ public interface IScriptingInterface {
      *
      * @return The minimum opacity value.
      */
-    float getMinStarOpacity();
+    float getStarMinOpacity();
 
     /**
      * Sets the minimum star opacity.
      *
      * @param opacity The minimum opacity value, between {@link Constants#MIN_STAR_MIN_OPACITY} and {@link Constants#MAX_STAR_MIN_OPACITY}.
      */
-    void setMinStarOpacity(float opacity);
+    void setStarMinOpacity(float opacity);
+
+    /**
+     * Sets the star texture index, in [1, 4]
+     *
+     * 1 - horizontal spike
+     * 2 - god rays
+     * 3 - horizontal and vertical spikes
+     * 4 - simple radial profile
+     * @param index The new star texture index
+     */
+    void setStarTextureIndex(int index);
+
+    /**
+     * Sets the number of nearest stars to be processed for each
+     * star group. This will limit the number of stars that are
+     * rendered with billboards, labels and velocity vectors.
+     * @param n The new number of nearest stars
+     */
+    void setStarGroupNearestNumber(int n);
+
+    /**
+     * Enable or disable the rendering of close stars as billboards.
+     * @param flag The state flag
+     */
+    void setStarGroupBillboard(boolean flag);
 
     /**
      * Sets the projection yaw angle (if this is a slave instance), in degrees.

@@ -206,9 +206,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
-    // Close up stars treated
-    private int N_CLOSEUP_STARS;
-
     /**
      * CLOSEST
      **/
@@ -223,7 +220,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         closestPm = new Vector3d();
         closestCol = new float[4];
         lastSortTime = -1;
-        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
     }
 
     @SuppressWarnings("unchecked")
@@ -267,25 +263,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public void setData(List<ParticleBean> pointData, boolean regenerateIndex) {
         super.setData(pointData, regenerateIndex);
-        this.N_CLOSEUP_STARS = getNCloseupStars();
-    }
-
-    private int getNCloseupStars() {
-        int n;
-        switch (GlobalConf.scene.GRAPHICS_QUALITY) {
-            case ULTRA:
-            case HIGH:
-                n = 100;
-                break;
-            case NORMAL:
-                n = 80;
-                break;
-            case LOW:
-            default:
-                n = 60;
-                break;
-        }
-        return Math.min(n, pointData.size());
     }
 
     /**
@@ -382,8 +359,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     protected void addToRenderLists(ICamera camera) {
         addToRender(this, RenderGroup.STAR_GROUP);
-        addToRender(this, RenderGroup.BILLBOARD_STAR);
         addToRender(this, RenderGroup.MODEL_VERT_STAR);
+        if (GlobalConf.scene.STAR_GROUP_BILLBOARD_FLAG) {
+            addToRender(this, RenderGroup.BILLBOARD_STAR);
+        }
         if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
             addToRender(this, RenderGroup.LINE);
             addToRender(this, RenderGroup.LINE);
@@ -412,7 +391,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         /** RENDER ACTUAL STARS **/
         boolean focusRendered = false;
-        for (int i = 0; i < N_CLOSEUP_STARS; i++) {
+        int n = Math.min(GlobalConf.scene.STAR_GROUP_N_NEAREST, pointData.size());
+        for (int i = 0; i < n; i++) {
             renderCloseupStar(active[i], camera, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
             focusRendered = focusRendered || active[i] == focusIndex;
         }
@@ -487,7 +467,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private long getMaxProperMotionLines() {
-        return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : (N_CLOSEUP_STARS * 20);
+        int n = Math.min(GlobalConf.scene.STAR_GROUP_N_NEAREST * 5, pointData.size());
+        return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : n;
     }
 
     private boolean rvLines = false;
@@ -634,8 +615,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
 
+        int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_NEAREST);
         if (camera.getCurrent() instanceof FovCamera) {
-            int n = Math.min(pointData.size(), N_CLOSEUP_STARS * 5);
             for (int i = 0; i < n; i++) {
                 StarBean star = (StarBean) pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
@@ -648,7 +629,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 }
             }
         } else {
-            for (int i = 0; i < N_CLOSEUP_STARS; i++) {
+            for (int i = 0; i < n; i++) {
                 StarBean star = (StarBean) pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
                 float distToCamera = (float) starPosition.len();
@@ -740,9 +721,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Super handles FOCUS_CHANGED and CAMERA_MOTION_UPDATED event
         super.notify(event, data);
         switch (event) {
-            case GRAPHICS_QUALITY_UPDATED:
-                this.N_CLOSEUP_STARS = getNCloseupStars();
-                break;
             default:
                 break;
         }

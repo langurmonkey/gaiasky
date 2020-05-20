@@ -12,6 +12,10 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.render.IQuadRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
@@ -24,7 +28,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.List;
 
-public class BillboardStarRenderSystem extends AbstractRenderSystem {
+public class BillboardStarRenderSystem extends AbstractRenderSystem implements IObserver {
 
     private IntMesh mesh;
     private Quaternion quaternion;
@@ -49,7 +53,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
     }
 
     private void init(String tex0, float w, float h) {
-        setTexture0(tex0);
+        setStarTexture(tex0);
 
         // Init comparator
         comp = new DistToCameraComparator<IRenderable>();
@@ -71,9 +75,10 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
         quaternion = new Quaternion();
         aux = new Vector3();
 
+        EventManager.instance.subscribe(this, Events.STAR_TEXTURE_IDX_CMD);
     }
 
-    public void setTexture0(String tex0) {
+    public void setStarTexture(String tex0) {
         texture0 = new Texture(GlobalConf.data.dataFileHandle(tex0), true);
         texture0.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     }
@@ -154,4 +159,14 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem {
 
     }
 
+    @Override
+    public void notify(Events event, Object... data) {
+        switch (event) {
+            case STAR_TEXTURE_IDX_CMD:
+                GaiaSky.postRunnable(()-> setStarTexture(GlobalConf.scene.getStarTexture()));
+                break;
+            default:
+                break;
+        }
+    }
 }
