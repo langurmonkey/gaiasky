@@ -885,7 +885,7 @@ public interface IScriptingInterface {
 
     /**
      * Sets the solid angle below which orbits fade and disappear.
-     * @param angle The threshold angle in degrees
+     * @param angleDeg The threshold angle in degrees
      */
     void setOrbitSolidAngleThreshold(float angleDeg);
 
