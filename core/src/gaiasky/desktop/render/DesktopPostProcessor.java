@@ -64,6 +64,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     Vector3 auxf;
     Matrix4 prevViewProj;
     Matrix4 invView, invProj;
+    Matrix4 frustumCorners;
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
@@ -76,6 +77,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         prevViewProj = new Matrix4();
         invView = new Matrix4();
         invProj = new Matrix4();
+        frustumCorners = new Matrix4();
     }
 
     public void initialize(AssetManager manager) {
@@ -131,6 +133,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true);
         ppb.pp.setViewport(new Rectangle(0, 0, width, height));
+
+        // RAY MARCHING
+        ppb.rm = new Raymarching(width, height);
+        ppb.rm.setFrustumCorners(GaiaSky.instance.getCameraManager().getFrustumCornersWorld(frustumCorners));
+        ppb.pp.addEffect(ppb.rm);
 
         // DEPTH BUFFER
         //ppb.depthBuffer = new DepthBuffer();
@@ -543,12 +550,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 break;
             case CAMERA_MOTION_UPDATED:
                 PerspectiveCamera cam = (PerspectiveCamera) data[3];
+                GaiaSky.instance.getCameraManager().getFrustumCornersWorld(frustumCorners);
+                Matrix4 civ = new Matrix4();
                 float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         ppb.lens.setStarburstOffset(cameraOffset);
                         ppb.lightglow.setOrientation(cameraOffset * 50f);
+                        ppb.rm.setFrustumCorners(frustumCorners);
+                        ppb.rm.setCamInvView(civ);
                     }
                 }
                 // Update previous projectionView matrix

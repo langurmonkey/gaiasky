@@ -14,6 +14,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.*;
 public interface IPostProcessor extends Disposable {
     class PostProcessBean {
         public PostProcessor pp;
+        public Raymarching rm;
         public CameraMotion camblur;
         public Bloom bloom;
         public Antialiasing antialiasing;
@@ -49,6 +50,8 @@ public interface IPostProcessor extends Disposable {
         public void dispose(boolean cleanAllBuffers){
             if (pp != null) {
                 pp.dispose(cleanAllBuffers);
+                if (rm != null)
+                    rm.dispose();
                 if (bloom != null)
                     bloom.dispose();
                 if (antialiasing != null)

@@ -38,7 +38,7 @@ public final class ShaderLoader {
     }
 
     public static ShaderProgram fromFile(String vertexFileName, String fragmentFileName, String defines) {
-        String log = "\"" + vertexFileName + "/" + fragmentFileName + "\"";
+        String log = "\"" + vertexFileName + " / " + fragmentFileName + "\"";
         if (defines.length() > 0) {
             log += " w/ (" + defines.replace("\n", ", ") + ")";
         }
@@ -65,7 +65,7 @@ public final class ShaderLoader {
         ShaderProgram shader = new ShaderProgram(insertDefines(vertex, defines), insertDefines(fragment, defines));
 
         if (!shader.isCompiled()) {
-            logger.error("Compile error: " + vertexName + "/" + fragmentName);
+            logger.error("Compile error: " + vertexName + " / " + fragmentName);
             logger.error(shader.getLog());
             System.exit(-1);
         }
