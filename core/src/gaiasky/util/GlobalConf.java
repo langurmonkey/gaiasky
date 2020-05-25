@@ -32,8 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Holds the global configuration options
@@ -344,9 +343,13 @@ public class GlobalConf {
          * Controller name blacklist. Check out names in the preferences window.
          **/
         public String[] CONTROLLER_BLACKLIST;
+        /**
+         * Keep track of added controller listeners
+         */
+        private Map<Controller, Set<ControllerListener>> controllerListenersMap;
 
         public ControlsConf() {
-
+            controllerListenersMap = new HashMap<>();
         }
 
         public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_Y_AXIS, boolean dEBUG_MODE, String[] cONTROLLER_BLACKLIST) {
@@ -368,6 +371,26 @@ public class GlobalConf {
             return false;
         }
 
+        private void addListener(Controller c, ControllerListener cl){
+            if(!controllerListenersMap.containsKey(c)){
+                Set<ControllerListener> cs = new HashSet<>();
+                cs.add(cl);
+                controllerListenersMap.put(c, cs);
+            } else {
+                Set<ControllerListener> cs = controllerListenersMap.get(c);
+                if(!cs.contains(cl))
+                    cs.add(cl);
+            }
+        }
+
+        private void removeListener(Controller c, ControllerListener cl){
+            if(controllerListenersMap.containsKey(c)){
+                Set<ControllerListener> cs = controllerListenersMap.get(c);
+                if(cs.contains(cl))
+                    cs.remove(cl);
+            }
+        }
+
         public void addControllerListener(ControllerListener listener) {
             Array<Controller> controllers = Controllers.getControllers();
             for (Controller controller : controllers) {
@@ -376,6 +399,7 @@ public class GlobalConf {
                     controller.removeListener(listener);
                     // Add
                     controller.addListener(listener);
+                    addListener(controller, listener);
                 }
             }
         }
@@ -388,6 +412,7 @@ public class GlobalConf {
                     controller.removeListener(listener);
                     // Add
                     controller.addListener(listener);
+                    addListener(controller, listener);
                 }
             }
         }
@@ -397,8 +422,24 @@ public class GlobalConf {
             for (Controller controller : controllers) {
                 if (!isControllerBlacklisted(controller.getName())) {
                     controller.removeListener(listener);
+                    removeListener(controller, listener);
                 }
             }
+        }
+
+        public void removeAllControllerListeners(){
+            Array<Controller> controllers = Controllers.getControllers();
+            for(Controller controller : controllers){
+                if(!isControllerBlacklisted(controller.getName())) {
+                    Set<ControllerListener> s = controllerListenersMap.get(controller);
+                    if (s != null){
+                        for(ControllerListener cl : s)
+                            controller.removeListener(cl);
+                        s.clear();
+                    }
+                }
+            }
+
         }
     }
 

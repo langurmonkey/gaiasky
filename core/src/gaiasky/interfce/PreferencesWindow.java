@@ -1829,6 +1829,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Array<OwnLabel> controllerNames = new Array<>();
         for (Controller c : controllers) {
             OwnLabel cl = new OwnLabel(c.getName(), skin);
+            cl.setName(c.getName());
             if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
                 cl.setText(cl.getText() + " [*]");
                 cl.setColor(1, 0, 0, 1);
@@ -1836,14 +1837,35 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             }
             controllerNames.add(cl);
         }
-        if (controllerNames.isEmpty())
+        if (controllerNames.isEmpty()) {
             controllerNames.add(new OwnLabel(I18n.txt("gui.controller.nocontrollers"), skin));
+
+        }
 
         if (table == null)
             table = new Table(skin);
         table.clear();
+        int i = 0;
         for (OwnLabel cn : controllerNames) {
-            table.add(cn).left().padBottom(pad5 * 2).row();
+            String controllerName = cn.getName();
+            table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad5 * 2f).padRight(pad * 2f);
+            if(controllerName != null && !GlobalConf.controls.isControllerBlacklisted(controllerName)) {
+                OwnTextButton config = new OwnTextButton("Configure", skin);
+                config.pad(pad5, pad5 * 2f, pad5, pad5 * 2f);
+                config.addListener(event -> {
+                    if(event instanceof ChangeEvent){
+                        ChangeEvent ce = (ChangeEvent) event;
+                        ControllerConfigWindow ccw = new ControllerConfigWindow(controllerName, stage, skin);
+                        ccw.show(stage);
+                        return true;
+                    }
+                    return false;
+                });
+                table.add(config).left().padBottom(i == controllerNames.size -1 ? 0f : pad5 * 2f).row();
+            } else {
+                table.add().left().row();
+            }
+            i++;
         }
         table.pack();
 
