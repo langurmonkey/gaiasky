@@ -205,6 +205,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             SceneGraphNode sgn = getObject(focusName);
             if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
+                focus = focus.getFocus(focusName);
                 NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
                 changeFocus(focus, cam, waitTimeSeconds);
             } else {
@@ -223,6 +224,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             SceneGraphNode sgn = getObject(focusName);
             if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
+                focus.getFocus(focusName);
                 em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                 em.post(Events.FOCUS_CHANGE_CMD, focus);
 
@@ -1940,7 +1942,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void changeFocus(IFocus object, NaturalCamera cam, double waitTimeSeconds) {
         // Post focus change and wait, if needed
         IFocus currentFocus = cam.getFocus();
-        if (currentFocus != object) {
+        if (currentFocus instanceof ParticleGroup || currentFocus != object) {
             em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
             em.post(Events.FOCUS_CHANGE_CMD, object);
 
