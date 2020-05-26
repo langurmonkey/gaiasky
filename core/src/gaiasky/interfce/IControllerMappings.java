@@ -15,7 +15,7 @@ public interface IControllerMappings {
     double getAxisValuePower();
 
     /**
-     * Returns the code of the axis that produces:
+     * Returns the code of the left stick horizontal axis, that produces:
      * <ul>
      * <li>Roll rotation in focus mode</li>
      * <li>Horizontal lateral movement in free mode</li>
@@ -23,15 +23,15 @@ public interface IControllerMappings {
      *
      * @return The axis code, negative if not mapped.
      */
-    int getAxisRoll();
+    int getAxisLstickH();
 
     /**
-     * Sensitivity of roll axis
+     * Sensitivity of left stick axis
      **/
-    double getAxisRollSensitivity();
+    double getAxisLstickHSensitivity();
 
     /**
-     * Returns the code of the axis that produces:
+     * Returns the code of the Right stick horizontal axis, that produces:
      * <ul>
      * <li>Vertical rotation around focus in focus mode</li>
      * <li>Vertical look rotation (pitch) in free mode</li>
@@ -39,15 +39,15 @@ public interface IControllerMappings {
      *
      * @return The axis code, negative if not mapped.
      */
-    int getAxisPitch();
+    int getAxisRstickH();
 
     /**
      * Sensitivity of pitch axis
      **/
-    double getAxisPitchSensitivity();
+    double getAxisRstickHSensitivity();
 
     /**
-     * Returns the code of the axis that produces:
+     * Returns the code of the right stick vertical axis, that produces:
      * <ul>
      * <li>Horizontal rotation around focus in focus mode</li>
      * <li>Horizontal look rotation (yaw) in free mode</li>
@@ -55,101 +55,157 @@ public interface IControllerMappings {
      *
      * @return The axis code, negative if not mapped.
      */
-    int getAxisYaw();
+    int getAxisRstickV();
 
     /**
-     * Sensitivity of yaw axis
+     * Sensitivity of right stick vertical axis
      **/
-    double getAxisYawSensitivity();
+    double getAxisRstickVSensitivity();
 
     /**
-     * Returns the code of the axis that controls the forward and backward
+     * Returns the code of the left stick vertical axis, that controls the forward and backward
      * movement
      *
      * @return The axis code, negative if not mapped.
      */
-    int getAxisMove();
+    int getAxisLstickV();
 
     /**
-     * Sensitivity of move axis
+     * Sensitivity of left stick vertical axis
      **/
-    double getAxisMoveSensitivity();
+    double getAxisLstickVSensitivity();
 
     /**
-     * Returns the code of the axis used to increase the velocity. All the range
+     * Returns the code of the right trigger axis, used to increase the velocity. All the range
      * of the axis is used. Usually mapped to a trigger button.
      *
      * @return The axis code, negative if not mapped.
      */
-    int getAxisVelocityUp();
+    int getAxisRT();
 
     /**
-     * Sensitivity of velocity up axis
+     * Sensitivity of right trigger axis
      **/
-    double getAxisVelUpSensitivity();
+    double getAxisRTSensitivity();
 
     /**
-     * Returns the code of the axis used to decrease the velocity. All the range
+     * Returns the code of the left trigger axis, used to decrease the velocity. All the range
      * of the axis is used. Usually mapped to a trigger button.
      *
      * @return The axis code, negative if not mapped.
      */
-    int getAxisVelocityDown();
+    int getAxisLT();
 
     /**
-     * Sensitivity of velocity down axis
+     * Sensitivity of left trigger axis
      **/
-    double getAxisVelDownSensitivity();
+    double getAxisLTSensitivity();
 
     /**
-     * Returns the code of the button that, when pressed, multiplies the
-     * velocity vector by 0.1.
+     * Returns the code of the Y button
      *
-     * @return The button code, negative if not mapped.
+     * @return The Y button code, negative if not mapped.
      */
-    int getButtonVelocityMultiplierTenth();
+    int getButtonY();
 
     /**
-     * Returns the code of the button that, when pressed, multiplies the
-     * velocity vector by 0.5.
+     * Returns the code of the X button
      *
-     * @return The button code, negative if not mapped.
+     * @return The X button code, negative if not mapped.
      */
-    int getButtonVelocityMultiplierHalf();
+    int getButtonX();
 
     /**
-     * Returns the code of the button used to increase the velocity.
+     * Returns the code of the A button
      *
-     * @return The button code, negative if not mapped.
+     * @return The A button code, negative if not mapped.
      */
-    int getButtonVelocityUp();
+    int getButtonA();
 
     /**
-     * Returns the code of the button used to decrease the velocity.
+     * Returns the code of the B button
      *
-     * @return The button code, negative if not mapped.
+     * @return The B button code, negative if not mapped.
      */
-    int getButtonVelocityDown();
+    int getButtonB();
 
     /**
-     * Returns the code of the button used to go up.
+     * Returns the code of the dpad-up button
      *
-     * @return The button code, negative if not mapped.
+     * @return The dpad-up button code, negative if not mapped.
      */
-    int getButtonUp();
+    int getButtonDpadUp();
 
     /**
-     * Returns the code of the button used to go down.
+     * Returns the code of the dpad-down button
      *
-     * @return The button code, negative if not mapped.
+     * @return The dpad-down button code, negative if not mapped.
      */
-    int getButtonDown();
+    int getButtonDpadDown();
 
     /**
-     * Returns the code of the button used to toggle between free and focus mode.
+     * Returns the code of the dpad-left button
      *
-     * @return The button code, negative if not mapped.
+     * @return The dpad-left button code, negative if not mapped.
      */
-    int getButtonModeToggle();
+    int getButtonDpadLeft();
 
+    /**
+     * Returns the code of the dpad-right button
+     *
+     * @return The dpad-right button code, negative if not mapped.
+     */
+    int getButtonDpadRight();
+
+    /**
+     * Returns the code of the left stick button
+     *
+     * @return The left stick button code, negative if not mapped.
+     */
+    int getButtonLstick();
+
+    /**
+     * Returns the code of the right stick button
+     *
+     * @return The right stick button code, negative if not mapped.
+     */
+    int getButtonRstick();
+
+    /**
+     * Returns the code of the start button
+     *
+     * @return The start button code, negative if not mapped.
+     */
+    int getButtonStart();
+
+    /**
+     * Returns the code of the select button
+     *
+     * @return The select button code, negative if not mapped.
+     */
+    int getButtonSelect();
+
+    /**
+     * Returns the code of the RT button
+     * @return The RT button code, negative if not mapped.
+     */
+    int getButtonRT();
+
+    /**
+     * Returns the code of the RB button
+     * @return The RB button code, negative if not mapped.
+     */
+    int getButtonRB();
+
+    /**
+     * Returns the code of the LT button
+     * @return The LT button code, negative if not mapped.
+     */
+    int getButtonLT();
+
+    /**
+     * Returns the code of the LB button
+     * @return The LB button code, negative if not mapped.
+     */
+    int getButtonLB();
 }

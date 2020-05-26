@@ -13,18 +13,26 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import gaiasky.GaiaSky;
+import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.*;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.Trio;
+import gaiasky.util.parse.Parser;
+import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
+import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.validator.LengthValidator;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,48 +42,77 @@ import java.util.Map;
 public class ControllerConfigWindow extends GenericDialog implements IObserver {
     private static Logger.Log logger = Logger.getLogger(ControllerConfigWindow.class);
 
+    private static final String none = "-none-";
+
     private Texture controller, stick, stickH, stickV, dpadU, dpadD, dpadL, dpadR, startSelect, a, b, x, y, lt, rt, lb, rb;
     // For each button/axis we have the texture, the location in pixels and the name
     private Map<Gamepad, Trio<Texture, float[], String>> inputInfo;
     private Map<Gamepad, OwnTextField> inputFields;
 
+    private String controllerName;
+
     private Gamepad currGamepad;
-    private OwnTextField currTextField;
+    private OwnTextField currTextField, filename;
+    private OwnLabel currentInput;
 
     // The cell with the active element
     private Cell<Image> elementCell;
+    private boolean jumpToNext = true;
+    // Saved file, at the end, if any
+    public Path savedFile = null;
+
+    private static final int TYPE_BUTTON = 0;
+    private static final int TYPE_AXIS = 1;
+    private static final int TYPE_EITHER = 2;
 
     private enum Gamepad {
-        A(true),
-        B(true),
-        X(true),
-        Y(true),
-        LSTICK_V(false),
-        LSTICK_H(false),
-        LSTICK(true),
-        RSTICK_V(false),
-        RSTICK_H(false),
-        RSTICK(true),
-        DPAD_UP(true),
-        DPAD_DOWN(true),
-        DPAD_RIGHT(true),
-        DPAD_LEFT(true),
-        START(true),
-        SELECT(true),
-        RB(true),
-        RT(false),
-        LB(true),
-        LT(false);
+        A(TYPE_BUTTON),
+        B(TYPE_BUTTON),
+        X(TYPE_BUTTON),
+        Y(TYPE_BUTTON),
+        LSTICK_V(TYPE_AXIS),
+        LSTICK_H(TYPE_AXIS),
+        LSTICK(TYPE_BUTTON),
+        RSTICK_V(TYPE_AXIS),
+        RSTICK_H(TYPE_AXIS),
+        RSTICK(TYPE_BUTTON),
+        DPAD_UP(TYPE_BUTTON),
+        DPAD_DOWN(TYPE_BUTTON),
+        DPAD_RIGHT(TYPE_BUTTON),
+        DPAD_LEFT(TYPE_BUTTON),
+        START(TYPE_BUTTON),
+        SELECT(TYPE_BUTTON),
+        RB(TYPE_BUTTON),
+        RT(TYPE_EITHER),
+        LB(TYPE_BUTTON),
+        LT(TYPE_EITHER);
 
-        public boolean button;
-        Gamepad(boolean button){
-            this.button = button;
+        public int type;
+
+        /**
+         * @param type 0 = button, 1 = axis, 2 = either
+         */
+        Gamepad(int type) {
+            this.type = type;
+        }
+
+        public boolean isButton() {
+            return type == TYPE_BUTTON || type == TYPE_EITHER;
+        }
+
+        public boolean isAxis() {
+            return type == TYPE_AXIS || type == TYPE_EITHER;
+        }
+
+        public boolean isEither() {
+            return type == TYPE_EITHER;
         }
     }
 
 
     public ControllerConfigWindow(String controllerName, Stage stage, Skin skin) {
         super("Configure controller: " + controllerName, skin, stage);
+        this.controllerName = controllerName;
 
         setModal(true);
         setAcceptText(I18n.txt("gui.save"));
@@ -144,14 +181,42 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         // Build UI
         buildSuper();
+
+        // Main tips
+        OwnLabel tip = new OwnLabel("Press the button/axis indicated on the controller image. Click any input on the right\nto edit its value. Click the first input to restart the full sequence.", skin);
+        content.add(tip).colspan(2).padBottom(pad * 2f).row();
+
+        // Controller
         Cell controllerCell = content.add().padRight(pad * 2);
 
         Table controllerTable = new Table(skin);
         controllerTable.setBackground(new SpriteDrawable(new Sprite(controller)));
         controllerTable.setSize(controller.getWidth(), controller.getHeight());
         controllerCell.setActor(controllerTable);
-
         elementCell = controllerTable.add();
+
+        // Last input
+        OwnLabel currentInputLabel = new OwnLabel("Last input:", skin, "help-title");
+        currentInput = new OwnLabel(none, skin, "default-blue");
+
+        HorizontalGroup lastInputGroup = new HorizontalGroup();
+        lastInputGroup.space(pad);
+        lastInputGroup.addActor(currentInputLabel);
+        lastInputGroup.addActor(currentInput);
+
+        // File name
+        OwnLabel fileLabel = new OwnLabel("Filename:", skin, "help-title");
+        LengthValidator lv = new LengthValidator(3, 100);
+        filename = new OwnTextField(this.controllerName.replaceAll("\\s+", "_"), skin, lv);
+        filename.setWidth(200f * GlobalConf.UI_SCALE_FACTOR);
+        OwnImageButton filenameTooltip = new OwnImageButton(skin, "tooltip");
+        filenameTooltip.addListener(new OwnTextTooltip("Filename without extension.\nThe controller file will be saved in " + SysUtils.getDefaultMappingsDir().toAbsolutePath(), skin));
+
+        HorizontalGroup filenameGroup = new HorizontalGroup();
+        filenameGroup.space(pad5);
+        filenameGroup.addActor(fileLabel);
+        filenameGroup.addActor(filename);
+        filenameGroup.addActor(filenameTooltip);
 
         // Table with inputs and mappings
         Table inputTable = new Table(skin);
@@ -159,7 +224,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         for (Gamepad gpd : gpds) {
             Trio<Texture, float[], String> t = inputInfo.get(gpd);
             inputTable.add(new OwnLabel(t.getThird() + ": ", skin)).left().padBottom(pad5).padRight(pad);
-            OwnTextField inputField = new OwnTextField("none", skin);
+            OwnTextField inputField = new OwnTextField(none, skin);
             Color origCol = inputField.getColor().cpy();
             String lastText = inputField.getText();
             inputFields.put(gpd, inputField);
@@ -170,6 +235,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
                         inputField.setColor(0.4f, 0.4f, 1f, 1f);
                         displayElement(gpd);
                         makeCurrent(gpd, inputField);
+                        //jumpToNext = (inputField == inputFields.get(gpds[0]));
                     } else {
                         inputField.setColor(origCol);
                         displayElement(null);
@@ -182,9 +248,14 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
             inputTable.add(inputField).left().padBottom(pad5).row();
         }
         content.add(inputTable);
+        content.row();
+        content.add(lastInputGroup).padTop(pad);
+        content.add(filenameGroup).padTop(pad);
 
         // Select first
-        stage.setKeyboardFocus(inputFields.get(gpds[0]));
+        GaiaSky.postRunnable(() -> {
+            stage.setKeyboardFocus(inputFields.get(gpds[0]));
+        });
 
         content.pack();
     }
@@ -210,12 +281,102 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     protected void build() {
     }
 
+    /**
+     * Returns an integer array with [0] the code and [1] the type
+     * @param gp The gamepad input
+     * @return The array with the configuration
+     */
+    protected int[] getInput(Gamepad gp) {
+        OwnTextField i = inputFields.get(gp);
+        String text = i.getText();
+        if (text.equalsIgnoreCase(none)) {
+            return new int[]{-1, -1};
+        } else {
+            String[] tokens = text.split("\\s+");
+            if(tokens.length != 2) {
+                logger.error("Failed to parse " + gp);
+                return new int[]{-1, -1};
+            }else{
+                try {
+                    int code = Parser.parseIntException(tokens[1]);
+                    int type = gp.type;
+                    if (type == TYPE_EITHER) {
+                        if (tokens[0].toLowerCase().equals("button")) {
+                            type = TYPE_BUTTON;
+                        } else {
+                            type = TYPE_AXIS;
+                        }
+                    }
+                    return new int[]{code, type};
+                }catch(Exception e){
+                    logger.error("Failed to parse " + gp);
+                    return new int[]{-1, -1};
+                }
+            }
+        }
+    }
+
+    private void restoreControllerListener(){
+        GlobalConf.controls.removeAllControllerListeners();
+        EventManager.instance.post(Events.CONTROLLER_CONNECTED_INFO, controllerName);
+    }
+
     @Override
     protected void accept() {
+        // Generate and save mappings file
+        Path mappings = SysUtils.getDefaultMappingsDir();
+        Path file = mappings.resolve(filename.getText() + ".controller");
+
+        ControllerMappings cm = new ControllerMappings(this.controllerName);
+
+        // Sticks
+        cm.AXIS_LSTICK_H = getInput(Gamepad.LSTICK_H)[0];
+        cm.AXIS_LSTICK_V = getInput(Gamepad.LSTICK_V)[0];
+        cm.BUTTON_LSTICK = getInput(Gamepad.LSTICK)[0];
+        cm.AXIS_RSTICK_H = getInput(Gamepad.RSTICK_H)[0];
+        cm.AXIS_RSTICK_V = getInput(Gamepad.RSTICK_V)[0];
+        cm.BUTTON_RSTICK = getInput(Gamepad.RSTICK)[0];
+
+        // Buttons
+        cm.BUTTON_A = getInput(Gamepad.A)[0];
+        cm.BUTTON_B = getInput(Gamepad.B)[0];
+        cm.BUTTON_X = getInput(Gamepad.X)[0];
+        cm.BUTTON_Y = getInput(Gamepad.Y)[0];
+        cm.BUTTON_START = getInput(Gamepad.START)[0];
+        cm.BUTTON_SELECT = getInput(Gamepad.SELECT)[0];
+
+        // Dpad
+        cm.BUTTON_DPAD_UP = getInput(Gamepad.DPAD_UP)[0];
+        cm.BUTTON_DPAD_DOWN = getInput(Gamepad.DPAD_DOWN)[0];
+        cm.BUTTON_DPAD_LEFT = getInput(Gamepad.DPAD_LEFT)[0];
+        cm.BUTTON_DPAD_RIGHT = getInput(Gamepad.DPAD_RIGHT)[0];
+
+        // Shoulder
+        cm.BUTTON_RB = getInput(Gamepad.RB)[0];
+        cm.BUTTON_LB = getInput(Gamepad.LB)[0];
+
+        int[] rt = getInput(Gamepad.RT);
+        if(rt[1] == TYPE_BUTTON)
+            cm.BUTTON_RT = rt[0];
+        else
+            cm.AXIS_RT = rt[0];
+
+        int[] lt = getInput(Gamepad.LT);
+        if(lt[1] == TYPE_BUTTON)
+            cm.BUTTON_LT = lt[0];
+        else
+            cm.AXIS_LT = lt[0];
+
+        if(cm.persist(file)){
+            savedFile = file;
+        }
+
+        restoreControllerListener();
     }
 
     @Override
     protected void cancel() {
+        restoreControllerListener();
     }
 
     @Override
@@ -230,7 +391,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         boolean capturingAxis = false;
         long lastT = System.currentTimeMillis();
         long lastAxisT = System.currentTimeMillis();
-        long minDelayT = 300;
+        long minDelayT = 400;
         long minAxisT = 500;
         double[] axes = new double[40];
 
@@ -246,12 +407,12 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
-            logger.info("Button: " + buttonCode);
-            if (currGamepad != null && currTextField != null && currGamepad.button && System.currentTimeMillis() - lastT > minDelayT) {
+            if (currGamepad != null && currTextField != null && currGamepad.isButton() && System.currentTimeMillis() - lastT > minDelayT) {
                 currTextField.setText("Button " + buttonCode);
-                currTextField.next(false);
+                jumpToNext();
                 lastT = System.currentTimeMillis();
             }
+            currentInput.setText("Button " + buttonCode);
             return true;
         }
 
@@ -262,8 +423,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
-            logger.info("Axis: " + axisCode);
-            if (currGamepad != null && currTextField != null && !currGamepad.button && (System.currentTimeMillis() - lastT > minDelayT || capturingAxis)) {
+            if (currGamepad != null && currTextField != null && currGamepad.isAxis() && (System.currentTimeMillis() - lastT > minDelayT || capturingAxis)) {
                 if (!capturingAxis) {
                     // Start capturing
                     capturingAxis = true;
@@ -289,13 +449,22 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
                         axes = new double[40];
 
                         currTextField.setText("Axis " + maxAxis);
-                        currTextField.next(false);
+                        jumpToNext();
                         capturingAxis = false;
                         lastT = System.currentTimeMillis();
                     }
                 }
             }
+            currentInput.setText("Axis " + axisCode);
             return false;
+        }
+
+        private void jumpToNext() {
+            if (currTextField != inputFields.get(Gamepad.values()[Gamepad.values().length - 1]) && jumpToNext) {
+                currTextField.next(false);
+            } else {
+                stage.setKeyboardFocus(null);
+            }
         }
 
         @Override

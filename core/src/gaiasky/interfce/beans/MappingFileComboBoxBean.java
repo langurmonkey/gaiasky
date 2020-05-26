@@ -15,11 +15,11 @@ import java.nio.file.Path;
 public class MappingFileComboBoxBean extends FileComboBoxBean {
     public MappingFileComboBoxBean(Path file) {
         super(file);
-        File assetsFolder = new File(GlobalConf.ASSETS_LOC + File.separator);
+        Path assets = GlobalConf.assetsPath(".");
         try {
-            String suffix = file.toAbsolutePath().toString().contains(assetsFolder.getCanonicalPath()) ? " [internal]" : " [user]";
+            String suffix = file.toRealPath().startsWith(assets.toRealPath()) ? " [internal]" : " [user]";
             this.name += suffix;
-        }catch(IOException e){
+        } catch (IOException e) {
             Logger.getLogger(MappingFileComboBoxBean.class.getSimpleName()).error(e);
         }
     }

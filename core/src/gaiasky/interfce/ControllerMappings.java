@@ -6,10 +6,17 @@
 package gaiasky.interfce;
 
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.parse.Parser;
 
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Properties;
 
 /**
@@ -19,54 +26,145 @@ import java.util.Properties;
  *
  */
 public class ControllerMappings extends AbstractControllerMappings {
+    private String name;
 
-    public ControllerMappings(FileHandle mappingsFile) {
+    /**
+     * Create empty controller mappings
+     */
+    public ControllerMappings(String name){
+        super();
+        this.name = name;
+    }
+
+    /**
+     * Create a controller mappings instance from a *.controller file
+     * @param mappingsFile
+     */
+    public ControllerMappings(Path mappingsFile) {
         super();
         Properties mappings = new Properties();
         try {
-            InputStream is = mappingsFile.read();
+            InputStream is = Files.newInputStream(mappingsFile);
             mappings.load(is);
             is.close();
 
-            AXIS_VALUE_POW = parseDouble(mappings, "axis.value.pow", "4.0");
+            AXIS_VALUE_POW = parseDouble(mappings, "4.0", "axis.value.pow");
 
-            AXIS_ROLL = parseInt(mappings, "axis.roll", "-1");
-            AXIS_ROLL_SENS = parseDouble(mappings, "axis.roll.sensitivity", "1.0");
-            AXIS_PITCH = parseInt(mappings,"axis.pitch", "-1");
-            AXIS_PITCH_SENS = parseDouble(mappings, "axis.pitch.sensitivity", "1.0");
-            AXIS_YAW = parseInt(mappings, "axis.yaw", "-1");
-            AXIS_YAW_SENS = parseDouble(mappings, "axis.yaw.sensitivity", "1.0");
-            AXIS_MOVE = parseInt(mappings,"axis.move", "-1");
-            AXIS_MOVE_SENS = parseDouble(mappings, "axis.move.sensitivity", "1.0");
-            AXIS_VEL_UP = parseInt(mappings, "axis.velocityup", "-1");
-            AXIS_VEL_UP_SENS = parseDouble(mappings, "axis.velocityup.sensitivity", "1.0");
-            AXIS_VEL_DOWN = parseInt(mappings,"axis.velocitydown", "-1");
-            AXIS_VEL_DOWN_SENS = parseDouble(mappings, "axis.velocitydown.sensitivity", "1.0");
+            AXIS_LSTICK_H = parseInt(mappings, "-1", "axis.roll", "axis.lstick.h");
+            AXIS_LSTICK_H_SENS = parseDouble(mappings, "1.0", "axis.roll.sensitivity", "axis.lstick.h.sensitivity");
+            AXIS_RSTICK_H = parseInt(mappings,"-1", "axis.pitch", "axis.rstick.h");
+            AXIS_RSTICK_H_SENS = parseDouble(mappings, "1.0", "axis.pitch.sensitivity", "axis.rstick.h.sensitivity");
+            AXIS_RSTICK_V = parseInt(mappings, "-1", "axis.yaw", "axis.rstick.v");
+            AXIS_RSTICK_V_SENS = parseDouble(mappings, "1.0", "axis.yaw.sensitivity", "axis.rstick.v.sensitivity");
+            AXIS_LSTICK_V = parseInt(mappings,"-1", "axis.move", "axis.lstick.v");
+            AXIS_LSTICK_V_SENS = parseDouble(mappings, "1.0", "axis.move.sensitivity", "axis.lstick.v.sensitivity");
+            AXIS_RT = parseInt(mappings, "-1", "axis.velocityup", "axis.rt");
+            AXIS_RT_SENS = parseDouble(mappings, "-1", "axis.velocityup.sensitivity", "axis.rt.sensitivity");
+            AXIS_LT = parseInt(mappings,"-1", "axis.velocitydown", "axis.lt");
+            AXIS_LT_SENS = parseDouble(mappings, "1.0", "axis.velocitydown.sensitivity", "axis.lt.sensitivity");
 
-            BUTTON_VEL_UP = parseInt(mappings,"button.velocityup", "-1");
-            BUTTON_VEL_DOWN = parseInt(mappings,"button.velocitydown", "-1");
-            BUTTON_VEL_MULT_TENTH = parseInt(mappings,"button.velocitytenth", "-1");
-            BUTTON_VEL_MULT_HALF = parseInt(mappings,"button.velocityhalf", "-1");
-            BUTTON_UP = parseInt(mappings,"button.up", "-1");
-            BUTTON_DOWN = parseInt(mappings,"button.down", "-1");
-            BUTTON_MODE_TOGGLE = parseInt(mappings,"button.mode.toggle", "-1");
+
+            BUTTON_A = parseInt(mappings,"-1", "button.velocityup", "button.a");
+            BUTTON_B = parseInt(mappings,"-1", "button.velocitydown", "button.b");
+            BUTTON_X = parseInt(mappings,"-1", "button.velocitytenth", "button.x");
+            BUTTON_Y = parseInt(mappings,"-1", "button.velocityhalf", "button.y");
+            BUTTON_DPAD_UP = parseInt(mappings,"-1", "button.up", "button.dpad.u");
+            BUTTON_DPAD_DOWN = parseInt(mappings,"-1", "button.down", "button.dpad.d");
+            BUTTON_DPAD_LEFT = parseInt(mappings,"-1", "button.dpad.l");
+            BUTTON_DPAD_RIGHT = parseInt(mappings,"-1", "button.dpad.r");
+            BUTTON_RSTICK = parseInt(mappings,"-1", "button.rstick", "button.mode.toggle");
+            BUTTON_LSTICK = parseInt(mappings,"-1", "button.lstick");
+            BUTTON_RT = parseInt(mappings,"-1", "button.rt");
+            BUTTON_RB = parseInt(mappings,"-1", "button.rb");
+            BUTTON_LT = parseInt(mappings,"-1", "button.lt");
+            BUTTON_LB = parseInt(mappings,"-1", "button.lb");
+            BUTTON_START = parseInt(mappings,"-1", "button.start");
+            BUTTON_SELECT = parseInt(mappings,"-1", "button.select");
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e, "Error reading inputListener mappings");
         }
     }
 
+    /**
+     * Persist the current mappings to the given path
+     * @param path Pointer to the file
+     * @return True if operation succeeded
+     */
+    public boolean persist(Path path){
+        Properties mappings = new Properties();
+        mappings.setProperty("axis.value.pow", Double.toString(AXIS_VALUE_POW));
+        // L-stick
+        mappings.setProperty("axis.lstick.h", Integer.toString(AXIS_LSTICK_H));
+        mappings.setProperty("axis.lstick.h.sensitivity", Double.toString(AXIS_LSTICK_H_SENS));
+        mappings.setProperty("axis.lstick.v", Integer.toString(AXIS_LSTICK_V));
+        mappings.setProperty("axis.lstick.v.sensitivity", Double.toString(AXIS_LSTICK_V_SENS));
+        // R-stick
+        mappings.setProperty("axis.rstick.h", Integer.toString(AXIS_RSTICK_H));
+        mappings.setProperty("axis.rstick.h.sensitivity", Double.toString(AXIS_RSTICK_H_SENS));
+        mappings.setProperty("axis.rstick.v", Integer.toString(AXIS_RSTICK_V));
+        mappings.setProperty("axis.rstick.v.sensitivity", Double.toString(AXIS_RSTICK_V_SENS));
+        // RT and LT
+        mappings.setProperty("axis.rt", Integer.toString(AXIS_RT));
+        mappings.setProperty("axis.rt.sensitivity", Double.toString(AXIS_RT_SENS));
+        mappings.setProperty("axis.lt", Integer.toString(AXIS_LT));
+        mappings.setProperty("axis.lt.sensitivity", Double.toString(AXIS_LT_SENS));
 
-    private int parseInt(Properties mappings, String property, String defaultValue){
+        // Regular buttons
+        mappings.setProperty("button.a", Integer.toString(BUTTON_A));
+        mappings.setProperty("button.b", Integer.toString(BUTTON_B));
+        mappings.setProperty("button.x", Integer.toString(BUTTON_X));
+        mappings.setProperty("button.y", Integer.toString(BUTTON_Y));
+        mappings.setProperty("button.start", Integer.toString(BUTTON_START));
+        mappings.setProperty("button.select", Integer.toString(BUTTON_SELECT));
+        // Stick buttons
+        mappings.setProperty("button.rstick", Integer.toString(BUTTON_RSTICK));
+        mappings.setProperty("button.lstick", Integer.toString(BUTTON_LSTICK));
+        // Shoulder buttons
+        mappings.setProperty("button.rt", Integer.toString(BUTTON_RT));
+        mappings.setProperty("button.rb", Integer.toString(BUTTON_RB));
+        mappings.setProperty("button.lt", Integer.toString(BUTTON_LT));
+        mappings.setProperty("button.lb", Integer.toString(BUTTON_LB));
+        // Dpad
+        mappings.setProperty("button.dpad.u", Integer.toString(BUTTON_DPAD_UP));
+        mappings.setProperty("button.dpad.d", Integer.toString(BUTTON_DPAD_DOWN));
+        mappings.setProperty("button.dpad.r", Integer.toString(BUTTON_DPAD_RIGHT));
+        mappings.setProperty("button.dpad.l", Integer.toString(BUTTON_DPAD_LEFT));
+
+        try {
+            OutputStream os = Files.newOutputStream(path, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+            mappings.store(os, "Controller mappings definition file for " + this.name);
+            logger.info("Controller mappings file written successfully: " + path.toAbsolutePath());
+            return true;
+        }catch(Exception e){
+            logger.error(e);
+            return false;
+        }
+
+
+    }
+
+
+    private int parseInt(Properties mappings, String defaultValue,  String... properties){
         try{
-            return Integer.parseInt(mappings.getProperty(property, defaultValue));
+            for(String property : properties) {
+                if(mappings.containsKey(property)) {
+                    return Integer.parseInt(mappings.getProperty(property, defaultValue));
+                }
+            }
+            throw new RuntimeException("Properties not found: " + GlobalResources.toString(properties, "", ","));
         } catch (Exception e){
             return Integer.parseInt(defaultValue);
         }
     }
-    private double parseDouble(Properties mappings, String property, String defaultValue){
+    private double parseDouble(Properties mappings, String defaultValue,  String... properties){
         try{
-            return Parser.parseDouble(mappings.getProperty(property, defaultValue));
+            for(String property : properties) {
+                if(mappings.containsKey(property)) {
+                    return Double.parseDouble(mappings.getProperty(property, defaultValue));
+                }
+            }
+            throw new RuntimeException("Properties not found: " + GlobalResources.toString(properties, "", ","));
         } catch (Exception e){
             return Parser.parseDouble(defaultValue);
         }

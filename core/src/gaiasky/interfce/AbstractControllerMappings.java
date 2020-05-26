@@ -5,34 +5,50 @@
 
 package gaiasky.interfce;
 
+import gaiasky.util.Logger;
 import gaiasky.util.math.MathUtilsd;
 
+/**
+ * Defines all controller inputs
+ */
 public abstract class AbstractControllerMappings implements IControllerMappings {
+    protected static final Logger.Log logger = Logger.getLogger(AbstractControllerMappings.class);
 
-    public double AXIS_VALUE_POW;
+    public double AXIS_VALUE_POW = 4d;
 
-    public int AXIS_ROLL;
-    public double AXIS_ROLL_SENS;
-    public int AXIS_PITCH;
-    public double AXIS_PITCH_SENS;
-    public int AXIS_YAW;
-    public double AXIS_YAW_SENS;
-    public int AXIS_MOVE;
-    public double AXIS_MOVE_SENS;
-    public int AXIS_VEL_UP;
-    public double AXIS_VEL_UP_SENS;
-    public int AXIS_VEL_DOWN;
-    public double AXIS_VEL_DOWN_SENS;
+    public int AXIS_LSTICK_H = -1;
+    public double AXIS_LSTICK_H_SENS = 1d;
+    public int AXIS_RSTICK_H = -1;
+    public double AXIS_RSTICK_H_SENS = 1d;
+    public int AXIS_RSTICK_V = -1;
+    public double AXIS_RSTICK_V_SENS = 1d;
+    public int AXIS_LSTICK_V = -1;
+    public double AXIS_LSTICK_V_SENS = 1d;
+    public int AXIS_RT = -1;
+    public double AXIS_RT_SENS = 1d;
+    public int AXIS_LT = -1;
+    public double AXIS_LT_SENS = 1d;
 
-    public int BUTTON_VEL_UP;
-    public int BUTTON_VEL_DOWN;
-    public int BUTTON_VEL_MULT_TENTH;
-    public int BUTTON_VEL_MULT_HALF;
+    public int BUTTON_A = -1;
+    public int BUTTON_B = -1;
+    public int BUTTON_X = -1;
+    public int BUTTON_Y = -1;
 
-    public int BUTTON_UP;
-    public int BUTTON_DOWN;
+    public int BUTTON_DPAD_UP = -1;
+    public int BUTTON_DPAD_DOWN = -1;
+    public int BUTTON_DPAD_LEFT = -1;
+    public int BUTTON_DPAD_RIGHT = -1;
 
-    public int BUTTON_MODE_TOGGLE;
+    public int BUTTON_START = -1;
+    public int BUTTON_SELECT = -1;
+
+    public int BUTTON_RT = -1;
+    public int BUTTON_RB = -1;
+    public int BUTTON_LT = -1;
+    public int BUTTON_LB = -1;
+
+    public int BUTTON_LSTICK = -1;
+    public int BUTTON_RSTICK = -1;
 
     @Override
     public double getAxisValuePower() {
@@ -40,97 +56,142 @@ public abstract class AbstractControllerMappings implements IControllerMappings 
     }
 
     @Override
-    public int getAxisRoll() {
-        return AXIS_ROLL;
+    public int getAxisLstickH() {
+        return AXIS_LSTICK_H;
     }
 
     @Override
-    public int getAxisPitch() {
-        return AXIS_PITCH;
+    public int getAxisRstickH() {
+        return AXIS_RSTICK_H;
     }
 
     @Override
-    public int getAxisYaw() {
-        return AXIS_YAW;
+    public int getAxisRstickV() {
+        return AXIS_RSTICK_V;
     }
 
     @Override
-    public int getAxisMove() {
-        return AXIS_MOVE;
+    public int getAxisLstickV() {
+        return AXIS_LSTICK_V;
     }
 
     @Override
-    public int getAxisVelocityUp() {
-        return AXIS_VEL_UP;
+    public int getAxisRT() {
+        return AXIS_RT;
     }
 
     @Override
-    public int getAxisVelocityDown() {
-        return AXIS_VEL_DOWN;
+    public int getAxisLT() {
+        return AXIS_LT;
     }
 
     @Override
-    public int getButtonVelocityMultiplierTenth() {
-        return BUTTON_VEL_MULT_HALF;
+    public int getButtonY() {
+        return BUTTON_Y;
     }
 
     @Override
-    public int getButtonVelocityMultiplierHalf() {
-        return BUTTON_VEL_MULT_TENTH;
+    public int getButtonX() {
+        return BUTTON_X;
     }
 
     @Override
-    public int getButtonVelocityUp() {
-        return BUTTON_VEL_UP;
+    public int getButtonA() {
+        return BUTTON_A;
     }
 
     @Override
-    public int getButtonVelocityDown() {
-        return BUTTON_VEL_DOWN;
+    public int getButtonB() {
+        return BUTTON_B;
     }
 
     @Override
-    public int getButtonUp() {
-        return BUTTON_UP;
+    public int getButtonDpadUp() {
+        return BUTTON_DPAD_UP;
     }
 
     @Override
-    public int getButtonDown() {
-        return BUTTON_DOWN;
+    public int getButtonDpadDown() {
+        return BUTTON_DPAD_DOWN;
     }
 
     @Override
-    public int getButtonModeToggle() {
-        return BUTTON_MODE_TOGGLE;
+    public int getButtonDpadLeft() {
+        return BUTTON_DPAD_LEFT;
     }
 
     @Override
-    public double getAxisRollSensitivity() {
-        return MathUtilsd.clamp(AXIS_ROLL_SENS, 0.01, 100.0);
+    public int getButtonDpadRight() {
+        return BUTTON_DPAD_RIGHT;
     }
 
     @Override
-    public double getAxisPitchSensitivity() {
-        return MathUtilsd.clamp(AXIS_PITCH_SENS, 0.01, 100.0);
+    public int getButtonLstick() {
+        return BUTTON_LSTICK;
     }
 
     @Override
-    public double getAxisYawSensitivity() {
-        return MathUtilsd.clamp(AXIS_YAW_SENS, 0.01, 100.0);
+    public int getButtonRstick() {
+        return BUTTON_RSTICK;
     }
 
     @Override
-    public double getAxisMoveSensitivity() {
-        return MathUtilsd.clamp(AXIS_MOVE_SENS, 0.01, 100.0);
+    public int getButtonStart() {
+        return BUTTON_START;
     }
 
     @Override
-    public double getAxisVelUpSensitivity() {
-        return MathUtilsd.clamp(AXIS_VEL_UP_SENS, 0.01, 100.0);
+    public int getButtonSelect() {
+        return BUTTON_SELECT;
     }
 
     @Override
-    public double getAxisVelDownSensitivity() {
-        return MathUtilsd.clamp(AXIS_VEL_DOWN_SENS, 0.01, 100.0);
+    public int getButtonRT(){
+        return BUTTON_RT;
+    }
+
+    @Override
+    public int getButtonRB(){
+        return BUTTON_RB;
+    }
+
+    @Override
+    public int getButtonLT(){
+        return BUTTON_LT;
+    }
+
+    @Override
+    public int getButtonLB(){
+        return BUTTON_LB;
+    }
+
+    @Override
+    public double getAxisLstickHSensitivity() {
+        return MathUtilsd.clamp(AXIS_LSTICK_H_SENS, 0.01, 100.0);
+    }
+
+    @Override
+    public double getAxisRstickHSensitivity() {
+        return MathUtilsd.clamp(AXIS_RSTICK_H_SENS, 0.01, 100.0);
+    }
+
+    @Override
+    public double getAxisRstickVSensitivity() {
+        return MathUtilsd.clamp(AXIS_RSTICK_V_SENS, 0.01, 100.0);
+    }
+
+    @Override
+    public double getAxisLstickVSensitivity() {
+        return MathUtilsd.clamp(AXIS_LSTICK_V_SENS, 0.01, 100.0);
+    }
+
+    @Override
+    public double getAxisRTSensitivity() {
+        return MathUtilsd.clamp(AXIS_RT_SENS, 0.01, 100.0);
+    }
+
+    @Override
+    public double getAxisLTSensitivity() {
+        return MathUtilsd.clamp(AXIS_LT_SENS, 0.01, 100.0);
     }
 }

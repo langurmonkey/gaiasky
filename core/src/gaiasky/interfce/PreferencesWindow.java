@@ -75,11 +75,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private INumberFormat nf3, nf1;
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb,
-                    lodFadeCb, cbAutoCamrec, real, nsl,
-                    inverty, highAccuracyPositions, shadowsCb,
-                    hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo,
-                    crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb,
-                    exitConfirmation;
+            lodFadeCb, cbAutoCamrec, real, nsl,
+            inverty, highAccuracyPositions, shadowsCb,
+            hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo,
+            crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb,
+            exitConfirmation;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -346,7 +346,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel aaLabel = new OwnLabel(I18n.txt("gui.aa"), skin);
         aaLabel.addListener(new OwnTextTooltip(I18n.txt("gui.aa.info"), skin));
 
-        ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.aa.no"), 0), new ComboBoxBean(I18n.txt("gui.aa.fxaa"), -1), new ComboBoxBean(I18n.txt("gui.aa.nfaa"), -2) };
+        ComboBoxBean[] aas = new ComboBoxBean[]{new ComboBoxBean(I18n.txt("gui.aa.no"), 0), new ComboBoxBean(I18n.txt("gui.aa.fxaa"), -1), new ComboBoxBean(I18n.txt("gui.aa.nfaa"), -2)};
         aa = new OwnSelectBox<>(skin);
         aa.setItems(aas);
         aa.setWidth(textwidth * 3f);
@@ -357,7 +357,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // ORBITS
         OwnLabel orbitsLabel = new OwnLabel(I18n.txt("gui.orbitrenderer"), skin);
-        ComboBoxBean[] orbitItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.orbitrenderer.line"), 0), new ComboBoxBean(I18n.txt("gui.orbitrenderer.gpu"), 1) };
+        ComboBoxBean[] orbitItems = new ComboBoxBean[]{new ComboBoxBean(I18n.txt("gui.orbitrenderer.line"), 0), new ComboBoxBean(I18n.txt("gui.orbitrenderer.gpu"), 1)};
         orbitRenderer = new OwnSelectBox<>(skin);
         orbitRenderer.setItems(orbitItems);
         orbitRenderer.setWidth(textwidth * 3f);
@@ -365,7 +365,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.txt("gui.linerenderer"), skin);
-        ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.linerenderer.normal"), 0), new ComboBoxBean(I18n.txt("gui.linerenderer.quad"), 1) };
+        ComboBoxBean[] lineRenderers = new ComboBoxBean[]{new ComboBoxBean(I18n.txt("gui.linerenderer.normal"), 0), new ComboBoxBean(I18n.txt("gui.linerenderer.quad"), 1)};
         lineRenderer = new OwnSelectBox<>(skin);
         lineRenderer.setItems(lineRenderers);
         lineRenderer.setWidth(textwidth * 3f);
@@ -524,7 +524,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // N SHADOWS
         OwnLabel nShadowsLabel = new OwnLabel("#" + I18n.txt("gui.graphics.shadows"), skin);
         nShadowsLabel.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
-        ComboBoxBean[] nsh = new ComboBoxBean[] { new ComboBoxBean("1", 1), new ComboBoxBean("2", 2), new ComboBoxBean("3", 3), new ComboBoxBean("4", 4) };
+        ComboBoxBean[] nsh = new ComboBoxBean[]{new ComboBoxBean("1", 1), new ComboBoxBean("2", 2), new ComboBoxBean("3", 3), new ComboBoxBean("4", 4)};
         nshadows = new OwnSelectBox<>(skin);
         nshadows.setItems(nsh);
         nshadows.setWidth(textwidth * 3f);
@@ -675,7 +675,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         /* Tone Mapping */
         OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
-        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean("Filmic", ToneMapping.FILMIC.ordinal()), new ComboBoxBean("Uncharted", ToneMapping.UNCHARTED.ordinal()), new ComboBoxBean("ACES", ToneMapping.ACES.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), ToneMapping.NONE.ordinal()) };
+        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[]{new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean("Filmic", ToneMapping.FILMIC.ordinal()), new ComboBoxBean("Uncharted", ToneMapping.UNCHARTED.ordinal()), new ComboBoxBean("ACES", ToneMapping.ACES.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), ToneMapping.NONE.ordinal())};
         OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(textwidth * 3f);
@@ -783,7 +783,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.txt("gui.ui.theme"), skin);
         themeLabel.setWidth(labelWidth);
-        String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "night-red" };
+        String[] themes = new String[]{"dark-green", "dark-blue", "dark-orange", "night-red"};
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(textwidth * 3f);
         theme.setItems(themes);
@@ -1030,24 +1030,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // CONTROLLER MAPPINGS
         OwnLabel mappingsLabel = new OwnLabel(I18n.txt("gui.controller.mappingsfile"), skin);
-        Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
-        Path mappingsAssets = Path.of(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName());
-        Path mappingsData = SysUtils.getDefaultMappingsDir();
-        Array<Path> mappingFiles = new Array<>();
-        GlobalResources.listRec(mappingsAssets, mappingFiles, ".inputListener", ".controller");
-        GlobalResources.listRec(mappingsData, mappingFiles, ".inputListener", ".controller");
-        FileComboBoxBean selected = null;
-        for (Path path : mappingFiles) {
-            FileComboBoxBean fcbb = new MappingFileComboBoxBean(path);
-            controllerMappingsFiles.add(fcbb);
-            if (GlobalConf.controls.CONTROLLER_MAPPINGS_FILE.endsWith(path.getFileName().toString())) {
-                selected = fcbb;
-            }
-        }
-
         controllerMappings = new OwnSelectBox<>(skin);
-        controllerMappings.setItems(controllerMappingsFiles);
-        controllerMappings.setSelected(selected);
+        reloadControllerMappings(null);
 
         // INVERT Y
         inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad5);
@@ -1186,7 +1170,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Mode
         OwnLabel ssModeLabel = new OwnLabel(I18n.txt("gui.screenshots.mode"), skin);
-        ComboBoxBean[] screenshotModes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1) };
+        ComboBoxBean[] screenshotModes = new ComboBoxBean[]{new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1)};
         screenshotMode = new OwnSelectBox<>(skin);
         screenshotMode.setItems(screenshotModes);
         screenshotMode.setWidth(textwidth * 3f);
@@ -1301,7 +1285,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Mode
         OwnLabel fomodeLabel = new OwnLabel(I18n.txt("gui.screenshots.mode"), skin);
-        ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1) };
+        ComboBoxBean[] frameoutputModes = new ComboBoxBean[]{new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1)};
         frameoutputMode = new OwnSelectBox<>(skin);
         frameoutputMode.setItems(frameoutputModes);
         frameoutputMode.setWidth(textwidth * 3f);
@@ -1585,11 +1569,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // CATALOG CHOOSER SHOW CRITERIA
         OwnLabel titleCatChooser = new OwnLabel(I18n.txt("gui.data.dschooser.title"), skin, "help-title");
-        datasetChooserDefault = new OwnCheckBox(I18n.txt("gui.data.dschooser.default"), skin, "radio",  pad5);
+        datasetChooserDefault = new OwnCheckBox(I18n.txt("gui.data.dschooser.default"), skin, "radio", pad5);
         datasetChooserDefault.setChecked(GlobalConf.program.CATALOG_CHOOSER.def());
-        datasetChooserAlways = new OwnCheckBox(I18n.txt("gui.data.dschooser.always"), skin, "radio",  pad5);
+        datasetChooserAlways = new OwnCheckBox(I18n.txt("gui.data.dschooser.always"), skin, "radio", pad5);
         datasetChooserAlways.setChecked(GlobalConf.program.CATALOG_CHOOSER.always());
-        datasetChooserNever = new OwnCheckBox(I18n.txt("gui.data.dschooser.never"), skin, "radio",  pad5);
+        datasetChooserNever = new OwnCheckBox(I18n.txt("gui.data.dschooser.never"), skin, "radio", pad5);
         datasetChooserNever.setChecked(GlobalConf.program.CATALOG_CHOOSER.never());
 
         ButtonGroup dsCh = new ButtonGroup();
@@ -1823,6 +1807,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     }
 
+    protected void reloadControllerMappings(Path selectedFile){
+        Array<FileComboBoxBean> controllerMappingsFiles = new Array<>();
+        Path mappingsAssets = Path.of(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName());
+        Path mappingsData = SysUtils.getDefaultMappingsDir();
+        Array<Path> mappingFiles = new Array<>();
+        GlobalResources.listRec(mappingsAssets, mappingFiles, ".inputListener", ".controller");
+        GlobalResources.listRec(mappingsData, mappingFiles, ".inputListener", ".controller");
+        FileComboBoxBean selected = null;
+        for (Path path : mappingFiles) {
+            FileComboBoxBean fcbb = new MappingFileComboBoxBean(path);
+            controllerMappingsFiles.add(fcbb);
+            if (selectedFile == null && GlobalConf.controls.CONTROLLER_MAPPINGS_FILE.endsWith(path.getFileName().toString())) {
+                selected = fcbb;
+            } else if(selectedFile != null && selectedFile.toAbsolutePath().toString().endsWith(path.getFileName().toString())){
+                selected = fcbb;
+            }
+        }
+
+        controllerMappings.setItems(controllerMappingsFiles);
+        controllerMappings.setSelected(selected);
+        controllerMappings.pack();
+    }
+
     protected void generateControllersList(Table table) {
         Array<Controller> controllers = Controllers.getControllers();
 
@@ -1849,19 +1856,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         for (OwnLabel cn : controllerNames) {
             String controllerName = cn.getName();
             table.add(cn).left().padBottom(i == controllerNames.size - 1 ? 0f : pad5 * 2f).padRight(pad * 2f);
-            if(controllerName != null && !GlobalConf.controls.isControllerBlacklisted(controllerName)) {
+            if (controllerName != null && !GlobalConf.controls.isControllerBlacklisted(controllerName)) {
                 OwnTextButton config = new OwnTextButton("Configure", skin);
                 config.pad(pad5, pad5 * 2f, pad5, pad5 * 2f);
                 config.addListener(event -> {
-                    if(event instanceof ChangeEvent){
-                        ChangeEvent ce = (ChangeEvent) event;
+                    if (event instanceof ChangeEvent) {
                         ControllerConfigWindow ccw = new ControllerConfigWindow(controllerName, stage, skin);
+                        ccw.setAcceptRunnable(() -> {
+                            if(ccw.savedFile != null){
+                                // File was saved, reload, select
+                                reloadControllerMappings(ccw.savedFile);
+                            }
+                        });
                         ccw.show(stage);
                         return true;
                     }
                     return false;
                 });
-                table.add(config).left().padBottom(i == controllerNames.size -1 ? 0f : pad5 * 2f).row();
+                table.add(config).left().padBottom(i == controllerNames.size - 1 ? 0f : pad5 * 2f).row();
             } else {
                 table.add().left().row();
             }
@@ -2041,11 +2053,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         ShowCriterion sc = ShowCriterion.DEFAULT;
-        if(datasetChooserDefault.isChecked())
-            sc= ShowCriterion.DEFAULT;
-        else if(datasetChooserAlways.isChecked())
+        if (datasetChooserDefault.isChecked())
+            sc = ShowCriterion.DEFAULT;
+        else if (datasetChooserAlways.isChecked())
             sc = ShowCriterion.ALWAYS;
-        else if(datasetChooserNever.isChecked()) {
+        else if (datasetChooserNever.isChecked()) {
             sc = ShowCriterion.NEVER;
         }
         GlobalConf.program.CATALOG_CHOOSER = sc;
@@ -2156,7 +2168,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     }
 
-    private void unsubscribe(){
+    private void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }
 
@@ -2236,22 +2248,22 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private String keyToString(int key) {
         switch (key) {
-        case Keys.PLUS:
-            return "+";
-        default:
-            return Keys.toString(key);
+            case Keys.PLUS:
+                return "+";
+            default:
+                return Keys.toString(key);
         }
     }
 
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case CONTROLLER_CONNECTED_INFO:
-        case CONTROLLER_DISCONNECTED_INFO:
-            generateControllersList(controllersTable);
-            break;
-        default:
-            break;
+            case CONTROLLER_CONNECTED_INFO:
+            case CONTROLLER_DISCONNECTED_INFO:
+                generateControllersList(controllersTable);
+                break;
+            default:
+                break;
         }
     }
 }

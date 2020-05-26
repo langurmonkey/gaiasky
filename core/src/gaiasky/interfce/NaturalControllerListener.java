@@ -21,6 +21,9 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class NaturalControllerListener implements ControllerListener, IObserver, IInputListener {
     private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
 
@@ -85,13 +88,13 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         String post = mappingsFile.substring(extensionStart + 1);
 
         String osMappingsFile = pre + "." + os + "." + post;
-        if (Gdx.files.absolute(osMappingsFile).exists()) {
+        if (Files.exists(Path.of(osMappingsFile))) {
             mappingsFile = osMappingsFile;
             logger.info("Controller mappings file set to " + mappingsFile);
         }
 
-        if (Gdx.files.absolute(mappingsFile).exists())
-            mappings = new ControllerMappings(Gdx.files.absolute(mappingsFile));
+        if (Files.exists(Path.of(mappingsFile)))
+            mappings = new ControllerMappings(Path.of(mappingsFile));
         else {
             // Defaults to xbox360
             mappings = new XBox360Mappings();
@@ -117,17 +120,17 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             logger.info("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         }
 
-        if (buttonCode == mappings.getButtonVelocityMultiplierHalf()) {
+        if (buttonCode == mappings.getButtonX()) {
             cam.setGamepadMultiplier(0.5);
-        } else if (buttonCode == mappings.getButtonVelocityMultiplierTenth()) {
+        } else if (buttonCode == mappings.getButtonY()) {
             cam.setGamepadMultiplier(0.1);
-        } else if (buttonCode == mappings.getButtonVelocityUp()) {
+        } else if (buttonCode == mappings.getButtonA()) {
             cam.setVelocity(1);
-        } else if (buttonCode == mappings.getButtonVelocityDown()) {
+        } else if (buttonCode == mappings.getButtonB()) {
             cam.setVelocity(-1);
-        } else if (buttonCode == mappings.getButtonUp()){
+        } else if (buttonCode == mappings.getButtonDpadUp()){
             cam.setVertical(1);
-        } else if (buttonCode == mappings.getButtonDown()){
+        } else if (buttonCode == mappings.getButtonDpadDown()){
             cam.setVertical(-1);
         }
         cam.setInputByController(true);
@@ -143,19 +146,19 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             logger.info("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         }
 
-        if (buttonCode == mappings.getButtonVelocityMultiplierHalf()) {
+        if (buttonCode == mappings.getButtonX()) {
             cam.setGamepadMultiplier(1);
-        } else if (buttonCode == mappings.getButtonVelocityMultiplierTenth()) {
+        } else if (buttonCode == mappings.getButtonY()) {
             cam.setGamepadMultiplier(1);
-        } else if (buttonCode == mappings.getButtonVelocityUp()) {
+        } else if (buttonCode == mappings.getButtonA()) {
             cam.setVelocity(0);
-        } else if (buttonCode == mappings.getButtonVelocityDown()) {
+        } else if (buttonCode == mappings.getButtonB()) {
             cam.setVelocity(0);
-        } else if (buttonCode == mappings.getButtonUp()){
+        } else if (buttonCode == mappings.getButtonDpadUp()){
             cam.setVertical(0);
-        } else if (buttonCode == mappings.getButtonDown()){
+        } else if (buttonCode == mappings.getButtonDpadDown()){
             cam.setVertical(0);
-        } else if (buttonCode == mappings.getButtonModeToggle()){
+        } else if (buttonCode == mappings.getButtonRstick()){
             if(cam.getMode().isFocus()){
                 // Set free
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
@@ -184,38 +187,38 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         // http://www.wolframalpha.com/input/?i=y+%3D+sign%28x%29+*+x%5E2+%28x+from+-1+to+1%29}
         double val = Math.signum(value) * Math.abs(Math.pow(value, mappings.getAxisValuePower()));
 
-        if (axisCode == mappings.getAxisRoll()) {
+        if (axisCode == mappings.getAxisLstickH()) {
             if (cam.getMode().isFocus()) {
-                cam.setRoll(val * 1e-2 * mappings.getAxisRollSensitivity());
+                cam.setRoll(val * 1e-2 * mappings.getAxisLstickHSensitivity());
             } else {
                 // Use this for lateral movement
-                cam.setHorizontal(val * mappings.getAxisRollSensitivity());
+                cam.setHorizontal(val * mappings.getAxisLstickHSensitivity());
             }
             treated = true;
-        } else if (axisCode == mappings.getAxisPitch()) {
-            if (cam.getMode().isFocus()) {
-                cam.setVertical(val * 0.1 * mappings.getAxisPitchSensitivity());
-            } else {
-                cam.setPitch((GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1.0 : -1.0) * val * 3e-2 * mappings.getAxisPitchSensitivity());
-            }
-            treated = true;
-        } else if (axisCode == mappings.getAxisYaw()) {
-            if (cam.getMode().isFocus()) {
-                cam.setHorizontal(val * 0.1 * mappings.getAxisYawSensitivity());
-            } else {
-                cam.setYaw(val * 3e-2 * mappings.getAxisYawSensitivity());
-            }
-            treated = true;
-        } else if (axisCode == mappings.getAxisMove()) {
+        } else if (axisCode == mappings.getAxisLstickV()) {
             if (Math.abs(val) < 0.005)
                 val = 0;
-            cam.setVelocity(-val * mappings.getAxisMoveSensitivity());
+            cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
             treated = true;
-        } else if (axisCode == mappings.getAxisVelocityUp()) {
-            cam.setVelocity((val * mappings.getAxisVelUpSensitivity() + 1.0) / 2.0);
+        } else if (axisCode == mappings.getAxisRstickH()) {
+            if (cam.getMode().isFocus()) {
+                cam.setHorizontal(val * 0.1 * mappings.getAxisRstickVSensitivity());
+            } else {
+                cam.setYaw(val * 3e-2 * mappings.getAxisRstickVSensitivity());
+            }
             treated = true;
-        } else if (axisCode == mappings.getAxisVelocityDown()) {
-            cam.setVelocity(-(val * mappings.getAxisVelDownSensitivity() + 1.0) / 2.0);
+        } else if (axisCode == mappings.getAxisRstickV()) {
+            if (cam.getMode().isFocus()) {
+                cam.setVertical(val * 0.1 * mappings.getAxisRstickHSensitivity());
+            } else {
+                cam.setPitch((GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1.0 : -1.0) * val * 3e-2 * mappings.getAxisRstickHSensitivity());
+            }
+            treated = true;
+        } else if (axisCode == mappings.getAxisRT()) {
+            cam.setVelocity((val * mappings.getAxisRTSensitivity() + 1.0) / 2.0);
+            treated = true;
+        } else if (axisCode == mappings.getAxisLT()) {
+            cam.setVelocity(-(val * mappings.getAxisLTSensitivity() + 1.0) / 2.0);
             treated = true;
         }
 
