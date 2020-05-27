@@ -94,7 +94,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         }
 
         if (Files.exists(Path.of(mappingsFile)))
-            mappings = new ControllerMappings(Path.of(mappingsFile));
+            mappings = new ControllerMappings(null, Path.of(mappingsFile));
         else {
             // Defaults to xbox360
             mappings = new XBox360Mappings();

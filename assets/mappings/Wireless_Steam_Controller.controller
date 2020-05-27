@@ -1,0 +1,33 @@
+#Controller mappings definition file for Wireless Steam Controller
+#Wed May 27 16:50:39 CEST 2020
+axis.dpad.h=-1
+axis.dpad.v=-1
+axis.lstick.h=0
+axis.lstick.h.sensitivity=1.0
+axis.lstick.v=1
+axis.lstick.v.sensitivity=1.0
+axis.lt=-1
+axis.lt.sensitivity=1.0
+axis.rstick.h=2
+axis.rstick.h.sensitivity=1.0
+axis.rstick.v=3
+axis.rstick.v.sensitivity=1.0
+axis.rt=-1
+axis.rt.sensitivity=-1.0
+axis.value.pow=4.0
+button.a=2
+button.b=3
+button.dpad.d=18
+button.dpad.l=19
+button.dpad.r=20
+button.dpad.u=17
+button.lb=6
+button.lstick=13
+button.lt=8
+button.rb=7
+button.rstick=-1
+button.rt=9
+button.select=10
+button.start=11
+button.x=4
+button.y=5

@@ -29,15 +29,17 @@ public abstract class AbstractControllerMappings implements IControllerMappings 
     public int AXIS_LT = -1;
     public double AXIS_LT_SENS = 1d;
 
-    public int BUTTON_A = -1;
-    public int BUTTON_B = -1;
-    public int BUTTON_X = -1;
-    public int BUTTON_Y = -1;
-
+    public int AXIS_DPAD_H = -1;
+    public int AXIS_DPAD_V = -1;
     public int BUTTON_DPAD_UP = -1;
     public int BUTTON_DPAD_DOWN = -1;
     public int BUTTON_DPAD_LEFT = -1;
     public int BUTTON_DPAD_RIGHT = -1;
+
+    public int BUTTON_A = -1;
+    public int BUTTON_B = -1;
+    public int BUTTON_X = -1;
+    public int BUTTON_Y = -1;
 
     public int BUTTON_START = -1;
     public int BUTTON_SELECT = -1;
@@ -83,6 +85,16 @@ public abstract class AbstractControllerMappings implements IControllerMappings 
     @Override
     public int getAxisLT() {
         return AXIS_LT;
+    }
+
+    @Override
+    public int getAxisDpadH() {
+        return AXIS_DPAD_H;
+    }
+
+    @Override
+    public int getAxisDpadV() {
+        return AXIS_DPAD_V;
     }
 
     @Override

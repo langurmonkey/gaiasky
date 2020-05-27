@@ -5,19 +5,21 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.files.FileHandle;
+import gaiasky.desktop.util.SortedProperties;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.parse.Parser;
+import org.apache.commons.io.FilenameUtils;
 
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Properties;
+import java.util.TreeSet;
 
 /**
  * Reads inputListener mappings from a file
@@ -26,23 +28,28 @@ import java.util.Properties;
  *
  */
 public class ControllerMappings extends AbstractControllerMappings {
-    private String name;
+    private String controllerName;
 
     /**
      * Create empty controller mappings
      */
-    public ControllerMappings(String name){
+    public ControllerMappings(String controllerName){
         super();
-        this.name = name;
+        this.controllerName = controllerName;
     }
 
     /**
      * Create a controller mappings instance from a *.controller file
-     * @param mappingsFile
+     * @param controllerName Controller name, or null
+     * @param mappingsFile The mappings file
      */
-    public ControllerMappings(Path mappingsFile) {
-        super();
-        Properties mappings = new Properties();
+    public ControllerMappings(String controllerName, Path mappingsFile) {
+        this(controllerName);
+        // If no controller name
+        if(controllerName == null || controllerName.isBlank()){
+            this.controllerName = FilenameUtils.removeExtension(mappingsFile.getFileName().toString());
+        }
+        Properties mappings = new SortedProperties();
         try {
             InputStream is = Files.newInputStream(mappingsFile);
             mappings.load(is);
@@ -62,16 +69,17 @@ public class ControllerMappings extends AbstractControllerMappings {
             AXIS_RT_SENS = parseDouble(mappings, "-1", "axis.velocityup.sensitivity", "axis.rt.sensitivity");
             AXIS_LT = parseInt(mappings,"-1", "axis.velocitydown", "axis.lt");
             AXIS_LT_SENS = parseDouble(mappings, "1.0", "axis.velocitydown.sensitivity", "axis.lt.sensitivity");
+            AXIS_DPAD_H = parseInt(mappings, "-1", "axis.dpad.h");
+            AXIS_DPAD_V = parseInt(mappings, "-1", "axis.dpad.v");
 
-
-            BUTTON_A = parseInt(mappings,"-1", "button.velocityup", "button.a");
-            BUTTON_B = parseInt(mappings,"-1", "button.velocitydown", "button.b");
-            BUTTON_X = parseInt(mappings,"-1", "button.velocitytenth", "button.x");
-            BUTTON_Y = parseInt(mappings,"-1", "button.velocityhalf", "button.y");
             BUTTON_DPAD_UP = parseInt(mappings,"-1", "button.up", "button.dpad.u");
             BUTTON_DPAD_DOWN = parseInt(mappings,"-1", "button.down", "button.dpad.d");
             BUTTON_DPAD_LEFT = parseInt(mappings,"-1", "button.dpad.l");
             BUTTON_DPAD_RIGHT = parseInt(mappings,"-1", "button.dpad.r");
+            BUTTON_A = parseInt(mappings,"-1", "button.velocityup", "button.a");
+            BUTTON_B = parseInt(mappings,"-1", "button.velocitydown", "button.b");
+            BUTTON_X = parseInt(mappings,"-1", "button.velocitytenth", "button.x");
+            BUTTON_Y = parseInt(mappings,"-1", "button.velocityhalf", "button.y");
             BUTTON_RSTICK = parseInt(mappings,"-1", "button.rstick", "button.mode.toggle");
             BUTTON_LSTICK = parseInt(mappings,"-1", "button.lstick");
             BUTTON_RT = parseInt(mappings,"-1", "button.rt");
@@ -92,7 +100,8 @@ public class ControllerMappings extends AbstractControllerMappings {
      * @return True if operation succeeded
      */
     public boolean persist(Path path){
-        Properties mappings = new Properties();
+
+        Properties mappings = new SortedProperties();
         mappings.setProperty("axis.value.pow", Double.toString(AXIS_VALUE_POW));
         // L-stick
         mappings.setProperty("axis.lstick.h", Integer.toString(AXIS_LSTICK_H));
@@ -130,20 +139,20 @@ public class ControllerMappings extends AbstractControllerMappings {
         mappings.setProperty("button.dpad.d", Integer.toString(BUTTON_DPAD_DOWN));
         mappings.setProperty("button.dpad.r", Integer.toString(BUTTON_DPAD_RIGHT));
         mappings.setProperty("button.dpad.l", Integer.toString(BUTTON_DPAD_LEFT));
+        mappings.setProperty("axis.dpad.h", Integer.toString(AXIS_DPAD_H));
+        mappings.setProperty("axis.dpad.v", Integer.toString(AXIS_DPAD_V));
 
         try {
+            // Sort alphabetically
             OutputStream os = Files.newOutputStream(path, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
-            mappings.store(os, "Controller mappings definition file for " + this.name);
+            mappings.store(os, "Controller mappings definition file for " + this.controllerName);
             logger.info("Controller mappings file written successfully: " + path.toAbsolutePath());
             return true;
         }catch(Exception e){
             logger.error(e);
             return false;
         }
-
-
     }
-
 
     private int parseInt(Properties mappings, String defaultValue,  String... properties){
         try{

@@ -1861,7 +1861,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 config.pad(pad5, pad5 * 2f, pad5, pad5 * 2f);
                 config.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        ControllerConfigWindow ccw = new ControllerConfigWindow(controllerName, stage, skin);
+                        // Get currently selected mappings
+                        ControllerMappings cm = new ControllerMappings(controllerName, Path.of(controllerMappings.getSelected().file));
+                        ControllerConfigWindow ccw = new ControllerConfigWindow(controllerName, cm, stage, skin);
                         ccw.setAcceptRunnable(() -> {
                             if(ccw.savedFile != null){
                                 // File was saved, reload, select

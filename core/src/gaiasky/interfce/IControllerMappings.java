@@ -130,6 +130,18 @@ public interface IControllerMappings {
     int getButtonB();
 
     /**
+     * Returns the code of the horizontal dpad axis, if exists
+     * @return Horizontal dpad axis code
+     */
+    int getAxisDpadH();
+
+    /**
+     * Returns the code of the vertical dpad axis, if exists
+     * @return Vertical dpad axis code
+     */
+    int getAxisDpadV();
+
+    /**
      * Returns the code of the dpad-up button
      *
      * @return The dpad-up button code, negative if not mapped.
