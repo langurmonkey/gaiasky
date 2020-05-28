@@ -1,5 +1,4 @@
 #Controller mappings definition file for 8Bitdo SF30 Pro
-#Wed May 27 16:25:57 CEST 2020
 axis.lstick.h=0
 axis.lstick.h.sensitivity=1.0
 axis.lstick.v=1

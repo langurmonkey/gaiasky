@@ -576,7 +576,6 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
-            logger.info("Axis " + axisCode);
             if (currGamepad != null && currTextField != null && currGamepad.isAxis() && (System.currentTimeMillis() - lastT > minDelayT || capturingAxis)) {
                 if (!capturingAxis) {
                     // Start capturing

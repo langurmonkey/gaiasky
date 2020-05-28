@@ -1099,13 +1099,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         scrolls.add(controlsScroll);
 
         // Add to content
-        contentControls.add(titleController).colspan(2).left().padBottom(pad5 * 2).row();
-        contentControls.add(detectedLabel).left().padBottom(pad5 * 2).padRight(pad5);
-        contentControls.add(controllersTable).left().padBottom(pad5 * 2).row();
-        contentControls.add(mappingsLabel).left().padBottom(pad5 * 2).padRight(pad5);
-        contentControls.add(controllerMappings).left().padBottom(pad5 * 2).row();
-        contentControls.add(inverty).left().colspan(2).padBottom(pad5 * 2).row();
-        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad5 * 2).row();
+        contentControls.add(titleController).colspan(2).left().padBottom(pad).row();
+        contentControls.add(detectedLabel).left().padBottom(pad).padRight(pad);
+        contentControls.add(controllersTable).left().padBottom(pad).row();
+        contentControls.add(mappingsLabel).left().padBottom(pad).padRight(pad);
+        contentControls.add(controllerMappings).left().padBottom(pad).row();
+        contentControls.add(inverty).left().colspan(2).padBottom(pad).row();
+        contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
         /*
@@ -1835,7 +1835,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         Array<OwnLabel> controllerNames = new Array<>();
         for (Controller c : controllers) {
-            OwnLabel cl = new OwnLabel(c.getName(), skin);
+            OwnLabel cl = new OwnLabel(c.getName(), skin, "default-blue");
             cl.setName(c.getName());
             if (GlobalConf.controls.isControllerBlacklisted(c.getName())) {
                 cl.setText(cl.getText() + " [*]");
