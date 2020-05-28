@@ -22,6 +22,7 @@ package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -31,6 +32,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  */
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Vector2 viewport;
+    private Vector3 camPos;
     private Matrix4 frustumCorners;
     private Matrix4 camInvView;
 
@@ -38,6 +40,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         // @formatter:off
         Texture("u_texture0", 0),
         Viewport("u_viewport", 2),
+        CamPos("u_camPos", 3),
         CamInvView("u_camInvViewTransform", 16),
         FrustumCorners("u_frustumCorners", 16);
         // @formatter:on
@@ -80,19 +83,25 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     public RaymarchingFilter(Vector2 viewportSize) {
         super(ShaderLoader.fromFile("raymarching/screenspace", "raymarching/blackhole"));
         this.viewport = viewportSize;
+        this.camPos = new Vector3();
         this.frustumCorners = new Matrix4();
         this.camInvView = new Matrix4();
         rebind();
     }
 
-    public void setFrustumCorners(Matrix4 fc){
+    public void setFrustumCorners(Matrix4 fc) {
         this.frustumCorners = fc;
         setParam(Param.FrustumCorners, this.frustumCorners);
     }
 
-    public void setCaminvView(Matrix4 civ){
+    public void setCaminvView(Matrix4 civ) {
         this.camInvView.set(civ);
         setParam(Param.CamInvView, this.camInvView);
+    }
+
+    public void setCamPos(Vector3 cpos) {
+        this.camPos.set(cpos);
+        setParam(Param.CamPos, this.camPos);
     }
 
     public void setViewportSize(float width, float height) {
@@ -111,6 +120,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.Viewport, viewport);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.CamInvView, camInvView);
+        setParams(Param.CamPos, camPos);
         endParams();
     }
 

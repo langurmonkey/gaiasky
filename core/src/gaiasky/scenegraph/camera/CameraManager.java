@@ -693,7 +693,7 @@ public class CameraManager implements ICamera, IObserver {
     public Matrix4 getFrustumCornersEye(Matrix4 frustumCorners) {
         PerspectiveCamera cam = this.getCamera();
         float camFov = cam.fieldOfView;
-        float camAspect = cam.viewportHeight / cam.viewportWidth;
+        float camAspect = cam.viewportWidth / cam.viewportHeight;
 
         float fovWHalf = camFov * 0.5f;
 

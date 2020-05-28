@@ -23,8 +23,8 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.FxaaFilter;
 import gaiasky.util.gdx.contrib.postprocess.filters.RaymarchingFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
@@ -55,6 +55,10 @@ public final class Raymarching extends PostProcessorEffect {
 
     public void setCamInvView(Matrix4 civ) {
         filter.setCaminvView(civ);
+    }
+
+    public void setCamPos(Vector3 camPos){
+        filter.setCamPos(camPos);
     }
 
     @Override
