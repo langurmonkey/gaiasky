@@ -1,5 +1,4 @@
 #Controller mappings definition file for SDL GameController Nintendo Switch Pro Controller
-#Thu May 28 09:09:54 CEST 2020
 axis.dpad.h=-1
 axis.dpad.v=-1
 axis.lstick.h=0

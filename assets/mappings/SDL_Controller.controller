@@ -1,5 +1,4 @@
 #Controller mappings definition file for SDL GameController X360 Controller
-#Thu May 28 08:32:34 CEST 2020
 axis.dpad.h=-1
 axis.dpad.v=-1
 axis.lstick.h=0
