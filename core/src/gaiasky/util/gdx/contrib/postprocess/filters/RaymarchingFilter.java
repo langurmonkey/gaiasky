@@ -37,6 +37,8 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Vector3 camPos;
     private Matrix4 frustumCorners;
     private Matrix4 camInvView;
+    private Matrix4 modelView;
+    private float timeSecs;
     /**
      * Default depth buffer texture. In our case, it contains the logarithmic
      * depth buffer data.
@@ -47,10 +49,12 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         // @formatter:off
         Texture("u_texture0", 0),
         TextureDepth("u_texture1", 0),
+        Time("u_time", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
         CamPos("u_camPos", 3),
         CamInvView("u_camInvViewTransform", 16),
+        ModelView("u_modelView", 16),
         FrustumCorners("u_frustumCorners", 16);
         // @formatter:on
 
@@ -98,6 +102,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.camPos = new Vector3();
         this.frustumCorners = new Matrix4();
         this.camInvView = new Matrix4();
+        this.modelView = new Matrix4();
         rebind();
     }
 
@@ -111,9 +116,19 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.CamInvView, this.camInvView);
     }
 
+    public void setModelView(Matrix4 mv) {
+        this.modelView.set(mv);
+        setParam(Param.ModelView, this.modelView);
+    }
+
     public void setCamPos(Vector3 cpos) {
         this.camPos.set(cpos);
         setParam(Param.CamPos, this.camPos);
+    }
+
+    public void setTime(float seconds){
+        this.timeSecs = seconds;
+        setParam(Param.Time, timeSecs);
     }
 
     public void setViewportSize(float width, float height) {
@@ -143,7 +158,9 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.CamInvView, camInvView);
+        setParams(Param.ModelView, this.modelView);
         setParams(Param.CamPos, camPos);
+        setParam(Param.Time, timeSecs);
         endParams();
     }
 

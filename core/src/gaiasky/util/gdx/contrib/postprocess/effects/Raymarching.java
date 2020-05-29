@@ -34,7 +34,7 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * @author Toni Sagrista
  */
 public final class Raymarching extends PostProcessorEffect {
-    private RaymarchingFilter filter = null;
+    private RaymarchingFilter filter;
 
     public Raymarching(String fragmentShader, float viewportWidth, float viewportHeight) {
         this(fragmentShader, (int) viewportWidth, (int) viewportHeight);
@@ -57,11 +57,19 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setCaminvView(civ);
     }
 
-    public void setCamPos(Vector3 camPos){
+    public void setModelView(Matrix4 civ) {
+        filter.setModelView(civ);
+    }
+
+    public void setCamPos(Vector3 camPos) {
         filter.setCamPos(camPos);
     }
 
-    public void setZfarK(float zfar, float k){
+    public void setTime(float seconds) {
+        filter.setTime(seconds);
+    }
+
+    public void setZfarK(float zfar, float k) {
         filter.setZfarK(zfar, k);
     }
 

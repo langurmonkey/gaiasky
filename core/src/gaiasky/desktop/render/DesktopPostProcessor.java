@@ -41,6 +41,10 @@ import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Path;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,6 +148,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // RAY MARCHING SHADERS
         //String[] rmShaders = new String[]{"raymarching/torus"};
+        //String[] rmShaders = new String[]{"raymarching/blackhole"};
         String[] rmShaders = new String[]{};
         for (String rmShader : rmShaders) {
             Raymarching rm = new Raymarching(rmShader, width, height);
@@ -598,8 +603,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 PerspectiveCamera cam = (PerspectiveCamera) data[3];
                 CameraManager cm = GaiaSky.instance.getCameraManager();
                 cm.getFrustumCornersEye(frustumCorners);
-                Matrix4 civ = cm.getCamera().view.cpy().inv();
+                Matrix4 civ = invView.set(cm.getCamera().view).inv();
+                Matrix4 mv = invProj.set(cm.getCamera().combined);
                 Vector3 cpos = cm.current.getPos().put(auxf);
+                ZonedDateTime zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
+                float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
                 float zfar = (float) cm.current.getFar();
                 float k = Constants.getCameraK();
                 float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);
@@ -616,8 +624,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                                 Raymarching raymarching = (Raymarching) rm;
                                 raymarching.setFrustumCorners(frustumCorners);
                                 raymarching.setCamInvView(civ);
+                                raymarching.setModelView(mv);
                                 raymarching.setCamPos(cpos);
                                 raymarching.setZfarK(zfar, k);
+                                raymarching.setTime(secs);
                             });
                     }
                 }
