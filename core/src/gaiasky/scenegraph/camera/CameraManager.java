@@ -7,6 +7,7 @@ package gaiasky.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -30,23 +31,39 @@ public class CameraManager implements ICamera, IObserver {
      * @author Toni Sagrista
      */
     public enum CameraMode {
-        /** Free navigation **/
+        /**
+         * Free navigation
+         **/
         FREE_MODE,
-        /** FOCUS_MODE **/
+        /**
+         * FOCUS_MODE
+         **/
         FOCUS_MODE,
-        /** GAME_MODE mode **/
+        /**
+         * GAME_MODE mode
+         **/
         GAME_MODE,
         /** Relativistic camera **/
         //Relativistic,
-        /** Gaia Scene **/
+        /**
+         * Gaia Scene
+         **/
         GAIA_SCENE_MODE,
-        /** SPACECRAFT_MODE **/
+        /**
+         * SPACECRAFT_MODE
+         **/
         SPACECRAFT_MODE,
-        /** FOV1 **/
+        /**
+         * FOV1
+         **/
         GAIA_FOV1_MODE,
-        /** FOV2 **/
+        /**
+         * FOV2
+         **/
         GAIA_FOV2_MODE,
-        /** Both fields of view **/
+        /**
+         * Both fields of view
+         **/
         GAIA_FOVS_MODE;
 
         static TwoWayHashmap<String, CameraMode> equivalences;
@@ -108,14 +125,14 @@ public class CameraManager implements ICamera, IObserver {
          */
         public int getGaiaFovMode() {
             switch (this) {
-            case GAIA_FOV1_MODE:
-                return 1;
-            case GAIA_FOV2_MODE:
-                return 2;
-            case GAIA_FOVS_MODE:
-                return 3;
-            default:
-                return 0;
+                case GAIA_FOV1_MODE:
+                    return 1;
+                case GAIA_FOV2_MODE:
+                    return 2;
+                case GAIA_FOVS_MODE:
+                    return 3;
+                default:
+                    return 0;
             }
         }
     }
@@ -131,14 +148,20 @@ public class CameraManager implements ICamera, IObserver {
 
     private ICamera[] cameras;
 
-    /** Last position, for working out velocity **/
+    /**
+     * Last position, for working out velocity
+     **/
     private Vector3d lastPos, out, in;
     private Vector3 vec, v0, v1, isec;
     private Matrix4 localTransformInv;
 
-    /** Current velocity in km/h **/
+    /**
+     * Current velocity in km/h
+     **/
     protected double speed;
-    /** Velocity vector **/
+    /**
+     * Velocity vector
+     **/
     protected Vector3d velocity, velocitynor;
 
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr) {
@@ -150,7 +173,7 @@ public class CameraManager implements ICamera, IObserver {
         spacecraftCamera = new SpacecraftCamera(this);
         relativisticCamera = new RelativisticCamera(manager, this);
 
-        cameras = new ICamera[] { naturalCamera, fovCamera, spacecraftCamera };
+        cameras = new ICamera[]{naturalCamera, fovCamera, spacecraftCamera};
 
         this.mode = mode;
         lastPos = new Vector3d();
@@ -185,31 +208,31 @@ public class CameraManager implements ICamera, IObserver {
         AbstractCamera aux;
         // Update
         switch (mode) {
-        case GAME_MODE:
-            EventManager.instance.post(Events.CAMERA_CINEMATIC_CMD, false, false);
-        case FREE_MODE:
-        case FOCUS_MODE:
-        case GAIA_SCENE_MODE:
-            aux = backupCam(current);
-            current = naturalCamera;
-            restoreCam(naturalCamera, aux);
-            break;
-        // case Relativistic:
-        //     aux = backupCam(current);
-        //     current = relativisticCamera;
-        //     restoreCam(relativisticCamera, aux);
-        case SPACECRAFT_MODE:
-            aux = backupCam(current);
-            current = spacecraftCamera;
-            restoreCam(spacecraftCamera, aux);
-            break;
-        case GAIA_FOV1_MODE:
-        case GAIA_FOV2_MODE:
-        case GAIA_FOVS_MODE:
-            current = fovCamera;
-            break;
-        default:
-            break;
+            case GAME_MODE:
+                EventManager.instance.post(Events.CAMERA_CINEMATIC_CMD, false, false);
+            case FREE_MODE:
+            case FOCUS_MODE:
+            case GAIA_SCENE_MODE:
+                aux = backupCam(current);
+                current = naturalCamera;
+                restoreCam(naturalCamera, aux);
+                break;
+            // case Relativistic:
+            //     aux = backupCam(current);
+            //     current = relativisticCamera;
+            //     restoreCam(relativisticCamera, aux);
+            case SPACECRAFT_MODE:
+                aux = backupCam(current);
+                current = spacecraftCamera;
+                restoreCam(spacecraftCamera, aux);
+                break;
+            case GAIA_FOV1_MODE:
+            case GAIA_FOV2_MODE:
+            case GAIA_FOVS_MODE:
+                current = fovCamera;
+                break;
+            default:
+                break;
         }
 
     }
@@ -239,12 +262,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getPreviousPos(){
+    public Vector3d getPreviousPos() {
         return current.getPreviousPos();
     }
 
     @Override
-    public void setPreviousPos(Vector3d prevpos){
+    public void setPreviousPos(Vector3d prevpos) {
         current.setPreviousPos(prevpos);
     }
 
@@ -400,18 +423,18 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case CAMERA_MODE_CMD:
-            CameraMode cm = (CameraMode) data[0];
-            boolean centerFocus = true;
-            if (data.length > 1)
-                centerFocus = (Boolean) data[1];
-            updateMode(cm, centerFocus, true);
-            break;
-        case FOV_CHANGE_NOTIFICATION:
-            updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            break;
-        default:
-            break;
+            case CAMERA_MODE_CMD:
+                CameraMode cm = (CameraMode) data[0];
+                boolean centerFocus = true;
+                if (data.length > 1)
+                    centerFocus = (Boolean) data[1];
+                updateMode(cm, centerFocus, true);
+                break;
+            case FOV_CHANGE_NOTIFICATION:
+                updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+                break;
+            default:
+                break;
         }
 
     }
@@ -606,5 +629,107 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public double getFar() {
         return current.getFar();
+    }
+
+    /**
+     * Stores the normalized rays representing the camera frustum in world space in a 4x4 matrix.  Each row is a vector.
+     *
+     * @param frustumCorners The matrix to fill
+     * @return The same matrix
+     */
+    public Matrix4 getFrustumCornersWorld(Matrix4 frustumCorners) {
+        PerspectiveCamera cam = this.getCamera();
+        float camFov = cam.fieldOfView;
+        float camAspect = cam.viewportHeight / cam.viewportWidth;
+
+        float fovW = camFov * 0.5f;
+        float fovH = camFov * camAspect * 0.5f;
+
+        Vector3 dir = new Vector3(cam.direction);
+
+        Vector3 aux = new Vector3();
+
+        Vector3 topLeft = (new Vector3(dir)).rotate(cam.up, fovW);
+        topLeft.rotate(aux.set(cam.up).crs(topLeft), fovH).nor();
+
+        Vector3 topRight = (new Vector3(dir)).rotate(cam.up, -fovW);
+        topRight.rotate(aux.set(cam.up).crs(topLeft), fovH).nor();
+
+        Vector3 bottomRight = (new Vector3(dir)).rotate(cam.up, -fovW);
+        bottomRight.rotate(aux.set(cam.up).crs(topLeft), -fovH).nor();
+
+        Vector3 bottomLeft = (new Vector3(dir)).rotate(cam.up, fovW);
+        bottomLeft.rotate(aux.set(cam.up).crs(topLeft), -fovH).nor();
+
+        // Store in column-major order, the glsl way
+        // Top left
+        frustumCorners.val[Matrix4.M00] = topLeft.x;
+        frustumCorners.val[Matrix4.M10] = topLeft.y;
+        frustumCorners.val[Matrix4.M20] = topLeft.z;
+
+        // Top right
+        frustumCorners.val[Matrix4.M01] = topRight.x;
+        frustumCorners.val[Matrix4.M11] = topRight.y;
+        frustumCorners.val[Matrix4.M21] = topRight.z;
+
+        // Bottom right
+        frustumCorners.val[Matrix4.M02] = bottomRight.x;
+        frustumCorners.val[Matrix4.M12] = bottomRight.y;
+        frustumCorners.val[Matrix4.M22] = bottomRight.z;
+
+        // Bottom left
+        frustumCorners.val[Matrix4.M03] = bottomLeft.x;
+        frustumCorners.val[Matrix4.M13] = bottomLeft.y;
+        frustumCorners.val[Matrix4.M23] = bottomLeft.z;
+        return frustumCorners;
+    }
+
+    /**
+     * Stores the normalized rays representing the camera frustum in eye space in a 4x4 matrix.  Each row is a vector.
+     *
+     * @param frustumCorners The matrix to fill
+     * @return The same matrix
+     */
+    public Matrix4 getFrustumCornersEye(Matrix4 frustumCorners) {
+        PerspectiveCamera cam = this.getCamera();
+        float camFov = cam.fieldOfView;
+        float camAspect = cam.viewportWidth / cam.viewportHeight;
+
+        float fovWHalf = camFov * 0.5f;
+
+        float tan_fov = (float) Math.tan(Math.toRadians(fovWHalf));
+
+        Vector3 right = Vector3.X;
+        Vector3 up = Vector3.Y;
+        Vector3 forward = Vector3.Z;
+
+        Vector3 toRight = (new Vector3(right)).scl(tan_fov * camAspect);
+        Vector3 toTop = (new Vector3(up)).scl(tan_fov);
+
+        Vector3 topLeft = (new Vector3(forward)).scl(-1).sub(toRight).add(toTop).nor();
+        Vector3 topRight = (new Vector3(forward)).scl(-1).add(toRight).add(toTop).nor();
+        Vector3 bottomRight = (new Vector3(forward)).scl(-1).add(toRight).sub(toTop).nor();
+        Vector3 bottomLeft = (new Vector3(forward)).scl(-1).sub(toRight).sub(toTop).nor();
+
+        // Top left
+        frustumCorners.val[Matrix4.M00] = topLeft.x;
+        frustumCorners.val[Matrix4.M10] = topLeft.y;
+        frustumCorners.val[Matrix4.M20] = topLeft.z;
+
+        // Top right
+        frustumCorners.val[Matrix4.M01] = topRight.x;
+        frustumCorners.val[Matrix4.M11] = topRight.y;
+        frustumCorners.val[Matrix4.M21] = topRight.z;
+
+        // Bottom right
+        frustumCorners.val[Matrix4.M02] = bottomRight.x;
+        frustumCorners.val[Matrix4.M12] = bottomRight.y;
+        frustumCorners.val[Matrix4.M22] = bottomRight.z;
+
+        // Bottom left
+        frustumCorners.val[Matrix4.M03] = bottomLeft.x;
+        frustumCorners.val[Matrix4.M13] = bottomLeft.y;
+        frustumCorners.val[Matrix4.M23] = bottomLeft.z;
+        return frustumCorners;
     }
 }
