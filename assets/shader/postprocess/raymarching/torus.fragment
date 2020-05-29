@@ -91,7 +91,7 @@ void main(){
 
     vec3 col = texture(u_texture0, v_texCoords).xyz; // Color of the scene before this shader was run
     float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y); // Logarithmic depth buffer
-    //depth *= length(v_ray);
+    depth *= length(v_ray);
     vec4 add = raymarch(ro, rd, depth);
 
     // Returns final color using alpha blending

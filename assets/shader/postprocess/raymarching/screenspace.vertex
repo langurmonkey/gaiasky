@@ -32,7 +32,7 @@ void main() {
     gl_Position.z = 0.1;
 
 	vec4 ray = u_frustumCorners[int(index)];
-	//ray /= abs(ray.z);
+	ray /= abs(ray.z);
 	ray = u_camInvViewTransform * ray;
 	v_ray = ray.xyz;
 }

@@ -29,9 +29,12 @@ import gaiasky.util.*;
 import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
+import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
+import gaiasky.util.gdx.contrib.postprocess.filters.CameraBlur;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -39,10 +42,13 @@ import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
-    private Logger.Log logger = Logger.getLogger(this.getClass().getSimpleName());
+    private static Log logger = Logger.getLogger(DesktopPostProcessor.class);
+    public static DesktopPostProcessor instance;
+
     private AssetManager manager;
     private PostProcessBean[] pps;
 
@@ -71,6 +77,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public DesktopPostProcessor() {
         ShaderLoader.BasePath = "shader/postprocess/";
+        instance = this;
 
         auxd = new Vector3d();
         auxf = new Vector3();
@@ -135,14 +142,18 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true);
         ppb.pp.setViewport(new Rectangle(0, 0, width, height));
 
-        // RAY MARCHING
-        ppb.rm = new Raymarching(width, height);
-        ppb.rm.setFrustumCorners(GaiaSky.instance.getCameraManager().getFrustumCornersWorld(frustumCorners));
-        ppb.pp.addEffect(ppb.rm);
+        // RAY MARCHING SHADERS
+        //String[] rmShaders = new String[]{"raymarching/torus"};
+        String[] rmShaders = new String[]{};
+        for (String rmShader : rmShaders) {
+            Raymarching rm = new Raymarching(rmShader, width, height);
+            rm.setFrustumCorners(GaiaSky.instance.getCameraManager().getFrustumCornersWorld(frustumCorners));
+            ppb.add(rm);
+        }
 
         // DEPTH BUFFER
-        //ppb.depthBuffer = new DepthBuffer();
-        //ppb.pp.addEffect(ppb.depthBuffer);
+        //DepthBuffer depthBuffer = new DepthBuffer();
+        //ppb.set(depthBuffer);
 
         // CAMERA MOTION BLUR
         initCameraBlur(ppb, width, height, gq);
@@ -150,14 +161,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // LIGHT GLOW
         Texture glow = manager.get(starTextureName);
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        ppb.lightglow = new LightGlow(5, 5);
-        ppb.lightglow.setLightGlowTexture(glow);
-        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-        ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
-        ppb.lightglow.setBackbufferScale(GlobalConf.screen.BACKBUFFER_SCALE);
+        LightGlow lightGlow = new LightGlow(5, 5);
+        lightGlow.setLightGlowTexture(glow);
+        lightGlow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+        lightGlow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+        lightGlow.setBackbufferScale(GlobalConf.screen.BACKBUFFER_SCALE);
+        lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        ppb.set(lightGlow);
         updateGlow(ppb, gq);
-        ppb.lightglow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
-        ppb.pp.addEffect(ppb.lightglow);
 
         /*
             TODO
@@ -171,7 +182,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 @Override
                 public void run() {
                     logger.info("Enabling light glow effect...");
-                    ppb.lightglow.setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+                    ppb.get(LightGlow.class).setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
                 }
             };
             Timer.schedule(enableLG, 5);
@@ -185,41 +196,41 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ldirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lburst = manager.get(lensStarburstName);
         lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        ppb.lens = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
-        ppb.lens.setGhosts(nGhosts);
-        ppb.lens.setHaloWidth(0.5f);
-        ppb.lens.setLensColorTexture(lcol);
-        ppb.lens.setLensDirtTexture(ldirt);
-        ppb.lens.setLensStarburstTexture(lburst);
-        ppb.lens.setFlareIntesity(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE ? flareIntensity : 0f);
-        ppb.lens.setFlareSaturation(0.8f);
-        ppb.lens.setBaseIntesity(1f);
-        ppb.lens.setBias(-0.98f);
-        ppb.lens.setBlurPasses(35);
-        ppb.pp.addEffect(ppb.lens);
+        LensFlare2 lensFlare = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
+        lensFlare.setGhosts(nGhosts);
+        lensFlare.setHaloWidth(0.5f);
+        lensFlare.setLensColorTexture(lcol);
+        lensFlare.setLensDirtTexture(ldirt);
+        lensFlare.setLensStarburstTexture(lburst);
+        lensFlare.setFlareIntesity(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE ? flareIntensity : 0f);
+        lensFlare.setFlareSaturation(0.8f);
+        lensFlare.setBaseIntesity(1f);
+        lensFlare.setBias(-0.98f);
+        lensFlare.setBlurPasses(35);
+        ppb.set(lensFlare);
 
         // BLOOM
-        ppb.bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
-        ppb.bloom.setBloomIntesity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
-        ppb.bloom.setThreshold(0.5f);
-        ppb.bloom.setBlurPasses(15);
-        ppb.bloom.setBlurAmount(20f);
-        ppb.bloom.setEnabled(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY > 0);
-        ppb.pp.addEffect(ppb.bloom);
+        Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
+        bloom.setBloomIntesity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
+        bloom.setThreshold(0.5f);
+        bloom.setBlurPasses(15);
+        bloom.setBlurAmount(20f);
+        bloom.setEnabled(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY > 0);
+        ppb.set(bloom);
 
         // DISTORTION (STEREOSCOPIC MODE)
-        ppb.curvature = new Curvature();
-        ppb.curvature.setDistortion(1.2f);
-        ppb.curvature.setZoom(0.75f);
-        ppb.curvature.setEnabled(GlobalConf.program.STEREOSCOPIC_MODE && GlobalConf.program.STEREO_PROFILE == StereoProfile.VR_HEADSET);
-        ppb.pp.addEffect(ppb.curvature);
+        Curvature curvature = new Curvature();
+        curvature.setDistortion(1.2f);
+        curvature.setZoom(0.75f);
+        curvature.setEnabled(GlobalConf.program.STEREOSCOPIC_MODE && GlobalConf.program.STEREO_PROFILE == StereoProfile.VR_HEADSET);
+        ppb.set(curvature);
 
         // FISHEYE DISTORTION (DOME)
-        ppb.fisheye = new Fisheye(width, height);
-        ppb.fisheye.setFov(GaiaSky.instance.cam.getCamera().fieldOfView);
-        ppb.fisheye.setMode(0);
-        ppb.fisheye.setEnabled(GlobalConf.postprocess.POSTPROCESS_FISHEYE);
-        ppb.pp.addEffect(ppb.fisheye);
+        Fisheye fisheye = new Fisheye(width, height);
+        fisheye.setFov(GaiaSky.instance.cam.getCamera().fieldOfView);
+        fisheye.setMode(0);
+        fisheye.setEnabled(GlobalConf.postprocess.POSTPROCESS_FISHEYE);
+        ppb.set(fisheye);
 
         // ANTIALIAS
         initAntiAliasing(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS, width, height, ppb);
@@ -241,16 +252,17 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 // Generate identity
                 data = PFMReader.constructPFMData(50, 50, val -> val);
             }
+            GeometryWarp geometryWarp;
             if (blendFile != null) {
                 // Set up blend texture
                 Texture blendTex = manager.get(blendFile.toString());
-                ppb.geometryWarp = new GeometryWarp(data, blendTex);
+                geometryWarp = new GeometryWarp(data, blendTex);
             } else {
                 // No blend
-                ppb.geometryWarp = new GeometryWarp(data);
+                geometryWarp = new GeometryWarp(data);
             }
-            ppb.geometryWarp.setEnabled(true);
-            ppb.pp.addEffect(ppb.geometryWarp);
+            geometryWarp.setEnabled(true);
+            ppb.set(geometryWarp);
 
         }
 
@@ -311,35 +323,39 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             lgw = 1000;
         }
         lgh = Math.round(lgw / ar);
-        ppb.lightglow.setNSamples(samples);
-        ppb.lightglow.setViewportSize(lgw, lgh);
+        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+        lightglow.setNSamples(samples);
+        lightglow.setViewportSize(lgw, lgh);
 
         lightGlowNSamples = samples;
 
     }
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
+        CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
         if (gq.isUltra()) {
-            ppb.camblur.setBlurMaxSamples(60);
+            cameraMotionBlur.setBlurMaxSamples(60);
         } else if (gq.isHigh()) {
-            ppb.camblur.setBlurMaxSamples(50);
+            cameraMotionBlur.setBlurMaxSamples(50);
         } else if (gq.isNormal()) {
-            ppb.camblur.setBlurMaxSamples(35);
+            cameraMotionBlur.setBlurMaxSamples(35);
         } else {
-            ppb.camblur.setBlurMaxSamples(20);
+            cameraMotionBlur.setBlurMaxSamples(20);
         }
     }
 
     private void updateFxaa(PostProcessBean ppb, GraphicsQuality gq) {
-        ppb.antialiasing.updateQuality(getFxaaQuality(gq));
+        Fxaa fxaa = (Fxaa) ppb.get(Fxaa.class);
+        if (fxaa != null)
+            fxaa.updateQuality(getFxaaQuality(gq));
     }
 
     private void initCameraBlur(PostProcessBean ppb, float width, float height, GraphicsQuality gq) {
-        ppb.camblur = new CameraMotion(width, height);
-        ppb.camblur.setBlurScale(1f);
-        ppb.camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR);
+        CameraMotion camblur = new CameraMotion(width, height);
+        camblur.setBlurScale(1f);
+        camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR);
+        ppb.set(camblur);
         updateCameraBlur(ppb, gq);
-        ppb.pp.addEffect(ppb.camblur);
 
         // Add to scene graph
         if (blurObject != null && !blurObjectAdded) {
@@ -350,27 +366,27 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void initLevels(PostProcessBean ppb) {
-        ppb.levels = new Levels();
-        ppb.levels.setBrightness(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS);
-        ppb.levels.setContrast(GlobalConf.postprocess.POSTPROCESS_CONTRAST);
-        ppb.levels.setHue(GlobalConf.postprocess.POSTPROCESS_HUE);
-        ppb.levels.setSaturation(GlobalConf.postprocess.POSTPROCESS_SATURATION);
-        ppb.levels.setGamma(GlobalConf.postprocess.POSTPROCESS_GAMMA);
+        Levels levels = new Levels();
+        levels.setBrightness(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS);
+        levels.setContrast(GlobalConf.postprocess.POSTPROCESS_CONTRAST);
+        levels.setHue(GlobalConf.postprocess.POSTPROCESS_HUE);
+        levels.setSaturation(GlobalConf.postprocess.POSTPROCESS_SATURATION);
+        levels.setGamma(GlobalConf.postprocess.POSTPROCESS_GAMMA);
 
         switch (GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE) {
             case AUTO:
-                ppb.levels.enableToneMappingAuto();
+                levels.enableToneMappingAuto();
                 break;
             case EXPOSURE:
-                ppb.levels.enableToneMappingExposure();
-                ppb.levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
+                levels.enableToneMappingExposure();
+                levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
                 break;
             case NONE:
-                ppb.levels.disableToneMapping();
+                levels.disableToneMapping();
                 break;
         }
 
-        ppb.pp.addEffect(ppb.levels);
+        ppb.set(levels);
     }
 
     private int getFxaaQuality(GraphicsQuality gq) {
@@ -387,16 +403,17 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void initAntiAliasing(Antialias aavalue, float width, float height, PostProcessBean ppb) {
+        Antialiasing antialiasing = null;
         if (aavalue.equals(Antialias.FXAA)) {
-            ppb.antialiasing = new Fxaa(width, height, getFxaaQuality(GlobalConf.scene.GRAPHICS_QUALITY));
+            antialiasing = new Fxaa(width, height, getFxaaQuality(GlobalConf.scene.GRAPHICS_QUALITY));
             Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "FXAA"));
         } else if (aavalue.equals(Antialias.NFAA)) {
-            ppb.antialiasing = new Nfaa(width, height);
+            antialiasing = new Nfaa(width, height);
             Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "NFAA"));
         }
-        if (ppb.antialiasing != null) {
-            ppb.antialiasing.setEnabled(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.isPostProcessAntialias());
-            ppb.pp.addEffect(ppb.antialiasing);
+        if (antialiasing != null) {
+            antialiasing.setEnabled(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.isPostProcessAntialias());
+            ppb.set(antialiasing);
         }
     }
 
@@ -449,8 +466,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            ppb.lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-                            ppb.lightglow.setSpiralScale(getGlowSpiralScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightglow != null) {
+                                lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                                lightglow.setSpiralScale(getGlowSpiralScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                            }
                         }
                     }
                 });
@@ -461,8 +481,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-                            ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
+                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightglow != null) {
+                                lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                                lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
+                            }
                         }
                     }
                 });
@@ -476,11 +499,26 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lightglow.setLightPositions(nLights, lightPos);
-                        ppb.lightglow.setLightViewAngles(angles);
-                        ppb.lightglow.setLightColors(colors);
-                        if (prePass != null)
-                            ppb.lightglow.setPrePassTexture(prePass);
+                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightglow != null) {
+                            lightglow.setLightPositions(nLights, lightPos);
+                            lightglow.setLightViewAngles(angles);
+                            lightglow.setLightColors(colors);
+                            if (prePass != null)
+                                lightglow.setPrePassTexture(prePass);
+                        }
+                    }
+                }
+                break;
+            case LIGHT_SCATTERING_CMD:
+                boolean active = (Boolean) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightglow != null) {
+                            lightglow.setEnabled(active);
+                        }
                     }
                 }
                 break;
@@ -490,9 +528,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-                            ppb.lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
-                            ppb.fisheye.setFov(newFov);
+                            LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                            if (lightglow != null) {
+                                lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                                lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                            }
+                            Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
+                            if (fisheye != null)
+                                fisheye.setFov(newFov);
                         }
                     }
                 });
@@ -531,21 +574,23 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            ppb.bloom.setBloomIntesity(intensity);
-                            ppb.bloom.setEnabled(intensity > 0);
+                            Bloom bloom = (Bloom) ppb.get(Bloom.class);
+                            bloom.setBloomIntesity(intensity);
+                            bloom.setEnabled(intensity > 0);
                         }
                     }
                 });
                 break;
             case LENS_FLARE_CMD:
-                boolean active = (Boolean) data[0];
+                active = (Boolean) data[0];
                 int nnghosts = active ? nGhosts : 0;
                 float intensity = active ? flareIntensity : 0;
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lens.setGhosts(nnghosts);
-                        ppb.lens.setFlareIntesity(intensity);
+                        LensFlare2 lensFlare = (LensFlare2) ppb.get(LensFlare2.class);
+                        lensFlare.setGhosts(nnghosts);
+                        lensFlare.setFlareIntesity(intensity);
                     }
                 }
                 break;
@@ -561,33 +606,31 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.lens.setStarburstOffset(cameraOffset);
-                        ppb.lightglow.setOrientation(cameraOffset * 50f);
-                        ppb.rm.setFrustumCorners(frustumCorners);
-                        ppb.rm.setCamInvView(civ);
-                        ppb.rm.setCamPos(cpos);
-                        ppb.rm.setZfarK(zfar, k);
+                        ((LensFlare2) ppb.get(LensFlare2.class)).setStarburstOffset(cameraOffset);
+                        ((LightGlow) ppb.get(LightGlow.class)).setOrientation(cameraOffset * 50f);
+
+                        // Update raymarching shaders
+                        List<PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        if (rms != null)
+                            rms.forEach((rm) -> {
+                                Raymarching raymarching = (Raymarching) rm;
+                                raymarching.setFrustumCorners(frustumCorners);
+                                raymarching.setCamInvView(civ);
+                                raymarching.setCamPos(cpos);
+                                raymarching.setZfarK(zfar, k);
+                            });
                     }
                 }
                 // Update previous projectionView matrix
                 prevViewProj = cam.combined;
-                break;
-            case LIGHT_SCATTERING_CMD:
-                active = (Boolean) data[0];
-                for (int i = 0; i < RenderType.values().length; i++) {
-                    if (pps[i] != null) {
-                        PostProcessBean ppb = pps[i];
-                        ppb.lightglow.setEnabled(active);
-                    }
-                }
                 break;
             case FISHEYE_CMD:
                 active = (Boolean) data[0];
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.fisheye.setEnabled(active);
-                        ppb.lightglow.setNSamples(active ? 1 : lightGlowNSamples);
+                        ppb.get(Fisheye.class).setEnabled(active);
+                        ((LightGlow) ppb.get(LightGlow.class)).setNSamples(active ? 1 : lightGlowNSamples);
                     }
                 }
                 break;
@@ -596,7 +639,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
+                        ppb.get(CameraMotion.class).setEnabled(enabled && !GlobalConf.runtime.OPENVR);
                     }
                 }
                 break;
@@ -606,9 +649,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.camblur.setEnabled(enabled && !GlobalConf.runtime.OPENVR);
-                        ppb.lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
-                        ppb.lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                        ppb.get(CameraMotion.class).setEnabled(enabled && !GlobalConf.runtime.OPENVR);
+                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightglow != null) {
+                            lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
+                            lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                        }
                     }
                 }
 
@@ -625,24 +671,21 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
+                            Antialiasing antialiasing = getAA(ppb);
                             if (aavalue.isPostProcessAntialias()) {
                                 // clean
-                                if (ppb.antialiasing != null) {
-                                    ppb.antialiasing.setEnabled(false);
-                                    ppb.pp.removeEffect(ppb.antialiasing);
-                                    ppb.antialiasing = null;
+                                if (antialiasing != null) {
+                                    ppb.remove(antialiasing.getClass());
                                 }
                                 // update
                                 initAntiAliasing(aavalue, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), ppb);
                                 // ensure motion blur and levels go after
-                                ppb.pp.removeEffect(ppb.levels);
+                                ppb.remove(Levels.class);
                                 initLevels(ppb);
                             } else {
                                 // remove
-                                if (ppb.antialiasing != null) {
-                                    ppb.antialiasing.setEnabled(false);
-                                    ppb.pp.removeEffect(ppb.antialiasing);
-                                    ppb.antialiasing = null;
+                                if (antialiasing != null) {
+                                    ppb.remove(antialiasing.getClass());
                                 }
                             }
                         }
@@ -654,7 +697,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.levels.setBrightness(br);
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setBrightness(br);
                     }
                 }
                 break;
@@ -663,7 +708,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.levels.setContrast(cn);
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setContrast(cn);
                     }
                 }
                 break;
@@ -672,7 +719,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.levels.setHue(hue);
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setHue(hue);
                     }
                 }
                 break;
@@ -681,7 +730,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.levels.setSaturation(sat);
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setSaturation(sat);
                     }
                 }
                 break;
@@ -690,7 +741,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.levels.setGamma(gamma);
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setGamma(gamma);
                     }
                 }
                 break;
@@ -704,26 +757,28 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        switch (tm) {
-                            case AUTO:
-                                ppb.levels.enableToneMappingAuto();
-                                break;
-                            case EXPOSURE:
-                                ppb.levels.enableToneMappingExposure();
-                                break;
-                            case ACES:
-                                ppb.levels.enableToneMappingACES();
-                                break;
-                            case UNCHARTED:
-                                ppb.levels.enableToneMappingUncharted();
-                                break;
-                            case FILMIC:
-                                ppb.levels.enableToneMappingFilmic();
-                                break;
-                            case NONE:
-                                ppb.levels.disableToneMapping();
-                                break;
-                        }
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            switch (tm) {
+                                case AUTO:
+                                    levels.enableToneMappingAuto();
+                                    break;
+                                case EXPOSURE:
+                                    levels.enableToneMappingExposure();
+                                    break;
+                                case ACES:
+                                    levels.enableToneMappingACES();
+                                    break;
+                                case UNCHARTED:
+                                    levels.enableToneMappingUncharted();
+                                    break;
+                                case FILMIC:
+                                    levels.enableToneMappingFilmic();
+                                    break;
+                                case NONE:
+                                    levels.disableToneMapping();
+                                    break;
+                            }
                     }
                 }
                 break;
@@ -732,7 +787,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.levels.setExposure(exposure);
+                        Levels levels = (Levels) ppb.get(Levels.class);
+                        if (levels != null)
+                            levels.setExposure(exposure);
                     }
                 }
                 break;
@@ -741,7 +798,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        ppb.camblur.setVelocityScale(fps / 60f);
+                        CameraMotion cameraMotionBlur = (CameraMotion) ppb.get(CameraMotion.class);
+                        if (cameraMotionBlur != null)
+                            cameraMotionBlur.setVelocityScale(fps / 60f);
                     }
                 }
                 break;
@@ -764,7 +823,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
                             PostProcessBean ppb = pps[i];
-                            ppb.lightglow.setLightGlowTexture(starTex);
+                            ((LightGlow) ppb.get(LightGlow.class)).setLightGlowTexture(starTex);
                         }
                     }
                 });
@@ -774,6 +833,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 break;
         }
 
+    }
+
+    private Antialiasing getAA(PostProcessBean ppb) {
+        PostProcessorEffect ppe = ppb.get(Fxaa.class);
+        if (ppe == null) {
+            ppe = ppb.get(Nfaa.class);
+            if (ppe == null)
+                return null;
+        }
+        return (Antialiasing) ppe;
     }
 
     /**
@@ -798,7 +867,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public boolean isLightScatterEnabled() {
-        return pps[RenderType.screen.index].lightglow.isEnabled();
+        return pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {
@@ -808,11 +877,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         for (int i = 0; i < RenderType.values().length; i++) {
             if (pps[i] != null) {
                 PostProcessBean ppb = pps[i];
-                ppb.curvature.setEnabled(curvatureEnabled);
+                ppb.get(Curvature.class).setEnabled(curvatureEnabled);
 
                 RenderType currentRenderType = RenderType.values()[i];
                 int[] size = getSize(currentRenderType);
-                ppb.lightglow.setViewportSize(size[0] / (viewportHalved ? 2 : 1), size[1]);
+                ((LightGlow) ppb.get(LightGlow.class)).setViewportSize(size[0] / (viewportHalved ? 2 : 1), size[1]);
             }
         }
     }

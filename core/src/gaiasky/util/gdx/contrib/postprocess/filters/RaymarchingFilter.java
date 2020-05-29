@@ -77,20 +77,22 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     /**
      * Creates a filter with the given viewport size
      *
+     * @param fragmentShader The name of the fragment shader file, without extension
      * @param viewportWidth  The viewport width in pixels.
      * @param viewportHeight The viewport height in pixels.
      */
-    public RaymarchingFilter(int viewportWidth, int viewportHeight) {
-        this(new Vector2((float) viewportWidth, (float) viewportHeight));
+    public RaymarchingFilter(String fragmentShader, int viewportWidth, int viewportHeight) {
+        this(fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
     }
 
     /**
      * Creates a filter with the given viewport size.
      *
+     * @param fragmentShader Name of fragment shader file without extension
      * @param viewportSize The viewport size in pixels.
      */
-    public RaymarchingFilter(Vector2 viewportSize) {
-        super(ShaderLoader.fromFile("raymarching/screenspace", "raymarching/blackhole"));
+    public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
+        super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
         this.viewport = viewportSize;
         this.zfark = new Vector2();
         this.camPos = new Vector3();
