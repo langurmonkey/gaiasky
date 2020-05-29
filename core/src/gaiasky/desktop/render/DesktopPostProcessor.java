@@ -22,6 +22,7 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor;
 import gaiasky.scenegraph.BackgroundModel;
+import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.component.MaterialComponent;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.*;
@@ -550,9 +551,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 break;
             case CAMERA_MOTION_UPDATED:
                 PerspectiveCamera cam = (PerspectiveCamera) data[3];
-                GaiaSky.instance.getCameraManager().getFrustumCornersEye(frustumCorners);
-                Matrix4 civ = GaiaSky.instance.getCameraManager().getCamera().view.cpy().inv();
-                Vector3 cpos = GaiaSky.instance.getCameraManager().current.getPos().put(auxf);
+                CameraManager cm = GaiaSky.instance.getCameraManager();
+                cm.getFrustumCornersEye(frustumCorners);
+                Matrix4 civ = cm.getCamera().view.cpy().inv();
+                Vector3 cpos = cm.current.getPos().put(auxf);
+                float zfar = (float) cm.current.getFar();
+                float k = Constants.getCameraK();
                 float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
@@ -562,6 +566,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         ppb.rm.setFrustumCorners(frustumCorners);
                         ppb.rm.setCamInvView(civ);
                         ppb.rm.setCamPos(cpos);
+                        ppb.rm.setZfarK(zfar, k);
                     }
                 }
                 // Update previous projectionView matrix

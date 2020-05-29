@@ -1,8 +1,15 @@
 #version 330 core
 
+#include shader/lib_logdepthbuff.glsl
+
+// Color buffer
 uniform sampler2D u_texture0;
+// Depth buffer (log)
+uniform sampler2D u_texture1;
+
 uniform vec3 u_pos;
 uniform vec3 u_camPos;
+uniform vec2 u_zfark;
 
 in vec2 v_texCoords;
 in vec3 v_ray;
@@ -41,14 +48,21 @@ vec3 calcNormal(in vec3 pos) {
 
 // Raymarch along given ray
 // ro: ray origin
-// rd: ray direction
-vec4 raymarch(vec3 ro, vec3 rd) {
+// rd: ray directionColor
+// s: depth buffer
+vec4 raymarch(vec3 ro, vec3 rd, float s) {
     vec3 lightDir = vec3(0.0, 1.0, 0.2);
-    vec4 ret = vec4(0,0,0,0);
+    vec4 ret = vec4(0.0, 0.0, 0.0, 0.0);
 
     const int maxstep = 128;
     float t = 0; // current distance traveled along ray
     for (int i = 0; i < maxstep; ++i) {
+        // If we run past the depth buffer, stop and return nothing (transparent pixel)
+        // this way raymarched objects and traditional meshes can coexist.
+        if (t >= s) {
+            ret = vec4(0.0, 0.0, 0.0, 0.0);
+            break;
+        }
         vec3 p = ro + rd * t; // World space position of sample
         float d = map(p);       // Sample of distance field (see map())
 
@@ -57,7 +71,7 @@ vec4 raymarch(vec3 ro, vec3 rd) {
             // Lambertian Lighting
             vec3 n = calcNormal(p);
             float dt = dot(-lightDir, n);
-            ret = vec4(dt, dt, dt, 1.0);
+            ret = clamp(vec4(dt * 0.2, dt, dt * 0.95, 0.7) + 0.3, 0.0, 1.0);
             break;
         }
 
@@ -66,43 +80,19 @@ vec4 raymarch(vec3 ro, vec3 rd) {
         // an object (see map()).
         t += d;
     }
-    return ret;
-}
-
-vec4 raymarch2(vec3 ro, vec3 rd) {
-    vec4 ret = vec4(0.0,0.0,0.0,0.0);
-
-    const int maxstep = 64;
-    float t = 0; // current distance traveled along ray
-    for (int i = 0; i < maxstep; ++i) {
-        vec3 p = ro + rd * t; // World space position of sample
-        float d = map(p);       // Sample of distance field (see map())
-
-        // If the sample <= 0, we have hit something (see map()).
-        if (d < 0.001) {
-            // Simply return a gray color if we have hit an object
-            // We will deal with lighting later.
-            ret = vec4(0.5, 0.5, 0.5, 1.0);
-            break;
-        }
-
-        // If the sample > 0, we haven't hit anything yet so we should march forward
-        // We step forward by distance d, because d is the minimum distance possible to intersect
-        // an object (see map()).
-        t += d;
-    }
-
     return ret;
 }
 
 void main(){
     // ray direction
-    vec3 rd = normalize(v_ray.xyz);
+    vec3 rd = normalize(v_ray);
     // ray origin (camera position)
     vec3 ro = vec3(u_camPos);
 
     vec3 col = texture(u_texture0, v_texCoords).xyz; // Color of the scene before this shader was run
-    vec4 add = raymarch(ro, rd);
+    float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y); // Logarithmic depth buffer
+    //depth *= length(v_ray);
+    vec4 add = raymarch(ro, rd, depth);
 
     // Returns final color using alpha blending
     fragColor = vec4(col * (1.0 - add.w) + add.xyz * add.w, 1.0);

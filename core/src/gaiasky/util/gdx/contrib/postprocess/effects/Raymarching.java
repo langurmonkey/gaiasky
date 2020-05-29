@@ -61,6 +61,10 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setCamPos(camPos);
     }
 
+    public void setZfarK(float zfar, float k){
+        filter.setZfarK(zfar, k);
+    }
+
     @Override
     public void dispose() {
         if (filter != null) {
@@ -77,6 +81,9 @@ public final class Raymarching extends PostProcessorEffect {
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
+        // Get depth buffer texture from main frame buffer
+        filter.setDepthTexture(main.getDepthBufferTexture());
+        // Set input, output and render
         filter.setInput(src).setOutput(dest).render();
     }
 }

@@ -20,6 +20,7 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -32,14 +33,22 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  */
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Vector2 viewport;
+    private Vector2 zfark;
     private Vector3 camPos;
     private Matrix4 frustumCorners;
     private Matrix4 camInvView;
+    /**
+     * Default depth buffer texture. In our case, it contains the logarithmic
+     * depth buffer data.
+     */
+    private Texture depthTexture;
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
+        TextureDepth("u_texture1", 0),
         Viewport("u_viewport", 2),
+        ZfarK("u_zfark", 2),
         CamPos("u_camPos", 3),
         CamInvView("u_camInvViewTransform", 16),
         FrustumCorners("u_frustumCorners", 16);
@@ -83,6 +92,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     public RaymarchingFilter(Vector2 viewportSize) {
         super(ShaderLoader.fromFile("raymarching/screenspace", "raymarching/blackhole"));
         this.viewport = viewportSize;
+        this.zfark = new Vector2();
         this.camPos = new Vector3();
         this.frustumCorners = new Matrix4();
         this.camInvView = new Matrix4();
@@ -109,6 +119,15 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.Viewport, this.viewport);
     }
 
+    public void setZfarK(float zfar, float k) {
+        this.zfark.set(zfar, k);
+        setParam(Param.ZfarK, this.zfark);
+    }
+    public void setDepthTexture(Texture tex){
+        this.depthTexture = tex;
+        setParam(Param.TextureDepth, u_texture1);
+    }
+
     public Vector2 getViewportSize() {
         return viewport;
     }
@@ -117,7 +136,9 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Texture, u_texture0);
+        setParams(Param.TextureDepth, u_texture1);
         setParams(Param.Viewport, viewport);
+        setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.CamInvView, camInvView);
         setParams(Param.CamPos, camPos);
@@ -127,5 +148,6 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     @Override
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
+        depthTexture.bind(u_texture1);
     }
 }
