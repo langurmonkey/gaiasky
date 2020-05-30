@@ -18,10 +18,12 @@
 -  [libgdx-contribs-postprocessing](https://github.com/manuelbua/libgdx-contribs/tree/master/postprocessing)
 -  [VisUI](https://github.com/kotcrab/vis-editor/wiki/VisUI) for some widgets (licensed under the Apache license)
 -  [VSOP87 code generator tool](http://neoprogrammics.com/vsop87/source_code_generator_tool/) for the base VSOP87 java code
--  Mark Taylor's [STIL](http://www.star.bristol.ac.uk/~mbt/stil/) library
--  The [Jython Project](http://www.jython.org/)
+-  Mark Taylor's [STIL](http://www.star.bristol.ac.uk/~mbt/stil/) and [jsamp](http://www.star.bristol.ac.uk/~mbt/jsamp/), available under (at least) the Academic Free License and the BSD License
 -  Sergei Klioner and Robin Geyer (TU Dresden) for the idea and octave implementation of the gravitational waves effect
 -  [Py4J](https://www.py4j.org)
+-  [set111](https://www.shadertoy.com/view/tsBXW3) for the original black hole shader code, licensed by default under [CC-BY-NC-SA](https://www.shadertoy.com/view/tsBXW3)
+-  [gdx2sdl](https://github.com/electronstudio/sdl2gdx), licensed under GNU General Public License with the classpath exception
+
 
 
 ## Textures, models, music and other assets
