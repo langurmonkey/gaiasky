@@ -61,8 +61,8 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setModelView(civ);
     }
 
-    public void setCamPos(Vector3 camPos) {
-        filter.setCamPos(camPos);
+    public void setPos(Vector3 pos) {
+        filter.setPos(pos);
     }
 
     public void setTime(float seconds) {

@@ -74,7 +74,15 @@ public class StaticCoordinates implements IBodyCoordinates {
     }
 
     public void setPosition(double[] position) {
+        setPositionkm(position);
+    }
+
+    public void setPositionkm(double[] position){
         this.position = new Vector3d(position[0] * Constants.KM_TO_U, position[1] * Constants.KM_TO_U, position[2] * Constants.KM_TO_U);
+    }
+
+    public void setPositionpc(double[] position){
+        this.position = new Vector3d(position[0] * Constants.PC_TO_U, position[1] * Constants.PC_TO_U, position[2] * Constants.PC_TO_U);
     }
 
     /**

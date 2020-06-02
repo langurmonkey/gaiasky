@@ -856,6 +856,13 @@ public enum Events {
      * Notifies new distances for the ruler. Contains a double with the distance in internal units and a formatted string
      **/
     RULER_DIST,
+
+    /**
+     * Submits a register/unregister command for a raymarching shader.
+     * Contains the name, the status (true/false), and optionally the path to the shader and the position
+     */
+    RAYMARCHING_CMD,
+
     /**
      * Contains the string with the script code and an optional boolean
      * indicating whether it must be run asynchronous

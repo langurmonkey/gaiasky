@@ -34,7 +34,6 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
-import gaiasky.util.gdx.contrib.postprocess.filters.CameraBlur;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -43,8 +42,6 @@ import gaiasky.util.math.Vector3d;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalField;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +87,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         invView = new Matrix4();
         invProj = new Matrix4();
         frustumCorners = new Matrix4();
+
+        EventManager.instance.subscribe(this, Events.RAYMARCHING_CMD);
     }
 
     public void initialize(AssetManager manager) {
@@ -465,6 +464,25 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
+            case RAYMARCHING_CMD:
+                String name = (String) data[0];
+                boolean status = (Boolean)data[1];
+                if(status){
+                    // Enable
+                    if(data.length > 2) {
+                        // Create or update
+                        String shader = (String) data[2];
+                        Vector3d pos = (Vector3d) data[3];
+                        logger.info("RAYMARCHING added: " + name + " / " + shader + " / " + pos);
+                    } else {
+                        // Just activate
+                        logger.info("RAYMARCHING enabled: " + name);
+                    }
+                } else {
+                    // Disable
+                    logger.info("RAYMARCHING disabled: " + name);
+                }
+                break;
             case STAR_BRIGHTNESS_CMD:
                 float brightness = (Float) data[0];
                 GaiaSky.postRunnable(() -> {
@@ -605,7 +623,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 cm.getFrustumCornersEye(frustumCorners);
                 Matrix4 civ = invView.set(cm.getCamera().view).inv();
                 Matrix4 mv = invProj.set(cm.getCamera().combined);
-                Vector3 cpos = cm.current.getPos().put(auxf);
+                Vector3 pos = auxd.set(cm.current.getPos()).sub(500.0 * Constants.PC_TO_U, 0.0, 0.0).put(auxf);
                 ZonedDateTime zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
                 float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
                 float zfar = (float) cm.current.getFar();
@@ -625,9 +643,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                                 raymarching.setFrustumCorners(frustumCorners);
                                 raymarching.setCamInvView(civ);
                                 raymarching.setModelView(mv);
-                                raymarching.setCamPos(cpos);
                                 raymarching.setZfarK(zfar, k);
                                 raymarching.setTime(secs);
+                                raymarching.setPos(pos);
                             });
                     }
                 }

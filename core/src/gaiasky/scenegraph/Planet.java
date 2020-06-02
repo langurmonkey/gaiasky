@@ -132,7 +132,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
         if (time.getDt() != 0 || force) {
             Vector3d aux3 = aux3d1.get();
-            // Load this planet's spherical ecliptic coordinates into pos
+            // Load this objects's equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
             // Convert to cartesian coordinates and put them in aux3 vector

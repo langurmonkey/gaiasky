@@ -35,6 +35,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Vector2 viewport;
     private Vector2 zfark;
     private Vector3 camPos;
+    private Vector3 pos;
     private Matrix4 frustumCorners;
     private Matrix4 camInvView;
     private Matrix4 modelView;
@@ -52,7 +53,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         Time("u_time", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
-        CamPos("u_camPos", 3),
+        Pos("u_pos", 3),
         CamInvView("u_camInvViewTransform", 16),
         ModelView("u_modelView", 16),
         FrustumCorners("u_frustumCorners", 16);
@@ -99,7 +100,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
         this.viewport = viewportSize;
         this.zfark = new Vector2();
-        this.camPos = new Vector3();
+        this.pos = new Vector3();
         this.frustumCorners = new Matrix4();
         this.camInvView = new Matrix4();
         this.modelView = new Matrix4();
@@ -121,9 +122,9 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.ModelView, this.modelView);
     }
 
-    public void setCamPos(Vector3 cpos) {
-        this.camPos.set(cpos);
-        setParam(Param.CamPos, this.camPos);
+    public void setPos(Vector3 pos) {
+        this.pos.set(pos);
+        setParam(Param.Pos, this.pos);
     }
 
     public void setTime(float seconds){
@@ -159,7 +160,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.CamInvView, camInvView);
         setParams(Param.ModelView, this.modelView);
-        setParams(Param.CamPos, camPos);
+        setParams(Param.Pos, this.pos);
         setParam(Param.Time, timeSecs);
         endParams();
     }

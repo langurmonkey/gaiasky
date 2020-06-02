@@ -10,9 +10,9 @@ uniform sampler2D u_texture1;
 uniform mat4 u_modelView;
 // Time in seconds
 uniform float u_time;
-
+// Floating position
 uniform vec3 u_pos;
-uniform vec3 u_camPos;
+// Zfar
 uniform vec2 u_zfark;
 
 in vec2 v_texCoords;
@@ -21,9 +21,8 @@ layout (location = 0) out vec4 fragColor;
 
 #define SPEED 1.0  //disk rotation speed
 
-#define STEPS  12. //disk texture layers
-#define SIZE 0.3 //size of BH
-
+#define STEPS  6. //disk texture layers
+#define SIZE 100.0 //size of BH
 
 
 float hash(float x){ return fract(sin(x)*152754.742);}
@@ -60,7 +59,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
     float parallel = dot(ray.xz, deltaPos);
     parallel /= sqrt(lengthPos);
     parallel *= 0.5;
-    float redShift = parallel +0.3;
+    float redShift = parallel + 0.3;
     redShift *= redShift;
 
     redShift = clamp(redShift, 0., 1.);
@@ -91,12 +90,12 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
         float u = lengthPos + time* SIZE*0.3 + intensity * SIZE * 0.2;
 
         vec2 xy ;
-        float rot = mod(time*SPEED, 8192.);
-        xy.x = -position.z*sin(rot) + position.x*cos(rot);
-        xy.y = position.x*sin(rot) + position.z*cos(rot);
+        float rot = mod(time * SPEED, 8192.);
+        xy.x = -position.z * sin(rot) + position.x * cos(rot);
+        xy.y = position.x * sin(rot) + position.z * cos(rot);
 
         float x = abs( xy.x/(xy.y));
-        float angle = 0.02*atan(x);
+        float angle = 0.02 * atan(x);
 
         const float f = 70.;
         float noise = value( vec2( angle, u * (1./SIZE) * 0.05), f);
@@ -111,7 +110,7 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
 
         lengthPos *= (1./SIZE);
 
-        o.rgb+= redShift*(intensity*1. + 0.5)* (1./STEPS) * 100.*distMult/(lengthPos*lengthPos);
+        o.rgb += redShift*(intensity*1. + 0.5)* (1./STEPS) * 100.*distMult/(lengthPos*lengthPos);
     }
 
     o.rgb = clamp(o.rgb - 0.005, 0., 1.);
@@ -123,11 +122,12 @@ void blackhole( out vec4 colOut, in vec2 fragCoord, in vec3 ray, in vec3 pos, in
     colOut = vec4(0.0);
 
     vec4 col = vec4(0.);
-    vec4 glow = vec4(0.);
     vec4 outCol =vec4(100.);
     vec2 tc = fragCoord;
+    vec3 opos = vec3(pos);
+    vec3 oray = vec3(ray);
 
-    for(int disks = 0; disks< 20; disks++) //steps
+    for(int disks = 0; disks < 20; disks++) //steps
     {
         for (int h = 0; h < 6; h++) //reduces tests for exit conditions (to minimise branching)
         {
@@ -136,48 +136,53 @@ void blackhole( out vec4 colOut, in vec2 fragCoord, in vec3 ray, in vec3 pos, in
             float centDist = dotpos * invDist; 	//distance to BH
             float stepDist = 0.92 * abs(pos.y /(ray.y));  //conservative distance to disk (y==0)
             float farLimit = centDist * 0.5; //limit step size far from to BH
-            float closeLimit = centDist*0.1 + 0.05*centDist*centDist*(1./SIZE); //limit step size closse to BH
+            float closeLimit = centDist*0.1 + 0.05*centDist*centDist*(1./SIZE); //limit step size close to BH
             stepDist = min(stepDist, min(farLimit, closeLimit));
+
+            // Depth buffer
+            if(centDist >= s) {
+                colOut = texture(u_texture0, fragCoord);
+                return;
+            }
 
             float invDistSqr = invDist * invDist;
             float bendForce = stepDist * invDistSqr * SIZE * 0.625;  //bending force
-            ray =  normalize(ray - (bendForce * invDist )*pos);  //bend ray towards BH
+            ray =  normalize(ray - (bendForce * invDist) * pos);  //bend ray towards BH
             pos += stepDist * ray;
 
-            glow += vec4(1.2,1.1,1, 1.0) *(0.01*stepDist * invDistSqr * invDistSqr *clamp( centDist*(2.) - 1.2,0.,1.)); //adds fairly cheap glow
         }
 
+
         float dist2 = length(pos);
+        float dist = length(opos);
 
         if(dist2 < SIZE * 0.1) //ray sucked in to BH
         {
-            outCol =  vec4( col.rgb * col.a + glow.rgb *(1.-col.a ) ,1.) ;
+            outCol =  vec4(col.rgb * col.a, 1.0) ;
             break;
         }
-
         else if(dist2 > SIZE * 1000.) //ray escaped BH
         {
-            vec3 ray_view = (u_modelView * vec4(ray, 0.0)).xyz;
-            vec4 bg = texture(u_texture0, ray_view.xy * 0.5 + 0.5); // Color of the scene before this shader was run
-            outCol = vec4(col.rgb * col.a + bg.rgb * (1. - col.a)  + glow.rgb *(1. - col.a), 1.);
+            vec2 bend_tc = (u_modelView * vec4(ray, 1.0)).xy * 0.5 + 0.5;
+            bend_tc = mix(bend_tc, tc, smoothstep(SIZE, SIZE * 1000.0, dist));
+            vec4 bg = texture(u_texture0, bend_tc); // Color of the scene before this shader was run
+            outCol = vec4(col.rgb * col.a + bg.rgb * (1.0 - col.a), 1.0);
             break;
         }
-
         else if (abs(pos.y) <= SIZE * 0.002 ) //ray hit accretion disk
         {
             vec4 diskCol = raymarchDisk(ray, pos, s);   //render disk
             pos.y = 0.;
-            pos += abs(SIZE * 0.001 /ray.y) * ray;
-            col = vec4(diskCol.rgb*(1.-col.a) + col.rgb, col.a + diskCol.a*(1.-col.a));
+            pos += abs(SIZE * 0.001 / ray.y) * ray;
+            col = vec4(diskCol.rgb * (1.0 - col.a) + col.rgb, col.a + diskCol.a * (1.0 - col.a));
         }
     }
 
     //if the ray never escaped or got sucked in
     if(outCol.r == 100.)
-    outCol = vec4(col.rgb + glow.rgb *(col.a +  glow.a) , 1.);
+        outCol = vec4(col.rgb, 1.0);
 
     col = outCol;
-    col.rgb =  pow( col.rgb, vec3(0.6) );
 
     colOut += col;
 
@@ -186,13 +191,10 @@ void blackhole( out vec4 colOut, in vec2 fragCoord, in vec3 ray, in vec3 pos, in
 void main(){
     // ray direction
     vec3 rd = normalize(v_ray);
-    // ray origin (camera position)
-    vec3 ro = vec3(u_camPos);
-    // object position
-    vec3 op = vec3(10.5, 0.0, 0.0);
+    // floating position (camPos - pos)
+    vec3 ro = u_pos;
 
-    vec3 col = texture(u_texture0, v_texCoords).xyz; // Color of the scene before this shader was run
-    float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y); // Logarithmic depth buffer
+    float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);// Logarithmic depth buffer
     depth *= length(v_ray);
     blackhole(fragColor, v_texCoords, rd, ro, depth);
 }
