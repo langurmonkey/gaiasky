@@ -318,7 +318,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
 
         pos = new Vector3d();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATED, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
     }
 
     private HorizontalGroup hg(Actor... actors) {
@@ -516,7 +516,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 focusRA.setText(nf.format((double) data[2] % 360) + "°");
                 focusDEC.setText(nf.format((double) data[3] % 360) + "°");
                 break;
-            case CAMERA_MOTION_UPDATED:
+            case CAMERA_MOTION_UPDATE:
                 Vector3d campos = (Vector3d) data[0];
                 Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x);
                 Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y);

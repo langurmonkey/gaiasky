@@ -17,50 +17,55 @@ import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import java.util.*;
 
 public interface IPostProcessor extends Disposable {
+    String DEFAULT_KEY = "%default%";
 
     class PostProcessBean {
         protected static Logger.Log logger = Logger.getLogger(PostProcessBean.class);
 
         public PostProcessor pp;
-        public Map<Class<? extends PostProcessorEffect>, List<PostProcessorEffect>> effects = new HashMap<>();
+        public Map<Class<? extends PostProcessorEffect>, Map<String, PostProcessorEffect>> effects = new HashMap<>();
 
         /**
-         * Adds a new non-singleton effect to the post processor
+         * Adds a new effect to the post processor with the default key
          *
          * @param effect The effect
          */
-        public void add(PostProcessorEffect effect) {
-            addEffect(effect, false);
+        public void set(PostProcessorEffect effect) {
+            addEffect(DEFAULT_KEY, effect);
+        }
+
+        /**
+         * Gets the effect of the given class with the default key
+         * @param clazz The class
+         */
+        public PostProcessorEffect get(Class<? extends PostProcessorEffect> clazz){
+            return get(DEFAULT_KEY, clazz);
         }
 
         /**
          * Sets the given singleton effect to the post processor. This replaces any previous effect of the same type.
          *
+         * @param key    The key
          * @param effect The effect
          */
-        public void set(PostProcessorEffect effect) {
-            addEffect(effect, true);
+        public void set(String key, PostProcessorEffect effect) {
+            addEffect(key, effect);
         }
 
         /**
          * Adds a new post-processing effect to this post-processor
          *
-         * @param effect    The effect
-         * @param singleton Whether this must be a singleton (overwrites existing)
+         * @param key    The key to use
+         * @param effect The effect
          */
-        private void addEffect(PostProcessorEffect effect, boolean singleton) {
+        private void addEffect(String key, PostProcessorEffect effect) {
             if (effects != null) {
-                List<PostProcessorEffect> l = effects.get(effect.getClass());
+                Map<String, PostProcessorEffect> l = effects.get(effect.getClass());
                 if (l != null) {
-                    if (singleton) {
-                        for (PostProcessorEffect ppe : l)
-                            pp.removeEffect(ppe);
-                        l.clear();
-                    }
-                    l.add(effect);
+                    l.put(key, effect);
                 } else {
-                    l = new ArrayList<>();
-                    l.add(effect);
+                    l = new HashMap<>();
+                    l.put(key, effect);
                     effects.put(effect.getClass(), l);
                 }
                 pp.addEffect(effect);
@@ -75,10 +80,10 @@ public interface IPostProcessor extends Disposable {
          * @param clazz The class
          * @return The effect
          */
-        public PostProcessorEffect get(Class<? extends PostProcessorEffect> clazz) {
-            List<PostProcessorEffect> l = effects.get(clazz);
+        public PostProcessorEffect get(String key, Class<? extends PostProcessorEffect> clazz) {
+            Map<String, PostProcessorEffect> l = effects.get(clazz);
             if (l != null) {
-                return l.get(0);
+                return l.get(key);
             }
             return null;
         }
@@ -87,10 +92,10 @@ public interface IPostProcessor extends Disposable {
          * Gets all effects of the given type
          *
          * @param clazz The class
-         * @return The list of effects
+         * @return The map of effects
          */
-        public List<PostProcessorEffect> getAll(Class<? extends PostProcessorEffect> clazz) {
-            List<PostProcessorEffect> l = effects.get(clazz);
+        public Map<String, PostProcessorEffect> getAll(Class<? extends PostProcessorEffect> clazz) {
+            Map<String, PostProcessorEffect> l = effects.get(clazz);
             if (l != null) {
                 return l;
             }
@@ -103,14 +108,32 @@ public interface IPostProcessor extends Disposable {
          * @param clazz The class
          */
         public void remove(Class<? extends PostProcessorEffect> clazz) {
-            List<PostProcessorEffect> l = getAll(clazz);
+            Map<String, PostProcessorEffect> l = getAll(clazz);
             if (l != null) {
-                for (PostProcessorEffect ppe : l) {
+                l.forEach((key, ppe) ->{
+                    ppe.setEnabled(false);
+                    pp.removeEffect(ppe);
+                });
+                l.clear();
+                effects.remove(clazz);
+            }
+        }
+
+        /**
+         * Removes the keyed effect from the given class
+         *
+         * @param key   The key
+         * @param clazz The class
+         */
+        public void remove(String key, Class<? extends PostProcessorEffect> clazz) {
+            Map<String, PostProcessorEffect> l = getAll(clazz);
+            if (l != null) {
+                if (l.containsKey(key)) {
+                    PostProcessorEffect ppe = l.get(key);
                     ppe.setEnabled(false);
                     pp.removeEffect(ppe);
                 }
-                l.clear();
-                effects.remove(clazz);
+                l.remove(key);
             }
         }
 
@@ -140,10 +163,13 @@ public interface IPostProcessor extends Disposable {
                 if (effects != null) {
                     Set<Class<? extends PostProcessorEffect>> keys = effects.keySet();
                     for (Class<? extends PostProcessorEffect> key : keys) {
-                        List<PostProcessorEffect> l = effects.get(key);
-                        if (l != null)
-                            for (PostProcessorEffect effect : l)
-                                effect.dispose();
+                        Map<String, PostProcessorEffect> l = effects.get(key);
+                        if (l != null) {
+                            for (String k : l.keySet()) {
+                                if (l.get(k) != null)
+                                    l.get(k).dispose();
+                            }
+                        }
                     }
                 }
             }

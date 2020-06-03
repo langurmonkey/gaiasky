@@ -7,7 +7,6 @@ package gaiasky.scenegraph.camera;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -326,7 +325,7 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         // Post event with camera motion parameters
-        EventManager.instance.post(Events.CAMERA_MOTION_UPDATED, current.getPos(), speed, velocitynor, current.getCamera());
+        EventManager.instance.post(Events.CAMERA_MOTION_UPDATE, current.getPos(), speed, velocitynor, current.getCamera());
 
         // Update last pos and dir
         lastPos.set(current.getPos());
@@ -687,11 +686,11 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Stores the normalized rays representing the camera frustum in eye space in a 4x4 matrix.  Each row is a vector.
      *
+     * @param cam The perspective camera
      * @param frustumCorners The matrix to fill
      * @return The same matrix
      */
-    public Matrix4 getFrustumCornersEye(Matrix4 frustumCorners) {
-        PerspectiveCamera cam = this.getCamera();
+    public static Matrix4 getFrustumCornersEye(PerspectiveCamera cam, Matrix4 frustumCorners) {
         float camFov = cam.fieldOfView;
         float camAspect = cam.viewportWidth / cam.viewportHeight;
 

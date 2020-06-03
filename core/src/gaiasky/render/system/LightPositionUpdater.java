@@ -121,9 +121,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                         }
                     }
                 }
-                EventManager.instance.post(Events.LIGHT_POS_2D_UPDATED, lightIndex, positions, viewAngles, colors, glowTex);
+                EventManager.instance.post(Events.LIGHT_POS_2D_UPDATE, lightIndex, positions, viewAngles, colors, glowTex);
             } else {
-                EventManager.instance.post(Events.LIGHT_POS_2D_UPDATED, 0, positions, viewAngles, colors, glowTex);
+                EventManager.instance.post(Events.LIGHT_POS_2D_UPDATE, 0, positions, viewAngles, colors, glowTex);
             }
         }
 

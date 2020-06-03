@@ -212,6 +212,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                     renderGui(selectionGui.left());
             }
 
+            sendOrientationUpdate(camera.getCamera(), rw, rh);
             postprocessRender(ppb, fbLeft, postproc, camera, rw, rh);
 
             /** RIGHT EYE **/
@@ -240,6 +241,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                     renderGui(selectionGui.right());
             }
 
+            sendOrientationUpdate(camera.getCamera(), rw, rh);
             postprocessRender(ppb, fbRight, postproc, camera, rw, rh);
 
             /** SUBMIT TO VR COMPOSITOR **/

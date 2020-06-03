@@ -179,7 +179,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     public ITimeFrameProvider time;
 
-    // The sprite batch to render the backbuffer to screen
+    // The sprite batch to render the back buffer to screen
     private SpriteBatch renderBatch;
 
     /**
@@ -799,7 +799,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, null, pp.getPostProcessBean(RenderType.screen));
                 } else {
                     PostProcessBean ppb = pp.getPostProcessBean(RenderType.screen);
-                    renderSgr(cam, t, Math.round(graphics.getWidth() * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(graphics.getHeight() * GlobalConf.screen.BACKBUFFER_SCALE), graphics.getWidth(), graphics.getHeight(), null, ppb);
+                    if (ppb != null)
+                        renderSgr(cam, t, Math.round(graphics.getWidth() * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(graphics.getHeight() * GlobalConf.screen.BACKBUFFER_SCALE), graphics.getWidth(), graphics.getHeight(), null, ppb);
                 }
 
                 // Render the GUI, setting the viewport
@@ -922,46 +923,42 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Update method.
      *
-     * @param deltat Delta time in seconds.
+     * @param dt Delta time in seconds.
      */
-    public void update(double deltat) {
+    public void update(double dt) {
         // Resize if needed
         updateResize();
 
         Timer.instance();
         // The current actual dt in seconds
-        double dt;
+        double dtGs;
         if (GlobalConf.frame.RENDER_OUTPUT) {
             // If RENDER_OUTPUT is active, we need to set our dt according to
             // the fps
-            dt = 1.0 / GlobalConf.frame.RENDER_TARGET_FPS;
+            dtGs = 1.0 / GlobalConf.frame.RENDER_TARGET_FPS;
         } else if (camRecording) {
             // If Camera is recording, we need to set our dt according to
             // the fps
-            dt = 1.0 / GlobalConf.frame.CAMERA_REC_TARGET_FPS;
+            dtGs = 1.0 / GlobalConf.frame.CAMERA_REC_TARGET_FPS;
         } else {
             // Max time step is 0.1 seconds. Not in RENDER_OUTPUT MODE.
-            dt = Math.min(deltat, 0.1);
+            dtGs = Math.min(dt, 0.1);
         }
 
-        this.t += dt;
+        this.t += dtGs;
 
         // Update GUI 
-        GuiRegistry.update(dt);
-        EventManager.instance.post(Events.UPDATE_GUI, dt);
+        GuiRegistry.update(dtGs);
+        EventManager.instance.post(Events.UPDATE_GUI, dtGs);
 
-        double dtScene = dt;
-        if (!GlobalConf.runtime.TIME_ON) {
-            dtScene = 0;
-        }
         // Update clock
-        time.update(dtScene);
+        time.update(GlobalConf.runtime.TIME_ON ? dtGs : 0);
 
         // Update events
         EventManager.instance.dispatchDelayedMessages();
 
         // Update cameras
-        cam.update(dt, time);
+        cam.update(dtGs, time);
 
         // Precompute isOn for all stars and galaxies
         Particle.renderOn = isOn(ComponentType.Stars);
@@ -996,7 +993,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 
-    private long lastResizeTime = Long.MAX_VALUE;
+    private long lastResizeTime = -1;
     private int resizeWidth, resizeHeight;
 
     @Override
@@ -1048,7 +1045,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             cam.updateAngleEdge(width, height);
             cam.resize(width, height);
-        }catch(Exception e){
+        } catch (Exception e) {
             // TODO This try-catch block is a provisional fix for Windows, as GLFW crashe when minimizing with lwjgl 2.3.3 and libgdx 1.9.10
         }
     }

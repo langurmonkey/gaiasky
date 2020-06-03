@@ -147,7 +147,13 @@ public enum Events {
      * <li>The PerspectiveCamera</li>
      * </ul>
      **/
-    CAMERA_MOTION_UPDATED,
+    CAMERA_MOTION_UPDATE,
+    /**
+     * Sent whenever the camera orientation changes. Note that this happens more
+     * often than {@link #CAMERA_MOTION_UPDATE}, as multi-render modes (cubemap, vr, etc.)
+     * need to send one of these every time the camera changes.
+     */
+    CAMERA_ORIENTATION_UPDATE,
     CAMERA_PAN,
     /**
      * Informs that the camera has started or stopped playing. Contains a
@@ -580,7 +586,7 @@ public enum Events {
      * Contains an int with the number of lights and a float[] with [x, y] of
      * the 10 closest stars in screen coordinates in [0..1]
      **/
-    LIGHT_POS_2D_UPDATED,
+    LIGHT_POS_2D_UPDATE,
     /**
      * Activate/deactivate the light scattering. Contains boolean with state and
      * a boolean for whether it comes from the interface

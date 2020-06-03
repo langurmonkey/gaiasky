@@ -31,7 +31,7 @@ import java.time.Instant;
 public class Invisible extends CelestialBody {
 
     private String raymarchingShader;
-    private boolean isOn = true;
+    private boolean isOn = false;
 
     /**
      * Needed for reflection in {@link AbstractPositionEntity#getSimpleCopy()}
@@ -56,7 +56,7 @@ public class Invisible extends CelestialBody {
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if(this.raymarchingShader != null && !this.raymarchingShader.isBlank())
-           EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), true, this.raymarchingShader, coordinates.getEquatorialCartesianCoordinates(Instant.now(), new Vector3d(pos)));
+           EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, this.raymarchingShader, coordinates.getEquatorialCartesianCoordinates(Instant.now(), new Vector3d(pos)));
     }
 
     @Override
@@ -105,7 +105,7 @@ public class Invisible extends CelestialBody {
         forceUpdateLocalValues(time, false);
         if(raymarchingShader != null){
             // Check enable/disable
-            if(viewAngleApparent >  Math.toRadians(0.5)){
+            if(viewAngleApparent >  Math.toRadians(0.001)){
                 if(!isOn) {
                     // Turn on
                     EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), true);

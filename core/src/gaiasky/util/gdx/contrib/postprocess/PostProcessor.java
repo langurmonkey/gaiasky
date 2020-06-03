@@ -170,10 +170,14 @@ public final class PostProcessor implements Disposable {
      * restoreViewport static method.
      */
     public void setViewport(Rectangle viewport) {
-        hasViewport = (viewport != null);
-        if (hasViewport) {
-            viewport.set(viewport);
+        hasViewport = (this.viewport != null);
+        if (hasViewport && viewport != null) {
+            this.viewport.set(viewport);
         }
+    }
+
+    public Rectangle getViewport(){
+        return viewport;
     }
 
     /** Frees owned resources. */

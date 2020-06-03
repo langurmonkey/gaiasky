@@ -451,7 +451,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         focusPositionSph = new Vector2d();
         lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         this.comp = new ParticleGroupComparator();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CAMERA_MOTION_UPDATED);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CAMERA_MOTION_UPDATE);
     }
 
     public void initialize() {
@@ -1168,7 +1168,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 }
                 updateFocusDataPos();
                 break;
-            case CAMERA_MOTION_UPDATED:
+            case CAMERA_MOTION_UPDATE:
                 // Check that the particles have names
                 if (updaterTask != null && pointData.get(0).names != null) {
                     final Vector3d currentCameraPos = (Vector3d) data[0];

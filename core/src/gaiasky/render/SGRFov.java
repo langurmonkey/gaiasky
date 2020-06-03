@@ -44,6 +44,7 @@ public class SGRFov extends SGRAbstract implements ISGR {
             sgr.renderSystem(camera, t, rc, StarGroupRenderSystem.class);
         }
 
+        sendOrientationUpdate(camera.getCamera(), rw, rh);
         postprocessRender(ppb, fb, postproc, camera, rw, rh);
 
     }

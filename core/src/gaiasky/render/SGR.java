@@ -48,8 +48,10 @@ public class SGR extends SGRAbstract implements ISGR {
         //}
 
         // GLFW reports a window size of 0x0 with AMD Graphics on windows when minimizing
-        if (rw > 0 && rh > 0)
+        if (rw > 0 && rh > 0) {
+            sendOrientationUpdate(camera.getCamera(), rw, rh);
             postprocessRender(ppb, fb, postproc, camera, tw * tw / rw, th * th / rh);
+        }
 
     }
 

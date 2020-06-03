@@ -34,7 +34,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Vector2 viewport;
     private Vector2 zfark;
-    private Vector3 camPos;
     private Vector3 pos;
     private Matrix4 frustumCorners;
     private Matrix4 camInvView;

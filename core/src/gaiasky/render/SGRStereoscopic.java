@@ -153,6 +153,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             boolean postproc = postprocessCapture(ppb, fb1, tw, th);
             sgr.renderScene(camera, t, rc);
 
+            sendOrientationUpdate(cam, rw, rh);
             postprocessRender(ppb, fb1, postproc, camera, rw, rh);
             Texture texLeft = fb1.getColorBufferTexture();
 
@@ -171,6 +172,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             postproc = postprocessCapture(ppb, fb2, tw, th);
             sgr.renderScene(camera, t, rc);
 
+            sendOrientationUpdate(cam, rw, rh);
             postprocessRender(ppb, fb2, postproc, camera, rw, rh);
             Texture texRight = fb2.getColorBufferTexture();
 
@@ -239,6 +241,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
+            sendOrientationUpdate(cam, rw, rh);
             Texture tex;
             postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
@@ -268,6 +271,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
+            sendOrientationUpdate(cam, rw, rh);
             postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 

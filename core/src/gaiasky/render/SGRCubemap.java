@@ -160,6 +160,7 @@ public abstract class SGRCubemap extends SGRAbstract {
 
         boolean postproc = postprocessCapture(ppb, fb, wh, wh);
         sgr.renderScene(camera, t, rc);
+        sendOrientationUpdate(camera.getCamera(), rw, rh);
         postprocessRender(ppb, fb, postproc, camera, rw, rh);
     }
 

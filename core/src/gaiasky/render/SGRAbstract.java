@@ -5,9 +5,12 @@
 
 package gaiasky.render;
 
+import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
@@ -67,6 +70,10 @@ public class SGRAbstract {
 
     public FrameBuffer getResultBuffer() {
         return resultBuffer;
+    }
+
+    protected void sendOrientationUpdate(PerspectiveCamera cam, int w, int h){
+        EventManager.instance.post(Events.CAMERA_ORIENTATION_UPDATE, cam, w, h);
     }
 
 }
