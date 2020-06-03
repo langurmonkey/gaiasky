@@ -24,8 +24,12 @@ package gaiasky.util.gdx.contrib.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public final class ShaderLoader {
     private static Log logger = Logger.getLogger(ShaderLoader.class);
@@ -45,8 +49,8 @@ public final class ShaderLoader {
         log += "...";
         logger.debug("Compiling " + log);
 
-        String vpSrc = Gdx.files.internal(BasePath + vertexFileName + ".vertex").readString();
-        String fpSrc = Gdx.files.internal(BasePath + fragmentFileName + ".fragment").readString();
+        String vpSrc = loadShaderCode(vertexFileName + ".vertex");
+        String fpSrc = loadShaderCode(fragmentFileName + ".fragment");
 
         // Resolve includes
         vpSrc = ShaderTemplatingLoader.resolveIncludes(vpSrc);
@@ -54,6 +58,27 @@ public final class ShaderLoader {
 
         ShaderProgram program = ShaderLoader.fromString(vpSrc, fpSrc, vertexFileName, fragmentFileName, defines);
         return program;
+    }
+
+    private static String loadShaderCode(String file){
+        try {
+            String src = Gdx.files.internal(BasePath + file).readString();
+            return src;
+        }catch(Exception e0){
+            // Try to load from data
+            Path path = GlobalConf.data.dataPath(file);
+            if(Files.exists(path) && Files.isReadable(path)){
+                try {
+                    return Files.readString(path);
+                }catch(Exception e1){
+                    logger.error(e1);
+                    return null;
+                }
+            }
+            logger.error(e0);
+        }
+        return null;
+
     }
 
     public static ShaderProgram fromString(String vertex, String fragment, String vertexName, String fragmentName) {

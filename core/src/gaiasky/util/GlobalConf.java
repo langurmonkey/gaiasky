@@ -781,19 +781,22 @@ public class GlobalConf {
             this.REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
         }
 
-        public String dataFile(String path) {
+        public Path dataPath(String path){
             String pth = path.replace('*', 'X');
-            if (Paths.get(pth).isAbsolute()) {
+            if (Path.of(pth).isAbsolute()) {
                 // Absolute path, just leave it
-                return path.replaceAll("\\\\", "/");
+                return Path.of(path);
             } else {
                 // Relative path, just remove leading 'data/' and prepend data location
                 if (path.startsWith("data/")) {
                     path = path.substring(5);
                 }
-                Path p = Paths.get(DATA_LOCATION);
-                return (p.toString() + File.separator + path).replaceAll("\\\\", "/");
+                return Path.of(DATA_LOCATION).resolve(path);
             }
+        }
+
+        public String dataFile(String path) {
+            return dataPath(path).toString().replaceAll("\\\\", "/");
         }
 
         public FileHandle dataFileHandle(String path) {
