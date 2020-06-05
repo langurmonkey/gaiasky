@@ -21,6 +21,9 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.Date;
 
+/**
+ * Gaia is a special entity, mainly because it has its own camera modes (FoV1/2/1&2, Gaia camera)
+ */
 public class Gaia extends Satellite {
 
     public Vector3d unrotatedPos;

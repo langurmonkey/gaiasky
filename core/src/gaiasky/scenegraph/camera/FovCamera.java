@@ -267,9 +267,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public PerspectiveCamera getCamera() {
         switch (parent.mode) {
-        case GAIA_FOV1_MODE:
-            return camera;
-        case GAIA_FOV2_MODE:
+            case GAIA_FOV2_MODE:
             return camera2;
         default:
             return camera;

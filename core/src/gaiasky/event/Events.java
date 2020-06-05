@@ -691,7 +691,7 @@ public enum Events {
     /**
      * Posts a recurrent runnable. Contains an identifier (String) and the runnable object
      **/
-    PARK_POST_RUNNABLE,
+    PARK_RUNNABLE,
     /**
      * Pauses background data loading thread, if any
      **/
@@ -1244,7 +1244,7 @@ public enum Events {
     /**
      * Unposts a runnable. Contains the identifier (String)
      **/
-    UNPARK_POST_RUNNABLE,
+    UNPARK_RUNNABLE,
     /**
      * Contains the new value
      **/

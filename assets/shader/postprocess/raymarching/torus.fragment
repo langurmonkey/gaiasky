@@ -85,18 +85,20 @@ vec4 raymarch(vec3 ro, vec3 rd, float s) {
 
 void main(){
     // ray direction
-    vec3 rd = normalize(v_ray);
-    // ray origin (camera position)
-    vec3 ro = vec3(u_camPos);
-
-    vec3 col = texture(u_texture0, v_texCoords).xyz; // Color of the scene before this shader was run
-    float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y); // Logarithmic depth buffer
+    vec3 ray = normalize(v_ray);
+    // floating position (camPos - pos)
+    vec3 pos = vec3(u_camPos);
+    // depth buffer
+    float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);
     depth *= length(v_ray);
-    vec4 add = raymarch(ro, rd, depth);
+    // color of pre-existing scene
+    vec3 col = texture(u_texture0, v_texCoords).rgb;
+    // ray marching
+    vec4 rmcol = raymarch(ray, pos, depth);
 
-    // Returns final color using alpha blending
-    fragColor = vec4(col * (1.0 - add.w) + add.xyz * add.w, 1.0);
+    // return final color using alpha blending
+    fragColor = vec4(col * (1.0 - rmcol.a) + rmcol.rgb * rmcol.a, 1.0);
 
-    // Debug ray direction
+    // debug ray direction
     //fragColor = clamp(vec4(v_ray.xyz, 1.0) * 0.4 + texture(u_texture0, v_texCoords) * 0.4, 0.0, 1.0);
 }

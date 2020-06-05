@@ -21,6 +21,7 @@
 
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
@@ -71,6 +72,10 @@ public final class Raymarching extends PostProcessorEffect {
 
     public void setZfarK(float zfar, float k) {
         filter.setZfarK(zfar, k);
+    }
+
+    public void setAdditionalTexture(Texture tex){
+        filter.setAdditionalTexture(tex);
     }
 
     public void setAdditional(float[] additional) {

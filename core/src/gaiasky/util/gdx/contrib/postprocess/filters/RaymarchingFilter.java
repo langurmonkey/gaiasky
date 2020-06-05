@@ -47,10 +47,16 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      */
     private Texture depthTexture;
 
+    /**
+     * Additional texture, to be used for any purpose
+     */
+    private Texture additionalTexture;
+
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
         TextureDepth("u_texture1", 0),
+        TextureAdditional("u_texture2", 0),
         Time("u_time", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
@@ -149,6 +155,11 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.TextureDepth, u_texture1);
     }
 
+    public void setAdditionalTexture(Texture tex){
+        this.additionalTexture = tex;
+        setParam(Param.TextureAdditional, u_texture2);
+    }
+
     public void setAdditional(float[] additional){
         int len = Math.min(additional.length, 4);
         System.arraycopy(additional, 0, this.additional, 0, len);
@@ -181,6 +192,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         // reimplement super to batch every parameter
         setParams(Param.Texture, u_texture0);
         setParams(Param.TextureDepth, u_texture1);
+        setParams(Param.TextureAdditional, u_texture2);
         setParams(Param.Viewport, viewport);
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
@@ -196,5 +208,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
         depthTexture.bind(u_texture1);
+        if(additionalTexture != null)
+            additionalTexture.bind(u_texture2);
     }
 }

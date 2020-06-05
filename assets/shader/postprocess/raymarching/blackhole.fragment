@@ -207,13 +207,14 @@ void blackhole(out vec4 colOut, in vec2 fragCoord, in vec3 ray, in vec3 pos, in 
 
 void main(){
     // ray direction
-    vec3 rd = normalize(v_ray);
+    vec3 ray = normalize(v_ray);
     // floating position (camPos - pos)
-    vec3 ro = u_pos;
+    vec3 pos = u_pos;
 
+    vec3 col = texture(u_texture0, v_texCoords).rgb; // Color of the scene before this shader was run
     float depth = 1.0 / recoverWValue(texture(u_texture1, v_texCoords).r, u_zfark.x, u_zfark.y);// Logarithmic depth buffer
-    depth *= length(v_ray);
-    blackhole(fragColor, v_texCoords, rd, ro, depth);
+    depth *= length(ray);
+    blackhole(fragColor, v_texCoords, ray, pos, depth);
 }
 
 

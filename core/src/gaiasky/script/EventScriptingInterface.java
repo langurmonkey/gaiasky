@@ -2307,13 +2307,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void parkRunnable(String id, Runnable runnable) {
         if (checkString(id, "id"))
-            em.post(Events.PARK_POST_RUNNABLE, id, runnable);
+            em.post(Events.PARK_RUNNABLE, id, runnable);
     }
 
     @Override
     public void unparkRunnable(String id) {
         if (checkString(id, "id"))
-            em.post(Events.UNPARK_POST_RUNNABLE, id);
+            em.post(Events.UNPARK_RUNNABLE, id);
     }
 
     @Override

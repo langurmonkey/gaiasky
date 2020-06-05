@@ -74,7 +74,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    // Contains a map by name with [0:shader{string}, 1:position{vector3d}, 2:additional{float4}]] for raymarching post-processors
+    // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}]] for raymarching post-processors
     private Map<String, Object[]> raymarchingDef;
 
     private void addRayMarchingDef(String name, Object[] list) {
@@ -109,6 +109,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         manager.load(lensColorName, Texture.class);
         manager.load(lensStarburstName, Texture.class);
         initializeBlurObject();
+
+        // Add volume clouds
+        //raymarchingDef.put("Volume Clouds", new Object[]{"raymarching/volumeclouds", true, new Vector3d(0, 0, 0), new float[]{0f, 0f, 0f, 0f}, GlobalConf.assetsFileStr("img/static.jpg")});
     }
 
     public void doneLoading(AssetManager manager) {
@@ -156,11 +159,19 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             float zfar = (float) GaiaSky.instance.getCameraManager().current.getFar();
             float k = Constants.getCameraK();
             rm.setZfarK(zfar, k);
-            if (list[2] != null) {
-                rm.setAdditional((float[]) list[2]);
+            if (list[3] != null) {
+                rm.setAdditional((float[]) list[3]);
             }
-            // Disabled by default
-            rm.setEnabled(false);
+            if (list.length > 4) {
+                // u_texture2
+                try {
+                    Texture tex = new Texture((String) list[4]);
+                    rm.setAdditionalTexture(tex);
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            }
+            rm.setEnabled((boolean) list[1]);
             ppb.set(key, rm);
         });
 
@@ -484,7 +495,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     // Add effect description for later initialization
                     String shader = (String) data[3];
                     float[] additional = data[4] != null ? (float[]) data[4] : null;
-                    Object[] l = new Object[]{shader, position, additional};
+                    Object[] l = new Object[]{shader, false, position, additional};
                     addRayMarchingDef(name, l);
                     logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + position + "]");
                 } else {
@@ -662,15 +673,17 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         ((LensFlare2) ppb.get(LensFlare2.class)).setStarburstOffset(cameraOffset);
                         ((LightGlow) ppb.get(LightGlow.class)).setOrientation(cameraOffset * 50f);
 
-                        // Update raymarching shaders
+                        // Update ray marching shaders
                         Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                         if (rms != null)
                             rms.forEach((key, rm) -> {
-                                Vector3d pos = (Vector3d) raymarchingDef.get(key)[1];
-                                Vector3 camPos = auxd.set(campos).sub(pos).put(auxf);
-                                Raymarching raymarching = (Raymarching) rm;
-                                raymarching.setTime(secs);
-                                raymarching.setPos(camPos);
+                                if(rm.isEnabled()) {
+                                    Vector3d pos = (Vector3d) raymarchingDef.get(key)[2];
+                                    Vector3 camPos = auxd.set(campos).sub(pos).put(auxf);
+                                    Raymarching raymarching = (Raymarching) rm;
+                                    raymarching.setTime(secs);
+                                    raymarching.setPos(camPos);
+                                }
                             });
                     }
                 }
@@ -691,11 +704,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                         if (rms != null)
                             rms.forEach((key, rm) -> {
-                                Raymarching raymarching = (Raymarching) rm;
-                                raymarching.setFrustumCorners(frustumCorners);
-                                raymarching.setCamInvView(civ);
-                                raymarching.setModelView(mv);
-                                raymarching.setViewportSize(w, h);
+                                if(rm.isEnabled()) {
+                                    Raymarching raymarching = (Raymarching) rm;
+                                    raymarching.setFrustumCorners(frustumCorners);
+                                    raymarching.setCamInvView(civ);
+                                    raymarching.setModelView(mv);
+                                    raymarching.setViewportSize(w, h);
+                                }
                             });
                     }
                 }

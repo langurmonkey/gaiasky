@@ -569,7 +569,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.PARK_POST_RUNNABLE, Events.UNPARK_POST_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.PARK_RUNNABLE, Events.UNPARK_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
 
         // Re-enable input
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
@@ -1246,22 +1246,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             case HOME_CMD:
                 goHome();
                 break;
-            case PARK_POST_RUNNABLE:
+            case PARK_RUNNABLE:
                 synchronized (runnables) {
                     String key = (String) data[0];
                     Runnable runnable = (Runnable) data[1];
-                    runnablesMap.put(key, runnable);
-                    runnables.add(runnable);
+                    parkRunnable(key, runnable);
                 }
                 break;
-            case UNPARK_POST_RUNNABLE:
+            case UNPARK_RUNNABLE:
                 synchronized (runnables) {
                     String key = (String) data[0];
-                    Runnable r = runnablesMap.get(key);
-                    if (r != null) {
-                        runnables.removeValue(r, true);
-                        runnablesMap.remove(data[0]);
-                    }
+                    unparkRunnable(key);
                 }
                 break;
             default:
@@ -1272,6 +1267,29 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public boolean isInitialised() {
         return initialized;
+    }
+
+    /**
+     * Parks a runnable that will run every frame right the update() method (before render)
+     * until it is unparked
+     * @param key The key to identify the runnable
+     * @param runnable The runnable
+     */
+    public void parkRunnable(String key, Runnable runnable) {
+        runnablesMap.put(key, runnable);
+        runnables.add(runnable);
+    }
+
+    /**
+     * Unparks a previously parked runnable
+     * @param key The key of the runnable to unpark
+     */
+    public void unparkRunnable(String key) {
+        Runnable r = runnablesMap.get(key);
+        if (r != null) {
+            runnables.removeValue(r, true);
+            runnablesMap.remove(key);
+        }
     }
 
     public static void postRunnable(Runnable r) {
