@@ -19,7 +19,7 @@ public enum Events {
 
     /**
      * Adds or modifies a custom image. Contains:
-     * <ol>
+     * <ol start='0'>
      * <li><strong>id</strong> - integer</li>
      * <li><strong>tex</strong> - Texture</li>
      * <li><strong>x</strong> - X position of bottom-left corner, float in
@@ -35,7 +35,7 @@ public enum Events {
     ADD_CUSTOM_IMAGE,
     /**
      * Adds or modifies a custom message. Contains:
-     * <ol>
+     * <ol start='0'>
      * <li><strong>id</strong> - integer</li>
      * <li><strong>message</strong> - string</li>
      * <li><strong>x</strong> - X position of bottom-left corner, float in
@@ -52,7 +52,7 @@ public enum Events {
     ADD_CUSTOM_MESSAGE,
     /**
      * Adds or modifies a custom message. Contains:
-     * <ol>
+     * <ol start='0'>
      * <li><strong>id</strong> - integer</li>
      * <li><strong>message</strong> - string</li>
      * <li><strong>x</strong> - X position of bottom-left corner, float in
@@ -140,7 +140,7 @@ public enum Events {
     CAMERA_MODE_CMD,
     /**
      * Informs of a new camera state. Contains:
-     * <ul>
+     * <ol start='0'>
      * <li>Vector3d with the current position of the camera</li>
      * <li>Double with the speed of the camera in km/s</li>
      * <li>Vector3d with the velocity vector of the camera</li>
@@ -364,10 +364,10 @@ public enum Events {
 
     /**
      * Informs that the focus has somehow changed and the GUI must be updated.
-     * <ul>
-     * <li>[0] - The new focus object.</li>
-     * <li>[1] - Center focus (bool). If true, the focus is centered on the view.</li>
-     * </ul>
+     * <ol start='0'>
+     * <li>The new focus object.</li>
+     * <li>Center focus (bool). If true, the focus is centered on the view.</li>
+     * </ol>
      **/
     FOCUS_CHANGED,
 
@@ -433,10 +433,10 @@ public enum Events {
     FRAME_TICK,
     /**
      * Posts the coordinates of the free mode focus.
-     * <ul>
-     * <li>[0] - ra  [deg]</li>
-     * <li>[1] - dec [deg]</li>
-     * </ul>
+     * <ol start='0'>
+     * <li>ra  [deg]</li>
+     * <li>dec [deg]</li>
+     * </ol>
      */
     FREE_MODE_COORD_CMD,
     /**
@@ -726,12 +726,14 @@ public enum Events {
     /**
      * Contains the mode and a boolean indicating if it comes from the interface.
      * Modes:
-     * 0 - direction
-     * 1 - length
-     * 2 - has radial velocity: blue=stars with RV, red=stars without RV
-     * 3 - redshift (sun): blue=-50 Km/s, red=50 Km/s
-     * 4 - redshift (camera): blue=-50 Km/s, red=50 Km/s
-     * 5 - unique color
+     * <ol start='0'>
+     * <li>direction</li>
+     * <li>length</li>
+     * <li>has radial velcotiy: blue=stars with RV, red=stars without RV</li>
+     * <li>redhsift (sun): blue=-50 Km/s, red=50 Kms/s</li>
+     * <li>redhsift (camera): blue=-50 Km/s, red=50 Kms/s</li>
+     * <li>unique color</li>
+     * </ol>
      */
     PM_COLOR_MODE_CMD,
     /**
@@ -771,14 +773,14 @@ public enum Events {
     PROPERTIES_WRITTEN,
     /**
      * Updates the position of the pointer and the view in equatorial coordinates.
-     * <ul>
-     * <li>[0] - pointer ra  [deg]</li>
-     * <li>[1] - pointer dec [deg]</li>
-     * <li>[2] - view ra     [deg]</li>
-     * <li>[3] - view dec    [deg]</li>
-     * <li>[4] - pointer x   [pixels]</li>
-     * <li>[5] - pointer y   [pixels]</li>
-     * </ul>
+     * <ol start='0'>
+     * <li>pointer ra  [deg]</li>
+     * <li>pointer dec [deg]</li>
+     * <li>view ra     [deg]</li>
+     * <li>view dec    [deg]</li>
+     * <li>pointer x   [pixels]</li>
+     * <li>pointer y   [pixels]</li>
+     * </ol>
      **/
     RA_DEC_UPDATED,
     /**
@@ -864,10 +866,25 @@ public enum Events {
     RULER_DIST,
 
     /**
-     * Submits a register/unregister command for a raymarching shader.
-     * Contains the name, the status (true/false), and optionally the path to the shader and the position
+     * Submits a register/unregister command for a ray marching shader.
+     * Contains the name, the status (true/false), the position and optionally the path to the shader (for creating) and the additional values
+     * <ol start='0'>
+     * <li>name [string]</li>
+     * <li>status [boolean]</li>
+     * <li>position [vector3]</li>
+     * <li>shader [string] - optional, only at creation</li>
+     * <li>additional [float4] - optional, only at creation</li>
+     * </ol>
      */
     RAYMARCHING_CMD,
+    /**
+     * Push new additional data to ray marching shader. Contains the name and the additional vector.
+     * <ol start='0'>
+     * <li>name [string]</li>
+     * <li>additional[float4]</li>
+     * </ol>
+     */
+    RAYMARCHING_ADDITIONAL_CMD,
 
     /**
      * Contains the string with the script code and an optional boolean
@@ -981,7 +998,7 @@ public enum Events {
     SHOW_UNCERTAINTIES,
     /**
      * Contains following info:
-     * <ul>
+     * <ol start='0'>
      * <li>current speed [u/s]</li>
      * <li>current yaw angle [deg]</li>
      * <li>current pitch angle [deg]</li>
@@ -991,7 +1008,7 @@ public enum Events {
      * <li>yaw power [-1..1]</li>
      * <li>pitch power [-1..1]</li>
      * <li>roll power [-1..1]</li>
-     * </ul>
+     * </ol>
      **/
     SPACECRAFT_INFO,
     /**
@@ -1001,10 +1018,10 @@ public enum Events {
 
     /**
      * Contains following info about the nearest object:
-     * <ul>
+     * <ol start='0'>
      * <li>nearest object name</li>
      * <li>distance to nearest object [u]</li>
-     * </ul>
+     * </ol>
      */
     SPACECRAFT_NEAREST_INFO,
     /**
@@ -1035,25 +1052,27 @@ public enum Events {
 
     /**
      * Contains the speed limit index as in:
-     * 0 - 100 km/h
-     * 1 - 0.5 * c
-     * 2 - 0.8 * c
-     * 3 - 0.9 * c
-     * 4 - 0.99 * c
-     * 5 - 0.99999 * c
-     * 6 - c (3e8 m/s)
-     * 7 - 2*c
-     * 8 - 10*c
-     * 9 - 1000*c
-     * 10 - 1 AU/s
-     * 11 - 10 AU/s
-     * 12 - 1000 AU/s
-     * 13 - 10000 AU/s
-     * 14 - 1 pc/s
-     * 15 - 2 pc/s
-     * 16 - 10 pc/s
-     * 17 - 1000 pc/s
-     * 18 - No limit
+     * <ol start='0'>
+     * <li>100 km/h       </li>
+     * <li>0.5 * c        </li>
+     * <li>0.8 * c        </li>
+     * <li>0.9 * c        </li>
+     * <li>0.99 * c       </li>
+     * <li>0.99999 * c    </li>
+     * <li>c (3e8 m/s)    </li>
+     * <li>2*c            </li>
+     * <li>10*c           </li>
+     * <li>1000*c         </li>
+     * <li>1 AU/s         </li>
+     * <li>10 AU/s        </li>
+     * <li>1000 AU/s      </li>
+     * <li>10000 AU/s     </li>
+     * <li>1 pc/s         </li>
+     * <li>2 pc/s         </li>
+     * <li>10 pc/s        </li>
+     * <li>1000 pc/s      </li>
+     * <li>No limit       </li>
+     * </ol>
      * It also contains a boolean indicating whether this comes from
      * the interface.
      **/

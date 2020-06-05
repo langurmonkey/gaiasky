@@ -16,15 +16,17 @@ uniform vec3 u_pos;
 uniform vec2 u_zfark;
 // Viewport
 uniform vec2 u_viewport;
+// Use additional.x for bend scaling
+uniform vec4 u_additional;
 
 in vec2 v_texCoords;
 in vec3 v_ray;
 layout (location = 0) out vec4 fragColor;
 
-#define SPEED 1.0  //disk rotation speed
+#define SPEED 1.0//disk rotation speed
 
-#define STEPS  6. //disk texture layers
-#define SIZE 100.0 //size of BH
+#define STEPS  6.//disk texture layers
+#define SIZE 100.0//size of BH
 
 
 vec3 prj(vec3 wc, mat4 combined){
@@ -42,21 +44,21 @@ vec3 project(vec3 wc, mat4 combined){
     return (sc + 1.0) / 2.0;
 }
 
-float hash(float x){ return fract(sin(x)*152754.742);}
-float hash(vec2 x){	return hash(x.x + hash(x.y));}
+float hash(float x){ return fract(sin(x)*152754.742); }
+float hash(vec2 x){ return hash(x.x + hash(x.y)); }
 
-float value(vec2 p, float f) //value noise
+float value(vec2 p, float f)//value noise
 {
-    float bl = hash(floor(p*f + vec2(0.,0.)));
-    float br = hash(floor(p*f + vec2(1.,0.)));
-    float tl = hash(floor(p*f + vec2(0.,1.)));
-    float tr = hash(floor(p*f + vec2(1.,1.)));
+    float bl = hash(floor(p*f + vec2(0., 0.)));
+    float br = hash(floor(p*f + vec2(1., 0.)));
+    float tl = hash(floor(p*f + vec2(0., 1.)));
+    float tr = hash(floor(p*f + vec2(1., 1.)));
 
     vec2 fr = fract(p*f);
     fr = (3. - 2.*fr)*fr*fr;
     float b = mix(bl, br, fr.x);
     float t = mix(tl, tr, fr.x);
-    return  mix(b,t, fr.y);
+    return mix(b, t, fr.y);
 }
 
 vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
@@ -64,13 +66,13 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
 
     vec3 position = zeroPos;
     float lengthPos = length(position.xz);
-    float dist = min(1., lengthPos*(1./SIZE) *0.5) * SIZE * 0.4 *(1./STEPS) /( abs(ray.y) );
+    float dist = min(1.0, lengthPos*(1.0/SIZE) * 0.5) * SIZE * 0.4 * (1.0 / STEPS) /(abs(ray.y));
 
-    position += dist*STEPS*ray*0.5;
+    position += dist * STEPS * ray * 0.5;
 
     vec2 deltaPos;
-    deltaPos.x = -zeroPos.z*0.01 + zeroPos.x;
-    deltaPos.y = zeroPos.x*0.01 + zeroPos.z;
+    deltaPos.x = -zeroPos.z * 0.01 + zeroPos.x;
+    deltaPos.y = zeroPos.x * 0.01 + zeroPos.z;
     deltaPos = normalize(deltaPos - zeroPos.xz);
 
     float parallel = dot(ray.xz, deltaPos);
@@ -79,10 +81,10 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
     float redShift = parallel + 0.3;
     redShift *= redShift;
 
-    redShift = clamp(redShift, 0., 1.);
+    redShift = clamp(redShift, 0.0, 1.0);
 
-    float disMix = clamp((lengthPos - SIZE * 2.)*(1./SIZE)*0.24, 0., 1.);
-    vec3 insideCol =  mix(vec3(1.0,0.8,0.0), vec3(0.5,0.13,0.02)*0.2, disMix);
+    float disMix = clamp((lengthPos - SIZE * 2.0) * (1.0 / SIZE) * 0.24, 0.0, 1.0);
+    vec3 insideCol =  mix(vec3(1.0, 0.8, 0.0), vec3(0.5, 0.13, 0.02) * 0.2, disMix);
 
     insideCol *= mix(vec3(0.4, 0.2, 0.1), vec3(1.6, 2.4, 4.0), redShift);
     insideCol *= 1.25;
@@ -91,112 +93,111 @@ vec4 raymarchDisk(vec3 ray, vec3 zeroPos, float s) {
 
     vec4 o = vec4(0.);
 
-    for(float i = 0. ; i < STEPS; i++)
+    for (float i = 0.; i < STEPS; i++)
     {
-        position -= dist * ray ;
+        position -= dist * ray;
 
-        float intensity =clamp( 1. - abs((i - 0.8) * (1./STEPS) * 2.), 0., 1.);
+        float intensity =clamp(1. - abs((i - 0.8) * (1./STEPS) * 2.), 0., 1.);
         float lengthPos = length(position.xz);
         float distMult = 1.;
         float time = u_time;
 
-        distMult *=  clamp((lengthPos -  SIZE * 0.75) * (1./SIZE) * 1.5, 0., 1.);
-        distMult *= clamp(( SIZE * 10. -lengthPos) * (1./SIZE) * 0.20, 0., 1.);
+        distMult *=  clamp((lengthPos -  SIZE * 0.75) * (1./SIZE) * 1.5, 0.0, 1.0);
+        distMult *= clamp((SIZE * 10.0 -lengthPos) * (1./SIZE) * 0.20, 0.0, 1.0);
         distMult *= distMult;
 
-        float u = lengthPos + time* SIZE*0.3 + intensity * SIZE * 0.2;
+        float u = lengthPos + time* SIZE * 0.3 + intensity * SIZE * 0.2;
 
-        vec2 xy ;
-        float rot = mod(time * SPEED, 8192.);
+        vec2 xy;
+        float rot = mod(time * SPEED, 8192.0);
         xy.x = -position.z * sin(rot) + position.x * cos(rot);
         xy.y = position.x * sin(rot) + position.z * cos(rot);
 
-        float x = abs( xy.x/(xy.y));
+        float x = abs(xy.x/(xy.y));
         float angle = 0.02 * atan(x);
 
         const float f = 70.;
-        float noise = value( vec2( angle, u * (1./SIZE) * 0.05), f);
-        noise = noise*0.66 + 0.33*value( vec2( angle, u * (1./SIZE) * 0.05), f*2.);
+        float noise = value(vec2(angle, u * (1.0 / SIZE) * 0.05), f);
+        noise = noise*0.66 + 0.33 * value(vec2(angle, u * (1.0 / SIZE) * 0.05), f * 2.0);
 
-        float extraWidth =  noise * 1. * (1. -  clamp(i * (1./STEPS)*2. - 1., 0., 1.));
+        float extraWidth =  noise * 1.0 * (1.0 -  clamp(i * (1.0 / STEPS) * 2.0 - 1.0, 0.0, 1.0));
 
-        float alpha = clamp(noise*(intensity + extraWidth)*( (1./SIZE) * 10.  + 0.01 ) *  dist * distMult , 0., 1.);
+        float alpha = clamp(noise*(intensity + extraWidth)*((1.0 / SIZE) * 10.0 + 0.01) *  dist * distMult, 0.0, 1.0);
 
-        vec3 col = 2.*mix(vec3(0.3,0.2,0.15)*insideCol, insideCol, min(1.,intensity*2.));
-        o = clamp(vec4(col*alpha + o.rgb*(1.-alpha), o.a*(1.-alpha) + alpha), vec4(0.), vec4(1.));
+        vec3 col = 2.0 * mix(vec3(0.3, 0.2, 0.15) * insideCol, insideCol, min(1.0, intensity * 2.0));
+        o = clamp(vec4(col * alpha + o.rgb * (1.0 - alpha), o.a * (1.0 - alpha) + alpha), vec4(0.0), vec4(1.0));
 
-        lengthPos *= (1./SIZE);
+        lengthPos *= (1.0 / SIZE);
 
-        o.rgb += redShift*(intensity*1. + 0.5)* (1./STEPS) * 100.*distMult/(lengthPos*lengthPos);
+        o.rgb += redShift * (intensity * 1.0 + 0.5) * (1.0 / STEPS) * 100.0 * distMult / (lengthPos * lengthPos);
     }
 
-    o.rgb = clamp(o.rgb - 0.005, 0., 1.);
-    return o ;
+    o.rgb = clamp(o.rgb - 0.005, 0.0, 1.0);
+    return o;
 }
 
 
-void blackhole( out vec4 colOut, in vec2 fragCoord, in vec3 ray, in vec3 pos, in float s) {
+void blackhole(out vec4 colOut, in vec2 fragCoord, in vec3 ray, in vec3 pos, in float s) {
     colOut = vec4(0.0);
 
-    vec4 col = vec4(0.);
-    vec4 outCol =vec4(100.);
+    vec4 col = vec4(0.0);
+    vec4 outCol =vec4(100.0);
     vec2 tc = fragCoord;
-    vec3 opos = vec3(pos);
-    vec3 oray = vec3(ray);
+    vec3 ray_mild = ray;
 
-    for(int disks = 0; disks < 20; disks++) //steps
+    for (int disks = 0; disks < 20; disks++)//steps
     {
-        for (int h = 0; h < 6; h++) //reduces tests for exit conditions (to minimise branching)
+        for (int h = 0; h < 6; h++)//reduces tests for exit conditions (to minimise branching)
         {
             float dotpos = dot(pos, pos);
-            float invDist = inversesqrt(dotpos); //1/distance to BH
-            float centDist = dotpos * invDist; 	//distance to BH
-            float stepDist = 0.92 * abs(pos.y /(ray.y));  //conservative distance to disk (y==0)
-            float farLimit = centDist * 0.5; //limit step size far from to BH
-            float closeLimit = centDist*0.1 + 0.05*centDist*centDist*(1./SIZE); //limit step size close to BH
+            float invDist = inversesqrt(dotpos);//1/distance to BH
+            float centDist = dotpos * invDist;//distance to BH
+            float stepDist = 0.92 * abs(pos.y /(ray.y));//conservative distance to disk (y==0)
+            float farLimit = centDist * 0.5;//limit step size far from to BH
+            float closeLimit = centDist * 0.1 + 0.05 * centDist * centDist * (1.0 / SIZE);//limit step size close to BH
             stepDist = min(stepDist, min(farLimit, closeLimit));
 
             // Depth buffer
-            if(centDist >= s) {
+            if (centDist >= s) {
                 colOut = clamp(vec4(texture(u_texture0, fragCoord).xyz, 1.0), 0.0, 1.0);
                 return;
             }
 
             float invDistSqr = invDist * invDist;
-            float bendForce = stepDist * invDistSqr * SIZE * 0.625;  //bending force
-            ray =  normalize(ray - (bendForce * invDist) * pos);  //bend ray towards BH
+            float bendForce = stepDist * invDistSqr * SIZE * 0.625;//bending force
+            ray =  normalize(ray - (bendForce * invDist) * pos);//bend ray towards BH
+            ray_mild = normalize(ray_mild - (bendForce * u_additional.x * invDist) * pos);
             pos += stepDist * ray;
 
         }
 
 
         float dist2 = length(pos);
-        float dist = length(opos);
 
-        if(dist2 < SIZE * 0.1) //ray sucked in to BH
+        if (dist2 < SIZE * 0.1)//ray sucked in to BH
         {
-            outCol =  vec4(col.rgb * col.a, 1.0) ;
+            outCol =  vec4(col.rgb * col.a, 1.0);
             break;
         }
-        else if(dist2 > SIZE * 1000.) //ray escaped BH
+        else if (dist2 > SIZE * 1000.)//ray escaped BH
         {
-            vec2 bend_tc = project(ray, u_modelView).xy;
-            vec4 bg = texture(u_texture0, bend_tc); // Color of the scene before this shader was run
+            vec2 bend_tc = project(ray_mild, u_modelView).xy;
+            vec4 bg = texture(u_texture0, bend_tc);// Color of the scene before this shader was run
             outCol = vec4(col.rgb * col.a + bg.rgb * (1.0 - col.a), 1.0);
             break;
         }
-        else if (abs(pos.y) <= SIZE * 0.002 ) //ray hit accretion disk
+        else if (abs(pos.y) <= SIZE * 0.002)//ray hit accretion disk
         {
-            vec4 diskCol = raymarchDisk(ray, pos, s);   //render disk
-            pos.y = 0.;
+            vec4 diskCol = raymarchDisk(ray, pos, s);//render disk
+            pos.y = 0.0;
             pos += abs(SIZE * 0.001 / ray.y) * ray;
             col = vec4(diskCol.rgb * (1.0 - col.a) + col.rgb, col.a + diskCol.a * (1.0 - col.a));
         }
     }
 
     //if the ray never escaped or got sucked in
-    if(outCol.r == 100.)
-        outCol = vec4(col.rgb, 1.0);
+    if (outCol.r == 100.0)
+    outCol = vec4(col.rgb, 1.0);
 
     col = outCol;
 

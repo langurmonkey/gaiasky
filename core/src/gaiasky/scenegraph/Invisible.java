@@ -56,7 +56,7 @@ public class Invisible extends CelestialBody {
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if(this.raymarchingShader != null && !this.raymarchingShader.isBlank())
-           EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, this.raymarchingShader, coordinates.getEquatorialCartesianCoordinates(Instant.now(), new Vector3d(pos)));
+           EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, coordinates.getEquatorialCartesianCoordinates(Instant.now(), pos), this.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
     }
 
     @Override
@@ -108,13 +108,13 @@ public class Invisible extends CelestialBody {
             if(viewAngleApparent >  Math.toRadians(0.001)){
                 if(!isOn) {
                     // Turn on
-                    EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), true);
+                    EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), true, pos);
                     isOn = true;
                 }
             } else {
                 if(isOn){
                     // Turn off
-                    EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false);
+                    EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, pos);
                     isOn = false;
                 }
             }

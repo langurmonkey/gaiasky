@@ -79,10 +79,14 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
      */
     public boolean copy = false;
 
-    /** The id of the octant it belongs to, if any **/
+    /**
+     * The id of the octant it belongs to, if any
+     **/
     public Long octantId;
 
-    /** Its page **/
+    /**
+     * Its page
+     **/
     public OctreeNode octant;
 
     protected AbstractPositionEntity() {
@@ -470,7 +474,14 @@ public abstract class AbstractPositionEntity extends SceneGraphNode {
         return pos;
     }
 
-    public void setLabelcolor(float[] labelColor){}
-    public void setLabelcolor(double[] labelColor){}
+    public Vector3d getUnrotatedPos() {
+        return null;
+    }
+
+    public void setLabelcolor(float[] labelColor) {
+    }
+
+    public void setLabelcolor(double[] labelColor) {
+    }
 
 }

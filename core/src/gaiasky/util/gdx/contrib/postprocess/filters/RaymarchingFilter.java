@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.Logger;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -35,6 +36,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private Vector2 viewport;
     private Vector2 zfark;
     private Vector3 pos;
+    private float[] additional;
     private Matrix4 frustumCorners;
     private Matrix4 camInvView;
     private Matrix4 modelView;
@@ -55,7 +57,8 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         Pos("u_pos", 3),
         CamInvView("u_camInvViewTransform", 16),
         ModelView("u_modelView", 16),
-        FrustumCorners("u_frustumCorners", 16);
+        FrustumCorners("u_frustumCorners", 16),
+        Additional("u_additional", 4);
         // @formatter:on
 
         private String mnemonic;
@@ -103,6 +106,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.frustumCorners = new Matrix4();
         this.camInvView = new Matrix4();
         this.modelView = new Matrix4();
+        this.additional = new float[4];
         rebind();
     }
 
@@ -145,6 +149,29 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.TextureDepth, u_texture1);
     }
 
+    public void setAdditional(float[] additional){
+        int len = Math.min(additional.length, 4);
+        System.arraycopy(additional, 0, this.additional, 0, len);
+        setParamv(Param.Additional, this.additional, 0, 4);
+    }
+
+    public void setAdditional(float a, float b, float c, float d){
+        this.additional[0] = a;
+        this.additional[1] = b;
+        this.additional[2] = c;
+        this.additional[3] = d;
+        setParamv(Param.Additional, this.additional, 0, 4);
+    }
+
+    public void setAdditional(int index, float value){
+        if(index >= 0 && index < 4){
+           this.additional[index] = value;
+           setParamv(Param.Additional, this.additional, 0, 4);
+        } else {
+            Logger.getLogger(RaymarchingFilter.class).error("Additional index must be in [0, 3]: " + index);
+        }
+    }
+
     public Vector2 getViewportSize() {
         return viewport;
     }
@@ -160,7 +187,8 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.CamInvView, camInvView);
         setParams(Param.ModelView, this.modelView);
         setParams(Param.Pos, this.pos);
-        setParam(Param.Time, timeSecs);
+        setParams(Param.Time, timeSecs);
+        setParamsv(Param.Additional, this.additional, 0, 4);
         endParams();
     }
 

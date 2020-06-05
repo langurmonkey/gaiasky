@@ -251,11 +251,10 @@ public class Orbit extends Polyline {
             alpha *= this.alpha;
 
             int last = 1;
-            // Make origin Gaia (hack)
             Vector3d parentPos = null;
-            if (parent instanceof Gaia) {
-                parentPos = ((Gaia) parent).unrotatedPos;
-                last = 2;
+            if (parent instanceof AbstractPositionEntity) {
+                parentPos = ((AbstractPositionEntity) parent).getUnrotatedPos();
+                last = parentPos != null ? 2 : 1;
             }
 
             float dAlpha = 0f;

@@ -73,6 +73,18 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setZfarK(zfar, k);
     }
 
+    public void setAdditional(float[] additional) {
+        filter.setAdditional(additional);
+    }
+
+    public void setAdditional(float a, float b, float c, float d) {
+        filter.setAdditional(a, b, c, d);
+    }
+
+    public void setAdditional(int index, float value) {
+        filter.setAdditional(index, value);
+    }
+
     @Override
     public void dispose() {
         if (filter != null) {

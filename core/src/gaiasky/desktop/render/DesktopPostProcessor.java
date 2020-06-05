@@ -42,10 +42,7 @@ import gaiasky.util.math.Vector3d;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private static Log logger = Logger.getLogger(DesktopPostProcessor.class);
@@ -77,19 +74,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    // Contains pairs [name, shader] for raymarching post-processors
-    private List<Pair<String, String>> raymarchingDef;
+    // Contains a map by name with [0:shader{string}, 1:position{vector3d}, 2:additional{float4}]] for raymarching post-processors
+    private Map<String, Object[]> raymarchingDef;
 
-    private void addRayMarchingDef(Pair<String, String> pair) {
-        boolean contains = false;
-        for (Pair<String, String> p : raymarchingDef) {
-            if (p.equals(pair)) {
-                contains = true;
-                break;
-            }
-        }
-        if (!contains)
-            raymarchingDef.add(pair);
+    private void addRayMarchingDef(String name, Object[] list) {
+        if (!raymarchingDef.containsKey(name))
+            raymarchingDef.put(name, list);
     }
 
     public DesktopPostProcessor() {
@@ -103,7 +93,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         invView = new Matrix4();
         invProj = new Matrix4();
         frustumCorners = new Matrix4();
-        raymarchingDef = new ArrayList<>();
+        raymarchingDef = new HashMap<>();
 
         EventManager.instance.subscribe(this, Events.RAYMARCHING_CMD);
     }
@@ -160,16 +150,19 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.pp.setViewport(new Rectangle(0, 0, width, height));
 
         // RAY MARCHING SHADERS
-        for (Pair<String, String> rmdef : raymarchingDef) {
-            Raymarching rm = new Raymarching(rmdef.getSecond(), width, height);
+        raymarchingDef.forEach((key, list) -> {
+            Raymarching rm = new Raymarching((String) list[0], width, height);
             // Fixed uniforms
             float zfar = (float) GaiaSky.instance.getCameraManager().current.getFar();
             float k = Constants.getCameraK();
             rm.setZfarK(zfar, k);
+            if (list[2] != null) {
+                rm.setAdditional((float[]) list[2]);
+            }
             // Disabled by default
             rm.setEnabled(false);
-            ppb.set(rmdef.getFirst(), rm);
-        }
+            ppb.set(key, rm);
+        });
 
         // DEPTH BUFFER
         //DepthBuffer depthBuffer = new DepthBuffer();
@@ -486,12 +479,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             case RAYMARCHING_CMD:
                 String name = (String) data[0];
                 boolean status = (Boolean) data[1];
-                if(data.length > 2){
-                    // Add effect description
-                    String shader = (String) data[2];
-                    Vector3d pos = (Vector3d) data[3];
-                    addRayMarchingDef(new Pair<>(name, shader));
-                    logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + pos + "]");
+                Vector3d position = (Vector3d) data[2];
+                if (data.length > 3) {
+                    // Add effect description for later initialization
+                    String shader = (String) data[3];
+                    float[] additional = data[4] != null ? (float[]) data[4] : null;
+                    Object[] l = new Object[]{shader, position, additional};
+                    addRayMarchingDef(name, l);
+                    logger.info("Ray marching effect definition added: [" + name + " | " + shader + " | " + position + "]");
                 } else {
                     for (int i = 0; i < RenderType.values().length; i++) {
                         if (pps[i] != null) {
@@ -501,6 +496,22 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                                 effect.setEnabled(status);
                                 logger.info("Ray marching effect " + (status ? "enabled" : "disabled") + ": " + name);
                             }
+                        }
+                    }
+                }
+                break;
+            case RAYMARCHING_ADDITIONAL_CMD:
+                name = (String) data[0];
+                float[] additional = (float[]) data[1];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        // Update ray marching additional data
+                        Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
+                        if (rms != null) {
+                            PostProcessorEffect ppe = rms.get(name);
+                            if (ppe != null)
+                                ((Raymarching) ppe).setAdditional(additional);
                         }
                     }
                 }
@@ -642,7 +653,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             case CAMERA_MOTION_UPDATE:
                 PerspectiveCamera cam = (PerspectiveCamera) data[3];
                 Vector3d campos = (Vector3d) data[0];
-                Vector3 pos = auxd.set(campos).sub(500.0 * Constants.PC_TO_U, 0.0, 0.0).put(auxf);
                 ZonedDateTime zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
                 float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
                 float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);
@@ -656,9 +666,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                         if (rms != null)
                             rms.forEach((key, rm) -> {
+                                Vector3d pos = (Vector3d) raymarchingDef.get(key)[1];
+                                Vector3 camPos = auxd.set(campos).sub(pos).put(auxf);
                                 Raymarching raymarching = (Raymarching) rm;
                                 raymarching.setTime(secs);
-                                raymarching.setPos(pos);
+                                raymarching.setPos(camPos);
                             });
                     }
                 }

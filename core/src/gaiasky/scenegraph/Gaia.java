@@ -27,13 +27,11 @@ public class Gaia extends Satellite {
     Attitude attitude;
     Quaterniond quaterniond;
     Quaternion quaternion;
-    Matrix4d auxm;
 
     public Gaia() {
         super();
         unrotatedPos = new Vector3d();
         quaternion = new Quaternion();
-        auxm = new Matrix4d();
     }
 
     @Override
@@ -58,6 +56,10 @@ public class Gaia extends Satellite {
         }
     }
 
+    @Override
+    public Vector3d getUnrotatedPos() {
+        return unrotatedPos;
+    }
 
 
     public void setToLocalTransform(float sizeFactor, Matrix4 localTransform, boolean forceUpdate) {
@@ -70,8 +72,8 @@ public class Gaia extends Satellite {
                 // Update orientation
                 orientation.idt().rotate(quaterniond).rotate(0, 0, 1, 180);
 
-                auxm.set(localTransform).mul(orientation);
-                auxm.putIn(localTransform);
+                matauxd.set(localTransform).mul(orientation);
+                matauxd.putIn(localTransform);
 
             }
         } else {
