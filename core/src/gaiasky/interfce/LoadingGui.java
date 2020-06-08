@@ -87,12 +87,10 @@ public class LoadingGui extends AbstractGui {
         i = -1;
         m1 = BigInteger.ZERO;
         m2 = BigInteger.ZERO;
-        OwnLabel loading = new OwnLabel(I18n.bundle.get("notif.loading.wait"), skin, "hud-header");
         spin = new OwnLabel("0", skin, "mono");
         spin.setColor(skin.getColor("theme"));
 
         center.add(gaiasky).center().padBottom(pad10 * 2f).row();
-        center.add(loading).padBottom(pad05).row();
         center.add(spin).padBottom(pad30).row();
 
         // Tips
