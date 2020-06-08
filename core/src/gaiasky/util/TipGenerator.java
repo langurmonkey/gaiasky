@@ -6,12 +6,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import gaiasky.interfce.KeyBindings;
-import gaiasky.interfce.KeyBindings.ProgramAction;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -38,18 +35,18 @@ public class TipGenerator {
                 String[] tokens = line.split("\\|");
                 int n = tokens.length;
                 String[] tip = new String[n];
-                if(n < 3) {
+                if (n < 3) {
                     tip = new String[3];
                     n = 3;
                 }
                 tip[0] = tokens[0].isBlank() ? null : tokens[0];
                 tip[n - 1] = tokens.length < 3 ? null : (tokens[n - 1].isBlank() ? null : tokens[n - 1]);
                 for (int i = 1; i < n - 1; i++) {
-                    if(tokens[i].isBlank()){
+                    if (tokens[i].isBlank()) {
                         tip[i] = null;
                     } else {
                         String keys = kb.getStringKeys(tokens[i]);
-                        if(keys == null)
+                        if (keys == null)
                             tip[i] = tokens[i];
                         else
                             tip[i] = keys;
@@ -75,7 +72,6 @@ public class TipGenerator {
             sequence[randomIndexToSwap] = sequence[i];
             sequence[i] = temp;
         }
-        System.out.println(Arrays.toString(sequence));
     }
 
     private void fallback() {
@@ -91,7 +87,7 @@ public class TipGenerator {
         String[] l = tips.get(sequence[currentIndex]);
         int n = l.length;
         String[] keys = (n == 3 && l[1] == null) ? null : new String[n - 2];
-        if(keys != null) {
+        if (keys != null) {
             for (int i = 1; i < n - 1; i++)
                 keys[i - 1] = l[i];
         }
