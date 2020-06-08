@@ -441,6 +441,7 @@ public class GuiRegistry implements IObserver {
                                 String action = m.getSecond();
                                 for (int i = 0; i < keys.length; i++) {
                                     TextButton key = new TextButton(keys[i], skin, "key");
+                                    key.pad(0, pad3, 0, pad3);
                                     key.pad(pad5);
                                     keysGroup.addActor(key);
                                     if (i < keys.length - 1) {

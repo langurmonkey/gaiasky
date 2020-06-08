@@ -1,5 +1,8 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    "title-20": {
+      "file": "skins/fonts/title-20.fnt"
+    },
     "title-40": {
       "file": "skins/fonts/title-40.fnt"
     },
@@ -237,6 +240,11 @@
     "key": {
       "up": "key",
       "font": "ui-11",
+      "fontColor": "black"
+    },
+    "key-big": {
+      "up": "key",
+      "font": "ui-18",
       "fontColor": "black"
     },
     "link": {
@@ -775,6 +783,10 @@
     },
     "main-title": {
       "font": "title-40",
+      "fontColor": "white"
+    },
+    "main-title-s": {
+      "font": "title-20",
       "fontColor": "white"
     }
   },

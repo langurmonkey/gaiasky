@@ -1,0 +1,26 @@
+Use|camera.full/camera.FREE_MODE|to enable the free camera mode
+Use|camera.full/camera.FOCUS_MODE|to switch to focus mode
+Use|camera.full/camera.GAME_MODE|to enable game mode
+Use|camera.full/camera.GAIA_SCENE_MODE|to enter Gaia scene mode
+Use|camera.full/camera.SPACECRAFT_MODE|to enter spacecraft mode
+|action.toggle/element.debugmode|displays debug information
+Use|action.search|to search objects by name
+||The velocity of the camera is proportional to the distance from the Sun
+Press|action.pauseresume|to start and stop the time
+Press|action.dividetime|to slow down the pace of time
+Press|action.doubletime|to speed up the pace of time
+Use|action.loadcatalog|to load catalogs in VOTable or CSV at runtime
+To show help use|action.help|
+Use|action.gotoobject|to immediately move to the current focus object
+Show and hide the minimap with|action.toggle/gui.minimap.title|
+|double-click|on an object to select it
+Show the preferences window with|action.preferences|
+You can always go back home with|action.home|
+You can reset the time with|action.resettime|
+Control the visibility of each element from the visibility pane:|action.expandcollapse.pane/gui.visibility|
+Create and edit bookmarks using the bookmarks pane:|action.expandcollapse.pane/gui.bookmarks|
+Use|action.toggle/element.stereomode|to enter stereographic mode
+Use|action.toggle/element.planetarium|to enter planetarium mode
+Use|action.toggle/element.360|to enter panorama mode
+You can disable all UI with|action.toggle/element.cleanmode|
+Please send us a bug report if the program crashes:|gitlab.com/langurmonkey/gaiasky/issues|
