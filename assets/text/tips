@@ -24,3 +24,7 @@ Use|action.toggle/element.planetarium|to enter planetarium mode
 Use|action.toggle/element.360|to enter panorama mode
 You can disable all UI with|action.toggle/element.cleanmode|
 Please send us a bug report if the program crashes:|gitlab.com/langurmonkey/gaiasky/issues|
+||Big catalogs use a magnitude-space levels-of-detail structure
+||Try visiting different planets and moons
+Game mode (|camera.full/camera.GAME_MODE|) allows WASD movement + mouse look
+||Try your favourite game controller with Gaia Sky!

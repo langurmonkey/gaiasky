@@ -87,7 +87,7 @@ public class LoadingGui extends AbstractGui {
         i = -1;
         m1 = BigInteger.ZERO;
         m2 = BigInteger.ZERO;
-        spin = new OwnLabel("0", skin, "mono");
+        spin = new OwnLabel("0", skin, "main-title-xs");
         spin.setColor(skin.getColor("theme"));
 
         center.add(gaiasky).center().padBottom(pad10 * 2f).row();

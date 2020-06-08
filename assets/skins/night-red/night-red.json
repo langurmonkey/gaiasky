@@ -1,5 +1,8 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    "title-12": {
+      "file": "skins/fonts/title-12.fnt"
+    },
     "title-20": {
       "file": "skins/fonts/title-20.fnt"
     },
@@ -782,6 +785,10 @@
     },
     "main-title-s": {
       "font": "title-20",
+      "fontColor": "red"
+    },
+    "main-title-xs": {
+      "font": "title-12",
       "fontColor": "red"
     }
   },
