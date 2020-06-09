@@ -58,20 +58,20 @@ In order to compile and run Gaia Sky from source, you need the following install
 
 First, clone the [GitLab](https://gitlab.com/langurmonkey/gaiasky) repository:
 
-```
-$  git clone https://gitlab.com/langurmonkey/gaiasky.git
+```console
+git clone https://gitlab.com/langurmonkey/gaiasky.git
 ```
 
 Then, run Gaia Sky (Linux, macOS) with the provided script:
 
-```
-$  cd gaiasky
-$  ./gaiasky
+```console
+cd gaiasky
+./gaiasky
 ```
 
 On Windows, open PowerShell, make sure your `$JAVA_HOME` environment variable points to a valid JDK11+ installation, and run:
 
-```
+```batchfile
 .\gradlew.bat core:run
 ```
 
@@ -99,9 +99,9 @@ We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 
 In order to add the documentation submodule to the project, do:
 
-```
-$  git submodule init
-$  git submodule update
+```console
+git submodule init
+git submodule update
 ```
 
 The documentation project will be checked out in the `docs/` folder.
@@ -127,7 +127,7 @@ The latest acknowledgements are always in the [ACKNOWLEDGEMENTS.md](/ACKNOWLEDGE
 
 You can run Gaia Sky in VR with Valve's OpenVR with the `-vr` flag.
 
-```
+```console
 gaiasky -vr
 ```
 
