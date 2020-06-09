@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
@@ -19,7 +20,9 @@ import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
+import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 /**
  * GUI window to choose the catalogs to load by default.
@@ -53,7 +56,14 @@ public class CatalogChooserWindow extends GenericDialog {
     @Override
     protected void build() {
         if(notice != null && !notice.isEmpty()){
-            content.add(new OwnLabel(notice, skin)).left().pad(15 * GlobalConf.UI_SCALE_FACTOR).row();
+
+            OwnImageButton tooltip = new OwnImageButton(skin, "tooltip");
+            tooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.catselection"), skin));
+            HorizontalGroup hg = new HorizontalGroup();
+            hg.space(pad);
+            hg.addActor(tooltip);
+            hg.addActor(new OwnLabel(notice, skin));
+            content.add(hg).left().pad(15f * GlobalConf.UI_SCALE_FACTOR).row();
         }
 
         Cell<Actor> cell = content.add((Actor) null);
