@@ -10,7 +10,6 @@ import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class TipGenerator {
@@ -97,6 +96,7 @@ public class TipGenerator {
 
     private void addTip(WidgetGroup g, String pre, String[] keys, String post) {
         float pad5 = GlobalConf.UI_SCALE_FACTOR * 5f;
+        float pad2 = GlobalConf.UI_SCALE_FACTOR * 2f;
         g.clear();
         if (pre != null) {
             OwnLabel prel = new OwnLabel(pre, skin, "main-title-s");
@@ -106,7 +106,7 @@ public class TipGenerator {
         if (keys != null)
             for (int i = 0; i < keys.length; i++) {
                 TextButton key = new TextButton(keys[i], skin, "key-big");
-                key.pad(0, pad5, 0, pad5);
+                key.pad(pad2, pad5, pad2, pad5);
                 g.addActor(key);
                 if (i < keys.length - 1) {
                     OwnLabel plus = new OwnLabel("+", skin, "main-title-s");
@@ -114,9 +114,9 @@ public class TipGenerator {
                 }
             }
         if (post != null) {
-            OwnLabel postl = new OwnLabel(post, skin, "main-title-s");
-            postl.setColor(0.5f, 0.5f, 0.5f, 1f);
-            g.addActor(postl);
+            OwnLabel postL = new OwnLabel(post, skin, "main-title-s");
+            postL.setColor(0.5f, 0.5f, 0.5f, 1f);
+            g.addActor(postL);
         }
     }
 }

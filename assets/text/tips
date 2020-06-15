@@ -28,3 +28,10 @@ Please send us a bug report if the program crashes:|gitlab.com/langurmonkey/gaia
 ||Try visiting different planets and moons
 Game mode (|camera.full/camera.GAME_MODE|) allows WASD movement + mouse look
 ||Try your favourite game controller with Gaia Sky!
+||You can scale up the UI for HiDPI screens in the interface preferences
+||Enable or disable post-processing effects in the graphics preferences
+||Start Gaia Sky with '--noscript' to prevent the creation of the scripting server
+||Start Gaia Sky with '-c' to show the catalog chooser window at startup
+||Start Gaia Sky with '-d' to show the download manager at startup
+||Some planets and moons have elevation data and gravity in Game mode
+||Gaia Sky can use SAMP to interoperate with other astronomical software packages

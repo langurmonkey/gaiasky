@@ -245,6 +245,11 @@
       "font": "ui-11",
       "fontColor": "black"
     },
+    "key-big": {
+      "up": "key",
+      "font": "ui-18",
+      "fontColor": "black"
+    },
     "link": {
       "font": "ui-11",
       "fontColor": "blue",
