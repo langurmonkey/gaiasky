@@ -98,13 +98,13 @@ public class CrashGui extends AbstractGui {
 
             // Crash image
             Image img = new Image(new Texture(Gdx.files.internal("img/crash.png")));
-            content.add(img).center().padBottom(pad * 2f).row();
+            content.add(img).center().padBottom(pad10 * 2f).row();
 
             // Delete data folder and try again
             content.add(new OwnLabel(I18n.txt("gui.crash.info.1"), skin)).left().padBottom(pad5).row();
             OwnLabel dloc = new OwnLabel(TextUtils.capString(GlobalConf.data.DATA_LOCATION, 50), skin, "hud-subheader");
             dloc.addListener(new OwnTextTooltip(GlobalConf.data.DATA_LOCATION, skin));
-            content.add(dloc).left().padBottom(pad * 3f).row();
+            content.add(dloc).left().padBottom(pad10 * 3f).row();
 
             // Crash log
             content.add(new OwnLabel(I18n.txt("gui.crash.info.2"), skin)).left().padBottom(pad5).row();
@@ -112,7 +112,7 @@ public class CrashGui extends AbstractGui {
             cloc.addListener(new OwnTextTooltip(SysUtils.getCrashReportsDir().toString(), skin));
             content.add(cloc).left().padBottom(pad5).row();
             content.add(new OwnLabel(I18n.txt("gui.crash.info.3"), skin)).left().padBottom(pad5).row();
-            content.add(new Link(GlobalConf.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), GlobalConf.REPO_ISSUES)).left().padBottom(pad * 3f).row();
+            content.add(new Link(GlobalConf.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), GlobalConf.REPO_ISSUES)).left().padBottom(pad10 * 3f).row();
 
             // Stack trace
             float taw = 450f * GlobalConf.UI_SCALE_FACTOR;

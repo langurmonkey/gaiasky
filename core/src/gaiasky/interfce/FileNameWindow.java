@@ -40,8 +40,8 @@ public class FileNameWindow extends GenericDialog{
         fileName = new OwnTextField(defaultName, skin, nameValidator);
         fileName.setWidth(250 * GlobalConf.UI_SCALE_FACTOR);
 
-        content.add(label).padRight(pad).padBottom(pad);
-        content.add(fileName).padBottom(pad);
+        content.add(label).padRight(pad10).padBottom(pad10);
+        content.add(fileName).padBottom(pad10);
     }
 
     /**

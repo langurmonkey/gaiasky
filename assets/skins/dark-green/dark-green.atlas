@@ -98,7 +98,7 @@ bin-s-icon-grey
   index: -1
 border
   rotate: false
-  xy: 74, 134
+  xy: 1018, 242
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -213,7 +213,7 @@ cubemap-icon
   index: -1
 cursor
   rotate: false
-  xy: 78, 129
+  xy: 645, 170
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -273,7 +273,7 @@ default-pane-noborder
   index: -1
 default-rect
   rotate: false
-  xy: 1018, 230
+  xy: 1018, 232
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -281,7 +281,7 @@ default-rect
   index: -1
 default-rect-down
   rotate: false
-  xy: 645, 170
+  xy: 1018, 237
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -289,7 +289,7 @@ default-rect-down
   index: -1
 default-rect-selection
   rotate: false
-  xy: 1018, 235
+  xy: 645, 165
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -297,7 +297,7 @@ default-rect-selection
   index: -1
 default-select-selection
   rotate: false
-  xy: 1018, 235
+  xy: 645, 165
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -373,6 +373,13 @@ default-slider-knob-before
   orig: 1, 11
   offset: 0, 0
   index: -1
+default-slider-knob-before-vertical
+  rotate: false
+  xy: 74, 136
+  size: 7, 1
+  orig: 7, 1
+  offset: 0, 0
+  index: -1
 default-splitpane
   rotate: false
   xy: 22, 2
@@ -383,7 +390,7 @@ default-splitpane
   index: -1
 default-splitpane-vertical
   rotate: false
-  xy: 1018, 240
+  xy: 78, 129
   size: 3, 5
   split: 0, 0, 2, 2
   orig: 3, 5
@@ -2389,7 +2396,7 @@ land-on
   index: -1
 light-grey
   rotate: false
-  xy: 79, 153
+  xy: 645, 162
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2739,7 +2746,7 @@ seam
   index: -1
 selection
   rotate: false
-  xy: 900, 205
+  xy: 79, 153
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2753,14 +2760,14 @@ separator
   index: -1
 separator-context
   rotate: false
-  xy: 636, 134
+  xy: 900, 205
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 separator-menu
   rotate: false
-  xy: 79, 136
+  xy: 636, 134
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2774,14 +2781,14 @@ sub-menu
   index: -1
 table-bg
   rotate: false
-  xy: 645, 167
+  xy: 51, 3
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 table-bg-inv
   rotate: false
-  xy: 51, 3
+  xy: 900, 202
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2796,7 +2803,7 @@ textfield-disabled
   index: -1
 tooltip-bg
   rotate: false
-  xy: 900, 202
+  xy: 639, 134
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2810,7 +2817,7 @@ tooltip-icon
   index: -1
 transparent
   rotate: false
-  xy: 639, 134
+  xy: 54, 3
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2845,7 +2852,7 @@ view-icon
   index: -1
 white
   rotate: false
-  xy: 645, 164
+  xy: 900, 199
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

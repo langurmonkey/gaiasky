@@ -3,8 +3,14 @@
     "title-12": {
       "file": "skins/fonts/title-12.fnt"
     },
+    "title-13": {
+      "file": "skins/fonts/title-13.fnt"
+    },
     "title-20": {
       "file": "skins/fonts/title-20.fnt"
+    },
+    "title-21": {
+      "file": "skins/fonts/title-21.fnt"
     },
     "title-40": {
       "file": "skins/fonts/title-40.fnt"
@@ -164,6 +170,12 @@
       "g": 0,
       "r": 1
     },
+    "theme2": {
+      "a": 1,
+      "b": 0.5,
+      "g": 0.5,
+      "r": 1
+    },
     "highlight": {
       "a": 1,
       "b": 0,
@@ -213,7 +225,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "font": "ui-11",
-      "fontColor": "red",
+      "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
     "download": {
@@ -221,7 +233,7 @@
       "up": "default-round",
       "disabled": "default-round",
       "font": "ui-14",
-      "fontColor": "red",
+      "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
     "toggle": {
@@ -229,16 +241,16 @@
       "up": "default-round",
       "checked": "default-round-down",
       "font": "ui-11",
-      "fontColor": "red",
-      "downFontColor": "red"
+      "fontColor": "theme",
+      "downFontColor": "theme"
     },
     "toggle-big": {
       "down": "default-round-down",
       "up": "default-round",
       "checked": "default-round-down",
       "font": "ui-13",
-      "fontColor": "red",
-      "downFontColor": "red"
+      "fontColor": "theme",
+      "downFontColor": "theme"
     },
     "key": {
       "up": "key",
@@ -253,7 +265,7 @@
     "link": {
       "font": "ui-11",
       "fontColor": "blue",
-      "downFontColor": "red"
+      "downFontColor": "theme"
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
@@ -548,7 +560,7 @@
       "scrollStyle": "default",
       "listStyle": {
         "font": "ui-11",
-        "fontColorSelected": "red",
+        "fontColorSelected": "theme",
         "fontColorUnselected": "black",
         "selection": "default-select-selection",
         "background": "dark-grey"
@@ -567,17 +579,17 @@
     "default": {
       "titleFont": "ui-13",
       "background": "default-window",
-      "titleFontColor": "red"
+      "titleFontColor": "theme"
     },
     "info": {
       "titleFont": "ui-13",
       "background": "info-window",
-      "titleFontColor": "red"
+      "titleFontColor": "theme"
     },
     "dialog": {
       "titleFont": "ui-13",
       "background": "default-window",
-      "titleFontColor": "red",
+      "titleFontColor": "theme",
       "stageBackground": "dialogDim"
     }
   },
@@ -586,6 +598,11 @@
       "background": "default-slider",
       "knob": "default-slider-knob",
       "knobBefore": "default-slider-knob-before"
+    },
+    "default-vertical": {
+      "background": "default-slider",
+      "knob": "default-slider-knob",
+      "knobBefore": "default-slider-knob-before-vertical"
     },
     "big-horizontal": {
       "background": "big-slider",
@@ -609,23 +626,27 @@
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "object-name": {
       "font": "ui-10",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "header": {
-      "font": "ui-13",
-      "fontColor": "red"
+      "font": "title-13",
+      "fontColor": "theme"
+    },
+    "header-s": {
+      "font": "title-12",
+      "fontColor": "theme2"
     },
     "question": {
       "font": "ui-10",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "hotkey": {
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "default": {
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "default-blue": {
       "font": "ui-11",
@@ -633,7 +654,7 @@
     },
     "default-red": {
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "default-pink": {
       "font": "ui-11",
@@ -645,91 +666,91 @@
     },
     "ui-10": {
       "font": "ui-10",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "ui-11": {
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "ui-12": {
       "font": "ui-12",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "ui-13": {
       "font": "ui-13",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "ui-15": {
       "font": "ui-15",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "ui-23": {
       "font": "ui-23",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-10": {
       "font": "ui-10",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-11": {
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-12": {
       "font": "ui-12",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-13": {
       "font": "ui-13",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-14": {
       "font": "ui-14",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-15": {
       "font": "ui-15",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-17": {
       "font": "ui-17",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-18": {
       "font": "ui-21",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-19": {
       "font": "ui-19",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-21": {
       "font": "ui-21",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-23": {
       "font": "ui-23",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-25": {
       "font": "ui-25",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-28": {
       "font": "ui-28",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-30": {
       "font": "ui-30",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "msg-33": {
       "font": "ui-33",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "mono": {
       "font": "mono",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "menuitem-shortcut": {
       "font": "ui-11",
@@ -737,43 +758,39 @@
     },
     "warp": {
       "font": "ui-15-bold",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "headline": {
       "font": "ui-25",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "subhead": {
       "font": "ui-15",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "hud": {
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "hud-med": {
       "font": "ui-12",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "hud-big": {
       "font": "ui-14",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "hud-header": {
       "font": "ui-17",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "hud-subheader": {
       "font": "ui-12",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "link": {
       "font": "ui-11",
       "fontColor": "blue"
-    },
-    "help-title": {
-      "font": "ui-13",
-      "fontColor": "red"
     },
     "sc-header": {
       "font": "ui-12-bold",
@@ -781,20 +798,20 @@
     },
     "tooltip": {
       "font": "ui-11",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": "tooltip-bg"
     },
     "main-title": {
       "font": "title-40",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "main-title-s": {
       "font": "title-20",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "main-title-xs": {
       "font": "title-12",
-      "fontColor": "red"
+      "fontColor": "theme"
     }
   },
 
@@ -831,82 +848,82 @@
     },
     "regular": {
       "font": "ui-11",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-10": {
       "font": "ui-10",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-11": {
       "font": "ui-11",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-12": {
       "font": "ui-12",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-13": {
       "font": "ui-13",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-14": {
       "font": "ui-14",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-15": {
       "font": "ui-15",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-17": {
       "font": "ui-17-bold",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-18": {
       "font": "ui-18",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-19": {
       "font": "ui-19",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-21": {
       "font": "ui-21",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-23": {
       "font": "ui-23",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-25": {
       "font": "ui-25",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-28": {
       "font": "ui-28",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-30": {
       "font": "ui-30",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     },
     "msg-33": {
       "font": "ui-33",
-      "fontColor": "red",
+      "fontColor": "theme",
       "background": null
     }
   },
@@ -917,7 +934,7 @@
       "checkboxOff": "check-off",
       "checkboxOffDisabled": "check-off-disabled",
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "title": {
       "checkboxOn": "check-on",
@@ -925,7 +942,7 @@
       "checkboxOff": "check-off",
       "checkboxOffDisabled": "check-off-disabled",
       "font": "ui-12",
-      "fontColor": "red"
+      "fontColor": "theme"
     },
     "radio": {
       "checkboxOn": "radio-on",
@@ -933,7 +950,7 @@
       "checkboxOff": "radio-off",
       "checkboxOffDisabled": "radio-off-disabled",
       "font": "ui-11",
-      "fontColor": "red"
+      "fontColor": "theme"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle": {
@@ -1018,7 +1035,7 @@
       "over": "button-over",
       "disabled": "button",
       "font": "ui-11",
-      "fontColor": "red",
+      "fontColor": "theme",
       "disabledFontColor": "grey"
     },
     "toggle": {
@@ -1026,7 +1043,7 @@
       "down": "button-down",
       "up": "button-dark",
       "font": "ui-11",
-      "fontColor": "red",
+      "fontColor": "theme",
       "over": "button-over",
       "disabled": "button",
       "disabledFontColor": "grey",

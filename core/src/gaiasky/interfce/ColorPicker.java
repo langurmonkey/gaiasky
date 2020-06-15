@@ -164,7 +164,7 @@ public class ColorPicker extends ColorPickerAbstract {
             content.clear();
 
             HorizontalGroup hg = new HorizontalGroup();
-            hg.space(pad);
+            hg.space(pad10);
             Image oldColorImage = new Image(skin.getDrawable("white"));
             oldColorImage.setColor(color[0], color[1], color[2], color[3]);
             Table ocol = new Table();
@@ -273,28 +273,28 @@ public class ColorPicker extends ColorPickerAbstract {
                 }
             });
 
-            content.add(hg).padBottom(pad * 2f).colspan(3).row();
+            content.add(hg).padBottom(pad10 * 2f).colspan(3).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad).padBottom(pad);
-            content.add(sred).left().padRight(pad).padBottom(pad);
-            content.add(tred).padBottom(pad).row();
+            content.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(sred).left().padRight(pad10).padBottom(pad10);
+            content.add(tred).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad).padBottom(pad);
-            content.add(sgreen).left().padRight(pad).padBottom(pad);
-            content.add(tgreen).padBottom(pad).row();
+            content.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(sgreen).left().padRight(pad10).padBottom(pad10);
+            content.add(tgreen).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad).padBottom(pad);
-            content.add(sblue).left().padRight(pad).padBottom(pad);
-            content.add(tblue).padBottom(pad).row();
+            content.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(sblue).left().padRight(pad10).padBottom(pad10);
+            content.add(tblue).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad).padBottom(pad);
-            content.add(salpha).left().padRight(pad).padBottom(pad);
-            content.add(talpha).padBottom(pad).row();
+            content.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(salpha).left().padRight(pad10).padBottom(pad10);
+            content.add(talpha).padBottom(pad10).row();
 
-            content.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad).padBottom(pad);
-            content.add(hexfield).colspan(2).left().padBottom(pad).row();
+            content.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad10).padBottom(pad10);
+            content.add(hexfield).colspan(2).left().padBottom(pad10).row();
 
-            content.add(coltable).colspan(3).padBottom(pad).row();
+            content.add(coltable).colspan(3).padBottom(pad10).row();
 
         }
 

@@ -27,15 +27,12 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private String fileName;
 
-    private float pad5, pad10, pad15, sliderWidth, fieldWidth, titleWidth, cpSize, taWidth;
+    private float sliderWidth, fieldWidth, titleWidth, cpSize, taWidth;
 
     public DatasetLoadDialog(String title, String fileName, Skin skin, Stage ui) {
         super(title, skin, ui);
 
         this.fileName = fileName;
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
         sliderWidth = !GlobalConf.isHiDPI() ? 370f * GlobalConf.UI_SCALE_FACTOR : 415f * GlobalConf.UI_SCALE_FACTOR;
         fieldWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
         titleWidth = 180f * GlobalConf.UI_SCALE_FACTOR;

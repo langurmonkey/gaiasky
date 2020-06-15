@@ -98,7 +98,7 @@ bin-s-icon-grey
   index: -1
 border
   rotate: false
-  xy: 74, 134
+  xy: 1018, 242
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -205,7 +205,7 @@ cubemap-icon
   index: -1
 cursor
   rotate: false
-  xy: 78, 129
+  xy: 645, 156
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -265,7 +265,7 @@ default-pane-noborder
   index: -1
 default-rect
   rotate: false
-  xy: 650, 178
+  xy: 660, 183
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -273,7 +273,7 @@ default-rect
   index: -1
 default-rect-down
   rotate: false
-  xy: 645, 156
+  xy: 660, 188
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -281,7 +281,7 @@ default-rect-down
   index: -1
 default-rect-selection
   rotate: false
-  xy: 660, 188
+  xy: 650, 178
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -337,7 +337,7 @@ default-select-disabled
   index: -1
 default-select-selection
   rotate: false
-  xy: 660, 183
+  xy: 1018, 237
   size: 3, 3
   split: 1, 1, 1, 1
   orig: 3, 3
@@ -365,6 +365,13 @@ default-slider-knob-before
   orig: 1, 11
   offset: 0, 0
   index: -1
+default-slider-knob-before-vertical
+  rotate: false
+  xy: 74, 136
+  size: 7, 1
+  orig: 7, 1
+  offset: 0, 0
+  index: -1
 default-splitpane
   rotate: false
   xy: 22, 2
@@ -375,7 +382,7 @@ default-splitpane
   index: -1
 default-splitpane-vertical
   rotate: false
-  xy: 1018, 240
+  xy: 78, 129
   size: 3, 5
   split: 0, 0, 2, 2
   orig: 3, 5
@@ -2745,21 +2752,21 @@ separator
   index: -1
 separator-context
   rotate: false
-  xy: 1018, 237
+  xy: 645, 153
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 transparent
   rotate: false
-  xy: 1018, 237
+  xy: 645, 153
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 separator-menu
   rotate: false
-  xy: 1021, 237
+  xy: 665, 190
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2773,14 +2780,14 @@ sub-menu
   index: -1
 table-bg
   rotate: false
-  xy: 79, 136
+  xy: 665, 187
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
   index: -1
 table-bg-inv
   rotate: false
-  xy: 645, 153
+  xy: 650, 175
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2803,7 +2810,7 @@ textfield-disabled
   index: -1
 tooltip-bg
   rotate: false
-  xy: 665, 190
+  xy: 655, 180
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
@@ -2845,7 +2852,7 @@ view-icon
   index: -1
 white
   rotate: false
-  xy: 665, 187
+  xy: 1018, 234
   size: 1, 1
   orig: 1, 1
   offset: 0, 0

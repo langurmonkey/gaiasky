@@ -60,7 +60,7 @@ public class CatalogChooserWindow extends GenericDialog {
             OwnImageButton tooltip = new OwnImageButton(skin, "tooltip");
             tooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.catselection"), skin));
             HorizontalGroup hg = new HorizontalGroup();
-            hg.space(pad);
+            hg.space(pad10);
             hg.addActor(tooltip);
             hg.addActor(new OwnLabel(notice, skin));
             content.add(hg).left().pad(15f * GlobalConf.UI_SCALE_FACTOR).row();

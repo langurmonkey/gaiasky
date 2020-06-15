@@ -21,7 +21,6 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnSelectBox;
 import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.DoubleValidator;
-import gaiasky.util.validator.IntValidator;
 
 public class KeyframePreferencesWindow extends GenericDialog {
 
@@ -74,21 +73,21 @@ public class KeyframePreferencesWindow extends GenericDialog {
         OwnLabel time = new OwnLabel(I18n.txt("gui.time"), skin);
         OwnLabel timeMethod = new OwnLabel(I18n.txt("gui.interpolation.linear"), skin);
 
-        content.add(generalTitle).left().top().colspan(2).padBottom(pad).row();
+        content.add(generalTitle).left().top().colspan(2).padBottom(pad10).row();
 
-        content.add(camfpsLabel).left().padRight(pad).padBottom(pad * 3f);
-        content.add(camrecFps).left().padBottom(pad * 3f).row();
+        content.add(camfpsLabel).left().padRight(pad10).padBottom(pad10 * 3f);
+        content.add(camrecFps).left().padBottom(pad10 * 3f).row();
 
-        content.add(interpTitle).left().top().colspan(2).padBottom(pad).row();
+        content.add(interpTitle).left().top().colspan(2).padBottom(pad10).row();
 
-        content.add(pos).left().padRight(pad).padBottom(pad);
-        content.add(posMethod).left().padBottom(pad).row();
+        content.add(pos).left().padRight(pad10).padBottom(pad10);
+        content.add(posMethod).left().padBottom(pad10).row();
 
-        content.add(orientation).left().padRight(pad).padBottom(pad);
-        content.add(orientationMethod).left().padBottom(pad).row();
+        content.add(orientation).left().padRight(pad10).padBottom(pad10);
+        content.add(orientationMethod).left().padBottom(pad10).row();
 
-        content.add(time).left().padRight(pad).padBottom(pad * 3f);
-        content.add(timeMethod).left().padBottom(pad * 3f).row();
+        content.add(time).left().padRight(pad10).padBottom(pad10 * 3f);
+        content.add(timeMethod).left().padBottom(pad10 * 3f).row();
 
     }
 

@@ -191,10 +191,10 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         // Main tips
         OwnLabel tip = new OwnLabel("Press the button/axis indicated on the controller image. Click any input on the right\nto edit its value. Click the first input to restart the full sequence.", skin);
-        content.add(tip).colspan(2).padBottom(pad * 2f).row();
+        content.add(tip).colspan(2).padBottom(pad10 * 2f).row();
 
         // Controller
-        Cell controllerCell = content.add().padRight(pad * 2);
+        Cell controllerCell = content.add().padRight(pad10 * 2);
 
         Table controllerTable = new Table(skin);
         controllerTable.setBackground(new SpriteDrawable(new Sprite(controller)));
@@ -203,16 +203,16 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         elementCell = controllerTable.add();
 
         // Last input
-        OwnLabel currentInputLabel = new OwnLabel("Last input:", skin, "help-title");
+        OwnLabel currentInputLabel = new OwnLabel("Last input:", skin, "header");
         currentInput = new OwnLabel(none, skin, "default-blue");
 
         HorizontalGroup lastInputGroup = new HorizontalGroup();
-        lastInputGroup.space(pad);
+        lastInputGroup.space(pad10);
         lastInputGroup.addActor(currentInputLabel);
         lastInputGroup.addActor(currentInput);
 
         // File name
-        OwnLabel fileLabel = new OwnLabel("Filename:", skin, "help-title");
+        OwnLabel fileLabel = new OwnLabel("Filename:", skin, "header");
         LengthValidator lv = new LengthValidator(3, 100);
         filename = new OwnTextField(this.controllerName.replaceAll("\\s+", "_"), skin, lv);
         filename.setWidth(200f * GlobalConf.UI_SCALE_FACTOR);
@@ -230,7 +230,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         Gamepad[] gpds = Gamepad.values();
         for (Gamepad gpd : gpds) {
             Trio<Texture, float[], String> t = inputInfo.get(gpd);
-            inputTable.add(new OwnLabel(t.getThird() + ": ", skin)).left().padBottom(pad5).padRight(pad);
+            inputTable.add(new OwnLabel(t.getThird() + ": ", skin)).left().padBottom(pad5).padRight(pad10);
 
             OwnTextField inputField = new OwnTextField(getMappingsValue(gpd, mappings), skin);
             Color origCol = inputField.getColor().cpy();
@@ -255,8 +255,8 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         }
         content.add(inputTable);
         content.row();
-        content.add(lastInputGroup).padTop(pad);
-        content.add(filenameGroup).padTop(pad);
+        content.add(lastInputGroup).padTop(pad10);
+        content.add(filenameGroup).padTop(pad10);
 
         // Select first
         GaiaSky.postRunnable(() -> {

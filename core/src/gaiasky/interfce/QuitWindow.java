@@ -8,8 +8,6 @@ package gaiasky.interfce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -39,7 +37,7 @@ public class QuitWindow extends GenericDialog {
     protected void build() {
         content.clear();
 
-        content.add(new OwnLabel(I18n.txt("gui.quit.sure"), skin)).left().padBottom(pad * 2f).row();
+        content.add(new OwnLabel(I18n.txt("gui.quit.sure"), skin)).left().padBottom(pad10 * 2f).row();
 
         doNotAsk = new OwnCheckBox(I18n.txt("gui.donotask"), skin, pad5);
         doNotAsk.setChecked(false);

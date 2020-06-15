@@ -28,7 +28,9 @@ import gaiasky.util.scene2d.OwnTextButton;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
 public abstract class GenericDialog extends CollapsibleWindow {
-    protected static float pad;
+    protected static float pad20;
+    protected static float pad15;
+    protected static float pad10;
     protected static float pad5;
 
     static {
@@ -36,7 +38,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     public static void updatePads() {
-        pad = 10f * GlobalConf.UI_SCALE_FACTOR;
+        pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
+        pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
+        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
         pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
     }
 
@@ -99,7 +103,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected void recalculateButtonSize() {
         float w = 80f * GlobalConf.UI_SCALE_FACTOR;
         for (Actor button : buttonGroup.getChildren()) {
-            w = Math.max(button.getWidth() + pad * 4f, w);
+            w = Math.max(button.getWidth() + pad10 * 4f, w);
         }
         for (Actor button : buttonGroup.getChildren()) {
             button.setWidth(w);
@@ -146,9 +150,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
         }
         recalculateButtonSize();
 
-        add(content).left().pad(pad).row();
-        add(bottom).expandY().bottom().right().padRight(pad).row();
-        add(buttonGroup).pad(pad).bottom().right();
+        add(content).left().pad(pad10).row();
+        add(bottom).expandY().bottom().right().padRight(pad10).row();
+        add(buttonGroup).pad(pad10).bottom().right();
         getTitleTable().align(Align.left);
 
         // Align top left

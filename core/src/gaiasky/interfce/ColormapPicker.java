@@ -306,7 +306,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             float sbwidth = 170 * GlobalConf.UI_SCALE_FACTOR;
 
             // Color map
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.colormap"), skin)).left().padRight(pad).padBottom(pad5).padTop(pad * 2);
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.colormap"), skin)).left().padRight(pad10).padBottom(pad5).padTop(pad10 * 2);
             ComboBoxBean[] gqs = new ComboBoxBean[cmapList.size];
             for (Pair<String, Integer> cmapDef : cmapList) {
                 gqs[cmapDef.getSecond()] = new ComboBoxBean(cmapDef.getFirst(), cmapDef.getSecond());
@@ -323,15 +323,15 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 return false;
             });
-            container.add(cmap).colspan(2).left().padBottom(pad5).padTop(pad * 2).row();
+            container.add(cmap).colspan(2).left().padBottom(pad5).padTop(pad10 * 2).row();
 
             // Color map image
             cmapImageCell = container.add();
-            cmapImageCell.colspan(3).center().padBottom(pad * 2).row();
+            cmapImageCell.colspan(3).center().padBottom(pad10 * 2).row();
             updateCmapImage(cmap.getSelected().name);
 
             // Attribute
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.attribute"), skin)).left().padRight(pad).padBottom(pad5);
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.attribute"), skin)).left().padRight(pad10).padBottom(pad5);
             FadeNode catalog = catalogInfo.object;
             boolean stars = catalog instanceof StarGroup || catalog instanceof OctreeWrapper;
             Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 12 : 7);
@@ -379,7 +379,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
 
             // Min mapping value
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.min"), skin)).left().padRight(pad).padBottom(pad5);
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.min"), skin)).left().padRight(pad10).padBottom(pad5);
             minMap = new OwnTextField(Double.toString(getCmapMin(cmapAttrib, catalogInfo)), skin);
             minMap.setWidth(sbwidth * 0.9f);
             minMap.addListener(event -> {
@@ -404,7 +404,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             container.add(reloadCmap).left().padBottom(pad5).row();
 
             // Max mapping value
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.max"), skin)).left().padRight(pad).padBottom(pad5);
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.max"), skin)).left().padRight(pad10).padBottom(pad5);
             maxMap = new OwnTextField(Double.toString(getCmapMax(cmapAttrib, catalogInfo)), skin);
             maxMap.setWidth(sbwidth * 0.9f);
             maxMap.addListener(event -> {
@@ -532,7 +532,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             float colsize = 100f * GlobalConf.UI_SCALE_FACTOR;
 
             HorizontalGroup hg = new HorizontalGroup();
-            hg.space(pad);
+            hg.space(pad10);
             Image oldColorImage = new Image(skin.getDrawable("white"));
             oldColorImage.setColor(color[0], color[1], color[2], color[3]);
             Table ocol = new Table();
@@ -641,28 +641,28 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
             });
 
-            container.add(hg).padBottom(pad * 2f).colspan(3).row();
+            container.add(hg).padBottom(pad10 * 2f).colspan(3).row();
 
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad).padBottom(pad);
-            container.add(sred).left().padRight(pad).padBottom(pad);
-            container.add(tred).padBottom(pad).row();
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad10).padBottom(pad10);
+            container.add(sred).left().padRight(pad10).padBottom(pad10);
+            container.add(tred).padBottom(pad10).row();
 
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad).padBottom(pad);
-            container.add(sgreen).left().padRight(pad).padBottom(pad);
-            container.add(tgreen).padBottom(pad).row();
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad10).padBottom(pad10);
+            container.add(sgreen).left().padRight(pad10).padBottom(pad10);
+            container.add(tgreen).padBottom(pad10).row();
 
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad).padBottom(pad);
-            container.add(sblue).left().padRight(pad).padBottom(pad);
-            container.add(tblue).padBottom(pad).row();
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad10).padBottom(pad10);
+            container.add(sblue).left().padRight(pad10).padBottom(pad10);
+            container.add(tblue).padBottom(pad10).row();
 
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad).padBottom(pad);
-            container.add(salpha).left().padRight(pad).padBottom(pad);
-            container.add(talpha).padBottom(pad).row();
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad10).padBottom(pad10);
+            container.add(salpha).left().padRight(pad10).padBottom(pad10);
+            container.add(talpha).padBottom(pad10).row();
 
-            container.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad).padBottom(pad);
-            container.add(hexfield).colspan(2).left().padBottom(pad).row();
+            container.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad10).padBottom(pad10);
+            container.add(hexfield).colspan(2).left().padBottom(pad10).row();
 
-            container.add(coltable).colspan(3).padBottom(pad).row();
+            container.add(coltable).colspan(3).padBottom(pad10).row();
         }
 
         @Override

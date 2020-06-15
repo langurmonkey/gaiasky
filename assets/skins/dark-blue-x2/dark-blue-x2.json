@@ -3,8 +3,14 @@
     "title-12": {
       "file": "skins/fonts/title-12.fnt"
     },
+    "title-13": {
+      "file": "skins/fonts/title-13.fnt"
+    },
     "title-20": {
       "file": "skins/fonts/title-20.fnt"
+    },
+    "title-21": {
+      "file": "skins/fonts/title-21.fnt"
     },
     "title-40": {
       "file": "skins/fonts/title-40.fnt"
@@ -164,6 +170,12 @@
       "g": 0.6,
       "r": 0.4
     },
+    "theme2": {
+      "a": 1,
+      "b": 0.95,
+      "g": 0.75,
+      "r": 0.65
+    },
     "highlight": {
       "a": 1,
       "b": 0,
@@ -221,7 +233,7 @@
       "up": "default-round",
       "disabled": "default-round",
       "font": "ui-21",
-      "fontColor": "blue",
+      "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
     "toggle": {
@@ -230,7 +242,7 @@
       "checked": "default-round-down",
       "font": "ui-18",
       "fontColor": "white",
-      "downFontColor": "blue"
+      "downFontColor": "theme"
     },
     "toggle-big": {
       "down": "default-round-down",
@@ -238,7 +250,7 @@
       "checked": "default-round-down",
       "font": "ui-21",
       "fontColor": "white",
-      "downFontColor": "blue"
+      "downFontColor": "theme"
     },
     "key": {
       "up": "key",
@@ -252,8 +264,8 @@
     },
     "link": {
       "font": "ui-18",
-      "fontColor": "blue",
-      "downFontColor": "blue"
+      "fontColor": "theme",
+      "downFontColor": "theme"
     }
   },
   "gaiasky.util.scene2d.OwnTextIconButton$TextIconButtonStyle": {
@@ -587,6 +599,11 @@
       "knob": "default-slider-knob",
       "knobBefore": "default-slider-knob-before"
     },
+    "default-vertical": {
+      "background": "default-slider",
+      "knob": "default-slider-knob",
+      "knobBefore": "default-slider-knob-before-vertical"
+    },
     "big-horizontal": {
       "background": "big-slider",
       "knob": "big-slider-knob",
@@ -612,8 +629,12 @@
       "fontColor": "lightblue"
     },
     "header": {
-      "font": "ui-21",
-      "fontColor": "blue"
+      "font": "title-21",
+      "fontColor": "theme"
+    },
+    "header-s": {
+      "font": "title-20",
+      "fontColor": "theme2"
     },
     "question": {
       "font": "ui-14",
@@ -621,7 +642,7 @@
     },
     "hotkey": {
       "font": "ui-18",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "default": {
       "font": "ui-18",
@@ -629,7 +650,7 @@
     },
     "default-blue": {
       "font": "ui-18",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "default-red": {
       "font": "ui-18",
@@ -737,7 +758,7 @@
     },
     "warp": {
       "font": "ui-23-bold",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "headline": {
       "font": "ui-25",
@@ -761,19 +782,15 @@
     },
     "hud-header": {
       "font": "ui-25",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "hud-subheader": {
       "font": "ui-17",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "link": {
       "font": "ui-17",
-      "fontColor": "blue"
-    },
-    "help-title": {
-      "font": "ui-19",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "sc-header": {
       "font": "ui-19-bold",
@@ -924,7 +941,7 @@
       "checkboxOff": "check-off",
       "checkboxOffDisabled": "check-off-disabled",
       "font": "ui-19",
-      "fontColor": "blue"
+      "fontColor": "theme"
     },
     "radio": {
       "checkboxOn": "radio-on",

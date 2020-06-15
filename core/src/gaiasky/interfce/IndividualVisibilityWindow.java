@@ -55,7 +55,7 @@ public class IndividualVisibilityWindow extends GenericDialog {
          */
         Group constelGroup = visibilitySwitcher(Constellation.class, I18n.txt("element.constellations"), "constellation");
 
-        content.add(meshesGroup).left().padBottom(pad * 2f).row();
+        content.add(meshesGroup).left().padBottom(pad10 * 2f).row();
         content.add(constelGroup).left();
     }
 

@@ -45,7 +45,7 @@ public class LandAtWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        latlonCb = new OwnCheckBox(I18n.txt("context.lonlat"), skin, "radio", pad);
+        latlonCb = new OwnCheckBox(I18n.txt("context.lonlat"), skin, "radio", pad10);
         latlonCb.setChecked(false);
         latlonCb.addListener(new EventListener() {
             @Override
@@ -65,7 +65,7 @@ public class LandAtWindow extends GenericDialog {
         longitude = new OwnTextField("", skin, new FloatValidator(0, 360));
         latitude = new OwnTextField("", skin, new FloatValidator(-90, 90));
 
-        locationCb = new OwnCheckBox(I18n.txt("context.location"), skin, "radio", pad);
+        locationCb = new OwnCheckBox(I18n.txt("context.location"), skin, "radio", pad10);
         locationCb.setChecked(true);
         locationCb.addListener(new EventListener() {
             @Override
@@ -86,14 +86,14 @@ public class LandAtWindow extends GenericDialog {
 
         new ButtonGroup<CheckBox>(latlonCb, locationCb);
 
-        content.add(locationCb).left().top().padBottom(pad).colspan(4).row();
-        content.add(new OwnLabel(I18n.txt("context.location"), skin)).left().top().padRight(pad);
-        content.add(location).left().top().padBottom(pad * 2).row();
+        content.add(locationCb).left().top().padBottom(pad10).colspan(4).row();
+        content.add(new OwnLabel(I18n.txt("context.location"), skin)).left().top().padRight(pad10);
+        content.add(location).left().top().padBottom(pad10 * 2).row();
 
-        content.add(latlonCb).left().top().padBottom(pad).colspan(4).row();
-        content.add(new OwnLabel(I18n.txt("context.longitude"), skin)).left().top().padRight(pad);
-        content.add(longitude).left().top().padRight(pad * 2);
-        content.add(new OwnLabel(I18n.txt("context.latitude"), skin)).left().top().padRight(pad);
+        content.add(latlonCb).left().top().padBottom(pad10).colspan(4).row();
+        content.add(new OwnLabel(I18n.txt("context.longitude"), skin)).left().top().padRight(pad10);
+        content.add(longitude).left().top().padRight(pad10 * 2);
+        content.add(new OwnLabel(I18n.txt("context.latitude"), skin)).left().top().padRight(pad10);
         content.add(latitude).left().top();
 
     }

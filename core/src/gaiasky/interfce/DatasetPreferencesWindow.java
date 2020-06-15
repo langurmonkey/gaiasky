@@ -58,31 +58,31 @@ public class DatasetPreferencesWindow extends GenericDialog {
     @Override
     protected void build() {
         // Name
-        content.add(new OwnLabel(I18n.txt("gui.dataset.name"), skin, "hud-subheader")).right().padRight(pad).padBottom(pad);
-        content.add(new OwnLabel(ci.name, skin)).left().padRight(pad).padBottom(pad).row();
+        content.add(new OwnLabel(I18n.txt("gui.dataset.name"), skin, "hud-subheader")).right().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(ci.name, skin)).left().padRight(pad10).padBottom(pad10).row();
         // Type
-        content.add(new OwnLabel(I18n.txt("gui.dataset.type"), skin, "hud-subheader")).right().padRight(pad).padBottom(pad);
-        content.add(new OwnLabel(ci.type.toString(), skin)).left().padRight(pad).padBottom(pad).row();
+        content.add(new OwnLabel(I18n.txt("gui.dataset.type"), skin, "hud-subheader")).right().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(ci.type.toString(), skin)).left().padRight(pad10).padBottom(pad10).row();
         // Added
-        content.add(new OwnLabel(I18n.txt("gui.dataset.loaded"), skin, "hud-subheader")).right().padRight(pad).padBottom(pad);
-        content.add(new OwnLabel(ci.loadDateUTC.atZone(ZoneId.systemDefault()).toString(), skin)).left().padRight(pad).padBottom(pad).row();
+        content.add(new OwnLabel(I18n.txt("gui.dataset.loaded"), skin, "hud-subheader")).right().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(ci.loadDateUTC.atZone(ZoneId.systemDefault()).toString(), skin)).left().padRight(pad10).padBottom(pad10).row();
         // Desc
-        content.add(new OwnLabel(I18n.txt("gui.dataset.description"), skin, "hud-subheader")).right().padRight(pad).padBottom(pad * 2f);
-        content.add(new OwnLabel(TextUtils.capString(ci.description, 55), skin)).left().padRight(pad).padBottom(pad * 2f).row();
+        content.add(new OwnLabel(I18n.txt("gui.dataset.description"), skin, "hud-subheader")).right().padRight(pad10).padBottom(pad10 * 2f);
+        content.add(new OwnLabel(TextUtils.capString(ci.description, 55), skin)).left().padRight(pad10).padBottom(pad10 * 2f).row();
 
         // Highlight
-        content.add(new OwnLabel(I18n.txt("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad).row();
+        content.add(new OwnLabel(I18n.txt("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad10).row();
 
         // Point size
         IValidator pointSizeValidator = new FloatValidator(0.5f, 15.0f);
         pointSize = new OwnTextField(Float.toString(ci.hlSizeFactor), skin, pointSizeValidator);
-        content.add(new OwnLabel(I18n.txt("gui.dataset.highlight.size"), skin)).left().padRight(pad).padBottom(pad);
-        content.add(pointSize).left().padRight(pad).padBottom(pad).row();
+        content.add(new OwnLabel(I18n.txt("gui.dataset.highlight.size"), skin)).left().padRight(pad10).padBottom(pad10);
+        content.add(pointSize).left().padRight(pad10).padBottom(pad10).row();
 
         // All visible
-        allVisible = new OwnCheckBox(I18n.txt("gui.dataset.highlight.allvisible"), skin, pad);
+        allVisible = new OwnCheckBox(I18n.txt("gui.dataset.highlight.allvisible"), skin, pad10);
         allVisible.setChecked(ci.hlAllVisible);
-        content.add(allVisible).left().colspan(2).padBottom(pad * 2f).row();
+        content.add(allVisible).left().colspan(2).padBottom(pad10 * 2f).row();
 
         // Filters
         content.add(new OwnLabel(I18n.txt("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad5).row();
@@ -112,8 +112,8 @@ public class DatasetPreferencesWindow extends GenericDialog {
                }
                return false;
             });
-            filterTable.add(new OwnLabel(I18n.txt("gui.dataset.filter.operation"), skin)).left().padRight(pad * 2f).padBottom(pad);
-            filterTable.add(operation).left().expandX().padBottom(pad).row();
+            filterTable.add(new OwnLabel(I18n.txt("gui.dataset.filter.operation"), skin)).left().padRight(pad10 * 2f).padBottom(pad10);
+            filterTable.add(operation).left().expandX().padBottom(pad10).row();
 
             // Rules
             Array<FilterRule> rules = filter.getRules();
@@ -169,7 +169,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     }
                     return false;
                 });
-                rulesTable.add(attribute).left().padRight(pad).padBottom(pad5);
+                rulesTable.add(attribute).left().padRight(pad10).padBottom(pad5);
 
                 // COMPARATOR
                 String[] cmps = new String[]{"<", "<=", ">", ">=", "==", "!="};
@@ -186,7 +186,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     }
                    return false;
                 });
-                rulesTable.add(comparator).left().padRight(pad).padBottom(pad5);
+                rulesTable.add(comparator).left().padRight(pad10).padBottom(pad5);
 
                 // VALUE
                 FloatValidator fval = new FloatValidator(-Float.MAX_VALUE, Float.MAX_VALUE);
@@ -207,11 +207,11 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     }
                    return false;
                 });
-                rulesTable.add(value).left().padRight(pad).padBottom(pad5);
+                rulesTable.add(value).left().padRight(pad10).padBottom(pad5);
 
 
                 // UNIT
-                rulesTable.add(unit).left().padRight(pad * 3f).padBottom(pad5);
+                rulesTable.add(unit).left().padRight(pad10 * 3f).padBottom(pad5);
 
                 // RUBBISH
                 OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
@@ -230,8 +230,8 @@ public class DatasetPreferencesWindow extends GenericDialog {
             // New rule button
             OwnTextIconButton addRule = new OwnTextIconButton(I18n.txt("gui.dataset.filter.rule.add"), skin, "add");
             addRule.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.filter.rule.add"), skin));
-            addRule.pad(pad);
-            rulesTable.add(addRule).left().padTop(pad).row();
+            addRule.pad(pad10);
+            rulesTable.add(addRule).left().padTop(pad10).row();
             addRule.addListener(event -> {
                 if(event instanceof ChangeEvent){
                     dpw.addRule(filter);
@@ -242,10 +242,10 @@ public class DatasetPreferencesWindow extends GenericDialog {
             });
         } else {
             // Add
-            filterTable.add(new OwnLabel("No filters yet", skin)).left().padBottom(pad).row();
+            filterTable.add(new OwnLabel("No filters yet", skin)).left().padBottom(pad10).row();
             OwnTextIconButton addFilter = new OwnTextIconButton(I18n.txt("gui.dataset.filter.add"), skin, "add");
             addFilter.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.filter.add"), skin));
-            addFilter.pad(pad);
+            addFilter.pad(pad10);
             filterTable.add(addFilter).left().padBottom(pad5).row();
             addFilter.addListener(event -> {
                 if (event instanceof ChangeEvent) {

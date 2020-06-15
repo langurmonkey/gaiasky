@@ -200,7 +200,7 @@ public class FileChooser extends GenericDialog {
         controlsTable.add(home).left().padRight(pad5);
         controlsTable.add(back).left().padRight(pad5);
         controlsTable.add(parent).left().padRight(pad5);
-        controlsTable.add(fwd).left().padRight(pad5).padRight(pad);
+        controlsTable.add(fwd).left().padRight(pad5).padRight(pad10);
 
         // Text input with current location
         location = new OwnTextField("", skin);
@@ -225,7 +225,7 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
-        controlsTable.add(location).left().pad(pad);
+        controlsTable.add(location).left().pad(pad10);
 
         // In windows, we need to be able to change drives
         driveButtonsList = new HorizontalGroup();
