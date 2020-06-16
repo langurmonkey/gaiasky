@@ -5,62 +5,123 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 
 public class OwnSlider extends Slider {
     private float ownwidth = 0f, ownheight = 0f;
     private float mapMin, mapMax;
     private boolean map = false;
+    private Skin skin;
+    private boolean displayValueMapped = false;
+    private boolean showValueLabel = true;
+    private OwnLabel valueLabel;
+    private String valuePrefix, valueSuffix;
+    private float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
+    private float padY = 3f * GlobalConf.UI_SCALE_FACTOR;
+    private INumberFormat nf;
 
-    public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, Skin skin){
-        super(min, max, stepSize, false, skin);
-        setMapValues(mapMin, mapMax);
+    public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, boolean vertical, Skin skin) {
+        super(min, max, stepSize, vertical, skin);
+        if (vertical) {
+            padX = -8;
+        } else {
+            padY = -1;
+        }
+        this.skin = skin;
+        setUp(mapMin, mapMax);
     }
 
-    public OwnSlider(float min, float max, float stepSize, Skin skin){
-        super(min, max, stepSize, false, skin);
+    public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
+        this(min, max, stepSize, mapMin, mapMax, false, skin);
+    }
+
+    public OwnSlider(float min, float max, float stepSize, Skin skin) {
+        this(min, max, stepSize, min, max, false, skin);
     }
 
     public OwnSlider(float min, float max, float stepSize, boolean vertical, Skin skin) {
-        super(min, max, stepSize, vertical, skin);
+        this(min, max, stepSize, min, max, vertical, skin);
     }
 
     public OwnSlider(float min, float max, float stepSize, boolean vertical, Skin skin, String styleName) {
         super(min, max, stepSize, vertical, skin, styleName);
     }
 
-    public void setMapValues(float mapMin, float mapMax){
+    public void setUp(float mapMin, float mapMax) {
+        setUp(mapMin, mapMax, NumberFormatFactory.getFormatter("####0.0#"));
+    }
+
+    public void setUp(float mapMin, float mapMax, INumberFormat nf) {
+        this.nf = nf;
+        setMapValues(mapMin, mapMax);
+
+        this.valueLabel = new OwnLabel(getValueString(), skin);
+        this.addListener((event) -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                this.valueLabel.setText(getValueString());
+                return true;
+            }
+            return false;
+        });
+    }
+
+    public void setMapValues(float mapMin, float mapMax) {
         this.mapMin = mapMin;
         this.mapMax = mapMax;
         this.map = true;
     }
 
-    public void removeMapValues(){
+    public void removeMapValues() {
         this.mapMin = 0;
         this.mapMax = 0;
         this.map = false;
     }
 
-    public float getMappedValue(){
-        if(map){
+    public String getValueString() {
+        return (valuePrefix != null ? valuePrefix : "") + nf.format((displayValueMapped ? getMappedValue() : getValue())) + (valueSuffix != null ? valueSuffix : "");
+    }
+
+    public float getMappedValue() {
+        if (map) {
             return MathUtilsd.lint(getValue(), getMinValue(), getMaxValue(), mapMin, mapMax);
-        }else{
+        } else {
             return getValue();
         }
     }
 
-    public void setMappedValue(double mappedValue){
+    public void setMappedValue(double mappedValue) {
         setMappedValue((float) mappedValue);
     }
 
-    public void setMappedValue(float mappedValue){
-        if(map){
+    public void setMappedValue(float mappedValue) {
+        if (map) {
             setValue(MathUtilsd.lint(mappedValue, mapMin, mapMax, getMinValue(), getMaxValue()));
         } else {
             setValue(mappedValue);
         }
+    }
+
+    public void setDisplayValueMapped(boolean displayValueMapped) {
+        this.displayValueMapped = displayValueMapped;
+    }
+
+    public void showValueLabel(boolean showValueLabel) {
+        this.showValueLabel = showValueLabel;
+    }
+
+    public void setValuePrefix(String valuePrefix) {
+        this.valuePrefix = valuePrefix;
+    }
+
+    public void setValueSuffix(String valueSuffix) {
+        this.valueSuffix = valueSuffix;
     }
 
     @Override
@@ -100,4 +161,23 @@ public class OwnSlider extends Slider {
         }
     }
 
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        if (valueLabel != null && showValueLabel) {
+            if (this.isVertical()) {
+                valueLabel.setPosition(getX() + padX, getY() + getPrefHeight() - (valueLabel.getPrefHeight() + padY));
+            } else {
+                valueLabel.setPosition(getX() + getPrefWidth() - (valueLabel.getPrefWidth() + padX), getY() + padY);
+            }
+            valueLabel.draw(batch, parentAlpha);
+        }
+    }
+
+    @Override
+    public void setDisabled(boolean disabled) {
+        super.setDisabled(disabled);
+        if (valueLabel != null)
+            valueLabel.setDisabled(disabled);
+    }
 }

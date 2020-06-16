@@ -262,6 +262,9 @@ public class Constants {
     public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;
     public final static float MAX_POINTER_GUIDES_WIDTH = 20f;
 
+    public final static float MIN_AXIS_SENSITIVITY = 0.1f;
+    public final static float MAX_AXIS_SENSITIVITY = 10f;
+
 
     // Max time, 5 Myr
     public static final long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;

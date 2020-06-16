@@ -322,7 +322,7 @@ public class SpacecraftGui extends AbstractGui {
         controlsGroup.pad(0, 10 * factor, 280 * factor, 0);
         controlsGroup.align(Align.topLeft);
 
-        responsiveness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        responsiveness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         responsiveness.setName("sc responsiveness");
         responsiveness.setValue(MathUtilsd.lint(GlobalConf.spacecraft.SC_RESPONSIVENESS, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
         responsiveness.addListener(event -> {
@@ -333,7 +333,7 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
 
-        drag = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, false, skin);
+        drag = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
         drag.setName("sc drag");
         drag.setValue(GlobalConf.spacecraft.SC_HANDLING_FRICTION * Constants.MAX_SLIDER);
         drag.addListener(event -> {

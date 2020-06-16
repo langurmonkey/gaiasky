@@ -132,7 +132,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
         colorMap.put(ci.name, cp);
 
-        String name = TextUtils.capString(ci.name, 18);
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, GlobalConf.isHiDPI() ? 23 : 16), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
         if (ci.isRegular()) {
