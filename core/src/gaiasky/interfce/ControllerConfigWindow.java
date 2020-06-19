@@ -14,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
@@ -26,10 +26,7 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Trio;
 import gaiasky.util.parse.Parser;
-import gaiasky.util.scene2d.OwnImageButton;
-import gaiasky.util.scene2d.OwnLabel;
-import gaiasky.util.scene2d.OwnTextField;
-import gaiasky.util.scene2d.OwnTextTooltip;
+import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.LengthValidator;
 
 import java.nio.file.Path;
@@ -57,6 +54,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     private Gamepad currGamepad;
     private OwnTextField currTextField, filename;
     private OwnLabel currentInput;
+    private OwnSlider lsx, lsy, rsx, rsy, lts, rts, axisPower;
 
     // The cell with the active element
     private Cell<Image> elementCell;
@@ -189,6 +187,14 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         // Build UI
         buildSuper();
 
+    }
+
+
+    @Override
+    protected void build() {
+        float lw = (GlobalConf.isHiDPI() ? 140f : 160f) * GlobalConf.UI_SCALE_FACTOR;
+        float iw = (GlobalConf.isHiDPI() ? 110f : 180f) * GlobalConf.UI_SCALE_FACTOR ;
+
         // Main tips
         OwnLabel tip = new OwnLabel("Press the button/axis indicated on the controller image. Click any input on the right\nto edit its value. Click the first input to restart the full sequence.", skin);
         content.add(tip).colspan(2).padBottom(pad10 * 2f).row();
@@ -215,12 +221,12 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         OwnLabel fileLabel = new OwnLabel("Filename:", skin, "header");
         LengthValidator lv = new LengthValidator(3, 100);
         filename = new OwnTextField(this.controllerName.replaceAll("\\s+", "_"), skin, lv);
-        filename.setWidth(200f * GlobalConf.UI_SCALE_FACTOR);
+        filename.setWidth(240f * GlobalConf.UI_SCALE_FACTOR);
         OwnImageButton filenameTooltip = new OwnImageButton(skin, "tooltip");
         filenameTooltip.addListener(new OwnTextTooltip("Filename without extension.\nThe controller file will be saved in " + SysUtils.getDefaultMappingsDir().toAbsolutePath(), skin));
 
         HorizontalGroup filenameGroup = new HorizontalGroup();
-        filenameGroup.space(pad5);
+        filenameGroup.space(pad20);
         filenameGroup.addActor(fileLabel);
         filenameGroup.addActor(filename);
         filenameGroup.addActor(filenameTooltip);
@@ -230,14 +236,15 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         Gamepad[] gpds = Gamepad.values();
         for (Gamepad gpd : gpds) {
             Trio<Texture, float[], String> t = inputInfo.get(gpd);
-            inputTable.add(new OwnLabel(t.getThird() + ": ", skin)).left().padBottom(pad5).padRight(pad10);
+            inputTable.add(new OwnLabel(t.getThird() + ": ", skin, lw)).left().padBottom(pad5).padRight(pad10);
 
             OwnTextField inputField = new OwnTextField(getMappingsValue(gpd, mappings), skin);
+            inputField.setWidth(iw);
             Color origCol = inputField.getColor().cpy();
             inputFields.put(gpd, inputField);
             inputField.addListener(event -> {
-                if (event instanceof FocusEvent) {
-                    FocusEvent fe = (FocusEvent) event;
+                if (event instanceof FocusListener.FocusEvent) {
+                    FocusListener.FocusEvent fe = (FocusListener.FocusEvent) event;
                     if (fe.isFocused()) {
                         inputField.setColor(0.4f, 0.4f, 1f, 1f);
                         displayElement(gpd);
@@ -253,10 +260,64 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
             });
             inputTable.add(inputField).left().padBottom(pad5).row();
         }
-        content.add(inputTable);
+
+        // Sensitivity
+        lsx = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        lsx.setValue((float) this.mappings.AXIS_LSTICK_H_SENS);
+        lsx.setWidth(iw);
+        lsy = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        lsy.setValue((float) this.mappings.AXIS_LSTICK_V_SENS);
+        lsy.setWidth(iw);
+        rsx = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        rsx.setValue((float) this.mappings.AXIS_RSTICK_H_SENS);
+        rsx.setWidth(iw);
+        rsy = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        rsy.setValue((float) this.mappings.AXIS_RSTICK_V_SENS);
+        rsy.setWidth(iw);
+        lts = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        lts.setValue((float) this.mappings.AXIS_LT_SENS);
+        lts.setWidth(iw);
+        rts = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        rts.setValue((float) this.mappings.AXIS_RT_SENS);
+        rts.setWidth(iw);
+        axisPower = new OwnSlider(0.1f, 10f, 0.1f, skin);
+        axisPower.setColor(1f, 0.5f, 0.5f, 1f);
+        axisPower.setValue((float) this.mappings.AXIS_VALUE_POW);
+        axisPower.setWidth(iw);
+
+        Table sensitivityTable01 = new Table(skin);
+        Table sensitivityTable02 = new Table(skin);
+
+        OwnLabel titleSensitivity = new OwnLabel(I18n.txt("gui.controller.sensitivity"), skin, "header-s");
+
+        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.lstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(lsx).left().padBottom(pad5).row();
+        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.lstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(lsy).left().padBottom(pad5).row();
+        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.rstick") + " X:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(rsx).left().padBottom(pad5).row();
+        sensitivityTable01.add(new OwnLabel(I18n.txt("gui.controller.rstick") + " Y:", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable01.add(rsy).left().padBottom(pad5).row();
+
+        sensitivityTable02.add(new OwnLabel(I18n.txt("gui.controller.lt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable02.add(lts).left().padBottom(pad5).row();
+        sensitivityTable02.add(new OwnLabel(I18n.txt("gui.controller.rt") + ":", skin, lw)).left().padRight(pad10).padBottom(pad20);
+        sensitivityTable02.add(rts).left().padBottom(pad20).row();
+        sensitivityTable02.add(new OwnLabel(I18n.txt("gui.controller.axis.pow") + ":", skin, lw)).left().padRight(pad10).padBottom(pad5);
+        sensitivityTable02.add(axisPower).left();
+
+        // Add inputs and the rest
+        content.add(inputTable).left();
         content.row();
-        content.add(lastInputGroup).padTop(pad10);
-        content.add(filenameGroup).padTop(pad10);
+        content.add(lastInputGroup).padBottom(pad10);
+        content.row();
+        content.add(titleSensitivity).left().colspan(2).padBottom(pad10);
+        content.add();
+        content.row();
+        content.add(sensitivityTable01).left().top();
+        content.add(sensitivityTable02).left().top();
+        content.row();
+        content.add(filenameGroup).colspan(2).padTop(pad20);
 
         // Select first
         GaiaSky.postRunnable(() -> {
@@ -274,124 +335,124 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         String a = axis + " ";
         String out;
         switch (gpd) {
-            case A:
-                out = m.BUTTON_A >= 0 ? b + m.BUTTON_A : none;
-                break;
-            case B:
-                out = m.BUTTON_B >= 0 ? b + m.BUTTON_B : none;
-                break;
-            case X:
-                out = m.BUTTON_X >= 0 ? b + m.BUTTON_X : none;
-                break;
-            case Y:
-                out = m.BUTTON_Y >= 0 ? b + m.BUTTON_Y : none;
-                break;
-            case START:
-                out = m.BUTTON_START >= 0 ? b + m.BUTTON_START : none;
-                break;
-            case SELECT:
-                out = m.BUTTON_SELECT >= 0 ? b + m.BUTTON_SELECT : none;
-                break;
-            case DPAD_UP:
-                if (m.BUTTON_DPAD_UP >= 0) {
-                    // Button
-                    out = b + m.BUTTON_DPAD_UP;
-                } else if (m.AXIS_DPAD_V >= 0) {
-                    // Axis
-                    out = a + m.AXIS_DPAD_V;
-                } else {
-                    // None
-                    out = none;
-                }
-                break;
-            case DPAD_DOWN:
-                if (m.BUTTON_DPAD_DOWN >= 0) {
-                    // Button
-                    out = b + m.BUTTON_DPAD_DOWN;
-                } else if (m.AXIS_DPAD_V >= 0) {
-                    // Axis
-                    out = a + m.AXIS_DPAD_V;
-                } else {
-                    // None
-                    out = none;
-                }
-                break;
-            case DPAD_LEFT:
-                if (m.BUTTON_DPAD_LEFT >= 0) {
-                    // Button
-                    out = b + m.BUTTON_DPAD_LEFT;
-                } else if (m.AXIS_DPAD_H >= 0) {
-                    // Axis
-                    out = a + m.AXIS_DPAD_H;
-                } else {
-                    // None
-                    out = none;
-                }
-                break;
-            case DPAD_RIGHT:
-                if (m.BUTTON_DPAD_RIGHT >= 0) {
-                    // Button
-                    out = b + m.BUTTON_DPAD_RIGHT;
-                } else if (m.AXIS_DPAD_H >= 0) {
-                    // Axis
-                    out = a + m.AXIS_DPAD_H;
-                } else {
-                    // None
-                    out = none;
-                }
-                break;
-            case RB:
-                out = m.BUTTON_RB >= 0 ? b + m.BUTTON_RB : none;
-                break;
-            case RT:
-                if (m.BUTTON_RT >= 0) {
-                    // Button
-                    out = b + m.BUTTON_RT;
-                } else if (m.AXIS_RT >= 0) {
-                    // Axis
-                    out = a + m.AXIS_RT;
-                } else {
-                    // None
-                    out = none;
-                }
-                break;
-            case LB:
-                out = m.BUTTON_LB >= 0 ? b + m.BUTTON_LB : none;
-                break;
-            case LT:
-                if (m.BUTTON_LT >= 0) {
-                    // Button
-                    out = b + m.BUTTON_LT;
-                } else if (m.AXIS_LT >= 0) {
-                    // Axis
-                    out = a + m.AXIS_LT;
-                } else {
-                    // None
-                    out = none;
-                }
-                break;
-            case LSTICK_H:
-                out = m.AXIS_LSTICK_H >= 0 ? a + m.AXIS_LSTICK_H : none;
-                break;
-            case LSTICK_V:
-                out = m.AXIS_LSTICK_V >= 0 ? a + m.AXIS_LSTICK_V : none;
-                break;
-            case LSTICK:
-                out = m.BUTTON_LSTICK >= 0 ? b + m.BUTTON_LSTICK : none;
-                break;
-            case RSTICK_H:
-                out = m.AXIS_RSTICK_H >= 0 ? a + m.AXIS_RSTICK_H : none;
-                break;
-            case RSTICK_V:
-                out = m.AXIS_RSTICK_V >= 0 ? a + m.AXIS_RSTICK_V : none;
-                break;
-            case RSTICK:
-                out = m.BUTTON_RSTICK >= 0 ? b + m.BUTTON_RSTICK : none;
-                break;
-
-            default:
+        case A:
+            out = m.BUTTON_A >= 0 ? b + m.BUTTON_A : none;
+            break;
+        case B:
+            out = m.BUTTON_B >= 0 ? b + m.BUTTON_B : none;
+            break;
+        case X:
+            out = m.BUTTON_X >= 0 ? b + m.BUTTON_X : none;
+            break;
+        case Y:
+            out = m.BUTTON_Y >= 0 ? b + m.BUTTON_Y : none;
+            break;
+        case START:
+            out = m.BUTTON_START >= 0 ? b + m.BUTTON_START : none;
+            break;
+        case SELECT:
+            out = m.BUTTON_SELECT >= 0 ? b + m.BUTTON_SELECT : none;
+            break;
+        case DPAD_UP:
+            if (m.BUTTON_DPAD_UP >= 0) {
+                // Button
+                out = b + m.BUTTON_DPAD_UP;
+            } else if (m.AXIS_DPAD_V >= 0) {
+                // Axis
+                out = a + m.AXIS_DPAD_V;
+            } else {
+                // None
                 out = none;
-                break;
+            }
+            break;
+        case DPAD_DOWN:
+            if (m.BUTTON_DPAD_DOWN >= 0) {
+                // Button
+                out = b + m.BUTTON_DPAD_DOWN;
+            } else if (m.AXIS_DPAD_V >= 0) {
+                // Axis
+                out = a + m.AXIS_DPAD_V;
+            } else {
+                // None
+                out = none;
+            }
+            break;
+        case DPAD_LEFT:
+            if (m.BUTTON_DPAD_LEFT >= 0) {
+                // Button
+                out = b + m.BUTTON_DPAD_LEFT;
+            } else if (m.AXIS_DPAD_H >= 0) {
+                // Axis
+                out = a + m.AXIS_DPAD_H;
+            } else {
+                // None
+                out = none;
+            }
+            break;
+        case DPAD_RIGHT:
+            if (m.BUTTON_DPAD_RIGHT >= 0) {
+                // Button
+                out = b + m.BUTTON_DPAD_RIGHT;
+            } else if (m.AXIS_DPAD_H >= 0) {
+                // Axis
+                out = a + m.AXIS_DPAD_H;
+            } else {
+                // None
+                out = none;
+            }
+            break;
+        case RB:
+            out = m.BUTTON_RB >= 0 ? b + m.BUTTON_RB : none;
+            break;
+        case RT:
+            if (m.BUTTON_RT >= 0) {
+                // Button
+                out = b + m.BUTTON_RT;
+            } else if (m.AXIS_RT >= 0) {
+                // Axis
+                out = a + m.AXIS_RT;
+            } else {
+                // None
+                out = none;
+            }
+            break;
+        case LB:
+            out = m.BUTTON_LB >= 0 ? b + m.BUTTON_LB : none;
+            break;
+        case LT:
+            if (m.BUTTON_LT >= 0) {
+                // Button
+                out = b + m.BUTTON_LT;
+            } else if (m.AXIS_LT >= 0) {
+                // Axis
+                out = a + m.AXIS_LT;
+            } else {
+                // None
+                out = none;
+            }
+            break;
+        case LSTICK_H:
+            out = m.AXIS_LSTICK_H >= 0 ? a + m.AXIS_LSTICK_H : none;
+            break;
+        case LSTICK_V:
+            out = m.AXIS_LSTICK_V >= 0 ? a + m.AXIS_LSTICK_V : none;
+            break;
+        case LSTICK:
+            out = m.BUTTON_LSTICK >= 0 ? b + m.BUTTON_LSTICK : none;
+            break;
+        case RSTICK_H:
+            out = m.AXIS_RSTICK_H >= 0 ? a + m.AXIS_RSTICK_H : none;
+            break;
+        case RSTICK_V:
+            out = m.AXIS_RSTICK_V >= 0 ? a + m.AXIS_RSTICK_V : none;
+            break;
+        case RSTICK:
+            out = m.BUTTON_RSTICK >= 0 ? b + m.BUTTON_RSTICK : none;
+            break;
+
+        default:
+            out = none;
+            break;
         }
         return out;
     }
@@ -412,11 +473,6 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
             elementCell.clearActor();
         }
     }
-
-    @Override
-    protected void build() {
-    }
-
     /**
      * Returns an integer array with [0] the code and [1] the type
      *
@@ -466,12 +522,19 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         ControllerMappings cm = this.mappings;
 
+        // Power value
+        cm.AXIS_VALUE_POW = axisPower.getValue();
+
         // Sticks
         cm.AXIS_LSTICK_H = getInput(Gamepad.LSTICK_H)[0];
+        cm.AXIS_LSTICK_H_SENS = lsx.getValue();
         cm.AXIS_LSTICK_V = getInput(Gamepad.LSTICK_V)[0];
+        cm.AXIS_LSTICK_V_SENS = lsy.getValue();
         cm.BUTTON_LSTICK = getInput(Gamepad.LSTICK)[0];
         cm.AXIS_RSTICK_H = getInput(Gamepad.RSTICK_H)[0];
+        cm.AXIS_RSTICK_H_SENS = rsx.getValue();
         cm.AXIS_RSTICK_V = getInput(Gamepad.RSTICK_V)[0];
+        cm.AXIS_RSTICK_V_SENS = rsy.getValue();
         cm.BUTTON_RSTICK = getInput(Gamepad.RSTICK)[0];
 
         // Buttons
@@ -511,14 +574,18 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         int[] rt = getInput(Gamepad.RT);
         if (rt[1] == TYPE_BUTTON)
             cm.BUTTON_RT = rt[0];
-        else
+        else {
             cm.AXIS_RT = rt[0];
+        }
+        cm.AXIS_RT_SENS = rts.getValue();
 
         int[] lt = getInput(Gamepad.LT);
         if (lt[1] == TYPE_BUTTON)
             cm.BUTTON_LT = lt[0];
-        else
+        else {
             cm.AXIS_LT = lt[0];
+        }
+        cm.AXIS_LT_SENS = lts.getValue();
 
         if (cm.persist(file)) {
             savedFile = file;

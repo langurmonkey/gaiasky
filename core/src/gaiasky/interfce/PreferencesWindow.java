@@ -82,7 +82,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<String> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
-    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, lsx, lsy, rsx, rsy, lt, rt;
+    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
     private DatasetsWidget dw;
@@ -965,36 +965,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad5);
         inverty.setChecked(GlobalConf.controls.INVERT_LOOK_Y_AXIS);
 
-        // SENSITIVITY
-        OwnLabel titleSensitivity = new OwnLabel(I18n.txt("gui.controller.sensitivity"), skin, "header-s");
-
-        Table sens = new Table(skin);
-        sens.add(new OwnLabel(I18n.txt("gui.controller.lstick") + " x", skin)).center().padRight(pad20).padBottom(pad10);
-        sens.add(new OwnLabel(I18n.txt("gui.controller.lstick") + " y", skin)).center().padRight(pad20).padBottom(pad10);
-        sens.add(new OwnLabel(I18n.txt("gui.controller.rstick") + " x", skin)).center().padRight(pad20).padBottom(pad10);
-        sens.add(new OwnLabel(I18n.txt("gui.controller.rstick") + " y", skin)).center().padRight(pad20).padBottom(pad10);
-        sens.add(new OwnLabel(I18n.txt("gui.controller.lt"), skin)).center().padRight(pad20).padBottom(pad10);
-        sens.add(new OwnLabel(I18n.txt("gui.controller.rt"), skin)).center().padRight(pad20).padBottom(pad10);
-        sens.row();
-        float sh = 60f;
-        lsx = new OwnSlider(0.1f, 10f, 0.1f, true, skin);
-        lsx.setHeight(GlobalConf.UI_SCALE_FACTOR * sh);
-        lsy = new OwnSlider(0.1f, 10f, 0.1f, true, skin);
-        lsy.setHeight(GlobalConf.UI_SCALE_FACTOR * sh);
-        rsx = new OwnSlider(0.1f, 10f, 0.1f, true, skin);
-        rsx.setHeight(GlobalConf.UI_SCALE_FACTOR * sh);
-        rsy = new OwnSlider(0.1f, 10f, 0.1f, true, skin);
-        rsy.setHeight(GlobalConf.UI_SCALE_FACTOR * sh);
-        lt = new OwnSlider(0.1f, 10f, 0.1f, true, skin);
-        lt.setHeight(GlobalConf.UI_SCALE_FACTOR * sh);
-        rt = new OwnSlider(0.1f, 10f, 0.1f, true, skin);
-        rt.setHeight(GlobalConf.UI_SCALE_FACTOR * sh);
-        sens.add(lsx).center().padRight(pad20);
-        sens.add(lsy).center().padRight(pad20);
-        sens.add(rsx).center().padRight(pad20);
-        sens.add(rsy).center().padRight(pad20);
-        sens.add(lt).center().padRight(pad20);
-        sens.add(rt).center().padRight(pad20);
 
         // KEY BINDINGS
         OwnLabel titleKeybindings = new OwnLabel(I18n.txt("gui.keymappings"), skin, "header");
