@@ -293,7 +293,17 @@ public class GuiRegistry implements IObserver {
                     (new AboutWindow(ui, skin)).show(ui);
                     break;
                 case SHOW_PREFERENCES_ACTION:
-                    (new PreferencesWindow(ui, skin)).show(ui);
+                    Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
+                    if(prefs.isEmpty()){
+                        // Bring new window up
+                        (new PreferencesWindow(ui, skin)).show(ui);
+                    }else {
+                        // Close current windows
+                        for (Actor pref : prefs) {
+                            ((PreferencesWindow) pref).cancel();
+                            ((PreferencesWindow) pref).hide();
+                        }
+                    }
                     break;
                 case SHOW_INDIVIDUAL_VISIBILITY_ACTION:
                     if (indVisWindow == null) {
@@ -491,6 +501,20 @@ public class GuiRegistry implements IObserver {
             }
         }
 
+    }
+
+    private Array<Actor> getElementsOfType(Class<? extends Actor> clazz){
+        Array<Actor> result = new Array<>();
+        if(current != null) {
+            Stage ui = current.getGuiStage();
+            Array<Actor> actors = ui.getActors();
+            for(Actor actor : actors){
+                if(actor.getClass().isAssignableFrom(clazz)){
+                    result.add(actor);
+                }
+            }
+        }
+        return result;
     }
 
     public boolean removeModeChangePopup() {

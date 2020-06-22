@@ -590,7 +590,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         if (cm.persist(file)) {
             savedFile = file;
         }
-
+        EventManager.instance.post(Events.RELOAD_CONTROLLER_MAPPINGS, file.toAbsolutePath().toString());
         restoreControllerListener();
     }
 

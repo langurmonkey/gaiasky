@@ -27,17 +27,19 @@ import java.nio.file.Path;
 public class NaturalControllerListener implements ControllerListener, IObserver, IInputListener {
     private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
 
-    NaturalCamera cam;
-    IControllerMappings mappings;
+    private NaturalCamera cam;
+    private IControllerMappings mappings;
+    private EventManager em;
 
-    IntSet pressedKeys;
+    private IntSet pressedKeys;
 
     public NaturalControllerListener(NaturalCamera cam, String mappingsFile) {
         this.cam = cam;
+        this.em = EventManager.instance;
         this.pressedKeys = new IntSet();
         updateControllerMappings(mappingsFile);
 
-        EventManager.instance.subscribe(this, Events.RELOAD_CONTROLLER_MAPPINGS);
+        em.subscribe(this, Events.RELOAD_CONTROLLER_MAPPINGS);
     }
 
     public void addPressedKey(int keycode) {
@@ -101,13 +103,13 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     @Override
     public void connected(Controller controller) {
         logger.info("Controller connected: " + controller.getName());
-        EventManager.instance.post(Events.CONTROLLER_CONNECTED_INFO, controller.getName());
+        em.post(Events.CONTROLLER_CONNECTED_INFO, controller.getName());
     }
 
     @Override
     public void disconnected(Controller controller) {
         logger.info("Controller disconnected: " + controller.getName());
-        EventManager.instance.post(Events.CONTROLLER_DISCONNECTED_INFO, controller.getName());
+        em.post(Events.CONTROLLER_DISCONNECTED_INFO, controller.getName());
     }
 
     @Override
@@ -116,19 +118,6 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             logger.info("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         }
 
-        if (buttonCode == mappings.getButtonX()) {
-            cam.setGamepadMultiplier(0.5);
-        } else if (buttonCode == mappings.getButtonY()) {
-            cam.setGamepadMultiplier(0.1);
-        } else if (buttonCode == mappings.getButtonA()) {
-            cam.setVelocity(1);
-        } else if (buttonCode == mappings.getButtonB()) {
-            cam.setVelocity(-1);
-        } else if (buttonCode == mappings.getButtonDpadUp()){
-            cam.setVertical(1);
-        } else if (buttonCode == mappings.getButtonDpadDown()){
-            cam.setVertical(-1);
-        }
         cam.setInputByController(true);
 
         addPressedKey(buttonCode);
@@ -137,30 +126,36 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     }
 
     @Override
-    public boolean buttonUp(Controller controller, int buttonCode) {
+    public boolean buttonUp(Controller controller, final int buttonCode) {
         if (GlobalConf.controls.DEBUG_MODE) {
             logger.info("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
         }
 
         if (buttonCode == mappings.getButtonX()) {
-            cam.setGamepadMultiplier(1);
+            em.post(Events.TOGGLE_MINIMAP);
         } else if (buttonCode == mappings.getButtonY()) {
-            cam.setGamepadMultiplier(1);
+            em.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false);
         } else if (buttonCode == mappings.getButtonA()) {
-            cam.setVelocity(0);
+            em.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false);
         } else if (buttonCode == mappings.getButtonB()) {
-            cam.setVelocity(0);
-        } else if (buttonCode == mappings.getButtonDpadUp()){
-            cam.setVertical(0);
-        } else if (buttonCode == mappings.getButtonDpadDown()){
-            cam.setVertical(0);
-        } else if (buttonCode == mappings.getButtonRstick()){
-            if(cam.getMode().isFocus()){
+            em.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false);
+        } else if (buttonCode == mappings.getButtonDpadUp()) {
+            em.post(Events.STAR_POINT_SIZE_INCREASE_CMD);
+        } else if (buttonCode == mappings.getButtonDpadDown()) {
+            em.post(Events.STAR_POINT_SIZE_DECREASE_CMD);
+        } else if (buttonCode == mappings.getButtonDpadLeft()) {
+            em.post(Events.TIME_STATE_CMD, false, false);
+        } else if (buttonCode == mappings.getButtonDpadRight()) {
+            em.post(Events.TIME_STATE_CMD, true, false);
+        } else if (buttonCode == mappings.getButtonStart()) {
+            em.post(Events.SHOW_PREFERENCES_ACTION);
+        } else if (buttonCode == mappings.getButtonRstick()) {
+            if (cam.getMode().isFocus()) {
                 // Set free
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+                em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
             } else {
                 // Set focus
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
             }
         }
         cam.setInputByController(true);
@@ -179,9 +174,8 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
         boolean treated = false;
 
-        // y = x^pow
-        // http://www.wolframalpha.com/input/?i=y+%3D+sign%28x%29+*+x%5E2+%28x+from+-1+to+1%29}
-        double val = Math.signum(value) * Math.abs(Math.pow(value, mappings.getAxisValuePower()));
+        // Apply power function to axis reading
+        double val = Math.signum(value) * Math.pow(Math.abs(value), mappings.getAxisValuePower());
 
         if (axisCode == mappings.getAxisLstickH()) {
             if (cam.getMode().isFocus()) {
@@ -211,10 +205,12 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             }
             treated = true;
         } else if (axisCode == mappings.getAxisRT()) {
-            cam.setVelocity((val * mappings.getAxisRTSensitivity() + 1.0) / 2.0);
+            double valr = val * 1e-1 * mappings.getAxisRTSensitivity();
+            cam.setRoll(valr);
             treated = true;
         } else if (axisCode == mappings.getAxisLT()) {
-            cam.setVelocity(-(val * mappings.getAxisLTSensitivity() + 1.0) / 2.0);
+            double valr = val * 1e-1 * mappings.getAxisLTSensitivity();
+            cam.setRoll(-valr);
             treated = true;
         }
 
@@ -247,11 +243,11 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case RELOAD_CONTROLLER_MAPPINGS:
-            updateControllerMappings((String) data[0]);
-            break;
-        default:
-            break;
+            case RELOAD_CONTROLLER_MAPPINGS:
+                updateControllerMappings((String) data[0]);
+                break;
+            default:
+                break;
         }
 
     }

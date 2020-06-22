@@ -854,15 +854,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentPerformance.align(Align.top | Align.left);
 
         // MULTITHREADING
-        OwnLabel titleMultithread = new OwnLabel(I18n.txt("gui.multithreading"), skin, "header");
+        OwnLabel titleMultiThread = new OwnLabel(I18n.txt("gui.multithreading"), skin, "header");
 
-        Table multithread = new Table(skin);
+        Table multiThread = new Table(skin);
 
         OwnLabel numThreadsLabel = new OwnLabel(I18n.txt("gui.thread.number"), skin);
-        int maxthreads = Runtime.getRuntime().availableProcessors();
-        ComboBoxBean[] cbs = new ComboBoxBean[maxthreads + 1];
+        int maxThreads = Runtime.getRuntime().availableProcessors();
+        ComboBoxBean[] cbs = new ComboBoxBean[maxThreads + 1];
         cbs[0] = new ComboBoxBean(I18n.txt("gui.letdecide"), 0);
-        for (i = 1; i <= maxthreads; i++) {
+        for (i = 1; i <= maxThreads; i++) {
             cbs[i] = new ComboBoxBean(I18n.txt("gui.thread", i), i);
         }
         numThreads = new OwnSelectBox<>(skin);
@@ -883,23 +883,23 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         numThreads.setDisabled(!multithreadCb.isChecked());
 
         // Add to table
-        multithread.add(multithreadCb).colspan(2).left().padBottom(pad5).row();
-        multithread.add(numThreadsLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        multithread.add(numThreads).left().padBottom(pad5).row();
-        final Cell<Actor> noticeMulithreadCell = multithread.add((Actor) null);
-        noticeMulithreadCell.colspan(2).left();
+        multiThread.add(multithreadCb).colspan(2).left().padBottom(pad5).row();
+        multiThread.add(numThreadsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        multiThread.add(numThreads).left().padBottom(pad5).row();
+        final Cell<Actor> noticeMultiThreadCell = multiThread.add((Actor) null);
+        noticeMultiThreadCell.colspan(2).left();
 
         multithreadCb.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                if (noticeMulithreadCell.getActor() == null) {
-                    String nextinfostr = I18n.txt("gui.ui.info") + '\n';
-                    int lines = GlobalResources.countOccurrences(nextinfostr, '\n');
-                    TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
+                if (noticeMultiThreadCell.getActor() == null) {
+                    String nextInfoStr = I18n.txt("gui.ui.info") + '\n';
+                    int lines = GlobalResources.countOccurrences(nextInfoStr, '\n');
+                    TextArea nextTimeInfo = new OwnTextArea(nextInfoStr, skin, "info");
                     nextTimeInfo.setDisabled(true);
                     nextTimeInfo.setPrefRows(lines + 1);
                     nextTimeInfo.setWidth(tawidth);
                     nextTimeInfo.clearListeners();
-                    noticeMulithreadCell.setActor(nextTimeInfo);
+                    noticeMultiThreadCell.setActor(nextTimeInfo);
                 }
                 return true;
             }
@@ -907,8 +907,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // Add to content
-        contentPerformance.add(titleMultithread).left().padBottom(pad5 * 2).row();
-        contentPerformance.add(multithread).left().padBottom(pad5 * 4).row();
+        contentPerformance.add(titleMultiThread).left().padBottom(pad5 * 2).row();
+        contentPerformance.add(multiThread).left().padBottom(pad5 * 4).row();
 
         // DRAW DISTANCE
         OwnLabel titleLod = new OwnLabel(I18n.txt("gui.lod"), skin, "header");
