@@ -1034,8 +1034,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentControls.add(mappingsLabel).left().padBottom(pad10).padRight(pad10);
         contentControls.add(controllerMappings).left().padBottom(pad10).row();
         contentControls.add(inverty).left().colspan(2).padBottom(pad10).row();
-        //contentControls.add(titleSensitivity).left().colspan(2).padBottom(pad10).row();
-        //contentControls.add(sens).left().colspan(2).padBottom(pad10).row();
         contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad10).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
