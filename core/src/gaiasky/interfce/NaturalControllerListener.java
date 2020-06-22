@@ -95,10 +95,6 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
         if (Files.exists(Path.of(mappingsFile)))
             mappings = new ControllerMappings(null, Path.of(mappingsFile));
-        else {
-            // Defaults to xbox360
-            mappings = new XBox360Mappings();
-        }
         return false;
     }
 
@@ -204,7 +200,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             if (cam.getMode().isFocus()) {
                 cam.setHorizontal(val * 0.1 * mappings.getAxisRstickVSensitivity());
             } else {
-                cam.setYaw(val * 3e-2 * mappings.getAxisRstickVSensitivity());
+                cam.setYaw((GlobalConf.controls.INVERT_LOOK_X_AXIS ? 1.0 : -1.0) * val * 3e-2 * mappings.getAxisRstickVSensitivity());
             }
             treated = true;
         } else if (axisCode == mappings.getAxisRstickV()) {

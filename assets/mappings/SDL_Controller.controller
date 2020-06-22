@@ -1,4 +1,4 @@
-#Controller mappings definition file for SDL GameController X360 Controller
+#Controller mappings definition file for a generic SDL controller
 axis.dpad.h=-1
 axis.dpad.v=-1
 axis.lstick.h=0

@@ -74,7 +74,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -961,8 +961,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controllerMappings = new OwnSelectBox<>(skin);
         reloadControllerMappings(null);
 
+        // INVERT X
+        invertx = new OwnCheckBox(I18n.txt("gui.controller.axis.invert", "X"), skin, "default", pad5);
+        invertx.setChecked(GlobalConf.controls.INVERT_LOOK_X_AXIS);
         // INVERT Y
-        inverty = new OwnCheckBox("Invert look y axis", skin, "default", pad5);
+        inverty = new OwnCheckBox(I18n.txt("gui.controller.axis.invert", "Y"), skin, "default", pad5);
         inverty.setChecked(GlobalConf.controls.INVERT_LOOK_Y_AXIS);
 
 
@@ -1033,6 +1036,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentControls.add(controllersTable).left().padBottom(pad10).row();
         contentControls.add(mappingsLabel).left().padBottom(pad10).padRight(pad10);
         contentControls.add(controllerMappings).left().padBottom(pad10).row();
+        contentControls.add(invertx).left().colspan(2).padBottom(pad10).row();
         contentControls.add(inverty).left().colspan(2).padBottom(pad10).row();
         contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad10).row();
         contentControls.add(controlsScroll).colspan(2).left();
@@ -2054,6 +2058,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 EventManager.instance.post(Events.RELOAD_CONTROLLER_MAPPINGS, mappingsFile);
             }
         }
+        GlobalConf.controls.INVERT_LOOK_X_AXIS = invertx.isChecked();
         GlobalConf.controls.INVERT_LOOK_Y_AXIS = inverty.isChecked();
 
         // Gaia attitude
