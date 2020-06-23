@@ -5,7 +5,6 @@
 
 package gaiasky.interfce;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -191,17 +190,19 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
             treated = true;
         } else if (axisCode == mappings.getAxisRstickH()) {
+            double valr = (GlobalConf.controls.INVERT_LOOK_X_AXIS ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
             if (cam.getMode().isFocus()) {
-                cam.setHorizontal(val * 0.1 * mappings.getAxisRstickVSensitivity());
+                cam.setHorizontal(valr * 0.1);
             } else {
-                cam.setYaw((GlobalConf.controls.INVERT_LOOK_X_AXIS ? 1.0 : -1.0) * val * 3e-2 * mappings.getAxisRstickVSensitivity());
+                cam.setYaw(valr * 3e-2);
             }
             treated = true;
         } else if (axisCode == mappings.getAxisRstickV()) {
+            double valr = (GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
             if (cam.getMode().isFocus()) {
-                cam.setVertical(val * 0.1 * mappings.getAxisRstickHSensitivity());
+                cam.setVertical(valr * 0.1);
             } else {
-                cam.setPitch((GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1.0 : -1.0) * val * 3e-2 * mappings.getAxisRstickHSensitivity());
+                cam.setPitch(valr * 3e-2);
             }
             treated = true;
         } else if (axisCode == mappings.getAxisRT()) {
