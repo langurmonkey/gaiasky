@@ -959,7 +959,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public boolean isLightScatterEnabled() {
-        return pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
+        return pps != null && pps[RenderType.screen.index] != null && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {

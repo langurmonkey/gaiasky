@@ -176,7 +176,11 @@ public class LoadingGui extends AbstractGui {
     }
 
     private void randomFunnyText() {
-        spin.setText(LoadingTextGenerator.next());
+        if(GlobalConf.runtime.OPENVR){
+            spin.setText("Loading...");
+        } else {
+            spin.setText(LoadingTextGenerator.next());
+        }
     }
 
 

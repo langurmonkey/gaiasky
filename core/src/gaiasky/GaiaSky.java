@@ -581,6 +581,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
+        if(GlobalConf.runtime.OPENVR){
+            resize(vrContext.getWidth(), vrContext.getHeight());
+        }
+
         // Initialise frames
         frames = 0;
 
@@ -993,13 +997,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 
-    private long lastResizeTime = -1;
+    private long lastResizeTime = Long.MAX_VALUE;
     private int resizeWidth, resizeHeight;
 
     @Override
     public void resize(final int width, final int height) {
         if (GlobalConf.runtime.OPENVR) {
-            postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), false, false, false));
+            postRunnable(() -> resizeImmediate(width, height, true, false, false));
         } else {
             if (!initialized) {
                 resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true);
@@ -1046,7 +1050,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             cam.updateAngleEdge(width, height);
             cam.resize(width, height);
         } catch (Exception e) {
-            // TODO This try-catch block is a provisional fix for Windows, as GLFW crashe when minimizing with lwjgl 2.3.3 and libgdx 1.9.10
+            // TODO This try-catch block is a provisional fix for Windows, as GLFW crashes when minimizing with lwjgl 3.2.3 and libgdx 1.9.10
         }
     }
 
@@ -1128,7 +1132,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 // Also VR
                 if (GlobalConf.runtime.OPENVR) {
-                    loadingGuiVR = new VRGui(LoadingGui.class, 200);
+                    loadingGuiVR = new VRGui(LoadingGui.class, 400);
                     loadingGuiVR.initialize(manager);
                 }
 
