@@ -22,7 +22,7 @@ Show the preferences window with|action.preferences|
 You can always go back home with|action.home|
 You can reset the time with|action.resettime|
 Control the visibility of each element from the visibility pane:|action.expandcollapse.pane/gui.visibility|
-Create and edit bookmarks using the bookmarks pane:|action.expandcollapse.pane/gui.bookmarks|
+|action.expandcollapse.pane/gui.bookmarks|Create and edit bookmarks with the most interesting objects
 Use|action.toggle/element.stereomode|to enter stereographic mode
 Use|action.toggle/element.planetarium|to enter planetarium mode
 Use|action.toggle/element.360|to enter panorama mode

@@ -54,7 +54,6 @@ public class CrashGui extends AbstractGui {
             vp.update(GaiaSky.graphics.getWidth(), GaiaSky.graphics.getHeight(), true);
         }
 
-
         skin = GlobalResources.skin;
 
         // Dialog

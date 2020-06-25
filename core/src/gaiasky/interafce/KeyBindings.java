@@ -417,6 +417,9 @@ public class KeyBindings {
         for (CameraMode mode : CameraMode.values()) {
             addAction(new ProgramAction("camera.full/camera." + mode.toString(), () -> EventManager.instance.post(Events.CAMERA_MODE_CMD, mode)));
         }
+
+        // Controller GUI
+        addAction(new ProgramAction("action.controller.gui.in", () -> EventManager.instance.post(Events.SHOW_CONTROLLER_GUI_ACTION)));
     }
 
     private void initMappings() {
@@ -454,6 +457,8 @@ public class KeyBindings {
                     logger.error(key + " is defined in the mappings file, but Action could not be found!");
                 }
             }
+
+            //addMapping(actions.get("action.controller.gui.in"), new int[]{Keys.ALT_LEFT, Keys.NUM_0});
 
         } catch (Exception e) {
             logger.error(e, "Error loading keyboard mappings: " + mappingsFile);
