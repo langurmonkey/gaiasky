@@ -336,7 +336,7 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
 
         switch (event) {
             case KEYFRAMES_FILE_SAVE:

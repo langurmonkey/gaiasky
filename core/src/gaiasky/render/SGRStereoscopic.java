@@ -385,7 +385,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:

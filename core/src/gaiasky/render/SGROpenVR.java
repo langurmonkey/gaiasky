@@ -19,7 +19,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.*;
+import gaiasky.interafce.*;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.StubModel;
@@ -332,7 +332,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case VR_DEVICE_CONNECTED:
                 VRDevice device = (VRDevice) data[0];

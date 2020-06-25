@@ -23,8 +23,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.ColormapPicker;
-import gaiasky.interfce.IGui;
+import gaiasky.interafce.ColormapPicker;
+import gaiasky.interafce.IGui;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
@@ -2856,7 +2856,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case INPUT_EVENT:
                 inputCode = (Integer) data[0];

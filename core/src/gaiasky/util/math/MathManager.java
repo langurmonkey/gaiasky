@@ -38,7 +38,7 @@ public class MathManager implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case HIGH_ACCURACY_CMD:
             boolean highAcc = (Boolean) data[0];

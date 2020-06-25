@@ -32,7 +32,7 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.*;
+import gaiasky.interafce.*;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
@@ -1117,7 +1117,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case LOAD_DATA_CMD:
                 // Init components that need assets in data folder

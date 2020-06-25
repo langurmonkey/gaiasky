@@ -49,7 +49,7 @@ public class HiddenHelperUser implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case NAVIGATE_TO_OBJECT:
             IFocus body;

@@ -717,7 +717,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         // Super handles FOCUS_CHANGED and CAMERA_MOTION_UPDATED event
         super.notify(event, data);
         switch (event) {

@@ -141,7 +141,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case TARGET_TIME_CMD:
             if (data.length > 0) {

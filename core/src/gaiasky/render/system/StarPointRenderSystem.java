@@ -166,7 +166,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case TRANSIT_COLOUR_CMD:
             starColorTransit = (boolean) data[1];

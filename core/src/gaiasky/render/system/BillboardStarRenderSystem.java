@@ -160,7 +160,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case STAR_TEXTURE_IDX_CMD:
                 GaiaSky.postRunnable(()-> setStarTexture(GlobalConf.scene.getStarTexture()));

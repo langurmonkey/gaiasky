@@ -26,7 +26,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.*;
+import gaiasky.interafce.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -1293,7 +1293,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case FOCUS_CHANGE_CMD:
             // Check the type of the parameter: IFocus or String

@@ -10,7 +10,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.interfce.ConsoleLogger;
+import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.*;
 import gaiasky.util.coord.MoonAACoordinates;
 import gaiasky.util.coord.vsop87.AbstractVSOP87;

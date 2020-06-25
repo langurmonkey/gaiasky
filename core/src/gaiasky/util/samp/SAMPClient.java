@@ -11,7 +11,7 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.DatasetLoadDialog;
+import gaiasky.interafce.DatasetLoadDialog;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -29,7 +29,6 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -270,7 +269,7 @@ public class SAMPClient implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case FOCUS_CHANGED:
                 if (!preventProgrammaticEvents) {

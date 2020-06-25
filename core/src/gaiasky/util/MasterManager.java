@@ -239,7 +239,7 @@ public class MasterManager implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         int i;
         switch (event) {
         case FOV_CHANGED_CMD:

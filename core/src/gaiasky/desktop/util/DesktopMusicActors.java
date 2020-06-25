@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.interfce.IMusicActors;
+import gaiasky.interafce.IMusicActors;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnTextTooltip;

@@ -7,6 +7,6 @@ package gaiasky.event;
 
 public interface IObserver {
 
-    void notify(Events event, Object... data);
+    void notify(final Events event, final Object... data);
 
 }

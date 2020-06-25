@@ -161,7 +161,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode mode = (CameraMode) data[0];

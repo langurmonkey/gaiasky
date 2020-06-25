@@ -5,7 +5,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
-import gaiasky.interfce.KeyBindings;
+import gaiasky.interafce.KeyBindings;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 

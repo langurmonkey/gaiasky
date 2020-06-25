@@ -227,7 +227,7 @@ public class RelativisticEffectsManager implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case GRAV_WAVE_START:
             int x = (Integer) data[0];

@@ -181,7 +181,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case UI_THEME_RELOAD_INFO:
             Skin skin = (Skin) data[0];
