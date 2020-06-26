@@ -11,8 +11,8 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.IGui;
-import gaiasky.interfce.RenderGui;
+import gaiasky.interafce.IGui;
+import gaiasky.interafce.RenderGui;
 import gaiasky.render.IMainRenderer;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.IPostProcessor.RenderType;
@@ -158,7 +158,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case RENDER_FRAME:
             IMainRenderer mr = (IMainRenderer) data[0];

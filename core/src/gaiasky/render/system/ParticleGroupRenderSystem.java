@@ -201,7 +201,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case DISPOSE_PARTICLE_GROUP_GPU_MESH:
             Integer meshIdx = (Integer) data[0];

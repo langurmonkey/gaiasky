@@ -1281,6 +1281,9 @@ public enum Events {
      * Informs of the current selecting state. Contains the state (true|false) and a double in [0,1] with the completion
      * rate
      */
-    VR_SELECTING_STATE
+    VR_SELECTING_STATE,
+
+    /** Show/hide controller gui **/
+    SHOW_CONTROLLER_GUI_ACTION,
 
 }

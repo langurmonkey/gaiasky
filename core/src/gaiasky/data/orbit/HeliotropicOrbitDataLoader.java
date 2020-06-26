@@ -12,7 +12,7 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.util.DesktopConfInit;
-import gaiasky.interfce.ConsoleLogger;
+import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;

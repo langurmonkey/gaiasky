@@ -170,7 +170,7 @@ public class EventManager implements IObserver {
      * @param data
      *            The event data.
      */
-    public void post(Events event, Object... data) {
+    public void post(final Events event, final Object... data) {
         synchronized (subscriptions) {
             Set<IObserver> observers = subscriptions.get(event.ordinal());
             if (observers != null && observers.size() > 0) {
@@ -301,7 +301,7 @@ public class EventManager implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case EVENT_TIME_FRAME_CMD:
             defaultTimeFrame = (TimeFrame) data[0];

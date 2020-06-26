@@ -16,7 +16,7 @@ import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.ModePopupInfo;
+import gaiasky.interafce.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.util.Logger.Log;
@@ -30,7 +30,6 @@ import gaiasky.util.update.VersionChecker;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.*;
 
@@ -271,7 +270,7 @@ public class GlobalConf {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(final Events event, final Object... data) {
             switch (event) {
                 case BLOOM_CMD:
                     POSTPROCESS_BLOOM_INTENSITY = (float) data[0];
@@ -492,7 +491,7 @@ public class GlobalConf {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(final Events event, final Object... data) {
             switch (event) {
                 case LIMIT_MAG_CMD:
                     LIMIT_MAG_RUNTIME = (float) data[0];
@@ -670,7 +669,7 @@ public class GlobalConf {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(final Events event, final Object... data) {
             switch (event) {
                 case CONFIG_FRAME_OUTPUT_CMD:
                     boolean updateFrameSize = RENDER_WIDTH != (int) data[0] || RENDER_HEIGHT != (int) data[1];
@@ -858,7 +857,7 @@ public class GlobalConf {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(final Events event, final Object... data) {
             switch (event) {
                 case LIMIT_FPS_CMD:
                     LIMIT_FPS = (Double) data[0];
@@ -1172,7 +1171,7 @@ public class GlobalConf {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(final Events event, final Object... data) {
             switch (event) {
                 case STEREOSCOPIC_CMD:
                     if (!GaiaSky.instance.cam.mode.isGaiaFov()) {
@@ -1710,7 +1709,7 @@ public class GlobalConf {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(final Events event, final Object... data) {
             switch (event) {
                 case TOGGLE_VISIBILITY_CMD:
                     String key = (String) data[0];

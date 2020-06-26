@@ -32,7 +32,7 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interfce.*;
+import gaiasky.interafce.*;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
@@ -167,7 +167,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui;
+    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, controllerGui;
 
     /**
      * List of GUIs
@@ -669,11 +669,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui();
         stereoGui.initialize(manager);
 
+        controllerGui = new ControllerGui();
+        controllerGui.initialize(manager);
+
         if (guis != null) {
             guis.add(mainGui);
             guis.add(debugGui);
             guis.add(spacecraftGui);
             guis.add(stereoGui);
+            guis.add(controllerGui);
         }
     }
 
@@ -705,6 +709,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
         GuiRegistry.registerGui(debugGui);
         GuiRegistry.addProcessor(debugGui);
+
+        GuiRegistry.registerGui(controllerGui);
+        GuiRegistry.addProcessor(controllerGui);
     }
 
     @Override
@@ -1116,7 +1123,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case LOAD_DATA_CMD:
                 // Init components that need assets in data folder

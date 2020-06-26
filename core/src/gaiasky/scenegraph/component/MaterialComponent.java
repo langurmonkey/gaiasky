@@ -427,7 +427,7 @@ public class MaterialComponent implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case ELEVATION_TYPE_CMD:
             if (this.hasHeight() && this.material != null) {

@@ -233,7 +233,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
             case STAR_MIN_OPACITY_CMD:
                 pointAlpha[0] = (float) data[0];

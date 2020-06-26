@@ -6,7 +6,7 @@ import gaiasky.data.group.CsvCatalogDataProvider;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.util.DesktopConfInit;
-import gaiasky.interfce.ConsoleLogger;
+import gaiasky.interafce.ConsoleLogger;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.util.ConfInit;
