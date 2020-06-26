@@ -456,8 +456,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 return VRStatus.OK;
             } catch (Exception e) {
                 // If initializing the VRContext failed
-                logger.debug(e);
-                logger.error(e.getLocalizedMessage());
+                logger.error(e);
                 logger.error("Initialisation of VR context failed");
                 return VRStatus.ERROR_NO_CONTEXT;
             }
@@ -1132,7 +1131,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 // Also VR
                 if (GlobalConf.runtime.OPENVR) {
-                    loadingGuiVR = new VRGui(LoadingGui.class, 400);
+                    loadingGuiVR = new VRGui(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f));
                     loadingGuiVR.initialize(manager);
                 }
 

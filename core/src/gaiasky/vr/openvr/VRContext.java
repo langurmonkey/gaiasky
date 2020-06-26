@@ -17,7 +17,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.Logger;
 import gaiasky.util.gdx.loader.ObjLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.*;
@@ -28,8 +27,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import static gaiasky.util.Logger.*;
-import static org.lwjgl.openvr.VR.ETrackedDeviceProperty_Prop_ModelNumber_String;
+import static gaiasky.util.Logger.Log;
+import static gaiasky.util.Logger.getLogger;
 import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
 
 /**
@@ -391,7 +390,7 @@ public class VRContext implements Disposable {
      * @return all {@link VRDevice} instances of the given {@link VRDeviceType}.
      */
     public Array<VRDevice> getDevicesByType(VRDeviceType type) {
-        Array<VRDevice> result = new Array<VRDevice>();
+        Array<VRDevice> result = new Array<>();
         for (VRDevice d : devices) {
             if (d != null && d.getType() == type)
                 result.add(d);
@@ -403,7 +402,7 @@ public class VRContext implements Disposable {
      * @return all currently connected {@link VRDevice} instances.
      */
     public Array<VRDevice> getDevices() {
-        Array<VRDevice> result = new Array<VRDevice>();
+        Array<VRDevice> result = new Array<>();
         for (VRDevice d : devices) {
             if (d != null)
                 result.add(d);
@@ -550,6 +549,9 @@ public class VRContext implements Disposable {
                     l.buttonUntouched(devices[index], button);
                 }
                 break;
+            case VR.EVREventType_VREvent_ActionBindingReloaded:
+
+                break;
             default:
                 for (VRDeviceListener l : listeners)
                     l.event(event.eventType());
@@ -557,19 +559,22 @@ public class VRContext implements Disposable {
             }
         }
 
-        // Axes
+        // Controller axes
         for (VRDevice device : devices) {
-            for (int axis = 0; axis <= 4; axis++) {
-                if (device != null && device.getType().equals(VRDeviceType.Controller) && device.pollAxis(axis)) {
-                    for (VRDeviceListener l : listeners)
-                        l.axisMoved(device, axis, device.axes[axis][0], device.axes[axis][1]);
+            if(device != null && device.getType().equals(VRDeviceType.Controller)) {
+                int n = device.axes != null ? device.axes.length : 5;
+                for (int axis = 0; axis < n; axis++) {
+                    if (device.pollAxis(axis)) {
+                        for (VRDeviceListener l : listeners)
+                            l.axisMoved(device, axis, device.axes[axis][0], device.axes[axis][1]);
+                    }
                 }
             }
         }
     }
 
     private void createDevice(int index) {
-        VRDeviceType type = null;
+        VRDeviceType type;
         int deviceClass = VRSystem.VRSystem_GetTrackedDeviceClass(index);
         switch (deviceClass) {
         case VR.ETrackedDeviceClass_TrackedDeviceClass_HMD:
@@ -608,7 +613,7 @@ public class VRContext implements Disposable {
         VR_ShutdownInternal();
     }
 
-    private IntModel loadRenderModel(String name, String modelNumber, String manufacturer) {
+    private IntModel loadRenderModel(String name, String modelNumber, String manufacturer, VRControllerRole role) {
         if (models.containsKey(name))
             return models.get(name);
 
@@ -698,16 +703,16 @@ public class VRContext implements Disposable {
         } else {
             ObjLoader ol = new ObjLoader();
             if (manufacturer.equalsIgnoreCase("Oculus")) {
-                if (isControllerLeft(name, modelNumber)) {
+                if (isControllerLeft(name, modelNumber, role)) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
-                } else if (isControllerRight(name, modelNumber)) {
+                } else if (isControllerRight(name, modelNumber, role)) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
                 } else {
                     logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
                 }
             } else {
                 // HTC
-                if (isControllerRight(name, modelNumber) || isControllerLeft(name, modelNumber)) {
+                if (isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role)) {
                     model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
                 } else {
                     logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
@@ -726,12 +731,12 @@ public class VRContext implements Disposable {
         return model;
     }
 
-    private boolean isControllerLeft(String name, String modelNumber) {
-        return name.equals("renderLeftHand") || name.contains("controller_left") || modelNumber.contains("Left Controller");
+    private boolean isControllerLeft(String name, String modelNumber, VRControllerRole role) {
+        return role == VRControllerRole.LeftHand ||  name.equals("renderLeftHand") || name.contains("_left") || modelNumber.contains("Left");
     }
 
-    private boolean isControllerRight(String name, String modelNumber) {
-        return name.equals("renderRightHand") || name.contains("controller_right") || modelNumber.contains("Right Controller");
+    private boolean isControllerRight(String name, String modelNumber, VRControllerRole role) {
+        return role == VRControllerRole.RightHand ||  name.equals("renderRightHand") || name.contains("_right") || modelNumber.contains("Right");
     }
 
     /**
@@ -814,7 +819,12 @@ public class VRContext implements Disposable {
         }
 
         public void initialize() {
-            IntModel model = loadRenderModel(getStringProperty(VRDeviceProperty.RenderModelName_String), getStringProperty(VRDeviceProperty.ModelNumber_String), getStringProperty(VRDeviceProperty.ManufacturerName_String));
+            String renderModelName = getStringProperty(VRDeviceProperty.RenderModelName_String);
+            String modelNumber = getStringProperty(VRDeviceProperty.ModelNumber_String);
+            String manufacturerName = getStringProperty(VRDeviceProperty.ManufacturerName_String);
+            int controllerRole = getInt32Property(VRDeviceProperty.ControllerRoleHint_Int32);
+            this.role = VRControllerRole.values()[controllerRole];
+            IntModel model = loadRenderModel(renderModelName, modelNumber, manufacturerName, this.role);
             this.modelInstance = model != null ? new IntModelInstance(model) : null;
             if (model != null)
                 this.modelInstance.transform.set(pose.transform);

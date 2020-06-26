@@ -204,7 +204,7 @@ public class OpenVRListener implements VRDeviceListener {
     private Array<IFocus> getHits(Vector3d p0, Vector3d p1) {
         Array<IFocus> l = GaiaSky.instance.getFocusableEntities();
 
-        Array<IFocus> hits = new Array<IFocus>();
+        Array<IFocus> hits = new Array<>();
 
         Iterator<IFocus> it = l.iterator();
         // Add all hits
@@ -230,7 +230,7 @@ public class OpenVRListener implements VRDeviceListener {
     @Override
     public void event(int code) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("Unhandled event: " + code);
+            //logger.info("Unhandled event: " + code);
         }
     }
 
