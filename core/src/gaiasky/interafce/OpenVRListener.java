@@ -230,7 +230,7 @@ public class OpenVRListener implements VRDeviceListener {
     @Override
     public void event(int code) {
         if (GlobalConf.controls.DEBUG_MODE) {
-            //logger.info("Unhandled event: " + code);
+            logger.info("Unhandled event: " + code);
         }
     }
 
