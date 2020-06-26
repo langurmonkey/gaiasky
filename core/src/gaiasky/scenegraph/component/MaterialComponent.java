@@ -156,7 +156,7 @@ public class MaterialComponent implements IObserver {
     }
 
     /**
-     * Adds the texture to load and unpacks any star (*) with the current
+     * Adds the texture to load and unpacks any "%QUALITY%" with the current
      * quality setting.
      *
      * @param tex

@@ -297,6 +297,9 @@ public class Constants {
     public static final String nameSeparatorRegex = "\\|";
     public static final String nameSeparator = "|";
 
+    // Asterisks must be substituted becasue windows does not allow them in paths
+    public static final String STAR_SUBSTITUTE = "%#QUAL#%";
+
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
      * algorithms.

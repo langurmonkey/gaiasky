@@ -677,19 +677,19 @@ public class GlobalResources {
     }
 
     public static String unpackTexName(String tex, GraphicsQuality gq) {
-        if (tex.contains("*")) {
+        if (tex.contains(Constants.STAR_SUBSTITUTE)) {
             // Start with current quality and scan to lower ones
             for (int i = gq.ordinal(); i >= 0; i--) {
                 GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
 
-                String texSuffix = tex.replace("*", suffix);
+                String texSuffix = tex.replace(Constants.STAR_SUBSTITUTE, suffix);
                 if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
             // Try with no suffix
-            String texNoSuffix = tex.replace("*", "");
+            String texNoSuffix = tex.replace(Constants.STAR_SUBSTITUTE, "");
             if (GlobalConf.data.dataFileHandle(texNoSuffix).exists()) {
                 return texNoSuffix;
             }
@@ -699,7 +699,7 @@ public class GlobalResources {
                 GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
 
-                String texSuffix = tex.replace("*", suffix);
+                String texSuffix = tex.replace(Constants.STAR_SUBSTITUTE, suffix);
                 if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }

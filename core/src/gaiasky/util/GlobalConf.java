@@ -783,16 +783,17 @@ public class GlobalConf {
         }
 
         public Path dataPath(String path){
-            String pth = path.replace('*', 'X');
+            // Windows does not allow asterisks in paths
+            String pth = path.replaceAll("\\*", Constants.STAR_SUBSTITUTE);
             if (Path.of(pth).isAbsolute()) {
                 // Absolute path, just leave it
-                return Path.of(path);
+                return Path.of(pth);
             } else {
                 // Relative path, just remove leading 'data/' and prepend data location
-                if (path.startsWith("data/")) {
-                    path = path.substring(5);
+                if (pth.startsWith("data/")) {
+                    pth = pth.substring(5);
                 }
-                return Path.of(DATA_LOCATION).resolve(path);
+                return Path.of(DATA_LOCATION).resolve(pth);
             }
         }
 
@@ -1852,12 +1853,12 @@ public class GlobalConf {
 
         public String getStarTexture() {
             String starTexIdx = String.format("%02d", STAR_TEX_INDEX);
-            String texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx + "*.png"));
+            String texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx +  Constants.STAR_SUBSTITUTE + ".png"));
             if (!Files.exists(Path.of(texture))) {
                 // Fall back to whatever available
                 for (int i = 1; i < 9; i++) {
                     starTexIdx = String.format("%02d", i);
-                    texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx + "*.png"));
+                    texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                     if (Files.exists(Path.of(texture)))
                         return texture;
                 }
