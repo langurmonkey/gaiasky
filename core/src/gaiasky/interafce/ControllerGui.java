@@ -6,7 +6,7 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -16,6 +16,7 @@ import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextButton;
 
 import java.util.ArrayList;
@@ -26,77 +27,102 @@ import java.util.List;
  */
 public class ControllerGui extends AbstractGui {
 
-    private final Table content, menu, camT, timeT, optT, datT, visT;
+    private final Table content, menu;
+    private Table camT, timeT, optT, datT, visT;
+    private Cell contentCell;
     private OwnTextButton cameraButton, timeButton, optionsButton, datasetsButton, visualsButton;
+
     private List<OwnTextButton> tabButtons;
+    private List<Table> tabContents;
+    private Table currentContent;
 
     private GUIControllerListener guiControllerListener;
 
-    private Button[][] focus;
-    private int row = 0, col = 0;
+    private int selectedTab = 0;
 
     public ControllerGui() {
         super();
         this.skin = GlobalResources.skin;
         content = new Table(skin);
         menu = new Table(skin);
-        camT = new Table(skin);
-        timeT = new Table(skin);
-        optT = new Table(skin);
-        datT = new Table(skin);
-        visT = new Table(skin);
         guiControllerListener = new GUIControllerListener();
         tabButtons = new ArrayList<>();
-        focus = new Button[1][5];
+        tabContents = new ArrayList<>();
     }
 
     @Override
     protected void rebuildGui() {
+        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        float pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
+
+        // Clean up
         content.clear();
         menu.clear();
-        camT.clear();
-        timeT.clear();
-        datT.clear();
-        optT.clear();
-        visT.clear();
+        tabButtons.clear();
+        tabContents.clear();
 
-        float padBig = 30f * GlobalConf.UI_SCALE_FACTOR;
+        // Create contents
+        camT = new Table(skin);
+        camT.add(new OwnLabel("This is camera", skin, "default"));
+        tabContents.add(camT);
+
+        timeT = new Table(skin);
+        timeT.add(new OwnLabel("This is time", skin, "default"));
+        tabContents.add(timeT);
+
+        datT = new Table(skin);
+        datT.add(new OwnLabel("This is datasets", skin, "default"));
+        tabContents.add(datT);
+
+        optT = new Table(skin);
+        optT.add(new OwnLabel("This is options", skin, "default"));
+        tabContents.add(optT);
+
+        visT = new Table(skin);
+        visT.add(new OwnLabel("This is visuals", skin, "default"));
+        tabContents.add(visT);
+
+        // Create tab buttons
         cameraButton = new OwnTextButton("Camera", skin, "toggle-huge");
-        focus[0][0] = cameraButton;
         tabButtons.add(cameraButton);
 
         timeButton = new OwnTextButton("Time", skin, "toggle-huge");
-        focus[0][1] = timeButton;
         tabButtons.add(timeButton);
 
         datasetsButton = new OwnTextButton("Datasets", skin, "toggle-huge");
-        focus[0][2] = datasetsButton;
         tabButtons.add(datasetsButton);
 
         optionsButton = new OwnTextButton("Options", skin, "toggle-huge");
-        focus[0][3] = optionsButton;
         tabButtons.add(optionsButton);
 
         visualsButton = new OwnTextButton("Visuals", skin, "toggle-huge");
-        focus[0][4] = visualsButton;
         tabButtons.add(visualsButton);
 
         for (OwnTextButton b : tabButtons) {
-            b.pad(10f * GlobalConf.UI_SCALE_FACTOR);
+            b.pad(pad10);
             b.setMinWidth(200f * GlobalConf.UI_SCALE_FACTOR);
         }
 
-        menu.add(cameraButton).center();
-        menu.add(timeButton).center();
-        menu.add(datasetsButton).center();
-        menu.add(optionsButton).center();
-        menu.add(visualsButton).center();
+        OwnTextButton lb, rb;
+        lb = new OwnTextButton("RB >", skin, "key-big");
+        rb = new OwnTextButton("< LB", skin, "key-big");
+        lb.pad(pad10);
+        rb.pad(pad10);
+        menu.add(rb).center().padBottom(pad10).padRight(pad30);
+        menu.add(cameraButton).center().padBottom(pad10);
+        menu.add(timeButton).center().padBottom(pad10);
+        menu.add(datasetsButton).center().padBottom(pad10);
+        menu.add(optionsButton).center().padBottom(pad10);
+        menu.add(visualsButton).center().padBottom(pad10);
+        menu.add(lb).center().padBottom(pad10).padLeft(pad30).row();
+
+        contentCell = menu.add().colspan(7);
 
         Table padTable = new Table(skin);
-        padTable.pad(padBig);
+        padTable.pad(pad30);
         padTable.setBackground("table-border");
         menu.pack();
-        padTable.add(menu).left();
+        padTable.add(menu).center();
 
         content.add(padTable);
 
@@ -104,6 +130,7 @@ public class ControllerGui extends AbstractGui {
         content.center();
         content.pack();
 
+        updateTabs();
         updateFocused();
 
     }
@@ -114,6 +141,7 @@ public class ControllerGui extends AbstractGui {
         Viewport vp = new ScreenViewport();
         ui = new Stage(vp, GlobalResources.spriteBatch);
 
+        // Comment to hide this whole dialog and functionality
         //EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION);
     }
 
@@ -122,42 +150,52 @@ public class ControllerGui extends AbstractGui {
         rebuildGui();
     }
 
-    public void updateFocused() {
-        for (int i = 0; i < focus.length; i++) {
-            for (int j = 0; j < focus[i].length; j++) {
-                if (row == i && col == j) {
-                    ui.setKeyboardFocus(focus[i][j]);
-                }
-            }
+    public void updateTabs() {
+        for (OwnTextButton tb : tabButtons) {
+            tb.setChecked(false);
         }
+        tabButtons.get(selectedTab).setChecked(true);
+        contentCell.setActor(null);
+        currentContent = tabContents.get(selectedTab);
+        contentCell.setActor(currentContent);
+    }
+
+    public void updateFocused() {
+        // Use current content table
+
+    }
+
+    public void tabLeft() {
+        if (selectedTab - 1 < 0) {
+            selectedTab = tabButtons.size() - 1;
+        } else {
+            selectedTab--;
+        }
+        updateTabs();
+    }
+
+    public void tabRight() {
+        selectedTab = (selectedTab + 1) % tabButtons.size();
+        updateTabs();
     }
 
     public void up() {
-        row = (row - 1) % focus.length;
         updateFocused();
     }
 
     public void down() {
-        row = (row + 1) % focus.length;
         updateFocused();
     }
 
     public void left() {
-        if(col - 1 < 0){
-            col = focus[row].length - 1;
-        } else {
-            col = (col - 1) % focus[row].length;
-        }
         updateFocused();
     }
 
     public void right() {
-        col = (col + 1) % focus[row].length;
         updateFocused();
     }
 
     public void select() {
-        focus[row][col].setChecked(true);
     }
 
     public void back() {
@@ -277,6 +315,10 @@ public class ControllerGui extends AbstractGui {
                 left();
             } else if (buttonCode == mappings.getButtonDpadRight()) {
                 right();
+            } else if (buttonCode == mappings.getButtonRB()) {
+                tabRight();
+            } else if (buttonCode == mappings.getButtonLB()) {
+                tabLeft();
             }
 
             return true;
