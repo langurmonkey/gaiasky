@@ -87,6 +87,9 @@ public class FadeNode extends AbstractPositionEntity {
      */
     protected CatalogInfo catalogInfo = null;
 
+    // Initial update flag
+    private boolean initialUpdate = true;
+
     /**
      * Is it highlighted?
      */
@@ -136,11 +139,12 @@ public class FadeNode extends AbstractPositionEntity {
         // Update with translation/rotation/etc
         updateLocal(time, camera);
 
-        if (children != null && GaiaSky.instance.isOn(ct)) {
+        if (children != null && (initialUpdate || GaiaSky.instance.isOn(ct))) {
             for (int i = 0; i < children.size; i++) {
                 SceneGraphNode child = children.get(i);
                 child.update(time, translation, camera, this.opacity);
             }
+            initialUpdate = false;
         }
     }
 
