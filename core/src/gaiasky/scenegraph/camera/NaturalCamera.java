@@ -1228,20 +1228,32 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case GAME_MODE:
             MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
             setMouseKbdListener(newListener);
-
-            GlobalConf.controls.addControllerListener(controllerListener);
+            addControllerListener();
             if (GlobalConf.runtime.OPENVR)
                 GaiaSky.instance.vrContext.addListener(openVRListener);
             break;
         default:
             // Unregister input controllers
             im.removeProcessor(currentMouseKbdListener);
-            GlobalConf.controls.removeControllerListener(controllerListener);
+            removeControllerListener();
             // Remove vr listener
             if (GlobalConf.runtime.OPENVR)
                 GaiaSky.instance.vrContext.removeListener(openVRListener);
             break;
         }
+    }
+
+    public NaturalControllerListener getControllerListener(){
+        return controllerListener;
+    }
+
+    public void addControllerListener(){
+        GlobalConf.controls.addControllerListener(controllerListener);
+        controllerListener.activate();
+    }
+    public void removeControllerListener(){
+        GlobalConf.controls.removeControllerListener(controllerListener);
+        controllerListener.deactivate();
     }
 
     public void setFocus(IFocus focus) {

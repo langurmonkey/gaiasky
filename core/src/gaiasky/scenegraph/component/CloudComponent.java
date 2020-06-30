@@ -120,11 +120,11 @@ public class CloudComponent {
         if (GlobalConf.scene.LAZY_TEXTURE_INIT && !texInitialised) {
 
             if (!texLoading) {
-                if (cloud != null)
-                    logger.info(I18n.bundle.format("notif.loading", cloud));
-                if (cloudtrans != null)
-                    logger.info(I18n.bundle.format("notif.loading", cloudtrans));
                 initialize(true);
+                if (cloud != null)
+                    logger.info(I18n.bundle.format("notif.loading", cloudUnpacked));
+                if (cloudtrans != null)
+                    logger.info(I18n.bundle.format("notif.loading", cloudtransUnpacked));
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {

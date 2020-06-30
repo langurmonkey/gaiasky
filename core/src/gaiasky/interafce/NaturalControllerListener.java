@@ -81,6 +81,10 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         return false;
     }
 
+    public IControllerMappings getMappings() {
+        return mappings;
+    }
+
     public boolean updateControllerMappings(String mappingsFile) {
         // We look for OS-specific mappings for the given inputListener. If not found, it defaults to the base
         String os = SysUtils.getOSFamily();
@@ -147,7 +151,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         } else if (buttonCode == mappings.getButtonDpadRight()) {
             em.post(Events.TIME_STATE_CMD, true, false);
         } else if (buttonCode == mappings.getButtonStart()) {
-            em.post(Events.SHOW_PREFERENCES_ACTION);
+            em.post(Events.SHOW_CONTROLLER_GUI_ACTION, cam);
         } else if (buttonCode == mappings.getButtonRstick()) {
             if (cam.getMode().isFocus()) {
                 // Set free
@@ -244,11 +248,11 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case RELOAD_CONTROLLER_MAPPINGS:
-                updateControllerMappings((String) data[0]);
-                break;
-            default:
-                break;
+        case RELOAD_CONTROLLER_MAPPINGS:
+            updateControllerMappings((String) data[0]);
+            break;
+        default:
+            break;
         }
 
     }

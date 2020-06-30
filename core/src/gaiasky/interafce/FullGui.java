@@ -166,7 +166,6 @@ public class FullGui extends AbstractGui {
         runStateInterface = new RunStateInterface(skin, true);
         runStateInterface.setFillParent(true);
         runStateInterface.center().bottom();
-        //runStateInterface.pad(GlobalConf.SCALE_FACTOR == 1 ? 135 : 200, 0, 0, 5);
         runStateInterface.pad(0, 0, pad, 0);
         interfaces.add(runStateInterface);
 

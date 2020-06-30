@@ -266,7 +266,7 @@ public class GuiRegistry implements IObserver {
             // Treats windows that can appear in any GUI
             switch (event) {
                 case SHOW_QUIT_ACTION:
-                    if (!removeModeChangePopup()) {
+                    if (!removeModeChangePopup() && !removeControllerGui()) {
                         if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
                             // Release mouse if captured
                             GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
@@ -515,6 +515,17 @@ public class GuiRegistry implements IObserver {
             }
         }
         return result;
+    }
+
+    public boolean removeControllerGui() {
+        for(int i =0; i < guis.size; i++){
+            IGui gui = guis.get(i);
+            if(gui instanceof ControllerGui){
+                ControllerGui cgui = (ControllerGui) gui;
+                return cgui.removeControllerGui(GaiaSky.instance.cam.naturalCamera);
+            }
+        }
+        return false;
     }
 
     public boolean removeModeChangePopup() {

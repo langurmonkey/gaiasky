@@ -275,8 +275,9 @@ public class MaterialComponent implements IObserver {
     private void initializeElevationData(Texture tex) {
         Thread t = new Thread(() -> {
             // Construct RAM height map from texture
-            logger.info("Constructing elevation data from texture: " + height);
-            Pixmap heightPixmap = new Pixmap(new FileHandle(GlobalResources.unpackTexName(height)));
+            String heightUnpacked = GlobalResources.unpackTexName(height);
+            logger.info("Constructing elevation data from texture: " + heightUnpacked);
+            Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
             float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
             for (int i = 0; i < heightPixmap.getWidth(); i++) {
                 for (int j = 0; j < heightPixmap.getHeight(); j++) {
