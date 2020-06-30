@@ -224,7 +224,16 @@
     "default": {
       "down": "default-round-down",
       "up": "default-round",
+      "focused": "default-round-sel",
       "font": "ui-18",
+      "fontColor": "white",
+      "disabledFontColor": "dark-gray"
+    },
+    "big": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "focused": "default-round-sel",
+      "font": "ui-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -239,18 +248,22 @@
     "toggle": {
       "down": "default-round-down",
       "up": "default-round",
+      "focused": "default-round-sel",
       "checked": "default-round-down",
+      "checkedFocused": "default-round-down-sel",
       "font": "ui-18",
       "fontColor": "white",
-      "downFontColor": "theme"
+      "downFontColor": "black"
     },
     "toggle-big": {
       "down": "default-round-down",
       "up": "default-round",
+      "focused": "default-round-sel",
       "checked": "default-round-down",
-      "font": "ui-21",
+      "checkedFocused": "default-round-down-sel",
+      "font": "ui-23",
       "fontColor": "white",
-      "downFontColor": "theme"
+      "downFontColor": "black"
     },
     "toggle-huge": {
       "down": "default-round-down",
@@ -260,7 +273,7 @@
       "checkedFocused": "default-round-down-sel",
       "font": "title-40",
       "fontColor": "white",
-      "downFontColor": "theme"
+      "downFontColor": "black"
     },
     "key": {
       "up": "key",

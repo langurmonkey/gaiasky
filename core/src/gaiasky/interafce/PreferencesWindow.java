@@ -115,15 +115,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     protected void build() {
-        float contentw = 700 * GlobalConf.UI_SCALE_FACTOR;
-        float contenth = 700 * GlobalConf.UI_SCALE_FACTOR;
-        final float tawidth = 600 * GlobalConf.UI_SCALE_FACTOR;
-        float tabwidth = (GlobalConf.isHiDPI() ? 180 : 220) * GlobalConf.UI_SCALE_FACTOR;
-        float textwidth = 65 * GlobalConf.UI_SCALE_FACTOR;
-        float scrollh = 400 * GlobalConf.UI_SCALE_FACTOR;
-        float controlsscrollw = 450 * GlobalConf.UI_SCALE_FACTOR;
-        float controllsscrollh = 250 * GlobalConf.UI_SCALE_FACTOR;
-        float sliderWidth = textwidth * 3;
+        float contentw = 700f * GlobalConf.UI_SCALE_FACTOR;
+        float contenth = 700f * GlobalConf.UI_SCALE_FACTOR;
+        final float tawidth = 600f * GlobalConf.UI_SCALE_FACTOR;
+        float tabwidth = (GlobalConf.isHiDPI() ? 200f : 200f) * GlobalConf.UI_SCALE_FACTOR;
+        float textwidth = 65f * GlobalConf.UI_SCALE_FACTOR;
+        float scrollh = 400f * GlobalConf.UI_SCALE_FACTOR;
+        float controlsscrollw = 450f * GlobalConf.UI_SCALE_FACTOR;
+        float controllsscrollh = 250f * GlobalConf.UI_SCALE_FACTOR;
+        float sliderWidth = textwidth * 3f;
 
         // Create the tab buttons
         VerticalGroup group = new VerticalGroup();

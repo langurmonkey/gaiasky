@@ -224,7 +224,16 @@
     "default": {
       "down": "default-round-down",
       "up": "default-round",
+      "focused": "default-round-sel",
       "font": "ui-11",
+      "fontColor": "theme",
+      "disabledFontColor": "dark-gray"
+    },
+    "big": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "focused": "default-round-sel",
+      "font": "ui-15",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
@@ -248,7 +257,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "checked": "default-round-down",
-      "font": "ui-13",
+      "font": "ui-15",
       "fontColor": "theme",
       "downFontColor": "theme"
     },
@@ -259,7 +268,7 @@
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
       "font": "title-20",
-      "fontColor": "white",
+      "fontColor": "theme",
       "downFontColor": "theme"
     },
     "key": {
@@ -824,7 +833,6 @@
       "fontColor": "theme"
     }
   },
-
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
     "default": {
       "selection": "selection",

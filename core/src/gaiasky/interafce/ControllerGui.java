@@ -5,9 +5,14 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
@@ -37,8 +42,10 @@ public class ControllerGui extends AbstractGui {
     private Table currentContent;
 
     private GUIControllerListener guiControllerListener;
+    private float pad5, pad10, pad30;
 
     private int selectedTab = 0;
+    private int focusedElem = 0;
 
     public ControllerGui() {
         super();
@@ -48,12 +55,13 @@ public class ControllerGui extends AbstractGui {
         guiControllerListener = new GUIControllerListener();
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
+        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
     }
 
     @Override
     protected void rebuildGui() {
-        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        float pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
 
         // Clean up
         content.clear();
@@ -61,26 +69,45 @@ public class ControllerGui extends AbstractGui {
         tabButtons.clear();
         tabContents.clear();
 
+        float w = 500f * GlobalConf.UI_SCALE_FACTOR;
+        float h = 500f * GlobalConf.UI_SCALE_FACTOR;
+
         // Create contents
         camT = new Table(skin);
-        camT.add(new OwnLabel("This is camera", skin, "default"));
+        camT.setSize(w, h);
+        camT.add(new OwnTextButton("Button cam 1", skin, "toggle-big")).padBottom(pad10).row();
+        camT.add(new OwnTextButton("Button cam 2", skin, "big")).padBottom(pad10).row();
+        camT.add(new OwnTextButton("Button cam 3", skin, "big")).padBottom(pad10).row();
         tabContents.add(camT);
+        updatePads(camT);
 
         timeT = new Table(skin);
-        timeT.add(new OwnLabel("This is time", skin, "default"));
+        timeT.setSize(w, h);
+        timeT.add(new OwnTextButton("Button time 1", skin, "toggle-big")).padBottom(pad10).row();
+        timeT.add(new OwnTextButton("Button time 2", skin, "toggle-big")).padBottom(pad10).row();
+        timeT.add(new OwnTextButton("Button time 3", skin, "toggle-big")).padBottom(pad10).row();
+        timeT.add(new OwnTextButton("Button time 4", skin, "toggle-big")).padBottom(pad10).row();
+        timeT.add(new OwnTextButton("Button time 5", skin, "toggle-big")).padBottom(pad10).row();
         tabContents.add(timeT);
+        updatePads(timeT);
 
         datT = new Table(skin);
+        datT.setSize(w, h);
         datT.add(new OwnLabel("This is datasets", skin, "default"));
         tabContents.add(datT);
+        updatePads(datT);
 
         optT = new Table(skin);
+        optT.setSize(w, h);
         optT.add(new OwnLabel("This is options", skin, "default"));
         tabContents.add(optT);
+        updatePads(optT);
 
         visT = new Table(skin);
+        visT.setSize(w, h);
         visT.add(new OwnLabel("This is visuals", skin, "default"));
         tabContents.add(visT);
+        updatePads(visT);
 
         // Create tab buttons
         cameraButton = new OwnTextButton("Camera", skin, "toggle-huge");
@@ -150,6 +177,15 @@ public class ControllerGui extends AbstractGui {
         rebuildGui();
     }
 
+    private void updatePads(Table t) {
+        Array<Cell> cells = t.getCells();
+        for (Cell c : cells) {
+            if (c.getActor() instanceof Button) {
+                ((Button) c.getActor()).pad(pad30);
+            }
+        }
+    }
+
     public void updateTabs() {
         for (OwnTextButton tb : tabButtons) {
             tb.setChecked(false);
@@ -158,10 +194,23 @@ public class ControllerGui extends AbstractGui {
         contentCell.setActor(null);
         currentContent = tabContents.get(selectedTab);
         contentCell.setActor(currentContent);
+        focusedElem = 0;
+        updateFocused();
     }
 
     public void updateFocused() {
         // Use current content table
+        if (currentContent != null) {
+            Array<Cell> cells = currentContent.getCells();
+            int focused = focusedElem % cells.size;
+            Cell cell = cells.get(focused);
+            if (cell.getActor() != null) {
+                Actor actor = cell.getActor();
+                if (actor instanceof Button) {
+                    ui.setKeyboardFocus(actor);
+                }
+            }
+        }
 
     }
 
@@ -180,22 +229,58 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void up() {
-        updateFocused();
+        left();
     }
 
     public void down() {
-        updateFocused();
+        right();
     }
 
     public void left() {
+        focusedElem = focusedElem - 1;
+        if (focusedElem < 0) {
+            focusedElem = currentContent.getCells().size - 1;
+        }
         updateFocused();
     }
 
     public void right() {
+        focusedElem = (focusedElem + 1) % currentContent.getCells().size;
         updateFocused();
     }
 
-    public void select() {
+    public void touchDown() {
+        if (currentContent != null) {
+            Array<Cell> cells = currentContent.getCells();
+            int focused = focusedElem % cells.size;
+            Actor actor = cells.get(focused).getActor();
+            if (actor != null && actor instanceof Button) {
+                final Button b = (Button) actor;
+
+                InputEvent inputEvent = Pools.obtain(InputEvent.class);
+                inputEvent.setType(InputEvent.Type.touchDown);
+                b.fire(inputEvent);
+                Pools.free(inputEvent);
+            }
+        }
+
+    }
+
+    public void touchUp() {
+        if (currentContent != null) {
+            Array<Cell> cells = currentContent.getCells();
+            int focused = focusedElem % cells.size;
+            Actor actor = cells.get(focused).getActor();
+            if (actor != null && actor instanceof Button) {
+                final Button b = (Button) actor;
+
+                InputEvent inputEvent = Pools.obtain(InputEvent.class);
+                inputEvent.setType(InputEvent.Type.touchUp);
+                b.fire(inputEvent);
+                Pools.free(inputEvent);
+            }
+
+        }
     }
 
     public void back() {
@@ -263,8 +348,8 @@ public class ControllerGui extends AbstractGui {
     }
 
     private class GUIControllerListener implements ControllerListener, IInputListener {
-        private static final double AXIS_TH = 0.25;
-        private static final long AXIS_DELAY = 150;
+        private static final double AXIS_TH = 0.5;
+        private static final long AXIS_DELAY = 250;
 
         private long lastAxisTime = 0;
         private EventManager em;
@@ -296,7 +381,10 @@ public class ControllerGui extends AbstractGui {
 
         @Override
         public boolean buttonDown(Controller controller, int buttonCode) {
-            return false;
+            if (buttonCode == mappings.getButtonA()) {
+                touchDown();
+            }
+            return true;
         }
 
         @Override
@@ -306,7 +394,7 @@ public class ControllerGui extends AbstractGui {
             } else if (buttonCode == mappings.getButtonB()) {
                 back();
             } else if (buttonCode == mappings.getButtonA()) {
-                select();
+                touchUp();
             } else if (buttonCode == mappings.getButtonDpadUp()) {
                 up();
             } else if (buttonCode == mappings.getButtonDpadDown()) {
@@ -338,9 +426,9 @@ public class ControllerGui extends AbstractGui {
                     } else if (axisCode == mappings.getAxisLstickV()) {
                         // up/down
                         if (value > 0) {
-                            up();
-                        } else {
                             down();
+                        } else {
+                            up();
                         }
                     }
                     lastAxisTime = System.currentTimeMillis();

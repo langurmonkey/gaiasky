@@ -87,7 +87,7 @@ public class OwnTextIconButton extends OwnTextButton {
         this.icon = icon;
         clearChildren();
         this.align(Align.left);
-        add(this.icon).left().pad(pad).padRight((getLabel().getText().length > 0 ? 5 : 1) * GlobalConf.UI_SCALE_FACTOR);
+        add(this.icon).left().pad(pad).padRight((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR);
         add(getLabel()).left().padRight(pad);
     }
 
