@@ -8,9 +8,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -22,6 +21,7 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
 
 import java.util.ArrayList;
@@ -36,13 +36,15 @@ public class ControllerGui extends AbstractGui {
     private Table camT, timeT, optT, datT, visT;
     private Cell contentCell;
     private OwnTextButton cameraButton, timeButton, optionsButton, datasetsButton, visualsButton;
+    private OwnTextButton timeStartStop, timeUp, timeDown;
 
     private List<OwnTextButton> tabButtons;
-    private List<Table> tabContents;
+    private List<ScrollPane> tabContents;
     private Table currentContent;
 
+    private EventManager em;
     private GUIControllerListener guiControllerListener;
-    private float pad5, pad10, pad30;
+    private float pad5, pad10, pad20, pad30;
 
     private int selectedTab = 0;
     private int focusedElem = 0;
@@ -50,6 +52,7 @@ public class ControllerGui extends AbstractGui {
     public ControllerGui() {
         super();
         this.skin = GlobalResources.skin;
+        this.em = EventManager.instance;
         content = new Table(skin);
         menu = new Table(skin);
         guiControllerListener = new GUIControllerListener();
@@ -57,6 +60,7 @@ public class ControllerGui extends AbstractGui {
         tabContents = new ArrayList<>();
         pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
         pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
         pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
     }
 
@@ -69,44 +73,74 @@ public class ControllerGui extends AbstractGui {
         tabButtons.clear();
         tabContents.clear();
 
-        float w = 500f * GlobalConf.UI_SCALE_FACTOR;
+        float w = 700f * GlobalConf.UI_SCALE_FACTOR;
         float h = 500f * GlobalConf.UI_SCALE_FACTOR;
 
         // Create contents
+
+        // CAMERA
         camT = new Table(skin);
         camT.setSize(w, h);
-        camT.add(new OwnTextButton("Button cam 1", skin, "toggle-big")).padBottom(pad10).row();
-        camT.add(new OwnTextButton("Button cam 2", skin, "big")).padBottom(pad10).row();
-        camT.add(new OwnTextButton("Button cam 3", skin, "big")).padBottom(pad10).row();
-        tabContents.add(camT);
+        camT.add(new OwnTextButton("Focus camera", skin, "toggle-big")).padBottom(pad10).row();
+        camT.add(new OwnTextButton("Free camera", skin, "toggle-big")).padBottom(pad10).row();
+        camT.add(new OwnTextButton("Cinematic mode", skin, "toggle-big")).padBottom(pad10).row();
+        tabContents.add(container(camT, w, h));
         updatePads(camT);
 
+        // TIME
         timeT = new Table(skin);
-        timeT.setSize(w, h);
-        timeT.add(new OwnTextButton("Button time 1", skin, "toggle-big")).padBottom(pad10).row();
-        timeT.add(new OwnTextButton("Button time 2", skin, "toggle-big")).padBottom(pad10).row();
-        timeT.add(new OwnTextButton("Button time 3", skin, "toggle-big")).padBottom(pad10).row();
-        timeT.add(new OwnTextButton("Button time 4", skin, "toggle-big")).padBottom(pad10).row();
-        timeT.add(new OwnTextButton("Button time 5", skin, "toggle-big")).padBottom(pad10).row();
-        tabContents.add(timeT);
+
+        boolean timeOn = GlobalConf.runtime.TIME_ON;
+        timeStartStop = new OwnTextButton(timeOn ? "Stop time" : "Start time", skin, "toggle-big");
+        timeStartStop.setChecked(timeOn);
+        timeStartStop.addListener(event -> {
+            if (event instanceof ChangeListener.ChangeEvent) {
+                em.post(Events.TIME_STATE_CMD, timeStartStop.isChecked(), false);
+                return true;
+            }
+            return false;
+        });
+        timeUp = new OwnTextButton("Speed up", skin, "big");
+        timeUp.addListener(event -> {
+            if(event instanceof ChangeListener.ChangeEvent){
+                em.post(Events.TIME_WARP_INCREASE_CMD);
+                return true;
+            }
+            return false;
+        });
+        timeDown = new OwnTextButton("Slow down", skin, "big");
+        timeDown.addListener(event -> {
+            if(event instanceof ChangeListener.ChangeEvent){
+                em.post(Events.TIME_WARP_DECREASE_CMD);
+                return true;
+            }
+            return false;
+        });
+
+        timeT.add(timeDown).padBottom(pad10).padRight(pad10);
+        timeT.add(timeStartStop).padBottom(pad10).padRight(pad10);
+        timeT.add(timeUp).padBottom(pad10).row();
+        timeT.add(new OwnTextButton("Reset time", skin, "big")).colspan(3).padBottom(pad10).row();
+        tabContents.add(container(timeT, w, h));
         updatePads(timeT);
 
+        // DATASETS
         datT = new Table(skin);
         datT.setSize(w, h);
         datT.add(new OwnLabel("This is datasets", skin, "default"));
-        tabContents.add(datT);
+        tabContents.add(container(datT, w, h));
         updatePads(datT);
 
+        // OPTIONS
         optT = new Table(skin);
-        optT.setSize(w, h);
         optT.add(new OwnLabel("This is options", skin, "default"));
-        tabContents.add(optT);
+        tabContents.add(container(optT, w, h));
         updatePads(optT);
 
+        // VISUALS
         visT = new Table(skin);
-        visT.setSize(w, h);
         visT.add(new OwnLabel("This is visuals", skin, "default"));
-        tabContents.add(visT);
+        tabContents.add(container(visT, w, h));
         updatePads(visT);
 
         // Create tab buttons
@@ -159,7 +193,6 @@ public class ControllerGui extends AbstractGui {
 
         updateTabs();
         updateFocused();
-
     }
 
     @Override
@@ -169,19 +202,29 @@ public class ControllerGui extends AbstractGui {
         ui = new Stage(vp, GlobalResources.spriteBatch);
 
         // Comment to hide this whole dialog and functionality
-        //EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION, Events.TIME_STATE_CMD);
     }
 
     @Override
     public void doneLoading(AssetManager assetManager) {
         rebuildGui();
+        ui.setKeyboardFocus(null);
+    }
+
+    private ScrollPane container(Table t, float w, float h){
+        OwnScrollPane c = new OwnScrollPane(t, skin, "minimalist-nobg");
+        t.top();
+        c.setFadeScrollBars(true);
+        c.setForceScroll(false, false);
+        c.setSize(w, h);
+        return c;
     }
 
     private void updatePads(Table t) {
         Array<Cell> cells = t.getCells();
         for (Cell c : cells) {
             if (c.getActor() instanceof Button) {
-                ((Button) c.getActor()).pad(pad30);
+                ((Button) c.getActor()).pad(pad20);
             }
         }
     }
@@ -192,15 +235,15 @@ public class ControllerGui extends AbstractGui {
         }
         tabButtons.get(selectedTab).setChecked(true);
         contentCell.setActor(null);
-        currentContent = tabContents.get(selectedTab);
-        contentCell.setActor(currentContent);
+        currentContent = (Table) tabContents.get(selectedTab).getActor();
+        contentCell.setActor(tabContents.get(selectedTab));
         focusedElem = 0;
         updateFocused();
     }
 
     public void updateFocused() {
         // Use current content table
-        if (currentContent != null) {
+        if (currentContent != null && content.getParent() != null) {
             Array<Cell> cells = currentContent.getCells();
             int focused = focusedElem % cells.size;
             Cell cell = cells.get(focused);
@@ -285,8 +328,8 @@ public class ControllerGui extends AbstractGui {
 
     public void back() {
         EventManager.instance.post(Events.SHOW_CONTROLLER_GUI_ACTION, GaiaSky.instance.cam.naturalCamera);
-        ui.setKeyboardFocus(null);
         updateFocused();
+        ui.setKeyboardFocus(null);
     }
 
     @Override
@@ -299,6 +342,7 @@ public class ControllerGui extends AbstractGui {
                 // Hide and remove
                 content.setVisible(false);
                 content.remove();
+                ui.setKeyboardFocus(null);
 
                 // Remove GUI listener, add natural listener
                 cam.addControllerListener();
@@ -315,6 +359,15 @@ public class ControllerGui extends AbstractGui {
                 addControllerListener(cam, cam.getControllerListener().getMappings());
             }
 
+            break;
+        case TIME_STATE_CMD:
+            boolean on = (Boolean) data[0];
+            timeStartStop.setProgrammaticChangeEvents(false);
+
+            timeStartStop.setChecked(on);
+            timeStartStop.setText(on ? "Stop time" : "Start time");
+
+            timeStartStop.setProgrammaticChangeEvents(true);
             break;
         default:
             break;
