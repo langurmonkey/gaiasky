@@ -878,7 +878,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public static StarGroup getStarGroup(String name, List<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
-        double[] fadeOut = dops == null || dops.fadeOut == null ? new double[]{2e3, 1e5} : dops.fadeOut;
+        double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
         double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
 
         StarGroup sg = new StarGroup();

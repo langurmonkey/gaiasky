@@ -131,6 +131,10 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Fade
         addFadeAttributes(container);
+        // Default fade out for stars
+        fadeOut.setChecked(true);
+        fadeOutMin.setText("10000");
+        fadeOutMax.setText("80000");
     }
 
     private void addParticlesWidget(Table container) {
@@ -384,10 +388,10 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addFadeInfo(DatasetOptions dops) {
         if (fadeIn.isChecked()) {
-            dops.fadeIn = new double[] { fadeInMin.getDoubleValue(0f), fadeInMax.getDoubleValue(10f) };
+            dops.fadeIn = new double[] { fadeInMin.getDoubleValue(0d), fadeInMax.getDoubleValue(0d) };
         }
         if (fadeOut.isChecked()) {
-            dops.fadeOut = new double[] { fadeInMin.getDoubleValue(0f), fadeInMax.getDoubleValue(10f) };
+            dops.fadeOut = new double[] { fadeOutMin.getDoubleValue(2000d), fadeOutMax.getDoubleValue(8000d) };
         }
     }
 
