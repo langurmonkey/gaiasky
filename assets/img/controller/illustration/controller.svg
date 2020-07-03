@@ -502,7 +502,7 @@
        id="path1189"
        d="m 83.442791,116.1677 c -7.701605,-0.14666 -14.555739,0.95266 -22.357727,5.27211 -4.988903,2.76203 -13.027989,11.4113 -16.14368,5.58556 -3.675529,-6.87253 -2.464403,-14.95131 -0.56412,-23.70698 1.588154,-7.317512 0.695492,-16.19551 8.72084,-20.336184 9.264059,-4.779786 20.155373,-3.823247 30.344687,-4.012704 10.189314,0.189457 21.080629,-0.767082 30.344689,4.012704 8.02535,4.140674 7.13268,13.018672 8.72084,20.336184 1.90028,8.75567 3.11141,16.83445 -0.56412,23.70698 -3.11569,5.82574 -11.15478,-2.82353 -16.14368,-5.58556 -7.80199,-4.31945 -14.656124,-5.41877 -22.357729,-5.27211 z"
        style="opacity:0.995;fill:#9ba3ae;fill-opacity:1;stroke:#000000;stroke-width:0.965;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png"
+       inkscape:export-filename="./controller.png"
        inkscape:original-d="m 83.781398,116.17493 c -0.286012,0 -1.326899,-0.43785 -1.921068,-0.2386 -0.355841,0.11935 -1.372447,0 -1.826562,0 h -4.176421 c -3.372946,0 -6.592806,-0.29052 -9.741511,1.05179 -0.242528,0.1034 -0.274333,0.3052 -0.466548,0.46538 -0.271812,0.22651 -0.591254,0.37173 -0.866571,0.58058 -0.347358,0.26349 -0.580634,0.67417 -0.872376,0.96591 -0.275749,0.27575 -0.654733,0.50299 -0.95439,0.75601 -0.640744,0.54105 -1.239697,1.13151 -1.870887,1.68381 -0.584353,0.51126 -0.149093,0.0824 -0.852448,0.47106 -1.557207,0.86051 0.6501,-0.25431 -0.654809,0.56126 -0.142393,0.089 -0.320937,0.10559 -0.467722,0.18709 -0.136287,0.0757 -0.249452,0.18713 -0.374177,0.28063 -0.09354,0.0935 -0.165772,0.21504 -0.280633,0.28064 -0.111625,0.0637 -0.265155,0.0254 -0.374176,0.0935 -0.14958,0.0935 -0.249452,0.24945 -0.374179,0.37418 -0.155906,0.0624 -0.320934,0.10549 -0.467723,0.18709 -0.576487,0.32027 -1.173874,0.75795 -1.714068,1.13979 -0.17766,0.12558 -0.31605,0.30614 -0.505918,0.41237 -0.01682,0.009 -1.51619,0.66609 -1.53003,0.67109 -0.149217,0.0549 -0.320334,0.0339 -0.467722,0.0935 -1.006306,0.40713 -3.66e-4,0.14713 -0.856692,0.57323 -0.180377,0.0898 -0.397378,0.0926 -0.573884,0.1897 -0.115895,0.0638 -0.165772,0.21503 -0.280633,0.28063 -0.111625,0.0637 -0.259186,0.036 -0.374176,0.0935 -0.02217,0.0111 -0.563152,0.43712 -0.654812,0.46772 -0.238864,0.0796 -0.503569,0 -0.755351,0 -1.265704,0 -2.598404,0.0265 -3.833945,-0.2867 -0.554432,-0.14054 -0.999477,-0.76687 -1.342927,-1.15556 -0.51539,-0.58326 -1.03395,-1.22761 -1.362954,-1.9473 -0.356605,-0.78008 0.174397,-0.31359 0.09548,-0.94491 -0.126389,-1.01111 0.123146,-2.22986 0.252385,-3.26379 0.201109,-1.60894 -0.738646,1.80867 -0.538137,-1.01008 0.0496,-0.6972 -0.0575,-1.40671 0,-2.10322 0.03665,-0.4439 -0.193184,-0.8045 -0.193184,-1.26171 0,-0.83812 0.234051,-1.63972 0.234051,-2.4742 0,-1.28978 0.02813,-2.54763 0.187089,-3.81933 0.05769,-0.46154 -0.03219,-0.85143 0.09607,-1.32011 0.21032,-0.76852 0.44581,-1.44584 0.588367,-2.2478 0.07686,-0.43236 0.04506,-0.89649 0.18709,-1.31242 0.122904,-0.35992 0.394278,-0.97885 0.481968,-1.33127 0.07558,-0.30374 -0.02834,-0.62728 0,-0.93899 0.01083,-0.11915 0.403821,-1.11675 0.434731,-1.24039 0.281292,-1.1248 0.134604,0.46863 0.283692,-0.85275 0.06503,-0.576379 -0.002,-1.216488 0.09354,-1.784303 0.03329,-0.197905 0.141767,-0.376446 0.190497,-0.571127 0.202026,-0.807153 0.30626,-1.650272 0.38031,-2.472679 0.04905,-0.544774 -0.07736,-1.122532 0,-1.664472 0.03657,-0.256194 0.247979,-0.472673 0.187089,-0.753494 0.05226,-0.36793 -0.06657,-0.762365 0,-1.1279 0.08197,-0.450112 0.58705,-1.872274 0.849715,-2.26627 0.07338,-0.110075 0.203163,-0.173392 0.280633,-0.280633 0.808146,-1.118809 -0.301146,0.282001 0.299598,-0.767324 0.230693,-0.402947 0.687674,-0.745339 0.949812,-1.138549 0.246539,-0.369806 0.470011,-0.775793 0.749512,-1.124842 0.421105,-0.525891 1.458126,-1.169905 2.012508,-1.629196 0.579871,-0.480404 1.152371,-0.962467 1.72857,-1.442632 0.10163,-0.08469 0.165151,-0.216103 0.280633,-0.280633 0.121201,-0.06773 0.277842,-0.04362 0.403871,-0.10187 0.51575,-0.238382 0.993217,-0.611984 1.48077,-0.901986 0.721214,-0.428982 -0.317662,0.18859 0.382783,-0.09354 0.570042,-0.229608 1.095438,-0.591709 1.706935,-0.766424 0.453697,-0.129629 0.860947,-0.139769 1.32012,-0.190789 0.45678,-0.05075 0.978162,-0.207326 1.428481,-0.288716 0.666538,-0.120464 0.08651,-0.06445 0.847703,-0.284593 0.322779,-0.09335 0.811634,-0.219247 1.131435,-0.283607 0.122275,-0.02461 0.253178,0.03025 0.37418,0 0.135284,-0.03382 0.241794,-0.14326 0.374176,-0.18709 0.582853,-0.19296 0.322707,-0.03521 0.847683,-0.09354 0.158022,-0.01756 0.311814,-0.06237 0.467722,-0.09355 0.124725,-0.03118 0.246594,-0.07766 0.374176,-0.09354 0.276083,-0.03434 0.569913,0.03937 0.845476,0 0.204182,-0.02917 0.450628,-0.157919 0.65481,-0.187089 0.123473,-0.01765 0.252455,0.0272 0.374179,0 0.167082,-0.03734 0.308364,-0.161139 0.477075,-0.190249 0.497166,-0.08578 1.009896,0.02973 1.513531,0 3.554949,-0.209922 7.122046,-0.250512 10.692243,-0.216022 1.530496,0.138886 3.41643,-0.04075 4.682086,-0.04075"
        inkscape:path-effect="#path-effect1191;#path-effect1193" />
     <g
@@ -511,7 +511,7 @@
        style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
        transform="matrix(5.7525117,0,0,5.7525117,-222.65764,-395.9003)"
        id="g1046"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png">
+       inkscape:export-filename="./controller.png">
       <ellipse
          ry="6.3744512"
          rx="6.5803828"
@@ -534,7 +534,7 @@
        style="stroke:#000000;stroke-width:1.49885;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        transform="matrix(4.6093896,0,0,4.6093896,-127.44091,-303.86753)"
        id="g1042"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png">
+       inkscape:export-filename="./controller.png">
       <g
          style="stroke:#000000;stroke-width:1.49885;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          transform="translate(-0.26052996,4.0134218)"
@@ -564,7 +564,7 @@
        cx="388.46942"
        id="path1079"
        style="fill:url(#linearGradient1087);fill-opacity:1;stroke:#000000;stroke-width:4.97592;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <circle
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
@@ -573,7 +573,7 @@
        cx="426.79684"
        cy="109.6694"
        r="17.134338"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <circle
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
@@ -582,7 +582,7 @@
        cx="351.28601"
        id="path1079-6-9"
        style="fill:url(#linearGradient1151);fill-opacity:1;stroke:#000000;stroke-width:4.97592;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <circle
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
@@ -591,7 +591,7 @@
        cx="388.46948"
        cy="77.460831"
        r="17.134338"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <ellipse
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
@@ -601,7 +601,7 @@
        ry="8.3081779"
        id="path1196"
        style="fill:#2d3a4d;fill-opacity:1;stroke:#000000;stroke-width:5.75251;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <ellipse
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
@@ -611,14 +611,14 @@
        rx="16.537323"
        cy="86.835297"
        cx="284.34091"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <g
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
        style="fill:#2d3a4d;fill-opacity:1;stroke:none;stroke-width:1.49885;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="g1042-9"
        transform="matrix(4.6093896,0,0,4.6093896,-127.44091,-308.7458)"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png">
+       inkscape:export-filename="./controller.png">
       <path
          transform="matrix(0.33019963,0,0,0.33019963,-22.16249,-26.171291)"
          d="m 263.42188,379.67188 v 15.10742 h -15.10743 v 14.15625 h 15.10743 v 15.10742 h 14.15624 v -15.10742 h 15.10743 V 394.7793 h -15.10743 v -15.10742 z"
@@ -631,7 +631,7 @@
        id="g1046-9"
        transform="matrix(5.7525117,0,0,5.7525117,-7.328925,-318.4162)"
        style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png">
+       inkscape:export-filename="./controller.png">
       <ellipse
          cy="87.48436"
          cx="57.394199"
@@ -655,7 +655,7 @@
        id="path1405"
        d="M 42.77074,117.00779 C 6.7269375,256.02113 35.429736,308.81118 46.080403,304.21997 67.990537,294.77513 134.826,254.14754 134.826,254.14754 c 0,0 -111.280879,19.28844 -92.05526,-137.13975 z"
        style="fill:#7f8b9d;fill-opacity:1;stroke:none;stroke-width:1.52202px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <path
        inkscape:export-ydpi="95.529999"
        inkscape:export-xdpi="95.529999"
@@ -663,9 +663,9 @@
        id="path1407"
        d="m 378.43456,255.9032 c 0,0 46.58919,45.61674 73.88388,42.8224 4.83395,-0.49472 9.31633,0.84069 14.18338,-5.32154 12.17424,-15.41395 12.12909,-43.0786 12.12909,-43.0786 0,0 -31.15609,51.17588 -100.19635,5.57774 z"
        style="fill:#7f8b9d;fill-opacity:1;stroke:none;stroke-width:1.52202px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png" />
+       inkscape:export-filename="./controller.png" />
     <g
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png"
+       inkscape:export-filename="./controller.png"
        id="g1046-5"
        transform="matrix(5.7525118,0,0,5.7525118,-124.47602,-89.732225)"
        style="stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none"
@@ -728,7 +728,7 @@
        inkscape:export-xdpi="96.36692"
        inkscape:export-ydpi="96.36692" />
     <g
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png"
+       inkscape:export-filename="./controller.png"
        id="g1042-1"
        transform="matrix(4.6093896,0,0,4.6093896,51.466966,-62.509526)"
        style="stroke:#000000;stroke-width:1.49885;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
@@ -756,7 +756,7 @@
       </g>
     </g>
     <g
-       inkscape:export-filename="/home/tsagrista/git/gaiasky/assets/img/controller/illustration/controller.png"
+       inkscape:export-filename="./controller.png"
        transform="matrix(4.6093896,0,0,4.6093896,51.466966,-67.387806)"
        id="g1042-9-9"
        style="fill:#2d3a4d;fill-opacity:1;stroke:none;stroke-width:1.49885;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"

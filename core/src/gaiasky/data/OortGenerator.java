@@ -44,9 +44,9 @@ public class OortGenerator {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File("../android/assets/conf/global.properties")), new FileInputStream(new File("../android/assets/data/dummyversion"))));
+            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File("../assets/conf/global.properties")), new FileInputStream(new File("../assets/data/dummyversion"))));
 
-            I18n.initialize(new FileHandle("/home/tsagrista/git/gaiasky/android/assets/i18n/gsbundle"));
+            I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/android/assets/i18n/gsbundle"));
 
             // Add notif watch
             new ConsoleLogger();
