@@ -826,6 +826,7 @@ public interface IScriptingInterface {
     /**
      * Sets the star brightness power profile value. This allows for adjusting
      * the shape of the curve: <code>brightness = brightness^power</code>. Default value is 0.6.
+     *
      * @param power The power value.
      */
     void setStarBrightnessPower(float power);
@@ -860,11 +861,12 @@ public interface IScriptingInterface {
 
     /**
      * Sets the star texture index, in [1, 4]
-     *
+     * <p>
      * 1 - horizontal spike
      * 2 - god rays
      * 3 - horizontal and vertical spikes
      * 4 - simple radial profile
+     *
      * @param index The new star texture index
      */
     void setStarTextureIndex(int index);
@@ -873,18 +875,21 @@ public interface IScriptingInterface {
      * Sets the number of nearest stars to be processed for each
      * star group. This will limit the number of stars that are
      * rendered with billboards, labels and velocity vectors.
+     *
      * @param n The new number of nearest stars
      */
     void setStarGroupNearestNumber(int n);
 
     /**
      * Enable or disable the rendering of close stars as billboards.
+     *
      * @param flag The state flag
      */
     void setStarGroupBillboard(boolean flag);
 
     /**
      * Sets the solid angle below which orbits fade and disappear.
+     *
      * @param angleDeg The threshold angle in degrees
      */
     void setOrbitSolidAngleThreshold(float angleDeg);
@@ -930,15 +935,18 @@ public interface IScriptingInterface {
 
     /**
      * Limits the frame rate of Gaia Sky.
+     *
      * @param limitFps The new maximum frame rate as a double-precision floating point number. Set zero or negative to unlimited.
      */
     void setLimitFps(double limitFps);
 
     /**
      * Limits the frame rate of Gaia Sky.
+     *
      * @param limitFps The new maximum frame rate as an integer number. Set zero or negative to unlimited.
      */
     void setLimitFps(int limitFps);
+
     /**
      * Configures the frame output system, setting the resolution of the images,
      * the target frames per second, the output folder and the image name
@@ -1078,7 +1086,7 @@ public interface IScriptingInterface {
      * back to 1.0 at the end of your script.
      * </p>
      *
-     * @param name The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, GaiaCoordinates, MoonAACoordinates).
+     * @param name          The name of the coordinates object (OrbitLintCoordinates, EclipticCoordinates, SaturnVSOP87, UranusVSOP87, EarthVSOP87, MercuryVSOP87, ..., PlutoCoordinates, GaiaCoordinates, MoonAACoordinates).
      * @param scalingFactor The scaling factor.
      */
     void setOrbitCoordinatesScaling(String name, double scalingFactor);
@@ -1366,6 +1374,7 @@ public interface IScriptingInterface {
      * Sets the target frame rate of the camera recorder. This will cap the frame rate of Gaia
      * Sky to this value while the camera is recording. When playing the camera file
      * back, you are responsible to set the right frame rate.
+     *
      * @param targetFps The target frame rate for the camera recorder.
      */
     void setCameraRecorderFps(double targetFps);
@@ -1448,9 +1457,10 @@ public interface IScriptingInterface {
     /**
      * Same as {@link IScriptingInterface#cameraTransition(double[], double[], double[], double)} but the
      * camera position is given in Km.
-     * @param camPos The target camera position in Km.
-     * @param camDir The target camera direction vector.
-     * @param camUp The target camera up vector.
+     *
+     * @param camPos  The target camera position in Km.
+     * @param camDir  The target camera direction vector.
+     * @param camUp   The target camera up vector.
      * @param seconds The duration of the transition in seconds.
      */
     void cameraTransitionKm(double[] camPos, double[] camDir, double[] camUp, double seconds);
@@ -2142,6 +2152,16 @@ public interface IScriptingInterface {
     boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor);
 
     /**
+     * Sets the 'all visible' property of datasets when highlighted. If set to true, all stars in the dataset have an increased minimum
+     * opacity when highlighted, so that they are all visible. Otherwise, stars retain their minimum opacity and base brightness.
+     *
+     * @param dsName     The dataset name.
+     * @param allVisible Whether all stars in the dataset should be visible when highlighted or not.
+     * @return False if the dataset could not be found.
+     */
+    boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible);
+
+    /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply
      * your coordinates in meters to get them in internal units.
      *
@@ -2180,6 +2200,7 @@ public interface IScriptingInterface {
      * @return The array in Kilometers.
      */
     double[] internalUnitsToKilometres(double[] internalUnits);
+
     /**
      * Converts the metres to internal units.
      *

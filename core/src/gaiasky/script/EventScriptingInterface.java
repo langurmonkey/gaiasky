@@ -2735,6 +2735,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible) {
+        if (checkString(dsName, "datasetName")) {
+
+            boolean exists = CatalogManager.instance().contains(dsName);
+            if (exists) {
+                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                ci.setHlAllVisible(allVisible);
+            } else {
+                logger.warn("Dataset with name " + dsName + " does not exist");
+            }
+            return exists;
+        }
+        return false;
+    }
+
+    @Override
     public double getMeterToInternalUnitConversion() {
         return Constants.M_TO_U;
     }
