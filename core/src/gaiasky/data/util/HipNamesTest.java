@@ -15,7 +15,7 @@ class HipNamesTest {
 
     public static void main(String[] args) {
         HipNames hn = new HipNames();
-        Path folder = Paths.get("/home/tsagrista/git/gaiasky/assets/assets-bak/data/hipnames/");
+        Path folder = Paths.get(System.getenv("PROJECTS"), "/gaiasky/assets/assets-bak/data/hipnames/");
 
         hn.load(folder);
 
