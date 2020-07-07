@@ -500,7 +500,7 @@ public class DownloadDataWindow extends GenericDialog {
             Trio<DatasetDesc, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
             DatasetDesc currentDataset = trio.getFirst();
             String name = currentDataset.name;
-            String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.MIRROR_URL);
+            String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
             String type = currentDataset.type;
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
