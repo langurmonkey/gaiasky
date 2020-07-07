@@ -34,7 +34,7 @@ public class MarsVSOP87 extends AbstractVSOP87 {
      * Astrophysics vol. 202, p309-p315 1988
      * 
      * Source code provided under the provisions of the GNU Affero General
-     * Public License, version 3. http://www.gnu.org/licenses/agpl.html
+     * Public License, version 3. https://www.gnu.org/licenses/agpl.html
      * 
      */
 

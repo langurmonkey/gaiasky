@@ -41,11 +41,11 @@ import java.nio.charset.StandardCharsets;
 public class ArchiveViewWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(ArchiveViewWindow.class);
 
-    private static String URL_GAIA_JSON_SOURCE = "http://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiadr2.gaia_source+WHERE+source_id=";
+    private static String URL_GAIA_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiadr2.gaia_source+WHERE+source_id=";
 
-    private static String URL_HIP_JSON_SOURCE = "http://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+extcat.hipparcos+WHERE+hip=";
+    private static String URL_HIP_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+extcat.hipparcos+WHERE+hip=";
 
-    private static String URL_GAIA_WEB_SOURCE = "http://gaia.ari.uni-heidelberg.de/singlesource.html#id=";
+    private static String URL_GAIA_WEB_SOURCE = "https://gaia.ari.uni-heidelberg.de/singlesource.html#id=";
 
     private static final String separator = "\n";
 

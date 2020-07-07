@@ -28,7 +28,7 @@ public class GuiUtils {
             @Override
             protected void build() {
                 OwnLabel info = new OwnLabel(I18n.txt("gui.download.noconnection"), skin);
-                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
                 content.add(info).pad(10).row();
                 content.add(manualDownload).pad(10);
             }
@@ -59,7 +59,7 @@ public class GuiUtils {
             protected void build() {
                 OwnLabel info = new OwnLabel(I18n.txt("gui.download.noconnection"), skin);
                 OwnLabel gsExit = new OwnLabel(I18n.txt("notif.gaiasky.exit"), skin);
-                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
                 content.add(info).left().pad(10).row();
                 content.add(gsExit).left().pad(10).row();
                 content.add(manualDownload).pad(10);

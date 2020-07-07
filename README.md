@@ -1,21 +1,21 @@
 # Gaia Sky
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
-[![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
+[![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
 
 [**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that
 runs on Linux, Windows and macOS. It is developed in the framework of
-[ESA](http://www.esa.int/ESA)'s [Gaia mission](http://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
+[ESA](https://www.esa.int/ESA)'s [Gaia mission](https://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 
-A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Catalog](http://dx.doi.org/10.1109/TVCG.2018.2864508).
+A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Catalog](https://dx.doi.org/10.1109/TVCG.2018.2864508).
 
 <img src="header.jpg" alt="Gaia Sky header" style="max-height: 20em;" />
 
 To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
-*  Read the [**Documentation**](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
+*  Read the [**Documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 *  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
 
@@ -86,12 +86,12 @@ Run `gaiasky -h` or `man gaiasky` to find out about how to launch Gaia Sky and w
 
 As of version `2.1.0`, Gaia Sky offers an automated way to download all data packs and catalogs from within the application. When Gaia Sky starts, if no base data or catalogs are found, the downloader window will prompt automatically. Otherwise, you can force the download window at startup with the `-d` argument. Just select the data packs and catalogs that you want to download, press `Download now` and wait for the process to finish.
 
-You can also download the **data packs manually** [here](http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
+You can also download the **data packs manually** [here](https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/).
 
 
 ##  4. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always in [gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest). For older versions and other formats, see [here](http://gaia.ari.uni-heidelberg.de/gaiasky/docs).
+The most up-to-date documentation of Gaia Sky is always in [gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest). For older versions and other formats, see [here](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
 
 We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 

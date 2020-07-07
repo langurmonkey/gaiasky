@@ -41,7 +41,7 @@ import java.util.logging.Level;
  * Loads VOTables, FITS, etc. This data provider makes educated guesses using UCDs and column names to
  * match columns to attributes.
  * <p>
- * More information on this can be found <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">here</a>.
+ * More information on this can be found <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">here</a>.
  *
  * @author tsagrista
  */

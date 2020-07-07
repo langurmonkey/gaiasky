@@ -36,7 +36,7 @@ import gaiasky.util.scene2d.OwnTextButton;
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
 
-    private static String URL_SIMBAD = "http://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
+    private static String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
     // TODO Use Wikipedia API to get localized content to the current language
     private static String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
 
