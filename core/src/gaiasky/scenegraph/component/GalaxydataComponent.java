@@ -8,21 +8,27 @@ package gaiasky.scenegraph.component;
 public class GalaxydataComponent {
     /** Star positions/sizes **/
     public String starsource;
+    public String starsourceUnpack;
 
     /** Bulge **/
     public String bulgesource;
+    public String bulgesourceUnpack;
 
     /** Dust positions/sizes **/
     public String dustsource;
+    public String dustsourceUnpack;
 
     /** HII positions/sizes **/
     public String hiisource;
+    public String hiisourceUnpack;
 
     /** Gas positions/sizes **/
     public String gassource;
+    public String gassourceUnpack;
 
     /** Nebulae - deprecated **/
     public String nebulasource;
+    public String nebulasourceUnpack;
 
     public GalaxydataComponent() {
 

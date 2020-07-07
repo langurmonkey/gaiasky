@@ -1854,12 +1854,12 @@ public class GlobalConf {
 
         public String getStarTexture() {
             String starTexIdx = String.format("%02d", STAR_TEX_INDEX);
-            String texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx +  Constants.STAR_SUBSTITUTE + ".png"));
+            String texture = GlobalConf.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx +  Constants.STAR_SUBSTITUTE + ".png"));
             if (!Files.exists(Path.of(texture))) {
                 // Fall back to whatever available
                 for (int i = 1; i < 9; i++) {
                     starTexIdx = String.format("%02d", i);
-                    texture = GlobalConf.data.dataFile(GlobalResources.unpackTexName("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                    texture = GlobalConf.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                     if (Files.exists(Path.of(texture)))
                         return texture;
                 }

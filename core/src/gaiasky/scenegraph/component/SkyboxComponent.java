@@ -77,7 +77,7 @@ public class SkyboxComponent {
         if (tex == null)
             return null;
 
-        tex = GlobalResources.unpackTexName(tex);
+        tex = GlobalResources.unpackAssetPath(tex);
         AssetBean.addAsset(tex, Texture.class, texParams);
 
         return tex;

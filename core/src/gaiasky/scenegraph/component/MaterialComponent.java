@@ -149,7 +149,7 @@ public class MaterialComponent implements IObserver {
         if (tex == null)
             return null;
 
-        tex = GlobalResources.unpackTexName(tex);
+        tex = GlobalResources.unpackAssetPath(tex);
         manager.load(tex, Texture.class, texParams);
 
         return tex;
@@ -166,7 +166,7 @@ public class MaterialComponent implements IObserver {
         if (tex == null)
             return null;
 
-        tex = GlobalResources.unpackTexName(tex);
+        tex = GlobalResources.unpackAssetPath(tex);
         logger.info(I18n.txt("notif.loading", tex));
         AssetBean.addAsset(tex, Texture.class, texParams);
 
@@ -275,7 +275,7 @@ public class MaterialComponent implements IObserver {
     private void initializeElevationData(Texture tex) {
         Thread t = new Thread(() -> {
             // Construct RAM height map from texture
-            String heightUnpacked = GlobalResources.unpackTexName(height);
+            String heightUnpacked = GlobalResources.unpackAssetPath(height);
             logger.info("Constructing elevation data from texture: " + heightUnpacked);
             Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
             float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];

@@ -676,20 +676,20 @@ public class GlobalResources {
 
     }
 
-    public static String unpackTexName(String tex, GraphicsQuality gq) {
-        if (tex.contains(Constants.STAR_SUBSTITUTE)) {
+    public static String unpackAssetPath(String path, GraphicsQuality gq) {
+        if (path.contains(Constants.STAR_SUBSTITUTE)) {
             // Start with current quality and scan to lower ones
             for (int i = gq.ordinal(); i >= 0; i--) {
                 GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
 
-                String texSuffix = tex.replace(Constants.STAR_SUBSTITUTE, suffix);
+                String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
                 if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
             // Try with no suffix
-            String texNoSuffix = tex.replace(Constants.STAR_SUBSTITUTE, "");
+            String texNoSuffix = path.replace(Constants.STAR_SUBSTITUTE, "");
             if (GlobalConf.data.dataFileHandle(texNoSuffix).exists()) {
                 return texNoSuffix;
             }
@@ -699,20 +699,20 @@ public class GlobalResources {
                 GraphicsQuality quality = GraphicsQuality.values()[i];
                 String suffix = quality.suffix;
 
-                String texSuffix = tex.replace(Constants.STAR_SUBSTITUTE, suffix);
+                String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
                 if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
-            logger.error("Texture not found: " + tex);
+            logger.error("Texture not found: " + path);
             return null;
         } else {
-            return tex;
+            return path;
         }
     }
 
-    public static String unpackTexName(String tex) {
-        return GlobalResources.unpackTexName(tex, GlobalConf.scene.GRAPHICS_QUALITY);
+    public static String unpackAssetPath(String tex) {
+        return GlobalResources.unpackAssetPath(tex, GlobalConf.scene.GRAPHICS_QUALITY);
     }
 
     public static String unpackSkyboxSide(String skyboxLoc, String side) throws RuntimeException {

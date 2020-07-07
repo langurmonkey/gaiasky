@@ -140,7 +140,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     private FileHandle unpack(String texName, GraphicsQuality gq) {
-        return GlobalConf.data.dataFileHandle(GlobalResources.unpackTexName(texFolder + texName, gq));
+        return GlobalConf.data.dataFileHandle(GlobalResources.unpackAssetPath(texFolder + texName, gq));
     }
 
     private void disposeTextureArray() {
@@ -157,9 +157,12 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     protected void initVertices() {
     }
 
-    private MeshData toMeshData(GpuData ad) {
+    private MeshData toMeshData(GpuData ad, MeshData md) {
         if (ad != null && ad.vertices != null) {
-            MeshData md = new MeshData();
+            if(md != null){
+                md.dispose();
+            }
+            md = new MeshData();
             VertexAttribute[] attribs = buildVertexAttributes();
             md.mesh = new IntMesh(true, ad.vertices.length / 6, 0, attribs);
             md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
@@ -237,19 +240,19 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     private void streamToGpu() {
         logger.info("Streaming galaxy to GPU");
-        bulge = toMeshData(bulgeA);
+        bulge = toMeshData(bulgeA, bulge);
         bulgeA = null;
 
-        stars = toMeshData(starsA);
+        stars = toMeshData(starsA, stars);
         starsA = null;
 
-        hii = toMeshData(hiiA);
+        hii = toMeshData(hiiA, hii);
         hiiA = null;
 
-        gas = toMeshData(gasA);
+        gas = toMeshData(gasA, gas);
         gasA = null;
 
-        dust = toMeshData(dustA);
+        dust = toMeshData(dustA, dust);
         dustA = null;
     }
 
