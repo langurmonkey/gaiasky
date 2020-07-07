@@ -172,6 +172,7 @@ project(":core") {
             include "icon/gs_icon.png"
             include "icon/gsvr_icon.png"
             include "img/**"
+            include "text/**"
             exclude "img/splash"
             include "shader/**"
             include "shaders/**"

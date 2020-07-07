@@ -23,6 +23,7 @@
 - ensure non-empty field in search dialog 
 
 ### Build System
+- fix build with text folder 
 - remove all absolute paths to project folder 
 
 ### Code Refactoring

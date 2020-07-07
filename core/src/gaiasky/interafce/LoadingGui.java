@@ -7,7 +7,10 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -15,7 +18,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.*;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.LoadingTextGenerator;
+import gaiasky.util.TipGenerator;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -79,7 +85,6 @@ public class LoadingGui extends AbstractGui {
         else if (hoffset < 0)
             center.padRight(-hoffset);
 
-
         OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(vr), skin, "main-title");
 
         // Funny text
@@ -136,7 +141,6 @@ public class LoadingGui extends AbstractGui {
 
     }
 
-
     private final long tipTime = 5000;
     private long funnyTextTime = 1400;
 
@@ -176,13 +180,16 @@ public class LoadingGui extends AbstractGui {
     }
 
     private void randomFunnyText() {
-        if(GlobalConf.runtime.OPENVR){
+        if (GlobalConf.runtime.OPENVR) {
             spin.setText("Loading...");
         } else {
-            spin.setText(LoadingTextGenerator.next());
+            try {
+                spin.setText(LoadingTextGenerator.next());
+            } catch (Exception e) {
+                spin.setText("Loading...");
+            }
         }
     }
-
 
     private void reset() {
         i = 0l;

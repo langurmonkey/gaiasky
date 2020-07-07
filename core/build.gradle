@@ -278,13 +278,6 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
             into "$distDir/scripts"
         }
 
-        // Copy text
-        mkdir "$distDir/text"
-        copy {
-            from "$baseDir/assets/text"
-            into "$distDir/text"
-        }
-
         // Copy scripts, README, LICENSE and AUTHORS
         copy {
             from "exe"
@@ -445,8 +438,11 @@ task prepareInstall4jScript(dependsOn: createArch, description: "Prepares the in
 }
 
 task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs the install4j task to create the installers") {
-    dependsOn 'prepareInstall4jScript' // example task that prepares the distribution for install4j
+    dependsOn 'prepareInstall4jScript'
 
+    doLast {
+        print("$packageDir/" + project.distName + ".install4j")
+    }
     projectFile = file("$packageDir/" + project.distName + ".install4j")
     variables = [majorVersion: project.tag, build: project.rev]
 }
@@ -455,12 +451,17 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 task pack(dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") {
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
-        String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
-        md5Tar = md5Tar.replace("\n", "").replace("\r", "");
-        file("$packageDir/" + 'md5sums').text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
+        File md5File = file("$packageDir/" + 'md5sums')
+        if(md5File.exists()) {
+            String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
+            md5Tar = md5Tar.replace("\n", "").replace("\r", "");
+            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
+            println("Removing file " + project.distName + ".tar.gz.md5")
+            file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
+        } else {
+            println("md5 file not found: " + md5File)
+        }
 
-        println("Removing file " + project.distName + ".tar.gz.md5")
-        file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
     }
 }
 
