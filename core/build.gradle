@@ -191,6 +191,7 @@ task copyToLib(dependsOn: createDistDir, description: "Copies the runtime depend
         delete project.distLib + '/shader'
         delete project.distLib + '/shaders'
         delete project.distLib + '/skins'
+        delete project.distLib + '/text'
     }
 }
 
@@ -275,6 +276,13 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
         copy {
             from "$baseDir/assets/scripts"
             into "$distDir/scripts"
+        }
+
+        // Copy text
+        mkdir "$distDir/text"
+        copy {
+            from "$baseDir/assets/text"
+            into "$distDir/text"
         }
 
         // Copy scripts, README, LICENSE and AUTHORS

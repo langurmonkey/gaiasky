@@ -160,3 +160,6 @@ if __name__ == '__main__':
         print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
         print()
         print(">DONE<")
+
+    else:
+        print("You must give a tag number!")
