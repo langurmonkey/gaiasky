@@ -239,7 +239,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /** BUTTONS **/
         float bw = 30f * GlobalConf.UI_SCALE_FACTOR, bh = 30f * GlobalConf.UI_SCALE_FACTOR;
         KeyBindings kb = KeyBindings.instance;
-        map = new OwnTextIconButton("", skin, "map");
+        Image icon = new Image(skin.getDrawable("map-icon"));
+        map = new OwnTextIconButton("", icon, skin, "toggle");
         map.setSize(bw, bh);
         map.setName("map");
         map.setChecked(GlobalConf.program.DISPLAY_MINIMAP);

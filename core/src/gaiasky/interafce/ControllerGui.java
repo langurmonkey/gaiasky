@@ -8,8 +8,11 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -24,6 +27,7 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +40,7 @@ public class ControllerGui extends AbstractGui {
     private Table camT, timeT, optT, datT, visT;
     private Cell contentCell;
     private OwnTextButton cameraButton, timeButton, optionsButton, datasetsButton, visualsButton;
-    private OwnTextButton timeStartStop, timeUp, timeDown;
+    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset;
 
     private List<OwnTextButton> tabButtons;
     private List<ScrollPane> tabContents;
@@ -94,7 +98,7 @@ public class ControllerGui extends AbstractGui {
         timeStartStop = new OwnTextButton(timeOn ? "Stop time" : "Start time", skin, "toggle-big");
         timeStartStop.setChecked(timeOn);
         timeStartStop.addListener(event -> {
-            if (event instanceof ChangeListener.ChangeEvent) {
+            if (event instanceof ChangeEvent) {
                 em.post(Events.TIME_STATE_CMD, timeStartStop.isChecked(), false);
                 return true;
             }
@@ -102,7 +106,7 @@ public class ControllerGui extends AbstractGui {
         });
         timeUp = new OwnTextButton("Speed up", skin, "big");
         timeUp.addListener(event -> {
-            if(event instanceof ChangeListener.ChangeEvent){
+            if(event instanceof ChangeEvent){
                 em.post(Events.TIME_WARP_INCREASE_CMD);
                 return true;
             }
@@ -110,8 +114,16 @@ public class ControllerGui extends AbstractGui {
         });
         timeDown = new OwnTextButton("Slow down", skin, "big");
         timeDown.addListener(event -> {
-            if(event instanceof ChangeListener.ChangeEvent){
+            if(event instanceof ChangeEvent){
                 em.post(Events.TIME_WARP_DECREASE_CMD);
+                return true;
+            }
+            return false;
+        });
+        timeReset = new OwnTextButton("Reset time", skin, "big");
+        timeReset.addListener(event -> {
+            if(event instanceof ChangeEvent){
+                em.post(Events.TIME_CHANGE_CMD, Instant.now());
                 return true;
             }
             return false;
@@ -120,7 +132,7 @@ public class ControllerGui extends AbstractGui {
         timeT.add(timeDown).padBottom(pad10).padRight(pad10);
         timeT.add(timeStartStop).padBottom(pad10).padRight(pad10);
         timeT.add(timeUp).padBottom(pad10).row();
-        timeT.add(new OwnTextButton("Reset time", skin, "big")).colspan(3).padBottom(pad10).row();
+        timeT.add(timeReset).colspan(3).padBottom(pad10).row();
         tabContents.add(container(timeT, w, h));
         updatePads(timeT);
 

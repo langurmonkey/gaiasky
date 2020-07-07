@@ -981,7 +981,7 @@ public class GlobalConf {
         public String VERSION_LAST_VERSION;
         public String VERSION_CHECK_URL;
 
-        public String MIRROR_URL = "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
+        public String DATA_MIRROR_URL = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
         public String DATA_DESCRIPTOR_URL;
         public String UI_THEME;
         public String SCRIPT_LOCATION;
@@ -1020,12 +1020,13 @@ public class GlobalConf {
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
-                               List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, boolean eXIT_CONFIRMATION, ShowCriterion cATALOG_CHOOSER) {
+                               List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, boolean eXIT_CONFIRMATION, ShowCriterion cATALOG_CHOOSER, String mIRROR) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
             VERSION_CHECK_URL = vERSION_CHECK_URL;
             DATA_DESCRIPTOR_URL = dATA_DESCRIPTOR_URL;
+            DATA_MIRROR_URL = mIRROR;
             UI_THEME = uI_THEME;
             SCRIPT_LOCATION = sCRIPT_LOCATION;
             REST_PORT = rEST_PORT;

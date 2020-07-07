@@ -589,7 +589,7 @@
         "catalog/wd"
       ],
       "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag - 177955 stars",
-      "link": "http://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
+      "link": "https://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
       "sha256": "73473bbc6718ae64bd3a9de5bdd2c00fcf3d75ce318af4b4e334a06e7c1408a9",
       "file": "@mirror-url@whitedwarfs/000_20181217/catalog-wd.tar.gz"
     },
@@ -605,7 +605,7 @@
         "catalog/hipparcos"
       ],
       "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007), already included in all DR2 catalogs - 177955 stars",
-      "link": "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
+      "link": "https://adsabs.harvard.edu/abs/2007ASSL..350.....V",
       "sha256": "31cfcba1b5ee633514f72cc7fee6a50a579dc639d89345720e2c3c861af843b1",
       "file": "@mirror-url@hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
     },
@@ -622,7 +622,7 @@
         "catalog/hipparcos"
       ],
       "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) with curated star names, already included in all DR2 catalogs - 177955 stars",
-      "link": "http://adsabs.harvard.edu/abs/2007ASSL..350.....V",
+      "link": "https://adsabs.harvard.edu/abs/2007ASSL..350.....V",
       "sha256": "7c22dfec8f16e8342c6556384c4a715d55a2095430203b27411b69552efc7cbc",
       "file": "@mirror-url@hipparcos/002_20200204/catalog-hipparcos-newreduction.tar.gz"
     },
