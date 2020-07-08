@@ -69,7 +69,7 @@ public class InitialGui extends AbstractGui {
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
 
-        } else if(GlobalConf.program.isSlave()){
+        } else if (GlobalConf.program.isSlave()) {
             // If slave, data load can start
             EventManager.instance.post(Events.LOAD_DATA_CMD);
         } else {
@@ -89,11 +89,20 @@ public class InitialGui extends AbstractGui {
                      * - no catalogs found in data folder, or
                      * - new versions of current datasets found
                      */
-                    DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
-                    if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
-                        // No catalog files, display downloader
-                        addDownloaderWindow(dd);
-                    } else {
+                    try {
+                        DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
+                        if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
+                            // No catalog files, display downloader
+                            addDownloaderWindow(dd);
+                        } else {
+                            displayChooser();
+                        }
+                    } catch (Exception e) {
+                        logger.error(e);
+                        logger.error("Error building data descriptor from URL: " + GlobalConf.program.DATA_DESCRIPTOR_URL);
+                        if(GlobalConf.program.DATA_DESCRIPTOR_URL.contains("http://")){
+                            logger.info("You are using HTTP but the server may be HTTPS - please check your URL in the properties file");
+                        }
                         displayChooser();
                     }
                 });

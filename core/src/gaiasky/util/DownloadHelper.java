@@ -35,6 +35,7 @@ public class DownloadHelper {
 
         // Make a GET request to get data descriptor
         HttpRequest request = new HttpRequest(HttpMethods.GET);
+        request.setFollowRedirects(true);
         request.setTimeOut(2500);
         request.setUrl(url);
 
