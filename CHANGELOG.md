@@ -1,6 +1,21 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.0...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.1...HEAD)
+
+
+<a name="2.3.1"></a>
+## [2.3.1](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.0) (2020-07-08)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.0...2.3.1)
+
+### Bug Fixes
+- shader lint function 
+- additional check for `http` to `https` redirects 
+
+### Code Refactoring
+- update some URLs from `http` to `https`
+
+### Features
+- hot reload of galaxy models 
 
 
 <a name="2.3.0"></a>
@@ -9,17 +24,17 @@
 
 ### Bug Fixes
 - update name and source version number 
-- error in lib_math shadier code 
+- error in lib_math shader code 
 - remove default fade-out values in star groups, added to loading dialog 
 - interpolation limits in math shader library 
 - initial update not performed on fade node children if ct is off 
 - uncomment unhandled event debug info 
-- windows crash due to stars '*' not being accepted in paths 
+- windows crash due to stars `*` not being accepted in paths 
 - add notice concerning the selection of more than one Gaia catalog 
 - changing focus to different object in same particle group works 
 - default value for magnitude scale is 0, fix float validator range 
 - disable depth test for billboards 
-- inconsistencies with STAR_MIN_OPACITY_CMD 
+- inconsistencies with `STAR_MIN_OPACITY_CMD `
 - ensure non-empty field in search dialog 
 
 ### Build System
@@ -39,7 +54,7 @@
 - add package-info package documentation, update changelog 
 
 ### Features
-- update server to HTTPS 
+- update server to `HTTPS`
 - add call to set 'all visible' dataset property 
 - add 'invert X look axis' as well as Y 
 - axis power value and sensitivity in config window 
