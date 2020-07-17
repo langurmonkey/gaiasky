@@ -256,7 +256,6 @@ public class ModelComponent implements Disposable, IObserver {
         if (GlobalConf.scene.LAZY_TEXTURE_INIT && mtc != null && !mtc.texInitialised) {
             if (mtc != null) {
                 if (!mtc.texLoading) {
-                    logger.info(I18n.bundle.format("notif.loading", mtc.getTexturesString()));
                     mtc.initialize(manager);
                     mtc.texLoading = true;
                 } else if (mtc.isFinishedLoading(manager)) {
@@ -279,8 +278,9 @@ public class ModelComponent implements Disposable, IObserver {
 
         if (localTransform != null && GlobalConf.scene.LAZY_MESH_INIT && !modelInitialised) {
             if (!modelLoading) {
-                logger.info(I18n.txt("notif.loading", modelFile));
-                AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), IntModel.class);
+                String mf = GlobalConf.data.dataFile(modelFile);
+                logger.info(I18n.txt("notif.loading", mf));
+                AssetBean.addAsset(mf, IntModel.class);
                 modelLoading = true;
             } else if (manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {
                 IntModel model;

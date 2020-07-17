@@ -171,7 +171,6 @@ public class DownloadDataWindow extends GenericDialog {
                                 // do stuff with result
                                 catalogsLoc.setText(result.toAbsolutePath().toString());
                                 GlobalConf.data.DATA_LOCATION = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
-                                ;
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {
                                     // Reset datasets

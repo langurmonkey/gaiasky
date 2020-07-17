@@ -150,6 +150,7 @@ public class MaterialComponent implements IObserver {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
+        logger.info(I18n.txt("notif.loading", tex));
         manager.load(tex, Texture.class, texParams);
 
         return tex;
