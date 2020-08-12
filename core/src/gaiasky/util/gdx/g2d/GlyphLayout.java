@@ -29,7 +29,7 @@ import gaiasky.util.gdx.g2d.BitmapFont.Glyph;
 
 import java.lang.StringBuilder;
 
-import static gaiasky.util.gdx.g2d.BitmapFont.*;
+import static gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
 
 /** Stores {@link GlyphRun runs} of glyphs for a piece of text. The text may contain newlines and color markup tags.
  * @author Nathan Sweet

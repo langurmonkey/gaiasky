@@ -5,7 +5,6 @@
 
 package gaiasky.data.octreegen.generator;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.util.tree.OctreeNode;
 

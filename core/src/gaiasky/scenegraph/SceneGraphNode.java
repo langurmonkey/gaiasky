@@ -9,13 +9,13 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.util.Constants;
@@ -56,170 +56,6 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
 
-    /**
-     * Describes to which render group this node belongs at a particular time
-     * step.
-     */
-    public enum RenderGroup {
-        /**
-         * Using normal shader for per-pixel lighting
-         **/
-        MODEL_PIX(0),
-        /**
-         * Using default shader, no normal map
-         **/
-        MODEL_VERT(1),
-        /**
-         * IntShader - stars
-         **/
-        BILLBOARD_STAR(2),
-        /**
-         * IntShader - galaxies
-         **/
-        BILLBOARD_GAL(3),
-        /**
-         * IntShader - front (planets, satellites...)
-         **/
-        BILLBOARD_SSO(4),
-        /**
-         * Billboard with custom texture
-         **/
-        BILLBOARD_TEX(5),
-        /**
-         * Single pixel
-         **/
-        POINT_STAR(6),
-        /**
-         * Line
-         **/
-        LINE(7),
-        /**
-         * Annotations
-         **/
-        FONT_ANNOTATION(8),
-        /**
-         * Atmospheres of planets
-         **/
-        MODEL_ATM(9),
-        /**
-         * Label
-         **/
-        FONT_LABEL(10),
-        /**
-         * Model star
-         **/
-        MODEL_VERT_STAR(11),
-        /**
-         * Galaxy as a whole
-         **/
-        GALAXY(12),
-        /**
-         * Model close up
-         **/
-        MODEL_CLOSEUP(13),
-        /**
-         * Beams
-         **/
-        MODEL_VERT_BEAM(14),
-        /**
-         * Particle grup
-         **/
-        PARTICLE_GROUP(15),
-        /**
-         * Star grup
-         **/
-        STAR_GROUP(16),
-        /**
-         * Shapes
-         **/
-        SHAPE(17),
-        /**
-         * Regular billboard sprite
-         **/
-        BILLBOARD_SPRITE(18),
-        /**
-         * Line GPU
-         **/
-        LINE_GPU(19),
-        /**
-         * Particle positions from orbital elements
-         **/
-        PARTICLE_ORBIT_ELEMENTS(20),
-        /**
-         * Transparent additive-blended meshes
-         **/
-        MODEL_VERT_ADDITIVE(21),
-        /**
-         * Grids shader
-         **/
-        MODEL_VERT_GRID(22),
-        /**
-         * Clouds
-         **/
-        MODEL_CLOUD(23),
-        /**
-         * Point
-         **/
-        POINT(24),
-        /**
-         * Point GPU
-         **/
-        POINT_GPU(25),
-        /**
-         * Opaque meshes (dust, etc.)
-         **/
-        MODEL_PIX_DUST(26),
-        /**
-         * Tessellated model
-         **/
-        MODEL_PIX_TESS(27),
-        /**
-         * Only diffuse
-         **/
-        MODEL_DIFFUSE(28),
-
-        /**
-         * None
-         **/
-        NONE(-1);
-
-        private int index;
-
-        RenderGroup(int index) {
-            this.index = index;
-        }
-
-        public boolean is(Bits rgmask) {
-            return (index < 0 && rgmask.isEmpty()) || rgmask.get(index);
-        }
-
-        /**
-         * Adds the given render groups to the given Bits mask
-         *
-         * @param rgmask The bit mask
-         * @param rgs    The render groups
-         * @return The bits instance
-         */
-        public static Bits add(Bits rgmask, RenderGroup... rgs) {
-            for (RenderGroup rg : rgs) {
-                rgmask.set(rg.index);
-            }
-            return rgmask;
-        }
-
-        /**
-         * Sets the given Bits mask to the given render groups
-         *
-         * @param rgmask The bit mask
-         * @param rgs    The render groups
-         * @return The bits instance
-         */
-        public static Bits set(Bits rgmask, RenderGroup... rgs) {
-            rgmask.clear();
-            return add(rgmask, rgs);
-        }
-
-    }
 
     /**
      * Reference to scene graph

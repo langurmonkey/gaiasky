@@ -5,6 +5,8 @@
 
 package gaiasky.scenegraph;
 
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**

@@ -11,7 +11,6 @@ import gaiasky.scenegraph.SceneGraphNode;
 import uk.ac.starlink.util.DataSource;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 

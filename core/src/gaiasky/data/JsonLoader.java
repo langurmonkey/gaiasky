@@ -19,7 +19,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.IBodyCoordinates;
 import uk.ac.starlink.util.DataSource;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

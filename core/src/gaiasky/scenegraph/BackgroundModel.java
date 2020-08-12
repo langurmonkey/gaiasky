@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IModelRenderable;
 import gaiasky.render.RenderingContext;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;

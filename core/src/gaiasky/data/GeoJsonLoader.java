@@ -17,8 +17,6 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import uk.ac.starlink.util.DataSource;
 
-import java.io.InputStream;
-
 /**
  * Loads GeoJson files to Area objects
  * @author Toni Sagrista

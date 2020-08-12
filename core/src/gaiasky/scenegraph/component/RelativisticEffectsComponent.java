@@ -10,11 +10,11 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.gdx.shader.Matrix3Attribute;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
+import gaiasky.util.gdx.shader.Matrix3Attribute;
 import gaiasky.util.gdx.shader.Vector3Attribute;
 import gaiasky.util.gdx.shader.Vector4Attribute;
+import gaiasky.util.gravwaves.RelativisticEffectsManager;
 
 import java.util.Map;
 import java.util.Set;

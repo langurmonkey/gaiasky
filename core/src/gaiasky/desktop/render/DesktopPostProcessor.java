@@ -42,7 +42,8 @@ import gaiasky.util.math.Vector3d;
 import java.nio.file.Path;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private static Log logger = Logger.getLogger(DesktopPostProcessor.class);

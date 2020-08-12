@@ -7,7 +7,7 @@ package gaiasky.render.system;
 
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 
 import java.util.List;

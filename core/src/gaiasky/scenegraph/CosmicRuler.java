@@ -15,6 +15,8 @@ import gaiasky.event.IObserver;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;

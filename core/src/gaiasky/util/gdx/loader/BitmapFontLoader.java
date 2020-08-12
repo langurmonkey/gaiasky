@@ -39,7 +39,7 @@ import gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
 import gaiasky.util.gdx.g2d.TextureAtlas;
 import gaiasky.util.gdx.g2d.TextureRegion;
 
-import static gaiasky.util.gdx.g2d.TextureAtlas.*;
+import static gaiasky.util.gdx.g2d.TextureAtlas.AtlasRegion;
 
 /** {@link AssetLoader} for {@link BitmapFont} instances. Loads the font description file (.fnt) asynchronously, loads the
  * {@link Texture} containing the glyphs as a dependency. The {@link BitmapFontParameter} allows you to set things like texture

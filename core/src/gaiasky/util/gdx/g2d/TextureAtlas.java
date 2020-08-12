@@ -37,7 +37,8 @@ import java.util.Comparator;
 
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.ClampToEdge;
 import static com.badlogic.gdx.graphics.Texture.TextureWrap.Repeat;
-import static gaiasky.util.gdx.g2d.TextureAtlas.TextureAtlasData.*;
+import static gaiasky.util.gdx.g2d.TextureAtlas.TextureAtlasData.Page;
+import static gaiasky.util.gdx.g2d.TextureAtlas.TextureAtlasData.Region;
 
 /** Loads images from texture atlases created by TexturePacker.<br>
  * <br>

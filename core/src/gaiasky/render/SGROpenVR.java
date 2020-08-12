@@ -21,7 +21,6 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
 import gaiasky.render.IPostProcessor.PostProcessBean;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -182,7 +181,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 auxd1.set(devicepos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 double controllerDist = auxd1.len();
                 if (controller.instance != null) {
-                    controller.addToRenderLists(RenderGroup.MODEL_PIX);
+                    controller.addToRenderLists(SceneGraphRenderer.RenderGroup.MODEL_PIX);
                 }
             }
 

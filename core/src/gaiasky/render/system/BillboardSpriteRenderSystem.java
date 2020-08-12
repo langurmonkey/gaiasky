@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.IQuadRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.DecalUtils;
 import gaiasky.util.comp.DistToCameraComparator;

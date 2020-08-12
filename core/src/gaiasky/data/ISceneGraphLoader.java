@@ -10,7 +10,6 @@ import gaiasky.scenegraph.SceneGraphNode;
 import uk.ac.starlink.util.DataSource;
 
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 public interface ISceneGraphLoader {
 

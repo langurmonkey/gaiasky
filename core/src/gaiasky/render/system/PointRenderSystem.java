@@ -13,7 +13,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IPointRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -28,16 +29,16 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
     protected Vector3 aux2;
 
-    public PointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
-        super(rg, alphas, shaders, -1);
-        glType = GL20.GL_POINTS;
-        aux2 = new Vector3();
-    }
-
     @Override
     protected void initShaderProgram() {
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+    }
+
+    public PointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+        super(rg, alphas, shaders, -1);
+        glType = GL20.GL_POINTS;
+        aux2 = new Vector3();
     }
 
     @Override

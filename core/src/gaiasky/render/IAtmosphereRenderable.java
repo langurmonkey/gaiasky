@@ -6,7 +6,6 @@
 package gaiasky.render;
 
 import gaiasky.util.gdx.IntModelBatch;
-
 import gaiasky.util.math.Vector3d;
 
 /**

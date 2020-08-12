@@ -9,7 +9,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IAnnotationsRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.comp.DistToCameraComparator;

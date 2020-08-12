@@ -31,7 +31,8 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.*;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.I18n;
 import gaiasky.util.scene2d.*;
 
 import java.util.List;

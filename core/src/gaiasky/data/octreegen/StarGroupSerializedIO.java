@@ -5,7 +5,6 @@
 
 package gaiasky.data.octreegen;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.SerializedDataProvider;
 import gaiasky.scenegraph.AbstractPositionEntity;

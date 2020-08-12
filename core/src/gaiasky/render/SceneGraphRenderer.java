@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Bits;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
 import gaiasky.assets.AtmosphereShaderProviderLoader.AtmosphereShaderProviderParameter;
@@ -35,7 +36,6 @@ import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.ModelBatchRenderSystem.ModelRenderType;
 import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.ModelBody;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -62,12 +62,180 @@ import org.lwjgl.opengl.GL40;
 import java.nio.IntBuffer;
 import java.util.*;
 
+import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
+
 /**
- * Renders a scenegraph.
+ * Renders the scene graph.
  *
  * @author Toni Sagrista
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
+
+    /**
+     * Describes to which render group this node belongs at a particular time
+     * step.
+     */
+    public enum RenderGroup {
+        /**
+         * Using normal shader for per-pixel lighting
+         **/
+        MODEL_PIX(0),
+        /**
+         * Using default shader, no normal map
+         **/
+        MODEL_VERT(1),
+        /**
+         * IntShader - stars
+         **/
+        BILLBOARD_STAR(2),
+        /**
+         * IntShader - galaxies
+         **/
+        BILLBOARD_GAL(3),
+        /**
+         * IntShader - front (planets, satellites...)
+         **/
+        BILLBOARD_SSO(4),
+        /**
+         * Billboard with custom texture
+         **/
+        BILLBOARD_TEX(5),
+        /**
+         * Single pixel
+         **/
+        POINT_STAR(6),
+        /**
+         * Line
+         **/
+        LINE(7),
+        /**
+         * Annotations
+         **/
+        FONT_ANNOTATION(8),
+        /**
+         * Atmospheres of planets
+         **/
+        MODEL_ATM(9),
+        /**
+         * Label
+         **/
+        FONT_LABEL(10),
+        /**
+         * Model star
+         **/
+        MODEL_VERT_STAR(11),
+        /**
+         * Galaxy as a whole
+         **/
+        GALAXY(12),
+        /**
+         * Model close up
+         **/
+        MODEL_CLOSEUP(13),
+        /**
+         * Beams
+         **/
+        MODEL_VERT_BEAM(14),
+        /**
+         * Particle grup
+         **/
+        PARTICLE_GROUP(15),
+        /**
+         * Star grup
+         **/
+        STAR_GROUP(16),
+        /**
+         * Shapes
+         **/
+        SHAPE(17),
+        /**
+         * Regular billboard sprite
+         **/
+        BILLBOARD_SPRITE(18),
+        /**
+         * Line GPU
+         **/
+        LINE_GPU(19),
+        /**
+         * Particle positions from orbital elements
+         **/
+        PARTICLE_ORBIT_ELEMENTS(20),
+        /**
+         * Transparent additive-blended meshes
+         **/
+        MODEL_VERT_ADDITIVE(21),
+        /**
+         * Grids shader
+         **/
+        MODEL_VERT_GRID(22),
+        /**
+         * Clouds
+         **/
+        MODEL_CLOUD(23),
+        /**
+         * Point
+         **/
+        POINT(24),
+        /**
+         * Point GPU
+         **/
+        POINT_GPU(25),
+        /**
+         * Opaque meshes (dust, etc.)
+         **/
+        MODEL_PIX_DUST(26),
+        /**
+         * Tessellated model
+         **/
+        MODEL_PIX_TESS(27),
+        /**
+         * Only diffuse
+         **/
+        MODEL_DIFFUSE(28),
+
+        /**
+         * None
+         **/
+        NONE(-1);
+
+        private int index;
+
+        RenderGroup(int index) {
+            this.index = index;
+        }
+
+        public boolean is(Bits rgmask) {
+            return (index < 0 && rgmask.isEmpty()) || rgmask.get(index);
+        }
+
+        /**
+         * Adds the given render groups to the given Bits mask
+         *
+         * @param rgmask The bit mask
+         * @param rgs    The render groups
+         * @return The bits instance
+         */
+        public static Bits add(Bits rgmask, RenderGroup... rgs) {
+            for (RenderGroup rg : rgs) {
+                rgmask.set(rg.index);
+            }
+            return rgmask;
+        }
+
+        /**
+         * Sets the given Bits mask to the given render groups
+         *
+         * @param rgmask The bit mask
+         * @param rgs    The render groups
+         * @return The bits instance
+         */
+        public static Bits set(Bits rgmask, RenderGroup... rgs) {
+            rgmask.clear();
+            return add(rgmask, rgs);
+        }
+
+    }
+
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
     public static SceneGraphRenderer instance;
 
@@ -374,7 +542,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
         orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
 
-        RenderGroup[] renderGroups = RenderGroup.values();
+        RenderGroup[] renderGroups = values();
         render_lists = new ArrayList<>(renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
             render_lists.add(new ArrayList<>(100));
@@ -476,69 +644,69 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
 
         // POINTS
-        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(RenderGroup.POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
+        AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
-        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
         modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
-        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_GRID, alphas, mbVertexLightingGrid, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(MODEL_VERT_GRID, alphas, mbVertexLightingGrid, ModelRenderType.NORMAL);
         modelGridsProc.addPostRunnables(clearDepthR);
 
         // ANNOTATIONS - (grids)
-        AbstractRenderSystem annotationsProc = new FontRenderSystem(RenderGroup.FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
+        AbstractRenderSystem annotationsProc = new FontRenderSystem(FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
         annotationsProc.addPreRunnables(regularBlendR, noDepthTestR);
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_STAR, alphas, starBillboardShaders, GlobalConf.scene.getStarTexture(), ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(BILLBOARD_STAR, alphas, starBillboardShaders, GlobalConf.scene.getStarTexture(), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
 
         // BILLBOARD GALAXIES
-        AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_GAL, alphas, galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
+        AbstractRenderSystem billboardGalaxiesProc = new BillboardStarRenderSystem(BILLBOARD_GAL, alphas, galShaders, "data/tex/base/static.jpg", ComponentType.Galaxies.ordinal());
         billboardGalaxiesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SPRITES
-        AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(RenderGroup.BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
+        AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
         billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // LINES CPU
         AbstractRenderSystem lineProc = getLineRenderSystem();
 
         // LINES GPU
-        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(RenderGroup.LINE_GPU, alphas, lineGpuShaders, true);
+        AbstractRenderSystem lineGpuProc = new VertGPURenderSystem(LINE_GPU, alphas, lineGpuShaders, true);
         lineGpuProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
 
         // POINTS CPU
-        AbstractRenderSystem pointProc = new PointRenderSystem(RenderGroup.POINT, alphas, pointShaders);
+        AbstractRenderSystem pointProc = new PointRenderSystem(POINT, alphas, pointShaders);
 
         // POINTS GPU
-        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem(RenderGroup.POINT_GPU, alphas, lineGpuShaders, false);
+        AbstractRenderSystem pointGpuProc = new VertGPURenderSystem(POINT_GPU, alphas, lineGpuShaders, false);
         pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODELS DUST AND MESH
-        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX_DUST, alphas, mbPixelLightingDust, ModelRenderType.NORMAL);
-        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(MODEL_PIX_DUST, alphas, mbPixelLightingDust, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive, ModelRenderType.NORMAL);
 
         // MODEL DIFFUSE
-        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(RenderGroup.MODEL_DIFFUSE, alphas, mbVertexDiffuse, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(MODEL_DIFFUSE, alphas, mbVertexDiffuse, ModelRenderType.NORMAL);
 
         // MODEL PER-PIXEL-LIGHTING
-        AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(RenderGroup.MODEL_PIX, alphas, mbPixelLighting, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(MODEL_PIX, alphas, mbPixelLighting, ModelRenderType.NORMAL);
 
         // MODEL PER-PIXEL-LIGHTING-TESSELLATION
-        AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(RenderGroup.MODEL_PIX_TESS, alphas, mbPixelLightingTessellation);
+        AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(MODEL_PIX_TESS, alphas, mbPixelLightingTessellation);
         modelPerPixelLightingTess.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL BEAM
-        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_BEAM, alphas, mbVertexLightingBeam, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(MODEL_VERT_BEAM, alphas, mbVertexLightingBeam, ModelRenderType.NORMAL);
 
         // GALAXY
-        mwrs = new MWModelRenderSystem(RenderGroup.GALAXY, alphas, galaxyPointShaders);
+        mwrs = new MWModelRenderSystem(GALAXY, alphas, galaxyPointShaders);
         AbstractRenderSystem milkyWayProc = mwrs;
 
         // PARTICLE EFFECTS
@@ -547,33 +715,33 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectsProc.addPostRunnables(regularBlendR);
 
         // PARTICLE GROUP
-        AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(RenderGroup.PARTICLE_GROUP, alphas, particleGroupShaders);
+        AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
-        AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(RenderGroup.STAR_GROUP, alphas, starGroupShaders);
+        AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders);
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // ORBITAL ELEMENTS PARTICLES
-        AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(RenderGroup.PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
+        AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
         orbitElemProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         orbitElemProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // MODEL STARS
-        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(RenderGroup.MODEL_VERT_STAR, alphas, mbVertexLightingStarsurface, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(MODEL_VERT_STAR, alphas, mbVertexLightingStarsurface, ModelRenderType.NORMAL);
 
         // LABELS
-        AbstractRenderSystem labelsProc = new FontRenderSystem(RenderGroup.FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
+        AbstractRenderSystem labelsProc = new FontRenderSystem(FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
         labelsProc.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SSO
-        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(RenderGroup.BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
+        AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
         billboardSSOProc.addPreRunnables(additiveBlendR, depthTestR);
 
         // MODEL ATMOSPHERE
-        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(RenderGroup.MODEL_ATM, alphas, mbAtmosphere, ModelRenderType.ATMOSPHERE) {
+        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(MODEL_ATM, alphas, mbAtmosphere, ModelRenderType.ATMOSPHERE) {
             @Override
             public float getAlpha(IRenderable s) {
                 return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
@@ -586,10 +754,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         };
 
         // MODEL CLOUDS
-        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(RenderGroup.MODEL_CLOUD, alphas, mbCloud, ModelRenderType.CLOUD);
+        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, mbCloud, ModelRenderType.CLOUD);
 
         // SHAPES
-        AbstractRenderSystem shapeProc = new ShapeRenderSystem(RenderGroup.SHAPE, alphas);
+        AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas);
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
         // Add components to set
@@ -696,7 +864,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             fb = glowFb;
         if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && fb != null) {
             // Get all billboard stars
-            List<IRenderable> bbStars = render_lists.get(RenderGroup.BILLBOARD_STAR.ordinal());
+            List<IRenderable> bbStars = render_lists.get(BILLBOARD_STAR.ordinal());
 
             stars.clear();
             for (IRenderable st : bbStars) {
@@ -707,8 +875,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
 
             // Get all models
-            List<IRenderable> models = render_lists.get(RenderGroup.MODEL_PIX.ordinal());
-            List<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
+            List<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
+            List<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers
             if (GlobalConf.runtime.OPENVR) {
@@ -926,8 +1094,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
              * shadow if different</li>
              * </ul>
              */
-            List<IRenderable> models = render_lists.get(RenderGroup.MODEL_PIX.ordinal());
-            List<IRenderable> modelsTess = render_lists.get(RenderGroup.MODEL_PIX_TESS.ordinal());
+            List<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
+            List<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(a -> ((AbstractPositionEntity) a).getDistToCamera()));
 
             int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP_MODE ? 6 : 1;
@@ -1037,7 +1205,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * finished.
      */
     public void clearLists() {
-        for (RenderGroup rg : RenderGroup.values()) {
+        for (RenderGroup rg : values()) {
             render_lists.get(rg.ordinal()).clear();
         }
     }
@@ -1280,11 +1448,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem sys;
         if (GlobalConf.scene.isNormalLineRenderer()) {
             // Normal
-            sys = new LineRenderSystem(RenderGroup.LINE, alphas, lineShaders);
+            sys = new LineRenderSystem(LINE, alphas, lineShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
         } else {
             // Quad
-            sys = new LineQuadRenderSystem(RenderGroup.LINE, alphas, lineQuadShaders);
+            sys = new LineQuadRenderSystem(LINE, alphas, lineQuadShaders);
             sys.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         }
         return sys;

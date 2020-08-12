@@ -11,6 +11,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.ICamera;
@@ -26,6 +27,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
 
 /**
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper
@@ -176,7 +179,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     public void addToRenderLists(ICamera camera, OctreeNode octant) {
         if (GlobalConf.runtime.DRAW_OCTREE && octant.observed && this.opacity > 0) {
-            boolean added = addToRender(octant, RenderGroup.LINE);
+            boolean added = addToRender(octant, LINE);
 
             if (added)
                 for (int i = 0; i < 8; i++) {

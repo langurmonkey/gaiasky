@@ -5,7 +5,6 @@
 
 package gaiasky.data;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
@@ -25,7 +24,6 @@ import gaiasky.util.tree.OctreeNode;
 import uk.ac.starlink.util.DataSource;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;

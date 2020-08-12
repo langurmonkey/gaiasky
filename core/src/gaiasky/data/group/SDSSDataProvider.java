@@ -5,7 +5,6 @@
 
 package gaiasky.data.group;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;

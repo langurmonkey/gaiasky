@@ -7,7 +7,7 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.SceneGraphNode.RenderGroup;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;

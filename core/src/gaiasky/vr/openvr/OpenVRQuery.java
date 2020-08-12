@@ -5,27 +5,17 @@
 
 package gaiasky.vr.openvr;
 
-import static org.lwjgl.openvr.VR.ETrackedDeviceProperty_Prop_ModelNumber_String;
-import static org.lwjgl.openvr.VR.ETrackedDeviceProperty_Prop_SerialNumber_String;
-import static org.lwjgl.openvr.VR.VR_GetVRInitErrorAsEnglishDescription;
-import static org.lwjgl.openvr.VR.VR_GetVRInitErrorAsSymbol;
-import static org.lwjgl.openvr.VR.VR_InitInternal;
-import static org.lwjgl.openvr.VR.VR_IsHmdPresent;
-import static org.lwjgl.openvr.VR.VR_IsRuntimeInstalled;
-import static org.lwjgl.openvr.VR.VR_RuntimePath;
-import static org.lwjgl.openvr.VR.VR_ShutdownInternal;
-import static org.lwjgl.openvr.VR.k_unTrackedDeviceIndex_Hmd;
-import static org.lwjgl.openvr.VRSystem.VRSystem_GetRecommendedRenderTargetSize;
-import static org.lwjgl.openvr.VRSystem.VRSystem_GetStringTrackedDeviceProperty;
-import static org.lwjgl.system.MemoryStack.stackPush;
-
-import java.nio.IntBuffer;
-
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import org.lwjgl.openvr.OpenVR;
 import org.lwjgl.system.MemoryStack;
 
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
+import java.nio.IntBuffer;
+
+import static org.lwjgl.openvr.VR.*;
+import static org.lwjgl.openvr.VRSystem.VRSystem_GetRecommendedRenderTargetSize;
+import static org.lwjgl.openvr.VRSystem.VRSystem_GetStringTrackedDeviceProperty;
+import static org.lwjgl.system.MemoryStack.stackPush;
 
 public class OpenVRQuery {
     private static final Log logger = Logger.getLogger(OpenVRQuery.class);

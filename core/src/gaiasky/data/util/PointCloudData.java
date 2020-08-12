@@ -6,7 +6,6 @@
 package gaiasky.data.util;
 
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;

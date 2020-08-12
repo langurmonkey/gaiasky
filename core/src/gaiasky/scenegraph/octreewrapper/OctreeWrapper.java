@@ -5,7 +5,6 @@
 
 package gaiasky.scenegraph.octreewrapper;
 
-import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;

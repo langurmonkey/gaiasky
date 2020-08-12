@@ -5,7 +5,6 @@
 
 package gaiasky.data.octreegen.generator;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.octreegen.StarBrightnessComparator;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;

@@ -19,13 +19,20 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.*;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.comp.CelestialBodyComparator;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnScrollPane;
+import gaiasky.util.scene2d.OwnTextField;
 
 public class ObjectsComponent extends GuiComponent implements IObserver {
     private static final Log logger = Logger.getLogger(ObjectsComponent.class);

@@ -6,7 +6,6 @@
 package gaiasky.util.coord.vsop87;
 
 import gaiasky.util.Constants;
-import gaiasky.util.Nature;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;

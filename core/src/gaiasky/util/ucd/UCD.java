@@ -5,8 +5,6 @@
 
 package gaiasky.util.ucd;
 
-import java.util.Objects;
-
 /**
  * Very naive class that represents and UCD and does the parsing.
  * @author tsagrista

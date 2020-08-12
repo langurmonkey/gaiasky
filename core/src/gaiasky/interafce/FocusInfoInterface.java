@@ -25,7 +25,10 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.scene2d.OwnImageButton;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 /**
  * Part of the user interface which holds the information on the current focus

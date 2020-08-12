@@ -8,13 +8,13 @@ package gaiasky.render;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.Disposable;
-import gaiasky.desktop.render.DesktopPostProcessor;
 import gaiasky.util.Logger;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.effects.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public interface IPostProcessor extends Disposable {
     String DEFAULT_KEY = "%default%";

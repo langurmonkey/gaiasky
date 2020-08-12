@@ -2,16 +2,12 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.data.ISceneGraphLoader;
-import gaiasky.data.group.IParticleGroupDataProvider;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
 import uk.ac.starlink.util.DataSource;
-
-import java.io.InputStream;
 
 /**
  * Represents a generic catalog of entities.

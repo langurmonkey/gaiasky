@@ -14,7 +14,6 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gaia.Attitude;
 import gaiasky.util.gaia.GaiaAttitudeServer;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
