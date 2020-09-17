@@ -56,8 +56,8 @@ public class GlobalConf {
     public static String APPLICATION_NAME = "Gaia Sky";
     public static String APPLICATION_NAME_TITLE = "G a i a   S k y";
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
-    public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
-    public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
+    public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky";
+    public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads";
     public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest";
     public static final String REPOSITORY = "https://gitlab.com/langurmonkey/gaiasky";
     public static final String ICON_URL;
