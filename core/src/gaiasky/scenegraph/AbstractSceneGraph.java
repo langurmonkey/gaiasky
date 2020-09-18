@@ -192,7 +192,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                     if (!map.containsKey(namelc)) {
                         map.put(namelc, node);
                     } else if (!namelc.isEmpty()) {
-                        logger.warn("Name conflict: " + namelc + " already exists in index");
+                        SceneGraphNode conflict = map.get(namelc);
+                        logger.warn("Name conflict: " + name + " (" + node.getClass().getSimpleName().toLowerCase() + ") conflicts with " + conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")");
                     }
                 }
 
