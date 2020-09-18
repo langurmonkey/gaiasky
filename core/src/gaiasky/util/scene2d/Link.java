@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.util.GlobalResources;
 
 /**
@@ -55,14 +56,23 @@ public class Link extends Label {
     }
 
     private void initialize() {
+        // Fix touchUp issue
+        this.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return super.touchDown(event, x, y, pointer, button);
+            }
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getButton() == Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
+                    Gdx.net.openURI(linkURL);
+
+                // Bubble up
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
         this.addListener(event -> {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();
-                // Click
-                if (type == Type.touchUp && ((InputEvent) event).getButton() == Buttons.LEFT) {
-                    if (linkURL != null && !linkURL.isEmpty())
-                        Gdx.net.openURI(linkURL);
-                } else if (type == Type.enter) {
+                if (type == Type.enter) {
                     Gdx.graphics.setCursor(GlobalResources.linkCursor);
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
