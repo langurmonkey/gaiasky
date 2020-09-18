@@ -4,7 +4,7 @@
 [![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
 
-[**Gaia Sky**](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky) is a real-time 3D Universe application that
+[**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that
 runs on Linux, Windows and macOS. It is developed in the framework of
 [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://sci.esa.int/gaia) to chart about 1 billion stars of our Galaxy.
 
@@ -14,7 +14,7 @@ A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Cata
 
 To get the latest up-to-date and most complete information,
 
-*  Visit our [**home page**](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky)
+*  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
 *  Read the [**Documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 *  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
@@ -44,9 +44,9 @@ This file contains the following sections:
 
 ### 2. Pre-built packages
 
-This is the Gaia Sky source repository. We recommend using the [pre-built packages](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads)
+This is the Gaia Sky source repository. We recommend using the [pre-built packages](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads)
 for the different Operating Systems in case you want a stable and hassle-free experience. We offer prebuilt packages for Linux, macOS or 
-Windows [here](https://zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky/downloads/).
+Windows [here](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads/).
 
 
 ### 3. Running from source repository
@@ -116,7 +116,7 @@ or visiting https://opensource.org/licenses/MPL-2.0.
 ##  6. Contact information
 
 The main webpage of the project is
-**[https://www.zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky](https://www.zah.uni-heidelberg.de/institutes/ari/gaia/outreach/gaiasky)**. There you can find
+**[https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky](https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky)**. There you can find
 the latest versions and the latest information on Gaia Sky.
 
 ##  7. Acknowledgements
