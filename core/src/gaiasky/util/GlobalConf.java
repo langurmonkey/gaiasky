@@ -1958,7 +1958,7 @@ public class GlobalConf {
     }
 
     public static String getShortApplicationName() {
-        return APPLICATION_SHORT_NAME + program.getNetName() + " " + version.version + " (" + version.build + ")";
+        return APPLICATION_SHORT_NAME + program.getNetName() + " " + version.version + " (build " + version.build + ")";
     }
 
     public static String getSuperShortApplicationName() {

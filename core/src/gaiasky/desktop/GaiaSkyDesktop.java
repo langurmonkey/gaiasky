@@ -42,8 +42,10 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,15 +58,15 @@ public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
 
     /*
-    * Source version to compare to config file and datasets.
-    * This is usually tag where each chunk takes 2 spaces.
-    * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
-    * Version = major * 10000 + minor * 100 + rev
-    * So 1.2.5 -> 10205
-    *    2.1.7 -> 20107
-    *
-    * Leading zeroes are omitted to avoid octal literal interpretation.
-    */
+     * Source version to compare to config file and datasets.
+     * This is usually tag where each chunk takes 2 spaces.
+     * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
+     * Version = major * 10000 + minor * 100 + rev
+     * So 1.2.5 -> 10205
+     *    2.1.7 -> 20107
+     *
+     * Leading zeroes are omitted to avoid octal literal interpretation.
+     */
     public static int SOURCE_VERSION = 20301;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
@@ -78,32 +80,24 @@ public class GaiaSkyDesktop implements IObserver {
      * Program arguments
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
-        private boolean help = false;
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
 
-        @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
-        private boolean version = false;
+        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
+        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiart = false;
 
-        @Parameter(names = {"-d", "--ds-download"}, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2)
-        private boolean download = false;
+        @Parameter(names = { "-d", "--ds-download" }, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2) private boolean download = false;
 
-        @Parameter(names = {"-c", "--cat-chooser"}, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3)
-        private boolean catalogChooser = false;
+        @Parameter(names = { "-c", "--cat-chooser" }, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3) private boolean catalogChooser = false;
 
-        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
-        private String propertiesFile = null;
+        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
 
-        @Parameter(names = {"-a", "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
-        private String assetsLocation = null;
+        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5) private String assetsLocation = null;
 
-        @Parameter(names = {"-vr", "--openvr"}, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6)
-        private boolean vr = false;
+        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6) private boolean vr = false;
 
-        @Parameter(names = {"-e", "--externalview"}, description = "Create a window with a view of the scene and no UI.", order = 7)
-        private boolean externalView = false;
+        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
 
-        @Parameter(names = {"-n", "--noscript"}, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
-        private boolean noScriptingServer = false;
+        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
     }
 
     /**
@@ -198,9 +192,25 @@ public class GaiaSkyDesktop implements IObserver {
 
             if (gsArgs.version) {
                 System.out.println(GlobalConf.getShortApplicationName());
-                System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
+                if (gsArgs.asciiart) {
+                    BufferedReader ascii = new BufferedReader(new InputStreamReader(Gdx.files.internal("icon/gsascii.txt").read()));
+                    System.out.println();
+                    String line = null;
+                    while ((line = ascii.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
                 System.out.println();
-                System.out.println("Written by Toni Sagrista Selles <tsagrista@ari.uni-heidelberg.de>");
+                System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
+                System.out.println("Written by " + GlobalConf.AUTHOR_NAME + " <" + GlobalConf.AUTHOR_EMAIL + ">");
+                System.out.println();
+                System.out.println(I18n.txt("gui.help.javaversion").toLowerCase() + ": " + System.getProperty("java.vm.version"));
+                System.out.println(I18n.txt("gui.help.javavmname").toLowerCase() + ": " + System.getProperty("java.vm.name"));
+                System.out.println();
+                System.out.println("gaiasky homepage  <" + GlobalConf.WEBPAGE + ">");
+                System.out.println("docs              <" + GlobalConf.DOCUMENTATION + ">");
+                System.out.println();
+                System.out.println("ZAH/DLR/BWT/DPAC");
                 return;
             }
 
@@ -347,31 +357,31 @@ public class GaiaSkyDesktop implements IObserver {
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-            case SCENE_GRAPH_LOADED:
-                if (REST_ENABLED) {
-                    /*
-                     * Notify REST server that GUI is loaded and everything should be in a
-                     * well-defined state
-                     */
-                    try {
-                        RESTServer.activate();
-                    } catch (SecurityException | IllegalArgumentException e) {
-                        logger.error(e);
-                    }
+        case SCENE_GRAPH_LOADED:
+            if (REST_ENABLED) {
+                /*
+                 * Notify REST server that GUI is loaded and everything should be in a
+                 * well-defined state
+                 */
+                try {
+                    RESTServer.activate();
+                } catch (SecurityException | IllegalArgumentException e) {
+                    logger.error(e);
                 }
-                break;
-            case DISPOSE:
-                if (REST_ENABLED) {
-                    /* Shutdown REST server thread on termination */
-                    try {
-                        RESTServer.dispose();
-                    } catch (SecurityException | IllegalArgumentException e) {
-                        logger.error(e);
-                    }
+            }
+            break;
+        case DISPOSE:
+            if (REST_ENABLED) {
+                /* Shutdown REST server thread on termination */
+                try {
+                    RESTServer.dispose();
+                } catch (SecurityException | IllegalArgumentException e) {
+                    logger.error(e);
                 }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -447,7 +457,6 @@ public class GaiaSkyDesktop implements IObserver {
             return false;
         }
     }
-
 
     /**
      * Checks for incompatibilities between the java version and the OS. Prints the necessary warnings for known issues.

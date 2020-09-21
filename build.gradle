@@ -171,6 +171,7 @@ project(":core") {
             include "font/font-titles.png"
             include "icon/gs_icon.png"
             include "icon/gsvr_icon.png"
+            include "icon/gsascii.txt"
             include "img/**"
             include "text/**"
             exclude "img/splash"

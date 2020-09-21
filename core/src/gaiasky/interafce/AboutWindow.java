@@ -166,11 +166,11 @@ public class AboutWindow extends GenericDialog {
         Label authorname = new OwnLabel(GlobalConf.AUTHOR_NAME, skin);
         Link authormail = new Link(GlobalConf.AUTHOR_EMAIL, linkStyle, "mailto:" + GlobalConf.AUTHOR_EMAIL);
         Link authorpage = new Link("www.tonisagrista.com", linkStyle, "https://tonisagrista.com");
-        Link authortwitter = new Link("@jumpinglangur", linkStyle, "https://twitter.com/jumpinglangur");
+        Link authormasto = new Link("@jumpinglangur@mastodont.cat", linkStyle, "https://mastodont.cat/@jumpinglangur");
         author.add(authorname).left().row();
         author.add(authormail).left().row();
         author.add(authorpage).left().row();
-        author.add(authortwitter).left().row();
+        author.add(authormasto).left().row();
 
         // Contributor
         Label contribtitle = new OwnLabel(I18n.txt("gui.help.contributors"), skin);
