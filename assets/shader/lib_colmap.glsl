@@ -286,7 +286,6 @@ vec3 colormap_hotmetal(float x) {
 }
 
 // REGULAR RAINBOW
-
 vec3 colormap_rainbow(float x) {
     float r = 0.0, g = 0.0, b = 0.0;
 
