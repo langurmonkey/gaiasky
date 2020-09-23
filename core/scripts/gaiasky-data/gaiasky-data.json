@@ -296,7 +296,7 @@
       ],
       "sha256": "0e671cb3fc9490a9f175f692186875a8588ce7ce3e58bdc35b49157b30497364",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.2 and above. Contains the Solar System, constellations, meshes and more",
-      "releasenotes": "Increase number of gas particles in Milky Way, and tweak their color",
+      "releasenotes": "Increase number of gas particles in Milky Way, and tweak their color.",
       "file": "@mirror-url@basedata/006_20191104/gaiasky_data.tar.gz"
     },
     {
@@ -361,8 +361,8 @@
       "name": "default-data",
       "type": "data-pack",
       "version": 8,
-      "mingsversion": 20300,
-      "size": 102527786,
+      "mingsversion": 20206,
+      "size": 63734321,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -410,10 +410,68 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "39b6f63c788f15b769c0aa90d976bad664c0750e65c5483b09e0223908dc13a5",
+      "sha256": "258baeeb68db796dc524ba7fad6b244ff35d6608bc527b6102b8078ea95157ed",
+      "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.6 and above. Contains the Solar System, constellations, meshes and more",
+      "releasenotes": "Add new Milky Way skymaps and fix Mars atmospheric scattering parameters.",
+      "file": "@mirror-url@basedata/008_20200923/gaiasky_data.tar.gz"
+    },
+    {
+      "name": "default-data",
+      "type": "data-pack",
+      "version": 10,
+      "mingsversion": 20300,
+      "size": 109572286,
+      "check": "data-main.json",
+      "data": [
+        "asteroids-dr2.json",
+        "asteroids.json",
+        "attitudexml",
+        "constellations",
+        "countries",
+        "data-main.json",
+        "extra.json",
+        "galaxy",
+        "locations-earth.json",
+        "locations.json",
+        "locations-moon.json",
+        "meshes/dr2/meshes_dust",
+        "meshes/dr2/meshes_hii",
+        "models",
+        "moons.json",
+        "autoload-meshes-dr2-dust.json",
+        "autoload-meshes-dr2-hii.json",
+        "oort",
+        "orbit",
+        "orbits-asteroid.json",
+        "orbits-asteroids-dr2.json",
+        "orbits-moon.json",
+        "orbits-planet.json",
+        "orbits-satellite.json",
+        "planets.json",
+        "satellites.json",
+        "tex/base/*-low.jpg",
+        "tex/base/*-med.jpg",
+        "tex/base/*-low.png",
+        "tex/base/*-med.png",
+        "tex/base/all-mild-specular.jpg",
+        "tex/base/attitudeindicator.png",
+        "tex/base/cluster-tex.png",
+        "tex/base/debug-color.jpg",
+        "tex/base/debug-height.jpg",
+        "tex/base/lenscolor.png",
+        "tex/base/lensstarburst.jpg",
+        "tex/base/lut.jpg",
+        "tex/base/sso.png",
+        "tex/base/star.jpg",
+        "tex/base/static.jpg",
+        "tex/base/telescopebeam.png",
+        "tex/base/mw-sprites",
+        "tex/skybox/gaiasky"
+      ],
+      "sha256": "348863755ca437eb0cde40c13590209c150ede0a37ee920bf32a639eb1de3c18",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
-      "releasenotes": "Add new Milky Way model by Stefan Payne-Wardenaar, adapted and ready for different graphics quality settings.",
-      "file": "@mirror-url@basedata/008_20200717/gaiasky_data.tar.gz"
+      "releasenotes": "Add new Milky Way model by Stefan Payne-Wardenaar, adapted and ready for different graphics quality settings. Add new Milky Way skymaps and fix Mars atmospheric scattering parameters.",
+      "file": "@mirror-url@basedata/010_20200923/gaiasky_data.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -424,7 +482,7 @@
       "data": [
         "tex/*-high.jpg"
       ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
       "md5sum": "4a33a91e16d799645960294dd7c4c179",
       "file": "@mirror-url@tex/000_20180904/hi-res-texture-pack.tar.gz"
     },
@@ -439,7 +497,7 @@
         "hi-res-tex-desc.json",
         "tex/base/*-high.jpg"
       ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
       "md5": "7e480c26e0126336b5776d2c26be466d",
       "file": "@mirror-url@tex/001_20181129/hi-res-texture-pack.tar.gz"
     },
@@ -457,7 +515,7 @@
         "tex/base/*-high.png",
         "tex/base/*-ultra.png"
       ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
       "sha256": "e620090efc6464422d2468abf795d246ef489b46f7d97f0bc7294aad099bb93c",
       "file": "@mirror-url@tex/002_20190614_v020200/hi-res-texture-pack.tar.gz"
     },
@@ -475,7 +533,7 @@
         "tex/base/*-high.png",
         "tex/base/*-ultra.png"
       ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
       "sha256": "08d9b3300ad356c7e29683dd87d67542d2b5394174a7afc723bffae0a64f6a4d",
       "file": "@mirror-url@tex/003_20191014/hi-res-texture-pack.tar.gz"
     },
@@ -493,10 +551,29 @@
         "tex/base/*-high.png",
         "tex/base/*-ultra.png"
       ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids.",
-      "releasenotes": "Add high resolution base and normal textures for Ceres and Pluto, remove hi-res star textures",
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
+      "releasenotes": "Add high resolution base and normal textures for Ceres and Pluto, remove hi-res star textures.",
       "sha256": "50dc78c2a840589303e7f124573748bd49d75bc7eaa618ba3da081868d288d85",
       "file": "@mirror-url@tex/004_20200423/hi-res-texture-pack.tar.gz"
+    },
+    {
+      "name": "hi-res-textures",
+      "type": "texture-pack",
+      "version": 5,
+      "mingsversion": 20206,
+      "size": 277955368,
+      "check": "hi-res-tex-desc.json",
+      "data": [
+        "hi-res-tex-desc.json",
+        "tex/base/*-high.jpg",
+        "tex/base/*-ultra.jpg",
+        "tex/base/*-high.png",
+        "tex/base/*-ultra.png"
+      ],
+      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
+      "releasenotes": "Add high- and ultra-resolution Milky Way skymaps.",
+      "sha256": "3da40544242cc34055e80831700d2dae4a2b82d5328195265ab216389c33d76b",
+      "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "catalog-dr2-verysmall",
