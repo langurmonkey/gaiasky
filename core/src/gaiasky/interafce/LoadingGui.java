@@ -34,7 +34,7 @@ import java.math.BigInteger;
  * @author Toni Sagrista
  */
 public class LoadingGui extends AbstractGui {
-    protected Table center, bottomRight, bottomLeft;
+    protected Table center, topLeft, bottomMiddle;
     protected Container<Button> screenMode;
 
     public NotificationsInterface notificationsInterface;
@@ -102,18 +102,18 @@ public class LoadingGui extends AbstractGui {
         tipGenerator = new TipGenerator(skin);
         tip = new HorizontalGroup();
         tip.space(pad10);
-        bottomLeft = new Table();
-        bottomLeft.setFillParent(true);
-        bottomLeft.left().bottom();
-        bottomLeft.padLeft(pad30).padBottom(pad10);
-        bottomLeft.add(tip);
+        bottomMiddle = new Table();
+        bottomMiddle.setFillParent(true);
+        bottomMiddle.center().bottom();
+        bottomMiddle.padLeft(pad30).padBottom(pad10);
+        bottomMiddle.add(tip);
 
         // Version and build
-        bottomRight = new Table();
-        bottomRight.setFillParent(true);
-        bottomRight.right().bottom();
-        bottomRight.pad(pad10);
-        bottomRight.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
+        topLeft = new Table();
+        topLeft.setFillParent(true);
+        topLeft.left().top();
+        topLeft.pad(pad10);
+        topLeft.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
 
         // SCREEN MODE BUTTON - TOP RIGHT
         screenMode = new Container<>();
@@ -206,8 +206,8 @@ public class LoadingGui extends AbstractGui {
             ui.clear();
             ui.addActor(screenMode);
             ui.addActor(center);
-            ui.addActor(bottomLeft);
-            ui.addActor(bottomRight);
+            ui.addActor(bottomMiddle);
+            ui.addActor(topLeft);
         }
     }
 
