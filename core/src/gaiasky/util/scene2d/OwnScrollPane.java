@@ -67,7 +67,7 @@ public class OwnScrollPane extends ScrollPane {
                     return this.getStage().setScrollFocus(null);
                 }
             }
-            return true;
+            return false;
         });
     }
 
