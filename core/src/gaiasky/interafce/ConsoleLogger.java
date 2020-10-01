@@ -41,6 +41,10 @@ public class ConsoleLogger implements IObserver {
         this(true);
     }
 
+    public void setUseHistorical(boolean useHistorical) {
+        this.useHistorical = useHistorical;
+    }
+
     /**
      * Initializes the notifications interface.
      *
