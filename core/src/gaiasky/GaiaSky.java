@@ -85,7 +85,6 @@ import java.util.*;
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
 
-
     /**
      * Current render process.
      * One of {@link #runnableInitialGui}, {@link #runnableLoadingGui} or {@link #runnableRender}.
@@ -193,6 +192,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public boolean windowCreated = false;
 
     /**
+     * Set log level to debug
+     */
+    private boolean debugMode;
+
+    /**
      * Whether to attempt a connection to the VR HMD
      */
     private boolean vr;
@@ -237,7 +241,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Creates an instance of Gaia Sky.
      */
     public GaiaSky() {
-        this(false, false, false, false, false);
+        this(false, false, false, false, false, false);
     }
 
     /**
@@ -247,10 +251,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param catchooser   Force-show the catalog chooser window
      * @param vr           Launch in VR mode
      * @param externalView Open a new window with a view of the rendered scene
+     * @param debugMode    Output debug information
      */
-    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView, boolean noScriptingServer) {
+    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView, boolean noScriptingServer, boolean debugMode) {
         super();
         instance = this;
+        this.debugMode = debugMode;
         this.runnables = new Array<>();
         this.runnablesMap = new HashMap<>();
         this.vr = vr;
@@ -265,8 +271,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void create() {
         startTime = TimeUtils.millis();
-        Gdx.app.setLogLevel(Application.LOG_INFO);
-        clogger = new ConsoleLogger(true, true);
+        // Log level
+        Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
+        Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
+
+        clogger = new ConsoleLogger();
+
+        if (debugMode)
+            logger.debug("Logging level set to DEBUG");
 
         // Init graphics and window
         graphics = (Lwjgl3Graphics) Gdx.graphics;
@@ -580,7 +592,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         for (IGui gui : guis)
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
-        if(GlobalConf.runtime.OPENVR){
+        if (GlobalConf.runtime.OPENVR) {
             resize(vrContext.getWidth(), vrContext.getHeight());
         }
 
@@ -641,9 +653,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[]{0, 5 * Constants.AU_TO_U, 0});
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[]{0, -1, 0});
-            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[]{0, 0, 1});
+            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
+            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
+            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0, 0, 1 });
         }
     }
 
@@ -669,15 +681,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui();
         stereoGui.initialize(manager);
 
-        //controllerGui = new ControllerGui();
-        //controllerGui.initialize(manager);
+        controllerGui = new ControllerGui();
+        controllerGui.initialize(manager);
 
         if (guis != null) {
             guis.add(mainGui);
             guis.add(debugGui);
             guis.add(spacecraftGui);
             guis.add(stereoGui);
-            //guis.add(controllerGui);
+            guis.add(controllerGui);
         }
     }
 
@@ -710,8 +722,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         GuiRegistry.registerGui(debugGui);
         GuiRegistry.addProcessor(debugGui);
 
-        //GuiRegistry.registerGui(controllerGui);
-        //GuiRegistry.addProcessor(controllerGui);
+        GuiRegistry.registerGui(controllerGui);
+        GuiRegistry.addProcessor(controllerGui);
     }
 
     @Override
@@ -1125,152 +1137,152 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case LOAD_DATA_CMD:
-                // Init components that need assets in data folder
-                reinitialiseGUI1();
-                pp.initialize(manager);
+        case LOAD_DATA_CMD:
+            // Init components that need assets in data folder
+            reinitialiseGUI1();
+            pp.initialize(manager);
 
-                // Initialise loading screen
-                loadingGui = new LoadingGui(vr);
-                loadingGui.initialize(manager);
+            // Initialise loading screen
+            loadingGui = new LoadingGui(vr);
+            loadingGui.initialize(manager);
 
-                Gdx.input.setInputProcessor(loadingGui.getGuiStage());
+            Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
-                // Also VR
-                if (GlobalConf.runtime.OPENVR) {
-                    loadingGuiVR = new VRGui(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f));
-                    loadingGuiVR.initialize(manager);
+            // Also VR
+            if (GlobalConf.runtime.OPENVR) {
+                loadingGuiVR = new VRGui(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f));
+                loadingGuiVR.initialize(manager);
+            }
+
+            this.renderProcess = runnableLoadingGui;
+
+            /* LOAD SCENE GRAPH */
+            if (sg == null) {
+                dataLoadString = "SceneGraphData";
+                String[] dataFilesToLoad = new String[GlobalConf.data.CATALOG_JSON_FILES.size + 1];
+                // Prepare files to load
+                int i = 0;
+                for (String dataFile : GlobalConf.data.CATALOG_JSON_FILES) {
+                    dataFilesToLoad[i] = dataFile;
+                    i++;
                 }
+                dataFilesToLoad[i] = GlobalConf.data.OBJECTS_JSON_FILES;
+                manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad, time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
+            }
+            break;
+        case TOGGLE_AMBIENT_LIGHT:
+            // TODO No better place to put this??
+            ModelComponent.toggleAmbientLight((Boolean) data[1]);
+            break;
+        case AMBIENT_LIGHT_CMD:
+            ModelComponent.setAmbientLight((float) data[0]);
+            break;
+        case RECORD_CAMERA_CMD:
+            if (data != null && data.length > 0) {
+                camRecording = (Boolean) data[0];
+            } else {
+                camRecording = !camRecording;
+            }
+            break;
+        case CAMERA_MODE_CMD:
+            // Register/unregister GUI
+            CameraMode mode = (CameraMode) data[0];
+            if (GlobalConf.program.isStereoHalfViewport()) {
+                GuiRegistry.change(stereoGui);
+            } else if (mode == CameraMode.SPACECRAFT_MODE) {
+                GuiRegistry.change(spacecraftGui);
+            } else {
+                GuiRegistry.change(mainGui);
+            }
+            break;
+        case STEREOSCOPIC_CMD:
+            boolean stereoMode = (Boolean) data[0];
+            if (stereoMode && GuiRegistry.current != stereoGui) {
+                GuiRegistry.change(stereoGui);
+            } else if (!stereoMode && GuiRegistry.previous != stereoGui) {
+                IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
+                GuiRegistry.change(GuiRegistry.previous, prev);
+            }
 
-                this.renderProcess = runnableLoadingGui;
+            // Post a message to the screen
+            if (stereoMode) {
+                ModePopupInfo mpi = new ModePopupInfo();
+                mpi.title = "Stereoscopic mode";
+                mpi.header = "You have entered Stereoscopic mode!";
+                mpi.addMapping("Back to normal mode", "CTRL", "S");
+                mpi.addMapping("Switch stereo profile", "CTRL", "SHIFT", "S");
 
-                /* LOAD SCENE GRAPH */
-                if (sg == null) {
-                    dataLoadString = "SceneGraphData";
-                    String[] dataFilesToLoad = new String[GlobalConf.data.CATALOG_JSON_FILES.size + 1];
-                    // Prepare files to load
-                    int i = 0;
-                    for (String dataFile : GlobalConf.data.CATALOG_JSON_FILES) {
-                        dataFilesToLoad[i] = dataFile;
-                        i++;
-                    }
-                    dataFilesToLoad[i] = GlobalConf.data.OBJECTS_JSON_FILES;
-                    manager.load(dataLoadString, ISceneGraph.class, new SGLoaderParameter(dataFilesToLoad, time, GlobalConf.performance.MULTITHREADING, GlobalConf.performance.NUMBER_THREADS()));
-                }
-                break;
-            case TOGGLE_AMBIENT_LIGHT:
-                // TODO No better place to put this??
-                ModelComponent.toggleAmbientLight((Boolean) data[1]);
-                break;
-            case AMBIENT_LIGHT_CMD:
-                ModelComponent.setAmbientLight((float) data[0]);
-                break;
-            case RECORD_CAMERA_CMD:
-                if (data != null && data.length > 0) {
-                    camRecording = (Boolean) data[0];
-                } else {
-                    camRecording = !camRecording;
-                }
-                break;
-            case CAMERA_MODE_CMD:
-                // Register/unregister GUI
-                CameraMode mode = (CameraMode) data[0];
-                if (GlobalConf.program.isStereoHalfViewport()) {
-                    GuiRegistry.change(stereoGui);
-                } else if (mode == CameraMode.SPACECRAFT_MODE) {
-                    GuiRegistry.change(spacecraftGui);
-                } else {
-                    GuiRegistry.change(mainGui);
-                }
-                break;
-            case STEREOSCOPIC_CMD:
-                boolean stereoMode = (Boolean) data[0];
-                if (stereoMode && GuiRegistry.current != stereoGui) {
-                    GuiRegistry.change(stereoGui);
-                } else if (!stereoMode && GuiRegistry.previous != stereoGui) {
-                    IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
-                    GuiRegistry.change(GuiRegistry.previous, prev);
-                }
+                EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "stereo", 120f);
+            } else {
+                EventManager.instance.post(Events.MODE_POPUP_CMD, null, "stereo");
+            }
 
-                // Post a message to the screen
-                if (stereoMode) {
-                    ModePopupInfo mpi = new ModePopupInfo();
-                    mpi.title = "Stereoscopic mode";
-                    mpi.header = "You have entered Stereoscopic mode!";
-                    mpi.addMapping("Back to normal mode", "CTRL", "S");
-                    mpi.addMapping("Switch stereo profile", "CTRL", "SHIFT", "S");
-
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "stereo", 120f);
-                } else {
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, null, "stereo");
-                }
-
-                break;
-            case SCREENSHOT_SIZE_UDPATE:
-            case FRAME_SIZE_UDPATE:
-                //GaiaSky.postRunnable(() -> {
-                //clearFrameBufferMap();
-                //});
-                break;
-            case SCENE_GRAPH_ADD_OBJECT_CMD:
-                final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
-                final boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
-                if (sg != null) {
-                    postRunnable(() -> {
-                        try {
-                            sg.insert(nodeToAdd, addToIndex);
-                        } catch (Exception e) {
-                            logger.error(e);
-                        }
-                    });
-                }
-                break;
-            case SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD:
-                final SceneGraphNode nodeToAddp = (SceneGraphNode) data[0];
-                final boolean addToIndexp = data.length == 1 ? true : (Boolean) data[1];
-                if (sg != null) {
+            break;
+        case SCREENSHOT_SIZE_UDPATE:
+        case FRAME_SIZE_UDPATE:
+            //GaiaSky.postRunnable(() -> {
+            //clearFrameBufferMap();
+            //});
+            break;
+        case SCENE_GRAPH_ADD_OBJECT_CMD:
+            final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
+            final boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
+                postRunnable(() -> {
                     try {
-                        sg.insert(nodeToAddp, addToIndexp);
+                        sg.insert(nodeToAdd, addToIndex);
                     } catch (Exception e) {
                         logger.error(e);
                     }
+                });
+            }
+            break;
+        case SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD:
+            final SceneGraphNode nodeToAddp = (SceneGraphNode) data[0];
+            final boolean addToIndexp = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
+                try {
+                    sg.insert(nodeToAddp, addToIndexp);
+                } catch (Exception e) {
+                    logger.error(e);
                 }
-                break;
-            case SCENE_GRAPH_REMOVE_OBJECT_CMD:
-                SceneGraphNode aux;
-                if (data[0] instanceof String) {
-                    aux = sg.getNode((String) data[0]);
-                    if (aux == null)
-                        return;
-                } else {
-                    aux = (SceneGraphNode) data[0];
-                }
-                final SceneGraphNode nodeToRemove = aux;
-                final boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
-                if (sg != null) {
-                    postRunnable(() -> {
-                        sg.remove(nodeToRemove, removeFromIndex);
-                    });
-                }
-                break;
-            case HOME_CMD:
-                goHome();
-                break;
-            case PARK_RUNNABLE:
-                synchronized (runnables) {
-                    String key = (String) data[0];
-                    Runnable runnable = (Runnable) data[1];
-                    parkRunnable(key, runnable);
-                }
-                break;
-            case UNPARK_RUNNABLE:
-                synchronized (runnables) {
-                    String key = (String) data[0];
-                    unparkRunnable(key);
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        case SCENE_GRAPH_REMOVE_OBJECT_CMD:
+            SceneGraphNode aux;
+            if (data[0] instanceof String) {
+                aux = sg.getNode((String) data[0]);
+                if (aux == null)
+                    return;
+            } else {
+                aux = (SceneGraphNode) data[0];
+            }
+            final SceneGraphNode nodeToRemove = aux;
+            final boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
+            if (sg != null) {
+                postRunnable(() -> {
+                    sg.remove(nodeToRemove, removeFromIndex);
+                });
+            }
+            break;
+        case HOME_CMD:
+            goHome();
+            break;
+        case PARK_RUNNABLE:
+            synchronized (runnables) {
+                String key = (String) data[0];
+                Runnable runnable = (Runnable) data[1];
+                parkRunnable(key, runnable);
+            }
+            break;
+        case UNPARK_RUNNABLE:
+            synchronized (runnables) {
+                String key = (String) data[0];
+                unparkRunnable(key);
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -1282,7 +1294,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Parks a runnable that will run every frame right the update() method (before render)
      * until it is unparked
-     * @param key The key to identify the runnable
+     *
+     * @param key      The key to identify the runnable
      * @param runnable The runnable
      */
     public void parkRunnable(String key, Runnable runnable) {
@@ -1292,6 +1305,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     /**
      * Unparks a previously parked runnable
+     *
      * @param key The key of the runnable to unpark
      */
     public void unparkRunnable(String key) {

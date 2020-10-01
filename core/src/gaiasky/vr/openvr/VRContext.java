@@ -492,9 +492,7 @@ public class VRContext implements Disposable {
             case VR.EVREventType_VREvent_DualAnalog_Cancel:
             case VR.EVREventType_VREvent_DualAnalog_ModeSwitch1:
             case VR.EVREventType_VREvent_DualAnalog_ModeSwitch2:
-                if (GlobalConf.controls.DEBUG_MODE) {
-                    getLogger(this.getClass()).info("Dual analog event: move/press/touch/unpress/untouch");
-                }
+                getLogger(this.getClass()).debug("Dual analog event: move/press/touch/unpress/untouch");
                 for (VRDeviceListener l : listeners)
                     l.event(event.eventType());
                 break;
@@ -561,7 +559,7 @@ public class VRContext implements Disposable {
 
         // Controller axes
         for (VRDevice device : devices) {
-            if(device != null && device.getType().equals(VRDeviceType.Controller)) {
+            if (device != null && device.getType().equals(VRDeviceType.Controller)) {
                 int n = device.axes != null ? device.axes.length : 5;
                 for (int axis = 0; axis < n; axis++) {
                     if (device.pollAxis(axis)) {
@@ -720,7 +718,7 @@ public class VRContext implements Disposable {
             }
 
             // Load default
-            if(model == null) {
+            if (model == null) {
                 logger.info("WARN: Could not find suitable controller model, using default...");
                 model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
             }
@@ -732,11 +730,11 @@ public class VRContext implements Disposable {
     }
 
     private boolean isControllerLeft(String name, String modelNumber, VRControllerRole role) {
-        return role == VRControllerRole.LeftHand ||  name.equals("renderLeftHand") || name.contains("_left") || modelNumber.contains("Left");
+        return role == VRControllerRole.LeftHand || name.equals("renderLeftHand") || name.contains("_left") || modelNumber.contains("Left");
     }
 
     private boolean isControllerRight(String name, String modelNumber, VRControllerRole role) {
-        return role == VRControllerRole.RightHand ||  name.equals("renderRightHand") || name.contains("_right") || modelNumber.contains("Right");
+        return role == VRControllerRole.RightHand || name.equals("renderRightHand") || name.contains("_right") || modelNumber.contains("Right");
     }
 
     /**

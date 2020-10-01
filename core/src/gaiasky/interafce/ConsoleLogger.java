@@ -16,6 +16,8 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 
@@ -33,23 +35,20 @@ public class ConsoleLogger implements IObserver {
     private static final String TAG_SEPARATOR = " - ";
     IDateFormat df;
     long msTimeout;
-    boolean writeDates;
     boolean useHistorical;
 
     public ConsoleLogger() {
-        this(true, true);
+        this(true);
     }
 
     /**
      * Initializes the notifications interface.
      *
-     * @param writeDates    Log the date and time.
      * @param useHistorical Keep logs.
      */
-    public ConsoleLogger(boolean writeDates, boolean useHistorical) {
+    private ConsoleLogger(boolean useHistorical) {
         this.msTimeout = DEFAULT_TIMEOUT;
         this.useHistorical = useHistorical;
-        this.writeDates = writeDates;
 
         try {
             this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
@@ -69,41 +68,32 @@ public class ConsoleLogger implements IObserver {
 
     private void addMessage(String msg) {
         Instant date = Instant.now();
-        log(df.format(date), msg, false);
+        log(df.format(date), msg, LoggerLevel.INFO);
         if (useHistorical) {
             NotificationsInterface.historical.add(new MessageBean(date, msg));
         }
     }
 
-    private void addMessage(String msg, boolean debug) {
+    private void addMessage(String msg, LoggerLevel level) {
         Instant date = Instant.now();
-        log(df.format(date), msg, debug);
+        String lvl = level.equals(LoggerLevel.DEBUG) ? " DEBUG" : "";
+        log(df.format(date) + lvl, msg, level);
         if (useHistorical) {
             NotificationsInterface.historical.add(new MessageBean(date, msg));
         }
     }
 
-    private void log(String date, String msg, boolean debug) {
+    private void log(String tag, String msg, LoggerLevel level) {
+        boolean debug = level.equals(LoggerLevel.DEBUG);
         if (Gdx.app != null) {
             if (debug) {
-                if (writeDates)
-                    Gdx.app.debug(date, msg);
-                else
-                    Gdx.app.debug(this.getClass().getSimpleName(), msg);
+                Gdx.app.debug(tag, msg);
             } else {
-                if (writeDates)
-                    Gdx.app.log(date, msg);
-                else
-                    Gdx.app.log(this.getClass().getSimpleName(), msg);
+                Gdx.app.log(tag, msg);
             }
         } else {
-            if (writeDates) {
-                if (!debug)
-                    System.out.println("[" + date + "] " + msg);
-            } else {
-                if (!debug)
-                    System.out.println(msg);
-            }
+            if (Logger.level.ordinal() >= level.ordinal())
+                System.out.println("[" + tag + "] " + msg);
         }
     }
 
@@ -111,17 +101,19 @@ public class ConsoleLogger implements IObserver {
     public void notify(final Events event, final Object... data) {
         switch (event) {
         case POST_NOTIFICATION:
+            LoggerLevel level = (LoggerLevel) data[0];
+            Object[] dat = (Object[]) data[1];
             String message = "";
-            for (int i = 0; i < data.length; i++) {
-                if (i == data.length - 1 && data[i] instanceof Boolean) {
+            for (int i = 0; i < dat.length; i++) {
+                if (i == dat.length - 1 && dat[i] instanceof Boolean) {
                 } else {
-                    message += data[i].toString();
-                    if (i < data.length - 1 && !(i == data.length - 2 && data[data.length - 1] instanceof Boolean)) {
+                    message += dat[i].toString();
+                    if (i < dat.length - 1 && !(i == dat.length - 2 && dat[data.length - 1] instanceof Boolean)) {
                         message += TAG_SEPARATOR;
                     }
                 }
             }
-            addMessage(message);
+            addMessage(message, level);
             break;
         case FOCUS_CHANGED:
             if (data[0] != null) {
@@ -190,7 +182,7 @@ public class ConsoleLogger implements IObserver {
             }
             break;
         case ORBIT_DATA_LOADED:
-            addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), true);
+            addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), LoggerLevel.DEBUG);
             break;
         case SCREENSHOT_INFO:
             addMessage(I18n.bundle.format("notif.screenshot", data[0]));

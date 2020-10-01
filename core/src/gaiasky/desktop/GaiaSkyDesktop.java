@@ -98,6 +98,8 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
 
         @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
+
+        @Parameter(names = { "--debug" }, description = "Launch in debug mode.", order = 9) private boolean debugMode = false;
     }
 
     /**
@@ -325,7 +327,7 @@ public class GaiaSkyDesktop implements IObserver {
         // Launch app
         GaiaSky gs = null;
         try {
-            gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer);
+            gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
             new Lwjgl3Application(gs, cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
@@ -341,7 +343,7 @@ public class GaiaSkyDesktop implements IObserver {
                     GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
                     cfg.useOpenGL3(true, 3, 2);
 
-                    gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer);
+                    gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
                     new Lwjgl3Application(gs, cfg);
                 } else {
                     logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);

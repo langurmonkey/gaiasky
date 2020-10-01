@@ -54,26 +54,26 @@ public class Logger {
 
     private static void error(Object... messages) {
         if (inLevel(LoggerLevel.ERROR))
-            log(messages);
+            log(LoggerLevel.ERROR, messages);
     }
 
     private static void warn(Object... messages) {
         if (inLevel(LoggerLevel.WARN))
-            log(messages);
+            log(LoggerLevel.WARN, messages);
     }
 
     private static void info(Object... messages) {
         if (inLevel(LoggerLevel.INFO)) {
-            log(messages);
+            log(LoggerLevel.INFO, messages);
         }
     }
 
     private static void debug(Object... messages) {
         if (inLevel(LoggerLevel.DEBUG))
-            log(messages);
+            log(LoggerLevel.DEBUG, messages);
     }
 
-    private static void log(Object... messages) {
+    private static void log(LoggerLevel level, Object... messages) {
         int idx = -1;
         for (int i = 0; i < messages.length; i++) {
             Object msg = messages[i];
@@ -90,7 +90,7 @@ public class Logger {
             msgs = messages;
         }
 
-        EventManager.instance.post(Events.POST_NOTIFICATION, msgs);
+        EventManager.instance.post(Events.POST_NOTIFICATION, level, msgs);
     }
 
     /**

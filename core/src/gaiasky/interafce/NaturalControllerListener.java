@@ -117,9 +117,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
-        }
+        logger.debug("button down [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
         cam.setInputByController(true);
 
@@ -130,9 +128,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
     @Override
     public boolean buttonUp(Controller controller, final int buttonCode) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
-        }
+        logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
         if (buttonCode == mappings.getButtonX()) {
             em.post(Events.TOGGLE_MINIMAP);
@@ -170,10 +166,8 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
     @Override
     public boolean axisMoved(Controller controller, int axisCode, float value) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            if (Math.abs(value) > 0.1)
-                logger.info("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
-        }
+        if (Math.abs(value) > 0.1)
+            logger.debug("axis moved [inputListener/code/value]: " + controller.getName() + " / " + axisCode + " / " + value);
 
         boolean treated = false;
 

@@ -23,9 +23,8 @@ import gaiasky.util.format.NumberFormatFactory;
 
 /**
  * Full OpenGL GUI with all the controls and whistles.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class StereoGui extends AbstractGui {
     private Skin skin;
@@ -69,20 +68,19 @@ public class StereoGui extends AbstractGui {
         nf = NumberFormatFactory.getFormatter("##0.###");
 
         // NOTIFICATIONS ONE - BOTTOM LEFT
-        notificationsOne = new NotificationsInterface(skin, lock, true, true, false,  false, false);
+        notificationsOne = new NotificationsInterface(skin, lock, true, true, false, false);
         notificationsOne.setFillParent(true);
         notificationsOne.left().bottom();
         notificationsOne.pad(0, 5, 5, 0);
         interfaces.add(notificationsOne);
 
         // NOTIFICATIONS TWO - BOTTOM CENTRE
-        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false, false);
+        notificationsTwo = new NotificationsInterface(skin, lock, true, true, false, false);
         notificationsTwo.setFillParent(true);
         notificationsTwo.bottom();
         notificationsTwo.setX(Gdx.graphics.getWidth() / 2);
         notificationsTwo.pad(0, 5, 5, 0);
         interfaces.add(notificationsTwo);
-
 
         // CUSTOM MESSAGES
         customInterface = new CustomInterface(ui, skin, lock);
@@ -108,7 +106,7 @@ public class StereoGui extends AbstractGui {
     /**
      * Removes the focus from this Gui and returns true if the focus was in the
      * GUI, false otherwise.
-     * 
+     *
      * @return true if the focus was in the GUI, false otherwise.
      */
     public boolean cancelTouchFocus() {

@@ -132,7 +132,7 @@ public class LoadingGui extends AbstractGui {
         screenMode.setActor(screenModeButton);
 
         // MESSAGE INTERFACE - BOTTOM
-        notificationsInterface = new NotificationsInterface(skin, lock, false, false, false, false);
+        notificationsInterface = new NotificationsInterface(skin, lock, false, false, false);
         center.add(notificationsInterface);
 
         interfaces.add(notificationsInterface);

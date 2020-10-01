@@ -496,4 +496,9 @@ public class MaterialComponent implements IObserver {
             sb.append(",").append(height);
         return sb.toString();
     }
+
+    @Override
+    public String toString(){
+        return base;
+    }
 }

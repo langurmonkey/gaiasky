@@ -60,4 +60,8 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
         this.scaling = scaling;
     }
 
+    @Override
+    public String toString() {
+        return "{" + "name='" + orbitname + '\'' + ", orbit=" + orbit + ", scaling=" + scaling + '}';
+    }
 }

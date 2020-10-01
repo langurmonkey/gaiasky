@@ -123,7 +123,7 @@ public class FullGui extends AbstractGui {
         nf = NumberFormatFactory.getFormatter("##0.##");
 
         // NOTIFICATIONS INTERFACE - BOTTOM LEFT
-        notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true, true);
+        notificationsInterface = new NotificationsInterface(skin, lock, true, true, true, true);
         notificationsInterface.pad(pad5);
         ni = new Container<>(notificationsInterface);
         ni.setFillParent(true);

@@ -9,7 +9,6 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.comp.ViewAngleComparator;
@@ -23,7 +22,7 @@ import java.util.*;
 
 public class OpenVRListener implements VRDeviceListener {
     private static final Log logger = Logger.getLogger(OpenVRListener.class);
-    
+
     /** The natural camera **/
     private NaturalCamera cam;
     /** Focus comparator **/
@@ -72,6 +71,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     /**
      * True if only the given button is pressed
+     *
      * @param button
      * @return
      */
@@ -79,10 +79,9 @@ public class OpenVRListener implements VRDeviceListener {
         return pressedButtons.contains(button);
     }
 
-
-    public void update(){
+    public void update() {
         long currentFrame = GaiaSky.instance.frames;
-        if(currentFrame - lastAxisMovedFrame > 1){
+        if (currentFrame - lastAxisMovedFrame > 1) {
             cam.clearVelocityVR();
         }
 
@@ -91,6 +90,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     /**
      * Returns true if all given buttons are pressed
+     *
      * @param buttons
      * @return
      */
@@ -102,15 +102,14 @@ public class OpenVRListener implements VRDeviceListener {
     }
 
     public void buttonPressed(VRDevice device, int button) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("vr button down [device/code]: " + device.toString() + " / " + button);
-        }
+        logger.debug("vr button down [device/code]: " + device.toString() + " / " + button);
+
         lazyInit();
         // Add to pressed
         pressedButtons.add(button);
 
         // Selection countdown
-        if(button == VRControllerButtons.SteamVR_Trigger){
+        if (button == VRControllerButtons.SteamVR_Trigger) {
             // Start countdown
             startSelectionCountdown(device);
         }
@@ -123,9 +122,7 @@ public class OpenVRListener implements VRDeviceListener {
     }
 
     public void buttonReleased(VRDevice device, int button) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("vr button released [device/code]: " + device.toString() + " / " + button);
-        }
+        logger.debug("vr button released [device/code]: " + device.toString() + " / " + button);
 
         // Removed from pressed
         pressedButtons.remove(button);
@@ -153,19 +150,19 @@ public class OpenVRListener implements VRDeviceListener {
         }
     }
 
-    private void startSelectionCountdown(VRDevice device){
+    private void startSelectionCountdown(VRDevice device) {
         selecting = true;
         selectingTime = System.currentTimeMillis();
         selectingDevice = device;
         EventManager.instance.post(Events.VR_SELECTING_STATE, true, 0d);
     }
 
-    private void updateSelectionCountdown(){
-        if(selecting){
-            if(isPressed(VRControllerButtons.SteamVR_Trigger)){
+    private void updateSelectionCountdown() {
+        if (selecting) {
+            if (isPressed(VRControllerButtons.SteamVR_Trigger)) {
                 long elapsed = System.currentTimeMillis() - selectingTime;
                 double completion = (double) elapsed / (double) SELECTION_COUNTDOWN_MS;
-                if(completion >= 1f){
+                if (completion >= 1f) {
                     // Select object!
                     select(selectingDevice);
                     selecting = false;
@@ -183,9 +180,10 @@ public class OpenVRListener implements VRDeviceListener {
 
     /**
      * Selects the object pointed by the given device.
+     *
      * @param device
      */
-    private void select(VRDevice device){
+    private void select(VRDevice device) {
         // Selection
         StubModel sm = vrDeviceToModel.get(device);
         if (sm != null) {
@@ -229,30 +227,23 @@ public class OpenVRListener implements VRDeviceListener {
 
     @Override
     public void event(int code) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("Unhandled event: " + code);
-        }
+        logger.debug("Unhandled event: " + code);
     }
 
     @Override
     public void buttonTouched(VRDevice device, int button) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("vr button touched [device/code]: " + device.toString() + " / " + button);
-        }
+        logger.debug("vr button touched [device/code]: " + device.toString() + " / " + button);
     }
 
     @Override
     public void buttonUntouched(VRDevice device, int button) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("vr button untouched [device/code]: " + device.toString() + " / " + button);
-        }
+        logger.debug("vr button untouched [device/code]: " + device.toString() + " / " + button);
     }
 
     @Override
     public void axisMoved(VRDevice device, int axis, float valueX, float valueY) {
-        if (GlobalConf.controls.DEBUG_MODE) {
-            logger.info("axis moved: [device/axis/x/y]: " + device.toString() + " / " + axis + " / " + valueX + " / " + valueY);
-        }
+        logger.debug("axis moved: [device/axis/x/y]: " + device.toString() + " / " + axis + " / " + valueX + " / " + valueY);
+
         lazyInit();
 
         StubModel sm;
@@ -277,13 +268,13 @@ public class OpenVRListener implements VRDeviceListener {
             // Joystick for forward/backward movement
             sm = vrDeviceToModel.get(device);
             if (sm != null) {
-                if(cam.getMode().isFocus()){
-                    if(pressedButtons.contains(VRControllerButtons.Axis2)){
+                if (cam.getMode().isFocus()) {
+                    if (pressedButtons.contains(VRControllerButtons.Axis2)) {
                         cam.addRotateMovement(valueX * 0.1, valueY * 0.1, false, false);
                     } else {
                         cam.setVelocityVR(sm.getBeamP0(), sm.getBeamP1(), valueX, valueY);
                     }
-                }else {
+                } else {
                     cam.setVelocityVR(sm.getBeamP0(), sm.getBeamP1(), valueX, valueY);
                 }
             }

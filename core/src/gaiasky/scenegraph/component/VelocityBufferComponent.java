@@ -42,25 +42,24 @@ public class VelocityBufferComponent {
         mat.set(new Vector3Attribute(Vector3Attribute.DCamPos, new Vector3()));
     }
 
-
     public void removeVelocityBufferMaterial(Material mat) {
         mat.remove(Matrix4Attribute.PrevProjView);
         mat.remove(Vector3Attribute.DCamPos);
     }
 
-    public void updateVelocityBufferMaterial(Material material, ICamera cam){
-        if(material.get(Matrix4Attribute.PrevProjView) == null){
+    public void updateVelocityBufferMaterial(Material material, ICamera cam) {
+        if (material.get(Matrix4Attribute.PrevProjView) == null) {
             setUpVelocityBufferMaterial(material);
         }
 
         // Previous projection view matrix
-        ((Matrix4Attribute)material.get(Matrix4Attribute.PrevProjView)).value.set(cam.getPreviousProjView());
+        ((Matrix4Attribute) material.get(Matrix4Attribute.PrevProjView)).value.set(cam.getPreviousProjView());
 
         // Camera position difference
-        Vector3 dcampos = ((Vector3Attribute)material.get(Vector3Attribute.DCamPos)).value;
+        Vector3 dcampos = ((Vector3Attribute) material.get(Vector3Attribute.DCamPos)).value;
         Vector3d dp = cam.getPreviousPos();
         Vector3d p = cam.getPos();
-        dcampos.set((float)(dp.x - p.x), (float)(dp.y - p.y), (float) (dp.z - p.z));
+        dcampos.set((float) (dp.x - p.x), (float) (dp.y - p.y), (float) (dp.z - p.z));
     }
 
     public boolean hasVelocityBuffer(Material mat) {

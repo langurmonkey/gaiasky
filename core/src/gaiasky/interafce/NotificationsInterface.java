@@ -20,6 +20,7 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.I18n;
+import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Pair;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
@@ -44,7 +45,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     Label message1, message2;
     Cell<Label> c1, c2;
     boolean displaying = false;
-    boolean consoleLog = true;
     boolean historicalLog = false;
     boolean permanent = false;
     boolean multiple = false;
@@ -62,13 +62,11 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param lock       The lock object.
      * @param multiple   Allow multiple messages?
      * @param writeDates Write dates with messages?
-     * @param consoleLog Log to console
      * @param bg       Apply background
      */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog, boolean bg) {
+    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean bg) {
         this(skin, lock, multiple, bg);
         this.writeDates = writeDates;
-        this.consoleLog = consoleLog;
     }
 
     /**
@@ -78,12 +76,11 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
      * @param lock          The lock object.
      * @param multiple      Allow multiple messages?
      * @param writeDates    Write dates with messages?
-     * @param consoleLog    Log to console
      * @param historicalLog Save logs to historical list
      * @param bg       Apply background
      */
-    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean consoleLog, boolean historicalLog, boolean bg) {
-        this(skin, lock, multiple, writeDates, consoleLog, bg);
+    public NotificationsInterface(Skin skin, Object lock, boolean multiple, boolean writeDates, boolean historicalLog, boolean bg) {
+        this(skin, lock, multiple, writeDates, bg);
         this.historicalLog = historicalLog;
     }
 
@@ -139,12 +136,13 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     }
 
     private void addMessage(String msg) {
-        addMessage(msg, false, false);
+        addMessage(msg, false, LoggerLevel.INFO);
     }
 
-    private void addMessage(String msg, boolean permanent, boolean debug) {
+    private void addMessage(String msg, boolean permanent, LoggerLevel level) {
         MessageBean messageBean = new MessageBean(msg);
 
+        boolean debug = level.equals(LoggerLevel.DEBUG);
         boolean add = !debug || debug && Gdx.app.getLogLevel() >= Application.LOG_DEBUG;
 
         if (add) {
@@ -153,7 +151,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 setText(message2, c2, message1.getText());
             }
             // Set 1
-            setText(message1, c1, formatMessage(messageBean));
+            setText(message1, c1, formatMessage(messageBean, level));
 
             this.displaying = true;
             this.permanent = permanent;
@@ -161,17 +159,13 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
             if (historicalLog)
                 historical.add(messageBean);
 
-            if (consoleLog && Gdx.graphics != null)
-                if (debug)
-                    Gdx.app.debug(df.format(messageBean.date), msg);
-                else
-                    Gdx.app.log(df.format(messageBean.date), msg);
         }
 
     }
 
-    private String formatMessage(MessageBean msgBean) {
-        return (writeDates ? df.format(msgBean.date) + TAG_SEPARATOR : "") + msgBean.msg;
+    private String formatMessage(MessageBean msgBean, LoggerLevel level) {
+        String lvl = level.equals(LoggerLevel.DEBUG) ? " DEBUG" : "";
+        return (writeDates ? df.format(msgBean.date) + lvl + TAG_SEPARATOR : (lvl.isBlank() ? "" : lvl + TAG_SEPARATOR)) + msgBean.msg;
     }
 
     public void update() {
@@ -213,19 +207,21 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         synchronized (lock) {
             switch (event) {
             case POST_NOTIFICATION:
+                LoggerLevel level = (LoggerLevel) data[0];
+                Object[] dat = (Object[]) data[1];
                 String message = "";
                 boolean perm = false;
-                for (int i = 0; i < data.length; i++) {
-                    if (i == data.length - 1 && data[i] instanceof Boolean) {
-                        perm = (Boolean) data[i];
+                for (int i = 0; i < dat.length; i++) {
+                    if (i == dat.length - 1 && dat[i] instanceof Boolean) {
+                        perm = (Boolean) dat[i];
                     } else {
-                        message += data[i].toString();
-                        if (i < data.length - 1 && !(i == data.length - 2 && data[data.length - 1] instanceof Boolean)) {
+                        message += dat[i].toString();
+                        if (i < dat.length - 1 && !(i == dat.length - 2 && dat[dat.length - 1] instanceof Boolean)) {
                             message += TAG_SEPARATOR;
                         }
                     }
                 }
-                addMessage(message, perm, false);
+                addMessage(message, perm, level);
                 break;
             case FOCUS_CHANGED:
                 if (data[0] != null) {
@@ -294,7 +290,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 }
                 break;
             case ORBIT_DATA_LOADED:
-                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, true);
+                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
                 break;
             case SCREENSHOT_INFO:
                 addMessage(I18n.bundle.format("notif.screenshot", data[0]));

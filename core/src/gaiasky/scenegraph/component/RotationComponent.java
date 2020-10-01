@@ -112,12 +112,9 @@ public class RotationComponent {
         this.meridianAngle = ma;
     }
 
-    public RotationComponent clone() {
-        RotationComponent clone = new RotationComponent();
-        clone.period = this.period;
-        clone.inclination = this.inclination;
-        clone.angularVelocity = this.angularVelocity;
-        clone.angle = this.angle;
-        return clone;
+    @Override
+    public String toString() {
+        return "{" + "angVel=" + angularVelocity + ", angle=" + angle + ", period=" + period + ", axialTilt=" + axialTilt + ", inclination=" + inclination + ", ascendingNode=" + ascendingNode + ", meridianAngle=" + meridianAngle + '}';
     }
+
 }

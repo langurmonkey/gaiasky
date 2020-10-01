@@ -102,4 +102,8 @@ public class StaticCoordinates implements IBodyCoordinates {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "{" + "pos=" + position + ", trf='" + transformName + '\'' + '}';
+    }
 }

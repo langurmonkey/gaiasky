@@ -338,7 +338,6 @@ public class GlobalConf {
         public String CONTROLLER_MAPPINGS_FILE;
         public boolean INVERT_LOOK_X_AXIS;
         public boolean INVERT_LOOK_Y_AXIS;
-        public boolean DEBUG_MODE;
         /**
          * Controller name blacklist. Check out names in the preferences window.
          **/
@@ -352,11 +351,10 @@ public class GlobalConf {
             controllerListenersMap = new HashMap<>();
         }
 
-        public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_X_AXIS, boolean iNVERT_LOOK_Y_AXIS, boolean dEBUG_MODE, String[] cONTROLLER_BLACKLIST) {
+        public void initialize(String cONTROLLER_MAPPINGS_FILE, boolean iNVERT_LOOK_X_AXIS, boolean iNVERT_LOOK_Y_AXIS, String[] cONTROLLER_BLACKLIST) {
             CONTROLLER_MAPPINGS_FILE = cONTROLLER_MAPPINGS_FILE;
             INVERT_LOOK_X_AXIS = iNVERT_LOOK_X_AXIS;
             INVERT_LOOK_Y_AXIS = iNVERT_LOOK_Y_AXIS;
-            DEBUG_MODE = dEBUG_MODE;
             CONTROLLER_BLACKLIST = cONTROLLER_BLACKLIST;
         }
 

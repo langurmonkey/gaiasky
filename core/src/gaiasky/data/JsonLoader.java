@@ -199,6 +199,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
             }
             attribute = attribute.next;
         }
+        logger.debug(I18n.txt("notif.loading", instance.getClass().getSimpleName() + ": " + instance.toString()));
         return instance;
     }
 

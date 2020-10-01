@@ -755,8 +755,9 @@ public enum Events {
      **/
     POST_HEADLINE_MESSAGE,
     /**
-     * Will be displayed in the notifications area (bottom left). Contains an
-     * array of strings with the messages and an optional boolean indicating
+     * Will be displayed in the notifications area (bottom left). Contains the
+     * notification level (same as log level: ERROR, WARN, INFO, DEBUG) and an
+     * array of strings with the messages plus an optional boolean indicating
      * whether the message is permanent so should stay until the next message is
      * received.
      **/

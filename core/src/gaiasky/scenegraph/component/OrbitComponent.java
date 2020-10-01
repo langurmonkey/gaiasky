@@ -130,4 +130,14 @@ public class OrbitComponent {
         out.set(y, z, x);
     }
 
+    @Override
+    public String toString(){
+        String desc;
+        if(source != null)
+            desc = source;
+        else
+            desc = "{epoch: " + epoch + ", period: " + period + ", e: " + e + ", i: " + i + ", sma: " + semimajoraxis + "}";
+        return desc;
+    }
+
 }

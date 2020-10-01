@@ -529,4 +529,13 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
+    public String toString(){
+        String desc;
+        if(modelFile != null)
+            desc = modelFile;
+        else
+            desc = "{" + type + ", params: " + params.toString() + "}";
+        return desc;
+    }
+
 }

@@ -394,10 +394,9 @@ public class DesktopConfInit extends ConfInit {
         String CONTROLLER_MAPPINGS_FILE = p.getProperty("controls.gamepad.mappings.file", "mappings/SDL_Controller.controller");
         boolean INVERT_LOOK_X_AXIS = Parser.parseBoolean(p.getProperty("controls.invert.x", "false"));
         boolean INVERT_LOOK_Y_AXIS = Parser.parseBoolean(p.getProperty("controls.invert.y", "true"));
-        boolean DEBUG_MODE = Parser.parseBoolean(p.getProperty("controls.debugmode", "false"));
         String[] CONTROLLER_BLACKLIST = GlobalResources.parseWhitespaceSeparatedList(p.getProperty("controls.blacklist"));
 
-        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_X_AXIS, INVERT_LOOK_Y_AXIS, DEBUG_MODE, CONTROLLER_BLACKLIST);
+        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_X_AXIS, INVERT_LOOK_Y_AXIS, CONTROLLER_BLACKLIST);
 
         /** SPACECRAFT CONF **/
         SpacecraftConf scc = new SpacecraftConf();
@@ -589,7 +588,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("controls.gamepad.mappings.file", GlobalConf.controls.CONTROLLER_MAPPINGS_FILE);
         p.setProperty("controls.invert.x", Boolean.toString(GlobalConf.controls.INVERT_LOOK_X_AXIS));
         p.setProperty("controls.invert.y", Boolean.toString(GlobalConf.controls.INVERT_LOOK_Y_AXIS));
-        p.setProperty("controls.debugmode", Boolean.toString(GlobalConf.controls.DEBUG_MODE));
         if (GlobalConf.controls.CONTROLLER_BLACKLIST != null)
             p.setProperty("controls.blacklist", GlobalResources.toWhitespaceSeparatedList(GlobalConf.controls.CONTROLLER_BLACKLIST));
 
