@@ -1,17 +1,16 @@
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
@@ -20,16 +19,23 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
+import gaiasky.util.scene2d.OwnSliderPlus;
 import gaiasky.util.scene2d.OwnTextButton;
+import gaiasky.util.scene2d.OwnTextIconButton;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * GUI that is operated with a game controller and optimized for that purpose.
@@ -37,26 +43,32 @@ import java.util.List;
 public class ControllerGui extends AbstractGui {
 
     private final Table content, menu;
-    private Table camT, timeT, optT, datT, visT;
+    private Table camT, timeT, optT, typesT, sysT;
     private Cell contentCell;
-    private OwnTextButton cameraButton, timeButton, optionsButton, datasetsButton, visualsButton;
-    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset;
+    private OwnTextButton cameraButton, timeButton, optionsButton, typesButton, systemButton;
+    // Contains a matrix (column major) of actors for each tab
+    private List<Actor[][]> model;
+    private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
+    private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton;
+    private OwnSliderPlus bloomSlider;
 
     private List<OwnTextButton> tabButtons;
     private List<ScrollPane> tabContents;
-    private Table currentContent;
+
+    private Actor[][] currentModel;
 
     private EventManager em;
     private GUIControllerListener guiControllerListener;
     private float pad5, pad10, pad20, pad30;
 
     private int selectedTab = 0;
-    private int focusedElem = 0;
+    private int fi = 0, fj = 0;
 
     public ControllerGui() {
         super();
         this.skin = GlobalResources.skin;
         this.em = EventManager.instance;
+        model = new ArrayList<>();
         content = new Table(skin);
         menu = new Table(skin);
         guiControllerListener = new GUIControllerListener();
@@ -76,26 +88,90 @@ public class ControllerGui extends AbstractGui {
         menu.clear();
         tabButtons.clear();
         tabContents.clear();
+        model.clear();
 
-        float w = 700f * GlobalConf.UI_SCALE_FACTOR;
+        float w = 900f * GlobalConf.UI_SCALE_FACTOR;
         float h = 500f * GlobalConf.UI_SCALE_FACTOR;
+        // Widget width
+        float ww = 250f * GlobalConf.UI_SCALE_FACTOR;
+        float sw = ww;
+        float sh = 60f * GlobalConf.UI_SCALE_FACTOR;
 
         // Create contents
 
         // CAMERA
+        Actor[][] cameraModel = new Actor[1][3];
+        model.add(cameraModel);
+
         camT = new Table(skin);
         camT.setSize(w, h);
-        camT.add(new OwnTextButton("Focus camera", skin, "toggle-big")).padBottom(pad10).row();
-        camT.add(new OwnTextButton("Free camera", skin, "toggle-big")).padBottom(pad10).row();
-        camT.add(new OwnTextButton("Cinematic mode", skin, "toggle-big")).padBottom(pad10).row();
+        CameraManager cm = GaiaSky.instance.getCameraManager();
+
+        // Focus
+        cameraFocus = new OwnTextButton("Focus camera", skin, "toggle-big");
+        cameraModel[0][0] = cameraFocus;
+        cameraFocus.setWidth(ww);
+        cameraFocus.setChecked(cm.getMode().isFocus());
+        cameraFocus.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (cameraFocus.isChecked()) {
+                    em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                    cameraFree.setProgrammaticChangeEvents(false);
+                    cameraFree.setChecked(false);
+                    cameraFree.setProgrammaticChangeEvents(true);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        // Free
+        cameraFree = new OwnTextButton("Free camera", skin, "toggle-big");
+        cameraModel[0][1] = cameraFree;
+        cameraFree.setWidth(ww);
+        cameraFree.setChecked(cm.getMode().isFree());
+        cameraFree.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (cameraFree.isChecked()) {
+                    em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+                    cameraFocus.setProgrammaticChangeEvents(false);
+                    cameraFocus.setChecked(false);
+                    cameraFocus.setProgrammaticChangeEvents(true);
+                }
+                return true;
+            }
+            return false;
+        });
+
+        // Cinematic
+        cameraCinematic = new OwnTextButton("Cinematic mode", skin, "toggle-big");
+        cameraModel[0][2] = cameraCinematic;
+        cameraCinematic.setWidth(ww);
+        cameraCinematic.setChecked(GlobalConf.scene.CINEMATIC_CAMERA);
+        cameraCinematic.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                em.post(Events.CAMERA_CINEMATIC_CMD, cameraCinematic.isChecked(), false);
+                return true;
+            }
+            return false;
+        });
+
+        camT.add(cameraFocus).padBottom(pad10).row();
+        camT.add(cameraFree).padBottom(pad10).row();
+        camT.add(cameraCinematic).padBottom(pad10).row();
         tabContents.add(container(camT, w, h));
         updatePads(camT);
 
         // TIME
+        Actor[][] timeModel = new Actor[3][2];
+        model.add(timeModel);
+
         timeT = new Table(skin);
 
         boolean timeOn = GlobalConf.runtime.TIME_ON;
         timeStartStop = new OwnTextButton(timeOn ? "Stop time" : "Start time", skin, "toggle-big");
+        timeModel[1][0] = timeStartStop;
+        timeStartStop.setWidth(ww);
         timeStartStop.setChecked(timeOn);
         timeStartStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -105,24 +181,30 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
         timeUp = new OwnTextButton("Speed up", skin, "big");
+        timeModel[2][0] = timeUp;
+        timeUp.setWidth(ww);
         timeUp.addListener(event -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 em.post(Events.TIME_WARP_INCREASE_CMD);
                 return true;
             }
             return false;
         });
         timeDown = new OwnTextButton("Slow down", skin, "big");
+        timeModel[0][0] = timeDown;
+        timeDown.setWidth(ww);
         timeDown.addListener(event -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 em.post(Events.TIME_WARP_DECREASE_CMD);
                 return true;
             }
             return false;
         });
         timeReset = new OwnTextButton("Reset time", skin, "big");
+        timeModel[1][1] = timeReset;
+        timeReset.setWidth(ww);
         timeReset.addListener(event -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 em.post(Events.TIME_CHANGE_CMD, Instant.now());
                 return true;
             }
@@ -132,28 +214,156 @@ public class ControllerGui extends AbstractGui {
         timeT.add(timeDown).padBottom(pad10).padRight(pad10);
         timeT.add(timeStartStop).padBottom(pad10).padRight(pad10);
         timeT.add(timeUp).padBottom(pad10).row();
-        timeT.add(timeReset).colspan(3).padBottom(pad10).row();
+        timeT.add(timeReset).padRight(pad10).padLeft(pad10).colspan(3).padBottom(pad10).row();
         tabContents.add(container(timeT, w, h));
         updatePads(timeT);
 
-        // DATASETS
-        datT = new Table(skin);
-        datT.setSize(w, h);
-        datT.add(new OwnLabel("This is datasets", skin, "default"));
-        tabContents.add(container(datT, w, h));
-        updatePads(datT);
+        // TYPES
+        int visTableCols = 6;
+        Actor[][] typesModel = new Actor[visTableCols][7];
+        model.add(typesModel);
+
+        typesT = new Table(skin);
+
+        float buttonPadHor = (GlobalConf.isHiDPI() ? 6f : 4f) * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPadVert = (GlobalConf.isHiDPI() ? 2.5f : 2.2f) * GlobalConf.UI_SCALE_FACTOR;
+        Set<Button> buttons = new HashSet<>();
+        ComponentType[] visibilityEntities = ComponentType.values();
+        boolean[] visible = new boolean[visibilityEntities.length];
+        for (int i = 0; i < visibilityEntities.length; i++)
+            visible[i] = SceneGraphRenderer.visible.get(visibilityEntities[i].ordinal());
+
+        if (visibilityEntities != null) {
+            int di = 0, dj = 0;
+            for (int i = 0; i < visibilityEntities.length; i++) {
+                final ComponentType ct = visibilityEntities[i];
+                final String name = ct.getName();
+                if (name != null) {
+                    Button button;
+                    if (ct.style != null) {
+                        Image icon = new Image(skin.getDrawable(ct.style));
+                        button = new OwnTextIconButton("", icon, skin, "toggle");
+                    } else {
+                        button = new OwnTextButton(name, skin, "toggle");
+                    }
+                    // Name is the key
+                    button.setName(ct.key);
+                    typesModel[di][dj] = button;
+
+                    button.setChecked(visible[i]);
+                    button.addListener(event -> {
+                        if (event instanceof ChangeEvent) {
+                            EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
+                            return true;
+                        }
+                        return false;
+                    });
+                    Cell c = typesT.add(button).padBottom(buttonPadVert).left();
+
+                    if ((i + 1) % visTableCols == 0) {
+                        typesT.row();
+                        di = 0;
+                        dj++;
+                    } else {
+                        c.padRight(buttonPadHor);
+                        di++;
+
+                    }
+                    buttons.add(button);
+                }
+            }
+        }
+
+        typesT.setSize(w, h);
+        tabContents.add(container(typesT, w, h));
+        updatePads(typesT);
 
         // OPTIONS
+        Actor[][] optionsModel = new Actor[1][4];
+        model.add(optionsModel);
+
         optT = new Table(skin);
-        optT.add(new OwnLabel("This is options", skin, "default"));
+
+        // Slider
+        bloomSlider = new OwnSliderPlus("Bloom", Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-15");
+        bloomSlider.setWidth(sw);
+        bloomSlider.setHeight(sh);
+        bloomSlider.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
+        bloomSlider.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.BLOOM_CMD, bloomSlider.getValue() / 10f, false);
+                return true;
+            }
+            return false;
+        });
+        optionsModel[0][0] = bloomSlider;
+        optT.add(bloomSlider).padBottom(pad10).row();
+
+        // Lens flare
+        flareButton = new OwnTextButton("Lens flare", skin, "toggle-big");
+        optionsModel[0][1] = flareButton;
+        flareButton.setWidth(ww);
+        flareButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE);
+        flareButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.LENS_FLARE_CMD, flareButton.isChecked(), false);
+                return true;
+            }
+            return false;
+        });
+        optT.add(flareButton).padBottom(pad10).row();
+
+        // Star glow
+        starGlowButton = new OwnTextButton("Star glow", skin, "toggle-big");
+        optionsModel[0][2] = starGlowButton;
+        starGlowButton.setWidth(ww);
+        starGlowButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        starGlowButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, starGlowButton.isChecked(), false);
+                return true;
+            }
+            return false;
+        });
+        optT.add(starGlowButton).padBottom(pad10).row();
+
+        // Motion blur
+        motionBlurButton = new OwnTextButton("Motion blur", skin, "toggle-big");
+        optionsModel[0][3] = motionBlurButton;
+        motionBlurButton.setWidth(ww);
+        motionBlurButton.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        motionBlurButton.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlurButton.isChecked(), false);
+                return true;
+            }
+            return false;
+        });
+        optT.add(motionBlurButton);
+
         tabContents.add(container(optT, w, h));
         updatePads(optT);
 
-        // VISUALS
-        visT = new Table(skin);
-        visT.add(new OwnLabel("This is visuals", skin, "default"));
-        tabContents.add(container(visT, w, h));
-        updatePads(visT);
+        // SYSTEM
+        Actor[][] systemModel = new Actor[1][1];
+        model.add(systemModel);
+
+        sysT = new Table(skin);
+
+        quit = new OwnTextButton("Exit", skin, "big");
+        systemModel[0][0] = quit;
+        quit.setWidth(ww);
+        quit.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                GaiaSky.postRunnable(() -> Gdx.app.exit());
+                return true;
+            }
+            return false;
+        });
+        sysT.add(quit);
+
+        tabContents.add(container(sysT, w, h));
+        updatePads(sysT);
 
         // Create tab buttons
         cameraButton = new OwnTextButton("Camera", skin, "toggle-huge");
@@ -162,14 +372,14 @@ public class ControllerGui extends AbstractGui {
         timeButton = new OwnTextButton("Time", skin, "toggle-huge");
         tabButtons.add(timeButton);
 
-        datasetsButton = new OwnTextButton("Datasets", skin, "toggle-huge");
-        tabButtons.add(datasetsButton);
+        typesButton = new OwnTextButton("Types", skin, "toggle-huge");
+        tabButtons.add(typesButton);
 
         optionsButton = new OwnTextButton("Options", skin, "toggle-huge");
         tabButtons.add(optionsButton);
 
-        visualsButton = new OwnTextButton("Visuals", skin, "toggle-huge");
-        tabButtons.add(visualsButton);
+        systemButton = new OwnTextButton("System", skin, "toggle-huge");
+        tabButtons.add(systemButton);
 
         for (OwnTextButton b : tabButtons) {
             b.pad(pad10);
@@ -184,9 +394,9 @@ public class ControllerGui extends AbstractGui {
         menu.add(rb).center().padBottom(pad10).padRight(pad30);
         menu.add(cameraButton).center().padBottom(pad10);
         menu.add(timeButton).center().padBottom(pad10);
-        menu.add(datasetsButton).center().padBottom(pad10);
+        menu.add(typesButton).center().padBottom(pad10);
         menu.add(optionsButton).center().padBottom(pad10);
-        menu.add(visualsButton).center().padBottom(pad10);
+        menu.add(systemButton).center().padBottom(pad10);
         menu.add(lb).center().padBottom(pad10).padLeft(pad30).row();
 
         contentCell = menu.add().colspan(7);
@@ -204,7 +414,7 @@ public class ControllerGui extends AbstractGui {
         content.pack();
 
         updateTabs();
-        updateFocused();
+        updateFocused(true);
     }
 
     @Override
@@ -223,7 +433,13 @@ public class ControllerGui extends AbstractGui {
         ui.setKeyboardFocus(null);
     }
 
-    private ScrollPane container(Table t, float w, float h){
+    @Override
+    public void update(double dt) {
+        super.update(dt);
+        this.guiControllerListener.update();
+    }
+
+    private ScrollPane container(Table t, float w, float h) {
         OwnScrollPane c = new OwnScrollPane(t, skin, "minimalist-nobg");
         t.top();
         c.setFadeScrollBars(true);
@@ -247,26 +463,77 @@ public class ControllerGui extends AbstractGui {
         }
         tabButtons.get(selectedTab).setChecked(true);
         contentCell.setActor(null);
-        currentContent = (Table) tabContents.get(selectedTab).getActor();
+        currentModel = model.get(selectedTab);
         contentCell.setActor(tabContents.get(selectedTab));
-        focusedElem = 0;
+        selectFirst();
         updateFocused();
     }
 
-    public void updateFocused() {
-        // Use current content table
-        if (currentContent != null && content.getParent() != null) {
-            Array<Cell> cells = currentContent.getCells();
-            int focused = focusedElem % cells.size;
-            Cell cell = cells.get(focused);
-            if (cell.getActor() != null) {
-                Actor actor = cell.getActor();
-                if (actor instanceof Button) {
-                    ui.setKeyboardFocus(actor);
+    /**
+     * Selects the given object. If it is null, it scans the row in the given direction until
+     * all elements have been scanned.
+     *
+     * @param i     The column
+     * @param j     The row
+     * @param right Whehter scan right or left
+     * @return True if the element was selected, false otherwise
+     */
+    public boolean selectRow(int i, int j, boolean right) {
+        fi = i;
+        fj = j;
+        if (currentModel != null && currentModel.length > 0) {
+            while (currentModel[fi][fj] == null) {
+                // Move to next column
+                fi = (fi + (right ? 1 : -1)) % currentModel.length;
+                if (fi == i) {
+                    return false;
                 }
             }
+            return true;
         }
+        return false;
+    }
 
+    /**
+     * Selects the given object. If it is null, it scans the column in the given direction until
+     * all elements have been scanned.
+     *
+     * @param i    The column
+     * @param j    The row
+     * @param down Whehter scan up or down
+     * @return True if the element was selected, false otherwise
+     */
+    public boolean selectCol(int i, int j, boolean down) {
+        fi = i;
+        fj = j;
+        if (currentModel != null && currentModel.length > 0) {
+            while (currentModel[fi][fj] == null) {
+                // Move to the next row
+                fj = (fj + (down ? 1 : -1)) % currentModel[fi].length;
+                if (fj == j) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public void selectFirst() {
+        selectRow(0, 0, true);
+    }
+
+    public void updateFocused() {
+        updateFocused(false);
+    }
+
+    public void updateFocused(boolean force) {
+        if ((force || content.getParent() != null) && currentModel != null && currentModel.length != 0) {
+            Actor actor = currentModel[fi][fj];
+            if (actor instanceof Button || actor instanceof Slider) {
+                ui.setKeyboardFocus(actor);
+            }
+        }
     }
 
     public void tabLeft() {
@@ -284,31 +551,61 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void up() {
-        left();
+        selectCol(fi, update(fj, -1, currentModel[fi].length), false);
+        updateFocused();
     }
 
     public void down() {
-        right();
+        selectCol(fi, update(fj, 1, currentModel[fi].length), true);
+        updateFocused();
     }
 
     public void left() {
-        focusedElem = focusedElem - 1;
-        if (focusedElem < 0) {
-            focusedElem = currentContent.getCells().size - 1;
-        }
+        selectRow(update(fi, -1, currentModel.length), fj, false);
         updateFocused();
     }
 
     public void right() {
-        focusedElem = (focusedElem + 1) % currentContent.getCells().size;
+        selectRow(update(fi, 1, currentModel.length), fj, false);
         updateFocused();
     }
 
+    public void sliderUp(float percent) {
+        sliderMove(true, percent);
+    }
+
+    public void sliderDown(float percent) {
+        sliderMove(false, percent);
+    }
+
+    public void sliderMove(boolean up, float percent) {
+        if (currentModel != null && currentModel[fi][fj] != null && currentModel[fi][fj] instanceof OwnSliderPlus) {
+            OwnSliderPlus s = (OwnSliderPlus) currentModel[fi][fj];
+            float max = s.getMaxValue();
+            float min = s.getMinValue();
+            float val = s.getValue();
+            float inc = (max - min) * percent;
+            s.setValue(MathUtils.clamp(val + (up ? inc : -inc), min, max));
+        }
+    }
+
+    private int update(int val, int inc, int len) {
+        if (len <= 0)
+            return val;
+        if (inc >= 0) {
+            return (val + inc) % len;
+        } else {
+            if (val + inc < 0) {
+                return inc + len;
+            } else {
+                return val + inc;
+            }
+        }
+    }
+
     public void touchDown() {
-        if (currentContent != null) {
-            Array<Cell> cells = currentContent.getCells();
-            int focused = focusedElem % cells.size;
-            Actor actor = cells.get(focused).getActor();
+        if (currentModel != null) {
+            Actor actor = currentModel[fi][fj];
             if (actor != null && actor instanceof Button) {
                 final Button b = (Button) actor;
 
@@ -322,10 +619,8 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void touchUp() {
-        if (currentContent != null) {
-            Array<Cell> cells = currentContent.getCells();
-            int focused = focusedElem % cells.size;
-            Actor actor = cells.get(focused).getActor();
+        if (currentModel != null) {
+            Actor actor = currentModel[fi][fj];
             if (actor != null && actor instanceof Button) {
                 final Button b = (Button) actor;
 
@@ -413,10 +708,13 @@ public class ControllerGui extends AbstractGui {
     }
 
     private class GUIControllerListener implements ControllerListener, IInputListener {
-        private static final double AXIS_TH = 0.5;
-        private static final long AXIS_DELAY = 250;
+        private static final double AXIS_TH = 0.3;
+        private static final long AXIS_EVT_DELAY = 250;
+        private static final long AXIS_POLL_DELAY = 50;
 
-        private long lastAxisTime = 0;
+        // Left and right stick values
+        private float lStickX = 0, lStickY = 0, rStickX = 0, rStickY = 0;
+        private long lastAxisEvtTime = 0, lastAxisPollTime = 0;
         private EventManager em;
         private NaturalCamera cam;
         private IControllerMappings mappings;
@@ -479,26 +777,33 @@ public class ControllerGui extends AbstractGui {
 
         @Override
         public boolean axisMoved(Controller controller, int axisCode, float value) {
-            if (Math.abs(value) > AXIS_TH) {
-                if (System.currentTimeMillis() - lastAxisTime > AXIS_DELAY) {
-                    if (axisCode == mappings.getAxisLstickH()) {
-                        // right/left
-                        if (value > 0) {
-                            right();
-                        } else {
-                            left();
-                        }
-                    } else if (axisCode == mappings.getAxisLstickV()) {
-                        // up/down
-                        if (value > 0) {
-                            down();
-                        } else {
-                            up();
-                        }
+            if (Math.abs(value) > AXIS_TH && System.currentTimeMillis() - lastAxisEvtTime > AXIS_EVT_DELAY) {
+                // Event-based
+                if (axisCode == mappings.getAxisLstickH()) {
+                    // LEFT STICK horizontal - move horizontally
+                    lStickX = value;
+                    if (value > 0) {
+                        right();
+                    } else {
+                        left();
                     }
-                    lastAxisTime = System.currentTimeMillis();
+                } else if (axisCode == mappings.getAxisLstickV()) {
+                    // LEFT STICK vertical - move vertically
+                    lStickY = value;
+                    if (value > 0) {
+                        down();
+                    } else {
+                        up();
+                    }
                 }
+                lastAxisEvtTime = System.currentTimeMillis();
             }
+            // Poll
+            if (axisCode == mappings.getAxisRstickH()) {
+                // RIGHT STICK horizontal - slider up/down
+                rStickX = value;
+            }
+
             return true;
         }
 
@@ -524,7 +829,16 @@ public class ControllerGui extends AbstractGui {
 
         @Override
         public void update() {
-
+            // Right stick moves slider
+            boolean update = System.currentTimeMillis() - lastAxisPollTime > AXIS_POLL_DELAY;
+            if (Math.abs(rStickX) > AXIS_TH && update) {
+                if (rStickX > 0) {
+                    sliderUp(0.05f);
+                } else {
+                    sliderDown(0.05f);
+                }
+                lastAxisPollTime = System.currentTimeMillis();
+            }
         }
 
         @Override

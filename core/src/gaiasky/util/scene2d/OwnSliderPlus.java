@@ -5,10 +5,13 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
@@ -19,6 +22,7 @@ import gaiasky.util.math.MathUtilsd;
  */
 public class OwnSliderPlus extends Slider {
 
+    private OwnSliderPlus me;
     private float ownwidth = 0f, ownheight = 0f;
     private float mapMin, mapMax;
     private boolean map = false;
@@ -33,48 +37,60 @@ public class OwnSliderPlus extends Slider {
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, mapMin, mapMax);
+        setUp(title, mapMin, mapMax, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, min, max);
+        setUp(title, min, max, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {
         super(min, max, stepSize, vertical, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, min, max);
+        setUp(title, min, max, "default");
     }
 
-    public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String styleName) {
-        super(min, max, stepSize, vertical, skin, styleName);
+    public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin, String labelStyleName) {
+        super(min, max, stepSize, vertical, skin, "big-horizontal");
         this.skin = skin;
-        setUp(title, min, max);
+        setUp(title, min, max, labelStyleName);
     }
 
-    public void setUp(String title, float mapMin, float mapMax) {
-        setUp(title, mapMin, mapMax, NumberFormatFactory.getFormatter("####0.##"));
+    public void setUp(String title, float mapMin, float mapMax, String labelStyleName) {
+        setUp(title, mapMin, mapMax, NumberFormatFactory.getFormatter("####0.##"), labelStyleName);
     }
 
-    public void setUp(String title, float mapMin, float mapMax, INumberFormat nf){
+    public void setUp(String title, float mapMin, float mapMax, INumberFormat nf, String labelStyleName) {
+        this.me = this;
         this.nf = nf;
         setMapValues(mapMin, mapMax);
 
         if (title != null && !title.isEmpty()) {
-            this.titleLabel = new OwnLabel(title, skin);
+            this.titleLabel = new OwnLabel(title, skin, labelStyleName);
         } else {
             this.titleLabel = null;
         }
 
-        this.valueLabel = new OwnLabel(getValueString(), skin);
+        this.valueLabel = new OwnLabel(getValueString(), skin, labelStyleName);
         this.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 this.valueLabel.setText(getValueString());
                 return true;
             }
             return false;
+        });
+        this.addListener(new FocusListener() {
+            @Override
+            public void keyboardFocusChanged(FocusEvent event, Actor actor, boolean focused) {
+                if (actor == me) {
+                    if (focused)
+                        me.setLabelColor(1, 1, 0, 1);
+                    else
+                        me.restoreLabelColor();
+                }
+            }
         });
     }
 
@@ -171,11 +187,11 @@ public class OwnSliderPlus extends Slider {
     public void draw(Batch batch, float parentAlpha) {
         super.draw(batch, parentAlpha);
         if (titleLabel != null) {
-            titleLabel.setPosition(getX() + padX, getY() + padY);
+            titleLabel.setPosition(getX() + padX, getY() + getHeight() - titleLabel.getHeight() - padY);
             titleLabel.draw(batch, parentAlpha);
         }
         if (valueLabel != null) {
-            valueLabel.setPosition(getX() + getPrefWidth() - (valueLabel.getPrefWidth() + padX * 2f), getY() + padY);
+            valueLabel.setPosition(getX() + getPrefWidth() - (valueLabel.getPrefWidth() + padX * 2f), getY() + getHeight() - valueLabel.getHeight() - padY);
             valueLabel.draw(batch, parentAlpha);
         }
     }
@@ -185,8 +201,29 @@ public class OwnSliderPlus extends Slider {
         super.setDisabled(disabled);
         if (valueLabel != null)
             valueLabel.setDisabled(disabled);
-        if(titleLabel != null)
+        if (titleLabel != null)
             titleLabel.setDisabled(disabled);
+    }
+
+    private Color labelColorBackup;
+
+    public void setLabelColor(float r, float g, float b, float a) {
+        if (this.titleLabel != null) {
+            labelColorBackup = this.titleLabel.getColor().cpy();
+            this.titleLabel.setColor(r, g, b, a);
+            if (this.valueLabel != null) {
+                this.valueLabel.setColor(r, g, b, a);
+            }
+        }
+    }
+
+    public void restoreLabelColor() {
+        if (labelColorBackup != null && this.titleLabel != null) {
+            this.titleLabel.setColor(labelColorBackup);
+            if (this.valueLabel != null) {
+                this.valueLabel.setColor(labelColorBackup);
+            }
+        }
     }
 
 }

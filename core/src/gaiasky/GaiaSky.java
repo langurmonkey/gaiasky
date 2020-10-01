@@ -680,15 +680,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         stereoGui = new StereoGui();
         stereoGui.initialize(manager);
 
-        controllerGui = new ControllerGui();
-        controllerGui.initialize(manager);
+        //controllerGui = new ControllerGui();
+        //controllerGui.initialize(manager);
 
         if (guis != null) {
             guis.add(mainGui);
             guis.add(debugGui);
             guis.add(spacecraftGui);
             guis.add(stereoGui);
-            guis.add(controllerGui);
+            //guis.add(controllerGui);
         }
     }
 
@@ -721,8 +721,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         GuiRegistry.registerGui(debugGui);
         GuiRegistry.addProcessor(debugGui);
 
-        GuiRegistry.registerGui(controllerGui);
-        GuiRegistry.addProcessor(controllerGui);
+        //GuiRegistry.registerGui(controllerGui);
+        //GuiRegistry.addProcessor(controllerGui);
     }
 
     @Override
