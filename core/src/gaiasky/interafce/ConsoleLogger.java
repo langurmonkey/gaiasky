@@ -78,10 +78,21 @@ public class ConsoleLogger implements IObserver {
         }
     }
 
+    /**
+     * Prepares the log tag using the date and the level
+     *
+     * @param date  The date
+     * @param level The logging level
+     * @return The tag
+     */
+    private String tag(Instant date, LoggerLevel level) {
+        String lvl = level.ordinal() != LoggerLevel.INFO.ordinal() ? " " + level.toString() : "";
+        return df.format(date) + lvl;
+    }
+
     private void addMessage(String msg, LoggerLevel level) {
         Instant date = Instant.now();
-        String lvl = level.equals(LoggerLevel.DEBUG) ? " DEBUG" : "";
-        log(df.format(date) + lvl, msg, level);
+        log(tag(date, level), msg, level);
         if (useHistorical) {
             NotificationsInterface.historical.add(new MessageBean(date, msg));
         }
@@ -89,15 +100,22 @@ public class ConsoleLogger implements IObserver {
 
     private void log(String tag, String msg, LoggerLevel level) {
         boolean debug = level.equals(LoggerLevel.DEBUG);
+        boolean err = level.equals(LoggerLevel.ERROR);
         if (Gdx.app != null) {
             if (debug) {
                 Gdx.app.debug(tag, msg);
+            } else if (err) {
+                Gdx.app.error(tag, msg);
             } else {
                 Gdx.app.log(tag, msg);
             }
         } else {
-            if (Logger.level.ordinal() >= level.ordinal())
-                System.out.println("[" + tag + "] " + msg);
+            if (Logger.level.ordinal() >= level.ordinal()) {
+                if (level.equals(LoggerLevel.ERROR))
+                    System.err.println("[" + tag + "] " + msg);
+                else
+                    System.out.println("[" + tag + "] " + msg);
+            }
         }
     }
 
