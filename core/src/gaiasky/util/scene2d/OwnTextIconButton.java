@@ -25,15 +25,31 @@ public class OwnTextIconButton extends OwnTextButton {
     private Image icon;
     private TextIconButtonStyle style;
     private float pad = 2f;
+    private int align = Align.left;
 
     public OwnTextIconButton(String text, Skin skin, String styleName) {
         super(text, skin);
         this.skin = skin;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), "default");
     }
+
+    public OwnTextIconButton(String text, int align, Skin skin, String styleName) {
+        super(text, skin);
+        this.skin = skin;
+        this.align = align;
+        setStyle(skin.get(styleName, TextIconButtonStyle.class), "default");
+    }
+
     public OwnTextIconButton(String text, Skin skin, String styleName, String textButtonStyle) {
         super(text, skin);
         this.skin = skin;
+        setStyle(skin.get(styleName, TextIconButtonStyle.class), textButtonStyle);
+    }
+
+    public OwnTextIconButton(String text, int align, Skin skin, String styleName, String textButtonStyle) {
+        super(text, skin);
+        this.skin = skin;
+        this.align = align;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), textButtonStyle);
     }
 
@@ -86,9 +102,15 @@ public class OwnTextIconButton extends OwnTextButton {
     public void setIcon(Image icon) {
         this.icon = icon;
         clearChildren();
-        this.align(Align.left);
-        add(this.icon).left().pad(pad).padRight((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR);
-        add(getLabel()).left().padRight(pad);
+        if(Align.isRight(align)){
+            this.align(align);
+            add(getLabel()).align(align).padRight((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR);
+            add(this.icon).align(align).pad(pad).padRight(pad);
+        } else {
+            this.align(align);
+            add(this.icon).align(align).pad(pad).padRight((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR);
+            add(getLabel()).align(align).padRight(pad);
+        }
     }
 
     public void draw (Batch batch, float parentAlpha) {

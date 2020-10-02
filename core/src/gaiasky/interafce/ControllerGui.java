@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -23,9 +24,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
+import gaiasky.util.*;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnSliderPlus;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -50,7 +49,7 @@ public class ControllerGui extends AbstractGui {
     private List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton;
-    private OwnSliderPlus bloomSlider;
+    private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider;
 
     private List<OwnTextButton> tabButtons;
     private List<ScrollPane> tabContents;
@@ -100,7 +99,7 @@ public class ControllerGui extends AbstractGui {
         // Create contents
 
         // CAMERA
-        Actor[][] cameraModel = new Actor[1][3];
+        Actor[][] cameraModel = new Actor[2][4];
         model.add(cameraModel);
 
         camT = new Table(skin);
@@ -108,7 +107,7 @@ public class ControllerGui extends AbstractGui {
         CameraManager cm = GaiaSky.instance.getCameraManager();
 
         // Focus
-        cameraFocus = new OwnTextButton("Focus camera", skin, "toggle-big");
+        cameraFocus = new OwnTextButton(CameraManager.CameraMode.FOCUS_MODE.toStringI18n(), skin, "toggle-big");
         cameraModel[0][0] = cameraFocus;
         cameraFocus.setWidth(ww);
         cameraFocus.setChecked(cm.getMode().isFocus());
@@ -126,7 +125,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Free
-        cameraFree = new OwnTextButton("Free camera", skin, "toggle-big");
+        cameraFree = new OwnTextButton(CameraManager.CameraMode.FREE_MODE.toStringI18n(), skin, "toggle-big");
         cameraModel[0][1] = cameraFree;
         cameraFree.setWidth(ww);
         cameraFree.setChecked(cm.getMode().isFree());
@@ -144,7 +143,7 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Cinematic
-        cameraCinematic = new OwnTextButton("Cinematic mode", skin, "toggle-big");
+        cameraCinematic = new OwnTextButton(I18n.txt("gui.camera.cinematic"), skin, "toggle-big");
         cameraModel[0][2] = cameraCinematic;
         cameraCinematic.setWidth(ww);
         cameraCinematic.setChecked(GlobalConf.scene.CINEMATIC_CAMERA);
@@ -156,9 +155,82 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        camT.add(cameraFocus).padBottom(pad10).row();
-        camT.add(cameraFree).padBottom(pad10).row();
-        camT.add(cameraCinematic).padBottom(pad10).row();
+        // FOV
+        fovSlider = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
+        cameraModel[1][0] = fovSlider;
+        fovSlider.setValueSuffix("°");
+        fovSlider.setName("field of view");
+        fovSlider.setWidth(sw);
+        fovSlider.setHeight(sh);
+        fovSlider.setValue(GlobalConf.scene.CAMERA_FOV);
+        fovSlider.setDisabled(GlobalConf.program.isFixedFov());
+        fovSlider.addListener(event -> {
+            if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !GlobalConf.program.isFixedFov()) {
+                float value = fovSlider.getMappedValue();
+                EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
+                return true;
+            }
+            return false;
+        });
+
+
+        // Speed
+        camSpeedSlider = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
+        cameraModel[1][1] = camSpeedSlider;
+        camSpeedSlider.setName("camera speed");
+        camSpeedSlider.setWidth(sw);
+        camSpeedSlider.setHeight(sh);
+        camSpeedSlider.setMappedValue(GlobalConf.scene.CAMERA_SPEED);
+        camSpeedSlider.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.CAMERA_SPEED_CMD, camSpeedSlider.getMappedValue(), false);
+                return true;
+            }
+            return false;
+        });
+
+        // Rot
+        camRotSlider = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
+        cameraModel[1][2] = camRotSlider;
+        camRotSlider.setName("rotate speed");
+        camRotSlider.setWidth(sw);
+        camRotSlider.setHeight(sh);
+        camRotSlider.setMappedValue(GlobalConf.scene.ROTATION_SPEED);
+        camRotSlider.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.ROTATION_SPEED_CMD, camRotSlider.getMappedValue(), false);
+                return true;
+            }
+            return false;
+        });
+
+        // Turn
+        camTurnSlider = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
+        cameraModel[1][3] = camTurnSlider;
+        camTurnSlider.setName("turn speed");
+        camTurnSlider.setWidth(sw);
+        camTurnSlider.setHeight(sh);
+        camTurnSlider.setMappedValue(GlobalConf.scene.TURNING_SPEED);
+        camTurnSlider.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.TURNING_SPEED_CMD, camTurnSlider.getMappedValue(), false);
+                return true;
+            }
+            return false;
+        });
+
+        camT.add(cameraFocus).padBottom(pad10).padRight(pad30);
+        camT.add(fovSlider).padBottom(pad10).row();
+
+        camT.add(cameraFree).padBottom(pad10).padRight(pad30);
+        camT.add(camSpeedSlider).padBottom(pad10).row();
+
+        camT.add(cameraCinematic).padBottom(pad10).padRight(pad30);
+        camT.add(camRotSlider).padBottom(pad10).row();
+
+        camT.add().padBottom(pad10).padRight(pad30);
+        camT.add(camTurnSlider).padBottom(pad10).row();
+
         tabContents.add(container(camT, w, h));
         updatePads(camT);
 
@@ -176,11 +248,12 @@ public class ControllerGui extends AbstractGui {
         timeStartStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Events.TIME_STATE_CMD, timeStartStop.isChecked(), false);
+                timeStartStop.setText(timeStartStop.isChecked() ? "Stop time" : "Start time");
                 return true;
             }
             return false;
         });
-        timeUp = new OwnTextButton("Speed up", skin, "big");
+        timeUp = new OwnTextIconButton("Speed up", Align.right, skin, "fwd");
         timeModel[2][0] = timeUp;
         timeUp.setWidth(ww);
         timeUp.addListener(event -> {
@@ -190,7 +263,7 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        timeDown = new OwnTextButton("Slow down", skin, "big");
+        timeDown = new OwnTextIconButton("Slow down", skin, "bwd");
         timeModel[0][0] = timeDown;
         timeDown.setWidth(ww);
         timeDown.addListener(event -> {
@@ -200,7 +273,7 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        timeReset = new OwnTextButton("Reset time", skin, "big");
+        timeReset = new OwnTextIconButton("Reset time", Align.center, skin, "reload");
         timeModel[1][1] = timeReset;
         timeReset.setWidth(ww);
         timeReset.addListener(event -> {
@@ -211,9 +284,9 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        timeT.add(timeDown).padBottom(pad10).padRight(pad10);
-        timeT.add(timeStartStop).padBottom(pad10).padRight(pad10);
-        timeT.add(timeUp).padBottom(pad10).row();
+        timeT.add(timeDown).padBottom(pad30).padRight(pad10);
+        timeT.add(timeStartStop).padBottom(pad30).padRight(pad10);
+        timeT.add(timeUp).padBottom(pad30).row();
         timeT.add(timeReset).padRight(pad10).padLeft(pad10).colspan(3).padBottom(pad10).row();
         tabContents.add(container(timeT, w, h));
         updatePads(timeT);
@@ -350,7 +423,7 @@ public class ControllerGui extends AbstractGui {
 
         sysT = new Table(skin);
 
-        quit = new OwnTextButton("Exit", skin, "big");
+        quit = new OwnTextIconButton("Exit", Align.center, skin, "quit");
         systemModel[0][0] = quit;
         quit.setWidth(ww);
         quit.addListener(event -> {

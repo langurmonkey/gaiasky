@@ -304,6 +304,12 @@
     "forward": {
       "imageUp": "iconic-arrow-thick-right"
     },
+    "fwd": {
+      "imageUp": "iconic-media-skip-forward"
+    },
+    "bwd": {
+      "imageUp": "iconic-media-skip-backward"
+    },
     "up": {
       "imageUp": "iconic-arrow-thick-top"
     },
