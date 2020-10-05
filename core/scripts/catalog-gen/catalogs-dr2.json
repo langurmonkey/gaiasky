@@ -7,7 +7,7 @@
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "small",
@@ -16,7 +16,7 @@
             "pllxerrfaint" : 0.005,
             "pllxzeropoint" : -0.02,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "bright",
@@ -25,7 +25,7 @@
             "pllxerrfaint" : 0.0,
             "pllxzeropoint" : -0.02,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "large",
@@ -34,7 +34,7 @@
             "pllxerrfaint" : 0.125,
             "pllxzeropoint" : -0.02,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "verylarge",
@@ -46,7 +46,7 @@
             "childcount" : 10000,
             "parentcount" : 50000,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "extralarge",
@@ -57,7 +57,7 @@
             "childcount" : 10000,
             "parentcount" : 50000,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "ratherlarge",
@@ -69,7 +69,7 @@
             "childcount" : 1000,
             "parentcount" : 50000,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         },
         {
             "name" : "ruwe",
@@ -81,7 +81,7 @@
             "childcount" : 1000,
             "parentcount" : 50000,
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
-            "xmatchfile" : "$DATA_LOC/data/gdr2hip/gdr2-hip-xmatch-all.csv"
+            "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/dr2/xmatch.csv"
         }
 
     ]
