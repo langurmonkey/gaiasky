@@ -36,9 +36,7 @@ import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
@@ -387,7 +385,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // The whole update thread must lock the value of direction and up
         distance = pos.len();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
-        double realTransUnits = m.isGame() ? getTranslateUnits(1e-5) : getTranslateUnits();
+        double realTransUnits = m.isGame() ? speedScaling(1e-5) : speedScaling();
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
         switch (m) {
         case FOCUS_MODE:
@@ -656,10 +654,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Gets the effective direction to use for the perspective camera. Takes into account planetarium down angle in free mode
+     *
      * @return The effective direction
      */
-    public Vector3d getEffectiveDirection(){
-        if(getMode().isFree() && GlobalConf.program.isPlanetarium())
+    public Vector3d getEffectiveDirection() {
+        if (getMode().isFree() && GlobalConf.program.isPlanetarium())
             return focusDirection;
         return direction;
     }
@@ -689,7 +688,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param amount Positive for forward force, negative for backward force.
      */
     public void addForwardForce(double amount) {
-        double tu = getTranslateUnits();
+        double tu = speedScaling();
         if (amount <= 0) {
             // Avoid getting stuck in surface
             tu = Math.max(10d * Constants.M_TO_U, tu);
@@ -754,7 +753,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param deltaY Amount of vertical movement.
      */
     public void addPanMovement(double deltaX, double deltaY) {
-        double tu = getTranslateUnits();
+        double tu = speedScaling();
         desired.set(direction).crs(up).nor().scl(-deltaX * tu);
         desired.add(aux1.set(up).nor().scl(-deltaY * tu));
         force.set(desired);
@@ -767,8 +766,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void forward(double amount, double minTu) {
-        double tu = getTranslateUnits(minTu);
-        desired.set(direction).nor().scl(amount * tu);
+        double speedScaling = speedScaling(minTu);
+        desired.set(direction).nor().scl(amount * speedScaling);
         vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
@@ -778,8 +777,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void strafe(double amount, double minTu) {
-        double tu = getTranslateUnits(minTu);
-        desired.set(direction).crs(up).nor().scl(amount * tu);
+        double speedScaling = speedScaling(minTu);
+        desired.set(direction).crs(up).nor().scl(amount * speedScaling);
         vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
@@ -789,8 +788,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void vertical(double amount, double minTu) {
-        double tu = getTranslateUnits(minTu);
-        desired.set(up).nor().scl(amount * tu);
+        double speedScaling = speedScaling(minTu);
+        desired.set(up).nor().scl(amount * speedScaling);
         vel.add(desired).clamp(0, 5e12);
         lastFwdTime = 0;
     }
@@ -1169,9 +1168,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Updates the camera direction and up vectors with a gentle turn towards the
      * given target.
      *
-     * @param dt               The current time step
-     * @param target           The position of the target
-     * @param turnVelocity     The velocity at which to turn
+     * @param dt           The current time step
+     * @param target       The position of the target
+     * @param turnVelocity The velocity at which to turn
      */
     private void directionToTarget(double dt, final Vector3d target, double turnVelocity) {
         desired.set(target).sub(pos);
@@ -1243,15 +1242,16 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
-    public NaturalControllerListener getControllerListener(){
+    public NaturalControllerListener getControllerListener() {
         return controllerListener;
     }
 
-    public void addControllerListener(){
+    public void addControllerListener() {
         GlobalConf.controls.addControllerListener(controllerListener);
         controllerListener.activate();
     }
-    public void removeControllerListener(){
+
+    public void removeControllerListener() {
         GlobalConf.controls.removeControllerListener(controllerListener);
         controllerListener.deactivate();
     }
@@ -1267,7 +1267,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
-    public double getTranslateUnits(double min) {
+
+    private final double DIST_A = 0.1 * Constants.PC_TO_U;
+    private final double DIST_B = 5.0 * Constants.KPC_TO_U;
+    private final double DIST_C = 5000.0 * Constants.MPC_TO_U;
+
+    /**
+     * The speed scaling function.
+     *
+     * @param min The minimum speed.
+     * @return The speed scaling.
+     */
+    public double speedScaling(double min) {
         double dist;
         if (parent.mode.useFocus() && focus != null) {
             dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
@@ -1276,24 +1287,37 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else {
             dist = distance;
         }
-        return dist > 0 ? Math.max(dist, min) * GlobalConf.scene.CAMERA_SPEED : 0;
+
+        double func;
+        if (dist < DIST_A) {
+            // 0.1 pc < d
+            func = MathUtilsd.lint(dist, 0, DIST_A, 0 , 1e6);
+        } else if (dist < DIST_B) {
+            // 0.1 pc < d < 5 Kpc
+            func = MathUtilsd.lint(dist, DIST_A, DIST_B, 1e6, 1e10);
+        } else {
+            // 5 Kpc < d
+            func = MathUtilsd.lint(dist, DIST_B, DIST_C, 1e10, 2e16);
+        }
+
+        return dist > 0 ? Math.max(func, min) * GlobalConf.scene.CAMERA_SPEED : 0;
     }
 
     /**
-     * this depends on the distance from the focus.
+     * The speed scaling function.
      *
-     * @return the translate units
+     * @return The speed scaling.
      */
-    public double getTranslateUnits() {
-        return getTranslateUnits(0.5e-8);
+    public double speedScaling() {
+        return speedScaling(0.5e-8);
     }
 
     /**
      * Depends on the distance to the focus
      *
-     * @return The rotation units
+     * @return The scaling for the rotation movement
      */
-    public double getRotationUnits() {
+    public double rotationScaling() {
         double dist;
         if (parent.mode == CameraMode.FOCUS_MODE) {
             AbstractPositionEntity ancestor = (AbstractPositionEntity) focus;
@@ -1446,9 +1470,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     if (octant != null && octant.getRoot() == octree.root) {
                         found = true;
                     }
-                } else if (data[0] instanceof GenericCatalog){
+                } else if (data[0] instanceof GenericCatalog) {
                     GenericCatalog gc = (GenericCatalog) data[0];
-                    if(gc.children != null && gc.children.contains((SceneGraphNode) this.focus, true)){
+                    if (gc.children != null && gc.children.contains((SceneGraphNode) this.focus, true)) {
                         found = true;
                     }
                 }
@@ -1654,7 +1678,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean draw = !GlobalConf.program.CUBEMAP_MODE && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.postprocess.POSTPROCESS_FISHEYE;
 
         // Pointer guides
-        if(GlobalConf.program.DISPLAY_POINTER_GUIDES) {
+        if (GlobalConf.program.DISPLAY_POINTER_GUIDES) {
             int mouseX = Gdx.input.getX();
             int mouseY = Gdx.input.getY();
             shapeRenderer.begin(ShapeType.Line);
@@ -1663,7 +1687,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             float pc[] = GlobalConf.program.POINTER_GUIDES_COLOR;
             shapeRenderer.setColor(pc[0], pc[1], pc[2], pc[3]);
             shapeRenderer.line(0, rh - mouseY, rw, rh - mouseY);
-            shapeRenderer.line(mouseX, 0, mouseX,rh);
+            shapeRenderer.line(mouseX, 0, mouseX, rh);
             shapeRenderer.end();
         }
 

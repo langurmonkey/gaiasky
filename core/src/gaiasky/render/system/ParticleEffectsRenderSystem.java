@@ -16,7 +16,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
@@ -99,7 +98,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
     }
 
     private void updatePositions(ICamera cam) {
-        double tu = cam.getCurrent().getTranslateUnits();
+        double tu = cam.getCurrent().speedScaling();
         double dist = 1200000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
 
         // If focus is very close, stop (jittering errors kick in)

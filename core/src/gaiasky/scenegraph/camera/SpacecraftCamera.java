@@ -496,7 +496,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public double getTranslateUnits() {
+    public double speedScaling() {
         return Math.max(0.001, scvel.len());
     }
 

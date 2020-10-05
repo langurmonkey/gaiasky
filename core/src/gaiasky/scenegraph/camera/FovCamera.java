@@ -407,7 +407,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public double getTranslateUnits() {
+    public double speedScaling() {
         return 0;
     }
 

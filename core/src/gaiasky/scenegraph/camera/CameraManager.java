@@ -610,8 +610,8 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public double getTranslateUnits() {
-        return current.getTranslateUnits();
+    public double speedScaling() {
+        return current.speedScaling();
     }
 
     @Override

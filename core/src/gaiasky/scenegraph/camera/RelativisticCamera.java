@@ -88,7 +88,7 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public double getTranslateUnits() {
+    public double speedScaling() {
         // TODO Auto-generated method stub
         return 0;
     }
