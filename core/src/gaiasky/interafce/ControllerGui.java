@@ -8,6 +8,7 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -22,13 +23,15 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.*;
-import gaiasky.util.scene2d.OwnScrollPane;
-import gaiasky.util.scene2d.OwnSliderPlus;
-import gaiasky.util.scene2d.OwnTextButton;
-import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -40,25 +43,30 @@ import java.util.Set;
  * GUI that is operated with a game controller and optimized for that purpose.
  */
 public class ControllerGui extends AbstractGui {
+    private static final Logger.Log logger = Logger.getLogger(ControllerGui.class.getSimpleName());
 
     private final Table content, menu;
-    private Table camT, timeT, optT, typesT, sysT;
-    private Cell contentCell;
-    private OwnTextButton cameraButton, timeButton, optionsButton, typesButton, systemButton;
+    private Table searchT, camT, timeT, optT, typesT, sysT;
+    private Cell contentCell, infoCell;
+    private OwnTextButton searchButton, cameraButton, timeButton, optionsButton, typesButton, systemButton;
     // Contains a matrix (column major) of actors for each tab
     private List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider;
+    private OwnTextField searchField;
+    private OwnLabel infoMessage;
 
     private List<OwnTextButton> tabButtons;
     private List<ScrollPane> tabContents;
 
     private Actor[][] currentModel;
+    private ISceneGraph sg;
 
     private EventManager em;
     private GUIControllerListener guiControllerListener;
     private float pad5, pad10, pad20, pad30;
+    private String currentInputText = "";
 
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
@@ -93,10 +101,114 @@ public class ControllerGui extends AbstractGui {
         float h = 500f * GlobalConf.UI_SCALE_FACTOR;
         // Widget width
         float ww = 250f * GlobalConf.UI_SCALE_FACTOR;
+        float wh = 50f * GlobalConf.UI_SCALE_FACTOR;
         float sw = ww;
         float sh = 60f * GlobalConf.UI_SCALE_FACTOR;
+        float tfw = 150f * GlobalConf.UI_SCALE_FACTOR;
 
         // Create contents
+
+        // SEARCH
+        Actor[][] searchModel = new Actor[11][5];
+        model.add(searchModel);
+
+        searchT = new Table(skin);
+        searchT.setSize(w, h);
+
+        searchField = new OwnTextField("", skin, "big");
+        searchField.setProgrammaticChangeEvents(true);
+        searchField.setSize(ww, wh);
+        searchField.setMessageText("Search...");
+        searchField.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                ChangeEvent ie = (ChangeEvent) event;
+                if (!searchField.getText().equals(currentInputText) && !searchField.getText().isBlank()) {
+                    // Process only if text changed
+                    currentInputText = searchField.getText();
+                    String name = currentInputText.toLowerCase().trim();
+                    if (!checkString(name, sg)) {
+                        if (name.matches("[0-9]+")) {
+                            // Check with 'HIP '
+                            checkString("hip " + name, sg);
+                        } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
+                            // Check without 'HIP '
+                            checkString(name.substring(4), sg);
+                        }
+                    }
+                }
+
+            }
+            return false;
+        });
+        searchT.add(searchField).colspan(11).padBottom(pad5).row();
+
+        infoMessage = new OwnLabel("", skin, "default-blue");
+        infoCell = searchT.add();
+        infoCell.colspan(10).padBottom(pad20).row();
+
+        // First row
+        addKey("Q", searchModel, 0, 0, false);
+        addKey("W", searchModel, 1, 0, false);
+        addKey("E", searchModel, 2, 0, false);
+        addKey("R", searchModel, 3, 0, false);
+        addKey("T", searchModel, 4, 0, false);
+        addKey("Y", searchModel, 5, 0, false);
+        addKey("U", searchModel, 6, 0, false);
+        addKey("I", searchModel, 7, 0, false);
+        addKey("O", searchModel, 8, 0, false);
+        addKey("P", searchModel, 9, 0, false);
+        addKey("<--", (event) -> {
+            if (event instanceof ChangeEvent) {
+                if (!searchField.getText().isBlank()) {
+                    searchField.setText(searchField.getText().substring(0, searchField.getText().length() - 1));
+                }
+            }
+            return false;
+        }, searchModel, 10, 0, true, tfw / 1.5f, pad10, 0);
+        // Second row
+        searchT.add().padRight(pad5).padBottom(pad10);
+        addKey("A", searchModel, 1, 1, false);
+        addKey("S", searchModel, 2, 1, false);
+        addKey("D", searchModel, 3, 1, false);
+        addKey("F", searchModel, 4, 1, false);
+        addKey("G", searchModel, 5, 1, false);
+        addKey("H", searchModel, 6, 1, false);
+        addKey("J", searchModel, 7, 1, false);
+        addKey("K", searchModel, 8, 1, false);
+        addKey("L", searchModel, 9, 1, false);
+        addKey("Clear", (event) -> {
+            if (event instanceof ChangeEvent) {
+                if (!searchField.getText().isBlank()) {
+                    searchField.setText("");
+                }
+            }
+            return false;
+        }, searchModel, 10, 1, true, tfw / 1.5f, pad10, 0);
+        // Third row
+        searchT.add().padRight(pad5).padBottom(pad10);
+        searchT.add().padRight(pad5).padBottom(pad10);
+        addKey("Z", searchModel, 2, 2, false);
+        addKey("X", searchModel, 3, 2, false);
+        addKey("C", searchModel, 4, 2, false);
+        addKey("V", searchModel, 5, 2, false);
+        addKey("B", searchModel, 6, 2, false);
+        addKey("N", searchModel, 7, 2, false);
+        addKey("M", searchModel, 8, 2, false);
+        addKey("-", searchModel, 9, 2, true);
+
+        // Fourth row
+        searchT.add().padRight(pad5).padBottom(pad10);
+        searchT.add().padRight(pad5).padBottom(pad10);
+        searchT.add().padRight(pad5).padBottom(pad10);
+        addKey("SPACE", (event) -> {
+            if (event instanceof ChangeEvent) {
+                searchField.setText(searchField.getText() + " ");
+            }
+            return false;
+        }, searchModel, 5, 3, false, tfw * 2f, pad5, 6);
+
+        tabContents.add(container(searchT, w, h));
+        updatePads(searchT);
 
         // CAMERA
         Actor[][] cameraModel = new Actor[2][4];
@@ -107,14 +219,14 @@ public class ControllerGui extends AbstractGui {
         CameraManager cm = GaiaSky.instance.getCameraManager();
 
         // Focus
-        cameraFocus = new OwnTextButton(CameraManager.CameraMode.FOCUS_MODE.toStringI18n(), skin, "toggle-big");
+        cameraFocus = new OwnTextButton(CameraMode.FOCUS_MODE.toStringI18n(), skin, "toggle-big");
         cameraModel[0][0] = cameraFocus;
         cameraFocus.setWidth(ww);
         cameraFocus.setChecked(cm.getMode().isFocus());
         cameraFocus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (cameraFocus.isChecked()) {
-                    em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                    em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                     cameraFree.setProgrammaticChangeEvents(false);
                     cameraFree.setChecked(false);
                     cameraFree.setProgrammaticChangeEvents(true);
@@ -125,14 +237,14 @@ public class ControllerGui extends AbstractGui {
         });
 
         // Free
-        cameraFree = new OwnTextButton(CameraManager.CameraMode.FREE_MODE.toStringI18n(), skin, "toggle-big");
+        cameraFree = new OwnTextButton(CameraMode.FREE_MODE.toStringI18n(), skin, "toggle-big");
         cameraModel[0][1] = cameraFree;
         cameraFree.setWidth(ww);
         cameraFree.setChecked(cm.getMode().isFree());
         cameraFree.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (cameraFree.isChecked()) {
-                    em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+                    em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
                     cameraFocus.setProgrammaticChangeEvents(false);
                     cameraFocus.setChecked(false);
                     cameraFocus.setProgrammaticChangeEvents(true);
@@ -172,7 +284,6 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-
 
         // Speed
         camSpeedSlider = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
@@ -439,6 +550,9 @@ public class ControllerGui extends AbstractGui {
         updatePads(sysT);
 
         // Create tab buttons
+        searchButton = new OwnTextButton("Search", skin, "toggle-huge");
+        tabButtons.add(searchButton);
+
         cameraButton = new OwnTextButton("Camera", skin, "toggle-huge");
         tabButtons.add(cameraButton);
 
@@ -456,7 +570,7 @@ public class ControllerGui extends AbstractGui {
 
         for (OwnTextButton b : tabButtons) {
             b.pad(pad10);
-            b.setMinWidth(200f * GlobalConf.UI_SCALE_FACTOR);
+            b.setMinWidth(150f * GlobalConf.UI_SCALE_FACTOR);
         }
 
         OwnTextButton lb, rb;
@@ -465,6 +579,7 @@ public class ControllerGui extends AbstractGui {
         lb.pad(pad10);
         rb.pad(pad10);
         menu.add(rb).center().padBottom(pad10).padRight(pad30);
+        menu.add(searchButton).center().padBottom(pad10);
         menu.add(cameraButton).center().padBottom(pad10);
         menu.add(timeButton).center().padBottom(pad10);
         menu.add(typesButton).center().padBottom(pad10);
@@ -490,6 +605,79 @@ public class ControllerGui extends AbstractGui {
         updateFocused(true);
     }
 
+    private void addKey(String text, Actor[][] m, int i, int j, boolean nl) {
+        addKey(text, (event) -> {
+            if (event instanceof ChangeEvent) {
+                searchField.setText(searchField.getText() + text.toLowerCase());
+            }
+            return false;
+        }, m, i, j, nl, -1, pad5, 1);
+    }
+
+    private void addKey(String text, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, float padRight, int colspan) {
+        OwnTextButton key = new OwnTextButton(text, skin, "big");
+        if (width > 0)
+            key.setWidth(width);
+        key.addListener(el);
+        m[i][j] = key;
+        Cell c = searchT.add(key).padRight(pad5).padBottom(pad10);
+        if (nl)
+            c.row();
+        if (colspan > 1)
+            c.colspan(colspan);
+    }
+
+    public boolean checkString(String text, ISceneGraph sg) {
+        try {
+            if (sg.containsNode(text)) {
+                SceneGraphNode node = sg.getNode(text);
+                if (node instanceof IFocus) {
+                    IFocus focus = ((IFocus) node).getFocus(text);
+                    boolean timeOverflow = focus.isCoordinatesTimeOverflow();
+                    boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
+                    boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
+                    if (!timeOverflow && canSelect && ctOn) {
+                        GaiaSky.postRunnable(() -> {
+                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
+                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                        });
+                        info(null);
+                    } else if (timeOverflow) {
+                        info(I18n.txt("gui.objects.search.timerange", text));
+                    } else if (!canSelect) {
+                        info(I18n.txt("gui.objects.search.filter", text));
+                    } else {
+                        info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
+                    }
+                    return true;
+                }
+            } else {
+                info(null);
+            }
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return false;
+    }
+
+    private void info(String info) {
+        if (info == null) {
+            infoMessage.setText("");
+            info(false);
+        } else {
+            infoMessage.setText(info);
+            info(true);
+        }
+    }
+
+    private void info(boolean visible) {
+        if (visible) {
+            infoCell.setActor(infoMessage);
+        } else {
+            infoCell.setActor(null);
+        }
+    }
+
     @Override
     public void initialize(AssetManager assetManager) {
         // User interface
@@ -497,7 +685,7 @@ public class ControllerGui extends AbstractGui {
         ui = new Stage(vp, GlobalResources.spriteBatch);
 
         // Comment to hide this whole dialog and functionality
-        EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION, Events.TIME_STATE_CMD);
+        EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION, Events.TIME_STATE_CMD, Events.SCENE_GRAPH_LOADED);
     }
 
     @Override
@@ -551,7 +739,7 @@ public class ControllerGui extends AbstractGui {
      * @param right Whehter scan right or left
      * @return True if the element was selected, false otherwise
      */
-    public boolean selectRow(int i, int j, boolean right) {
+    public boolean selectInRow(int i, int j, boolean right) {
         fi = i;
         fj = j;
         if (currentModel != null && currentModel.length > 0) {
@@ -576,11 +764,14 @@ public class ControllerGui extends AbstractGui {
      * @param down Whehter scan up or down
      * @return True if the element was selected, false otherwise
      */
-    public boolean selectCol(int i, int j, boolean down) {
+    public boolean selectInCol(int i, int j, boolean down) {
         fi = i;
         fj = j;
         if (currentModel != null && currentModel.length > 0) {
             while (currentModel[fi][fj] == null) {
+                // Try out other columns
+                if (selectInRow(fi, fj, true))
+                    return true;
                 // Move to the next row
                 fj = (fj + (down ? 1 : -1)) % currentModel[fi].length;
                 if (fj == j) {
@@ -593,7 +784,7 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void selectFirst() {
-        selectRow(0, 0, true);
+        selectInRow(0, 0, true);
     }
 
     public void updateFocused() {
@@ -624,22 +815,22 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void up() {
-        selectCol(fi, update(fj, -1, currentModel[fi].length), false);
+        selectInCol(fi, update(fj, -1, currentModel[fi].length), false);
         updateFocused();
     }
 
     public void down() {
-        selectCol(fi, update(fj, 1, currentModel[fi].length), true);
+        selectInCol(fi, update(fj, 1, currentModel[fi].length), true);
         updateFocused();
     }
 
     public void left() {
-        selectRow(update(fi, -1, currentModel.length), fj, false);
+        selectInRow(update(fi, -1, currentModel.length), fj, false);
         updateFocused();
     }
 
     public void right() {
-        selectRow(update(fi, 1, currentModel.length), fj, false);
+        selectInRow(update(fi, 1, currentModel.length), fj, false);
         updateFocused();
     }
 
@@ -720,6 +911,7 @@ public class ControllerGui extends AbstractGui {
             NaturalCamera cam = (NaturalCamera) data[0];
             if (content.isVisible() && content.getParent() != null) {
                 // Hide and remove
+                searchField.setText("");
                 content.setVisible(false);
                 content.remove();
                 ui.setKeyboardFocus(null);
@@ -748,6 +940,9 @@ public class ControllerGui extends AbstractGui {
             timeStartStop.setText(on ? "Stop time" : "Start time");
 
             timeStartStop.setProgrammaticChangeEvents(true);
+            break;
+        case SCENE_GRAPH_LOADED:
+            this.sg = (ISceneGraph) data[0];
             break;
         default:
             break;
@@ -925,4 +1120,5 @@ public class ControllerGui extends AbstractGui {
         }
 
     }
+
 }
