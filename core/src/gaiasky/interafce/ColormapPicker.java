@@ -102,11 +102,12 @@ public class ColormapPicker extends ColorPickerAbstract {
 
     protected void initialize() {
 
-        this.addListener(event -> {
-            if (event instanceof InputEvent) {
-                Type type = ((InputEvent) event).getType();
-                // Click
-                if ((type == Type.touchUp) && (((InputEvent) event).getButton() == Buttons.LEFT)) {
+        this.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return super.touchDown(event, x, y, pointer, button);
+            }
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getButton() == Buttons.LEFT){
                     // Launch color picker window
                     ColorPickerColormapDialog cpd = new ColorPickerColormapDialog(name, color, stage, skin);
                     cpd.setAcceptRunnable(() -> {
@@ -124,7 +125,17 @@ public class ColormapPicker extends ColorPickerAbstract {
                     });
                     cpd.show(stage);
 
-                } else if (type == Type.enter) {
+                }
+
+                // Bubble up
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
+        this.addListener(event -> {
+            if (event instanceof InputEvent) {
+                Type type = ((InputEvent) event).getType();
+                // Click
+                if (type == Type.enter) {
                     Gdx.graphics.setCursor(GlobalResources.linkCursor);
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
