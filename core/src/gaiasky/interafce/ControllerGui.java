@@ -98,13 +98,15 @@ public class ControllerGui extends AbstractGui {
         model.clear();
 
         float w = 900f * GlobalConf.UI_SCALE_FACTOR;
-        float h = 500f * GlobalConf.UI_SCALE_FACTOR;
+        float h = 400f * GlobalConf.UI_SCALE_FACTOR;
         // Widget width
         float ww = 250f * GlobalConf.UI_SCALE_FACTOR;
         float wh = 50f * GlobalConf.UI_SCALE_FACTOR;
         float sw = ww;
         float sh = 60f * GlobalConf.UI_SCALE_FACTOR;
         float tfw = 150f * GlobalConf.UI_SCALE_FACTOR;
+        // Tab width
+        float tw = 140f * GlobalConf.UI_SCALE_FACTOR;
 
         // Create contents
 
@@ -147,17 +149,17 @@ public class ControllerGui extends AbstractGui {
         infoCell.colspan(10).padBottom(pad20).row();
 
         // First row
-        addKey("Q", searchModel, 0, 0, false);
-        addKey("W", searchModel, 1, 0, false);
-        addKey("E", searchModel, 2, 0, false);
-        addKey("R", searchModel, 3, 0, false);
-        addKey("T", searchModel, 4, 0, false);
-        addKey("Y", searchModel, 5, 0, false);
-        addKey("U", searchModel, 6, 0, false);
-        addKey("I", searchModel, 7, 0, false);
-        addKey("O", searchModel, 8, 0, false);
-        addKey("P", searchModel, 9, 0, false);
-        addKey("<--", (event) -> {
+        addTextKey("Q", searchModel, 0, 0, false);
+        addTextKey("W", searchModel, 1, 0, false);
+        addTextKey("E", searchModel, 2, 0, false);
+        addTextKey("R", searchModel, 3, 0, false);
+        addTextKey("T", searchModel, 4, 0, false);
+        addTextKey("Y", searchModel, 5, 0, false);
+        addTextKey("U", searchModel, 6, 0, false);
+        addTextKey("I", searchModel, 7, 0, false);
+        addTextKey("O", searchModel, 8, 0, false);
+        addTextKey("P", searchModel, 9, 0, false);
+        addTextKey("<--", (event) -> {
             if (event instanceof ChangeEvent) {
                 if (!searchField.getText().isBlank()) {
                     searchField.setText(searchField.getText().substring(0, searchField.getText().length() - 1));
@@ -167,16 +169,16 @@ public class ControllerGui extends AbstractGui {
         }, searchModel, 10, 0, true, tfw / 1.5f, pad10, 0);
         // Second row
         searchT.add().padRight(pad5).padBottom(pad10);
-        addKey("A", searchModel, 1, 1, false);
-        addKey("S", searchModel, 2, 1, false);
-        addKey("D", searchModel, 3, 1, false);
-        addKey("F", searchModel, 4, 1, false);
-        addKey("G", searchModel, 5, 1, false);
-        addKey("H", searchModel, 6, 1, false);
-        addKey("J", searchModel, 7, 1, false);
-        addKey("K", searchModel, 8, 1, false);
-        addKey("L", searchModel, 9, 1, false);
-        addKey("Clear", (event) -> {
+        addTextKey("A", searchModel, 1, 1, false);
+        addTextKey("S", searchModel, 2, 1, false);
+        addTextKey("D", searchModel, 3, 1, false);
+        addTextKey("F", searchModel, 4, 1, false);
+        addTextKey("G", searchModel, 5, 1, false);
+        addTextKey("H", searchModel, 6, 1, false);
+        addTextKey("J", searchModel, 7, 1, false);
+        addTextKey("K", searchModel, 8, 1, false);
+        addTextKey("L", searchModel, 9, 1, false);
+        addTextKey("Clear", (event) -> {
             if (event instanceof ChangeEvent) {
                 if (!searchField.getText().isBlank()) {
                     searchField.setText("");
@@ -187,20 +189,20 @@ public class ControllerGui extends AbstractGui {
         // Third row
         searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
-        addKey("Z", searchModel, 2, 2, false);
-        addKey("X", searchModel, 3, 2, false);
-        addKey("C", searchModel, 4, 2, false);
-        addKey("V", searchModel, 5, 2, false);
-        addKey("B", searchModel, 6, 2, false);
-        addKey("N", searchModel, 7, 2, false);
-        addKey("M", searchModel, 8, 2, false);
-        addKey("-", searchModel, 9, 2, true);
+        addTextKey("Z", searchModel, 2, 2, false);
+        addTextKey("X", searchModel, 3, 2, false);
+        addTextKey("C", searchModel, 4, 2, false);
+        addTextKey("V", searchModel, 5, 2, false);
+        addTextKey("B", searchModel, 6, 2, false);
+        addTextKey("N", searchModel, 7, 2, false);
+        addTextKey("M", searchModel, 8, 2, false);
+        addTextKey("-", searchModel, 9, 2, true);
 
         // Fourth row
         searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
         searchT.add().padRight(pad5).padBottom(pad10);
-        addKey("SPACE", (event) -> {
+        addTextKey("SPACE", (event) -> {
             if (event instanceof ChangeEvent) {
                 searchField.setText(searchField.getText() + " ");
             }
@@ -352,19 +354,19 @@ public class ControllerGui extends AbstractGui {
         timeT = new Table(skin);
 
         boolean timeOn = GlobalConf.runtime.TIME_ON;
-        timeStartStop = new OwnTextButton(timeOn ? "Stop time" : "Start time", skin, "toggle-big");
+        timeStartStop = new OwnTextButton(I18n.txt(timeOn ? "gui.time.pause" : "gui.time.start"), skin, "toggle-big");
         timeModel[1][0] = timeStartStop;
         timeStartStop.setWidth(ww);
         timeStartStop.setChecked(timeOn);
         timeStartStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Events.TIME_STATE_CMD, timeStartStop.isChecked(), false);
-                timeStartStop.setText(timeStartStop.isChecked() ? "Stop time" : "Start time");
+                timeStartStop.setText(I18n.txt(timeStartStop.isChecked() ? "gui.time.pause" : "gui.time.start"));
                 return true;
             }
             return false;
         });
-        timeUp = new OwnTextIconButton("Speed up", Align.right, skin, "fwd");
+        timeUp = new OwnTextIconButton(I18n.txt("gui.time.speedup"), Align.right, skin, "fwd");
         timeModel[2][0] = timeUp;
         timeUp.setWidth(ww);
         timeUp.addListener(event -> {
@@ -374,7 +376,7 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        timeDown = new OwnTextIconButton("Slow down", skin, "bwd");
+        timeDown = new OwnTextIconButton(I18n.txt("gui.time.slowdown"), skin, "bwd");
         timeModel[0][0] = timeDown;
         timeDown.setWidth(ww);
         timeDown.addListener(event -> {
@@ -384,7 +386,7 @@ public class ControllerGui extends AbstractGui {
             }
             return false;
         });
-        timeReset = new OwnTextIconButton("Reset time", Align.center, skin, "reload");
+        timeReset = new OwnTextIconButton(I18n.txt("action.resettime"), Align.center, skin, "reload");
         timeModel[1][1] = timeReset;
         timeReset.setWidth(ww);
         timeReset.addListener(event -> {
@@ -469,7 +471,7 @@ public class ControllerGui extends AbstractGui {
         optT = new Table(skin);
 
         // Slider
-        bloomSlider = new OwnSliderPlus("Bloom", Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-15");
+        bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-15");
         bloomSlider.setWidth(sw);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
@@ -484,7 +486,7 @@ public class ControllerGui extends AbstractGui {
         optT.add(bloomSlider).padBottom(pad10).row();
 
         // Lens flare
-        flareButton = new OwnTextButton("Lens flare", skin, "toggle-big");
+        flareButton = new OwnTextButton(I18n.txt("gui.lensflare"), skin, "toggle-big");
         optionsModel[0][1] = flareButton;
         flareButton.setWidth(ww);
         flareButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE);
@@ -498,7 +500,7 @@ public class ControllerGui extends AbstractGui {
         optT.add(flareButton).padBottom(pad10).row();
 
         // Star glow
-        starGlowButton = new OwnTextButton("Star glow", skin, "toggle-big");
+        starGlowButton = new OwnTextButton(I18n.txt("gui.lightscattering"), skin, "toggle-big");
         optionsModel[0][2] = starGlowButton;
         starGlowButton.setWidth(ww);
         starGlowButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
@@ -512,7 +514,7 @@ public class ControllerGui extends AbstractGui {
         optT.add(starGlowButton).padBottom(pad10).row();
 
         // Motion blur
-        motionBlurButton = new OwnTextButton("Motion blur", skin, "toggle-big");
+        motionBlurButton = new OwnTextButton(I18n.txt("gui.motionblur"), skin, "toggle-big");
         optionsModel[0][3] = motionBlurButton;
         motionBlurButton.setWidth(ww);
         motionBlurButton.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
@@ -534,7 +536,7 @@ public class ControllerGui extends AbstractGui {
 
         sysT = new Table(skin);
 
-        quit = new OwnTextIconButton("Exit", Align.center, skin, "quit");
+        quit = new OwnTextIconButton(I18n.txt("gui.quit.title"), Align.center, skin, "quit");
         systemModel[0][0] = quit;
         quit.setWidth(ww);
         quit.addListener(event -> {
@@ -550,42 +552,97 @@ public class ControllerGui extends AbstractGui {
         updatePads(sysT);
 
         // Create tab buttons
-        searchButton = new OwnTextButton("Search", skin, "toggle-huge");
+        searchButton = new OwnTextButton(I18n.txt("gui.search"), skin, "toggle-huge");
         tabButtons.add(searchButton);
+        searchButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(searchButton);
+                updateTabs();
+            }
+            return false;
+        });
 
-        cameraButton = new OwnTextButton("Camera", skin, "toggle-huge");
+        cameraButton = new OwnTextButton(I18n.txt("gui.camera"), skin, "toggle-huge");
         tabButtons.add(cameraButton);
+        cameraButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(cameraButton);
+                updateTabs();
+            }
+            return false;
+        });
 
-        timeButton = new OwnTextButton("Time", skin, "toggle-huge");
+        timeButton = new OwnTextButton(I18n.txt("gui.time"), skin, "toggle-huge");
         tabButtons.add(timeButton);
+        timeButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(timeButton);
+                updateTabs();
+            }
+            return false;
+        });
 
-        typesButton = new OwnTextButton("Types", skin, "toggle-huge");
+        typesButton = new OwnTextButton(I18n.txt("gui.types"), skin, "toggle-huge");
         tabButtons.add(typesButton);
+        typesButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(typesButton);
+                updateTabs();
+            }
+            return false;
+        });
 
-        optionsButton = new OwnTextButton("Options", skin, "toggle-huge");
+        optionsButton = new OwnTextButton(I18n.txt("gui.options"), skin, "toggle-huge");
         tabButtons.add(optionsButton);
+        optionsButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(optionsButton);
+                updateTabs();
+            }
+            return false;
+        });
 
-        systemButton = new OwnTextButton("System", skin, "toggle-huge");
+        systemButton = new OwnTextButton(I18n.txt("gui.system"), skin, "toggle-huge");
         tabButtons.add(systemButton);
+        systemButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                selectedTab = tabButtons.indexOf(systemButton);
+                updateTabs();
+            }
+            return false;
+        });
 
         for (OwnTextButton b : tabButtons) {
             b.pad(pad10);
-            b.setMinWidth(150f * GlobalConf.UI_SCALE_FACTOR);
+            b.setMinWidth(tw);
         }
 
+        // Left and Right indicators
         OwnTextButton lb, rb;
-        lb = new OwnTextButton("RB >", skin, "key-big");
-        rb = new OwnTextButton("< LB", skin, "key-big");
-        lb.pad(pad10);
+        rb = new OwnTextIconButton("RB", Align.right, skin, "caret-right");
+        rb.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                tabRight();
+            }
+            return false;
+        });
         rb.pad(pad10);
-        menu.add(rb).center().padBottom(pad10).padRight(pad30);
+        lb = new OwnTextIconButton("LB", Align.left, skin, "caret-left");
+        lb.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                tabLeft();
+            }
+            return false;
+        });
+        lb.pad(pad10);
+        menu.add(lb).center().padBottom(pad10).padRight(pad30);
         menu.add(searchButton).center().padBottom(pad10);
         menu.add(cameraButton).center().padBottom(pad10);
         menu.add(timeButton).center().padBottom(pad10);
         menu.add(typesButton).center().padBottom(pad10);
         menu.add(optionsButton).center().padBottom(pad10);
         menu.add(systemButton).center().padBottom(pad10);
-        menu.add(lb).center().padBottom(pad10).padLeft(pad30).row();
+        menu.add(rb).center().padBottom(pad10).padLeft(pad30).row();
 
         contentCell = menu.add().colspan(7);
 
@@ -603,10 +660,13 @@ public class ControllerGui extends AbstractGui {
 
         updateTabs();
         updateFocused(true);
+
+        if(sg == null)
+            sg = GaiaSky.instance.sg;
     }
 
-    private void addKey(String text, Actor[][] m, int i, int j, boolean nl) {
-        addKey(text, (event) -> {
+    private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
+        addTextKey(text, (event) -> {
             if (event instanceof ChangeEvent) {
                 searchField.setText(searchField.getText() + text.toLowerCase());
             }
@@ -614,7 +674,20 @@ public class ControllerGui extends AbstractGui {
         }, m, i, j, nl, -1, pad5, 1);
     }
 
-    private void addKey(String text, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, float padRight, int colspan) {
+    private void addTextIconKey(String text, String style, int align, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, float padRight, int colspan) {
+        OwnTextButton key = new OwnTextIconButton(text, align, skin, style);
+        if (width > 0)
+            key.setWidth(width);
+        key.addListener(el);
+        m[i][j] = key;
+        Cell c = searchT.add(key).padRight(pad5).padBottom(pad10);
+        if (nl)
+            c.row();
+        if (colspan > 1)
+            c.colspan(colspan);
+    }
+
+    private void addTextKey(String text, EventListener el, Actor[][] m, int i, int j, boolean nl, float width, float padRight, int colspan) {
         OwnTextButton key = new OwnTextButton(text, skin, "big");
         if (width > 0)
             key.setWidth(width);
@@ -720,9 +793,13 @@ public class ControllerGui extends AbstractGui {
 
     public void updateTabs() {
         for (OwnTextButton tb : tabButtons) {
+            tb.setProgrammaticChangeEvents(false);
             tb.setChecked(false);
+            tb.setProgrammaticChangeEvents(true);
         }
+        tabButtons.get(selectedTab).setProgrammaticChangeEvents(false);
         tabButtons.get(selectedTab).setChecked(true);
+        tabButtons.get(selectedTab).setProgrammaticChangeEvents(true);
         contentCell.setActor(null);
         currentModel = model.get(selectedTab);
         contentCell.setActor(tabContents.get(selectedTab));

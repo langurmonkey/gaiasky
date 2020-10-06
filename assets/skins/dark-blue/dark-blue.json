@@ -319,6 +319,12 @@
     "up": {
       "imageUp": "iconic-arrow-thick-top"
     },
+    "caret-left": {
+      "imageUp": "iconic-caret-left"
+    },
+    "caret-right": {
+      "imageUp": "iconic-caret-right"
+    },
     "edit": {
       "imageUp": "edit-icon"
     },
