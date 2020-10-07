@@ -45,7 +45,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
     private static final String separator = comma;
 
-
     /**
      * Maximum file count to load. 0 or negative for unlimited
      */
@@ -75,10 +74,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * Default columns for DR2
      */
     public void setDR2Columns() {
-        setColumns(ColId.sourceid.toString(), ColId.ra.toString(), ColId.dec.toString(), ColId.pllx.toString(),
-                ColId.ra_err.toString(), ColId.dec_err.toString(), ColId.pllx_err.toString(), ColId.pmra.toString(),
-                ColId.pmdec.toString(), ColId.radvel.toString(), ColId.pmra_err.toString(), ColId.pmdec_err.toString(),
-                ColId.pllx_err.toString(), ColId.gmag.toString(), ColId.bpmag.toString(), ColId.rpmag.toString(), ColId.ref_epoch.toString());
+        setColumns(ColId.sourceid.toString(), ColId.ra.toString(), ColId.dec.toString(), ColId.pllx.toString(), ColId.ra_err.toString(), ColId.dec_err.toString(), ColId.pllx_err.toString(), ColId.pmra.toString(), ColId.pmdec.toString(), ColId.radvel.toString(), ColId.pmra_err.toString(), ColId.pmdec_err.toString(), ColId.pllx_err.toString(), ColId.gmag.toString(), ColId.bpmag.toString(), ColId.rpmag.toString(), ColId.ref_epoch.toString());
     }
 
     /**
@@ -120,7 +116,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     public List<ParticleBean> loadData(String file) {
         return loadData(file, 1d);
     }
-
 
     public List<ParticleBean> loadData(String file, double factor, boolean compat) {
         initLists(1000000);
@@ -192,7 +187,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 i++;
             }
             // Flush resting
-            if(lineBuffer.size() > 0){
+            if (lineBuffer.size() > 0) {
                 if (parallel)
                     lineBuffer.parallelStream().forEach(c);
                 else
@@ -235,7 +230,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
             double pllxerr = Parser.parseDouble(tokens[idx(ColId.pllx_err)]);
             double appmag = Parser.parseDouble(tokens[idx(ColId.gmag)]);
             extra.put(new UCD("pllx_err", ColId.pllx_err.toString(), "", 0), pllxerr);
-
 
             // Keep only stars with relevant parallaxes
             if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
@@ -299,6 +293,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                                 // Take extinction from database
                                 ag = Parser.parseDouble(tokens[idx(ColId.ag)]);
                             } else if (hasAdditional(ColId.ag, sourceid)) {
+                                // Take extinction from additional file
                                 ag = getAdditionalValue(ColId.ag, sourceid);
                             } else {
                                 // Compute extinction analytically
@@ -313,7 +308,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             }
                         }
                         // Apply extinction
-                        if(Double.isFinite(ag))
+                        if (Double.isFinite(ag))
                             appmag -= ag;
 
                         double absmag = appmag - 5.0 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5.0;
@@ -334,7 +329,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                                 // From additional
                                 ebr = getAdditionalValue(ColId.ebp_min_rp, sourceid);
                             } else {
-                                // Compute reddening analtytically
+                                // Compute reddening analytically
                                 ebr = magcorraux * 2.9e-4;
                                 // Limit to 1.6
                                 ebr = Math.min(ebr, 1.6);

@@ -320,7 +320,7 @@ public class OctreeGeneratorRun {
                                 boolean negativeGaiaDistance = Math.abs(aux1.len() - AbstractStarGroupDataProvider.NEGATIVE_DIST) < 1e-10;
                                 if (negativeGaiaDistance) {
                                     // Negative distance in Gaia star!
-                                    // Use Gaia position, HIP distance
+                                    // Use Gaia position, HIP distance and name(s)
 
                                     // Fetch Gaia RA/DEC
                                     Coordinates.cartesianToSpherical(aux1, aux2);
