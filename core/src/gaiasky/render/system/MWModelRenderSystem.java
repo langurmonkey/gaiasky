@@ -17,7 +17,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.MilkyWay;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
@@ -341,6 +340,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     shaderProgram.end();
+
                 }
                 break;
             }
