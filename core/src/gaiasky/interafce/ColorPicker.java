@@ -60,32 +60,35 @@ public class ColorPicker extends ColorPickerAbstract {
     }
 
     protected void initialize() {
-        this.addListener(event -> {
-            if (event instanceof InputEvent) {
-                Type type = ((InputEvent) event).getType();
-                // Click
-                if ((type == Type.touchUp) && (((InputEvent) event).getButton() == Buttons.LEFT)) {
-                    // Launch color picker window
-                    ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
-                    cpd.setAcceptRunnable(() -> {
-                        // Set color and run runnable, if any
-                        setPickedColor(cpd.color);
-                        if (newColorRunnable != null) {
-                            newColorRunnable.run();
-                        }
-                    });
-                    cpd.show(stage);
-
-                } else if (type == Type.enter) {
-                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
-                } else if (type == Type.exit) {
-                    Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
-                }
-                return true;
+        this.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return super.touchDown(event, x, y, pointer, button);
             }
-            return false;
-        });
 
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if (event instanceof InputEvent) {
+                    Type type = event.getType();
+                    // Click
+                    if ((type == Type.touchUp) && (event.getButton() == Buttons.LEFT)) {
+                        // Launch color picker window
+                        ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
+                        cpd.setAcceptRunnable(() -> {
+                            // Set color and run runnable, if any
+                            setPickedColor(cpd.color);
+                            if (newColorRunnable != null) {
+                                newColorRunnable.run();
+                            }
+                        });
+                        cpd.show(stage);
+
+                    } else if (type == Type.enter) {
+                        Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                    } else if (type == Type.exit) {
+                        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+                    }
+                }
+            }
+        });
     }
 
     public void setNewColorRunnable(Runnable r) {
@@ -119,7 +122,7 @@ public class ColorPicker extends ColorPickerAbstract {
 
     public double[] getPickedColorDouble() {
         double[] c = new double[color.length];
-        for(int i = 0; i < color.length; i++)
+        for (int i = 0; i < color.length; i++)
             c[i] = color[i];
         return c;
     }
@@ -152,6 +155,7 @@ public class ColorPicker extends ColorPickerAbstract {
 
             buildSuper();
         }
+
         public ColorPickerDialog(float[] color, Stage stage, Skin skin) {
             this(null, color, stage, skin);
         }
@@ -312,7 +316,7 @@ public class ColorPicker extends ColorPickerAbstract {
             color = null;
         }
 
-        public void setColor(float[] color){
+        public void setColor(float[] color) {
             setColor(color[0], color[1], color[2], color[3]);
         }
 
