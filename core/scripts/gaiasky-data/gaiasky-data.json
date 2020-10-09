@@ -420,7 +420,7 @@
       "type": "data-pack",
       "version": 10,
       "mingsversion": 20300,
-      "size": 105420283,
+      "size": 105420269,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -468,7 +468,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "2cbd34262508e6754915933fcf716a262aa6fc1640667aedf1a1da745442c9bd",
+      "sha256": "6ba29670117773cf0b27975f9e5bd9a912a257fa8298e8c59c103d4945659d8c",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
       "releasenotes": "Add new Milky Way model by Stefan Payne-Wardenaar, adapted and ready for different graphics quality settings. Add new Milky Way skymaps and fix Mars atmospheric scattering parameters.",
       "file": "@mirror-url@basedata/010_20200923/gaiasky_data.tar.gz"
