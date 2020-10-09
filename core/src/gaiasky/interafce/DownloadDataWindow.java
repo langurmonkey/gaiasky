@@ -242,7 +242,7 @@ public class DownloadDataWindow extends GenericDialog {
                 // Add dataset to desc table
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
                 cb.left();
-                cb.setMinWidth(!GlobalConf.isHiDPI() ? 220f * GlobalConf.UI_SCALE_FACTOR : 160f * GlobalConf.UI_SCALE_FACTOR);
+                cb.setMinWidth(!GlobalConf.isHiDPI() ? 230f * GlobalConf.UI_SCALE_FACTOR : 190f * GlobalConf.UI_SCALE_FACTOR);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -398,8 +398,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.45f, 750f * GlobalConf.UI_SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 600f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 760f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 650f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).top().left().padBottom(padLarge).colspan(2).row();
 
