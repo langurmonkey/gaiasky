@@ -1678,7 +1678,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabContent.addActor(contentSystem);
 
         /* ADD TO MAIN TABLE */
-        content.add(tabContent).left().padLeft(10).expand().fill();
+        content.add(tabContent).left().padLeft(pad10).expand().fill();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state
