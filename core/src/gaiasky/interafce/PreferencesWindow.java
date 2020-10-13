@@ -121,7 +121,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float tabwidth = (GlobalConf.isHiDPI() ? 200f : 200f) * GlobalConf.UI_SCALE_FACTOR;
         float textwidth = 65f * GlobalConf.UI_SCALE_FACTOR;
         float scrollh = 400f * GlobalConf.UI_SCALE_FACTOR;
-        float controlsscrollw = 500f * GlobalConf.UI_SCALE_FACTOR;
+        float controlsscrollw = 550f * GlobalConf.UI_SCALE_FACTOR;
         float controlsscrollh = 350f * GlobalConf.UI_SCALE_FACTOR;
         float sliderWidth = textwidth * 3f;
 
@@ -1678,7 +1678,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabContent.addActor(contentSystem);
 
         /* ADD TO MAIN TABLE */
-        content.add(tabContent).left().padLeft(10).expand().fill();
+        content.add(tabContent).left().padLeft(pad10).expand().fill();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state

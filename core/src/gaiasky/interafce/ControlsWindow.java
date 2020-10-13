@@ -326,7 +326,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         int size = mainActors.size();
         for (int i = 0; i < size; i++) {
             Actor actor = mainActors.get(i);
-            guiLayout.add(actor).prefWidth(185 * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
+            guiLayout.add(actor).prefWidth(185f * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
             if (i < size - 1) {
                 // Not last
                 guiLayout.row();

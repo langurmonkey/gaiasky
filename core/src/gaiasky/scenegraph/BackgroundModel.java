@@ -85,7 +85,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
         // Model
         mc.doneLoading(manager, localTransform, cc);
         // Disable depth
-        mc.setDepthTest(GL20.GL_NONE, false);
+        //mc.setDepthTest(GL20.GL_NONE, false);
 
         // Label pos 3D
         if (label && labelPosition != null && !label2d) {

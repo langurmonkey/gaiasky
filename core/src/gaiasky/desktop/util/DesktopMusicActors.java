@@ -6,8 +6,6 @@
 package gaiasky.desktop.util;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Event;
-import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -28,15 +26,12 @@ public class DesktopMusicActors implements IMusicActors {
 
 	ImageButton reloadMusic = new OwnImageButton(skin, "reload");
 	reloadMusic.setName("reload music");
-	reloadMusic.addListener(new EventListener() {
-	    @Override
-	    public boolean handle(Event event) {
-		if (event instanceof ChangeEvent) {
-		    EventManager.instance.post(Events.MUSIC_RELOAD_CMD);
-		    return true;
-		}
-		return false;
-	    }
+	reloadMusic.addListener(event -> {
+	if (event instanceof ChangeEvent) {
+		EventManager.instance.post(Events.MUSIC_RELOAD_CMD);
+		return true;
+	}
+	return false;
 	});
 	reloadMusic.addListener(new OwnTextTooltip(I18n.bundle.get("gui.music.reload"), skin));
 

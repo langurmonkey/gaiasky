@@ -14,7 +14,9 @@ import gaiasky.event.IObserver;
 import gaiasky.util.Logger.Log;
 
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
 
 public class MusicManager implements IObserver {
     private static final Log logger = Logger.getLogger(MusicManager.class);
@@ -162,9 +164,10 @@ public class MusicManager implements IObserver {
     }
 
     private class MusicFileFilter implements DirectoryStream.Filter<Path> {
+        private PathMatcher pm = FileSystems.getDefault().getPathMatcher("glob:**.{mp3,wav,ogg,flac}");
         @Override
         public boolean accept(Path dir) {
-            return dir.endsWith(".mp3") || dir.endsWith(".wav") || dir.endsWith(".ogg");
+            return pm.matches(dir);
         }
 
     }

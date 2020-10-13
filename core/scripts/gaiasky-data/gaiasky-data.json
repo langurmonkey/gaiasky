@@ -362,7 +362,7 @@
       "type": "data-pack",
       "version": 8,
       "mingsversion": 20206,
-      "size": 63734321,
+      "size": 59581622,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -410,7 +410,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "258baeeb68db796dc524ba7fad6b244ff35d6608bc527b6102b8078ea95157ed",
+      "sha256": "cac4c13e321799e830ff17b1ebea0bd6bfa38d021f4f5284474849bc41c939d9",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.2.6 and above. Contains the Solar System, constellations, meshes and more",
       "releasenotes": "Add new Milky Way skymaps and fix Mars atmospheric scattering parameters.",
       "file": "@mirror-url@basedata/008_20200923/gaiasky_data.tar.gz"
@@ -420,7 +420,7 @@
       "type": "data-pack",
       "version": 10,
       "mingsversion": 20300,
-      "size": 109572286,
+      "size": 105420269,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -468,7 +468,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "348863755ca437eb0cde40c13590209c150ede0a37ee920bf32a639eb1de3c18",
+      "sha256": "6ba29670117773cf0b27975f9e5bd9a912a257fa8298e8c59c103d4945659d8c",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
       "releasenotes": "Add new Milky Way model by Stefan Payne-Wardenaar, adapted and ready for different graphics quality settings. Add new Milky Way skymaps and fix Mars atmospheric scattering parameters.",
       "file": "@mirror-url@basedata/010_20200923/gaiasky_data.tar.gz"
@@ -572,7 +572,7 @@
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
       "releasenotes": "Add high- and ultra-resolution Milky Way skymaps.",
-      "sha256": "3da40544242cc34055e80831700d2dae4a2b82d5328195265ab216389c33d76b",
+      "sha256": "d48dcff9b47322f570cf51f80a6990d536638e185d82aaee3d31388e270b9dd5",
       "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz"
     },
     {

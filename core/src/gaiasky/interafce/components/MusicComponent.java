@@ -46,7 +46,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float componentWidth = 165 * GlobalConf.UI_SCALE_FACTOR;
+        float componentWidth = 165f* GlobalConf.UI_SCALE_FACTOR;
         nf = NumberFormatFactory.getFormatter("##0");
         intf = NumberFormatFactory.getFormatter("#00");
 
