@@ -121,8 +121,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float tabwidth = (GlobalConf.isHiDPI() ? 200f : 200f) * GlobalConf.UI_SCALE_FACTOR;
         float textwidth = 65f * GlobalConf.UI_SCALE_FACTOR;
         float scrollh = 400f * GlobalConf.UI_SCALE_FACTOR;
-        float controlsscrollw = 450f * GlobalConf.UI_SCALE_FACTOR;
-        float controllsscrollh = 250f * GlobalConf.UI_SCALE_FACTOR;
+        float controlsscrollw = 500f * GlobalConf.UI_SCALE_FACTOR;
+        float controlsscrollh = 350f * GlobalConf.UI_SCALE_FACTOR;
         float sliderWidth = textwidth * 3f;
 
         // Create the tab buttons
@@ -1024,7 +1024,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         OwnScrollPane controlsScroll = new OwnScrollPane(controls, skin, "minimalist-nobg");
         controlsScroll.setWidth(controlsscrollw);
-        controlsScroll.setHeight(controllsscrollh * 0.6f);
+        controlsScroll.setHeight(controlsscrollh);
         controlsScroll.setScrollingDisabled(true, false);
         controlsScroll.setSmoothScrolling(true);
         controlsScroll.setFadeScrollBars(false);
