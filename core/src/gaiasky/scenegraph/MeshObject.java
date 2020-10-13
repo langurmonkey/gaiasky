@@ -18,7 +18,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IModelRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -78,14 +77,25 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
             }
         }
 
+        recomputePositioning();
+
+    }
+
+    private void recomputePositioning(){
         if (mc != null) {
-            coordinateSystem = new Matrix4();
+            if (coordinateSystem == null)
+                coordinateSystem = new Matrix4();
+            else
+                coordinateSystem.idt();
+
+
+            // REFSYS ROTATION
             if (transformName != null) {
                 Class<Coordinates> c = Coordinates.class;
                 try {
                     Method m = ClassReflection.getMethod(c, transformName);
                     Matrix4 trf = (Matrix4) m.invoke(null);
-                    coordinateSystem.set(trf);
+                    coordinateSystem.mul(trf);
                 } catch (ReflectionException e) {
                     Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
                 }
@@ -93,14 +103,22 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
                 // Equatorial, nothing
             }
 
-            if (axis != null)
+            // ROTATION
+            if (axis != null) {
                 coordinateSystem.rotate(axis, degrees);
+            }
+
+            // TRANSLATION
             if (translate != null) {
                 pos.set(translate);
                 coordinateSystem.translate(translate.x, translate.y, translate.z);
             }
-            if (scale != null)
+
+            // SCALE
+            if (scale != null) {
                 coordinateSystem.scale(scale.x, scale.y, scale.z);
+            }
+
         }
     }
 
