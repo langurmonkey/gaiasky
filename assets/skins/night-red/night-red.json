@@ -856,6 +856,16 @@
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
+    "big": {
+      "selection": "selection",
+      "background": "textfield",
+      "disabledBackground": "textfield-disabled",
+      "font": "ui-18",
+      "fontColor": "black",
+      "disabledFontColor": "grey",
+      "messageFontColor": "dark-gray",
+      "cursor": "cursor"
+    },
     "no-disabled": {
       "selection": "selection",
       "background": "textfield",
