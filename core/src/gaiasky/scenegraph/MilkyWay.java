@@ -41,7 +41,7 @@ import gaiasky.util.tree.LoadStatus;
 
 import java.util.List;
 
-public class MilkyWay extends AbstractPositionEntity implements I3DTextRenderable, IObserver {
+public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObserver {
     float[] labelColour = new float[] { 1f, 1f, 1f, 1f };
     String transformName;
     Matrix4 coordinateSystem;

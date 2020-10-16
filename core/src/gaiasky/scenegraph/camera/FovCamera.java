@@ -23,18 +23,18 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.Gaia;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.I18n;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
 import gaiasky.util.math.Frustumd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.time.GlobalClock;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.ArrayList;
@@ -152,7 +152,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fpstages[1] = fov2;
         fpstages[2] = fov12;
 
-        EventManager.instance.subscribe(this, Events.GAIA_LOADED, Events.COMPUTE_GAIA_SCAN_CMD);
+        EventManager.instance.subscribe(this, Events.GAIA_LOADED);
     }
 
     public void update(double dt, ITimeFrameProvider time) {
@@ -161,7 +161,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         up.set(0, 1, 0);
 
         /** POSITION **/
-        AbstractPositionEntity fccopy = gaia.getLineCopy();
+        SceneGraphNode fccopy = gaia.getLineCopy();
         fccopy.getRoot().translation.set(0f, 0f, 0f);
         fccopy.getRoot().update(time, null, this);
 
@@ -207,22 +207,6 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
         /** WORK OUT INTERPOLATED DIRECTIONS IN THE CASE OF FAST SCANNING **/
         interpolatedDirections.clear();
-        if (GlobalConf.scene.COMPUTE_GAIA_SCAN) {
-            if (lastTime != 0 && currentTime - lastTime > MAX_OVERLAP_TIME) {
-                if (((GlobalClock) time).fps < 0) {
-                    ((GlobalClock) time).fps = 10;
-                    logger.info(I18n.bundle.get("notif.timeprovider.fixed"));
-                }
-                for (long t = lastTime + MAX_OVERLAP_TIME; t < currentTime; t += MAX_OVERLAP_TIME) {
-                    interpolatedDirections.add(getDirections(new Date(t)));
-                }
-            } else {
-                if (((GlobalClock) time).fps > 0) {
-                    ((GlobalClock) time).fps = -1;
-                    logger.info(I18n.bundle.get("notif.timeprovider.real"));
-                }
-            }
-        }
     }
 
     public Vector3d[] getDirections(Date d) {
@@ -309,10 +293,6 @@ public class FovCamera extends AbstractCamera implements IObserver {
         case GAIA_LOADED:
             this.gaia = (Gaia) data[0];
             break;
-        case COMPUTE_GAIA_SCAN_CMD:
-            lastTime = 0;
-            currentTime = 0;
-            break;
         default:
             break;
         }
@@ -370,11 +350,6 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public IFocus getFocus() {
         return null;
-    }
-
-    public void computeGaiaScan(ITimeFrameProvider time, CelestialBody cb) {
-        boolean visible = computeVisibleFovs(cb, this);
-        cb.updateTransitNumber(visible && time.getDt() != 0, time, this);
     }
 
     @Override

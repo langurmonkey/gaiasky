@@ -13,9 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.render.IGPUVertsRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -163,8 +161,8 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
-            if(renderable.getParent() != null && renderable.getParent() instanceof AbstractPositionEntity){
-                Vector3d urp = ((AbstractPositionEntity) renderable.getParent()).getUnrotatedPos();
+            if(renderable.getParent() != null){
+                Vector3d urp = renderable.getParent().getUnrotatedPos();
                 if(urp != null)
                     shaderProgram.setUniformf("u_parentPos", (float) urp.x, (float) urp.y, (float) urp.z);
                 else

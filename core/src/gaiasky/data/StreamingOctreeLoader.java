@@ -11,7 +11,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
@@ -384,12 +383,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octreeWrapper
      */
     public void unloadOctant(OctreeNode octant, final AbstractOctreeWrapper octreeWrapper) {
-        List<AbstractPositionEntity> objects = octant.objects;
+        List<SceneGraphNode> objects = octant.objects;
         if (objects != null) {
             GaiaSky.postRunnable(() -> {
                 synchronized (octant) {
                     try {
-                        for (AbstractPositionEntity object : objects) {
+                        for (SceneGraphNode object : objects) {
                             int count = object.getStarCount();
                             object.dispose();
                             object.octant = null;
@@ -497,7 +496,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                                 loader.unloadOctant(octant, octreeWrapper);
                             }
                             if (octant != null && octant.objects != null && octant.objects.size() > 0) {
-                                AbstractPositionEntity sg = octant.objects.get(0);
+                                SceneGraphNode sg = octant.objects.get(0);
                                 nUnloaded += sg.getStarCount();
                                 if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
                                     break;

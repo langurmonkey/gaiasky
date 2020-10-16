@@ -19,10 +19,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.interafce.beans.AttributeComboBoxBean;
 import gaiasky.interafce.beans.ComboBoxBean;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
@@ -237,7 +237,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         private boolean changeEvents = true;
         private ColorPickerColormapDialog cpd;
         private Array<ParticleGroup> pgarray;
-        private Array<AbstractPositionEntity> apearray;
+        private Array<SceneGraphNode> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
@@ -498,7 +498,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 if (ci.object instanceof OctreeWrapper) {
                     OctreeWrapper ow = (OctreeWrapper) ci.object;
                     ow.root.addParticlesTo(apearray);
-                    for (AbstractPositionEntity ape : apearray) {
+                    for (SceneGraphNode ape : apearray) {
                         if (ape instanceof ParticleGroup)
                             pgarray.add((ParticleGroup) ape);
                     }

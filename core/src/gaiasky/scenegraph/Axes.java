@@ -11,7 +11,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.render.ILineRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -24,7 +23,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 /**
  * Representation of axes
  */
-public class Axes extends AbstractPositionEntity implements ILineRenderable {
+public class Axes extends SceneGraphNode implements ILineRenderable {
     private static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
     private String transformName;
     private Matrix4d coordinateSystem;

@@ -524,7 +524,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 entity2 = (CelestialBody) GaiaSky.instance.sg.getNode("Earth");
                 entity3 = (CelestialBody) GaiaSky.instance.sg.getNode("Mars");
             }
-            AbstractPositionEntity fccopy = entity1.getLineCopy();
+            SceneGraphNode fccopy = entity1.getLineCopy();
             fccopy.getRoot().translation.set(0f, 0f, 0f);
             fccopy.getRoot().update(time, null, this);
             this.pos.set(fccopy.translation);
@@ -1320,7 +1320,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public double rotationScaling() {
         double dist;
         if (parent.mode == CameraMode.FOCUS_MODE) {
-            AbstractPositionEntity ancestor = (AbstractPositionEntity) focus;
+            SceneGraphNode ancestor = (SceneGraphNode) focus;
             dist = ancestor.distToCamera - ancestor.getRadius();
         } else {
             dist = distance;

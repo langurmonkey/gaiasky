@@ -7,8 +7,8 @@ package gaiasky.data.octreegen;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.Particle;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.Star;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
@@ -62,7 +62,7 @@ import java.io.*;
 public class ParticleDataBinaryIO {
     private static final Log logger = Logger.getLogger(ParticleDataBinaryIO.class);
 
-    public void writeParticles(Array<AbstractPositionEntity> particles, OutputStream out) {
+    public void writeParticles(Array<SceneGraphNode> particles, OutputStream out) {
 
         try {
             // Wrap the FileOutputStream with a DataOutputStream
@@ -70,7 +70,7 @@ public class ParticleDataBinaryIO {
 
             // Size of stars
             data_out.writeInt(particles.size);
-            for (AbstractPositionEntity ape : particles) {
+            for (SceneGraphNode ape : particles) {
                 if (ape instanceof Particle) {
                     Particle s = (Particle) ape;
                     // name_length, name, appmag, absmag, colorbv, r, g, b, a,
@@ -121,14 +121,14 @@ public class ParticleDataBinaryIO {
         }
     }
 
-    public Array<AbstractPositionEntity> readParticles(InputStream in) throws FileNotFoundException {
-        Array<AbstractPositionEntity> stars = null;
+    public Array<SceneGraphNode> readParticles(InputStream in) throws FileNotFoundException {
+        Array<SceneGraphNode> stars = null;
         DataInputStream data_in = new DataInputStream(in);
 
         try {
             // Read size of stars
             int size = data_in.readInt();
-            stars = new Array<AbstractPositionEntity>(size);
+            stars = new Array<SceneGraphNode>(size);
 
             for (int idx = 0; idx < size; idx++) {
                 try {

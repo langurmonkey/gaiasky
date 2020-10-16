@@ -11,9 +11,11 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.system.AbstractRenderSystem;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
@@ -28,7 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
+import static gaiasky.render.SceneGraphRenderer.RenderGroup.LINE;
 
 /**
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper
@@ -41,7 +43,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     public OctreeNode root;
     /** Roulette list with the objects to process **/
     protected List<SceneGraphNode> roulette;
-    public Map<AbstractPositionEntity, OctreeNode> parenthood;
+    public Map<SceneGraphNode, OctreeNode> parenthood;
     /** The number of objects added to render in the last frame **/
     protected int lastNumberObjects = 0;
     /**
@@ -71,7 +73,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         super.initialize();
     }
 
-    public boolean containsObject(AbstractPositionEntity object) {
+    public boolean containsObject(SceneGraphNode object) {
         return root.containsObject(object);
     }
 
@@ -84,7 +86,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     private void addObjectsDeep(OctreeNode octant, SceneGraphNode root) {
         if (octant.objects != null) {
             root.add(octant.objects);
-            for (AbstractPositionEntity sgn : octant.objects) {
+            for (SceneGraphNode sgn : octant.objects) {
                 parenthood.put(sgn, octant);
             }
         }
@@ -97,19 +99,19 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         }
     }
 
-    public void add(List<AbstractPositionEntity> children, OctreeNode octant) {
+    public void add(List<SceneGraphNode> children, OctreeNode octant) {
         super.add(children);
-        for (AbstractPositionEntity sgn : children) {
+        for (SceneGraphNode sgn : children) {
             parenthood.put(sgn, octant);
         }
     }
 
-    public void add(AbstractPositionEntity child, OctreeNode octant) {
+    public void add(SceneGraphNode child, OctreeNode octant) {
         super.add(child);
         parenthood.put(child, octant);
     }
 
-    public void removeParenthood(AbstractPositionEntity child) {
+    public void removeParenthood(SceneGraphNode child) {
         parenthood.remove(child);
     }
 

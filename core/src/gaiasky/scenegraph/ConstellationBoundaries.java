@@ -7,7 +7,6 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
 import gaiasky.render.ILineRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -16,7 +15,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.List;
 
-public class ConstellationBoundaries extends AbstractPositionEntity implements ILineRenderable {
+public class ConstellationBoundaries extends SceneGraphNode implements ILineRenderable {
     private float alpha = .2f;
     private List<List<Vector3d>> boundaries;
 

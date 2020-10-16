@@ -51,7 +51,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-public class StarCluster extends AbstractPositionEntity implements IFocus, IProperMotion, IModelRenderable, I3DTextRenderable, IQuadRenderable {
+public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion, IModelRenderable, I3DTextRenderable, IQuadRenderable {
 
     private static final double TH_ANGLE = Math.toRadians(0.6);
     private static final double TH_ANGLE_OVERLAP = Math.toRadians(0.7);
@@ -236,9 +236,9 @@ public class StarCluster extends AbstractPositionEntity implements IFocus, IProp
         aux.set(pos);
         Vector3d pmv = aux3d2.get().set(pm).scl(ySinceEpoch);
         aux.add(pmv);
-        AbstractPositionEntity entity = this;
-        while (entity.parent != null && entity.parent instanceof AbstractPositionEntity) {
-            entity = (AbstractPositionEntity) entity.parent;
+        SceneGraphNode entity = this;
+        while (entity.parent != null) {
+            entity = entity.parent;
             aux.add(entity.pos);
         }
         return aux;

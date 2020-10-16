@@ -21,13 +21,11 @@ import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Intersectord;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -39,7 +37,7 @@ import net.jafama.FastMath;
  * @author Toni Sagrista
  *
  */
-public abstract class CelestialBody extends AbstractPositionEntity implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
+public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
     private static float[] labelColour = new float[] { 1, 1, 1, 1 };
 
     /**
@@ -108,26 +106,6 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
         if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
             super.update(time, parentTransform, camera);
         }
-    }
-
-    float smoothstep(float edge0, float edge1, float x) {
-        // Scale, bias and saturate x to 0..1 range
-        x = MathUtilsd.clamp((x - edge0) / (edge1 - edge0), 0.0f, 1.0f);
-        // Evaluate polynomial
-        return x * x * (3f - 2f * x);
-    }
-
-    float step(float edge, float x) {
-        if (x < edge)
-            return 0f;
-        else
-            return 1f;
-    }
-
-    float core(float distance_center, float inner_rad) {
-        float core = 1.0f - step(inner_rad / 5.0f, distance_center);
-        float core_glow = smoothstep(inner_rad / 2.0f, inner_rad / 5.0f, distance_center);
-        return core_glow + core;
     }
 
     /**
@@ -287,38 +265,6 @@ public abstract class CelestialBody extends AbstractPositionEntity implements I3
         copy.colorbv = this.colorbv;
         copy.rc = this.rc;
         return (T) copy;
-    }
-
-    /**
-     * Updates the transit number of this body if visible is true and it is a
-     * new transit. It also updates the colour if needed.
-     * 
-     * @param visible
-     * @param time
-     */
-    public void updateTransitNumber(boolean visible, ITimeFrameProvider time, FovCamera fcamera) {
-        if (GlobalConf.scene.COMPUTE_GAIA_SCAN && visible && timeCondition(time)) {
-            // Update observations. Add if forward time, subtract if backward
-            // time
-            transits = Math.max(0, transits + (int) Math.signum(time.getDt()));
-            lastTransitIncrease = time.getTime().toEpochMilli();
-            // Update transit colour
-            ColorUtils.colormap_long_rainbow(ColorUtils.normalize(transits, 0, 30), this.ccTransit);
-        }
-    }
-
-    protected boolean timeCondition(ITimeFrameProvider time) {
-        // 95 seconds minimum since last increase, this ensures we are not
-        // increasing more than once in the same transit
-        if (time.getDt() < 0 && lastTransitIncrease - time.getTime().toEpochMilli() < 0) {
-            lastTransitIncrease = time.getTime().toEpochMilli();
-            return true;
-        } else if (time.getDt() > 0 && time.getTime().toEpochMilli() - lastTransitIncrease < 0) {
-            lastTransitIncrease = time.getTime().toEpochMilli();
-            return true;
-        } else {
-            return (time.getDt() > 0 && time.getTime().toEpochMilli() - lastTransitIncrease > 90000) || (time.getDt() < 0 && lastTransitIncrease - time.getTime().toEpochMilli() > 90000);
-        }
     }
 
     @Override

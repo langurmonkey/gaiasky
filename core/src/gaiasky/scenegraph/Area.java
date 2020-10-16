@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.ILineRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -24,7 +23,7 @@ import net.jafama.FastMath;
  * @author tsagrista
  *
  */
-public class Area extends AbstractPositionEntity implements ILineRenderable {
+public class Area extends SceneGraphNode implements ILineRenderable {
 
     private float[][][] loc2d, loc3d;
 

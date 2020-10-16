@@ -155,8 +155,6 @@ public interface ICamera {
 
     boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera);
 
-    void computeGaiaScan(ITimeFrameProvider time, CelestialBody cb);
-
     void resize(int width, int height);
 
     /**

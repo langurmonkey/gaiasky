@@ -5,7 +5,6 @@
 
 package gaiasky.scenegraph.octreewrapper;
 
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3d;
@@ -37,7 +36,7 @@ public class OctreeWrapper extends AbstractOctreeWrapper {
         int size = roulette.size();
         for (int i = 0; i < size; i++) {
             SceneGraphNode sgn = roulette.get(i);
-            sgn.update(time, parentTransform, camera, this.opacity * ((AbstractPositionEntity) sgn).octant.opacity);
+            sgn.update(time, parentTransform, camera, this.opacity * sgn.octant.opacity);
         }
     }
 

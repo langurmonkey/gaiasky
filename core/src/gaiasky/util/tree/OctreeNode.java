@@ -14,7 +14,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -75,7 +74,7 @@ public class OctreeNode implements ILineRenderable {
     /** Children nodes **/
     public OctreeNode[] children = new OctreeNode[8];
     /** List of objects **/
-    public List<AbstractPositionEntity> objects;
+    public List<SceneGraphNode> objects;
 
     private double radius;
     /** If observed, the view angle in radians of this octant **/
@@ -254,7 +253,7 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-    public boolean containsObject(AbstractPositionEntity object){
+    public boolean containsObject(SceneGraphNode object){
         boolean has = this.objects.contains(object);
         if(!has && children != null && childrenCount > 0){
             for(OctreeNode child : children){
@@ -306,7 +305,7 @@ public class OctreeNode implements ILineRenderable {
         return opacity;
     }
 
-    public boolean add(AbstractPositionEntity e) {
+    public boolean add(SceneGraphNode e) {
         if (objects == null)
             objects = new ArrayList<>(1);
         objects.add(e);
@@ -314,7 +313,7 @@ public class OctreeNode implements ILineRenderable {
         return true;
     }
 
-    public boolean addAll(List<AbstractPositionEntity> l) {
+    public boolean addAll(List<SceneGraphNode> l) {
         if (objects == null)
             objects = new ArrayList<>(l.size());
         objects.addAll(l);
@@ -322,12 +321,12 @@ public class OctreeNode implements ILineRenderable {
         return true;
     }
 
-    public void setObjects(List<AbstractPositionEntity> l) {
+    public void setObjects(List<SceneGraphNode> l) {
         this.objects = l;
         ownObjects = objects.size();
     }
 
-    public boolean insert(AbstractPositionEntity e, int level) {
+    public boolean insert(SceneGraphNode e, int level) {
         int node = 0;
         if (e.getPosition().y > blf.y + ((trb.y - blf.y) / 2))
             node += 4;
@@ -342,8 +341,8 @@ public class OctreeNode implements ILineRenderable {
         }
     }
 
-    public void toTree(TreeSet<AbstractPositionEntity> tree) {
-        for (AbstractPositionEntity i : objects) {
+    public void toTree(TreeSet<SceneGraphNode> tree) {
+        for (SceneGraphNode i : objects) {
             tree.add(i);
         }
         if (children != null) {
@@ -375,9 +374,9 @@ public class OctreeNode implements ILineRenderable {
      * 
      * @param particles
      */
-    public void addParticlesTo(Array<AbstractPositionEntity> particles) {
+    public void addParticlesTo(Array<SceneGraphNode> particles) {
         if (this.objects != null) {
-            for (AbstractPositionEntity elem : this.objects)
+            for (SceneGraphNode elem : this.objects)
                 particles.add(elem);
         }
         for (int i = 0; i < 8; i++) {
@@ -718,7 +717,7 @@ public class OctreeNode implements ILineRenderable {
         // Number of own objects
         this.ownObjects = 0;
         if (objects != null) {
-            for (AbstractPositionEntity ape : objects) {
+            for (SceneGraphNode ape : objects) {
                 this.ownObjects += ape.getStarCount();
             }
         }
@@ -742,7 +741,7 @@ public class OctreeNode implements ILineRenderable {
     public int countObjects() {
         int n = 0;
         if (objects != null) {
-            for (AbstractPositionEntity obj : objects) {
+            for (SceneGraphNode obj : objects) {
                 n += obj.getStarCount();
             }
         }

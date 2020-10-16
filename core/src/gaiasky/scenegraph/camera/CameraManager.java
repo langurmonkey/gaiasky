@@ -310,10 +310,6 @@ public class CameraManager implements ICamera, IObserver {
         // Update the camera
         current.update(dt, time);
 
-        if (current != fovCamera && GlobalConf.scene.COMPUTE_GAIA_SCAN) {
-            fovCamera.updateDirections(time);
-        }
-
         // Speed = dx/dt
         velocity.set(lastPos).sub(current.getPos());
         velocitynor.set(velocity).nor();
@@ -502,10 +498,6 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public IFocus getFocus() {
         return current.getFocus();
-    }
-
-    public void computeGaiaScan(ITimeFrameProvider time, CelestialBody cb) {
-        current.computeGaiaScan(time, cb);
     }
 
     @Override

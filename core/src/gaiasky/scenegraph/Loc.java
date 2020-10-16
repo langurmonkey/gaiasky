@@ -15,7 +15,6 @@ import gaiasky.GaiaSky;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
@@ -32,7 +31,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-public class Loc extends AbstractPositionEntity implements IFocus, I3DTextRenderable, ILineRenderable {
+public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, ILineRenderable {
     private static final float LOWER_LIMIT = 3e-4f;
     private static final float UPPER_LIMIT = 3e-3f;
 

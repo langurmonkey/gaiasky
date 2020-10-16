@@ -5,9 +5,9 @@
 
 package gaiasky.util.coord;
 
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Orbit;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
@@ -34,7 +34,7 @@ public class StaticParentRotationCoordinates implements IBodyCoordinates {
 
     @Override
     public void doneLoading(Object... params) {
-        AbstractPositionEntity me = (AbstractPositionEntity) params[1];
+        SceneGraphNode me = (SceneGraphNode) params[1];
         if (me.parent != null && me.parent instanceof ModelBody) {
             parent = (ModelBody) me.parent;
         }

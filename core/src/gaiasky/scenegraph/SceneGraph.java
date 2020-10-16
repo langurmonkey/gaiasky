@@ -24,8 +24,6 @@ public class SceneGraph extends AbstractSceneGraph {
     }
 
     public void update(ITimeFrameProvider time, ICamera camera) {
-        super.update(time, camera);
-
         root.translation.set(camera.getInversePos());
         root.update(time, null, camera);
         objectsPerThread[0] = root.numChildren;

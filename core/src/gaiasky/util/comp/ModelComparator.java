@@ -5,7 +5,7 @@
 
 package gaiasky.util.comp;
 
-import gaiasky.scenegraph.AbstractPositionEntity;
+import gaiasky.scenegraph.SceneGraphNode;
 
 import java.util.Comparator;
 
@@ -18,7 +18,7 @@ public class ModelComparator<T> implements Comparator<T> {
 
     @Override
     public int compare(T o1, T o2) {
-        return Double.compare(((AbstractPositionEntity) o2).distToCamera, ((AbstractPositionEntity) o1).distToCamera);
+        return Double.compare(((SceneGraphNode) o2).distToCamera, ((SceneGraphNode) o1).distToCamera);
     }
 
 }

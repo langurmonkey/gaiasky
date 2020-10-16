@@ -34,7 +34,6 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.render.system.ModelBatchRenderSystem.ModelRenderType;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.StubModel;
@@ -1096,7 +1095,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
              */
             List<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
             List<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
-            models.sort(Comparator.comparingDouble(a -> ((AbstractPositionEntity) a).getDistToCamera()));
+            models.sort(Comparator.comparingDouble(a -> a.getDistToCamera()));
 
             int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP_MODE ? 6 : 1;
 

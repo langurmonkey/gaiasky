@@ -16,7 +16,7 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 
-public class StubModel extends AbstractPositionEntity implements IModelRenderable, ILineRenderable {
+public class StubModel extends SceneGraphNode implements IModelRenderable, ILineRenderable {
 
     public IntModelInstance instance;
     private Environment env;

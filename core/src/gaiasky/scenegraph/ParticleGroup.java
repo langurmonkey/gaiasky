@@ -23,7 +23,6 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -922,7 +921,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // Myself!
-    public AbstractPositionEntity getComputedAncestor() {
+    public SceneGraphNode getComputedAncestor() {
         return this;
     }
 

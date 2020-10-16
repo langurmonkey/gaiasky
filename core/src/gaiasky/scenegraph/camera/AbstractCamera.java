@@ -172,13 +172,6 @@ public abstract class AbstractCamera implements ICamera {
 
     private static final double VIEW_ANGLE = Math.toRadians(0.05);
 
-    public void computeGaiaScan(ITimeFrameProvider time, CelestialBody cb) {
-        if (GlobalConf.scene.COMPUTE_GAIA_SCAN && time.getDt() != 0) {
-            boolean visibleByGaia = computeVisibleFovs(cb, parent.fovCamera);
-            cb.updateTransitNumber(visibleByGaia, time, parent.fovCamera);
-        }
-    }
-
     @Override
     public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
         return isVisible(time, cb.viewAngle, cb.translation, cb.distToCamera);
@@ -200,14 +193,6 @@ public abstract class AbstractCamera implements ICamera {
     protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fcamera) {
         boolean visible = false;
         Vector3d[] dirs;
-        if (GlobalConf.scene.COMPUTE_GAIA_SCAN && !fcamera.interpolatedDirections.isEmpty()) {
-            // We need to interpolate...
-            for (Vector3d[] interpolatedDirection : fcamera.interpolatedDirections) {
-                visible = visible || GlobalResources.isInView(cb.translation, cb.distToCamera, fcamera.angleEdgeRad, interpolatedDirection[0]) || GlobalResources.isInView(cb.translation, cb.distToCamera, fcamera.angleEdgeRad, interpolatedDirection[1]);
-                if (visible)
-                    return true;
-            }
-        }
         dirs = fcamera.directions;
         visible = visible || GlobalResources.isInView(cb.translation, cb.distToCamera, fcamera.angleEdgeRad, dirs[0]) || GlobalResources.isInView(cb.translation, cb.distToCamera, fcamera.angleEdgeRad, dirs[1]);
         return visible;

@@ -9,12 +9,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
-import gaiasky.render.system.StarPointRenderSystem;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
-import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -132,8 +129,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     private void addToHipMap(SceneGraphNode node) {
         if (node instanceof AbstractOctreeWrapper) {
             AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
-            Set<AbstractPositionEntity> set = aow.parenthood.keySet();
-            for (AbstractPositionEntity ape : set)
+            Set<SceneGraphNode> set = aow.parenthood.keySet();
+            for (SceneGraphNode ape : set)
                 addToHipMap(ape);
         } else {
             if (node instanceof CelestialBody) {
@@ -161,8 +158,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     private void removeFromHipMap(SceneGraphNode node) {
         if (node instanceof AbstractOctreeWrapper) {
             AbstractOctreeWrapper aow = (AbstractOctreeWrapper) node;
-            Set<AbstractPositionEntity> set = aow.parenthood.keySet();
-            for (AbstractPositionEntity ape : set)
+            Set<SceneGraphNode> set = aow.parenthood.keySet();
+            for (SceneGraphNode ape : set)
                 removeFromHipMap(ape);
         } else {
             if (node instanceof CelestialBody) {
@@ -223,14 +220,6 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
             // Special cases
             node.removeFromIndex(map);
-        }
-    }
-
-    @Override
-    public void update(ITimeFrameProvider time, ICamera camera) {
-        // Check if we need to update the points
-        if (GlobalConf.scene.COMPUTE_GAIA_SCAN && time.getDt() != 0) {
-            StarPointRenderSystem.POINT_UPDATE_FLAG = true;
         }
     }
 

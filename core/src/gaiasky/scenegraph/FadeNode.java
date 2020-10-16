@@ -29,7 +29,7 @@ import java.util.Map;
  *
  * @author tsagrista
  */
-public class FadeNode extends AbstractPositionEntity {
+public class FadeNode extends SceneGraphNode {
 
     /**
      * Fade in low and high limits
@@ -60,7 +60,7 @@ public class FadeNode extends AbstractPositionEntity {
      * If set, the fade distance is the distance between the current fade node and this object.
      * Otherwise, it is the length of the current object's position.
      */
-    private AbstractPositionEntity position;
+    private SceneGraphNode position;
 
     /**
      * The name of the position object
@@ -121,7 +121,7 @@ public class FadeNode extends AbstractPositionEntity {
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (positionObjectName != null) {
-            this.position = (AbstractPositionEntity) sg.getNode(positionObjectName);
+            this.position = sg.getNode(positionObjectName);
         }
     }
 

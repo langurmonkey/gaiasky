@@ -239,12 +239,6 @@ public enum Events {
     COLLAPSE_PANE_CMD,
 
     /**
-     * Contains the name, the boolean value, and a boolean indicating if this
-     * comes from the interface
-     **/
-    COMPUTE_GAIA_SCAN_CMD,
-
-    /**
      * Configures the render system. Contains width, height, FPS, folder and
      * file
      **/

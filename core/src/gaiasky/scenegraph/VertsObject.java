@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.render.IGPUVertsRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3d;
@@ -21,7 +20,7 @@ import gaiasky.util.time.ITimeFrameProvider;
  *
  * @author tsagrista
  */
-public class VertsObject extends AbstractPositionEntity implements IGPUVertsRenderable {
+public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
 
     /** GPU rendering attributes **/
     protected boolean inGpu = false;

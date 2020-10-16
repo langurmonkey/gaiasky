@@ -6,8 +6,8 @@
 package gaiasky.data.octreegen;
 
 import gaiasky.data.group.BinaryDataProvider;
-import gaiasky.scenegraph.AbstractPositionEntity;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 
 import java.io.InputStream;
@@ -35,11 +35,11 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @param list The list with the star group to write
      * @param out  The output stream to write to
      */
-    public void writeParticles(List<AbstractPositionEntity> list, OutputStream out) {
+    public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
         writeParticles(list, out, true);
     }
 
-    public void writeParticles(List<AbstractPositionEntity> list, OutputStream out, boolean compat) {
+    public void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat) {
         if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
             provider.writeData(sg.data(), out, compat);
@@ -52,16 +52,16 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @param in The input stream to read the star group from
      * @return A list with a single star group object
      */
-    public List<AbstractPositionEntity> readParticles(InputStream in) {
+    public List<SceneGraphNode> readParticles(InputStream in) {
         return readParticles(in, true);
     }
 
-    public List<AbstractPositionEntity> readParticles(InputStream in, boolean compat) {
+    public List<SceneGraphNode> readParticles(InputStream in, boolean compat) {
         List<ParticleBean> data = provider.loadData(in, 1.0, compat);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 
-        List<AbstractPositionEntity> l = new ArrayList<>(1);
+        List<SceneGraphNode> l = new ArrayList<>(1);
         l.add(sg);
         return l;
     }

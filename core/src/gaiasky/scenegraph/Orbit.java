@@ -19,7 +19,6 @@ import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -53,7 +52,8 @@ public class Orbit extends Polyline {
      * Threshold solid angle
      **/
     protected static float SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(1.5);
-    public static void setSolidAngleThreshold(float angleDeg){
+
+    public static void setSolidAngleThreshold(float angleDeg) {
         SOLID_ANGLE_THRESHOLD = (float) Math.toRadians(angleDeg);
     }
 
@@ -111,7 +111,7 @@ public class Orbit extends Polyline {
 
     public Orbit() {
         super();
-        pointColor = new float[]{0.8f, 0.8f, 0.8f, 1f};
+        pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
         localTransform = new Matrix4();
         localTransformD = new Matrix4d();
         prev = new Vector3d();
@@ -253,11 +253,9 @@ public class Orbit extends Polyline {
             alpha *= this.alpha;
 
             int last = 1;
-            Vector3d parentPos = null;
-            if (parent instanceof AbstractPositionEntity) {
-                parentPos = ((AbstractPositionEntity) parent).getUnrotatedPos();
-                last = parentPos != null ? 2 : 1;
-            }
+            Vector3d parentPos;
+            parentPos = parent.getUnrotatedPos();
+            last = parentPos != null ? 2 : 1;
 
             float dAlpha = 0f;
             int stIdx = 0;
@@ -313,7 +311,6 @@ public class Orbit extends Polyline {
                     renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], calpha * cc[3]);
                 }
                 renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], calpha * cc[3]);
-
 
                 alpha -= dAlpha;
 
