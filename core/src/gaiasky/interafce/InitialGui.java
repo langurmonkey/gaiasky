@@ -100,7 +100,7 @@ public class InitialGui extends AbstractGui {
                     } catch (Exception e) {
                         logger.error(e);
                         logger.error("Error building data descriptor from URL: " + GlobalConf.program.DATA_DESCRIPTOR_URL);
-                        if(GlobalConf.program.DATA_DESCRIPTOR_URL.contains("http://")){
+                        if (GlobalConf.program.DATA_DESCRIPTOR_URL.contains("http://")) {
                             logger.info("You are using HTTP but the server may be HTTPS - please check your URL in the properties file");
                         }
                         displayChooser();
@@ -130,6 +130,16 @@ public class InitialGui extends AbstractGui {
         return GlobalConf.data.CATALOG_JSON_FILES != null && GlobalConf.data.CATALOG_JSON_FILES.size > 0;
     }
 
+    private int numCatalogDRFiles() {
+        int matches = 0;
+        for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
+            if (f.matches("^\\S*catalog-[e]?dr\\d+-\\S+$")) {
+                matches++;
+            }
+        }
+        return matches;
+    }
+
     private void displayChooser() {
         DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
@@ -139,9 +149,15 @@ public class InitialGui extends AbstractGui {
          * - force display (args), or
          * - show criterion is 'always' (conf)
          * - catalogs available and no catalogs are selected
+         * - catalogs available and more than one xDRx (DR1, DR2, eDR3, ...) catalog selected
          */
-        if (catalogChooser || GlobalConf.program.CATALOG_CHOOSER.always() || (catalogFiles.size > 0 && (!isCatalogSelected() && !GlobalConf.program.CATALOG_CHOOSER.never()))) {
-            String noticeKey = "gui.dschooser.nocatselected";
+        if (catalogChooser || GlobalConf.program.CATALOG_CHOOSER.always() || (catalogFiles.size > 0 && (!isCatalogSelected() && !GlobalConf.program.CATALOG_CHOOSER.never())) || (catalogFiles.size > 0 && (numCatalogDRFiles() > 1 && !GlobalConf.program.CATALOG_CHOOSER.never()))) {
+            String noticeKey;
+            if (catalogFiles.size > 0 && numCatalogDRFiles() > 1) {
+                noticeKey = "gui.dschooser.morethanonedr";
+            } else {
+                noticeKey = "gui.dschooser.nocatselected";
+            }
             addDatasetChooser(noticeKey);
         } else {
             // Event
