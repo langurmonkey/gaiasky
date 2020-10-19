@@ -13,7 +13,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IPointRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -90,7 +89,7 @@ public class PointRenderSystem extends ImmediateRenderSystem {
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
-        shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+        shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         addEffectsUniforms(shaderProgram, camera);
 
         renderables.forEach(r ->{
@@ -113,6 +112,7 @@ public class PointRenderSystem extends ImmediateRenderSystem {
         // Reset indices
         meshIdx = 1;
         curr = meshes.get(0);
+
     }
 
     public void addPoint(IPointRenderable pr, double x, double y, double z, float pointSize, float r, float g, float b, float a) {

@@ -7,7 +7,6 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
 import gaiasky.render.ILineRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -42,7 +41,7 @@ public class Polyline extends VertsObject implements ILineRenderable {
             for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
                 pointCloudData.loadPoint(prev, i);
                 prev.add(translation);
-                renderer.addPoint(this, (float) prev.x, (float) prev.y, (float) prev.z, cc[0], cc[1], cc[2], (alpha) * cc[3]);
+                renderer.addPoint(this, (float) prev.x, (float) prev.y, (float) prev.z, cc[0], cc[1], cc[2], alpha * cc[3]);
             }
             renderer.breakLine();
         }

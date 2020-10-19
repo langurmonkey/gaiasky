@@ -120,7 +120,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knots = new Points(RenderGroup.POINT);
         knots.setName("Keyframes.knots");
         knots.ct = this.ct;
-        knots.setColor(ColorUtils.gWhite);
+        knots.setColor(ColorUtils.gGreen);
         knots.setClosedLoop(false);
         knots.setPrimitiveSize(8f * ss);
         knots.initialize();
@@ -131,6 +131,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         knotsSeam.setColor(ColorUtils.gRed);
         knotsSeam.setClosedLoop(false);
         knotsSeam.setPrimitiveSize(8f * ss);
+        knotsSeam.setBlend(false);
         knotsSeam.initialize();
 
         selectedKnot = new Points(RenderGroup.POINT);
@@ -140,6 +141,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         selectedKnot.setClosedLoop(false);
         selectedKnot.setPrimitiveSize(12f * ss);
         selectedKnot.setDepth(false);
+        selectedKnot.setBlend(false);
         selectedKnot.initialize();
 
         highlightedKnot = new Points(RenderGroup.POINT);
@@ -149,6 +151,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         highlightedKnot.setClosedLoop(false);
         highlightedKnot.setPrimitiveSize(12f * ss);
         highlightedKnot.setDepth(false);
+        highlightedKnot.setBlend(false);
         highlightedKnot.initialize();
 
         objects = new Array<>();
