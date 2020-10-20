@@ -499,10 +499,10 @@ public class OctreeGeneratorRun {
     }
 
     private Map<Long, Integer> readXmatchTable(String xmatchFile) {
+        Map<Long, Integer> map = new HashMap<>();
         File xm = new File(xmatchFile);
         if (xm.exists()) {
             try {
-                Map<Long, Integer> map = new HashMap<>();
                 BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(xm)));
                 // Assume no header
                 String line;
@@ -514,14 +514,13 @@ public class OctreeGeneratorRun {
                 }
                 br.close();
                 logger.error("Cross-match table read with " + map.size() + " entries: " + xmatchFile);
-                return map;
             } catch (Exception e) {
                 logger.error(e);
             }
         } else {
             logger.error("Cross-match file '" + xmatchFile + "' does not exist");
         }
-        return null;
+        return map;
     }
 
     private void delete(File element) {
