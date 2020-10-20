@@ -7,13 +7,16 @@ package gaiasky.data.util;
 
 import com.badlogic.gdx.utils.Array;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
 class HipNamesTest {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        final PrintStream out = new PrintStream(System.out, true, "UTF-8");
         HipNames hn = new HipNames();
         Path folder = Paths.get(System.getenv("PROJECTS"), "/gaiasky/assets/assets-bak/data/hipnames/");
 
@@ -23,15 +26,15 @@ class HipNamesTest {
 
         hipNames.keySet().stream().sorted().forEach(hip -> {
             Array<String> nms = hipNames.get(hip);
-            System.out.print(hip + ",");
+            out.print(hip + ",");
 
             for (int i = 0; i < nms.size; i++) {
-                System.out.print(nms.get(i));
+                out.print(nms.get(i));
                 if (i < nms.size - 1)
-                    System.out.print("|");
+                    out.print("|");
             }
 
-            System.out.println();
+            out.println();
         });
 
     }

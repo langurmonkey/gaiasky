@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Generates eDR3int2 catalogs
+# Generates eDR3int4 catalogs
 
 # Get script path
 SOURCE="${BASH_SOURCE[0]}"
@@ -16,6 +16,7 @@ LOGS_LOC="$GSDIR/edr3int4_logs"
 DATA_LOC="$HOME/gaiadata"
 DR_BASE="$DATA_LOC/eDR3"
 DR_LOC="$DR_BASE/int4"
+CATALOG_NAME="edr3int4"
 
 # Definition file
 CATDEF="$GSDIR/catalogs-edr3int4.json"

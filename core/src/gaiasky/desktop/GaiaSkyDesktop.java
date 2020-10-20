@@ -42,10 +42,7 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -112,12 +109,20 @@ public class GaiaSkyDesktop implements IObserver {
         jc.usage();
     }
 
+    /** UTF-8 output stream printer **/
+    private static PrintStream out;
+
     /**
      * Main method
      *
      * @param args Arguments
      */
     public static void main(String[] args) {
+        try {
+            out = new PrintStream(System.out, true, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            out = new PrintStream(System.out, true);
+        }
         gsArgs = new GaiaSkyArgs();
         JCommander jc = JCommander.newBuilder().addObject(gsArgs).build();
         jc.setProgramName("gaiasky");
@@ -129,7 +134,7 @@ public class GaiaSkyDesktop implements IObserver {
                 return;
             }
         } catch (Exception e) {
-            System.out.print("gaiasky: bad program arguments\n\n");
+            out.print("gaiasky: bad program arguments\n\n");
             printUsage(jc);
             return;
         }
@@ -193,26 +198,26 @@ public class GaiaSkyDesktop implements IObserver {
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
             if (gsArgs.version) {
-                System.out.println(GlobalConf.getShortApplicationName());
+                out.println(GlobalConf.getShortApplicationName());
                 if (gsArgs.asciiart) {
                     BufferedReader ascii = new BufferedReader(new InputStreamReader(Gdx.files.internal("icon/gsascii.txt").read()));
-                    System.out.println();
-                    String line = null;
+                    out.println();
+                    String line;
                     while ((line = ascii.readLine()) != null) {
-                        System.out.println(line);
+                        out.println(line);
                     }
                 }
-                System.out.println();
-                System.out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
-                System.out.println("Written by " + GlobalConf.AUTHOR_NAME + " <" + GlobalConf.AUTHOR_EMAIL + ">");
-                System.out.println();
-                System.out.println(I18n.txt("gui.help.javaversion").toLowerCase() + ": " + System.getProperty("java.vm.version"));
-                System.out.println(I18n.txt("gui.help.javavmname").toLowerCase() + ": " + System.getProperty("java.vm.name"));
-                System.out.println();
-                System.out.println("gaiasky homepage  <" + GlobalConf.WEBPAGE + ">");
-                System.out.println("docs              <" + GlobalConf.DOCUMENTATION + ">");
-                System.out.println();
-                System.out.println("ZAH/DLR/BWT/DPAC");
+                out.println();
+                out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
+                out.println("Written by " + GlobalConf.AUTHOR_NAME + " <" + GlobalConf.AUTHOR_EMAIL + ">");
+                out.println();
+                out.println(I18n.txt("gui.help.javaversion").toLowerCase() + ": " + System.getProperty("java.vm.version"));
+                out.println(I18n.txt("gui.help.javavmname").toLowerCase() + ": " + System.getProperty("java.vm.name"));
+                out.println();
+                out.println("gaiasky homepage  <" + GlobalConf.WEBPAGE + ">");
+                out.println("docs              <" + GlobalConf.DOCUMENTATION + ">");
+                out.println();
+                out.println("ZAH/DLR/BWT/DPAC");
                 return;
             }
 
@@ -421,10 +426,10 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Check latest version
             if (!userProps.containsKey("properties.version")) {
-                System.out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
+                out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
                 overwrite = true;
             } else if (Integer.parseInt(userProps.getProperty("properties.version")) < internalVersion) {
-                System.out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userProps.getProperty("properties.version")) + ", required " + internalVersion);
+                out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userProps.getProperty("properties.version")) + ", required " + internalVersion);
                 overwrite = true;
             }
         }
@@ -468,17 +473,17 @@ public class GaiaSkyDesktop implements IObserver {
         boolean linux = SysUtils.isLinux();
         boolean gnome = SysUtils.checkGnome();
         if (jv >= 10 && linux && gnome) {
-            System.out.println("======================================= WARNING ========================================");
-            System.out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
-            System.out.println("========================================================================================");
-            System.out.println();
+            out.println("======================================= WARNING ========================================");
+            out.println("It looks like you are running Gaia Sky with java " + jv + " in Linux with Gnome.\n" + "This version may crash. If it does, comment out the property\n" + "'assistive_technologies' in the '/etc/java-[version]/accessibility.properties' file.");
+            out.println("========================================================================================");
+            out.println();
         }
 
         if (jv < 9) {
-            System.out.println("========================== ERROR ==============================");
-            System.out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
-            System.out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
-            System.out.println("===============================================================");
+            out.println("========================== ERROR ==============================");
+            out.println("You are using Java " + jv + ", which is unsupported by Gaia Sky");
+            out.println("             Please, use at least Java " + REQUIRED_JAVA_VERSION);
+            out.println("===============================================================");
             JAVA_VERSION_FLAG = true;
         }
     }
@@ -488,10 +493,10 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static void experimentalCheck() {
         if (gsArgs.externalView) {
-            System.out.println("============================ WARNING ================================");
-            System.out.println("The -e/--externalview feature is experimental and may cause problems!");
-            System.out.println("=====================================================================");
-            System.out.println();
+            out.println("============================ WARNING ================================");
+            out.println("The -e/--externalview feature is experimental and may cause problems!");
+            out.println("=====================================================================");
+            out.println();
         }
     }
 }

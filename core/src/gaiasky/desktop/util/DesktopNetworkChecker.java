@@ -33,6 +33,9 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnTextButton;
 
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
+
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
 
@@ -265,29 +268,30 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws UnsupportedEncodingException {
+        final PrintStream out = new PrintStream(System.out, true, "UTF-8");
         Gdx.net = new Lwjgl3Net(new Lwjgl3ApplicationConfiguration());
         DesktopNetworkChecker dnc = new DesktopNetworkChecker();
         dnc.urlCheck("https://ca.ba.de.si.com", new LinkListener() {
             @Override
             public void ok(String link) {
-                System.out.println("ok : " + link);
+                out.println("ok : " + link);
             }
 
             @Override
             public void ko(String link) {
-                System.out.println("ko : " + link);
+                out.println("ko : " + link);
             }
         });
         dnc.urlCheck("https://www.google.com", new LinkListener() {
             @Override
             public void ok(String link) {
-                System.out.println("ok : " + link);
+                out.println("ok : " + link);
             }
 
             @Override
             public void ko(String link) {
-                System.out.println("ko : " + link);
+                out.println("ko : " + link);
             }
         });
 

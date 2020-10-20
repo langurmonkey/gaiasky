@@ -97,7 +97,8 @@ public class GalaxyGenerator {
             } else if (GALAXY_TYPE.equals("bulge")) {
                 gal = generateBulge();
             } else {
-                System.out.println("Wrong galaxy type: " + GALAXY_TYPE);
+                PrintStream out = new PrintStream(System.out, true, "UTF-8");
+                out.println("Wrong galaxy type: " + GALAXY_TYPE);
                 return;
             }
 

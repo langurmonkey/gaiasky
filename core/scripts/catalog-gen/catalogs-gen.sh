@@ -71,7 +71,7 @@ for CURRENT_CATALOG in "${TORUN[@]}"; do
         # Remove quotes
         NAME=$(sed -e 's/^"//' -e 's/"$//' <<<"$NAME")
         if [ "$NAME" == "$CURRENT_CATALOG" ]; then
-            DSNAME="00$j-$(date +'%Y%m%d')-edr3int2-$NAME"
+            DSNAME="00$j-$(date +'%Y%m%d')-$CATALOG_NAME-$NAME"
             echo $DSNAME
             CMD="nohup $GSDIR/octreegen --loader CsvCatalogDataProvider --input $DR_LOC/csv/ --output $DR_LOC/out/$DSNAME/"
             NATTR=$(jq ".catalogs[$j] | length" $CATDEF)
