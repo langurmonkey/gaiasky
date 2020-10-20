@@ -69,7 +69,7 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     public Array<Keyframe> loadKeyframesFile(Path file) throws RuntimeException {
-        Array<Keyframe> result = new Array<Keyframe>();
+        Array<Keyframe> result = new Array<>();
         BufferedReader br = null;
         try {
             br = new BufferedReader(new FileReader(file.toFile()));
