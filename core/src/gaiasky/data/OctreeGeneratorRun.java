@@ -249,7 +249,7 @@ public class OctreeGeneratorRun {
             STILDataProvider stil = new STILDataProvider();
 
             // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider
-            if (xmatchTable != null) {
+            if (xmatchTable != null && !xmatchTable.isEmpty()) {
                 Set<Long> mustLoad = new HashSet<>();
                 for (int hipNumber : xmatchTable.values()) {
                     mustLoad.add(Long.valueOf(hipNumber));

@@ -26,10 +26,10 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
         NORMAL, ATMOSPHERE, CLOUD
     }
 
-    private ComponentTypes ctAtm, ctClouds;
+    protected ComponentTypes ctAtm, ctClouds;
 
-    private IntModelBatch batch;
-    private ModelRenderType type;
+    protected IntModelBatch batch;
+    protected ModelRenderType type;
 
     /**
      * Creates a new model batch render component.

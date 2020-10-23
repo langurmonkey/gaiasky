@@ -42,6 +42,7 @@ action.toggle/element.boundaries            = SHIFT_L B
 action.toggle/element.equatorial            = SHIFT_L Q
 action.toggle/element.ecliptic              = SHIFT_L E
 action.toggle/element.galactic              = SHIFT_L G
+action.toggle/element.recursivegrid         = SHIFT_L R
 action.toggle/element.meshes                = SHIFT_L H
 action.toggle/element.clusters              = SHIFT_L V
 

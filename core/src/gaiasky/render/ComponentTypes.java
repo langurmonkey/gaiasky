@@ -61,8 +61,9 @@ public class ComponentTypes extends BitSet {
         Equatorial("icon-elem-equatorial"),
         Ecliptic("icon-elem-ecliptic"),
         Galactic("icon-elem-galactic"),
+        RecursiveGrid("icon-elem-recgrid"),
         Labels("icon-elem-labels"),
-        Titles("icon-elem-titles"),
+
 
         Orbits("icon-elem-orbits"),
         Locations("icon-elem-locations"),
@@ -77,6 +78,7 @@ public class ComponentTypes extends BitSet {
         Axes("icon-elem-axes"),
 
         VelocityVectors("icon-elem-arrows"),
+        Titles("icon-elem-titles"),
         Others("icon-elem-others"),
 
         // ALWAYS LAST

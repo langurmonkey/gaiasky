@@ -168,7 +168,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
                     int key = ievent.getKeyCode();
                     switch (key) {
                     case Keys.ESCAPE:
-                        if(escExit) {
+                        if (escExit) {
                             // Exit
                             cancel();
                             if (cancelRunnable != null)
@@ -177,7 +177,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
                         }
                         return true;
                     case Keys.ENTER:
-                        if(enterExit) {
+                        if (enterExit) {
                             // Exit
                             accept();
                             if (acceptRunnable != null)
@@ -216,9 +216,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         // Build actual content
         build();
-
-        // Set position
-        setPosition(Math.round(stage.getWidth() / 2f - this.getWidth() / 2f), Math.round(stage.getHeight() / 2f - this.getHeight() / 2f));
 
         // Modal
         setModal(this.modal);
@@ -277,7 +274,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage) {
         show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
-        setPosition((stage.getWidth() - getWidth()) / 2f, (stage.getHeight() - getHeight()) / 2f);
+        setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
         setKeyboardFocus();
         return this;
     }
@@ -286,8 +283,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * {@link #pack() Packs} the dialog and adds it to the stage at the specified position
      */
     public GenericDialog show(Stage stage, float x, float y) {
-        show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
-        setPosition(x, y);
+        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(0.4f, Interpolation.fade)));
+        setPosition(Math.round(x), Math.round(y));
         setKeyboardFocus();
         return this;
     }

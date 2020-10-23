@@ -7,6 +7,7 @@ package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
@@ -26,6 +27,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.FloatExtAttribute;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -389,6 +391,34 @@ public class ModelComponent implements Disposable, IObserver {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 ((ColorAttribute) instance.materials.get(i).get(ColorAttribute.Diffuse)).color.a = alpha;
+            }
+        }
+    }
+
+    public void setFloatExtAttribute(long attrib, float value){
+        if (instance != null) {
+            int n = instance.materials.size;
+            for (int i = 0; i < n; i++) {
+                Material mat = instance.materials.get(i);
+                if(!mat.has(attrib)){
+                    mat.set(new FloatExtAttribute(attrib, value));
+                } else {
+                    ((FloatExtAttribute) mat.get(attrib)).value = value;
+                }
+            }
+        }
+    }
+
+    public void setColorAttribute(long attrib, float[] rgba){
+        if (instance != null) {
+            int n = instance.materials.size;
+            for (int i = 0; i < n; i++) {
+                Material mat = instance.materials.get(i);
+                if(!mat.has(attrib)){
+                    mat.set(new ColorAttribute(attrib, new Color(rgba[0], rgba[1], rgba[2], rgba[3])));
+                } else {
+                    ((ColorAttribute) mat.get(attrib)).color.set(rgba[0], rgba[1], rgba[2], rgba[3]);
+                }
             }
         }
     }

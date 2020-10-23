@@ -260,6 +260,9 @@ public class KeyBindings {
         // Toggle galactic
         addAction(new ProgramAction("action.toggle/element.galactic", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.galactic", false)));
 
+        // Toggle recgrid
+        addAction(new ProgramAction("action.toggle/element.recursivegrid", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.recursivegrid", false)));
+
         // toggle meshes
         addAction(new ProgramAction("action.toggle/element.meshes", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.meshes", false)));
 
