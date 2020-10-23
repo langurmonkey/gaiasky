@@ -22,9 +22,14 @@ LIB_PATH="$GSDIR/lib/*"
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # macOS, use bundled JRE
     if [[ -f "$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java" ]]; then
+        # Check default dmg jre location
         JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/jre/bin/java"
-    else
+    elif [[ -f "$GSDIR/../../PlugIns/jre.bundle/Contents/Home/bin/java" ]]; then
+        # Check out this other location...
         JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/bin/java"
+    else
+        # Just use default java installation, hopefully it's 11+
+        JAVA="java"
     fi
 elif [[ "$JAVA_HOME" != "" ]]; then
     # Use $JAVA_HOME
