@@ -235,7 +235,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             Class<Coordinates> c = Coordinates.class;
             try {
                 Method m = ClassReflection.getMethod(c, transformName);
-                coordinateSystemd = (Matrix4d) m.invoke(null);
+                coordinateSystemd.set((Matrix4d) m.invoke(null));
                 coordinateSystemd.putIn(coordinateSystem);
             } catch (ReflectionException e) {
                 Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
@@ -258,7 +258,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             localTransform.translate(focus.getAbsolutePosition(aux3d).sub(camera.getPos()).setLength(1).put(aux3));
         }
         localTransform.scl((float) (0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
-        localTransform.mul(coordinateSystem);
+        if (coordinateSystem != null)
+            localTransform.mul(coordinateSystem);
 
         // Must rotate due to orientation of billboard
         localTransform.rotate(1, 0, 0, 90);
@@ -318,8 +319,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         // n up, n down (if possible)
         int n = 2;
-        for (int i = index - n; i < index + n; i++){
-            if(i >= 0 && i < annotations.size()){
+        for (int i = index - n; i < index + n; i++) {
+            if (i >= 0 && i < annotations.size()) {
                 // Render
                 renderDistanceLabel(batch, shader, sys, rc, camera, annotations.get(i).getFirst(), annotations.get(i).getSecond());
             }
