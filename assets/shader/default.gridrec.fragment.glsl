@@ -6,6 +6,8 @@ uniform vec4 u_diffuseColor;
 uniform float u_tessQuality;
 // Subgrid fading encoded in u_heightScale
 uniform float u_heightScale;
+// fovFactor
+uniform float u_ts;
 
 // VARYINGS
 
@@ -20,10 +22,10 @@ layout (location = 0) out vec4 fragColor;
 
 #define PI 3.141592
 #define N 10.0
-#define WIDTH 1.0
+#define WIDTH 2.0
 
 vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col) {
-    float lw = 0.001 * WIDTH;
+    float lw = u_ts * WIDTH;
     float factor = (1.0 - lw);
 
     vec2 tcp = tc * d * f;
@@ -41,7 +43,7 @@ vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col) {
     float func = cos(PI * dist);
 
     // lines
-    vec2 lines = smoothstep(factor, 1.0, pow(1.0 - abs(tc), vec2(2.0)));
+    vec2 lines = smoothstep(factor, 1.0, pow(1.0 - abs(tc), vec2(3.0)));
 
     vec4 result = col * (max(smoothstep(factor, 1.0, func), max(lines.x, lines.y)));
     result.a *= alpha;

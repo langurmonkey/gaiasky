@@ -43,6 +43,16 @@ public class Constants {
     public static double U_TO_AU = 1d / AU_TO_U;
 
     /**
+     * Light years to local units.
+     */
+    public static double LY_TO_U = Nature.LY_TO_KM * KM_TO_U;
+
+    /**
+     * Local units to light years.
+     */
+    public static double U_TO_LY = 1d / LY_TO_U;
+
+    /**
      * Parsec to local unit conversion. Multiply this by all values in pc.
      */
     public static double PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
