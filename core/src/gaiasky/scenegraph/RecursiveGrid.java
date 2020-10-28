@@ -248,8 +248,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         // Compute projection lines to refsys
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES && camera.getFocus() != null) {
             IFocus focus = camera.getFocus();
-            Vector3d cpos = aux3d1.get();
-            Vector3d fpos = aux3d2.get();
+            Vector3d cpos = aux3d3.get();
+            Vector3d fpos = aux3d4.get();
             getCFPos(cpos, fpos, camera, focus);
 
             // Line in XZ
