@@ -70,7 +70,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         this.skin = skin;
 
         nf = NumberFormatFactory.getFormatter("##0.##");
-        sf = NumberFormatFactory.getFormatter("#0.##E0");
+        sf = NumberFormatFactory.getFormatter("0.###E0");
 
         float buttonSize = 15f * GlobalConf.UI_SCALE_FACTOR;
         float imgSize = 18f * GlobalConf.UI_SCALE_FACTOR;

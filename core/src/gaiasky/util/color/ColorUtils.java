@@ -15,13 +15,13 @@ public class ColorUtils {
      */
 
     // Google colors
-    public static float[] gGreen = new float[] { 0f / 255f, 135f / 255f, 68f / 255f, 1f };
+    public static float[] gGreen = new float[] { 15f / 255f, 157f / 255f, 88f / 255f, 1f };
     public static Color gGreenC = getCol(gGreen);
-    public static float[] gBlue = new float[] { 0f / 255f, 87f / 255f, 231f / 255f, 1f };
+    public static float[] gBlue = new float[] { 66f / 255f, 133f / 255f, 244f / 255f, 1f };
     public static Color gBlueC = getCol(gBlue);
-    public static float[] gRed = new float[] { 214f / 255f, 45f / 255f, 32f / 255f, 1f };
+    public static float[] gRed = new float[] { 219f / 255f, 68f / 255f, 55f / 255f, 1f };
     public static Color gRedC = getCol(gRed);
-    public static float[] gYellow = new float[] { 255f / 255f, 167f / 255f, 0f / 255f, 1f };
+    public static float[] gYellow = new float[] { 244f / 255f, 160f / 255f, 0f / 255f, 1f };
     public static Color gYellowC = getCol(gYellow);
     public static float[] gWhite = new float[] { 255f / 255f, 255f / 255f, 255f / 255f, 1f };
     public static Color gWhiteC = getCol(gWhite);

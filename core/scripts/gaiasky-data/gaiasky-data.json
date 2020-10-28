@@ -63,7 +63,7 @@
       "type": "data-pack",
       "version": 11,
       "mingsversion": 20300,
-      "size": 105419844,
+      "size": 105419746,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -111,7 +111,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "055235a3187819d41ba79e3053b8f904599943d7c2e4dc0978177b1b0f894c7d",
+      "sha256": "0bc61737d214128f28baf08475b7e6fe47837136a899c8ff2bb4afef00719423",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
       "releasenotes": "Add recursive grid object.",
       "file": "@mirror-url@basedata/011_20201027/gaiasky_data.tar.gz"

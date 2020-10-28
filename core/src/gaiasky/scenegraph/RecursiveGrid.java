@@ -10,7 +10,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -20,17 +19,19 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.ILineRenderable;
 import gaiasky.render.IModelRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
+import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.Logger;
-import gaiasky.util.Pair;
+import gaiasky.util.*;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.format.INumberFormat;
+import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -50,23 +51,30 @@ import java.util.Map;
  *
  * @author tsagrista
  */
-public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DTextRenderable, IObserver {
+public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DTextRenderable, ILineRenderable, IObserver {
     protected String transformName;
     public ModelComponent mc;
     private Matrix4 coordinateSystem;
     private Matrix4d coordinateSystemd;
+    private Matrix4d mat4daux;
     private boolean label;
 
     private float[] cc;
-    private float[] ccEq = new float[] { 0.9f, 0.3f, 0.2f, 1f };
-    private float[] ccEcl = new float[] { 0.2f, 0.9f, 0.3f, 1f };
-    private float[] ccGal = new float[] { 0.2f, 0.3f, 0.9f, 1f };
+    private float[] ccEq = ColorUtils.gRed;
+    private float[] ccEcl = ColorUtils.gGreen;
+    private float[] ccGal = ColorUtils.gBlue;
+
+    private float[] ccL = ColorUtils.gYellow;
 
     private Pair<Double, Double> scalingFading;
-    private Vector3d aux3d;
-    private Vector3 aux3;
     private float fovFactor;
     private List<Pair<Double, String>> annotations;
+
+    // Mid-points of lines in refys mode
+    private Vector3d p01, p02, a, b, c, d;
+    private double d01, d02;
+
+    private INumberFormat nf;
 
     private RenderGroup renderGroupModel = RenderGroup.MODEL_VERT_RECGRID;
 
@@ -80,13 +88,25 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         transformName = GlobalConf.scene.VISIBILITY[ComponentType.Galactic.ordinal()] ? "galacticToEquatorial" : (GlobalConf.scene.VISIBILITY[ComponentType.Ecliptic.ordinal()] ? "eclipticToEquatorial" : null);
         coordinateSystem = new Matrix4();
         coordinateSystemd = new Matrix4d();
+        mat4daux = new Matrix4d();
         updateCoordinateSystem();
+
+        nf = NumberFormatFactory.getFormatter("0.###E0");
 
         cc = GlobalConf.scene.VISIBILITY[ComponentType.Galactic.ordinal()] ? ccGal : (GlobalConf.scene.VISIBILITY[ComponentType.Ecliptic.ordinal()] ? ccEcl : ccEq);
         labelcolor = cc;
         label = true;
         labelPosition = new Vector3d();
         localTransform = new Matrix4();
+
+        p01 = new Vector3d();
+        p02 = new Vector3d();
+        d01 = -1;
+        d02 = -1;
+        a = new Vector3d();
+        b = new Vector3d();
+        c = new Vector3d();
+        d = new Vector3d();
 
         // Init billboard model
         mc = new ModelComponent();
@@ -98,9 +118,6 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         mc.initialize();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], cc[3]));
         mc.setDepthTest(GL20.GL_NONE, false);
-
-        aux3d = new Vector3d();
-        aux3 = new Vector3();
 
         // Initialize annotations vectorR
         initAnnotations();
@@ -208,6 +225,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             if (label) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
+            if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES && camera.getFocus() != null) {
+                addToRender(this, RenderGroup.LINE);
+            }
         }
     }
 
@@ -215,7 +235,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.distToCamera = getDistanceToOrigin(camera);
         this.opacity = opacity;
-        if (camera.getFocus() != null) {
+        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
             IFocus focus = camera.getFocus();
             this.opacity *= MathUtilsd.lint(this.distToCamera, focus.getRadius() * 5d, focus.getRadius() * 50d, 0d, 1d);
         }
@@ -225,7 +245,28 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         // Distance in u_tessQuality
         scalingFading = getGridScaling(distToCamera);
 
-        if (!this.copy && this.opacity > 0) {
+        // Compute projection lines to refsys
+        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES && camera.getFocus() != null) {
+            IFocus focus = camera.getFocus();
+            Vector3d cpos = aux3d1.get();
+            Vector3d fpos = aux3d2.get();
+            getCFPos(cpos, fpos, camera, focus);
+
+            // Line in XZ
+            getZXLine(a, b, cpos, fpos);
+            d01 = p01.set(b).sub(a).len();
+            p01.setLength(d01 / 2d).add(a);
+
+            // Line in Y
+            getYLine(c, d, cpos, fpos);
+            d02 = p02.set(c).sub(d).len();
+            p02.setLength(d02 / 2d).add(d);
+        } else {
+            d01 = -1;
+            d02 = -1;
+        }
+
+            if (!this.copy && this.opacity > 0) {
             addToRenderLists(camera);
         }
     }
@@ -250,12 +291,12 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private void updateLocalTransform(ICamera camera) {
         IFocus focus = camera.getFocus();
         localTransform.idt();
-        if (focus == null) {
+        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
             // Coordinate origin - Sun
-            localTransform.translate(camera.getInversePos().put(aux3).setLength(1));
+            localTransform.translate(camera.getInversePos().put(aux3f1.get()).setLength(1));
         } else {
             // Focus object
-            localTransform.translate(focus.getAbsolutePosition(aux3d).sub(camera.getPos()).setLength(1).put(aux3));
+            localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(1).put(aux3f1.get()));
         }
         localTransform.scl((float) (0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
         if (coordinateSystem != null)
@@ -283,8 +324,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     private double getDistanceToOrigin(ICamera camera) {
         IFocus focus = camera.getFocus();
-        if (focus == null) {
-            return camera.getPos().put(aux3).len();
+        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
+            return camera.getPos().len();
         } else {
             return focus.getDistToCamera();
         }
@@ -326,6 +367,14 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             }
         }
 
+        if(GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && camera.getFocus() != null && d01 > 0 && d02 > 0){
+            shader.setUniform4fv("u_color", ccL, 0, 4);
+            Pair<Double, String> d = GlobalResources.doubleToDistanceString(d01);
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, textScale(), (float) (d01 * 2e-3d * camera.getFovFactor()));
+            d = GlobalResources.doubleToDistanceString(d02);
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, textScale(), (float) (d02 * 2e-3d * camera.getFovFactor()));
+        }
+
     }
 
     private void renderDistanceLabel(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera, double dist, String text) {
@@ -335,8 +384,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         shader.setUniformf("u_thOverFactorScl", 1);
 
         IFocus focus = camera.getFocus();
-        Vector3d v = aux3d;
-        if (focus != null) {
+        Vector3d v = aux3d1.get().setZero();
+        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && focus != null) {
             focus.getAbsolutePosition(v);
         } else {
 
@@ -353,6 +402,50 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
         render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, textScale(), (float) (dist * 2e-3d * camera.getFovFactor()));
+    }
+
+    /**
+     * Line rendering.
+     *
+     * @param renderer The line renderer.
+     * @param camera   The camera.
+     * @param alpha    The alpha opacity.
+     */
+    @Override
+    public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
+        // Here, we must have a focus and be in refsys mode
+        IFocus focus = camera.getFocus();
+        if (focus != null) {
+            // Line in ZX
+            renderer.addLine(this, a.x, a.y, a.z, b.x, b.y, b.z, ccL[0], ccL[1], ccL[2], ccL[3]);
+            // Line in Y
+            renderer.addLine(this, c.x, c.y, c.z, d.x, d.y, d.z, ccL[0], ccL[1], ccL[2], ccL[3]);
+        }
+    }
+
+    private void getCFPos(Vector3d cpos, Vector3d fpos, ICamera camera, IFocus focus){
+        Matrix4d inv = coordinateSystemd;
+        Matrix4d trf = mat4daux.set(inv).inv();
+        camera.getPos().put(cpos).mul(trf);
+        focus.getAbsolutePosition(fpos).mul(trf);
+        fpos.sub(cpos);
+    }
+
+    private void getZXLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos){
+        Matrix4d inv = coordinateSystemd;
+        a.set(-cpos.x, -cpos.y, -cpos.z);
+        b.set(fpos.x, -cpos.y, fpos.z);
+        // Back to equatorial
+        a.mul(inv);
+        b.mul(inv);
+    }
+    private void getYLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos){
+        Matrix4d inv = coordinateSystemd;
+        a.set(fpos.x, -cpos.y, fpos.z);
+        b.set(fpos.x, fpos.y, fpos.z);
+        // Back to equatorial
+        a.mul(inv);
+        b.mul(inv);
     }
 
     public void setTransformName(String transformName) {
@@ -460,5 +553,15 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         default:
             break;
         }
+    }
+
+    @Override
+    public float getLineWidth() {
+        return 0.5f;
+    }
+
+    @Override
+    public int getGlPrimitive() {
+        return GL20.GL_LINES;
     }
 }

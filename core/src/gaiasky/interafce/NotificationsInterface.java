@@ -47,7 +47,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     boolean displaying = false;
     boolean historicalLog = false;
     boolean permanent = false;
-    boolean multiple = false;
+    boolean multiple;
     boolean writeDates = true;
 
     /**

@@ -31,6 +31,7 @@ import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
 import gaiasky.util.GlobalConf.PostprocessConf.ToneMapping;
+import gaiasky.util.GlobalConf.ProgramConf.OriginType;
 import gaiasky.util.GlobalConf.ProgramConf.ShowCriterion;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -74,12 +75,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
-    private OwnSelectBox<String> theme;
+    private OwnSelectBox<String> theme, recgridOrigin;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth;
@@ -837,13 +838,38 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pg.add(guidesWidthLabel).left().padBottom(pad5).padRight(pad10);
         pg.add(pointerGuidesWidth).left().padBottom(pad5).padRight(pad10);
 
+        /* RECURSIVE GRID */
+        OwnLabel titleRecgrid = new OwnLabel(I18n.txt("gui.ui.recursivegrid"), skin, "header");
+        Table rg = new Table();
+
+        // ORIGIN
+        OwnLabel originLabel = new OwnLabel(I18n.txt("gui.ui.recursivegrid.origin"), skin);
+        originLabel.setWidth(labelWidth);
+        String[] origins = new String[] { I18n.txt("gui.ui.recursivegrid.origin.refsys"), I18n.txt("gui.ui.recursivegrid.origin.focus") };
+        recgridOrigin = new OwnSelectBox<>(skin);
+        recgridOrigin.setWidth(textwidth * 3f);
+        recgridOrigin.setItems(origins);
+        recgridOrigin.setSelectedIndex(GlobalConf.program.RECURSIVE_GRID_ORIGIN.ordinal());
+
+        // PROJECTION LINES
+        recgridProjectionLinesCb = new OwnCheckBox("" + I18n.txt("gui.ui.recursivegrid.projlines"), skin, pad10);
+        recgridProjectionLinesCb.setName("origin projection lines cb");
+        recgridProjectionLinesCb.setChecked(GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES);
+
+        // Add to table
+        rg.add(originLabel).left().padBottom(pad5).padRight(pad10);
+        rg.add(recgridOrigin).left().padBottom(pad5).row();
+        rg.add(recgridProjectionLinesCb).colspan(2).left().padBottom(pad5);
+
         // Add to content
-        contentUI.add(titleUI).left().padBottom(pad5 * 2).row();
-        contentUI.add(ui).left().padBottom(pad5 * 4).row();
-        contentUI.add(titleCrosshair).left().padBottom(pad5 * 2).row();
-        contentUI.add(ch).left().padBottom(pad5 * 4).row();
-        contentUI.add(titleGuides).left().padBottom(pad5 * 2).row();
-        contentUI.add(pg).left();
+        contentUI.add(titleUI).left().padBottom(pad5 * 2f).row();
+        contentUI.add(ui).left().padBottom(pad5 * 4f).row();
+        contentUI.add(titleCrosshair).left().padBottom(pad5 * 2f).row();
+        contentUI.add(ch).left().padBottom(pad5 * 4f).row();
+        contentUI.add(titleGuides).left().padBottom(pad5 * 2f).row();
+        contentUI.add(pg).left().padBottom(pad5 * 4f).row();
+        contentUI.add(titleRecgrid).left().padBottom(pad5 * 2f).row();
+        contentUI.add(rg).left();
 
 
         /*
@@ -1957,6 +1983,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Pointer guides
         EventManager.instance.post(Events.POINTER_GUIDES_CMD, pointerGuidesCb.isChecked(), pointerGuidesColor.getPickedColor(), pointerGuidesWidth.getMappedValue());
+
+        // Recursive grid
+        GlobalConf.program.RECURSIVE_GRID_ORIGIN = OriginType.values()[recgridOrigin.getSelectedIndex()];
+        GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES = recgridProjectionLinesCb.isChecked();
 
         // Minimap size
         GlobalConf.program.MINIMAP_SIZE = minimapSize.getValue();

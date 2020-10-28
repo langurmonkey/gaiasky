@@ -930,6 +930,18 @@ public class GlobalConf {
             }
         }
 
+        public enum OriginType{
+            REFSYS, FOCUS;
+
+            public boolean isRefsys() {
+                return this.equals(REFSYS);
+            }
+            public boolean isFocus() {
+                return this.equals(FOCUS);
+            }
+
+        }
+
         /**
          * In a client-server configuration, this instance of Gaia Sky acts as a slave and
          * receives the state over the network if this is set to true
@@ -991,6 +1003,8 @@ public class GlobalConf {
         public boolean DISPLAY_POINTER_GUIDES;
         public float[] POINTER_GUIDES_COLOR;
         public float POINTER_GUIDES_WIDTH;
+        public OriginType RECURSIVE_GRID_ORIGIN;
+        public boolean RECURSIVE_GRID_ORIGIN_LINES;
         public boolean DISPLAY_MINIMAP;
         public float MINIMAP_SIZE;
         public boolean MINIMAP_IN_WINDOW = false;
@@ -1018,7 +1032,7 @@ public class GlobalConf {
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
-                               List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, boolean eXIT_CONFIRMATION, ShowCriterion cATALOG_CHOOSER, String mIRROR) {
+                               List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, OriginType rECURSIVE_GRID_ORIGIN, boolean rECURSIVE_GRID_ORIGIN_LINES, boolean eXIT_CONFIRMATION, ShowCriterion cATALOG_CHOOSER, String mIRROR) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -1053,6 +1067,8 @@ public class GlobalConf {
             DISPLAY_POINTER_GUIDES = dISPLAY_POINTER_GUIDES;
             POINTER_GUIDES_COLOR = pOINTER_GUIDES_COLOR;
             POINTER_GUIDES_WIDTH = pOINTER_GUIDES_WIDTH;
+            RECURSIVE_GRID_ORIGIN = rECURSIVE_GRID_ORIGIN;
+            RECURSIVE_GRID_ORIGIN_LINES = rECURSIVE_GRID_ORIGIN_LINES;
             EXIT_CONFIRMATION = eXIT_CONFIRMATION;
             CATALOG_CHOOSER = cATALOG_CHOOSER;
         }

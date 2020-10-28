@@ -14,6 +14,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.*;
 import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
+import gaiasky.util.GlobalConf.ProgramConf.OriginType;
 import gaiasky.util.GlobalConf.ProgramConf.ShowCriterion;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
@@ -231,6 +232,10 @@ public class DesktopConfInit extends ConfInit {
         float[] POINTER_GUIDES_COLOR = Parser.parseFloatArray(p.getProperty("program.pointer.guides.color", "[1.0,1.0,1.0,0.3]"));
         float POINTER_GUIDES_WIDTH = Parser.parseFloat(p.getProperty("program.pointer.guides.width", "1.5"));
 
+        // Recursive grid origin
+        OriginType RECURSIVE_GRID_ORIGIN = OriginType.valueOf(p.getProperty("program.recursivegrid.origin", "focus").toUpperCase());
+        boolean RECURSIVE_GRID_ORIGIN_LINES = Parser.parseBoolean(p.getProperty("program.recursivegrid.origin.lines", "true"));
+
         LinkedList<String> NET_MASTER_SLAVES = null;
         if (NET_MASTER) {
             NET_MASTER_SLAVES = new LinkedList<>();
@@ -240,7 +245,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, EXIT_CONFIRMATION, CATALOG_CHOOSER, MIRROR_URL);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, CATALOG_CHOOSER, MIRROR_URL);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -497,6 +502,8 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.pointer.guides.display", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_GUIDES));
         p.setProperty("program.pointer.guides.color", Arrays.toString(GlobalConf.program.POINTER_GUIDES_COLOR));
         p.setProperty("program.pointer.guides.width", Float.toString(GlobalConf.program.POINTER_GUIDES_WIDTH));
+        p.setProperty("program.recursivegrid.origin", GlobalConf.program.RECURSIVE_GRID_ORIGIN.toString().toLowerCase());
+        p.setProperty("program.recursivegrid.origin.lines", Boolean.toString(GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES));
         p.setProperty("program.display.minimap", Boolean.toString(GlobalConf.program.DISPLAY_MINIMAP));
         p.setProperty("program.minimap.size", Float.toString(GlobalConf.program.MINIMAP_SIZE));
         p.setProperty("program.debuginfo", Boolean.toString(GlobalConf.program.SHOW_DEBUG_INFO));
