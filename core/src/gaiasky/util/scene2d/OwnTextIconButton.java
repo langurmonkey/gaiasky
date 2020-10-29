@@ -23,8 +23,9 @@ public class OwnTextIconButton extends OwnTextButton {
     private Skin skin;
     private Image icon;
     private TextIconButtonStyle style;
-    private float pad = 2f;
-    private int align = Align.left;
+    private float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
+    private float space = -1;
+    private int contentAlign = Align.left;
 
     public OwnTextIconButton(String text, Skin skin, String styleName) {
         super(text, skin);
@@ -32,10 +33,10 @@ public class OwnTextIconButton extends OwnTextButton {
         setStyle(skin.get(styleName, TextIconButtonStyle.class), "default");
     }
 
-    public OwnTextIconButton(String text, int align, Skin skin, String styleName) {
+    public OwnTextIconButton(String text, int contentAlign, Skin skin, String styleName) {
         super(text, skin);
         this.skin = skin;
-        this.align = align;
+        this.contentAlign = contentAlign;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), "default");
     }
 
@@ -48,7 +49,7 @@ public class OwnTextIconButton extends OwnTextButton {
     public OwnTextIconButton(String text, int align, Skin skin, String styleName, String textButtonStyle) {
         super(text, skin);
         this.skin = skin;
-        this.align = align;
+        this.contentAlign = align;
         setStyle(skin.get(styleName, TextIconButtonStyle.class), textButtonStyle);
     }
 
@@ -64,8 +65,17 @@ public class OwnTextIconButton extends OwnTextButton {
         setIcon(up);
     }
 
+    public void setContentAlign(int align){
+        this.contentAlign = align;
+    }
+
     public void setPad(float pad) {
         this.pad = pad;
+        setIcon(this.icon);
+    }
+
+    public void setSpace(float space){
+        this.space = space;
         setIcon(this.icon);
     }
 
@@ -87,6 +97,16 @@ public class OwnTextIconButton extends OwnTextButton {
             updateImage();
     }
 
+    @Override
+    public void setDisabled(boolean isDisabled) {
+        super.setDisabled(isDisabled);
+        if(this.style.disabledFontColor != null){
+            this.icon.setColor(this.style.disabledFontColor);
+            this.setIcon(this.icon);
+        }
+
+    }
+
     protected void updateImage() {
         if (style != null) {
             Drawable drawable = style.imageUp;
@@ -99,14 +119,14 @@ public class OwnTextIconButton extends OwnTextButton {
     public void setIcon(Image icon) {
         this.icon = icon;
         clearChildren();
-        if (Align.isRight(align)) {
-            this.align(align);
-            add(getLabel()).align(align).padRight((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR);
-            add(this.icon).align(align).pad(pad).padRight(pad);
+        if (Align.isRight(contentAlign)) {
+            this.align(contentAlign);
+            add(getLabel()).align(contentAlign).padRight(space <= 0 ? ((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR) : space);
+            add(this.icon).align(contentAlign).pad(pad).padRight(pad);
         } else {
-            this.align(align);
-            add(this.icon).align(align).pad(pad).padRight((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR);
-            add(getLabel()).align(align).padRight(pad);
+            this.align(contentAlign);
+            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? ((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR) : space);
+            add(getLabel()).align(contentAlign).padRight(pad);
         }
     }
 

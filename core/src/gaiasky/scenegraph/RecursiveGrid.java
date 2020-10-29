@@ -418,9 +418,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         IFocus focus = camera.getFocus();
         if (focus != null) {
             // Line in ZX
-            renderer.addLine(this, a.x, a.y, a.z, b.x, b.y, b.z, ccL[0], ccL[1], ccL[2], ccL[3]);
+            renderer.addLine(this, a.x, a.y, a.z, b.x, b.y, b.z, ccL[0], ccL[1], ccL[2], ccL[3] * alpha * opacity);
             // Line in Y
-            renderer.addLine(this, c.x, c.y, c.z, d.x, d.y, d.z, ccL[0], ccL[1], ccL[2], ccL[3]);
+            renderer.addLine(this, c.x, c.y, c.z, d.x, d.y, d.z, ccL[0], ccL[1], ccL[2], ccL[3] * alpha * opacity);
         }
     }
 

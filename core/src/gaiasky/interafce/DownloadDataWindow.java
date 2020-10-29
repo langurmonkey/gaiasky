@@ -20,6 +20,7 @@ import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
@@ -97,20 +98,19 @@ public class DownloadDataWindow extends GenericDialog {
     private int current = -1;
 
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
-        this(stage, skin, dd, true, I18n.txt("gui.start"), I18n.txt("gui.exit"));
+        this(stage, skin, dd, true, I18n.txt("gui.ok"));
     }
 
-    public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText, String cancelText) {
+    public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
         super(I18n.txt("gui.download.title") + (dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.dd = dd;
         this.choiceList = new LinkedList<>();
         this.rubbishes = new Array<>();
-        this.highlight = skin.getColor("highlight");
+        this.highlight = ColorUtils.gYellowC;
 
         this.dataLocation = dataLocation;
 
-        setCancelText(cancelText);
         setAcceptText(acceptText);
 
         // Build
@@ -122,7 +122,7 @@ public class DownloadDataWindow extends GenericDialog {
         me.acceptButton.setDisabled(false);
         float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
         float padLarge = 9f * GlobalConf.UI_SCALE_FACTOR;
-        float minW = !GlobalConf.isHiDPI() ? 550f : 650f;
+        float minW = !GlobalConf.isHiDPI() ? 570f : 650f;
 
         float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
         Cell<Actor> topCell = content.add((Actor) null).left().top();
@@ -179,7 +179,7 @@ public class DownloadDataWindow extends GenericDialog {
                                 });
                             } else {
                                 Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
-                                warn.setColor(1f, .4f, .4f, 1f);
+                                warn.setColor(ColorUtils.gRedC);
                                 notice.setActor(warn);
                                 return false;
                             }
@@ -273,7 +273,7 @@ public class DownloadDataWindow extends GenericDialog {
                 HorizontalGroup descGroup = new HorizontalGroup();
                 descGroup.space(padLarge);
                 OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
-                desc.setWidth(!GlobalConf.isHiDPI() ? 200f * GlobalConf.UI_SCALE_FACTOR : 140f * GlobalConf.UI_SCALE_FACTOR);
+                desc.setWidth(!GlobalConf.isHiDPI() ? 200f * GlobalConf.UI_SCALE_FACTOR : 170f * GlobalConf.UI_SCALE_FACTOR);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
@@ -300,7 +300,7 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 OwnLabel vers = new OwnLabel(vstring, skin);
-                vers.setWidth(50f * GlobalConf.UI_SCALE_FACTOR);
+                vers.setWidth(60f * GlobalConf.UI_SCALE_FACTOR);
                 if (!dataset.exists) {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
                 } else if (dataset.outdated) {
@@ -392,16 +392,16 @@ public class DownloadDataWindow extends GenericDialog {
 
         }
 
-        datasetsTable.align(Align.top | Align.left);
+        datasetsTable.align(Align.top | Align.center);
         datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
         datasetsScroll.setScrollingDisabled(true, false);
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 760f * GlobalConf.UI_SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 650f * GlobalConf.UI_SCALE_FACTOR : 750f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 720f * GlobalConf.UI_SCALE_FACTOR : 790f * GlobalConf.UI_SCALE_FACTOR));
 
-        downloadTable.add(datasetsScroll).top().left().padBottom(padLarge).colspan(2).row();
+        downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
 
         // Current dataset info
         currentDownloadFile = new OwnLabel("", skin, "hotkey");
@@ -740,7 +740,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.outdated"));
-        label.setColor(1, 1, 0, 1);
+        label.setColor(ColorUtils.gYellowC);
         if (ds.releaseNotes != null && !ds.releaseNotes.isEmpty()) {
             label.setText(label.getText());
             label.addListener(new OwnTextTooltip(I18n.txt("gui.download.releasenotes", ds.releaseNotes), skin, 10));
@@ -749,28 +749,28 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void setStatusFound(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.found"));
-        label.setColor(0, 1, 0, 1);
+        label.setColor(ColorUtils.gGreenC);
     }
 
     private void setStatusNotFound(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.notfound"));
-        label.setColor(1, 0.3f, 0, 1);
+        label.setColor(ColorUtils.gRedC);
     }
 
     private void setStatusError(DatasetDesc ds, OwnLabel label) {
         label.setText("Failed");
         label.setText(I18n.txt("gui.download.status.failed"));
-        label.setColor(1, 0, 0, 1);
+        label.setColor(ColorUtils.gRedC);
     }
 
     private void setStatusCancelled(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.cancelled"));
-        label.setColor(1, 0, 0, 1);
+        label.setColor(ColorUtils.gRedC);
     }
 
     private void setStatusProgress(OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.working"));
-        label.setColor(.3f, .3f, 1, 1);
+        label.setColor(ColorUtils.gBlueC);
     }
 
     private void setMessageOk(String text) {
@@ -780,7 +780,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void setMessageError(String text) {
         currentDownloadFile.setText(text);
-        currentDownloadFile.setColor(1, 0, 0, 1);
+        currentDownloadFile.setColor(ColorUtils.gRedC);
     }
 
     @Override

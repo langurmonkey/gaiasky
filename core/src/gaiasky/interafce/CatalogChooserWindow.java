@@ -15,8 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
@@ -46,8 +44,7 @@ public class CatalogChooserWindow extends GenericDialog {
         this.notice = I18n.txt(noticeKey);
         assetsLoc = GlobalConf.ASSETS_LOC;
 
-        setCancelText(I18n.txt("gui.exit"));
-        setAcceptText(I18n.txt("gui.start"));
+        setAcceptText(I18n.txt("gui.ok"));
 
         // Build
         buildSuper();
@@ -56,7 +53,6 @@ public class CatalogChooserWindow extends GenericDialog {
     @Override
     protected void build() {
         if(notice != null && !notice.isEmpty()){
-
             OwnImageButton tooltip = new OwnImageButton(skin, "tooltip");
             tooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.catselection"), skin));
             HorizontalGroup hg = new HorizontalGroup();
@@ -99,13 +95,10 @@ public class CatalogChooserWindow extends GenericDialog {
         }
         // No change to execute exit event, manually restore cursor to default
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-        // Data load can start
-        EventManager.instance.post(Events.LOAD_DATA_CMD);
     }
 
     @Override
     protected void cancel() {
-        Gdx.app.exit();
     }
 
 }

@@ -78,8 +78,8 @@ public class DatasetsWidget {
         OwnScrollPane scroll = null;
         if (scrollOn) {
             scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
-            scroll.setHeight(300 * GlobalConf.UI_SCALE_FACTOR);
-            scroll.setWidth(600 * GlobalConf.UI_SCALE_FACTOR);
+            scroll.setHeight(300f * GlobalConf.UI_SCALE_FACTOR);
+            scroll.setWidth(600f * GlobalConf.UI_SCALE_FACTOR);
             scroll.setFadeScrollBars(false);
             scroll.setScrollingDisabled(true, false);
             scroll.setSmoothScrolling(true);
@@ -187,7 +187,7 @@ public class DatasetsWidget {
 
         dsTable.pack();
         if (scroll != null) {
-            scroll.setWidth(Math.min(800 * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
+            scroll.setWidth(Math.min(800f * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
         }
 
         // No files
@@ -201,7 +201,7 @@ public class DatasetsWidget {
                 maxw = b.getWidth();
         }
         for (Button b : cbs)
-            b.setWidth(maxw + 10 * GlobalConf.UI_SCALE_FACTOR);
+            b.setWidth(maxw + 10f * GlobalConf.UI_SCALE_FACTOR);
 
         return result;
     }

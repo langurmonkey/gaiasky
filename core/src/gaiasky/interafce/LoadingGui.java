@@ -5,13 +5,18 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -77,7 +82,11 @@ public class LoadingGui extends AbstractGui {
 
         skin = GlobalResources.skin;
 
+        Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
+        Drawable bg = new SpriteDrawable(new Sprite(tex));
+
         center = new Table();
+        center.setBackground(bg);
         center.setFillParent(true);
         center.center();
         if (hoffset > 0)

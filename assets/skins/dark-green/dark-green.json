@@ -237,11 +237,27 @@
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
+    "huge": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "focused": "default-round-sel",
+      "font": "ui-18",
+      "fontColor": "white",
+      "disabledFontColor": "dark-gray"
+    },
     "download": {
       "down": "default-round-down",
       "up": "default-round",
       "disabled": "default-round",
       "font": "ui-14",
+      "fontColor": "theme",
+      "disabledFontColor": "dark-gray"
+    },
+    "download-big": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "disabled": "default-round",
+      "font": "ui-18",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
@@ -435,6 +451,33 @@
     },
     "cubemap": {
       "imageUp": "cubemap-icon"
+    },
+    "start": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "disabled": "default-round",
+      "font": "ui-20",
+      "fontColor": "theme",
+      "disabledFontColor": "dark-gray",
+      "imageUp": "car-icon"
+    },
+    "cloud-download": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "disabled": "default-round",
+      "font": "ui-18",
+      "fontColor": "white",
+      "disabledFontColor": "dark-gray",
+      "imageUp": "iconic-cloud-download"
+    },
+    "check": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "disabled": "default-round",
+      "font": "ui-18",
+      "fontColor": "white",
+      "disabledFontColor": "dark-gray",
+      "imageUp": "iconic-check"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
