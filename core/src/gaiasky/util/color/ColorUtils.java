@@ -52,6 +52,35 @@ public class ColorUtils {
         return colorArray[idx % colorArray.length];
     }
 
+    public static float[] getRgbaComplimentary(float[] rgba) {
+        float[] hsb = rgbToHsb(rgba);
+        float hue = hsb[0] * 360f;
+        hsb[0] = ((hue + 180f) % 360f) / 360f;
+        float[] rgb = hsbToRgb(hsb);
+        return new float[] { rgb[0], rgb[1], rgb[2], rgba[3] };
+    }
+
+    public static float[] getRgbComplimentary(float[] rgb) {
+        float[] hsb = rgbToHsb(rgb);
+        float hue = hsb[0] * 360f;
+        hsb[0] = ((hue + 180f) % 360f) / 360f;
+        hsb[0] = 1f - hsb[0];
+        return hsbToRgb(hsb);
+    }
+
+    public static float[] rgbToHsb(float[] color) {
+        int r = (int) (color[0] * 255f);
+        int g = (int) (color[1] * 255f);
+        int b = (int) (color[2] * 255f);
+        return java.awt.Color.RGBtoHSB(r, g, b, null);
+    }
+
+    public static float[] hsbToRgb(float[] hsb) {
+        java.awt.Color c = new java.awt.Color(java.awt.Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]));
+        return new float[] { c.getRed() / 255f, c.getGreen() / 255f, c.getBlue() / 255f };
+
+    }
+
     public static String rgbaToHex(float[] color) {
         int r = (int) (color[0] * 255f);
         int g = (int) (color[1] * 255f);

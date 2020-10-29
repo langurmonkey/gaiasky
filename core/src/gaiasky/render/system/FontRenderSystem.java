@@ -28,11 +28,11 @@ public class FontRenderSystem extends AbstractRenderSystem {
     private float[] red;
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
-        super(rg, alphas, new ExtShaderProgram[]{program});
+        super(rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
         // Init comparator
         comp = new DistToCameraComparator<>();
-        red = new float[]{1f, 0f, 0f, 1f};
+        red = new float[] { 1f, 0f, 0f, 1f };
     }
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
@@ -58,25 +58,29 @@ public class FontRenderSystem extends AbstractRenderSystem {
                 s.render(batch, camera, font2d, getAlpha(s));
             }
         } else {
-            float lalpha = alphas[ComponentType.Labels.ordinal()];
-            fontDistanceField.getData().setScale(0.6f);
-            renderables.forEach(r -> {
-                I3DTextRenderable lr = (I3DTextRenderable) r;
-
-                // Label color
-                program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
-                // Component alpha
-                program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : lalpha));
-                // Font opacity multiplier, take into account element opacity
-                program.setUniformf("u_opacity", 0.75f * lr.getTextOpacity());
-                // zfar and k
-                addDepthBufferUniforms(program, camera);
-
-                lr.render(batch, program, this, rc, camera);
-            });
+            renderFont3D(renderables, program, camera, alphas[ComponentType.Labels.ordinal()]);
         }
         batch.end();
 
+    }
+
+    private void renderFont3D(List<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float lalpha) {
+
+        fontDistanceField.getData().setScale(0.6f);
+        renderables.forEach(r -> {
+            I3DTextRenderable lr = (I3DTextRenderable) r;
+
+            // Label color
+            program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
+            // Component alpha
+            program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : lalpha));
+            // Font opacity multiplier, take into account element opacity
+            program.setUniformf("u_opacity", 0.75f * lr.getTextOpacity());
+            // zfar and k
+            addDepthBufferUniforms(program, camera);
+
+            lr.render(batch, program, this, rc, camera);
+        });
     }
 
     @Override

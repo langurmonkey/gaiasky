@@ -1,7 +1,9 @@
 #version 330 core
 
-// Diffuse color
+// Outer color
 uniform vec4 u_diffuseColor;
+// Inner color
+uniform vec4 u_emissiveColor;
 // Camera distance encoded in u_tessQuality
 uniform float u_tessQuality;
 // Subgrid fading encoded in u_heightScale
@@ -24,7 +26,7 @@ layout (location = 0) out vec4 fragColor;
 #define N 10.0
 #define WIDTH 2.0
 
-vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col) {
+vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col, vec4 lcol) {
     float lw = u_ts * WIDTH;
     float factor = (1.0 - lw);
 
@@ -45,7 +47,7 @@ vec4 circle_rec(vec2 tc, float d, float f, float alpha, vec4 col) {
     // lines
     vec2 lines = smoothstep(factor, 1.0, pow(1.0 - abs(tc), vec2(3.0)));
 
-    vec4 result = col * (max(smoothstep(factor, 1.0, func), max(lines.x, lines.y)));
+    vec4 result = max(col * smoothstep(factor, 1.0, func), lcol * max(lines.x, lines.y));
     result.a *= alpha;
     return result;
 }
@@ -54,10 +56,12 @@ vec4 circle(vec2 tc) {
     // in [-1..1]
     tc = (tc - 0.5) * 2.0;
     float alpha = v_opacity * clamp(1.0 - length(tc), 0.0, 1.0);
-    
+
+    float fade = pow(u_heightScale, 0.5);
+
     // Draw two levels
-    vec4 r01 = circle_rec(tc, u_tessQuality, 10.0, alpha * u_heightScale, u_diffuseColor);
-    vec4 r02 = circle_rec(tc, u_tessQuality, 1.0, alpha, u_diffuseColor);
+    vec4 r01 = circle_rec(tc, u_tessQuality, 10.0, alpha * fade, mix(u_emissiveColor, u_diffuseColor, u_heightScale), u_diffuseColor);
+    vec4 r02 = circle_rec(tc, u_tessQuality, 1.0, alpha, u_diffuseColor, u_diffuseColor);
 
     return max(r01, r02);
 }

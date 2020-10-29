@@ -210,6 +210,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         // Model
         mc.doneLoading(GaiaSky.instance.manager, localTransform, cc);
+        mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
 
         // Listen
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD);
@@ -266,7 +267,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             d02 = -1;
         }
 
-            if (!this.copy && this.opacity > 0) {
+        if (!this.copy && this.opacity > 0) {
             addToRenderLists(camera);
         }
     }
@@ -367,7 +368,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             }
         }
 
-        if(GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && camera.getFocus() != null && d01 > 0 && d02 > 0){
+        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && camera.getFocus() != null && d01 > 0 && d02 > 0) {
             shader.setUniform4fv("u_color", ccL, 0, 4);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(d01);
             render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, textScale(), (float) (d01 * 2e-3d * camera.getFovFactor()));
@@ -423,7 +424,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         }
     }
 
-    private void getCFPos(Vector3d cpos, Vector3d fpos, ICamera camera, IFocus focus){
+    private void getCFPos(Vector3d cpos, Vector3d fpos, ICamera camera, IFocus focus) {
         Matrix4d inv = coordinateSystemd;
         Matrix4d trf = mat4daux.set(inv).inv();
         camera.getPos().put(cpos).mul(trf);
@@ -431,7 +432,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         fpos.sub(cpos);
     }
 
-    private void getZXLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos){
+    private void getZXLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos) {
         Matrix4d inv = coordinateSystemd;
         a.set(-cpos.x, -cpos.y, -cpos.z);
         b.set(fpos.x, -cpos.y, fpos.z);
@@ -439,7 +440,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         a.mul(inv);
         b.mul(inv);
     }
-    private void getYLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos){
+
+    private void getYLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos) {
         Matrix4d inv = coordinateSystemd;
         a.set(fpos.x, -cpos.y, fpos.z);
         b.set(fpos.x, fpos.y, fpos.z);
@@ -548,6 +550,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
                 }
                 updateCoordinateSystem();
                 mc.setColorAttribute(ColorAttribute.Diffuse, cc);
+                mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
             }
             break;
         default:
@@ -564,4 +567,5 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     public int getGlPrimitive() {
         return GL20.GL_LINES;
     }
+
 }
