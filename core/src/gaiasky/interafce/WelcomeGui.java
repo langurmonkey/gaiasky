@@ -244,7 +244,7 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table startGroup = new Table(skin);
-        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc"), skin, textStyle);
+        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
         startGroup.add(startLabel).top().left().padBottom(pad10).row();
         if (!basicDataPresent()) {
             // No basic data, can't start!
