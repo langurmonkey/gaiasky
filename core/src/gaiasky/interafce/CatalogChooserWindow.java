@@ -57,17 +57,18 @@ public class CatalogChooserWindow extends GenericDialog {
             hg.space(pad10);
             hg.addActor(tooltip);
             hg.addActor(new OwnLabel(notice, skin));
-            content.add(hg).left().pad(15f * GlobalConf.UI_SCALE_FACTOR).row();
+            content.add(hg).left().pad(pad15).row();
         }
 
         Cell<Actor> cell = content.add((Actor) null);
 
-        dw = new DatasetsWidget(skin, assetsLoc);
+        dw = new DatasetsWidget(skin);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
         cell.clearActor();
-        cell.space(3 * GlobalConf.UI_SCALE_FACTOR);
-        cell.padTop(10 * GlobalConf.UI_SCALE_FACTOR);
+        cell.space(3f * GlobalConf.UI_SCALE_FACTOR);
+        cell.padTop(pad5);
+        cell.padLeft(pad20).padRight(pad20);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));
 
     }

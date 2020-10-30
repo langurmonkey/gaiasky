@@ -33,7 +33,7 @@ public class DatasetsWidget {
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
 
-    public DatasetsWidget(Skin skin, String assetsLoc) {
+    public DatasetsWidget(Skin skin) {
         super();
         this.skin = skin;
         candidates = new HashMap<>();
@@ -61,7 +61,7 @@ public class DatasetsWidget {
         return buildDatasetsWidget(catalogFiles, scrollOn, 40);
     }
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn, int maxCharsDescription) {
-        float pad = 3 * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 3f * GlobalConf.UI_SCALE_FACTOR;
 
         JsonReader reader = new JsonReader();
 
@@ -79,7 +79,6 @@ public class DatasetsWidget {
         if (scrollOn) {
             scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
             scroll.setHeight(300f * GlobalConf.UI_SCALE_FACTOR);
-            scroll.setWidth(600f * GlobalConf.UI_SCALE_FACTOR);
             scroll.setFadeScrollBars(false);
             scroll.setScrollingDisabled(true, false);
             scroll.setSmoothScrolling(true);
@@ -187,7 +186,7 @@ public class DatasetsWidget {
 
         dsTable.pack();
         if (scroll != null) {
-            scroll.setWidth(Math.min(800f * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
+            scroll.setWidth(Math.min(830f * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
         }
 
         // No files

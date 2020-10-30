@@ -1522,8 +1522,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.setWidth(tawidth);
         dataSourceInfo.clearListeners();
 
-        String assetsLoc = GlobalConf.ASSETS_LOC;
-        dw = new DatasetsWidget(skin, assetsLoc);
+        dw = new DatasetsWidget(skin);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
 

@@ -6,6 +6,7 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -91,7 +93,7 @@ public class WelcomeGui extends AbstractGui {
             // If slave, data load can start
             gaiaSky();
         } else {
-            dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
+            dw = new DatasetsWidget(skin);
             catalogFiles = dw.buildCatalogFiles();
 
             // Otherwise, check for updates, etc.
@@ -124,6 +126,19 @@ public class WelcomeGui extends AbstractGui {
                     });
                 }
             }, null);
+
+
+            /** CAPTURE SCROLL FOCUS **/
+            ui.addListener(event -> {
+                if (event instanceof InputEvent) {
+                    InputEvent ie = (InputEvent) event;
+
+                    if (ie.getType() == Type.keyUp && ie.getKeyCode() == Input.Keys.ESCAPE) {
+                        Gdx.app.exit();
+                    }
+                }
+                return false;
+            });
 
         }
     }
@@ -297,7 +312,7 @@ public class WelcomeGui extends AbstractGui {
      */
     private void reloadView() {
         if (dw == null) {
-            dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
+            dw = new DatasetsWidget(skin);
         }
         catalogFiles = dw.buildCatalogFiles();
         clearGui();
