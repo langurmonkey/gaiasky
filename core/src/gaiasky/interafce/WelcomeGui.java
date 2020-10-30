@@ -164,14 +164,14 @@ public class WelcomeGui extends AbstractGui {
         float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
 
         // Title
-        OwnLabel title = new OwnLabel("Welcome to Gaia Sky " + GlobalConf.version.version, skin, "main-title");
+        OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", GlobalConf.APPLICATION_NAME, GlobalConf.version.version), skin, "main-title");
         Color theme = skin.getColor("theme");
         title.setColor(theme);
 
         String textStyle = "main-title-s";
 
         // Data downloader
-        OwnTextIconButton downloadButton = new OwnTextIconButton("Dataset manager", skin, "cloud-download");
+        OwnTextIconButton downloadButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
         downloadButton.setSpace(pad15);
         downloadButton.setContentAlign(Align.center);
         downloadButton.align(Align.center);
@@ -183,22 +183,22 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table downloadGroup = new Table(skin);
-        OwnLabel downloadLabel = new OwnLabel("Download, update and manage your datasets.\nChoose this if it is the first time launching Gaia Sky.", skin, textStyle);
+        OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
         downloadGroup.add(downloadLabel).top().left().padBottom(pad10);
         if (dd != null && dd.updatesAvailable) {
             downloadGroup.row();
-            OwnLabel updates = new OwnLabel(dd.numUpdates + " dataset update(s) available!", skin, textStyle);
+            OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
             downloadGroup.add(updates).bottom().left();
         } else if (!basicDataPresent()) {
             downloadGroup.row();
-            OwnLabel getBasedata = new OwnLabel("Download the base-data package and some catalogs here!", skin, textStyle);
+            OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
             downloadGroup.add(getBasedata).bottom().left();
         }
 
         // Catalog chooser
-        OwnTextIconButton catalogButton = new OwnTextIconButton("Catalog selection", skin, "check");
+        OwnTextIconButton catalogButton = new OwnTextIconButton(I18n.txt("gui.welcome.catalogsel"), skin, "check");
         catalogButton.setSpace(pad15);
         catalogButton.setContentAlign(Align.center);
         catalogButton.align(Align.center);
@@ -216,23 +216,23 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table catalogGroup = new Table(skin);
-        OwnLabel catalogLabel = new OwnLabel("Choose which catalogs and datasets to load at startup.\nWatch out! Only one Gaia LOD dataset should be selected!", skin, textStyle);
+        OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
         catalogGroup.add(catalogLabel).top().left().padBottom(pad10).row();
         if (catalogFiles.size == 0) {
             // No catalog files, disable and add notice
             catalogButton.setDisabled(true);
 
-            OwnLabel noCatalogs = new OwnLabel("You have no catalog files yet, use the 'Dataset manager' to get some!", skin, textStyle);
+            OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
             noCatalogs.setColor(ColorUtils.aOrangeC);
             catalogGroup.add(noCatalogs).bottom().left();
         } else {
-            OwnLabel ok = new OwnLabel(numCatalogsSelected() + " catalog(s) selected", skin, textStyle);
-            ok.setColor(skin.getColor("theme"));
+            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected()), skin, textStyle);
+            ok.setColor(ColorUtils.gBlueC);
             catalogGroup.add(ok).bottom().left();
         }
 
         // Start
-        OwnTextIconButton startButton = new OwnTextIconButton("Start Gaia Sky", skin, "start");
+        OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", GlobalConf.APPLICATION_NAME), skin, "start");
         startButton.setSpace(pad15);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
@@ -244,28 +244,28 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table startGroup = new Table(skin);
-        OwnLabel startLabel = new OwnLabel("Launch Gaia Sky and start the action.", skin, textStyle);
+        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc"), skin, textStyle);
         startGroup.add(startLabel).top().left().padBottom(pad10).row();
         if (!basicDataPresent()) {
             // No basic data, can't start!
             startButton.setDisabled(true);
 
-            OwnLabel noBaseData = new OwnLabel("Base data package not found, get it with the 'Dataset manager'!", skin, textStyle);
-            noBaseData.setColor(ColorUtils.aOrangeC);
+            OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
+            noBaseData.setColor(ColorUtils.gRedC);
             startGroup.add(noBaseData).bottom().left();
         } else if (catalogFiles.size > 0 && numCatalogsSelected() == 0) {
-            OwnLabel noCatsSelected = new OwnLabel("You have not selected any of the downloaded catalogs, use 'Catalog selection' to do so!", skin, textStyle);
-            noCatsSelected.setColor(ColorUtils.aOrangeC);
+            OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
+            noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
         } else {
-            OwnLabel ready = new OwnLabel("Ready to go!", skin, textStyle);
+            OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
             ready.setColor(ColorUtils.gGreenC);
             startGroup.add(ready).bottom().left();
 
         }
 
         // Quit
-        OwnTextIconButton quitButton = new OwnTextIconButton("Quit", skin, "quit");
+        OwnTextIconButton quitButton = new OwnTextIconButton(I18n.txt("gui.exit"), skin, "quit");
         quitButton.setSpace(pad10);
         quitButton.align(Align.center);
         quitButton.setSize(bw * 0.5f, bh * 0.6f);
