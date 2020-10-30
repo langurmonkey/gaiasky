@@ -166,7 +166,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui initialGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, controllerGui;
+    public IGui welcomeGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, controllerGui;
 
     /**
      * List of GUIs
@@ -202,14 +202,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private boolean vr;
 
     /**
-     * Forces the dataset download window
+     * Skip welcome screen if possible
      */
-    private boolean dsDownload;
-
-    /**
-     * Forces the catalog chooser window
-     */
-    private boolean catChooser;
+    private boolean skipWelcome;
 
     /**
      * Forbids the creation of the scripting server
@@ -241,27 +236,24 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Creates an instance of Gaia Sky.
      */
     public GaiaSky() {
-        this(false, false, false, false, false, false);
+        this(false, false, false, false, false);
     }
 
     /**
      * Creates an instance of Gaia Sky.
-     *
-     * @param dsdownload   Force-show the datasets download window
-     * @param catchooser   Force-show the catalog chooser window
+     * @param skipWelcome  Skips welcome screen if possible
      * @param vr           Launch in VR mode
      * @param externalView Open a new window with a view of the rendered scene
      * @param debugMode    Output debug information
      */
-    public GaiaSky(boolean dsdownload, boolean catchooser, boolean vr, boolean externalView, boolean noScriptingServer, boolean debugMode) {
+    public GaiaSky(boolean skipWelcome, boolean vr, boolean externalView, boolean noScriptingServer, boolean debugMode) {
         super();
         instance = this;
+        this.skipWelcome = skipWelcome;
         this.debugMode = debugMode;
         this.runnables = new Array<>();
         this.runnablesMap = new HashMap<>();
         this.vr = vr;
-        this.dsDownload = dsdownload;
-        this.catChooser = catchooser;
         this.externalView = externalView;
         this.renderProcess = runnableInitialGui;
         this.noScripting = noScriptingServer;
@@ -405,9 +397,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        initialGui = new InitialGui(dsDownload, catChooser, vrStatus);
-        initialGui.initialize(manager);
-        Gdx.input.setInputProcessor(initialGui.getGuiStage());
+        welcomeGui = new WelcomeGui(skipWelcome, vrStatus);
+        welcomeGui.initialize(manager);
+        Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
         // GL clear state
         Gdx.gl.glClearColor(0, 0, 0, 0);
@@ -487,8 +479,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private void doneLoading() {
         windowCreated = true;
         // Dispose of initial and loading GUIs
-        initialGui.dispose();
-        initialGui = null;
+        welcomeGui.dispose();
+        welcomeGui = null;
 
         loadingGui.dispose();
         loadingGui = null;
@@ -849,7 +841,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Displays the initial GUI
      **/
-    private Runnable runnableInitialGui = () -> renderGui(initialGui);
+    private Runnable runnableInitialGui = () -> renderGui(welcomeGui);
 
     /**
      * Displays the loading GUI
@@ -1045,8 +1037,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis) {
         try {
             if (!initialized) {
-                if (initialGui != null)
-                    initialGui.resize(width, height);
+                if (welcomeGui != null)
+                    welcomeGui.resize(width, height);
                 if (loadingGui != null)
                     loadingGui.resizeImmediate(width, height);
             } else {

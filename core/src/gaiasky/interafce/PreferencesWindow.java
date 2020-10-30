@@ -32,7 +32,6 @@ import gaiasky.util.*;
 import gaiasky.util.GlobalConf.PostprocessConf.Antialias;
 import gaiasky.util.GlobalConf.PostprocessConf.ToneMapping;
 import gaiasky.util.GlobalConf.ProgramConf.OriginType;
-import gaiasky.util.GlobalConf.ProgramConf.ShowCriterion;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.GlobalConf.ScreenshotMode;
@@ -75,7 +74,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private INumberFormat nf3, nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, datasetChooserDefault, datasetChooserAlways, datasetChooserNever, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -110,6 +109,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Build UI
         buildSuper();
+
 
         EventManager.instance.subscribe(this, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
     }
@@ -1527,17 +1527,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
 
-        // CATALOG CHOOSER SHOW CRITERIA
-        OwnLabel titleCatChooser = new OwnLabel(I18n.txt("gui.data.dschooser.title"), skin, "header");
-        datasetChooserDefault = new OwnCheckBox(I18n.txt("gui.data.dschooser.default"), skin, "radio", pad5);
-        datasetChooserDefault.setChecked(GlobalConf.program.CATALOG_CHOOSER.def());
-        datasetChooserAlways = new OwnCheckBox(I18n.txt("gui.data.dschooser.always"), skin, "radio", pad5);
-        datasetChooserAlways.setChecked(GlobalConf.program.CATALOG_CHOOSER.always());
-        datasetChooserNever = new OwnCheckBox(I18n.txt("gui.data.dschooser.never"), skin, "radio", pad5);
-        datasetChooserNever.setChecked(GlobalConf.program.CATALOG_CHOOSER.never());
-
-        ButtonGroup dsCh = new ButtonGroup();
-        dsCh.add(datasetChooserDefault, datasetChooserAlways, datasetChooserNever);
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
         dataDownload.setSize(150 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
@@ -1571,11 +1560,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentDataTable.add(haGroup).left().padBottom(pad5 * 4).row();
         contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataSourceInfo).left().padBottom(pad5).row();
-        contentDataTable.add(dataSource).left().padBottom(pad5 * 4).row();
-        contentDataTable.add(titleCatChooser).left().padBottom(pad5 * 2).row();
-        contentDataTable.add(datasetChooserDefault).left().padBottom(pad5 * 2).row();
-        contentDataTable.add(datasetChooserAlways).left().padBottom(pad5 * 2).row();
-        contentDataTable.add(datasetChooserNever).left().padBottom(pad5 * 6).row();
+        contentDataTable.add(dataSource).left().padLeft(pad5).padBottom(pad5 * 4).row();
         contentDataTable.add(dataDownload).left();
 
         /*
@@ -2016,16 +2001,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                 GlobalConf.data.CATALOG_JSON_FILES.add(dw.candidates.get(b));
             }
         }
-
-        ShowCriterion sc = ShowCriterion.DEFAULT;
-        if (datasetChooserDefault.isChecked())
-            sc = ShowCriterion.DEFAULT;
-        else if (datasetChooserAlways.isChecked())
-            sc = ShowCriterion.ALWAYS;
-        else if (datasetChooserNever.isChecked()) {
-            sc = ShowCriterion.NEVER;
-        }
-        GlobalConf.program.CATALOG_CHOOSER = sc;
 
         // Screenshots
         File ssfile = new File(screenshotsLocation.getText().toString());

@@ -38,4 +38,4 @@ Game mode |camera.full/camera.GAME_MODE| allows WASD movement + mouse look
 ||Start Gaia Sky with '-c' to show the catalog chooser window at startup
 ||Start Gaia Sky with '-d' to show the download manager at startup
 ||Some planets and moons have elevation data and gravity in Game mode
-||Gaia Sky can use SAMP to interoperate with other astronomical software packages
+||Gaia Sky can use SAMP to interoperate with other astronomical software packages like Topcat or Aladin

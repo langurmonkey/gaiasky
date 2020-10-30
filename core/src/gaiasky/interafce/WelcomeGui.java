@@ -40,15 +40,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Displays dataset downloader and dataset chooser screen if needed.
+ * Welcome screen that allows access to the main application, as well as the dataset manager and the catalog selection.
  *
  * @author Toni Sagrista
  */
-public class InitialGui extends AbstractGui {
-    private static final Log logger = Logger.getLogger(InitialGui.class);
+public class WelcomeGui extends AbstractGui {
+    private static final Log logger = Logger.getLogger(WelcomeGui.class);
 
-    private boolean datasetsDownload, catalogChooser;
     private VRStatus vrStatus;
+    private boolean skipWelcome;
 
     protected DownloadDataWindow ddw;
     protected CatalogChooserWindow cdw;
@@ -65,14 +65,12 @@ public class InitialGui extends AbstractGui {
     /**
      * Creates an initial GUI
      *
-     * @param datasetsDownload Forces dataset download window
-     * @param catalogChooser   Forces catalog chooser window
-     * @param vrStatus         The status of VR
+     * @param skipWelcome Skips the welcome screen if possible
+     * @param vrStatus    The status of VR
      */
-    public InitialGui(boolean datasetsDownload, boolean catalogChooser, VRStatus vrStatus) {
+    public WelcomeGui(boolean skipWelcome, VRStatus vrStatus) {
         lock = new Object();
-        this.catalogChooser = catalogChooser;
-        this.datasetsDownload = datasetsDownload;
+        this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
     }
 
@@ -91,7 +89,7 @@ public class InitialGui extends AbstractGui {
 
         } else if (GlobalConf.program.isSlave()) {
             // If slave, data load can start
-            EventManager.instance.post(Events.LOAD_DATA_CMD);
+            gaiaSky();
         } else {
             dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
             catalogFiles = dw.buildCatalogFiles();
@@ -102,8 +100,12 @@ public class InitialGui extends AbstractGui {
             dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
             DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
                 GaiaSky.postRunnable(() -> {
-                    // Data descriptor ok
-                    buildWelcomeUI();
+                    // Data descriptor ok. Skip welcome screen only if flag and basedata present
+                    if (skipWelcome && basicDataPresent()) {
+                        gaiaSky();
+                    } else {
+                        buildWelcomeUI();
+                    }
                 });
             }, () -> {
                 // Fail?
@@ -170,7 +172,7 @@ public class InitialGui extends AbstractGui {
         downloadGroup.add(downloadLabel).top().left().padBottom(pad10);
         if (dd != null && dd.updatesAvailable) {
             downloadGroup.row();
-            OwnLabel updates = new OwnLabel(dd.numUpdates + " update(s) available!", skin, textStyle);
+            OwnLabel updates = new OwnLabel(dd.numUpdates + " dataset update(s) available!", skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
             downloadGroup.add(updates).bottom().left();
         } else if (!basicDataPresent()) {
@@ -199,7 +201,7 @@ public class InitialGui extends AbstractGui {
             return true;
         });
         Table catalogGroup = new Table(skin);
-        OwnLabel catalogLabel = new OwnLabel("Choose which catalog(s) to load at startup.\nWatch out! Only one Gaia LOD dataset should be selected!", skin, textStyle);
+        OwnLabel catalogLabel = new OwnLabel("Choose which catalogs and datasets to load at startup.\nWatch out! Only one Gaia LOD dataset should be selected!", skin, textStyle);
         catalogGroup.add(catalogLabel).top().left().padBottom(pad10).row();
         if (catalogFiles.size == 0) {
             // No catalog files, disable and add notice
@@ -222,8 +224,7 @@ public class InitialGui extends AbstractGui {
         startButton.setSize(bw, bh);
         startButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                bgTex.dispose();
-                EventManager.instance.post(Events.LOAD_DATA_CMD);
+                gaiaSky();
             }
             return true;
         });
@@ -237,7 +238,7 @@ public class InitialGui extends AbstractGui {
             OwnLabel noBaseData = new OwnLabel("Base data package not found, get it with the 'Dataset manager'!", skin, textStyle);
             noBaseData.setColor(ColorUtils.aOrangeC);
             startGroup.add(noBaseData).bottom().left();
-        } else if(catalogFiles.size > 0 && numCatalogsSelected() == 0){
+        } else if (catalogFiles.size > 0 && numCatalogsSelected() == 0) {
             OwnLabel noCatsSelected = new OwnLabel("You have not selected any of the downloaded catalogs, use 'Catalog selection' to do so!", skin, textStyle);
             noCatsSelected.setColor(ColorUtils.aOrangeC);
             startGroup.add(noCatsSelected).bottom().left();
@@ -284,44 +285,24 @@ public class InitialGui extends AbstractGui {
 
     }
 
+    private void gaiaSky() {
+        if (bgTex != null)
+            bgTex.dispose();
+        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+        EventManager.instance.post(Events.LOAD_DATA_CMD);
+    }
+
     /**
      * Reloads the view completely
      */
-    private void reloadView(){
-        if(dw == null){
+    private void reloadView() {
+        if (dw == null) {
             dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
         }
         catalogFiles = dw.buildCatalogFiles();
         clearGui();
+        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
-    }
-
-    private void regularGaiaSky(Array<FileHandle> catalogFiles) {
-
-        /**
-         * Display download manager if:
-         * - force display (args), or
-         * - base data not found, or
-         * - no catalogs found in data folder, or
-         * - new versions of current datasets found
-         */
-        try {
-            DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
-            if (datasetsDownload || !basicDataPresent() || catalogFiles.size == 0 || dd.updatesAvailable) {
-                // No catalog files, display downloader
-                addDatasetManagerWindow(dd);
-            } else {
-                addCatalogSelectionWindow();
-            }
-        } catch (Exception e) {
-            logger.error(e);
-            logger.error("Error building data descriptor from URL: " + GlobalConf.program.DATA_DESCRIPTOR_URL);
-            if (GlobalConf.program.DATA_DESCRIPTOR_URL.contains("http://")) {
-                logger.info("You are using HTTP but the server may be HTTPS - please check your URL in the properties file");
-            }
-            addCatalogSelectionWindow();
-        }
-
     }
 
     private boolean isCatalogSelected() {
@@ -340,31 +321,6 @@ public class InitialGui extends AbstractGui {
             }
         }
         return matches;
-    }
-
-    private void addCatalogSelectionWindow() {
-        DatasetsWidget dw = new DatasetsWidget(skin, GlobalConf.ASSETS_LOC);
-        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
-        /**
-         * Display chooser if:
-         * - force display (args), or
-         * - show criterion is 'always' (conf)
-         * - catalogs available and no catalogs are selected
-         * - catalogs available and more than one xDRx (DR1, DR2, eDR3, ...) catalog selected
-         */
-        if (catalogChooser || GlobalConf.program.CATALOG_CHOOSER.always() || (catalogFiles.size > 0 && (!isCatalogSelected() && !GlobalConf.program.CATALOG_CHOOSER.never())) || (catalogFiles.size > 0 && (numCatalogDRFiles() > 1 && !GlobalConf.program.CATALOG_CHOOSER.never()))) {
-            String noticeKey;
-            if (catalogFiles.size > 0 && numCatalogDRFiles() > 1) {
-                noticeKey = "gui.dschooser.morethanonedr";
-            } else {
-                noticeKey = "gui.dschooser.nocatselected";
-            }
-            addCatalogSelectionWindow(noticeKey);
-        } else {
-            // Event
-            EventManager.instance.post(Events.LOAD_DATA_CMD);
-        }
-
     }
 
     /**
@@ -417,6 +373,8 @@ public class InitialGui extends AbstractGui {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 reloadView();
             });
+        } else {
+            cdw.refresh();
         }
         cdw.show(ui);
     }

@@ -64,7 +64,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static int SOURCE_VERSION = 20301;
+    public static int SOURCE_VERSION = 30000;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
@@ -80,11 +80,10 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
 
         @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
+
         @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiart = false;
 
-        @Parameter(names = { "-d", "--ds-download" }, description = "Display the data download dialog at startup. If no data is found, the download dialog is shown automatically.", order = 2) private boolean download = false;
-
-        @Parameter(names = { "-c", "--cat-chooser" }, description = "Display the catalog chooser dialog at startup. This enables the selection of different available catalogs when Gaia Sky starts.", order = 3) private boolean catalogChooser = false;
+        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2) private boolean skipWelcome = false;
 
         @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
 
@@ -332,7 +331,7 @@ public class GaiaSkyDesktop implements IObserver {
         // Launch app
         GaiaSky gs = null;
         try {
-            gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
+            gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
             new Lwjgl3Application(gs, cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
@@ -348,7 +347,7 @@ public class GaiaSkyDesktop implements IObserver {
                     GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
                     cfg.useOpenGL3(true, 3, 2);
 
-                    gs = new GaiaSky(gsArgs.download, gsArgs.catalogChooser, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
+                    gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
                     new Lwjgl3Application(gs, cfg);
                 } else {
                     logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);

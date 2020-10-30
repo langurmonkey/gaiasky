@@ -3,64 +3,6 @@
     {
       "name": "default-data",
       "type": "data-pack",
-      "version": 10,
-      "mingsversion": 20300,
-      "size": 105420269,
-      "check": "data-main.json",
-      "data": [
-        "asteroids-dr2.json",
-        "asteroids.json",
-        "attitudexml",
-        "constellations",
-        "countries",
-        "data-main.json",
-        "extra.json",
-        "galaxy",
-        "locations-earth.json",
-        "locations.json",
-        "locations-moon.json",
-        "meshes/dr2/meshes_dust",
-        "meshes/dr2/meshes_hii",
-        "models",
-        "moons.json",
-        "autoload-meshes-dr2-dust.json",
-        "autoload-meshes-dr2-hii.json",
-        "oort",
-        "orbit",
-        "orbits-asteroid.json",
-        "orbits-asteroids-dr2.json",
-        "orbits-moon.json",
-        "orbits-planet.json",
-        "orbits-satellite.json",
-        "planets.json",
-        "satellites.json",
-        "tex/base/*-low.jpg",
-        "tex/base/*-med.jpg",
-        "tex/base/*-low.png",
-        "tex/base/*-med.png",
-        "tex/base/all-mild-specular.jpg",
-        "tex/base/attitudeindicator.png",
-        "tex/base/cluster-tex.png",
-        "tex/base/debug-color.jpg",
-        "tex/base/debug-height.jpg",
-        "tex/base/lenscolor.png",
-        "tex/base/lensstarburst.jpg",
-        "tex/base/lut.jpg",
-        "tex/base/sso.png",
-        "tex/base/star.jpg",
-        "tex/base/static.jpg",
-        "tex/base/telescopebeam.png",
-        "tex/base/mw-sprites",
-        "tex/skybox/gaiasky"
-      ],
-      "sha256": "6ba29670117773cf0b27975f9e5bd9a912a257fa8298e8c59c103d4945659d8c",
-      "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
-      "releasenotes": "Add new Milky Way model by Stefan Payne-Wardenaar, adapted and ready for different graphics quality settings. Add new Milky Way skymaps and fix Mars atmospheric scattering parameters.",
-      "file": "@mirror-url@basedata/010_20200923/gaiasky_data.tar.gz"
-    },
-    {
-      "name": "default-data",
-      "type": "data-pack",
       "version": 11,
       "mingsversion": 20300,
       "size": 105419746,
@@ -115,6 +57,60 @@
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
       "releasenotes": "Add recursive grid object.",
       "file": "@mirror-url@basedata/011_20201027/gaiasky_data.tar.gz"
+    },
+    {
+      "name": "default-data",
+      "type": "data-pack",
+      "version": 12,
+      "mingsversion": 30000,
+      "size": 100116590,
+      "check": "data-main.json",
+      "data": [
+        "asteroids-dr2.json",
+        "asteroids.json",
+        "attitudexml",
+        "constellations",
+        "countries",
+        "data-main.json",
+        "extra.json",
+        "galaxy",
+        "locations-earth.json",
+        "locations.json",
+        "locations-moon.json",
+        "models",
+        "moons.json",
+        "oort",
+        "orbit",
+        "orbits-asteroid.json",
+        "orbits-asteroids-dr2.json",
+        "orbits-moon.json",
+        "orbits-planet.json",
+        "orbits-satellite.json",
+        "planets.json",
+        "satellites.json",
+        "tex/base/*-low.jpg",
+        "tex/base/*-med.jpg",
+        "tex/base/*-low.png",
+        "tex/base/*-med.png",
+        "tex/base/all-mild-specular.jpg",
+        "tex/base/attitudeindicator.png",
+        "tex/base/cluster-tex.png",
+        "tex/base/debug-color.jpg",
+        "tex/base/debug-height.jpg",
+        "tex/base/lenscolor.png",
+        "tex/base/lensstarburst.jpg",
+        "tex/base/lut.jpg",
+        "tex/base/sso.png",
+        "tex/base/star.jpg",
+        "tex/base/static.jpg",
+        "tex/base/telescopebeam.png",
+        "tex/base/mw-sprites",
+        "tex/skybox/gaiasky"
+      ],
+      "sha256": "7638b28319600f16b2900fca438a66da644f864530b80241f7c9a6d1c7726f98",
+      "description": "Default data pack for Gaia Sky - For Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
+      "releasenotes": "Remove dust and HII meshes, they belong in their own package.",
+      "file": "@mirror-url@basedata/20201030_v012/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -324,22 +320,6 @@
     {
       "name": "catalog-nbg",
       "type": "catalog",
-      "version": 2,
-      "mingsversion": 260,
-      "size": 15495600,
-      "check": "autoload-nbg.json",
-      "data": [
-        "autoload-nbg.json",
-        "nbg",
-        "tex/extragal"
-      ],
-      "description": "NBG catalog - Nearby Galaxies Catalog - 870 galaxies",
-      "md5": "b1a829727bef8b703d465b2104e92178",
-      "file": "@mirror-url@galaxies/002_20181213/nbg-galaxies.tar.gz"
-    },
-    {
-      "name": "catalog-nbg",
-      "type": "catalog",
       "version": 3,
       "mingsversion": 260,
       "size": 15786547,
@@ -352,6 +332,23 @@
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
       "sha256": "cf1f56feb25abb964e31afc798a57179547ffa640e92894da349990e048f71f9",
       "file": "@mirror-url@galaxies/003_20190411/nbg-galaxies.tar.gz"
+    },
+    {
+      "name": "catalog-nbg",
+      "type": "catalog",
+      "version": 4,
+      "mingsversion": 30000,
+      "size": 15786828,
+      "check": "catalog-nbg.json",
+      "data": [
+        "catalog-nbg.json",
+        "particles-nbg.json",
+        "nbg",
+        "tex/extragal"
+      ],
+      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
+      "sha256": "c51499c52421658133bdc944f8f9756d78a74e5e0d8e2a92ca0b075906776036",
+      "file": "@mirror-url@galaxies/nbg/20201030_v04/galaxies-nbg.tar.gz"
     },
     {
       "name": "catalog-sdss-12",
@@ -369,6 +366,22 @@
       "file": "@mirror-url@galaxies/005_20190904/sdss-12-galaxies.tar.gz"
     },
     {
+      "name": "catalog-sdss-12",
+      "type": "catalog",
+      "version": 3,
+      "mingsversion": 30000,
+      "size": 10296296,
+      "check": "catalog-sdss-12.json",
+      "data": [
+        "catalog-sdss-12.json",
+        "particles-sdss-12.json",
+        "sdss/sdss_dr12_small.csv"
+      ],
+      "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
+      "sha256": "1f93ab8ce5d66656cc71a2faa7b01c183d8499eea5c43a1eeb6dde2958a5442d",
+      "file": "@mirror-url@galaxies/sdss12/20201030_v03/galaxies-sdss12.tar.gz"
+    },
+    {
       "name": "catalog-sdss-14",
       "type": "catalog",
       "version": 2,
@@ -384,19 +397,20 @@
       "file": "@mirror-url@galaxies/005_20190904/sdss-14-galaxies.tar.gz"
     },
     {
-      "name": "catalog-nebulae",
+      "name": "catalog-sdss-14",
       "type": "catalog",
-      "version": 0,
-      "mingsversion": 260,
-      "size": 15407761,
-      "check": "autoload-nebulae.json",
+      "version": 3,
+      "mingsversion": 30000,
+      "size": 79127288,
+      "check": "catalog-sdss-14.json",
       "data": [
-        "autoload-nebulae.json",
-        "tex/nebulae"
+        "catalog-sdss-14.json",
+        "particles-sdss-14.json",
+        "sdss/sdss_dr14_large.csv"
       ],
-      "description": "Nebulae - A few nebulae with textures",
-      "sha256": "36586bb45b2560f49ff0eb44dc0cfe9fd719e052a0411c3283d43f552c5e33d6",
-      "file": "@mirror-url@nebulae/001_20181129/nebulae.tar.gz"
+      "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
+      "sha256": "57c6ff79403987b2176765bd437fab4ee4090238b488d71478f7f8462ef3a7de",
+      "file": "@mirror-url@galaxies/sdss14/20201030_v03/galaxies-sdss14.tar.gz"
     },
     {
       "name": "catalog-nebulae",
@@ -409,9 +423,25 @@
         "autoload-nebulae.json",
         "tex/nebulae"
       ],
-      "description": "Nebulae - A few nebulae with textures",
+      "description": "Nebulae - Catalog of 15 nebulae with textures",
       "sha256": "b303f8988e5d4e5f1e5da19297b71c6f11a93fdcf6105f4a37008cdeb8b3d3f8",
       "file": "@mirror-url@nebulae/002_20190726/nebulae.tar.gz"
+    },
+    {
+      "name": "catalog-nebulae",
+      "type": "catalog",
+      "version": 2,
+      "mingsversion": 30000,
+      "size": 15407657,
+      "check": "catalog-nebulae.json",
+      "data": [
+        "catalog-nebulae.json",
+        "particles-nebulae.json",
+        "tex/nebulae"
+      ],
+      "description": "Nebulae - Catalog of 15 nebulae with textures",
+      "sha256": "2ec68156cf2b5a4a3f698e5cdd30132acbeeddb7a0bf71f08bcf0eaa41d2f593",
+      "file": "@mirror-url@nebulae/20201030_v02/nebulae.tar.gz"
     },
     {
       "name": "catalog-ocdr2",
@@ -424,9 +454,25 @@
         "autoload-ocdr2.json",
         "ocdr2"
       ],
-      "description": "OC DR2 - Open Clusters catalog based on DR2 data, by Castro et al.",
+      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
       "sha256" : "442930f8266cec076f2ae33af289e0093652476ab8f964e64ee04dd8d3a0aa52",
       "file": "@mirror-url@clusters/ocdr2/20201027_v01/ocdr2-clusters.tar.gz"
+    },
+    {
+      "name": "catalog-ocdr2",
+      "type": "catalog",
+      "version": 2,
+      "mingsversion": 30000,
+      "size": 58191,
+      "check": "catalog-ocdr2.json",
+      "data": [
+        "catalog-ocdr2.json",
+        "particles-ocdr2.json",
+        "ocdr2"
+      ],
+      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
+      "sha256" : "a223caa45440c3f95af249aeeefd2726c9c28cee2625b225fa6c6deb8ed275b7",
+      "file": "@mirror-url@clusters/ocdr2/20201030_v02/clusters-ocdr2.tar.gz"
     },
     {
       "name": "catalog-mwsc",
@@ -439,65 +485,55 @@
         "autoload-mwsc.json",
         "mwsc"
       ],
-      "description": "MWSC - Milky Way Star Clusters catalog",
+      "description": "MWSC - Milky Way Star Clusters catalog - 3017 clusters",
       "sha256" : "d64a87a04416a84c90000568d255088575b1c7480cef4906def773451f031125",
       "file": "@mirror-url@clusters/001_20200326/mwsc-clusters.tar.gz"
     },
     {
-      "name": "mesh-dr2-hot-very",
-      "type": "mesh",
-      "version": 0,
-      "size": 15711473,
-      "check": "autoload-meshes-dr2-hot-very.json",
+      "name": "catalog-mwsc",
+      "type": "catalog",
+      "version": 2,
+      "mingsversion": 30000,
+      "size": 78311,
+      "check": "catalog-mwsc.json",
       "data": [
-        "autoload-meshes-dr2-hot-very.json",
-        "meshes/dr2/meshes_hot/very_ionizing*.g3db"
+        "catalog-mwsc.json",
+        "particles-mwsc.json",
+        "mwsc"
       ],
-      "description": "Very ionizing star map - Isosurfaces of very ionizing hot OB stars",
-      "sha256" : "db6235802ee21b228b921452e79ecf73f2ebe3b4f9377173630cee570c1fe7d2",
-      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-very.tar.gz"
+      "description": "MWSC - Milky Way Star Clusters catalog - 3017 clusters",
+      "sha256" : "f785a73f9b0c4b64c748a85c31ab1d69eb22f245860f001a27dbd2330af0ae22",
+      "file": "@mirror-url@clusters/mwsc/20201030_v02/clusters-mwsc.tar.gz"
     },
     {
-      "name": "mesh-dr2-hot-some",
+      "name": "mesh-dr2-dust",
       "type": "mesh",
-      "version": 0,
-      "size": 15849733,
-      "check": "autoload-meshes-dr2-hot-some.json",
+      "version": 1,
+      "size": 2828332,
+      "check": "catalog-mesh-dr2-dust.json",
       "data": [
-        "autoload-meshes-dr2-hot-some.json",
-        "meshes/dr2/meshes_hot/some_ionizing*.g3db"
+        "catalog-mesh-dr2-dust.json",
+        "mesh-dr2-dust.json",
+        "meshes/dr2/meshes_dust"
       ],
-      "description": "Some ionizing star map - Isosurfaces of somewhat ionizing hot OB stars",
-      "sha256" : "fa24c69a57c9a6f2e74ad9adf8c72a3e551a69ad4a0038da9e84fe04b94977d0",
-      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-some.tar.gz"
+      "description": "Dust maps based on GDR2 data - Isosurfaces for 15% and 60% density",
+      "sha256" : "31c3ebc134abaed08247130223c4a48b91b4e9556e1f15e432fd67ca92d04e68",
+      "file": "@mirror-url@meshes/dr2/dust/20201030_v01/mesh-dr2-dust.tar.gz"
     },
     {
-      "name": "mesh-dr2-hot-non",
+      "name": "mesh-dr2-hii",
       "type": "mesh",
-      "version": 0,
-      "size": 18570118,
-      "check": "autoload-meshes-dr2-hot-none.json",
+      "version": 1,
+      "size": 2475023,
+      "check": "catalog-mesh-dr2-hii.json",
       "data": [
-        "autoload-meshes-dr2-hot-none.json",
-        "meshes/dr2/meshes_hot/non_ionizing_ge*.g3db"
+        "catalog-mesh-dr2-hii.json",
+        "mesh-dr2-hii.json",
+        "meshes/dr2/meshes_hii"
       ],
-      "description": "Nonionizing star map - Isosurfaces of non-ionizing hot OB stars (x <= 50)",
-      "sha256" : "969faf43cc8ae1769f59af6d5944b4988276e95da63d64fb22ef57359639bd7b",
-      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-non.tar.gz"
-    },
-    {
-      "name": "mesh-dr2-hot-non-medium",
-      "type": "mesh",
-      "version": 0,
-      "size": 33856669,
-      "check": "autoload-meshes-dr2-hot-none-medium.json",
-      "data": [
-        "autoload-meshes-dr2-hot-none-medium.json",
-        "meshes/dr2/meshes_hot/non_ionizing_25*.g3db"
-      ],
-      "description": "Nonionizing star map - Isosurfaces of very ionizing hot OB stars (25 < x <= 50)",
-      "sha256" : "305d748806be5b13a2abaeb1307cdda9e5ebec2f5895bc8505c55c91757b2aa8",
-      "file": "@mirror-url@meshes/000_20180904/meshes-dr2-hot-non-medium.tar.gz"
+      "description": "HII regions based on GDR2 data - Isosurfaces for HII regions",
+      "sha256" : "3bd7e15fe9564d97668537273104c04eb27ad185a558bb6c05fabdfd5771491c",
+      "file": "@mirror-url@meshes/dr2/hii/20201030_v01/mesh-dr2-hii.tar.gz"
     }
   ]
 }

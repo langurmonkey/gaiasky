@@ -17,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
-import gaiasky.util.scene2d.OwnCheckBox;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
@@ -33,7 +32,6 @@ public class CatalogChooserWindow extends GenericDialog {
     private DatasetsWidget dw;
     private String assetsLoc;
     private String notice;
-    private OwnCheckBox skipCatalogChooser;
 
     public CatalogChooserWindow(Stage stage, Skin skin){
         this(stage, skin, null);
@@ -72,16 +70,16 @@ public class CatalogChooserWindow extends GenericDialog {
         cell.padTop(10 * GlobalConf.UI_SCALE_FACTOR);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));
 
+    }
 
-        skipCatalogChooser = new OwnCheckBox(I18n.txt("gui.dschooser.notshow"), skin, pad5);
-        skipCatalogChooser.setChecked(false);
-
-        bottom.add(skipCatalogChooser).right().row();
+    public void refresh(){
+        content.clear();
+        bottom.clear();
+        build();
     }
 
     @Override
     protected void accept() {
-        GlobalConf.program.CATALOG_CHOOSER = skipCatalogChooser.isChecked() ? GlobalConf.ProgramConf.ShowCriterion.NEVER : GlobalConf.program.CATALOG_CHOOSER;
         // Update setting
         if (dw != null && dw.cbs != null) {
             GlobalConf.data.CATALOG_JSON_FILES.clear();

@@ -18,7 +18,7 @@ usage() {
     echo "Usage: $0 [-c catalog_1,catalog_2,...] [-n max_files] [-h]"
     echo
     echo "    OPTIONS:"
-    echo "       -c    comma-separated list of catalog names (small,default,bright,large,verylarge,extralarge,ratherlarge,ruwe)"
+    echo "       -c    comma-separated list of catalog names (default,small,medium,bright,large,verylarge,extralarge,ratherlarge,ruwe,full)"
     echo "       -n    maximum number of files to load, negative for unlimited"
     echo "       -h    show this help"
     1>&2; exit 1;
@@ -43,7 +43,7 @@ while getopts ":c:n:h" arg; do
     esac
 done
 # Datasets to generate. Passed via arguments.
-# Values: small, default, bright, large, verylarge, extralarge, ratherlarge, ruwe
+# Values: default, small, medium, bright, large, verylarge, extralarge, ratherlarge, ruwe, full
 if [ -z "$CATALOGS" ]; then
     TORUN=("small" "default")
     echo "Using default catalog list: ${TORUN[*]}"
