@@ -42,6 +42,7 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -303,7 +304,14 @@ public class GaiaSkyDesktop implements IObserver {
                     cfg.setFullscreenMode(mymode);
                 }
             } else {
-                cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
+                int w = GlobalConf.screen.getScreenWidth();
+                int h = GlobalConf.screen.getScreenHeight();
+                if(w == 0 || h == 0){
+                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    w = (int) (screenSize.width * 0.85f);
+                    h = (int) (screenSize.height * 0.85f);
+                }
+                cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
             cfg.setBackBufferConfig(8, 8, 8, 8, 32, 0, 0);
@@ -312,7 +320,14 @@ public class GaiaSkyDesktop implements IObserver {
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
             cfg.useVsync(false);
-            cfg.setWindowedMode(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
+            int w = GlobalConf.screen.SCREEN_WIDTH;
+            int h = GlobalConf.screen.SCREEN_HEIGHT;
+            if(w == 0 || h == 0){
+                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                w = (int) (screenSize.width * 0.85f);
+                h = (int) (screenSize.height * 0.85f);
+            }
+            cfg.setWindowedMode(w, h);
             cfg.setResizable(true);
         }
         if (gsArgs.vr) {

@@ -287,17 +287,14 @@ public class WelcomeGui extends AbstractGui {
             }
         });
 
+
         center.add(title).center().padBottom(pad15 * 5f).colspan(2).row();
-
-        center.add(startButton).center().top().padBottom(pad15 * 6f).padRight(pad25);
-        center.add(startGroup).top().left().padBottom(pad15 * 6f).row();
-
+        center.add(startButton).center().top().padBottom(pad15 * 4f).padRight(pad25);
+        center.add(startGroup).top().left().padBottom(pad15 * 4f).row();
         center.add(downloadButton).center().top().padBottom(pad20).padRight(pad25);
         center.add(downloadGroup).left().top().padBottom(pad20).row();
-
-        center.add(catalogButton).center().top().padBottom(pad15 * 14f).padRight(pad25);
-        center.add(catalogGroup).left().top().padBottom(pad15 * 14f).row();
-
+        center.add(catalogButton).center().top().padBottom(pad15 * 8f).padRight(pad25);
+        center.add(catalogGroup).left().top().padBottom(pad15 * 8f).row();
         center.add(quitButton).center().top().colspan(2);
 
         // Bottom left table
