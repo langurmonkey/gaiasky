@@ -135,14 +135,23 @@ public class WelcomeGui extends AbstractGui {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
 
-                    if (ie.getType() == Type.keyUp && ie.getKeyCode() == Input.Keys.ESCAPE) {
-                        Gdx.app.exit();
+                    if (ie.getType() == Type.keyUp) {
+                        if (ie.getKeyCode() == Input.Keys.ESCAPE) {
+                            Gdx.app.exit();
+                        } else if (ie.getKeyCode() == Input.Keys.ENTER) {
+                            if(basicDataPresent()){
+                                gaiaSky();
+                            } else {
+                                addDatasetManagerWindow(dd);
+                            }
+                        }
                     }
                 }
                 return false;
             });
 
         }
+
     }
 
     private void buildWelcomeUI() {
