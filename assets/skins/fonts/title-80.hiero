@@ -1,11 +1,11 @@
-font.name=Open Sans Condensed
+font.name=C059
 font.size=80
 font.bold=false
 font.italic=false
 font.gamma=0.0
 font.mono=false
 
-font2.file=/home/tsagrista/.fonts/truetype/Comfortaa-Regular.ttf
+font2.file=/home/tsagrista/.local/share/fonts/ttf/scifi/ethnocentric rg.ttf
 font2.use=true
 
 pad.top=1

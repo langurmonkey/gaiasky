@@ -15,6 +15,15 @@
     "title-40": {
       "file": "skins/fonts/title-40.fnt"
     },
+    "title-30": {
+      "file": "skins/fonts/title-30.fnt"
+    },
+    "title-60": {
+      "file": "skins/fonts/title-60.fnt"
+    },
+    "title-65": {
+      "file": "skins/fonts/title-65.fnt"
+    },
     "title-80": {
       "file": "skins/fonts/title-80.fnt"
     },
@@ -651,17 +660,17 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
     "default": {
-      "titleFont": "ui-13",
+      "titleFont": "title-13",
       "background": "default-window",
       "titleFontColor": "theme"
     },
     "info": {
-      "titleFont": "ui-13",
+      "titleFont": "title-13",
       "background": "info-window",
       "titleFontColor": "theme"
     },
     "dialog": {
-      "titleFont": "ui-13",
+      "titleFont": "title-13",
       "background": "default-window",
       "titleFontColor": "theme",
       "stageBackground": "dialogDim"

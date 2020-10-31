@@ -33,6 +33,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
@@ -61,6 +62,7 @@ public class WelcomeGui extends AbstractGui {
     private boolean downloadError = false;
     private Texture bgTex;
     private DatasetsWidget dw;
+    private DataDescriptor dd;
 
     /** Lock object for synchronisation **/
 
@@ -144,7 +146,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWelcomeUI() {
-        final DataDescriptor dd = !downloadError ? DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor) : null;
+        dd = !downloadError ? DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor) : null;
         // Center table
         Table center = new Table(skin);
         center.setFillParent(true);
@@ -170,7 +172,40 @@ public class WelcomeGui extends AbstractGui {
 
         String textStyle = "main-title-s";
 
-        // Data downloader
+        // Start Gaia Sky button
+        OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", GlobalConf.APPLICATION_NAME), skin, "start");
+        startButton.setSpace(pad15);
+        startButton.setContentAlign(Align.center);
+        startButton.align(Align.center);
+        startButton.setSize(bw, bh);
+        startButton.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                gaiaSky();
+            }
+            return true;
+        });
+        Table startGroup = new Table(skin);
+        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
+        startGroup.add(startLabel).top().left().padBottom(pad10).row();
+        if (!basicDataPresent()) {
+            // No basic data, can't start!
+            startButton.setDisabled(true);
+
+            OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
+            noBaseData.setColor(ColorUtils.gRedC);
+            startGroup.add(noBaseData).bottom().left();
+        } else if (catalogFiles.size > 0 && numCatalogsSelected() == 0) {
+            OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
+            noCatsSelected.setColor(ColorUtils.gRedC);
+            startGroup.add(noCatsSelected).bottom().left();
+        } else {
+            OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
+            ready.setColor(ColorUtils.gGreenC);
+            startGroup.add(ready).bottom().left();
+
+        }
+
+        // Data manager button
         OwnTextIconButton downloadButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
         downloadButton.setSpace(pad15);
         downloadButton.setContentAlign(Align.center);
@@ -197,7 +232,7 @@ public class WelcomeGui extends AbstractGui {
             downloadGroup.add(getBasedata).bottom().left();
         }
 
-        // Catalog chooser
+        // Catalog selection button
         OwnTextIconButton catalogButton = new OwnTextIconButton(I18n.txt("gui.welcome.catalogsel"), skin, "check");
         catalogButton.setSpace(pad15);
         catalogButton.setContentAlign(Align.center);
@@ -231,40 +266,8 @@ public class WelcomeGui extends AbstractGui {
             catalogGroup.add(ok).bottom().left();
         }
 
-        // Start
-        OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", GlobalConf.APPLICATION_NAME), skin, "start");
-        startButton.setSpace(pad15);
-        startButton.setContentAlign(Align.center);
-        startButton.align(Align.center);
-        startButton.setSize(bw, bh);
-        startButton.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                gaiaSky();
-            }
-            return true;
-        });
-        Table startGroup = new Table(skin);
-        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel).top().left().padBottom(pad10).row();
-        if (!basicDataPresent()) {
-            // No basic data, can't start!
-            startButton.setDisabled(true);
 
-            OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
-            noBaseData.setColor(ColorUtils.gRedC);
-            startGroup.add(noBaseData).bottom().left();
-        } else if (catalogFiles.size > 0 && numCatalogsSelected() == 0) {
-            OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
-            noCatsSelected.setColor(ColorUtils.gRedC);
-            startGroup.add(noCatsSelected).bottom().left();
-        } else {
-            OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
-            ready.setColor(ColorUtils.gGreenC);
-            startGroup.add(ready).bottom().left();
-
-        }
-
-        // Quit
+        // Exit button
         OwnTextIconButton quitButton = new OwnTextIconButton(I18n.txt("gui.exit"), skin, "quit");
         quitButton.setSpace(pad10);
         quitButton.align(Align.center);
@@ -342,19 +345,11 @@ public class WelcomeGui extends AbstractGui {
      * Checks if the basic Gaia Sky data folders are present
      * in the default data folder
      *
-     * @return
+     * @return True if basic data is found
      */
     private boolean basicDataPresent() {
-        Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
-        // Add all paths to check in this list
         Array<Path> required = new Array<>();
-        required.add(dataPath.resolve("data-main.json"));
-        required.add(dataPath.resolve("asteroids.json"));
-        required.add(dataPath.resolve("planets.json"));
-        required.add(dataPath.resolve("satellites.json"));
-        required.add(dataPath.resolve("tex"));
-        required.add(dataPath.resolve("attitudexml"));
-        required.add(dataPath.resolve("meshes"));
+        fillBasicDataFiles(required);
 
         for (Path p : required) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
@@ -364,6 +359,19 @@ public class WelcomeGui extends AbstractGui {
         }
 
         return true;
+    }
+
+    private void fillBasicDataFiles(Array<Path> required) {
+        Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
+        required.add(dataPath.resolve("data-main.json"));
+        required.add(dataPath.resolve("asteroids.json"));
+        required.add(dataPath.resolve("planets.json"));
+        required.add(dataPath.resolve("satellites.json"));
+        required.add(dataPath.resolve("tex/base"));
+        required.add(dataPath.resolve("attitudexml"));
+        required.add(dataPath.resolve("orbit"));
+        required.add(dataPath.resolve("oort"));
+        required.add(dataPath.resolve("galaxy"));
     }
 
     @Override

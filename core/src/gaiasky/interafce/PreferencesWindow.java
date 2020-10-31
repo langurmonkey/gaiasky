@@ -119,7 +119,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float contentw = 700f * GlobalConf.UI_SCALE_FACTOR;
         float contenth = 700f * GlobalConf.UI_SCALE_FACTOR;
         final float tawidth = 600f * GlobalConf.UI_SCALE_FACTOR;
-        float tabwidth = (GlobalConf.isHiDPI() ? 200f : 200f) * GlobalConf.UI_SCALE_FACTOR;
+        float tabwidth = (GlobalConf.isHiDPI() ? 230f : 220f) * GlobalConf.UI_SCALE_FACTOR;
         float textwidth = 65f * GlobalConf.UI_SCALE_FACTOR;
         float scrollh = 400f * GlobalConf.UI_SCALE_FACTOR;
         float controlsscrollw = 550f * GlobalConf.UI_SCALE_FACTOR;

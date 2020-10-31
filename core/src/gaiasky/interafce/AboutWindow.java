@@ -70,7 +70,7 @@ public class AboutWindow extends GenericDialog {
         float taWidth = GlobalConf.isHiDPI() ? 700 : 440;
         float taWidth2 = 800 * GlobalConf.UI_SCALE_FACTOR;
         float taHeight = 100 * GlobalConf.UI_SCALE_FACTOR;
-        float tabWidth = 110 * GlobalConf.UI_SCALE_FACTOR;
+        float tabWidth = 130 * GlobalConf.UI_SCALE_FACTOR;
 
         // Create the tab buttons
         HorizontalGroup group = new HorizontalGroup();
