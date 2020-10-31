@@ -1,16 +1,31 @@
 {
   "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    "title-11": {
+      "file": "skins/fonts/title-11.fnt"
+    },
     "title-12": {
       "file": "skins/fonts/title-12.fnt"
     },
     "title-13": {
       "file": "skins/fonts/title-13.fnt"
     },
+    "title-15": {
+      "file": "skins/fonts/title-15.fnt"
+    },
+    "title-17": {
+      "file": "skins/fonts/title-17.fnt"
+    },
     "title-20": {
       "file": "skins/fonts/title-20.fnt"
     },
     "title-21": {
       "file": "skins/fonts/title-21.fnt"
+    },
+    "title-23": {
+      "file": "skins/fonts/title-23.fnt"
+    },
+    "title-27": {
+      "file": "skins/fonts/title-27.fnt"
     },
     "title-30": {
       "file": "skins/fonts/title-30.fnt"
@@ -234,7 +249,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "focused": "default-round-sel",
-      "font": "ui-11",
+      "font": "title-11",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -242,7 +257,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "focused": "default-round-sel",
-      "font": "ui-15",
+      "font": "title-15",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -250,7 +265,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "focused": "default-round-sel",
-      "font": "ui-18",
+      "font": "title-17",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
@@ -258,7 +273,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "disabled": "default-round",
-      "font": "ui-14",
+      "font": "title-15",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
@@ -266,7 +281,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "disabled": "default-round",
-      "font": "ui-18",
+      "font": "title-17",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
@@ -276,7 +291,7 @@
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
-      "font": "ui-11",
+      "font": "title-11",
       "fontColor": "white",
       "downFontColor": "black"
     },
@@ -286,7 +301,7 @@
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
-      "font": "ui-15",
+      "font": "title-15",
       "fontColor": "white",
       "downFontColor": "black"
     },
@@ -465,7 +480,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "disabled": "default-round",
-      "font": "ui-20",
+      "font": "title-20",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray",
       "imageUp": "car-icon"
@@ -474,7 +489,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "disabled": "default-round",
-      "font": "ui-18",
+      "font": "title-17",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-cloud-download"
@@ -483,7 +498,7 @@
       "down": "default-round-down",
       "up": "default-round",
       "disabled": "default-round",
-      "font": "ui-18",
+      "font": "title-17",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-check"
@@ -876,7 +891,7 @@
       "fontColor": "white"
     },
     "hud-header": {
-      "font": "ui-17",
+      "font": "title-17",
       "fontColor": "theme"
     },
     "hud-subheader": {
