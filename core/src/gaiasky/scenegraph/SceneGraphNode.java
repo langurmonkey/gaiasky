@@ -1146,7 +1146,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 
-        if (getRadius() == 0 || distToCamera > getRadius() * 2) {
+        if (getRadius() == 0 || distToCamera > getRadius() * 2d) {
 
             size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
 
@@ -1158,9 +1158,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
                 Vector3 v1 = aux3f1.get();
                 Vector3 v2 = aux3f2.get();
                 camera.getCamera().project(v1.set((float) pos.x, (float) pos.y, (float) pos.z));
-                v1.z = 0;
-                v2.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
-                rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90 : -90);
+                v1.z = 0f;
+                v2.set(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, 0f);
+                rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90f : -90f);
             }
 
             shader.setUniformf("u_pos", pos.put(aux3f1.get()));
