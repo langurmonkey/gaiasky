@@ -237,7 +237,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public SceneGraphNode(String name, SceneGraphNode parent) {
-        this(new String[] { name }, parent);
+        this(new String[]{name}, parent);
     }
 
     public SceneGraphNode(String name) {
@@ -539,7 +539,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         if (names != null)
             names[0] = name;
         else
-            names = new String[] { name };
+            names = new String[]{name};
     }
 
     /**
@@ -1143,6 +1143,10 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, float scale, float size) {
+       render3DLabel(batch, shader, font, camera, rc, label, pos, scale, size, -1, -1);
+    }
+
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 
@@ -1165,7 +1169,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
 
             shader.setUniformf("u_pos", pos.put(aux3f1.get()));
 
-            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap());
+            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }
     }
 

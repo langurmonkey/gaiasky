@@ -6,6 +6,7 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -19,12 +20,12 @@ import gaiasky.util.math.Vector3d;
  * this is, flat textures in the 3D space.
  *
  * @author Toni Sagrista
- *
  */
 public class DecalUtils {
 
     static Vector3 tmp, tmp2, tmp3;
     static Matrix4 idt, aux1, aux2;
+
     static {
         tmp = new Vector3();
         tmp2 = new Vector3();
@@ -41,19 +42,18 @@ public class DecalUtils {
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
      *
-     * @param font
-     *            The font.
-     * @param batch
-     *            The sprite batch to use.
-     * @param text
-     *            The text to write.
-     * @param position
-     *            The 3D position.
-     * @param camera
-     *            The camera.
+     * @param font     The font.
+     * @param batch    The sprite batch to use.
+     * @param text     The text to write.
+     * @param position The 3D position.
+     * @param camera   The camera.
      */
     public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, Camera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, position, 1f, camera, faceCamera);
+    }
+
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float size, float rotationCenter, Camera camera, boolean faceCamera) {
+        drawFont3D(font, batch, text, x, y, z, size, rotationCenter, camera, faceCamera, -1, -1);
     }
 
     /**
@@ -63,35 +63,34 @@ public class DecalUtils {
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
      *
-     * @param font
-     *            The font.
-     * @param batch
-     *            The sprite batch to use.
-     * @param text
-     *            The text to write.
-     * @param x
-     *            The x coordinate.
-     * @param y
-     *            The y coordinate.
-     * @param z
-     *            The z coordinate.
-     * @param scale
-     *            The scale of the font.
-     * @param rotationCenter
-     *            Angles to rotate around center.
-     * @param camera
-     *            The camera.
-     * @param faceCamera
-     *            Whether to apply bill-boarding.
+     * @param font           The font.
+     * @param batch          The sprite batch to use.
+     * @param text           The text to write.
+     * @param x              The x coordinate.
+     * @param y              The y coordinate.
+     * @param z              The z coordinate.
+     * @param size           The scale of the font.
+     * @param rotationCenter Angles to rotate around center.
+     * @param camera         The camera.
+     * @param faceCamera     Whether to apply bill-boarding.
+     * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
+     * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float scale, float rotationCenter, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float size, float rotationCenter, Camera camera, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
 
         Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 
-        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(scale, scale, scale);
+        if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
+            double dist = camera.position.dst(tmp3.set(x, y, z));
+            double minsize = minSizeDegrees > 0 ? Math.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
+            double maxsize = maxSizeDegrees > 0 ? Math.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
+            size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
+        }
+
+        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(size, size, size);
         // Force matrices to be set to shader
         batch.setProjectionMatrix(idt);
 
@@ -108,19 +107,13 @@ public class DecalUtils {
      * always facing the camera. It assumes that {@link ExtSpriteBatch#begin()} has
      * been called. This enables 3D techniques such as z-buffering to be applied
      * to the text textures.
-     * 
-     * @param font
-     *            The font.
-     * @param batch
-     *            The sprite batch to use.
-     * @param text
-     *            The text to write.
-     * @param position
-     *            The 3D position.
-     * @param camera
-     *            The camera.
-     * @param scale
-     *            The scale of the font.
+     *
+     * @param font     The font.
+     * @param batch    The sprite batch to use.
+     * @param text     The text to write.
+     * @param position The 3D position.
+     * @param camera   The camera.
+     * @param scale    The scale of the font.
      */
     public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, float scale, Camera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, position.x, position.y, position.z, scale, 0, camera, faceCamera);
@@ -161,9 +154,8 @@ public class DecalUtils {
 
     /**
      * Gets the billboard rotation using the parameters of the given camera
-     * 
-     * @param camera
-     *            The camera
+     *
+     * @param camera The camera
      * @return The quaternion with the rotation
      */
     public static Quaternion getBillboardRotation(Camera camera) {
@@ -173,11 +165,9 @@ public class DecalUtils {
     /**
      * Returns a Quaternion representing the billboard rotation to be applied to
      * a decal that is always to face the given direction and up vector
-     * 
-     * @param direction
-     *            The direction vector
-     * @param up
-     *            The up vector
+     *
+     * @param direction The direction vector
+     * @param up        The up vector
      * @return The quaternion with the rotation
      */
     public static Quaternion getBillboardRotation(Vector3 direction, Vector3 up) {
@@ -189,13 +179,10 @@ public class DecalUtils {
     /**
      * Sets the rotation of this decal based on the (normalized) direction and
      * up vector.
-     * 
-     * @param rotation
-     *            out-parameter, quaternion where the result is set
-     * @param direction
-     *            the direction vector
-     * @param up
-     *            the up vector
+     *
+     * @param rotation  out-parameter, quaternion where the result is set
+     * @param direction the direction vector
+     * @param up        the up vector
      */
     public static void setBillboardRotation(Quaternion rotation, final Vector3 direction, final Vector3 up) {
         tmp.set(up).crs(direction).nor();
@@ -206,11 +193,9 @@ public class DecalUtils {
     /**
      * Sets the rotation of this decal based on the (normalized) direction and
      * up vector.
-     * 
-     * @param direction
-     *            the direction vector
-     * @param up
-     *            the up vector
+     *
+     * @param direction the direction vector
+     * @param up        the up vector
      */
     public static void setBillboardRotation(Quaternion rotation, final Vector3d direction, final Vector3d up) {
         tmp.set((float) up.x, (float) up.y, (float) up.z).crs((float) direction.x, (float) direction.y, (float) direction.z).nor();
