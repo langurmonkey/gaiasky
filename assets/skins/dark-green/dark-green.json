@@ -117,6 +117,9 @@
     "mono": {
       "file": "skins/fonts/mono-small.fnt"
     },
+    "mono-big": {
+      "file": "skins/fonts/mono-large.fnt"
+    },
     "grid-annotation": {
       "file": "skins/fonts/ui-11.fnt"
     }
@@ -327,6 +330,11 @@
     },
     "link": {
       "font": "ui-11",
+      "fontColor": "blue",
+      "downFontColor": "theme"
+    },
+    "link-big": {
+      "font": "ui-18",
       "fontColor": "blue",
       "downFontColor": "theme"
     }
@@ -860,6 +868,10 @@
     },
     "mono": {
       "font": "mono",
+      "fontColor": "white"
+    },
+    "mono-big": {
+      "font": "mono-big",
       "fontColor": "white"
     },
     "menuitem-shortcut": {
