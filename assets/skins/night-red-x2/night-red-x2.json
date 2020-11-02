@@ -914,6 +914,10 @@
     "main-title-xs": {
       "font": "title-20",
       "fontColor": "theme"
+    },
+    "mono-pink": {
+      "font": "mono",
+      "fontColor": "pink"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {

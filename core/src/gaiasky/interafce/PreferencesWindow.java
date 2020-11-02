@@ -1023,13 +1023,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         controls.add(new OwnLabel(I18n.txt("gui.keymappings.keys"), skin, "header")).left().row();
 
         controls.add(new OwnLabel(I18n.txt("action.forward"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.UP).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(Keys.toString(Keys.UP).toUpperCase(), skin, "mono-pink")).left().row();
         controls.add(new OwnLabel(I18n.txt("action.backward"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.DOWN).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(Keys.toString(Keys.DOWN).toUpperCase(), skin, "mono-pink")).left().row();
         controls.add(new OwnLabel(I18n.txt("action.left"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.LEFT).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(Keys.toString(Keys.LEFT).toUpperCase(), skin, "mono-pink")).left().row();
         controls.add(new OwnLabel(I18n.txt("action.right"), skin)).left().padRight(pad10);
-        controls.add(new OwnLabel(Keys.toString(Keys.RIGHT).toUpperCase(), skin, "default-pink")).left().row();
+        controls.add(new OwnLabel(Keys.toString(Keys.RIGHT).toUpperCase(), skin, "mono-pink")).left().row();
 
         // Controls
         for (String[] action : data) {
@@ -1038,7 +1038,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             for (int j = 1; j < action.length; j++) {
                 String[] keys = action[j].split("\\+");
                 for (int k = 0; k < keys.length; k++) {
-                    keysGroup.addActor(new OwnLabel(keys[k].trim(), skin, "default-pink"));
+                    keysGroup.addActor(new OwnLabel(keys[k].trim(), skin, "mono-pink"));
                     if (k < keys.length - 1)
                         keysGroup.addActor(new OwnLabel("+", skin));
                 }

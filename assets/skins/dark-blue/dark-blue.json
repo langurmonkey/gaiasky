@@ -327,7 +327,7 @@
     },
     "link": {
       "font": "ui-11",
-      "fontColor": "theme",
+      "fontColor": "blue",
       "downFontColor": "theme"
     }
   },
@@ -363,6 +363,14 @@
       "imageUp": "iconic-caret-left"
     },
     "caret-right": {
+      "imageUp": "iconic-caret-right"
+    },
+    "key-caret-left": {
+      "up" : "key",
+      "imageUp": "iconic-caret-left"
+    },
+    "key-caret-right": {
+      "up" : "key",
       "imageUp": "iconic-caret-right"
     },
     "edit": {
@@ -752,7 +760,7 @@
     },
     "default-blue": {
       "font": "ui-11",
-      "fontColor": "theme"
+      "fontColor": "blue"
     },
     "default-red": {
       "font": "ui-11",
@@ -892,7 +900,7 @@
     },
     "link": {
       "font": "ui-11",
-      "fontColor": "theme"
+      "fontColor": "blue"
     },
     "sc-header": {
       "font": "ui-12-bold",
@@ -914,6 +922,10 @@
     "main-title-xs": {
       "font": "title-12",
       "fontColor": "white"
+    },
+    "mono-pink": {
+      "font": "mono",
+      "fontColor": "pink"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {

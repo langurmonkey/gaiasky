@@ -60,6 +60,7 @@ public class DatasetsWidget {
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn) {
         return buildDatasetsWidget(catalogFiles, scrollOn, 40);
     }
+
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn, int maxCharsDescription) {
         float pad = 3f * GlobalConf.UI_SCALE_FACTOR;
 
@@ -139,12 +140,15 @@ public class DatasetsWidget {
             imgTooltip.addListener(new OwnTextTooltip(desc, skin, 10));
             descGroup.addActor(imgTooltip);
             descGroup.addActor(description);
+            dsTable.add(descGroup).left().padRight(pad * 6f).padBottom(pad);
+
             // Link
             if (link != null) {
                 LinkButton imgLink = new LinkButton(link, skin);
-                descGroup.addActor(imgLink);
+                dsTable.add(imgLink).left().padRight(pad * 6f).padBottom(pad);
+            } else {
+                dsTable.add().left().padRight(pad * 6f).padBottom(pad);
             }
-            dsTable.add(descGroup).left().padRight(pad * 6f).padBottom(pad);
 
             // Version
             String vers = "v-0";
@@ -186,7 +190,7 @@ public class DatasetsWidget {
 
         dsTable.pack();
         if (scroll != null) {
-            scroll.setWidth(Math.min(830f * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
+            scroll.setWidth(Math.min(950f * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
         }
 
         // No files

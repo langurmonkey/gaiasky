@@ -9,13 +9,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -33,7 +33,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
-import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
@@ -165,7 +164,6 @@ public class WelcomeGui extends AbstractGui {
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 
-        float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
         float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
         float pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
         float pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
@@ -175,9 +173,13 @@ public class WelcomeGui extends AbstractGui {
         float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
 
         // Title
+        HorizontalGroup titleGroup = new HorizontalGroup();
+        titleGroup.space(pad20);
         OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", GlobalConf.APPLICATION_NAME, GlobalConf.version.version), skin, "main-title");
-        Color theme = skin.getColor("theme");
-        title.setColor(theme);
+        OwnLabel gs = new OwnLabel(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version, skin, "main-title");
+        gs.setColor(skin.getColor("theme"));
+        titleGroup.addActor(title);
+        titleGroup.addActor(gs);
 
         String textStyle = "main-title-s";
 
@@ -288,7 +290,7 @@ public class WelcomeGui extends AbstractGui {
         });
 
 
-        center.add(title).center().padBottom(pad15 * 5f).colspan(2).row();
+        center.add(titleGroup).center().padBottom(pad15 * 5f).colspan(2).row();
         center.add(startButton).center().top().padBottom(pad15 * 4f).padRight(pad25);
         center.add(startGroup).top().left().padBottom(pad15 * 4f).row();
         center.add(downloadButton).center().top().padBottom(pad20).padRight(pad25);

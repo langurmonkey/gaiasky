@@ -22,7 +22,7 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
 /**
- * GUI window to choose the catalogs to load by default.
+ * GUI window to choose the catalogs to load at startup.
  * This is shown at startup if no catalogs are selected and {@link GlobalConf#program#SKIP_CATALOG_CHOOSER} is false.
  * @author tsagrista
  *
