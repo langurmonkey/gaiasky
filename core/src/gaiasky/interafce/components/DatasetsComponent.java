@@ -132,7 +132,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
         colorMap.put(ci.name, cp);
 
-        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, GlobalConf.isHiDPI() ? 23 : 16), skin, "hud-subheader");
+        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, GlobalConf.isHiDPI() ? 26 : 23), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
         if (ci.isRegular()) {
             t.add(nameLabel).left().padBottom(pad);
@@ -147,12 +147,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         } else {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
-        int cap = GlobalConf.isHiDPI() ? 24 : 23;
+        int cap = GlobalConf.isHiDPI() ? 27 : 26;
         String types = ci.type.toString() + " / " + ci.object.ct.toString();
         OwnLabel typesLabel = new OwnLabel(TextUtils.capString(types, cap), skin);
         typesLabel.addListener(new OwnTextTooltip(types, skin));
         t.add(typesLabel).colspan(2).left().row();
-        t.add(new OwnLabel(TextUtils.capString(ci.description, cap), skin)).left().expandX();
+        OwnLabel desc = new OwnLabel(TextUtils.capString(ci.description, cap), skin);
+        desc.addListener(new OwnTextTooltip(ci.description, skin));
+        t.add(desc).left().expandX();
         Link info = new Link("(i)", skin.get("link", Label.LabelStyle.class), null);
         info.addListener(new OwnTextTooltip(ci.description, skin));
         t.add(info).left().padLeft(pad);
@@ -168,8 +170,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(ControlsWindow.getContentWidth());
-        scroll.setHeight(GlobalConf.isHiDPI() ? 125 : 75);
+        scroll.setWidth(ControlsWindow.getContentWidth() * (GlobalConf.isHiDPI() ? 0.96f : 1f));
+        scroll.setHeight(GlobalConf.isHiDPI() ? 120f : 75f);
 
         //ciGroup.addActor(controls);
         ciGroup.addActor(scroll);

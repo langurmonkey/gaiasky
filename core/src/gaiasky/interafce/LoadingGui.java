@@ -129,7 +129,7 @@ public class LoadingGui extends AbstractGui {
         screenMode.setFillParent(true);
         screenMode.top().right();
         screenMode.pad(pad10);
-        OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
+        OwnTextIconButton screenModeButton = new OwnTextIconButton("A", skin, "screen-mode");
         screenModeButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
