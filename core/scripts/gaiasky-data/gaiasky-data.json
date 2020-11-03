@@ -270,7 +270,7 @@
     },
     {
       "name": "catalog-whitedwarfs",
-      "type": "catalog",
+      "type": "catalog-gaia",
       "version": 0,
       "size": 34471681,
       "check": "catalog-wd.json",
@@ -286,7 +286,7 @@
     },
     {
       "name": "catalog-hipparcos-newred",
-      "type": "catalog",
+      "type": "catalog-star",
       "version": 1,
       "size": 5360300,
       "check": "catalog-hip.json",
@@ -302,7 +302,7 @@
     },
     {
       "name": "catalog-hipparcos-newred",
-      "type": "catalog",
+      "type": "catalog-star",
       "version": 2,
       "mingsversion": 20205,
       "size": 5433177,
@@ -319,7 +319,7 @@
     },
     {
       "name": "catalog-nbg",
-      "type": "catalog",
+      "type": "catalog-gal",
       "version": 3,
       "mingsversion": 260,
       "size": 15786547,
@@ -335,7 +335,7 @@
     },
     {
       "name": "catalog-nbg",
-      "type": "catalog",
+      "type": "catalog-gal",
       "version": 4,
       "mingsversion": 30000,
       "size": 15786828,
@@ -352,7 +352,7 @@
     },
     {
       "name": "catalog-sdss-12",
-      "type": "catalog",
+      "type": "catalog-gal",
       "version": 2,
       "mingsversion": 20201,
       "size": 10296142,
@@ -367,7 +367,7 @@
     },
     {
       "name": "catalog-sdss-12",
-      "type": "catalog",
+      "type": "catalog-gal",
       "version": 3,
       "mingsversion": 30000,
       "size": 10296296,
@@ -383,7 +383,7 @@
     },
     {
       "name": "catalog-sdss-14",
-      "type": "catalog",
+      "type": "catalog-gal",
       "version": 2,
       "mingsversion": 20201,
       "size": 79127047,
@@ -398,7 +398,7 @@
     },
     {
       "name": "catalog-sdss-14",
-      "type": "catalog",
+      "type": "catalog-gal",
       "version": 3,
       "mingsversion": 30000,
       "size": 79127288,
@@ -413,39 +413,8 @@
       "file": "@mirror-url@galaxies/sdss14/20201030_v03/galaxies-sdss14.tar.gz"
     },
     {
-      "name": "catalog-nebulae",
-      "type": "catalog",
-      "version": 1,
-      "mingsversion": 20200,
-      "size": 15407613,
-      "check": "autoload-nebulae.json",
-      "data": [
-        "autoload-nebulae.json",
-        "tex/nebulae"
-      ],
-      "description": "Nebulae - Catalog of 15 nebulae with textures",
-      "sha256": "b303f8988e5d4e5f1e5da19297b71c6f11a93fdcf6105f4a37008cdeb8b3d3f8",
-      "file": "@mirror-url@nebulae/002_20190726/nebulae.tar.gz"
-    },
-    {
-      "name": "catalog-nebulae",
-      "type": "catalog",
-      "version": 2,
-      "mingsversion": 30000,
-      "size": 15407657,
-      "check": "catalog-nebulae.json",
-      "data": [
-        "catalog-nebulae.json",
-        "particles-nebulae.json",
-        "tex/nebulae"
-      ],
-      "description": "Nebulae - Catalog of 15 nebulae with textures",
-      "sha256": "2ec68156cf2b5a4a3f698e5cdd30132acbeeddb7a0bf71f08bcf0eaa41d2f593",
-      "file": "@mirror-url@nebulae/20201030_v02/nebulae.tar.gz"
-    },
-    {
       "name": "catalog-ocdr2",
-      "type": "catalog",
+      "type": "catalog-cluster",
       "version": 1,
       "mingsversion": 20300,
       "size": 58194,
@@ -460,7 +429,7 @@
     },
     {
       "name": "catalog-ocdr2",
-      "type": "catalog",
+      "type": "catalog-cluster",
       "version": 2,
       "mingsversion": 30000,
       "size": 58191,
@@ -476,7 +445,7 @@
     },
     {
       "name": "catalog-mwsc",
-      "type": "catalog",
+      "type": "catalog-cluster",
       "version": 1,
       "mingsversion": 20206,
       "size": 208327,
@@ -491,7 +460,7 @@
     },
     {
       "name": "catalog-mwsc",
-      "type": "catalog",
+      "type": "catalog-cluster",
       "version": 2,
       "mingsversion": 30000,
       "size": 78311,
@@ -504,6 +473,37 @@
       "description": "MWSC - Milky Way Star Clusters catalog - 3017 clusters",
       "sha256" : "f785a73f9b0c4b64c748a85c31ab1d69eb22f245860f001a27dbd2330af0ae22",
       "file": "@mirror-url@clusters/mwsc/20201030_v02/clusters-mwsc.tar.gz"
+    },
+    {
+      "name": "catalog-nebulae",
+      "type": "catalog-other",
+      "version": 1,
+      "mingsversion": 20200,
+      "size": 15407613,
+      "check": "autoload-nebulae.json",
+      "data": [
+        "autoload-nebulae.json",
+        "tex/nebulae"
+      ],
+      "description": "Nebulae - Catalog of 15 nebulae with textures",
+      "sha256": "b303f8988e5d4e5f1e5da19297b71c6f11a93fdcf6105f4a37008cdeb8b3d3f8",
+      "file": "@mirror-url@nebulae/002_20190726/nebulae.tar.gz"
+    },
+    {
+      "name": "catalog-nebulae",
+      "type": "catalog-other",
+      "version": 2,
+      "mingsversion": 30000,
+      "size": 15407657,
+      "check": "catalog-nebulae.json",
+      "data": [
+        "catalog-nebulae.json",
+        "particles-nebulae.json",
+        "tex/nebulae"
+      ],
+      "description": "Nebulae - Catalog of 15 nebulae with textures",
+      "sha256": "2ec68156cf2b5a4a3f698e5cdd30132acbeeddb7a0bf71f08bcf0eaa41d2f593",
+      "file": "@mirror-url@nebulae/20201030_v02/nebulae.tar.gz"
     },
     {
       "name": "mesh-dr2-dust",
