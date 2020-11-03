@@ -197,7 +197,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel).top().left().padBottom(pad10).row();
+        startGroup.add(startLabel).top().left().padTop(pad10).padBottom(pad10).row();
         if (!basicDataPresent()) {
             // No basic data, can't start!
             startButton.setDisabled(true);
@@ -234,7 +234,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table downloadGroup = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
-        downloadGroup.add(downloadLabel).top().left().padBottom(pad10);
+        downloadGroup.add(downloadLabel).top().left().padTop(pad10).padBottom(pad10);
         if (dd != null && dd.updatesAvailable) {
             downloadGroup.row();
             OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
@@ -256,7 +256,7 @@ public class WelcomeGui extends AbstractGui {
         catalogButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 String noticeKey;
-                if (catalogFiles.size > 0 && numCatalogDRFiles() > 1) {
+                if (numCatalogs() > 0 && numCatalogDRFiles() > 1) {
                     noticeKey = "gui.dschooser.morethanonedr";
                 } else {
                     noticeKey = "gui.dschooser.nocatselected";
@@ -267,8 +267,8 @@ public class WelcomeGui extends AbstractGui {
         });
         Table catalogGroup = new Table(skin);
         OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
-        catalogGroup.add(catalogLabel).top().left().padBottom(pad10).row();
-        if (catalogFiles.size == 0) {
+        catalogGroup.add(catalogLabel).top().left().padTop(pad10).padBottom(pad10).row();
+        if (numCatalogs() == 0) {
             // No catalog files, disable and add notice
             catalogButton.setDisabled(true);
 
@@ -280,7 +280,7 @@ public class WelcomeGui extends AbstractGui {
             tooManyDR.setColor(ColorUtils.gRedC);
             catalogGroup.add(tooManyDR).bottom().left();
         } else {
-            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected()), skin, textStyle);
+            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected(), numCatalogs()), skin, textStyle);
             ok.setColor(ColorUtils.gBlueC);
             catalogGroup.add(ok).bottom().left();
         }
@@ -345,6 +345,10 @@ public class WelcomeGui extends AbstractGui {
 
     private int numCatalogsSelected() {
         return GlobalConf.data.CATALOG_JSON_FILES.size;
+    }
+
+    private int numCatalogs(){
+        return catalogFiles.size;
     }
 
     private int numCatalogDRFiles() {
