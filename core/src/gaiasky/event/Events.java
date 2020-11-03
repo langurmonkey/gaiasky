@@ -422,10 +422,6 @@ public enum Events {
     FRAME_SIZE_UDPATE,
 
     /**
-     * Event sent before the start of every frame. Contains a long with the frame number
-     */
-    FRAME_TICK,
-    /**
      * Posts the coordinates of the free mode focus.
      * <ol start='0'>
      * <li>ra  [deg]</li>

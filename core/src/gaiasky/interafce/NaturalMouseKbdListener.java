@@ -384,7 +384,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     }
 
     @Override
-    public boolean scrolled(int amountY) {
+    public boolean scrolled(float amountX, float amountY) {
         if (GlobalConf.runtime.INPUT_ENABLED) {
             return zoom(amountY * scrollFactor);
         }
@@ -444,7 +444,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
             this.touchDragged((int) data[0], (int) data[1], (int) data[2]);
             break;
         case SCROLLED:
-            this.scrolled((int) data[0]);
+            this.scrolled(0f, (float) data[0]);
             break;
         case KEY_DOWN:
             this.keyDown((int) data[0]);

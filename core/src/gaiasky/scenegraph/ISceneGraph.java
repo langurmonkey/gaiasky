@@ -7,10 +7,11 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.IntMap;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
+
+import java.util.Map;
 
 /**
  * Defines the interface for any scene graph implementation
@@ -88,7 +89,7 @@ public interface ISceneGraph extends Disposable {
      *
      * @return The HIP star map
      */
-    IntMap<IPosition> getStarMap();
+    Map<Integer, IPosition> getStarMap();
 
     Array<SceneGraphNode> getNodes();
 

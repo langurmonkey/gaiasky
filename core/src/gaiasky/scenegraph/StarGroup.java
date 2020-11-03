@@ -805,13 +805,16 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public IFocus getFocus(String name) {
-        candidateFocusIndex = index.get(name, -1);
+        if (index.containsKey(name))
+            candidateFocusIndex = index.get(name);
+        else
+            candidateFocusIndex = -1;
         return this;
     }
 
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
         if (index.containsKey(name)) {
-            int idx = index.get(name, 0);
+            int idx = index.get(name);
             StarBean sb = (StarBean) pointData.get(idx);
             fetchPosition(sb, null, aux, currDeltaYears);
             return aux;

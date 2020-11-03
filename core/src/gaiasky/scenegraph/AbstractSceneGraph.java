@@ -6,8 +6,6 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup.StarBean;
@@ -19,7 +17,9 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
@@ -28,12 +28,12 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
-    protected ObjectMap<String, SceneGraphNode> stringToNode;
+    protected Map<String, SceneGraphNode> stringToNode;
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations
      **/
-    protected IntMap<IPosition> hipMap;
+    protected Map<Integer, IPosition> hipMap;
     /** Number of objects per thread **/
     protected int[] objectsPerThread;
     /** Does it contain an octree **/
@@ -75,9 +75,9 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode = new ObjectMap<>(nodes.size);
+        stringToNode = new HashMap<>(nodes.size);
         stringToNode.put(root.names[0].toLowerCase().trim(), root);
-        hipMap = new IntMap<>();
+        hipMap = new HashMap<>();
         for (SceneGraphNode node : nodes) {
             addToIndex(node, stringToNode);
 
@@ -181,7 +181,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         }
     }
 
-    protected void addToIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
+    protected void addToIndex(SceneGraphNode node, Map<String, SceneGraphNode> map) {
         if (node.names != null) {
             if (node.mustAddToIndex()) {
                 for (String name : node.names) {
@@ -206,7 +206,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         }
     }
 
-    private void removeFromIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
+    private void removeFromIndex(SceneGraphNode node, Map<String, SceneGraphNode> map) {
         if (node.names != null) {
             for (String name : node.names) {
                 map.remove(name.toLowerCase().trim());
@@ -284,7 +284,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     @Override
-    public IntMap<IPosition> getStarMap() {
+    public Map<Integer, IPosition> getStarMap() {
         return hipMap;
     }
 

@@ -8,13 +8,11 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.IntMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
@@ -29,6 +27,8 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
+
+import java.util.Map;
 
 /**
  * Represents a constellation object.
@@ -107,7 +107,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
             if (lines == null) {
                 lines = new IPosition[npairs][];
             }
-            IntMap<IPosition> hipMap = sg.getStarMap();
+            Map<Integer, IPosition> hipMap = sg.getStarMap();
             allLoaded = true;
             for (int i = 0; i < npairs; i++) {
                 int[] pair = ids.get(i);

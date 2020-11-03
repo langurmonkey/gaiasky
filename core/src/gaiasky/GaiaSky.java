@@ -192,6 +192,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public boolean windowCreated = false;
 
     /**
+     * Used to wait for new frames
+     */
+    public final Object frameMonitor = new Object();
+
+    /**
      * Set log level to debug
      */
     private boolean debugMode;
@@ -229,8 +234,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Runnables
      */
-    private final Array<Runnable> runnables;
-    private Map<String, Runnable> runnablesMap;
+    private final Array<Runnable> parkedRunnables;
+    private Map<String, Runnable> parkedRunnablesMap;
 
     /**
      * Creates an instance of Gaia Sky.
@@ -251,13 +256,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         instance = this;
         this.skipWelcome = skipWelcome;
         this.debugMode = debugMode;
-        this.runnables = new Array<>();
-        this.runnablesMap = new HashMap<>();
+        this.parkedRunnablesMap = new HashMap<>();
+        this.parkedRunnables = new Array<>();
         this.vr = vr;
         this.externalView = externalView;
         this.renderProcess = runnableInitialGui;
         this.noScripting = noScriptingServer;
-
     }
 
     @Override
@@ -786,7 +790,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         manager.update();
 
         if (!GlobalConf.runtime.UPDATE_PAUSE) {
-            EventManager.instance.post(Events.FRAME_TICK, frames);
+            synchronized (frameMonitor){
+                frameMonitor.notify();
+            }
             /*
              * UPDATE
              */
@@ -828,6 +834,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr.clearLists();
         // Number of frames
         frames++;
+
 
         if (GlobalConf.screen.LIMIT_FPS > 0.0) {
             sleep(GlobalConf.screen.LIMIT_FPS);
@@ -884,6 +891,23 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (!crashed) {
                 // Run the render process
                 renderProcess.run();
+
+                // Run parked runnables
+                synchronized (parkedRunnables) {
+                    if(parkedRunnables.size > 0) {
+                        Iterator<Runnable> it = parkedRunnables.iterator();
+                        while (it.hasNext()) {
+                            Runnable r = it.next();
+                            try {
+                                r.run();
+                            } catch (Exception e) {
+                                logger.error(e);
+                                // If it crashed, remove it
+                                it.remove();
+                            }
+                        }
+                    }
+                }
             } else if (crashGui != null) {
                 // Crash information
                 renderGui(crashGui);
@@ -982,20 +1006,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update scene graph
         sg.update(time, cam);
 
-        // Run parked runnables
-        synchronized (runnables) {
-            Iterator<Runnable> it = runnables.iterator();
-            while (it.hasNext()) {
-                Runnable r = it.next();
-                try {
-                    r.run();
-                } catch (Exception e) {
-                    logger.error(e);
-                    // If it crashed, remove it
-                    it.remove();
-                }
-            }
-        }
     }
 
     public void preRenderScene() {
@@ -1260,14 +1270,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             goHome();
             break;
         case PARK_RUNNABLE:
-            synchronized (runnables) {
+            synchronized (parkedRunnables) {
                 String key = (String) data[0];
                 Runnable runnable = (Runnable) data[1];
                 parkRunnable(key, runnable);
             }
             break;
         case UNPARK_RUNNABLE:
-            synchronized (runnables) {
+            synchronized (parkedRunnables) {
                 String key = (String) data[0];
                 unparkRunnable(key);
             }
@@ -1290,8 +1300,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param runnable The runnable
      */
     public void parkRunnable(String key, Runnable runnable) {
-        runnablesMap.put(key, runnable);
-        runnables.add(runnable);
+        parkedRunnablesMap.put(key, runnable);
+        parkedRunnables.add(runnable);
     }
 
     /**
@@ -1300,10 +1310,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param key The key of the runnable to unpark
      */
     public void unparkRunnable(String key) {
-        Runnable r = runnablesMap.get(key);
+        Runnable r = parkedRunnablesMap.get(key);
         if (r != null) {
-            runnables.removeValue(r, true);
-            runnablesMap.remove(key);
+            parkedRunnables.removeValue(r, true);
+            parkedRunnablesMap.remove(key);
         }
     }
 

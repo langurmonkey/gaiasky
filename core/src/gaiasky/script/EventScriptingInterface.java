@@ -87,22 +87,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private Set<AtomicBoolean> stops;
 
-    /**
-     * Used to wait for new frames
-     */
-    private final Object frameMonitor;
-
-    /**
-     * Contains the current frame number. Available right after
-     * notify() is called on frameMonitor.
-     */
-    private long frameNumber;
-
     private EventScriptingInterface() {
         em = EventManager.instance;
         manager = GaiaSky.instance.manager;
-
-        frameMonitor = new Object();
 
         stops = new HashSet<>();
 
@@ -114,7 +101,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3d6 = new Vector3d();
         aux2d1 = new Vector2d();
 
-        em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE, Events.FRAME_TICK);
+        em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
     }
 
     private void initializeTextures() {
@@ -1940,8 +1927,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         long frameCount = 0;
         while (frameCount < frames) {
             try {
-                synchronized (frameMonitor) {
-                    frameMonitor.wait();
+                synchronized (GaiaSky.instance.frameMonitor) {
+                    GaiaSky.instance.frameMonitor.wait();
                 }
                 frameCount++;
             } catch (InterruptedException e) {
@@ -2529,13 +2516,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             logger.info(data.size() + " stars loaded");
                         });
                         // Sync waiting until the node is in the scene graph
-                        float maxMsWait = 2500f;
-                        float start = System.currentTimeMillis();
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
                             sleepFrames(1);
-                            if(System.currentTimeMillis() - start > maxMsWait){
-                                break;
-                            }
                         }
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
@@ -2553,13 +2535,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             logger.info(data.size() + " particles loaded");
                         });
                         // Sync waiting until the node is in the scene graph
-                        float maxMsWait = 2500f;
-                        float start = System.currentTimeMillis();
                         while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
                             sleepFrames(1);
-                            if(System.currentTimeMillis() - start > maxMsWait){
-                                break;
-                            }
                         }
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
@@ -2584,13 +2561,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         logger.info(scc.children.size + " star clusters loaded");
                     });
                     // Sync waiting until the node is in the scene graph
-                    float maxMsWait = 2500f;
-                    float start = System.currentTimeMillis();
                     while (sync && (!scc.inSceneGraph)) {
                         sleepFrames(1);
-                        if(System.currentTimeMillis() - start > maxMsWait){
-                            break;
-                        }
                     }
                 }
                 // One extra flush frame
@@ -2841,7 +2813,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public long getFrameNumber() {
-        return frameNumber;
+        return GaiaSky.instance.frames;
     }
 
     @Override
@@ -2909,13 +2881,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         switch (event) {
         case INPUT_EVENT:
             inputCode = (Integer) data[0];
-            break;
-        case FRAME_TICK:
-            // New frame
-            frameNumber = (Long) data[0];
-            synchronized (frameMonitor) {
-                frameMonitor.notify();
-            }
             break;
         case DISPOSE:
             // Stop all

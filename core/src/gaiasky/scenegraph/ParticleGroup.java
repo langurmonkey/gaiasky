@@ -11,8 +11,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectIntMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
@@ -393,7 +391,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public boolean disposed = false;
 
     // Name index
-    protected ObjectIntMap<String> index;
+    protected Map<String, Integer> index;
 
     // Minimum amount of time [ms] between two update calls
     protected static final double MIN_UPDATE_TIME_MS = 200;
@@ -597,8 +595,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param pointData The data
      * @return An map{string,int} mapping names to indices
      */
-    public ObjectIntMap<String> generateIndex(List<? extends ParticleBean> pointData) {
-        ObjectIntMap<String> index = new ObjectIntMap<>();
+    public Map<String, Integer> generateIndex(List<? extends ParticleBean> pointData) {
+        Map<String, Integer> index = new HashMap<>();
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
             ParticleBean pb = pointData.get(i);
@@ -613,9 +611,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+    protected void addToIndex(Map<String, SceneGraphNode> map) {
         if (index != null) {
-            ObjectIntMap.Keys<String> keys = index.keys();
+            Set<String> keys = index.keySet();
             for (String key : keys) {
                 map.put(key, this);
             }
@@ -623,9 +621,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
         if (index != null) {
-            ObjectIntMap.Keys<String> keys = index.keys();
+            Set<String> keys = index.keySet();
             for (String key : keys) {
                 map.remove(key);
             }
@@ -946,7 +944,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public Vector3d getAbsolutePosition(String name, Vector3d out) {
         if (index.containsKey(name)) {
-            int idx = index.get(name, 0);
+            int idx = index.get(name);
             ParticleBean pb = pointData.get(idx);
             out.set(pb.x(), pb.y(), pb.z());
             return out;
@@ -1247,7 +1245,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public IFocus getFocus(String name) {
-        candidateFocusIndex = index.get(name, -1);
+        if (index.containsKey(name))
+            candidateFocusIndex = index.get(name);
+        else
+            candidateFocusIndex = -1;
         return this;
     }
 

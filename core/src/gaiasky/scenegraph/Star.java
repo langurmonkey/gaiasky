@@ -21,12 +21,10 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -380,7 +378,7 @@ public class Star extends Particle {
     }
 
     @Override
-    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+    protected void addToIndex(Map<String, SceneGraphNode> map) {
         // Hip
         if (hip > 0) {
             String hipid = "hip " + hip;
@@ -389,7 +387,7 @@ public class Star extends Particle {
     }
 
     @Override
-    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
         // Hip
         if (hip > 0) {
             String hipid = "hip " + hip;
