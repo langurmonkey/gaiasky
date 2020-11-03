@@ -354,7 +354,7 @@ public class WelcomeGui extends AbstractGui {
     private int numCatalogDRFiles() {
         int matches = 0;
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
-            if (f.matches("^\\S*catalog-[e]?dr\\d+-\\S+$")) {
+            if (f.matches("^\\S*catalog-[e]?dr\\d+(int\\d+)?-\\S+$")) {
                 matches++;
             }
         }
