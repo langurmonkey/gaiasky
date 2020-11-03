@@ -2528,11 +2528,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             logger.info(data.size() + " stars loaded");
                         });
-                        // TODO FIX
-                        sync = false;
                         // Sync waiting until the node is in the scene graph
+                        float maxMsWait = 2500f;
+                        float start = System.currentTimeMillis();
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
                             sleepFrames(1);
+                            if(System.currentTimeMillis() - start > maxMsWait){
+                                break;
+                            }
                         }
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
@@ -2550,8 +2553,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             logger.info(data.size() + " particles loaded");
                         });
                         // Sync waiting until the node is in the scene graph
+                        float maxMsWait = 2500f;
+                        float start = System.currentTimeMillis();
                         while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
                             sleepFrames(1);
+                            if(System.currentTimeMillis() - start > maxMsWait){
+                                break;
+                            }
                         }
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
@@ -2576,8 +2584,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         logger.info(scc.children.size + " star clusters loaded");
                     });
                     // Sync waiting until the node is in the scene graph
+                    float maxMsWait = 2500f;
+                    float start = System.currentTimeMillis();
                     while (sync && (!scc.inSceneGraph)) {
                         sleepFrames(1);
+                        if(System.currentTimeMillis() - start > maxMsWait){
+                            break;
+                        }
                     }
                 }
                 // One extra flush frame
