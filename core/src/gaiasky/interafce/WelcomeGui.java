@@ -209,7 +209,7 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
             noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
-        }else if (numCatalogDRFiles() > 1){
+        }else if (numCatalogDRFilesSelected() > 1){
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.start.check"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             startGroup.add(tooManyDR).bottom().left();
@@ -256,7 +256,7 @@ public class WelcomeGui extends AbstractGui {
         catalogButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 String noticeKey;
-                if (numCatalogs() > 0 && numCatalogDRFiles() > 1) {
+                if (numCatalogsAvailable() > 0 && numCatalogDRFilesSelected() > 1) {
                     noticeKey = "gui.dschooser.morethanonedr";
                 } else {
                     noticeKey = "gui.dschooser.nocatselected";
@@ -268,19 +268,19 @@ public class WelcomeGui extends AbstractGui {
         Table catalogGroup = new Table(skin);
         OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
         catalogGroup.add(catalogLabel).top().left().padTop(pad10).padBottom(pad10).row();
-        if (numCatalogs() == 0) {
+        if (numCatalogsAvailable() == 0) {
             // No catalog files, disable and add notice
             catalogButton.setDisabled(true);
 
             OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
             noCatalogs.setColor(ColorUtils.aOrangeC);
             catalogGroup.add(noCatalogs).bottom().left();
-        }else if (numCatalogDRFiles() > 1){
+        }else if (numCatalogDRFilesSelected() > 1){
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             catalogGroup.add(tooManyDR).bottom().left();
         } else {
-            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected(), numCatalogs()), skin, textStyle);
+            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
             ok.setColor(ColorUtils.gBlueC);
             catalogGroup.add(ok).bottom().left();
         }
@@ -347,11 +347,11 @@ public class WelcomeGui extends AbstractGui {
         return GlobalConf.data.CATALOG_JSON_FILES.size;
     }
 
-    private int numCatalogs(){
+    private int numCatalogsAvailable(){
         return catalogFiles.size;
     }
 
-    private int numCatalogDRFiles() {
+    private int numCatalogDRFilesSelected() {
         int matches = 0;
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
             if (f.matches("^\\S*catalog-[e]?dr\\d+(int\\d+)?-\\S+$")) {
