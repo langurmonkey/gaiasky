@@ -345,6 +345,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         logger.debug("Exception parsing row " + i + ": skipping");
                     }
                     i++;
+                    if(i % 250000 == 0) {
+                        logger.info(i + " objects loaded...");
+                    }
                 }
                 if (nInvalidPllx > 0) {
                     logger.warn("Found " + nInvalidPllx + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");

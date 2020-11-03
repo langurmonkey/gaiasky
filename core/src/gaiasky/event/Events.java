@@ -204,7 +204,7 @@ public enum Events {
     LIMIT_FPS_CMD,
 
     /**
-     * A new catalog has been loaded. Contains the new catalog info object
+     * A new catalog has been loaded. Contains the new catalog info object, a boolean indicating whether to add the object to the scene graph, and an optional boolean telling whether to use a postRunnable
      **/
     CATALOG_ADD,
     /**

@@ -2528,6 +2528,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             logger.info(data.size() + " stars loaded");
                         });
+                        // TODO FIX
+                        sync = false;
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
                             sleepFrames(1);
