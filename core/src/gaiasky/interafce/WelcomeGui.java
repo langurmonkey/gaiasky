@@ -209,6 +209,10 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
             noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
+        }else if (numCatalogDRFiles() > 1){
+            OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.start.check"), skin, textStyle);
+            tooManyDR.setColor(ColorUtils.gRedC);
+            startGroup.add(tooManyDR).bottom().left();
         } else {
             OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
             ready.setColor(ColorUtils.gGreenC);
@@ -271,6 +275,10 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
             noCatalogs.setColor(ColorUtils.aOrangeC);
             catalogGroup.add(noCatalogs).bottom().left();
+        }else if (numCatalogDRFiles() > 1){
+            OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
+            tooManyDR.setColor(ColorUtils.gRedC);
+            catalogGroup.add(tooManyDR).bottom().left();
         } else {
             OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected()), skin, textStyle);
             ok.setColor(ColorUtils.gBlueC);

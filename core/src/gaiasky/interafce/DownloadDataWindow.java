@@ -97,6 +97,8 @@ public class DownloadDataWindow extends GenericDialog {
     private Array<OwnImageButton> rubbishes;
     private int current = -1;
 
+    private Set<DatasetDesc> downloaded;
+
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
         this(stage, skin, dd, true, I18n.txt("gui.ok"));
     }
@@ -108,6 +110,7 @@ public class DownloadDataWindow extends GenericDialog {
         this.choiceList = new LinkedList<>();
         this.rubbishes = new Array<>();
         this.highlight = ColorUtils.gYellowC;
+        this.downloaded = new HashSet<>();
 
         this.dataLocation = dataLocation;
 
@@ -352,6 +355,8 @@ public class DownloadDataWindow extends GenericDialog {
                                                 FileUtils.forceDelete(file);
                                             }
                                         }
+                                        // Remove from downloaded list, if it is there
+                                        downloaded.remove(dataset);
                                     } catch (Exception e) {
                                         logger.error(e);
                                     }
@@ -569,12 +574,9 @@ public class DownloadDataWindow extends GenericDialog {
                 });
 
                 if (errors == 0) {
-                    // Select dataset if needed
-                    if (type.startsWith("catalog-")) {
-                        // Descriptor file
-                        GlobalConf.data.CATALOG_JSON_FILES.add(currentDataset.check.toString());
-                    }
-
+                    // Add to downloaded list for later selection
+                    downloaded.add(trio.getFirst());
+                    // Ok message
                     setMessageOk(I18n.txt("gui.download.idle"));
                     setStatusFound(currentDataset, trio.getThird());
 
@@ -785,6 +787,12 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void accept() {
+        // Select downloaded catalogs
+        for(DatasetDesc dd : downloaded){
+            if(dd.type.startsWith("catalog")){
+                GlobalConf.data.addSelectedCatalog(dd.check);
+            }
+        }
         cleanupTempFiles();
     }
 
