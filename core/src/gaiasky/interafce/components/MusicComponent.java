@@ -91,7 +91,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType().equals(InputEvent.Type.scrolled)) {
-                    float scroll = -ie.getScrollAmountY() * 0.1f;
+                    float scroll = -ie.getScrollAmount() * 0.1f;
                     float currentVol = MusicManager.instance.getVolume();
                     float newVol = Math.max(0f, Math.min(1f, currentVol + scroll));
                     EventManager.instance.post(Events.MUSIC_VOLUME_CMD, newVol);
