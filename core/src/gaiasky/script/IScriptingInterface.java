@@ -1196,6 +1196,16 @@ public interface IScriptingInterface {
     double getDistanceTo(String name);
 
     /**
+     * Returns the star parameters given its identifier or name, if the star exists
+     * and it is loaded.
+     *
+     * @param starId The star identifier or name.
+     * @return An array with (ra [deg], dec [deg], parallax [mas], pmra [mas/yr], pmdec [mas/yr], radvel [km/s], appmag [mag], red [0,1], green [0,1], blue [0,1]) if the
+     * star exists and is loaded, null otherwise.
+     */
+    double[] getStarParameters(String starId);
+
+    /**
      * Gets the current position of the object identified by <code>name</code> in
      * the internal coordinate system and internal units. If the object does not exist,
      * it returns null

@@ -28,6 +28,7 @@ import gaiasky.interafce.IGui;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.screenshot.ImageRenderer;
@@ -64,7 +65,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author Toni Sagrista
  */
-@SuppressWarnings({"unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue"})
+@SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
@@ -310,7 +311,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraPosition(double x, double y, double z) {
-        setCameraPosition(new double[]{x, y, z});
+        setCameraPosition(new double[] { x, y, z });
     }
 
     public void setCameraPosition(final List vec) {
@@ -320,7 +321,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraPosition() {
         Vector3d campos = GaiaSky.instance.cam.getPos();
-        return new double[]{campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM};
+        return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
     }
 
     @Override
@@ -335,7 +336,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraDirection() {
         Vector3d camdir = GaiaSky.instance.cam.getDirection();
-        return new double[]{camdir.x, camdir.y, camdir.z};
+        return new double[] { camdir.x, camdir.y, camdir.z };
     }
 
     @Override
@@ -351,7 +352,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public double[] getCameraUp() {
         Vector3d camup = GaiaSky.instance.cam.getUp();
-        return new double[]{camup.x, camup.y, camup.z};
+        return new double[] { camup.x, camup.y, camup.z };
     }
 
     @Override
@@ -810,6 +811,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
             EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, minOpacity, false);
     }
+
     public void setMinStarOpacity(float minOpacity) {
         setStarMinOpacity(minOpacity);
     }
@@ -835,7 +837,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setOrbitSolidAngleThreshold(float angleDeg) {
-        if(checkNum(angleDeg, 0.0f, 180f, "solid-angle")){
+        if (checkNum(angleDeg, 0.0f, 180f, "solid-angle")) {
             Orbit.setSolidAngleThreshold(angleDeg);
         }
     }
@@ -1429,12 +1431,30 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public double[] getStarParameters(String id) {
+        SceneGraphNode sgn = getObject(id);
+        if (sgn instanceof StarGroup) {
+            // This star group contains the star
+            StarGroup sg = (StarGroup) sgn;
+            if (sg != null) {
+                StarBean sb = (StarBean) sg.getCandidateBean();
+                if(sb != null) {
+                    double[] rgb = sb.rgb();
+                    return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
+                }
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public double[] getObjectPosition(String name) {
         SceneGraphNode sgn = getObject(name);
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
             obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
-            return new double[]{aux3d1.x, aux3d1.y, aux3d1.z};
+            return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
         }
         return null;
     }
@@ -1524,7 +1544,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[]{id}));
+        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[] { id }));
     }
 
     @Override
@@ -1618,7 +1638,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 y += parent.getY();
                 parent = parent.getParent();
             }
-            return new float[]{x, y, actor.getWidth(), actor.getHeight()};
+            return new float[] { x, y, actor.getWidth(), actor.getHeight() };
         } else {
             return null;
         }
@@ -1671,7 +1691,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void preloadTexture(String path) {
-        preloadTextures(new String[]{path});
+        preloadTextures(new String[] { path });
     }
 
     @Override
@@ -1722,16 +1742,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             Object monitor = new Object();
             IObserver watcher = (event, data) -> {
                 switch (event) {
-                    case CAMERA_PLAY_INFO:
-                        Boolean status = (Boolean) data[0];
-                        if (!status) {
-                            synchronized (monitor) {
-                                monitor.notify();
-                            }
+                case CAMERA_PLAY_INFO:
+                    Boolean status = (Boolean) data[0];
+                    if (!status) {
+                        synchronized (monitor) {
+                            monitor.notify();
                         }
-                        break;
-                    default:
-                        break;
+                    }
+                    break;
+                default:
+                    break;
                 }
             };
             em.subscribe(watcher, Events.CAMERA_PLAY_INFO);
@@ -1794,7 +1814,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
 
         private Pathd<Vector3d> getPathd(Vector3d p0, double[] p1) {
-            Vector3d[] points = new Vector3d[]{new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2])};
+            Vector3d[] points = new Vector3d[] { new Vector3d(p0), new Vector3d(p1[0], p1[1], p1[2]) };
             return new Lineard<>(points);
         }
 
@@ -1968,33 +1988,33 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public double[] galacticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.galacticToEquatorial());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
     @Override
     public double[] equatorialToInternalCartesian(double ra, double dec, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(ra * Nature.TO_RAD, dec * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
-        return new double[]{pos.x, pos.y, pos.z};
+        return new double[] { pos.x, pos.y, pos.z };
     }
 
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
         Vector3d in = aux3d1.set(x, y, z);
         Vector3d out = aux3d2;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[]{out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len()};
+        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len() };
     }
 
     @Override
     public double[] equatorialCartesianToInternalCartesian(double[] eq, double kmFactor) {
         aux3d1.set(eq).scl(kmFactor).scl(Constants.KM_TO_U);
-        return new double[]{aux3d1.y, aux3d1.z, aux3d1.x};
+        return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
     }
 
     public double[] equatorialCartesianToInternalCartesian(final List eq, double kmFactor) {
@@ -2093,7 +2113,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHDRToneMappingType(String type) {
-        if (checkString(type, new String[]{"auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE"}, "tone mapping type"))
+        if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
             GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, GlobalConf.PostprocessConf.ToneMapping.valueOf(type.toUpperCase()), false));
     }
 
@@ -2402,7 +2422,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[]{1.5d, 100d}, ct, fadeIn, fadeOut, sync);
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, fadeIn, fadeOut, sync);
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
@@ -2440,7 +2460,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List labelColor, List fadeIn, List fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
-
 
     @Override
     public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
@@ -2544,7 +2563,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     scc.setColor(dops.particleColor);
                     scc.setLabelcolor(dops.labelColor);
                     scc.setCt(dops.ct.toString());
-                    scc.setPosition(new double[]{0, 0, 0});
+                    scc.setPosition(new double[] { 0, 0, 0 });
                     scc.setDataSource(ds);
                     scc.setProvider(StarClusterLoader.class.getName());
 
@@ -2566,8 +2585,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // No data has been loaded
                 return false;
             }
-        } catch (
-                Exception e) {
+        } catch (Exception e) {
             logger.error(e);
             return false;
         }
@@ -2874,25 +2892,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case INPUT_EVENT:
-                inputCode = (Integer) data[0];
-                break;
-            case FRAME_TICK:
-                // New frame
-                frameNumber = (Long) data[0];
-                synchronized (frameMonitor) {
-                    frameMonitor.notify();
-                }
-                break;
-            case DISPOSE:
-                // Stop all
-                for (AtomicBoolean stop : stops) {
-                    if (stop != null)
-                        stop.set(true);
-                }
-                break;
-            default:
-                break;
+        case INPUT_EVENT:
+            inputCode = (Integer) data[0];
+            break;
+        case FRAME_TICK:
+            // New frame
+            frameNumber = (Long) data[0];
+            synchronized (frameMonitor) {
+                frameMonitor.notify();
+            }
+            break;
+        case DISPOSE:
+            // Stop all
+            for (AtomicBoolean stop : stops) {
+                if (stop != null)
+                    stop.set(true);
+            }
+            break;
+        default:
+            break;
         }
 
     }

@@ -111,6 +111,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
 
         /**
+         * Parallax in mas.
+         *
+         * @return The parallax in mas.
+         */
+        public double parallax() {
+            return 1000d / (distance() * Constants.U_TO_PC);
+        }
+
+        /**
          * Right ascension in degrees. Beware, does the conversion on the fly.
          *
          * @return The right ascension, in degrees
@@ -221,7 +230,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (names != null)
                 names[0] = name;
             else
-                names = new String[]{name};
+                names = new String[] { name };
         }
 
         public void addName(String name) {
@@ -239,27 +248,27 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
 
         public void addNames(String... names) {
-            for(String name : names)
+            for (String name : names)
                 addName(name);
         }
 
-        public boolean hasExtra(String name){
-            if(extra != null){
+        public boolean hasExtra(String name) {
+            if (extra != null) {
                 Set<UCD> ucds = extra.keySet();
-                for(UCD ucd : ucds){
-                    if(ucd.originalucd.equals(name) || ucd.colname.equals(name)){
-                       return true;
+                for (UCD ucd : ucds) {
+                    if (ucd.originalucd.equals(name) || ucd.colname.equals(name)) {
+                        return true;
                     }
                 }
             }
             return false;
         }
 
-        public double getExtra(String name){
-            if(extra != null){
+        public double getExtra(String name) {
+            if (extra != null) {
                 Set<UCD> ucds = extra.keySet();
-                for(UCD ucd : ucds){
-                    if((ucd.originalucd != null && ucd.originalucd.equals(name)) || (ucd.colname != null && ucd.colname.equals(name))){
+                for (UCD ucd : ucds) {
+                    if ((ucd.originalucd != null && ucd.originalucd.equals(name)) || (ucd.colname != null && ucd.colname.equals(name))) {
                         return extra.get(ucd);
                     }
                 }
@@ -300,7 +309,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Particle size limits, in pixels
      */
-    public double[] particleSizeLimits = new double[]{3.5d, 800d};
+    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
 
     /**
      * Are the data of this group in the GPU memory?
@@ -337,7 +346,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     Vector3d focusPosition;
 
     /**
-     * Position in equatorial coordinates of the current focus
+     * Position in equatorial coordinates of the current focus in radians
      */
     Vector2d focusPositionSph;
 
@@ -635,7 +644,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public String getRandomParticleName() {
         if (pointData != null)
             for (ParticleBean pb : pointData) {
-                if(pb.names != null && pb.names.length > 0)
+                if (pb.names != null && pb.names.length > 0)
                     return pb.names[0];
             }
         return null;
@@ -1161,26 +1170,26 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case FOCUS_CHANGED:
-                if (data[0] instanceof String) {
-                    focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
-                } else {
-                    focusIndex = data[0] == this ? focusIndex : -1;
+        case FOCUS_CHANGED:
+            if (data[0] instanceof String) {
+                focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
+            } else {
+                focusIndex = data[0] == this ? focusIndex : -1;
+            }
+            updateFocusDataPos();
+            break;
+        case CAMERA_MOTION_UPDATE:
+            // Check that the particles have names
+            if (updaterTask != null && pointData.get(0).names != null) {
+                final Vector3d currentCameraPos = (Vector3d) data[0];
+                long t = TimeUtils.millis() - lastSortTime;
+                if (!updating && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
+                    updating = DatasetUpdater.execute(updaterTask);
                 }
-                updateFocusDataPos();
-                break;
-            case CAMERA_MOTION_UPDATE:
-                // Check that the particles have names
-                if (updaterTask != null && pointData.get(0).names != null) {
-                    final Vector3d currentCameraPos = (Vector3d) data[0];
-                    long t = TimeUtils.millis() - lastSortTime;
-                    if (!updating && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
-                        updating = DatasetUpdater.execute(updaterTask);
-                    }
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -1240,6 +1249,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public IFocus getFocus(String name) {
         candidateFocusIndex = index.get(name, -1);
         return this;
+    }
+
+    public ParticleBean getCandidateBean() {
+        if (candidateFocusIndex >= 0)
+            return pointData.get(candidateFocusIndex);
+        else
+            return null;
     }
 
     @Override
@@ -1409,11 +1425,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public static ParticleGroup getParticleGroup(String name, List<ParticleBean> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
-        double[] particleColor = dops == null || dops.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.particleColor;
+        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
         double colorNoise = dops == null ? 0 : dops.particleColorNoise;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
         double particleSize = dops == null ? 0 : dops.particleSize;
-        double[] minParticleSize = dops == null ? new double[]{2d, 200d} : dops.particleSizeLimits;
+        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 
