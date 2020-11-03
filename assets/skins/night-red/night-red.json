@@ -409,6 +409,9 @@
     "reload": {
       "imageUp": "reload"
     },
+    "reset": {
+      "imageUp": "iconic-reload"
+    },
     "preferences": {
       "imageUp": "prefs-icon"
     },

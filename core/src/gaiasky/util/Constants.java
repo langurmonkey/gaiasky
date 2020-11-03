@@ -195,6 +195,11 @@ public class Constants {
     /** Maximum star brightness **/
     public static final float MAX_STAR_BRIGHTNESS = 8f;
 
+    /** Minimum star brightness power **/
+    public static final float MIN_STAR_BRIGHTNESS_POW = 0.1f;
+    /** Maximum star brightness power **/
+    public static final float MAX_STAR_BRIGHTNESS_POW = 2.0f;
+
     /** Minimum star pixel size **/
     public static final float MIN_STAR_POINT_SIZE = 0.1f;
     /** Maximum star pixel size **/

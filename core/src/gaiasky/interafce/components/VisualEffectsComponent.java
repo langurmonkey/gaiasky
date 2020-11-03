@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -17,12 +18,23 @@ import gaiasky.interafce.ControlsWindow;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Logger;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnSliderPlus;
+import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Properties;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
+    private static final Logger.Log logger = Logger.getLogger(VisualEffectsComponent.class);
 
-    private OwnSliderPlus starBrightness, starSize, starMinOpacity, ambientLight, labelSize, lineWidth, elevMult;
+    private OwnSliderPlus starBrightness, starBrightnessPower, starSize, starMinOpacity, ambientLight, labelSize, lineWidth, elevMult;
+    private OwnTextIconButton resetDefaults;
 
     boolean flag = true;
 
@@ -42,6 +54,19 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starBrightness.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 EventManager.instance.post(Events.STAR_BRIGHTNESS_CMD, starBrightness.getMappedValue(), true);
+                return true;
+            }
+            return false;
+        });
+
+        /** Star brightness power **/
+        starBrightnessPower = new OwnSliderPlus(I18n.txt("gui.starbrightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
+        starBrightnessPower.setName("star brightness power");
+        starBrightnessPower.setWidth(contentWidth);
+        starBrightnessPower.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS_POWER);
+        starBrightnessPower.addListener(event -> {
+            if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
+                EventManager.instance.post(Events.STAR_BRIGHTNESS_POW_CMD, starBrightnessPower.getValue(), true);
                 return true;
             }
             return false;
@@ -128,19 +153,65 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
+        /** Reset defaults **/
+        resetDefaults = new OwnTextIconButton(I18n.txt("gui.resetdefaults"), skin, "reset");
+        resetDefaults.align(Align.center);
+        resetDefaults.setWidth(contentWidth);
+        resetDefaults.addListener(new OwnTextTooltip(I18n.txt("gui.resetdefaults.tooltip"), skin));
+        resetDefaults.addListener(event -> {
+            if(event instanceof ChangeEvent){
+                // Read defaults from internal config file
+                try {
+                    Path confFolder = GlobalConf.assetsPath("conf");
+                    Path internalFolderConfFile = confFolder.resolve(DesktopConfInit.getConfigFileName(GlobalConf.runtime.OPENVR || GlobalConf.runtime.OVR));
+                    Properties internalProps = new Properties();
+                    internalProps.load(Files.newInputStream(internalFolderConfFile));
+
+                    float br = Parser.parseFloat(internalProps.getProperty("scene.star.brightness"));
+                    float pow = Parser.parseFloat(internalProps.getProperty("scene.star.brightness.pow"));
+                    float ss = Parser.parseFloat(internalProps.getProperty("scene.star.point.size"));
+                    float pam = Parser.parseFloat(internalProps.getProperty("scene.point.alpha.min"));
+                    float amb = Parser.parseFloat(internalProps.getProperty("scene.ambient"));
+                    float ls = Parser.parseFloat(internalProps.getProperty("scene.label.size"));
+                    float lw = Parser.parseFloat(internalProps.getProperty("scene.line.width"));
+                    float em = Parser.parseFloat(internalProps.getProperty("scene.elevation.multiplier"));
+
+                    // Events
+                    EventManager m = EventManager.instance;
+                    m.post(Events.STAR_BRIGHTNESS_CMD, br, false);
+                    m.post(Events.STAR_BRIGHTNESS_POW_CMD, pow, false);
+                    m.post(Events.STAR_POINT_SIZE_CMD, ss, false);
+                    m.post(Events.STAR_MIN_OPACITY_CMD, pam, false);
+                    m.post(Events.AMBIENT_LIGHT_CMD, amb, false);
+                    m.post(Events.LABEL_SIZE_CMD, ls, false);
+                    m.post(Events.LINE_WIDTH_CMD, lw, false);
+                    m.post(Events.ELEVATION_MUTLIPLIER_CMD, em, false);
+
+                }catch(IOException e){
+                    logger.error(e, "Error loading default configuration file");
+                }
+
+                return true;
+            }
+            return false;
+        });
+
+        /** Add to group **/
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         lightingGroup.space(space6);
         lightingGroup.addActor(starBrightness);
+        lightingGroup.addActor(starBrightnessPower);
         lightingGroup.addActor(starSize);
         lightingGroup.addActor(starMinOpacity);
         lightingGroup.addActor(ambientLight);
         lightingGroup.addActor(lineWidth);
         lightingGroup.addActor(labelSize);
         lightingGroup.addActor(elevMult);
+        lightingGroup.addActor(resetDefaults);
 
         component = lightingGroup;
 
-        EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD);
+        EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.STAR_MIN_OPACITY_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD);
     }
 
     @Override
@@ -159,6 +230,14 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                 Float brightness = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 starBrightness.setMappedValue(brightness);
+                hackProgrammaticChangeEvents = true;
+            }
+            break;
+        case STAR_BRIGHTNESS_POW_CMD:
+            if(!(boolean) data[1]){
+                Float pow = (Float) data[0];
+                hackProgrammaticChangeEvents = false;
+                starBrightnessPower.setMappedValue(pow);
                 hackProgrammaticChangeEvents = true;
             }
             break;

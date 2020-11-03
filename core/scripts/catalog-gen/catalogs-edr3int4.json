@@ -23,8 +23,8 @@
         {
             "name" : "medium",
             "maxpart" : 100000,
-            "pllxerrbright" : 0.25,
-            "pllxerrfaint" : 0.02,
+            "pllxerrbright" : 0.3,
+            "pllxerrfaint" : 0.05,
             "pllxzeropoint" : -0.017,
             "additional" : "$DATA_LOC/data/ag-e/edr3int4/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
