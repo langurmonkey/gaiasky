@@ -21,7 +21,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.NumberUtils;
-import com.badlogic.gdx.utils.ObjectIntMap;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IStarGroupDataProvider;
@@ -52,6 +51,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -278,8 +278,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
      */
-    public ObjectIntMap<String> generateIndex(Array<? extends ParticleBean> pointData) {
-        ObjectIntMap<String> index = new ObjectIntMap<>();
+    public Map<String, Integer> generateIndex(Array<? extends ParticleBean> pointData) {
+        Map<String, Integer> index = new HashMap<>();
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
             StarBean sb = (StarBean) pointData.get(i);

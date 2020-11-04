@@ -21,8 +21,10 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
-import com.badlogic.gdx.utils.IntMap;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public final class Blur extends MultipassFilter {
     // @formatter:off
@@ -62,7 +64,7 @@ public final class Blur extends MultipassFilter {
 
     // fbo, textures
     private float invWidth, invHeight;
-    private final IntMap<Convolve2D> convolve = new IntMap<Convolve2D>(Tap.values().length);
+    private final Map<Integer, Convolve2D> convolve = new HashMap<>(Tap.values().length);
 
     public Blur(int width, int height) {
         // precompute constants

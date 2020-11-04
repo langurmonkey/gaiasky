@@ -5,22 +5,20 @@
 
 package gaiasky.event;
 
-import com.badlogic.gdx.utils.IntMap;
-import com.badlogic.gdx.utils.IntMap.Keys;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
  * Event manager that allows for subscription of observers to events (identified
  * by strings), and also for the creation of event objects by anyone.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class EventManager implements IObserver {
 
@@ -47,25 +45,25 @@ public class EventManager implements IObserver {
     private static final long START = TimeUtils.millis();
 
     /** Holds a priority queue for each time frame **/
-    private ObjectMap<TimeFrame, PriorityQueue<Telegram>> queues;
+    private Map<TimeFrame, PriorityQueue<Telegram>> queues;
 
     /** Telegram pool **/
     private final Pool<Telegram> pool;
 
     /** Subscriptions Event-Observers **/
-    private IntMap<Set<IObserver>> subscriptions = new IntMap<>();
+    private Map<Integer, Set<IObserver>> subscriptions = new HashMap<>();
 
     /** The time frame to use if none is specified **/
     private TimeFrame defaultTimeFrame;
 
     public EventManager() {
-        this.pool = new Pool<Telegram>(20) {
+        this.pool = new Pool<>(20) {
             protected Telegram newObject() {
                 return new Telegram();
             }
         };
         // Initialize queues, one for each time frame.
-        queues = new ObjectMap<>(TimeFrame.values().length);
+        queues = new HashMap<>(TimeFrame.values().length);
         for (TimeFrame tf : TimeFrame.values()) {
             PriorityQueue<Telegram> pq = new PriorityQueue<>();
             queues.put(tf, pq);
@@ -76,11 +74,9 @@ public class EventManager implements IObserver {
 
     /**
      * Subscribes the given observer to the given event types.
-     * 
-     * @param observer
-     *            The observer to subscribe.
-     * @param events
-     *            The event types to subscribe to.
+     *
+     * @param observer The observer to subscribe.
+     * @param events   The event types to subscribe to.
      */
     public void subscribe(IObserver observer, Events... events) {
         for (Events event : events) {
@@ -91,11 +87,9 @@ public class EventManager implements IObserver {
     /**
      * Registers a listener for the specified message code. Messages without an
      * explicit receiver are broadcasted to all its registered listeners.
-     * 
-     * @param msg
-     *            the message code
-     * @param listener
-     *            the listener to add
+     *
+     * @param msg      the message code
+     * @param listener the listener to add
      */
     public void subscribe(IObserver listener, Events msg) {
         synchronized (subscriptions) {
@@ -117,11 +111,9 @@ public class EventManager implements IObserver {
 
     /**
      * Unregister the specified listener for the specified message code.
-     * 
-     * @param events
-     *            The message code.
-     * @param listener
-     *            The listener to remove.
+     *
+     * @param events   The message code.
+     * @param listener The listener to remove.
      **/
     public void unsubscribe(IObserver listener, Events events) {
         synchronized (subscriptions) {
@@ -134,15 +126,13 @@ public class EventManager implements IObserver {
 
     /**
      * Unregisters all the subscriptions of the given listeners.
-     * 
-     * @param listeners
-     *            The listeners to remove.
+     *
+     * @param listeners The listeners to remove.
      */
     public void removeAllSubscriptions(IObserver... listeners) {
         synchronized (subscriptions) {
-            Keys km = subscriptions.keys();
-            while (km.hasNext) {
-                int key = km.next();
+            Set<Integer> km = subscriptions.keySet();
+            for (int key : km) {
                 for (IObserver listener : listeners) {
                     subscriptions.get(key).remove(listener);
                 }
@@ -152,9 +142,8 @@ public class EventManager implements IObserver {
 
     /**
      * Unregisters all the listeners for the specified message code.
-     * 
-     * @param msg
-     *            the message code
+     *
+     * @param msg the message code
      */
     public void clearSubscriptions(Events msg) {
         synchronized (subscriptions) {
@@ -164,11 +153,9 @@ public class EventManager implements IObserver {
 
     /**
      * Posts or registers a new event type with the given data.
-     * 
-     * @param event
-     *            The event type.
-     * @param data
-     *            The event data.
+     *
+     * @param event The event type.
+     * @param data  The event data.
      */
     public void post(final Events event, final Object... data) {
         synchronized (subscriptions) {
@@ -186,13 +173,10 @@ public class EventManager implements IObserver {
      * time frame. The default time frame can be changed using the event
      * {@link Events#EVENT_TIME_FRAME_CMD}. The event will be passed along after
      * the specified delay time [ms] in the given time frame has passed.
-     * 
-     * @param event
-     *            The event type.
-     * @param delayMs
-     *            Milliseconds of delay in the given time frame.
-     * @param data
-     *            The event data.
+     *
+     * @param event   The event type.
+     * @param delayMs Milliseconds of delay in the given time frame.
+     * @param data    The event data.
      */
     public void postDelayed(Events event, long delayMs, Object... data) {
         if (delayMs <= 0) {
@@ -212,16 +196,12 @@ public class EventManager implements IObserver {
      * Posts or registers a new event type with the given data. The event will
      * be passed along after the specified delay time [ms] in the given time
      * frame has passed.
-     * 
-     * @param event
-     *            The event type.
-     * @param delayMs
-     *            Milliseconds of delay in the given time frame.
-     * @param frame
-     *            The time frame, either real time (user) or simulation time
-     *            (simulation clock time).
-     * @param data
-     *            The event data.
+     *
+     * @param event   The event type.
+     * @param delayMs Milliseconds of delay in the given time frame.
+     * @param frame   The time frame, either real time (user) or simulation time
+     *                (simulation clock time).
+     * @param data    The event data.
      */
     public void postDelayed(Events event, long delayMs, TimeFrame frame, Object... data) {
         if (delayMs <= 0) {
@@ -251,7 +231,7 @@ public class EventManager implements IObserver {
      * This method must be called each time through the main loop.
      */
     public void dispatchDelayedMessages() {
-        for (TimeFrame tf : queues.keys()) {
+        for (TimeFrame tf : queues.keySet()) {
             dispatch(queues.get(tf), tf.getCurrentTimeMs());
         }
     }
@@ -288,12 +268,12 @@ public class EventManager implements IObserver {
         return scr != null && !scr.isEmpty();
     }
 
-    public boolean isSubscribedToAny(IObserver o){
-        IntMap.Keys keys = subscriptions.keys();
+    public boolean isSubscribedToAny(IObserver o) {
+        Set<Integer> keys = subscriptions.keySet();
 
-        for(int key : keys.toArray().items){
+        for (int key : keys) {
             Set<IObserver> set = subscriptions.get(key);
-            if(set.contains(o)){
+            if (set.contains(o)) {
                 return true;
             }
         }

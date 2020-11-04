@@ -6,11 +6,13 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Pool;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MyPools {
-    static private final ObjectMap<String, Pool> typePools = new ObjectMap();
+    static private final Map<String, Pool> typePools = new HashMap<>();
 
     static Object lock = new Object();
 
