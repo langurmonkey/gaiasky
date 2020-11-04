@@ -11,6 +11,11 @@ uniform float u_heightScale;
 // fovFactor
 uniform float u_ts;
 
+// Depth
+#include shader/lib_logdepthbuff.glsl
+uniform vec2 u_cameraNearFar;
+uniform float u_cameraK;
+
 // VARYINGS
 
 // Coordinate of the texture
@@ -20,7 +25,13 @@ in float v_opacity;
 // Color
 in vec4 v_color;
 
+// OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 1) out vec4 velMap;
+
+#ifdef velocityBufferFlag
+#include shader/lib_velbuffer.frag.glsl
+#endif
 
 #define PI 3.141592
 #define N 10.0
@@ -85,4 +96,10 @@ vec4 square(vec2 tc) {
 
 void main() {
     fragColor = circle(v_texCoords0);
+
+    gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+    #ifdef velocityBufferFlag
+    velocityBuffer();
+    #endif
 }

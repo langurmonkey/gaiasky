@@ -392,7 +392,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         stars = new ArrayList<>();
 
-        renderProcesses = new ArrayList<>();
+        renderProcesses = new NoDuplicatesList<>();
 
         noDepthTestR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
@@ -661,7 +661,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         modelGridsProc.addPostRunnables(clearDepthR);
         // RECURSIVE GRID
         AbstractRenderSystem modelRecGridProc = new ModelBatchRenderSystem(MODEL_VERT_RECGRID, alphas, mbVertexLightingRecGrid, ModelRenderType.NORMAL);
-        modelRecGridProc.addPostRunnables(clearDepthR);
+        modelRecGridProc.addPreRunnables(regularBlendR, depthTestR);
+        //modelRecGridProc.addPostRunnables(clearDepthR);
 
         // ANNOTATIONS - (grids)
         AbstractRenderSystem annotationsProc = new FontRenderSystem(FONT_ANNOTATION, alphas, spriteBatch, null, null, font2d, null);
@@ -771,7 +772,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Add components to set
         renderProcesses.add(modelBackgroundProc);
         renderProcesses.add(modelGridsProc);
-        renderProcesses.add(modelRecGridProc);
         renderProcesses.add(pixelStarProc);
         renderProcesses.add(annotationsProc);
 
@@ -802,9 +802,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Labels
         renderProcesses.add(labelsProc);
 
-        // Galaxy and nebulae billboards
+        // Galaxy & nebulae billboards, recursive grid
         renderProcesses.add(billboardSpritesProc);
         renderProcesses.add(billboardGalaxiesProc);
+        renderProcesses.add(modelRecGridProc);
 
         // Primitives
         renderProcesses.add(pointProc);

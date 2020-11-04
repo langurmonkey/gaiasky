@@ -43,6 +43,11 @@ public class Pair<A, B> {
         return "(" + first + ", " + second + ")";
     }
 
+    public void set(A first, B second){
+        this.first = first;
+        this.second = second;
+    }
+
     public A getFirst() {
         return first;
     }

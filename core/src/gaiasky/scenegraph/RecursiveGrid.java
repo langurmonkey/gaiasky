@@ -89,6 +89,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         coordinateSystem = new Matrix4();
         coordinateSystemd = new Matrix4d();
         mat4daux = new Matrix4d();
+        scalingFading = new Pair<>(0d, 0d);
         updateCoordinateSystem();
 
         nf = NumberFormatFactory.getFormatter("0.###E0");
@@ -117,7 +118,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         mc.forceInit = true;
         mc.initialize();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], cc[3]));
-        mc.setDepthTest(GL20.GL_NONE, false);
+        // Depth check, no depth writes
+        mc.setDepthTest(GL20.GL_ONE, false);
 
         // Initialize annotations vectorR
         initAnnotations();
@@ -201,7 +203,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     }
 
     private void annotation(double dist, String text) {
-        annotations.add(new Pair<Double, String>(dist, text));
+        annotations.add(new Pair<>(dist, text));
     }
 
     @Override
@@ -214,7 +216,6 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         // Listen
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD);
-
     }
 
     @Override
@@ -238,13 +239,13 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         this.opacity = opacity;
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
             IFocus focus = camera.getFocus();
-            this.opacity *= MathUtilsd.lint(this.distToCamera, focus.getRadius() * 5d, focus.getRadius() * 50d, 0d, 1d);
+            this.opacity *= MathUtilsd.lint(this.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
         }
         this.fovFactor = camera.getFovFactor() * .75e-3f;
 
         updateLocalTransform(camera);
         // Distance in u_tessQuality
-        scalingFading = getGridScaling(distToCamera);
+        getGridScaling(distToCamera, scalingFading);
 
         // Compute projection lines to refsys
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES && camera.getFocus() != null) {
@@ -294,12 +295,12 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         localTransform.idt();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
             // Coordinate origin - Sun
-            localTransform.translate(camera.getInversePos().put(aux3f1.get()).setLength(1));
+            localTransform.translate(camera.getInversePos().put(aux3f1.get()));
         } else {
             // Focus object
-            localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(1).put(aux3f1.get()));
+            localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).put(aux3f1.get()));
         }
-        localTransform.scl((float) (0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
+        localTransform.scl((float) (distToCamera * 0.065d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
         if (coordinateSystem != null)
             localTransform.mul(coordinateSystem);
 
@@ -308,9 +309,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     }
 
-    private Pair<Double, Double> getGridScaling(double camdist) {
+    private Pair<Double, Double> getGridScaling(double camdist, Pair<Double,Double> res) {
         double au = camdist * Constants.U_TO_AU;
-        Pair<Double, Double> res = new Pair<>(au, 0d);
+        res.set(au, 0d);
 
         for (int i = -25; i < 25; i++) {
             if (au < Math.pow(10, i)) {
@@ -338,11 +339,12 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(alpha * cc[3] * opacity);
+        mc.setDepthTest(GL20.GL_ONE, false);
         mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, (float) (scalingFading.getFirst() * Constants.DISTANCE_SCALE_FACTOR));
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
         // FovFactor
-        mc.setFloatExtAttribute(FloatExtAttribute.Ts, this.fovFactor);
+        mc.setFloatExtAttribute(FloatExtAttribute.Ts, this.fovFactor * 0.5f * GlobalConf.scene.LINE_WIDTH_FACTOR);
         modelBatch.render(mc.instance, mc.env);
     }
 
