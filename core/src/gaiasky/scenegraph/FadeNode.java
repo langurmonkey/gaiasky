@@ -54,7 +54,7 @@ public class FadeNode extends SceneGraphNode {
     /**
      * The current distance at each cycle, in internal units
      */
-    private double currentDistance;
+    protected double currentDistance;
 
     /**
      * If set, the fade distance is the distance between the current fade node and this object.
@@ -153,11 +153,7 @@ public class FadeNode extends SceneGraphNode {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
         // Update alpha
-        //this.opacity = getBaseOpacity();
-        if (fadeIn != null)
-            this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeIn.x, fadeIn.y, 0, 1);
-        if (fadeOut != null)
-            this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeOut.x, fadeOut.y, 1, 0);
+        updateOpacity();
 
         // Visibility
         float visop = MathUtilsd.lint(msSinceStateChange(), 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
@@ -169,6 +165,14 @@ public class FadeNode extends SceneGraphNode {
         if (!this.copy && this.opacity > 0) {
             addToRenderLists(camera);
         }
+
+    }
+
+    protected void updateOpacity(){
+        if (fadeIn != null)
+            this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeIn.x, fadeIn.y, 0, 1);
+        if (fadeOut != null)
+            this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeOut.x, fadeOut.y, 1, 0);
 
     }
 

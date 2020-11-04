@@ -123,6 +123,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         // Initialize annotations vectorR
         initAnnotations();
+
+        // Upper-bound fading
+        this.setFadeout(new double[] { 2.8e7d, 9e7 });
     }
 
     private void initAnnotations() {
@@ -236,11 +239,15 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.distToCamera = getDistanceToOrigin(camera);
+        this.currentDistance = this.distToCamera;
         this.opacity = opacity;
+        super.updateOpacity();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
+            // Baked fade-in as we get close to focus
             IFocus focus = camera.getFocus();
             this.opacity *= MathUtilsd.lint(this.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
         }
+
         this.fovFactor = camera.getFovFactor() * .75e-3f;
 
         updateLocalTransform(camera);
@@ -309,7 +316,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     }
 
-    private Pair<Double, Double> getGridScaling(double camdist, Pair<Double,Double> res) {
+    private Pair<Double, Double> getGridScaling(double camdist, Pair<Double, Double> res) {
         double au = camdist * Constants.U_TO_AU;
         res.set(au, 0d);
 
@@ -381,7 +388,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
                 render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, textScale(), (float) (d01 * 1e-3d * camera.getFovFactor()), min, max);
             d = GlobalResources.doubleToDistanceString(d02);
             if (d02 / distToCamera > 0.1f)
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, textScale(), (float) (d02 * 1e-3d * camera.getFovFactor()), min, max);
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, textScale(), (float) (d02 * 1e-3d * camera.getFovFactor()), min, max);
         }
 
     }
