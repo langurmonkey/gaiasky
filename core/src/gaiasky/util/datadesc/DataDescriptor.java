@@ -5,6 +5,9 @@
 
 package gaiasky.util.datadesc;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 public class DataDescriptor {
@@ -19,13 +22,13 @@ public class DataDescriptor {
     public boolean updatesAvailable = false;
     public int numUpdates = 0;
 
-    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets){
+    public DataDescriptor(List<DatasetType> types, List<DatasetDesc> datasets) {
         this.types = types;
         this.datasets = datasets;
 
-        for(DatasetDesc ds : datasets){
+        for (DatasetDesc ds : datasets) {
             updatesAvailable = updatesAvailable || ds.outdated;
-            if(ds.outdated)
+            if (ds.outdated)
                 numUpdates++;
         }
         currentDataDescriptor = this;
@@ -33,12 +36,13 @@ public class DataDescriptor {
 
     /**
      * Finds the dataset with the given name in the dataset descriptor list.
+     *
      * @param name The name of the dataset
      * @return The dataset descriptor or null if it was not found
      */
-    public DatasetDesc findDataset(String name){
-        for(DatasetDesc dd : datasets){
-            if(dd.name.equals(name))
+    public DatasetDesc findDataset(String name) {
+        for (DatasetDesc dd : datasets) {
+            if (dd.name.equals(name))
                 return dd;
         }
         return null;
@@ -47,14 +51,29 @@ public class DataDescriptor {
     /**
      * Checks whether the dataset with the given name is present in the
      * data folder.
-     * @param name The dataset name
-     * @return True if the dataset is present, false otherwise
+     *
+     * @param name The dataset name.
+     * @return True if the dataset is present, false otherwise.
      */
-    public boolean datasetPresent(String name){
+    public boolean datasetPresent(String name) {
         DatasetDesc dd = findDataset(name);
-        if(dd != null){
+        if (dd != null) {
             return dd.exists;
         }
         return false;
+    }
+
+    /**
+     * Finds the dataset with the given descriptor file in the dataset descriptor list.
+     *
+     * @param descriptorFile The filename of the descriptor file.
+     * @return The dataset descriptor or null if it was not found.
+     */
+    public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {
+        for (DatasetDesc dd : datasets) {
+            if (Files.exists(dd.check) && Files.isSameFile(dd.check, descriptorFile))
+                return dd;
+        }
+        return null;
     }
 }

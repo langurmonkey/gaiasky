@@ -150,4 +150,8 @@ public class DatasetDesc {
             throw new RuntimeException("Path is null");
         }
     }
+
+    public boolean isStarDataset(){
+        return this.type != null && (this.type.equals("catalog-log") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
+    }
 }

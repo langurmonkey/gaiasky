@@ -33,10 +33,12 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
+import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -128,7 +130,6 @@ public class WelcomeGui extends AbstractGui {
                 }
             }, null);
 
-
             /** CAPTURE SCROLL FOCUS **/
             ui.addListener(event -> {
                 if (event instanceof InputEvent) {
@@ -138,7 +139,7 @@ public class WelcomeGui extends AbstractGui {
                         if (ie.getKeyCode() == Input.Keys.ESCAPE) {
                             Gdx.app.exit();
                         } else if (ie.getKeyCode() == Input.Keys.ENTER) {
-                            if(basicDataPresent()){
+                            if (basicDataPresent()) {
                                 gaiaSky();
                             } else {
                                 addDatasetManagerWindow(dd);
@@ -172,6 +173,12 @@ public class WelcomeGui extends AbstractGui {
         float bw = 350f * GlobalConf.UI_SCALE_FACTOR;
         float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
 
+        int numCatalogsAvailable = numCatalogsAvailable();
+        int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
+        int numStarCatalogsSelected = numStarCatalogsSelected();
+        int numTotalCatalogsSelected = numTotalCatalogsSelected();
+        boolean basicDataPresent = basicDataPresent();
+
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(pad20);
@@ -198,18 +205,18 @@ public class WelcomeGui extends AbstractGui {
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
         startGroup.add(startLabel).top().left().padTop(pad10).padBottom(pad10).row();
-        if (!basicDataPresent()) {
+        if (!basicDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
 
             OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
             noBaseData.setColor(ColorUtils.gRedC);
             startGroup.add(noBaseData).bottom().left();
-        } else if (catalogFiles.size > 0 && numCatalogsSelected() == 0) {
+        } else if (numCatalogsAvailable > 0 && numTotalCatalogsSelected == 0) {
             OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
             noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
-        }else if (numCatalogDRFilesSelected() > 1){
+        } else if (numGaiaDRCatalogsSelected > 1 || numStarCatalogsSelected == 0) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.start.check"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             startGroup.add(tooManyDR).bottom().left();
@@ -240,7 +247,7 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
             downloadGroup.add(updates).bottom().left();
-        } else if (!basicDataPresent()) {
+        } else if (!basicDataPresent) {
             downloadGroup.row();
             OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
@@ -256,7 +263,7 @@ public class WelcomeGui extends AbstractGui {
         catalogButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 String noticeKey;
-                if (numCatalogsAvailable() > 0 && numCatalogDRFilesSelected() > 1) {
+                if (numCatalogsAvailable() > 0 && numGaiaDRCatalogsSelected() > 1) {
                     noticeKey = "gui.dschooser.morethanonedr";
                 } else {
                     noticeKey = "gui.dschooser.nocatselected";
@@ -268,23 +275,26 @@ public class WelcomeGui extends AbstractGui {
         Table catalogGroup = new Table(skin);
         OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
         catalogGroup.add(catalogLabel).top().left().padTop(pad10).padBottom(pad10).row();
-        if (numCatalogsAvailable() == 0) {
+        if (numCatalogsAvailable == 0) {
             // No catalog files, disable and add notice
             catalogButton.setDisabled(true);
-
             OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
             noCatalogs.setColor(ColorUtils.aOrangeC);
             catalogGroup.add(noCatalogs).bottom().left();
-        }else if (numCatalogDRFilesSelected() > 1){
+        } else if (numGaiaDRCatalogsSelected > 1) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             catalogGroup.add(tooManyDR).bottom().left();
+        } else if (numStarCatalogsSelected == 0) {
+            OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
+            noStarCatalogs.setColor(ColorUtils.aOrangeC);
+            catalogGroup.add(noStarCatalogs).bottom().left();
+
         } else {
-            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
+            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numTotalCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
             ok.setColor(ColorUtils.gBlueC);
             catalogGroup.add(ok).bottom().left();
         }
-
 
         // Exit button
         OwnTextIconButton quitButton = new OwnTextIconButton(I18n.txt("gui.exit"), skin, "quit");
@@ -296,7 +306,6 @@ public class WelcomeGui extends AbstractGui {
                 Gdx.app.exit();
             }
         });
-
 
         center.add(titleGroup).center().padBottom(pad15 * 5f).colspan(2).row();
         center.add(startButton).center().top().padBottom(pad15 * 4f).padRight(pad25);
@@ -343,19 +352,42 @@ public class WelcomeGui extends AbstractGui {
         return GlobalConf.data.CATALOG_JSON_FILES != null && GlobalConf.data.CATALOG_JSON_FILES.size > 0;
     }
 
-    private int numCatalogsSelected() {
+    private int numTotalCatalogsSelected() {
         return GlobalConf.data.CATALOG_JSON_FILES.size;
     }
 
-    private int numCatalogsAvailable(){
+    private int numCatalogsAvailable() {
         return catalogFiles.size;
     }
 
-    private int numCatalogDRFilesSelected() {
+    private int numGaiaDRCatalogsSelected() {
         int matches = 0;
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
-            if (f.matches("^\\S*catalog-[e]?dr\\d+(int\\d+)?-\\S+$")) {
+            String filename = Path.of(f).getFileName().toString();
+            if (isGaiaDRCatalogFile(filename)) {
                 matches++;
+            }
+        }
+        return matches;
+    }
+
+    private boolean isGaiaDRCatalogFile(String name) {
+        return name.matches("^\\S*catalog-[e]?dr\\d+(int\\d+)?-\\S+(\\.json)$");
+    }
+
+    private int numStarCatalogsSelected() {
+        int matches = 0;
+        for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
+            // File name with no extension
+            Path path = Path.of(f);
+            String filenameExt = path.getFileName().toString();
+            try {
+                DatasetDesc dataset = dd.findDatasetByDescriptor(path);
+                if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
+                    matches++;
+                }
+            } catch (IOException e) {
+                logger.error(e);
             }
         }
         return matches;
