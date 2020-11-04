@@ -74,6 +74,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private Vector3d p01, p02, a, b, c, d;
     private double d01, d02;
 
+    // Regime: 1 - normal quad, 2 - auto-resizing quad
+    private int regime = 1;
+
     private INumberFormat nf;
 
     private RenderGroup renderGroupModel = RenderGroup.MODEL_VERT_RECGRID;
@@ -125,7 +128,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         initAnnotations();
 
         // Upper-bound fading
-        this.setFadeout(new double[] { 2.8e7d, 9e7 });
+        this.setFadeout(new double[]{.5e8d, 1e11});
     }
 
     private void initAnnotations() {
@@ -240,6 +243,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.distToCamera = getDistanceToOrigin(camera);
         this.currentDistance = this.distToCamera;
+        this.regime = distToCamera > 1e7 * Constants.PC_TO_U ? 2 : 1;
         this.opacity = opacity;
         super.updateOpacity();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
@@ -302,12 +306,22 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         localTransform.idt();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
             // Coordinate origin - Sun
-            localTransform.translate(camera.getInversePos().put(aux3f1.get()));
+            if (regime == 1)
+                localTransform.translate(camera.getInversePos().put(aux3f1.get()));
+            else
+                localTransform.translate(camera.getInversePos().put(aux3f1.get()).setLength(1));
         } else {
             // Focus object
-            localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).put(aux3f1.get()));
+            if (regime == 1)
+                localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).put(aux3f1.get()));
+            else
+                localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(1).put(aux3f1.get()));
         }
-        localTransform.scl((float) (distToCamera * 0.065d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
+        if (regime == 1)
+            localTransform.scl((float) (distToCamera * 0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
+        else
+            localTransform.scl((float) (0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
+
         if (coordinateSystem != null)
             localTransform.mul(coordinateSystem);
 
@@ -346,7 +360,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(alpha * cc[3] * opacity);
-        mc.setDepthTest(GL20.GL_ONE, false);
+        if (regime == 1)
+            mc.setDepthTest(GL20.GL_ONE, false);
+        else
+            mc.setDepthTest(GL20.GL_NONE, false);
         mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, (float) (scalingFading.getFirst() * Constants.DISTANCE_SCALE_FACTOR));
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
@@ -547,32 +564,32 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
-            ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
-                if (ct.equals(ComponentType.Equatorial)) {
-                    // Activate equatorial
-                    transformName = null;
-                    cc = ccEq;
-                    labelcolor = ccEq;
-                } else if (ct.equals(ComponentType.Ecliptic)) {
-                    // Activate ecliptic
-                    transformName = "eclipticToEquatorial";
-                    cc = ccEcl;
-                    labelcolor = ccEq;
-                } else if (ct.equals(ComponentType.Galactic)) {
-                    // Activate galactic
-                    transformName = "galacticToEquatorial";
-                    cc = ccGal;
-                    labelcolor = ccEq;
+            case TOGGLE_VISIBILITY_CMD:
+                ComponentType ct = ComponentType.getFromKey((String) data[0]);
+                if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
+                    if (ct.equals(ComponentType.Equatorial)) {
+                        // Activate equatorial
+                        transformName = null;
+                        cc = ccEq;
+                        labelcolor = ccEq;
+                    } else if (ct.equals(ComponentType.Ecliptic)) {
+                        // Activate ecliptic
+                        transformName = "eclipticToEquatorial";
+                        cc = ccEcl;
+                        labelcolor = ccEq;
+                    } else if (ct.equals(ComponentType.Galactic)) {
+                        // Activate galactic
+                        transformName = "galacticToEquatorial";
+                        cc = ccGal;
+                        labelcolor = ccEq;
+                    }
+                    updateCoordinateSystem();
+                    mc.setColorAttribute(ColorAttribute.Diffuse, cc);
+                    mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
                 }
-                updateCoordinateSystem();
-                mc.setColorAttribute(ColorAttribute.Diffuse, cc);
-                mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
     }
 
