@@ -338,7 +338,7 @@
       "type": "catalog-gal",
       "version": 4,
       "mingsversion": 30000,
-      "size": 15786828,
+      "size": 15786671,
       "check": "catalog-nbg.json",
       "data": [
         "catalog-nbg.json",
@@ -347,7 +347,7 @@
         "tex/extragal"
       ],
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
-      "sha256": "c51499c52421658133bdc944f8f9756d78a74e5e0d8e2a92ca0b075906776036",
+      "sha256": "0ab22e25ca8e7f82e42602c582a21f23fe4d3438fcdb61b5b5c9bfc7bd57130a",
       "file": "@mirror-url@galaxies/nbg/20201030_v04/galaxies-nbg.tar.gz"
     },
     {
