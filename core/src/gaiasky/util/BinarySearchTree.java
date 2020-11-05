@@ -256,21 +256,20 @@ public class BinarySearchTree {
         System.out.println("Checking... (no more output means success)");
 
         for (int i = GAP; i != 0; i = (i + GAP) % NUMS)
-            t.insert(new Integer(i));
+            t.insert(i);
 
         for (int i = 1; i < NUMS; i += 2)
-            t.remove(new Integer(i));
+            t.remove(i);
 
-        if (((Integer) (t.findMin())).intValue() != 2 ||
-                ((Integer) (t.findMax())).intValue() != NUMS - 2)
+        if ((Integer) (t.findMin()) != 2 || (Integer) (t.findMax()) != NUMS - 2)
             System.out.println("FindMin or FindMax error!");
 
         for (int i = 2; i < NUMS; i += 2)
-            if (((Integer) (t.find(new Integer(i)))).intValue() != i)
+            if ((Integer) (t.find(i)) != i)
                 System.out.println("Find error1!");
 
         for (int i = 1; i < NUMS; i += 2) {
-            if (t.find(new Integer(i)) != null)
+            if (t.find(i) != null)
                 System.out.println("Find error2!");
         }
     }
