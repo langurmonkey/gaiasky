@@ -215,8 +215,8 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
         // INDIVIDUAL VISIBILITY
         OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.txt("gui.visibility.individual"), skin, "eye");
-        individualVisibility.padLeft(space2);
-        individualVisibility.padRight(space2);
+        individualVisibility.align(Align.center);
+        individualVisibility.setWidth(contentWidth);
         individualVisibility.addListener(event -> {
             if(event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);

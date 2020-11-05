@@ -75,7 +75,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private double d01, d02;
 
     // Regime: 1 - normal with depth buffer, 2 - rescaling quad
-    private byte regime;
+    private byte regime = 1;
 
     private INumberFormat nf;
 
@@ -360,7 +360,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(alpha * cc[3] * opacity);
-        mc.setDepthTest(GL20.GL_ONE, false);
+        if (regime == 1)
+            mc.setDepthTest(GL20.GL_ONE, false);
+        else
+            mc.setDepthTest(GL20.GL_NONE, false);
         mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, (float) (scalingFading.getFirst() * Constants.DISTANCE_SCALE_FACTOR));
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
@@ -561,32 +564,32 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
-            ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
-                if (ct.equals(ComponentType.Equatorial)) {
-                    // Activate equatorial
-                    transformName = null;
-                    cc = ccEq;
-                    labelcolor = ccEq;
-                } else if (ct.equals(ComponentType.Ecliptic)) {
-                    // Activate ecliptic
-                    transformName = "eclipticToEquatorial";
-                    cc = ccEcl;
-                    labelcolor = ccEq;
-                } else if (ct.equals(ComponentType.Galactic)) {
-                    // Activate galactic
-                    transformName = "galacticToEquatorial";
-                    cc = ccGal;
-                    labelcolor = ccEq;
+            case TOGGLE_VISIBILITY_CMD:
+                ComponentType ct = ComponentType.getFromKey((String) data[0]);
+                if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
+                    if (ct.equals(ComponentType.Equatorial)) {
+                        // Activate equatorial
+                        transformName = null;
+                        cc = ccEq;
+                        labelcolor = ccEq;
+                    } else if (ct.equals(ComponentType.Ecliptic)) {
+                        // Activate ecliptic
+                        transformName = "eclipticToEquatorial";
+                        cc = ccEcl;
+                        labelcolor = ccEq;
+                    } else if (ct.equals(ComponentType.Galactic)) {
+                        // Activate galactic
+                        transformName = "galacticToEquatorial";
+                        cc = ccGal;
+                        labelcolor = ccEq;
+                    }
+                    updateCoordinateSystem();
+                    mc.setColorAttribute(ColorAttribute.Diffuse, cc);
+                    mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
                 }
-                updateCoordinateSystem();
-                mc.setColorAttribute(ColorAttribute.Diffuse, cc);
-                mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
     }
 
