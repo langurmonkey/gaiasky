@@ -82,11 +82,13 @@ public class LoadingGui extends AbstractGui {
 
         skin = GlobalResources.skin;
 
-        Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
-        Drawable bg = new SpriteDrawable(new Sprite(tex));
 
         center = new Table();
-        center.setBackground(bg);
+        if(!vr) {
+            Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
+            Drawable bg = new SpriteDrawable(new Sprite(tex));
+            center.setBackground(bg);
+        }
         center.setFillParent(true);
         center.center();
         if (hoffset > 0)
