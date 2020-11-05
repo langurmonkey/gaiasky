@@ -181,6 +181,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
                 mc.setDepthTest(GL20.GL_NONE, false);
             } else {
                 mc.update(localTransform, alpha * opacity);
+                mc.setDepthTest(GL20.GL_ONE, true);
             }
             // Render
             if (mc.instance != null)

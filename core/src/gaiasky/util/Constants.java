@@ -5,6 +5,9 @@
 
 package gaiasky.util;
 
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+
 public class Constants {
 
     /**
@@ -133,6 +136,8 @@ public class Constants {
         Ro_TO_U = Ro_TO_KM * KM_TO_U;
         U_TO_Ro = 1d / Ro_TO_U;
         CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
+
+        EventManager.instance.post(Events.NEW_DISTANCE_SCALE_FACTOR);
     }
 
     /**

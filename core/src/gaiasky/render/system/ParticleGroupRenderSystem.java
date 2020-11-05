@@ -17,7 +17,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.ParticleGroup.ParticleBean;
@@ -163,7 +162,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
                             shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
                             shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * GlobalConf.getStarPointSize() * 0.1)) * particleGroup.highlightedSizeFactor() * meanDist * 0.15 / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
-                            shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)), (float) (particleGroup.particleSizeLimits[1] / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                            shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] / (camera.getFovFactor() )), (float) (particleGroup.particleSizeLimits[1] / (camera.getFovFactor() )));
                             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
                             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);

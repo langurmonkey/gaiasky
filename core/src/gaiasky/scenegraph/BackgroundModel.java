@@ -61,6 +61,21 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
 
+        updateLocalTransform();
+
+        // Model
+        mc.doneLoading(manager, localTransform, cc);
+        // Disable depth
+        mc.setDepthTest(GL20.GL_ONE, false);
+
+        // Label pos 3D
+        if (label && labelPosition != null && !label2d) {
+            labelPosition.scl(Constants.PC_TO_U);
+        }
+    }
+
+    private void updateLocalTransform(){
+        localTransform.idt();
         // Initialize transform.
         localTransform.scl(size);
 
@@ -80,18 +95,6 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
         // Must rotate due to orientation of createCylinder
         localTransform.rotate(0, 1, 0, 90);
-
-
-        // Model
-        mc.doneLoading(manager, localTransform, cc);
-        // Disable depth
-        //mc.setDepthTest(GL20.GL_NONE, false);
-
-        // Label pos 3D
-        if (label && labelPosition != null && !label2d) {
-            labelPosition.scl(Constants.PC_TO_U);
-        }
-
     }
 
     @Override
@@ -115,6 +118,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+        // Disable depth
         mc.update(alpha * cc[3] * opacity);
         modelBatch.render(mc.instance, mc.env);
     }

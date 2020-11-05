@@ -223,6 +223,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     private OpenVRListener openVRListener;
 
+    private double DIST_A;
+    private double DIST_B;
+    private double DIST_C;
+
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
     private Texture crosshairFocus, crosshairClosest, crosshairHome, crosshairArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
@@ -267,6 +271,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         focusPos = new Vector3d();
         freeTargetPos = new Vector3d();
         freeTargetOn = false;
+
+        DIST_A = 0.1 * Constants.PC_TO_U;
+        DIST_B = 5.0 * Constants.KPC_TO_U;
+        DIST_C = 5000.0 * Constants.MPC_TO_U;
 
         aux1 = new Vector3d();
         aux2 = new Vector3d();
@@ -341,7 +349,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO, Events.NEW_DISTANCE_SCALE_FACTOR);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -1268,9 +1276,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
 
-    private final double DIST_A = 0.1 * Constants.PC_TO_U;
-    private final double DIST_B = 5.0 * Constants.KPC_TO_U;
-    private final double DIST_C = 5000.0 * Constants.MPC_TO_U;
 
     /**
      * The speed scaling function.
@@ -1291,13 +1296,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double func;
         if (dist < DIST_A) {
             // 0.1 pc < d
-            func = MathUtilsd.lint(dist, 0, DIST_A, 0 , 1e6);
+            func = MathUtilsd.lint(dist, 0, DIST_A, 0 , 1e6) * Constants.DISTANCE_SCALE_FACTOR;
         } else if (dist < DIST_B) {
             // 0.1 pc < d < 5 Kpc
-            func = MathUtilsd.lint(dist, DIST_A, DIST_B, 1e6, 1e10);
+            func = MathUtilsd.lint(dist, DIST_A, DIST_B, 1e6, 1e10) * Constants.DISTANCE_SCALE_FACTOR;
         } else {
             // 5 Kpc < d
-            func = MathUtilsd.lint(dist, DIST_B, DIST_C, 1e10, 2e16);
+            func = MathUtilsd.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
         }
 
         return dist > 0 ? Math.max(func, min) * GlobalConf.scene.CAMERA_SPEED : 0;
@@ -1499,6 +1504,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case CONTROLLER_DISCONNECTED_INFO:
             // Nothing
+            break;
+        case NEW_DISTANCE_SCALE_FACTOR:
+            DIST_A = 0.1 * Constants.PC_TO_U;
+            DIST_B = 5.0 * Constants.KPC_TO_U;
+            DIST_C = 5000.0 * Constants.MPC_TO_U;
             break;
         default:
             break;

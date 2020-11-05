@@ -126,9 +126,6 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         // Initialize annotations vectorR
         initAnnotations();
-
-        // Upper-bound fading
-        this.setFadeout(new double[] { 1e9d, .7e11 });
     }
 
     private void initAnnotations() {
@@ -243,7 +240,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.distToCamera = getDistanceToOrigin(camera);
         this.currentDistance = this.distToCamera;
-        this.regime = this.distToCamera > 1e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
+        this.regime = this.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
         this.opacity = opacity;
         super.updateOpacity();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
@@ -318,9 +315,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
                 localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(1).put(aux3f1.get()));
         }
         if (regime == 1)
-            localTransform.scl((float) (distToCamera * 0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
+            localTransform.scl((float) (distToCamera * 0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
         else
-            localTransform.scl((float) (0.067d * Constants.AU_TO_U * Constants.DISTANCE_SCALE_FACTOR));
+            localTransform.scl((float) (0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
 
         if (coordinateSystem != null)
             localTransform.mul(coordinateSystem);
@@ -364,7 +361,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             mc.setDepthTest(GL20.GL_ONE, false);
         else
             mc.setDepthTest(GL20.GL_NONE, false);
-        mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, (float) (scalingFading.getFirst() * Constants.DISTANCE_SCALE_FACTOR));
+        mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, scalingFading.getFirst().floatValue());
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
         // FovFactor
@@ -564,32 +561,32 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void notify(Events event, Object... data) {
         switch (event) {
-            case TOGGLE_VISIBILITY_CMD:
-                ComponentType ct = ComponentType.getFromKey((String) data[0]);
-                if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
-                    if (ct.equals(ComponentType.Equatorial)) {
-                        // Activate equatorial
-                        transformName = null;
-                        cc = ccEq;
-                        labelcolor = ccEq;
-                    } else if (ct.equals(ComponentType.Ecliptic)) {
-                        // Activate ecliptic
-                        transformName = "eclipticToEquatorial";
-                        cc = ccEcl;
-                        labelcolor = ccEq;
-                    } else if (ct.equals(ComponentType.Galactic)) {
-                        // Activate galactic
-                        transformName = "galacticToEquatorial";
-                        cc = ccGal;
-                        labelcolor = ccEq;
-                    }
-                    updateCoordinateSystem();
-                    mc.setColorAttribute(ColorAttribute.Diffuse, cc);
-                    mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
+        case TOGGLE_VISIBILITY_CMD:
+            ComponentType ct = ComponentType.getFromKey((String) data[0]);
+            if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
+                if (ct.equals(ComponentType.Equatorial)) {
+                    // Activate equatorial
+                    transformName = null;
+                    cc = ccEq;
+                    labelcolor = ccEq;
+                } else if (ct.equals(ComponentType.Ecliptic)) {
+                    // Activate ecliptic
+                    transformName = "eclipticToEquatorial";
+                    cc = ccEcl;
+                    labelcolor = ccEq;
+                } else if (ct.equals(ComponentType.Galactic)) {
+                    // Activate galactic
+                    transformName = "galacticToEquatorial";
+                    cc = ccGal;
+                    labelcolor = ccEq;
                 }
-                break;
-            default:
-                break;
+                updateCoordinateSystem();
+                mc.setColorAttribute(ColorAttribute.Diffuse, cc);
+                mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
+            }
+            break;
+        default:
+            break;
         }
     }
 

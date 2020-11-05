@@ -1280,4 +1280,9 @@ public enum Events {
     /** Show/hide controller gui **/
     SHOW_CONTROLLER_GUI_ACTION,
 
+    /**
+     * This event informs a new DISTANCE_SCALE_FACTOR is in place
+     */
+    NEW_DISTANCE_SCALE_FACTOR
+
 }
