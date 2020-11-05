@@ -52,7 +52,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     // Dataset options, may be null
     private DatasetOptions dops;
 
-
     public STILDataProvider() {
         super();
         // Disable logging
@@ -126,28 +125,51 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public List<? extends ParticleBean> loadData(DataSource ds, double factor) {
-        return loadData(ds, factor, true);
+        return loadData(ds, factor, null, null, null);
+    }
+
+    public List<? extends ParticleBean> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
+        return loadData(ds, factor, true, preCallback, updateCallback, postCallback);
     }
 
     public List<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat) {
+        return loadData(ds, factor, compat, null, null, null);
+    }
 
+    /**
+     * @param ds
+     * @param factor
+     * @param compat
+     * @param preCallback    A function that runs before.
+     * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
+     *                       second holds the total number of objects to load.
+     * @param postCallback   A function that runs after the data has been loaded.
+     * @return
+     */
+    public List<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
             // Add extra builders
             List builders = factory.getDefaultBuilders();
             builders.add(new CsvTableBuilder());
             builders.add(new AsciiTableBuilder());
 
+            if (preCallback != null)
+                preCallback.run();
+
             // Try to load
             StarTable table = factory.makeStarTable(ds);
 
-            initLists((int) table.getRowCount());
+            long count = table.getRowCount();
+            initLists((int) count);
 
             UCDParser ucdp = new UCDParser();
             ucdp.parse(table);
 
             if (ucdp.haspos) {
                 int nInvalidPllx = 0;
-                int i = 0;
+                long i = 0l;
+                long step = Math.max(1l, Math.round(count / 100d));
+
                 RowSequence rs = table.getRowSequence();
                 while (rs.next()) {
                     Object[] row = rs.getRow();
@@ -256,7 +278,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             if (!ucdp.ID.isEmpty()) {
                                 // We have ID
                                 Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
-                                names = new String[]{namePair.getSecond()};
+                                names = new String[] { namePair.getSecond() };
                                 if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
                                     hip = Integer.valueOf(namePair.getSecond());
                                     id = (long) hip;
@@ -266,7 +288,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // Emtpy ID
                                 id = ++starid;
-                                names = new String[]{id.toString()};
+                                names = new String[] { id.toString() };
                             }
                         } else {
                             // We have name
@@ -298,7 +320,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         // Populate provider lists
                         colors.put(id, rgb);
-                        sphericalPositions.put(id, new double[]{sph.x, sph.y, sph.z});
+                        sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
                         if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
                             double[] point = new double[StarBean.SIZE + 3];
@@ -345,8 +367,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         logger.debug("Exception parsing row " + i + ": skipping");
                     }
                     i++;
-                    if(i % 250000 == 0) {
-                        logger.info(i + " objects loaded...");
+                    if (updateCallback != null && i % step == 0) {
+                        updateCallback.run(i, count);
                     }
                 }
                 if (nInvalidPllx > 0) {
@@ -358,6 +380,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
         } catch (Exception e) {
             logger.error(e);
+        } finally {
+            if (postCallback != null)
+                postCallback.run();
         }
 
         return list;

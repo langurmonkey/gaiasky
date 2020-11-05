@@ -127,9 +127,9 @@
   "com.badlogic.gdx.graphics.Color": {
     "green": {
       "a": 1,
-      "b": 0,
-      "g": 0.701,
-      "r": 0.18
+      "b": 0.34509,
+      "g": 0.61568,
+      "r": 0.05882
     },
     "white": {
       "a": 1,
@@ -193,15 +193,15 @@
     },
     "theme": {
       "a": 1,
-      "b": 0,
-      "g": 0.701,
-      "r": 0.18
+      "b": 0.34509,
+      "g": 0.61568,
+      "r": 0.05882
     },
     "theme2": {
       "a": 1,
-      "b": 0.6,
-      "g": 1,
-      "r": 0.9
+      "b": 0.44509,
+      "g": 0.71568,
+      "r": 0.15882
     },
     "highlight": {
       "a": 1,
@@ -409,9 +409,6 @@
     "go-to": {
       "imageUp": "go-to"
     },
-    "go-to": {
-      "imageUp": "go-to"
-    },
     "land-on": {
       "imageUp": "land-on"
     },
@@ -465,9 +462,6 @@
     },
     "screen-mode": {
       "imageUp": "screen-mode"
-    },
-    "reload": {
-      "imageUp": "reload"
     },
     "script-stop": {
       "imageUp": "script-stop"
@@ -1138,6 +1132,11 @@
       "background": "progress-bg",
       "knob": "progress-knob",
       "knobBefore": "progress-knob-before"
+    },
+    "small-horizontal": {
+      "background": "progress-s-bg",
+      "knob": "progress-s-knob",
+      "knobBefore": "progress-s-knob-before"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle": {

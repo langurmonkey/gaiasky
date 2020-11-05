@@ -2491,7 +2491,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private List<ParticleBean> loadParticleBeans(DataSource ds, DatasetOptions dops) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(dops);
-        @SuppressWarnings("unchecked") List<ParticleBean> data = (List<ParticleBean>) provider.loadData(ds, 1.0f);
+        @SuppressWarnings("unchecked") List<ParticleBean> data = (List<ParticleBean>) provider.loadData(ds, 1.0f,
+                () -> {
+                    // Show progress bar
+                    EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
+                    // Reset
+                    EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, 0.1f);
+                },
+                (current, count) -> {
+                    EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, (float) current / (float) count);
+                    if (current % 250000 == 0) {
+                        logger.info(current + " objects loaded...");
+                    }
+                },
+                () ->{
+                    // Hide progress bar
+                    EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
+                }
+        );
         return data;
     }
 

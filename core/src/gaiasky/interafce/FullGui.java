@@ -67,6 +67,7 @@ public class FullGui extends AbstractGui {
     protected RunStateInterface runStateInterface;
     protected TopInfoInterface topInfoInterface;
     protected MinimapInterface minimapInterface;
+    protected LoadProgressInterface loadProgressInterface;
 
     protected SearchDialog searchDialog;
     protected MemInfoWindow memInfoWindow;
@@ -110,7 +111,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS);
     }
 
     protected void buildGui() {
@@ -277,6 +278,9 @@ public class FullGui extends AbstractGui {
             }
             if (minimapInterface != null) {
                 ui.addActor(minimapInterface);
+            }
+            if (loadProgressInterface != null) {
+                ui.addActor(loadProgressInterface);
             }
 
             if (pointerXCoord != null && pointerYCoord != null) {
@@ -489,6 +493,9 @@ public class FullGui extends AbstractGui {
                 showMinimapInterface(ui, show);
             }
             break;
+        case SHOW_LOAD_PROGRESS:
+            showLoadProgressInterface(ui, (Boolean) data[0]);
+            break;
         default:
             break;
         }
@@ -564,7 +571,25 @@ public class FullGui extends AbstractGui {
             // Remove from ui
             minimapInterface.remove();
         }
+    }
 
+    public void showLoadProgressInterface(Stage ui, boolean show) {
+        if (loadProgressInterface == null) {
+            loadProgressInterface = new LoadProgressInterface(ui.getWidth(), skin);
+            loadProgressInterface.setFillParent(true);
+            loadProgressInterface.bottom().left();
+            loadProgressInterface.pad(0);
+            interfaces.add(loadProgressInterface);
+        }
+        if (show) {
+            // Add to ui
+            if (!loadProgressInterface.hasParent() || loadProgressInterface.getParent() != ui.getRoot()) {
+                ui.addActor(loadProgressInterface);
+            }
+        } else {
+            // Remove from ui
+            loadProgressInterface.remove();
+        }
     }
 
     public void toggleMinimapInterface(Stage ui) {

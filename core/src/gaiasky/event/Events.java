@@ -1202,16 +1202,24 @@ public enum Events {
     TOGGLE_VISIBILITY_CMD,
 
     /**
+     * Shows the load progress bar. Contains a boolean with the state and a boolean indicating if it
+     * comes from the interface
+     */
+    SHOW_LOAD_PROGRESS,
+    /**
+     * Updates the load progress bar, contains a float in (0,1)
+     */
+    UPDATE_LOAD_PROGRESS,
+
+    /**
      * Contains the tone mapping type as an {@link GlobalConf.PostprocessConf.ToneMapping} or a
      * string in [AUTO|EXPOSURE|NONE].
      */
     TONEMAPPING_TYPE_CMD,
 
-    TOUCH_DOWN // INPUT LISTENER EVENTS
-    ,
-
+    // INPUT LISTENER EVENTS
+    TOUCH_DOWN,
     TOUCH_DRAGGED,
-
     TOUCH_UP,
 
     /**
@@ -1250,11 +1258,6 @@ public enum Events {
      * Update external GUIs signal. Contains the dt in seconds.
      **/
     UPDATE_GUI,
-
-    /**
-     * Issued when the viewport size changed. Contains the new width and height
-     **/
-    VIEWPORT_RESIZE,
 
     /**
      * Contains an array of booleans with the visibility of each ComponentType,
