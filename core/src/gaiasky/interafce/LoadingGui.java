@@ -39,8 +39,7 @@ import java.math.BigInteger;
  * @author Toni Sagrista
  */
 public class LoadingGui extends AbstractGui {
-    protected Table center, topLeft, bottomMiddle;
-    protected Container<Button> screenMode;
+    protected Table center, topLeft, bottomMiddle, screenMode;
 
     public NotificationsInterface notificationsInterface;
     private TipGenerator tipGenerator;
@@ -70,7 +69,6 @@ public class LoadingGui extends AbstractGui {
         interfaces = new Array<>();
         float pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
         float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        float pad05 = 5f * GlobalConf.UI_SCALE_FACTOR;
         // User interface
         Viewport vp = new ScreenViewport();
         ui = new Stage(vp, GlobalResources.spriteBatch);
@@ -83,7 +81,7 @@ public class LoadingGui extends AbstractGui {
         skin = GlobalResources.skin;
 
 
-        center = new Table();
+        center = new Table(skin);
         if(!vr) {
             Texture tex = new Texture(Gdx.files.internal("img/splash/splash.jpg"));
             Drawable bg = new SpriteDrawable(new Sprite(tex));
@@ -113,25 +111,25 @@ public class LoadingGui extends AbstractGui {
         tipGenerator = new TipGenerator(skin);
         tip = new HorizontalGroup();
         tip.space(pad10);
-        bottomMiddle = new Table();
+        bottomMiddle = new Table(skin);
         bottomMiddle.setFillParent(true);
         bottomMiddle.center().bottom();
         bottomMiddle.padLeft(pad30).padBottom(pad10);
         bottomMiddle.add(tip);
 
         // Version and build
-        topLeft = new Table();
+        topLeft = new Table(skin);
         topLeft.setFillParent(true);
         topLeft.left().top();
         topLeft.pad(pad10);
         topLeft.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
 
         // SCREEN MODE BUTTON - TOP RIGHT
-        screenMode = new Container<>();
+        screenMode = new Table(skin);
         screenMode.setFillParent(true);
         screenMode.top().right();
         screenMode.pad(pad10);
-        OwnTextIconButton screenModeButton = new OwnTextIconButton("A", skin, "screen-mode");
+        OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
         screenModeButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
@@ -140,7 +138,7 @@ public class LoadingGui extends AbstractGui {
             }
             return false;
         });
-        screenMode.setActor(screenModeButton);
+        screenMode.add(screenModeButton);
 
         // MESSAGE INTERFACE - BOTTOM
         notificationsInterface = new NotificationsInterface(skin, lock, false, false, false);
@@ -215,10 +213,12 @@ public class LoadingGui extends AbstractGui {
     public void rebuildGui() {
         if (ui != null) {
             ui.clear();
-            ui.addActor(screenMode);
             ui.addActor(center);
-            ui.addActor(bottomMiddle);
-            ui.addActor(topLeft);
+            ui.addActor(screenMode);
+            if(!vr) {
+                ui.addActor(bottomMiddle);
+                ui.addActor(topLeft);
+            }
         }
     }
 

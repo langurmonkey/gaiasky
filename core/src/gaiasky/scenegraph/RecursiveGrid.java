@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
@@ -26,6 +27,7 @@ import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
@@ -219,6 +221,11 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         // Listen
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD);
+
+        // Fade out in VR
+        if (GlobalConf.runtime.OPENVR) {
+            setFadeout(new double[] { 5e6, 50e6 });
+        }
     }
 
     @Override
@@ -301,23 +308,36 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private void updateLocalTransform(ICamera camera) {
         IFocus focus = camera.getFocus();
         localTransform.idt();
+
+        Vector3 vroffset = aux3f4.get();
+        float vrScl = 1f;
+        if (GlobalConf.runtime.OPENVR) {
+            vrScl = 100f;
+            if (camera.getCurrent() instanceof NaturalCamera) {
+                ((NaturalCamera) camera.getCurrent()).vroffset.put(vroffset);
+                vroffset.scl((float) (1f / Constants.M_TO_U));
+            }
+        } else {
+            vroffset.set(0, 0, 0);
+        }
+
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
             // Coordinate origin - Sun
             if (regime == 1)
                 localTransform.translate(camera.getInversePos().put(aux3f1.get()));
             else
-                localTransform.translate(camera.getInversePos().put(aux3f1.get()).setLength(1));
+                localTransform.translate(camera.getInversePos().put(aux3f1.get()).setLength(vrScl).add(vroffset));
         } else {
             // Focus object
             if (regime == 1)
                 localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).put(aux3f1.get()));
             else
-                localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(1).put(aux3f1.get()));
+                localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(vrScl).add(vroffset).put(aux3f1.get()));
         }
         if (regime == 1)
             localTransform.scl((float) (distToCamera * 0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
         else
-            localTransform.scl((float) (0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
+            localTransform.scl((float) (0.067f * vrScl * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
 
         if (coordinateSystem != null)
             localTransform.mul(coordinateSystem);

@@ -166,7 +166,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The user interfaces
      */
-    public IGui welcomeGui, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, controllerGui;
+    public IGui welcomeGui, welcomeGuiVR, loadingGui, loadingGuiVR, mainGui, spacecraftGui, stereoGui, debugGui, crashGui, controllerGui;
 
     /**
      * List of GUIs
@@ -405,6 +405,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         welcomeGui.initialize(manager);
         Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
+        if(GlobalConf.runtime.OPENVR){
+            welcomeGuiVR = new VRGui(WelcomeGuiVR.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f));
+            welcomeGuiVR.initialize(manager);
+        }
+
         // GL clear state
         Gdx.gl.glClearColor(0, 0, 0, 0);
         Gdx.gl.glClearDepthf(1f);
@@ -491,6 +496,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Dispose vr loading GUI
         if (GlobalConf.runtime.OPENVR) {
+            welcomeGuiVR.dispose();
+            welcomeGuiVR = null;
+
             loadingGuiVR.dispose();
             loadingGuiVR = null;
 
@@ -848,7 +856,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Displays the initial GUI
      **/
-    private Runnable runnableInitialGui = () -> renderGui(welcomeGui);
+    private Runnable runnableInitialGui = () -> {
+        renderGui(welcomeGui);
+        if(GlobalConf.runtime.OPENVR){
+            try {
+                vrContext.pollEvents();
+            } catch (Exception e) {
+                logger.error(e);
+            }
+
+            renderVRGui((VRGui) welcomeGuiVR);
+        }
+    };
 
     /**
      * Displays the loading GUI
@@ -867,20 +886,24 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     logger.error(e);
                 }
 
-                vrLoadingLeftFb.begin();
-                renderGui(((VRGui) loadingGuiVR).left());
-                vrLoadingLeftFb.end();
-
-                vrLoadingRightFb.begin();
-                renderGui(((VRGui) loadingGuiVR).right());
-                vrLoadingRightFb.end();
-
-                /** SUBMIT TO VR COMPOSITOR **/
-                VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
-                VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
+                renderVRGui((VRGui) loadingGuiVR);
             }
         }
     };
+
+    private void renderVRGui(VRGui vrGui){
+        vrLoadingLeftFb.begin();
+        renderGui((vrGui).left());
+        vrLoadingLeftFb.end();
+
+        vrLoadingRightFb.begin();
+        renderGui((vrGui).right());
+        vrLoadingRightFb.end();
+
+        /** SUBMIT TO VR COMPOSITOR **/
+        VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
+        VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
+    }
 
     // Has the application crashed?
     private boolean crashed = false;
