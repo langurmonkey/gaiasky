@@ -27,20 +27,18 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * @author tsagrista
  *
  */
-public class CatalogChooserWindow extends GenericDialog {
+public class CatalogSelectionWindow extends GenericDialog {
 
     private DatasetsWidget dw;
-    private String assetsLoc;
     private String notice;
 
-    public CatalogChooserWindow(Stage stage, Skin skin){
+    public CatalogSelectionWindow(Stage stage, Skin skin){
         this(stage, skin, null);
     }
 
-    public CatalogChooserWindow(Stage stage, Skin skin, String noticeKey) {
+    public CatalogSelectionWindow(Stage stage, Skin skin, String noticeKey) {
         super(I18n.txt("gui.dschooser.title"), skin, stage);
         this.notice = I18n.txt(noticeKey);
-        assetsLoc = GlobalConf.ASSETS_LOC;
 
         setAcceptText(I18n.txt("gui.ok"));
 

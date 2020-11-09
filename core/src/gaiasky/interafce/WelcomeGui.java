@@ -55,7 +55,7 @@ public class WelcomeGui extends AbstractGui {
     private boolean skipWelcome;
 
     protected DownloadDataWindow ddw;
-    protected CatalogChooserWindow cdw;
+    protected CatalogSelectionWindow cdw;
 
     private FileHandle dataDescriptor;
     private Array<FileHandle> catalogFiles;
@@ -443,7 +443,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void addCatalogSelectionWindow(String noticeKey) {
         if (cdw == null) {
-            cdw = new CatalogChooserWindow(ui, skin, noticeKey);
+            cdw = new CatalogSelectionWindow(ui, skin, noticeKey);
             cdw.setAcceptRunnable(() -> {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 reloadView();

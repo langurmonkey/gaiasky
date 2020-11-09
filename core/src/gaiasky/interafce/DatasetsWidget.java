@@ -79,7 +79,7 @@ public class DatasetsWidget {
         OwnScrollPane scroll = null;
         if (scrollOn) {
             scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
-            scroll.setHeight(300f * GlobalConf.UI_SCALE_FACTOR);
+            scroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.75f, 400f * GlobalConf.UI_SCALE_FACTOR));
             scroll.setFadeScrollBars(false);
             scroll.setScrollingDisabled(true, false);
             scroll.setSmoothScrolling(true);

@@ -99,7 +99,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     private void updatePositions(ICamera cam) {
         double tu = cam.getCurrent().speedScaling();
-        double dist = 1200000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
+        double dist = 2600000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
 
         // If focus is very close, stop (jittering errors kick in)
         if (cam.getMode().isFocus()) {
@@ -191,7 +191,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
             updatePositions(camera);
 
             // Regular
-            Gdx.gl.glLineWidth(GlobalConf.UI_SCALE_FACTOR * GlobalConf.scene.LINE_WIDTH_FACTOR);
+            Gdx.gl.glLineWidth(GlobalConf.UI_SCALE_FACTOR * 2f);
 
             if (curr != null) {
                 curr.vertexIdx = 0;
@@ -219,7 +219,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1f));
-                shaderProgram.setUniformf("u_alpha", alpha * 0.6f);
+                shaderProgram.setUniformf("u_alpha", alpha * 0.8f);
                 shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor);
                 shaderProgram.setUniformf("u_t", getT());
 
