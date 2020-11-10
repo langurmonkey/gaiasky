@@ -85,6 +85,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         }
 
         if (params.postprocess) {
+            logger.info("Post-processing octree: childcount=" + params.childCount + ", parentcount=" + params.parentCount);
             long mergedNodes = 0;
             long mergedObjects = 0;
             // We merge low-count nodes (<= childcount) with parents, if parents' count is <= parentcount
@@ -113,7 +114,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 }
             }
 
-            logger.info("POSTPROCESS EMPTY STATS:");
+            logger.info("POSTPROCESS STATS:");
             logger.info("    Merged nodes:    " + mergedNodes);
             logger.info("    Merged objects:  " + mergedObjects);
         }

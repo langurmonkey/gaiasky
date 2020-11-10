@@ -287,7 +287,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         // Line of sight extinction in the G band
                         double ag = 0;
                         // Galactic latitude in radians
-                        double magcorraux = 0;
+                        Vector3d posgal = new Vector3d(pos);
+                        posgal.mul(Coordinates.eqToGal());
+                        Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
+                        double b = posgalsph.y;
+                        double magcorraux = Math.min(distpc, 150d / Math.abs(Math.sin(b)));
+
                         if (magCorrections) {
                             if (hasCol(ColId.ag) && !tokens[idx(ColId.ag)].isEmpty()) {
                                 // Take extinction from database
@@ -297,11 +302,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                                 ag = getAdditionalValue(ColId.ag, sourceid);
                             } else {
                                 // Compute extinction analytically
-                                Vector3d posgal = new Vector3d(pos);
-                                posgal.mul(Coordinates.eqToGal());
-                                Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
-                                double b = posgalsph.y;
-                                magcorraux = Math.min(distpc, 150d / Math.abs(Math.sin(b)));
                                 ag = magcorraux * 5.9e-4;
                                 // Limit to 3
                                 ag = Math.min(ag, 3.2);

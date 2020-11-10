@@ -100,10 +100,10 @@ public class OctreeGeneratorRun {
     @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
     private boolean postprocess = false;
 
-    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with thier parents. Defaults to 100")
+    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with their parents. Defaults to 100")
     private long childCount = 100;
 
-    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with thier parents. Defaults to 1000")
+    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000")
     private long parentCount = 1000;
 
     @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
