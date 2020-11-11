@@ -42,6 +42,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Welcome screen that allows access to the main application, as well as the dataset manager and the catalog selection.
@@ -115,7 +117,7 @@ public class WelcomeGui extends AbstractGui {
             }, () -> {
                 // Fail?
                 downloadError = true;
-                logger.error("No internet connection or server is down! We will attempt to continue");
+                logger.error(I18n.txt("gui.welcome.error.nointernet"));
                 if (basicDataPresent()) {
                     // Go on all in
                     GaiaSky.postRunnable(() -> {
@@ -123,7 +125,7 @@ public class WelcomeGui extends AbstractGui {
                     });
                 } else {
                     // Error and exit
-                    logger.error("No base data present - need an internet connection to continue, exiting");
+                    logger.error(I18n.txt("gui.welcome.error.nobasedata"));
                     GaiaSky.postRunnable(() -> {
                         GuiUtils.addNoConnectionExit(skin, ui);
                     });
@@ -173,6 +175,9 @@ public class WelcomeGui extends AbstractGui {
         float bw = 350f * GlobalConf.UI_SCALE_FACTOR;
         float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
 
+        int removed = removeNonExistent();
+        if (removed > 0)
+            logger.warn(I18n.txt("gui.welcome.warn.nonexistent", removed));
         int numCatalogsAvailable = numCatalogsAvailable();
         int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
         int numStarCatalogsSelected = numStarCatalogsSelected();
@@ -390,7 +395,27 @@ public class WelcomeGui extends AbstractGui {
                 logger.error(e);
             }
         }
+
         return matches;
+    }
+
+    private int removeNonExistent() {
+        Set<String> toRemove = new HashSet<>();
+        for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
+            // File name with no extension
+            Path path = Path.of(f);
+            if (!Files.exists(path)) {
+                // File does not exist, remove from selected list!
+                toRemove.add(f);
+            }
+        }
+
+        // Remove non-existent files
+        for (String out : toRemove) {
+            GlobalConf.data.CATALOG_JSON_FILES.removeValue(out, true);
+        }
+
+        return toRemove.size();
     }
 
     /**

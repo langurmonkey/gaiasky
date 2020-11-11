@@ -70,10 +70,11 @@ public class DataDescriptor {
      * @return The dataset descriptor or null if it was not found.
      */
     public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {
-        for (DatasetDesc dd : datasets) {
-            if (Files.exists(dd.check) && Files.isSameFile(dd.check, descriptorFile))
-                return dd;
-        }
+        if (Files.exists(descriptorFile))
+            for (DatasetDesc dd : datasets) {
+                if (Files.exists(dd.check) && Files.isSameFile(dd.check, descriptorFile))
+                    return dd;
+            }
         return null;
     }
 }
