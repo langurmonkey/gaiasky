@@ -38,7 +38,6 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -238,6 +237,7 @@ public class WelcomeGui extends AbstractGui {
         downloadButton.setContentAlign(Align.center);
         downloadButton.align(Align.center);
         downloadButton.setSize(bw, bh);
+        downloadButton.setDisabled(dd == null);
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 addDatasetManagerWindow(dd);
@@ -382,6 +382,8 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsSelected() {
         int matches = 0;
+        if(dd == null)
+            return 0;
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
             // File name with no extension
             Path path = Path.of(f);
@@ -391,7 +393,7 @@ public class WelcomeGui extends AbstractGui {
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
                     matches++;
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error(e);
             }
         }
