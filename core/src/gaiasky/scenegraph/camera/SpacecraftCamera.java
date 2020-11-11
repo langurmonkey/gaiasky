@@ -99,11 +99,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         // init camera
         camera = new PerspectiveCamera(20, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.near = (float) (100d * Constants.KM_TO_U);
+        camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
 
         // init cameras vector
-        cameras = new PerspectiveCamera[]{camera, camLeft, camRight};
+        cameras = new PerspectiveCamera[]{ camera, camLeft, camRight};
 
         // init gui camera
         guiCam = new PerspectiveCamera(30, 300, 300);
@@ -117,7 +117,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         fovFactor = camera.fieldOfView / 40f;
 
         inputController = new SpacecraftInputController(new GestureAdapter());
-        //controllerListener = new SpacecraftControllerListener();
 
         // Init sprite batch for crosshair and cockpit
         spriteBatch = new SpriteBatch(1000, GlobalResources.spriteShader);
@@ -141,7 +140,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public PerspectiveCamera[] getFrontCameras() {
-        return new PerspectiveCamera[]{camera};
+        return new PerspectiveCamera[]{ camera };
     }
 
     @Override
@@ -233,8 +232,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             // POSITION
             double tgfac = targetDistance * sc.sizeFactor / fovFactor;
             relpos.scl(sc.sizeFactor);
-            aux2.set(scup).nor().scl(tgfac / 8d);
-            desired.set(scdir).nor().scl(-tgfac).add(aux2);
+            desired.set(scdir).nor().scl(-tgfac);
             todesired.set(desired).sub(relpos);
             todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6);
             relpos.add(todesired);
@@ -242,8 +240,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             relpos.scl(1 / sc.sizeFactor);
 
             // DIRECTION
-            aux1.set(scup).nor().scl(0.00001);
-            aux2.set(scdir).nor().scl(tgfac * 4).add(aux1);
+            aux1.set(scup).nor().scl(targetDistance * 7d);
+            aux2.set(scdir).nor().scl(tgfac * 3d).add(aux1);
             direction.set(scpos).add(aux2).sub(pos).nor();
 
             // UP
@@ -264,10 +262,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     protected void updatePerspectiveCamera() {
         camera.fieldOfView = 40;
         fovFactor = camera.fieldOfView / 40f;
-        camera.near = (float) (targetDistance * 0.6);
-        if (closestBody != null) {
-            camera.near = Math.min(camera.near, ((float) closestBody.getPos().dst(pos) - (float) closestBody.getRadius()) * (float) sc.sizeFactor / 2.5f) * (float) sc.sizeFactor;
-        }
         camera.position.set(0, 0, 0);
         direction.put(camera.direction);
         up.put(camera.up);

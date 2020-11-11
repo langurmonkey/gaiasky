@@ -21,7 +21,6 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -55,11 +54,11 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     /**
      * Factor (adapt to be able to navigate small and large scale structures
      **/
-    public static final double[] thrustFactor = new double[13];
+    public static final double[] thrustFactor = new double[14];
 
     static {
-        double val = 0.1;
-        for (int i = 0; i < 13; i++) {
+        double val = 0.01;
+        for (int i = 0; i < 14; i++) {
             thrustFactor[i] = val * Math.pow(10, i);
         }
     }
@@ -84,7 +83,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public double mass;
 
     /** Factor hack **/
-    public double sizeFactor = 10d;
+    public double sizeFactor = 1d;
 
     /** Only the rotation matrix **/
     public Matrix4 rotationMatrix;
@@ -342,7 +341,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             // We use the simulation time for the integration
             double dt = Gdx.graphics.getDeltaTime();
             // Poll keys
-            pollKeys(Gdx.graphics.getDeltaTime());
+            if (camera.getMode().isSpacecraft())
+                pollKeys(Gdx.graphics.getDeltaTime());
 
             /** POSITION **/
             pos = computePosition(dt, camera.getSecondClosestBody(), enginePower, thrust, direction, force, accel, vel, pos);
