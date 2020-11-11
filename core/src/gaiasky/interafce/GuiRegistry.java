@@ -294,14 +294,16 @@ public class GuiRegistry implements IObserver {
                     break;
                 case SHOW_PREFERENCES_ACTION:
                     Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
-                    if(prefs.isEmpty()){
+                    if (prefs.isEmpty()) {
                         // Bring new window up
                         (new PreferencesWindow(ui, skin)).show(ui);
-                    }else {
+                    } else {
                         // Close current windows
                         for (Actor pref : prefs) {
-                            ((PreferencesWindow) pref).cancel();
-                            ((PreferencesWindow) pref).hide();
+                            if (pref instanceof PreferencesWindow) {
+                                ((PreferencesWindow) pref).cancel();
+                                ((PreferencesWindow) pref).hide();
+                            }
                         }
                     }
                     break;
@@ -476,7 +478,7 @@ public class GuiRegistry implements IObserver {
                             startModePopupInfoThread(modeChangeTable, seconds);
                         } else {
                             // Remove
-                            if (modeChangeTable != null && modeChangeTable.hasParent() &&  modeChangeTable.getName().equals("mct-" + name)){
+                            if (modeChangeTable != null && modeChangeTable.hasParent() && modeChangeTable.getName().equals("mct-" + name)) {
                                 modeChangeTable.remove();
                                 modeChangeTable = null;
                             }
@@ -503,13 +505,13 @@ public class GuiRegistry implements IObserver {
 
     }
 
-    private Array<Actor> getElementsOfType(Class<? extends Actor> clazz){
+    private Array<Actor> getElementsOfType(Class<? extends Actor> clazz) {
         Array<Actor> result = new Array<>();
-        if(current != null) {
+        if (current != null) {
             Stage ui = current.getGuiStage();
             Array<Actor> actors = ui.getActors();
-            for(Actor actor : actors){
-                if(actor.getClass().isAssignableFrom(clazz)){
+            for (Actor actor : actors) {
+                if (clazz.isAssignableFrom(actor.getClass())) {
                     result.add(actor);
                 }
             }
@@ -518,9 +520,9 @@ public class GuiRegistry implements IObserver {
     }
 
     public boolean removeControllerGui() {
-        for(int i =0; i < guis.size; i++){
+        for (int i = 0; i < guis.size; i++) {
             IGui gui = guis.get(i);
-            if(gui instanceof ControllerGui){
+            if (gui instanceof ControllerGui) {
                 ControllerGui cgui = (ControllerGui) gui;
                 return cgui.removeControllerGui(GaiaSky.instance.cam.naturalCamera);
             }
