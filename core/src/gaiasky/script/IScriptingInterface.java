@@ -2206,7 +2206,8 @@ public interface IScriptingInterface {
 
     /**
      * Sets the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
-     * and in the past (-years).
+     * and in the past (-years). This setting is not saved to the configuration and resets to 5 Myr after
+     * restart.
      * @param years The maximum year number to allow.
      */
     void setMaximumSimulationTime(long years);
