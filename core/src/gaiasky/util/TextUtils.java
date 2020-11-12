@@ -13,6 +13,7 @@ import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TextUtils {
@@ -152,6 +153,37 @@ public class TextUtils {
         return buff;
     }
 
+    public static String arrayToStr(String[] arr, String pre, String post, String sep) {
+        String buff = pre;
+        for (int i = 0; i < arr.length; i++) {
+            buff += arr[i];
+            if (i < arr.length - 1) {
+                buff += sep;
+            }
+        }
+        return buff + post;
+    }
+
+    public static String setToStr(Set<String> set) {
+        return setToStr(set, "[", "]", ", ");
+    }
+
+    public static String setToStr(Set<String> set, String pre, String post, String sep) {
+        String buff = pre;
+        if (set != null) {
+            int n = set.size();
+            int i = 0;
+            for (String elem : set) {
+                buff += elem;
+                if (i < n - 1) {
+                    buff += sep;
+                }
+                i++;
+            }
+        }
+        return buff + post;
+    }
+
     /** Decimal format **/
     private static INumberFormat nf, nfsci;
 
@@ -202,16 +234,16 @@ public class TextUtils {
         return concatAll(base, suffixesNew);
     }
 
-    public static boolean contains(String[] list, String key){
+    public static boolean contains(String[] list, String key) {
         return contains(list, key, false);
     }
 
     public static boolean contains(String[] list, String key, boolean ignoreCase) {
         AtomicBoolean contained = new AtomicBoolean(false);
         Arrays.stream(list).forEach(candidate -> {
-           if(ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)){
-               contained.set(true);
-           }
+            if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
+                contained.set(true);
+            }
         });
         return contained.get();
     }

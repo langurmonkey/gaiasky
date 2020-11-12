@@ -174,9 +174,11 @@ public class WelcomeGui extends AbstractGui {
         float bw = 350f * GlobalConf.UI_SCALE_FACTOR;
         float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
 
-        int removed = removeNonExistent();
-        if (removed > 0)
-            logger.warn(I18n.txt("gui.welcome.warn.nonexistent", removed));
+        Set<String> removed = removeNonExistent();
+        if (removed.size() > 0) {
+            logger.warn(I18n.txt("gui.welcome.warn.nonexistent", removed.size()));
+            logger.warn(TextUtils.setToStr(removed));
+        }
         int numCatalogsAvailable = numCatalogsAvailable();
         int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
         int numStarCatalogsSelected = numStarCatalogsSelected();
@@ -401,7 +403,7 @@ public class WelcomeGui extends AbstractGui {
         return matches;
     }
 
-    private int removeNonExistent() {
+    private Set<String> removeNonExistent() {
         Set<String> toRemove = new HashSet<>();
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
             // File name with no extension
@@ -417,7 +419,7 @@ public class WelcomeGui extends AbstractGui {
             GlobalConf.data.CATALOG_JSON_FILES.removeValue(out, true);
         }
 
-        return toRemove.size();
+        return toRemove;
     }
 
     /**

@@ -42,13 +42,13 @@
         },
         {
             "name" : "verylarge",
-            "maxpart" : 120000,
+            "maxpart" : 130000,
             "pllxerrbright" : 0.5,
             "pllxerrfaint" : 0.5,
             "pllxzeropoint" : -0.017,
             "postprocess" : null,
-            "childcount" : 500,
-            "parentcount" : 35000,
+            "childcount" : 300,
+            "parentcount" : 25000,
             "additional" : "$DATA_LOC/data/ag-e/edr3int4/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/edr3int4/xmatch.csv"
