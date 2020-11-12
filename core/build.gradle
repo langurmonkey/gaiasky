@@ -61,7 +61,7 @@ class GaiaSkyRun extends JavaExec {
         systemProperties['org.slf4j.simpleLogger.showThreadName'] = 'false'
 
         minHeapSize = "3g"
-        maxHeapSize = "6g"
+        maxHeapSize = "8g"
         // Parallel GC
         //jvmArgs = [ '-XX:+UseParNewGC']
         // CMS GC
