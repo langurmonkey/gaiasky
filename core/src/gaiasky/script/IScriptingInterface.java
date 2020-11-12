@@ -1243,6 +1243,23 @@ public interface IScriptingInterface {
     void addPolyline(String name, double[] points, double[] color, double lineWidth);
 
     /**
+     * Adds a new polyline with the given name, points, color and line width. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. The default primitive type of GL_LINE_STRIP
+     * is used. This version enables the addition of arrow caps. In the case arrow caps
+     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with many points.
+     * The arrow cap is added at the first point in the series.
+     *
+     * @param name      The name to identify the polyline, to possibly remove it later.
+     * @param points    The points of the polyline. It is an array containing all the
+     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
+     */
+    void addPolyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps);
+
+    /**
      * Adds a new polyline with the given name, points, color, line width and primitive. The polyline will
      * be created with the 'Others' component type, so you need to enable the
      * visibility of 'Others' in order to see it.
@@ -1256,6 +1273,22 @@ public interface IScriptingInterface {
      */
     void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive);
 
+    /**
+     * Adds a new polyline with the given name, points, color, line width, primitive and arrow caps. The polyline will
+     * be created with the 'Others' component type, so you need to enable the
+     * visibility of 'Others' in order to see it. This version enables the addition of arrow caps. In the case arrow caps
+     * are enabled, the line will be rendered in CPU mode (no VBO), making it slightly slower, especially for lines with many points.
+     * The arrow cap is added at the first point in the series.
+     *
+     * @param name      The name to identify the polyline, to possibly remove it later.
+     * @param points    The points of the polyline. It is an array containing all the
+     *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
+     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param lineWidth The line width. Usually a value between 1 (default) and 10.
+     * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
+     * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
+     */
+    void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps);
     /**
      * <p>
      * Removes the model object identified by the given name from the internal

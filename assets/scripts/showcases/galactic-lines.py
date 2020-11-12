@@ -28,13 +28,13 @@ pc_to_km = 3.0856776e13
 
 names = []
 # Loop over l and b
-for l in arange(0.0, 360.0, 5.0):
-    for b in arange(-90.0, 90.0, 5.0):
+for l in arange(0.0, 360.0, 20.0):
+    for b in arange(-90.0, 90.0, 10.0):
         start = gs.galacticToInternalCartesian(l, b, 10 * pc_to_km)
-        end = gs.galacticToInternalCartesian(l - 1.0, b, 10 * pc_to_km)
+        end = gs.galacticToInternalCartesian(l - 10.0, b, 10 * pc_to_km)
 
         name = "arrow-%d-%d" % (l, b)
-        gs.addPolyline(name, [start[0], start[1], start[2], end[0], end[1], end[2]], [0.8, l / 360.0, (b + 90.0) / 180.0, 1.0], 2)
+        gs.addPolyline(name, [start[0], start[1], start[2], end[0], end[1], end[2]], [0.8, l / 360.0, (b + 90.0) / 180.0, 1.0], 2, True)
         names.append(name)
 
 

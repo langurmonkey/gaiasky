@@ -2256,13 +2256,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void addPolyline(String name, double[] points, double[] color, double lineWidth) {
-        addPolyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP);
+        addPolyline(name, points, color, lineWidth, false);
+    }
+
+    @Override
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth, boolean arrowCaps) {
+        addPolyline(name, points, color, lineWidth, GL20.GL_LINE_STRIP, arrowCaps);
     }
 
     @Override
     public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive) {
+        addPolyline(name, points, color, lineWidth, primitive, false);
+    }
+
+    @Override
+    public void addPolyline(String name, double[] points, double[] color, double lineWidth, int primitive, boolean arrowCaps) {
         if (checkString(name, "name") && checkNum(lineWidth, 0.1f, 50f, "lineWidth") && checkNum(primitive, 1, 3, "primitive")) {
-            Polyline pl = new Polyline(primitive);
+            Polyline pl = new Polyline(arrowCaps, primitive);
             pl.setCt("Others");
             pl.setColor(color);
             pl.setName(name);
@@ -2288,16 +2298,32 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         addPolyline(name, dArray(points), dArray(color), lineWidth);
     }
 
+    public void addPolyline(String name, List points, List color, float lineWidth, boolean arrowCaps) {
+        addPolyline(name, dArray(points), dArray(color), lineWidth, arrowCaps);
+    }
+
     public void addPolyline(String name, List points, List color, float lineWidth, int primitive) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive);
+    }
+
+    public void addPolyline(String name, List points, List color, float lineWidth, int primitive, boolean arrowCaps) {
+        addPolyline(name, dArray(points), dArray(color), lineWidth, primitive, arrowCaps);
     }
 
     public void addPolyline(String name, List points, List color, int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
+    public void addPolyline(String name, List points, List color, int lineWidth, boolean arrowCaps) {
+        addPolyline(name, points, color, (float) lineWidth, arrowCaps);
+    }
+
     public void addPolyline(String name, List points, List color, int lineWidth, int primitive) {
         addPolyline(name, points, color, (float) lineWidth, primitive);
+    }
+
+    public void addPolyline(String name, List points, List color, int lineWidth, int primitive, boolean arrowCaps) {
+        addPolyline(name, points, color, (float) lineWidth, primitive, arrowCaps);
     }
 
     @Override

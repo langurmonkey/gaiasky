@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateRenderSystem {
     protected ICamera camera;
-    protected boolean lines = false;
+    protected boolean lines;
 
     public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(rg, alphas, shaders);

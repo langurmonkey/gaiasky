@@ -47,8 +47,8 @@
             "pllxerrfaint" : 0.5,
             "pllxzeropoint" : -0.017,
             "postprocess" : null,
-            "childcount" : 200,
-            "parentcount" : 25000,
+            "childcount" : 500,
+            "parentcount" : 35000,
             "additional" : "$DATA_LOC/data/ag-e/edr3int4/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/edr3int4/xmatch.csv"
