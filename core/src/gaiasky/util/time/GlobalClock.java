@@ -9,6 +9,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Nature;
@@ -60,8 +61,6 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
         EventManager.instance.subscribe(this, Events.PACE_CHANGE_CMD, Events.TIME_WARP_DECREASE_CMD, Events.TIME_WARP_INCREASE_CMD, Events.TIME_CHANGE_CMD, Events.TARGET_TIME_CMD);
     }
 
-    double msacum = 0d;
-
     /**
     	 * Update function
     	 * 
@@ -97,23 +96,23 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 }
             }
 
-            if (newTime > Constants.MAX_TIME_MS) {
-                if (currentTime < Constants.MAX_TIME_MS) {
-                    logger.info("Maximum time reached (" + (Constants.MAX_TIME_MS * Nature.MS_TO_Y) + " years)!");
+            if (newTime > GlobalConf.runtime.MAX_TIME_MS) {
+                if (currentTime < GlobalConf.runtime.MAX_TIME_MS) {
+                    logger.info("Maximum time reached (" + (GlobalConf.runtime.MAX_TIME_MS * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
                     EventManager.instance.post(Events.TIME_STATE_CMD, false, false);
                 }
-                newTime = Constants.MAX_TIME_MS;
+                newTime = GlobalConf.runtime.MAX_TIME_MS;
                 time = Instant.ofEpochMilli(newTime);
                 EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
                 lastUpdate = 0;
-            } else if (newTime < Constants.MIN_TIME_MS) {
-                if (currentTime > Constants.MIN_TIME_MS) {
-                    logger.info("Minimum time reached (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)!");
+            } else if (newTime < GlobalConf.runtime.MIN_TIME_MS) {
+                if (currentTime > GlobalConf.runtime.MIN_TIME_MS) {
+                    logger.info("Minimum time reached (" + (GlobalConf.runtime.MIN_TIME_MS * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
                     EventManager.instance.post(Events.TIME_STATE_CMD, false, false);
                 }
-                newTime = Constants.MIN_TIME_MS;
+                newTime = GlobalConf.runtime.MIN_TIME_MS;
                 time = Instant.ofEpochMilli(newTime);
                 EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
                 lastUpdate = 0;
@@ -184,14 +183,14 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             Instant newinstant = ((Instant) data[0]);
             long newt = newinstant.toEpochMilli();
             boolean updt = false;
-            if (newt > Constants.MAX_TIME_MS) {
-                newt = Constants.MAX_TIME_MS;
-                logger.info("Time overflow, set to maximum (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
+            if (newt > GlobalConf.runtime.MAX_TIME_MS) {
+                newt = GlobalConf.runtime.MAX_TIME_MS;
+                logger.info("Time overflow, set to maximum (" + (GlobalConf.runtime.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
                 updt = true;
             }
-            if (newt < Constants.MIN_TIME_MS) {
-                newt = Constants.MIN_TIME_MS;
-                logger.info("Time overflow, set to minimum (" + (Constants.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
+            if (newt < GlobalConf.runtime.MIN_TIME_MS) {
+                newt = GlobalConf.runtime.MIN_TIME_MS;
+                logger.info("Time overflow, set to minimum (" + (GlobalConf.runtime.MIN_TIME_MS * Nature.MS_TO_Y) + " years)");
                 updt = true;
             }
             if (updt) {

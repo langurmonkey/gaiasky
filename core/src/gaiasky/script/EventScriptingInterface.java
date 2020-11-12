@@ -2799,6 +2799,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setMaximumSimulationTime(long years) {
+        GlobalConf.runtime.setMaxTime(years);
+    }
+
+    public void setMaximumSimulationTime(double years) {
+        setMaximumSimulationTime((long) years);
+    }
+
+    public void setMaximumSimulationTime(Long years) {
+        setMaximumSimulationTime(years.longValue());
+    }
+
+    public void setMaximumSimulationTime(Double years) {
+        setMaximumSimulationTime(years.longValue());
+    }
+
+    public void setMaximumSimulationTime(Integer years) {
+        setMaximumSimulationTime(years.longValue());
+    }
+
+    @Override
     public double getMeterToInternalUnitConversion() {
         return Constants.M_TO_U;
     }

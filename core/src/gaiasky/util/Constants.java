@@ -115,7 +115,7 @@ public class Constants {
      */
     public static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
 
-    public static float getCameraK(){
+    public static float getCameraK() {
         return (float) CAMERA_K;
     }
 
@@ -286,11 +286,6 @@ public class Constants {
     public final static float MAX_AXIS_SENSITIVITY = 10f;
 
 
-    // Max time, 5 Myr
-    public static final long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;
-    // Min time, -5 Myr
-    public static final long MIN_TIME_MS = -MAX_TIME_MS;
-
     // Max time for VSOP87 algorithms
     public static final long MAX_VSOP_TIME_MS = 20000l * (long) Nature.Y_TO_MS;
 
@@ -306,7 +301,6 @@ public class Constants {
     public static final float MAX_DATASET_SIZE_FACTOR = 5.0f;
     // Min dataset highlight size factor
     public static final float MIN_DATASET_SIZE_FACTOR = 0.1f;
-
 
     // Maximum minimap size (px)
     public static final float MAX_MINIMAP_SIZE = 350f;

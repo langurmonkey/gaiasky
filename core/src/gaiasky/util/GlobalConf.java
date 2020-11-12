@@ -465,6 +465,7 @@ public class GlobalConf {
         public boolean RECORD_CAMERA;
         public boolean RECORD_KEYFRAME_CAMERA;
         public float LIMIT_MAG_RUNTIME;
+
         /**
          * Whether octree drawing is active or not
          **/
@@ -473,6 +474,17 @@ public class GlobalConf {
         public boolean GRAVITATIONAL_WAVES = false;
 
         public boolean DISPLAY_VR_GUI = false;
+
+        // Max clock time, 5 Myr by default
+        public long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;
+        // Min clock time, -5 Myr by default
+        public long MIN_TIME_MS = -MAX_TIME_MS;
+
+        public void setMaxTime(long years) {
+            MAX_TIME_MS = years * (long) Nature.Y_TO_MS;
+            MIN_TIME_MS = -MAX_TIME_MS;
+        }
+
 
         public RuntimeConf() {
             EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);

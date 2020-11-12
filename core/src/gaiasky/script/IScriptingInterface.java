@@ -2205,6 +2205,13 @@ public interface IScriptingInterface {
     boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible);
 
     /**
+     * Sets the maximum simulation time allowed, in years. This sets the maximum time in the future (years)
+     * and in the past (-years).
+     * @param years The maximum year number to allow.
+     */
+    void setMaximumSimulationTime(long years);
+
+    /**
      * Returns the meter to internal unit conversion factor. Use this factor to multiply
      * your coordinates in meters to get them in internal units.
      *
