@@ -1425,7 +1425,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             StarGroup sg = (StarGroup) sgn;
             if (sg != null) {
                 StarBean sb = (StarBean) sg.getCandidateBean();
-                if(sb != null) {
+                if (sb != null) {
                     double[] rgb = sb.rgb();
                     return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
                 }
@@ -2517,24 +2517,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private List<ParticleBean> loadParticleBeans(DataSource ds, DatasetOptions dops) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(dops);
-        @SuppressWarnings("unchecked") List<ParticleBean> data = (List<ParticleBean>) provider.loadData(ds, 1.0f,
-                () -> {
-                    // Show progress bar
-                    EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
-                    // Reset
-                    EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, 0.1f);
-                },
-                (current, count) -> {
-                    EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, (float) current / (float) count);
-                    if (current % 250000 == 0) {
-                        logger.info(current + " objects loaded...");
-                    }
-                },
-                () ->{
-                    // Hide progress bar
-                    EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
-                }
-        );
+        @SuppressWarnings("unchecked") List<ParticleBean> data = (List<ParticleBean>) provider.loadData(ds, 1.0f, () -> {
+            // Show progress bar
+            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
+            // Reset
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, 0.1f);
+        }, (current, count) -> {
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, (float) current / (float) count);
+            if (current % 250000 == 0) {
+                logger.info(current + " objects loaded...");
+            }
+        }, () -> {
+            // Hide progress bar
+            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
+        });
         return data;
     }
 
@@ -2800,11 +2796,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setMaximumSimulationTime(long years) {
-        GlobalConf.runtime.setMaxTime(years);
+        GlobalConf.runtime.setMaxTime(Math.abs(years));
     }
 
     public void setMaximumSimulationTime(double years) {
-        setMaximumSimulationTime((long) years);
+        if (Double.isFinite(years))
+            setMaximumSimulationTime((long) years);
+        else
+            logger.error("The number of years is not a finite number: " + years);
     }
 
     public void setMaximumSimulationTime(Long years) {
@@ -2812,7 +2811,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public void setMaximumSimulationTime(Double years) {
-        setMaximumSimulationTime(years.longValue());
+        if (Double.isFinite(years))
+            setMaximumSimulationTime(years.longValue());
+        else
+            logger.error("The number of years is not a finite number: " + years);
     }
 
     public void setMaximumSimulationTime(Integer years) {
