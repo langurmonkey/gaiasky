@@ -38,6 +38,8 @@ task versionFile {
 
 jar {
     dependsOn versionFile
+    exclude('**/*.hiero')
+    exclude('**/*.svg')
 }
 
 install4j {
@@ -251,10 +253,10 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
 
         // Copy music
         mkdir "$distDir/music"
-        copy {
-            from "../assets/music"
-            into "$distDir/music"
-        }
+        //copy {
+        //    from "../assets/music"
+        //    into "$distDir/music"
+        //}
 
         // Copy mappings
         mkdir "$distDir/mappings"

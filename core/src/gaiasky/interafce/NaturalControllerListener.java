@@ -86,18 +86,6 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     }
 
     public boolean updateControllerMappings(String mappingsFile) {
-        // We look for OS-specific mappings for the given inputListener. If not found, it defaults to the base
-        String os = SysUtils.getOSFamily();
-        int extensionStart = mappingsFile.lastIndexOf('.');
-        String pre = mappingsFile.substring(0, extensionStart); //-V6009
-        String post = mappingsFile.substring(extensionStart + 1);
-
-        String osMappingsFile = pre + "." + os + "." + post;
-        if (Files.exists(Path.of(osMappingsFile))) {
-            mappingsFile = osMappingsFile;
-            logger.info("Controller mappings file set to " + mappingsFile);
-        }
-
         if (Files.exists(Path.of(mappingsFile)))
             mappings = new ControllerMappings(null, Path.of(mappingsFile));
         return false;
