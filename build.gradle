@@ -174,7 +174,6 @@ project(":core") {
             include "icon/gsascii.txt"
             include "img/**"
             include "text/**"
-            exclude "img/splash"
             include "shader/**"
             include "shaders/**"
             include "skins/**"

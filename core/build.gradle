@@ -40,6 +40,7 @@ jar {
     dependsOn versionFile
     exclude('**/*.hiero')
     exclude('**/*.svg')
+    exclude('**/*.xcf')
 }
 
 install4j {
