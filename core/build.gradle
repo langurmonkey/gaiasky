@@ -211,7 +211,7 @@ task execPermission(type: Exec) {
 
 task manGen(type: Exec) {
     workingDir "$distDir"
-    commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
+    commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
 
 }
 
