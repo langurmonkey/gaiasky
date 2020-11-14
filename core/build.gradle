@@ -206,7 +206,13 @@ task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates 
 }
 
 task execPermission(type: Exec) {
-    commandLine 'chmod', 'ugo+x', "$distDir/gaiasky"
+    commandLine "chmod", "ugo+x", "$distDir/gaiasky"
+}
+
+task manGen(type: Exec) {
+    workingDir "$distDir"
+    commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
+
 }
 
 task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
@@ -311,9 +317,7 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
 
         // Generate man
         println("Generate man: $distDir/gaiasky.6.gz")
-        exec {
-            commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
-        }
+        manGen.exec()
         exec {
             commandLine "gzip", "$distDir/gaiasky.6"
         }
