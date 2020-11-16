@@ -217,7 +217,6 @@ task execPermission(type: Exec) {
 task manGen(type: Exec) {
     workingDir "$distDir"
     commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
-
 }
 
 task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
@@ -324,9 +323,7 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
             if (Os.isFamily(Os.FAMILY_UNIX)) {
                 // Generate man
                 println("Generate man: $distDir/gaiasky.6.gz")
-                exec {
-                    commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
-                }
+                manGen.exec()
                 exec {
                     commandLine "gzip", "$distDir/gaiasky.6"
                 }
