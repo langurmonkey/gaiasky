@@ -135,6 +135,7 @@ public class DatasetsWidget {
             descGroup.space(pad * 2f);
             String shortDesc = TextUtils.capString(desc != null ? desc : "", maxCharsDescription);
             OwnLabel description = new OwnLabel(shortDesc, skin);
+            description.addListener(new OwnTextTooltip(desc, skin, 10));
             // Info
             OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
             imgTooltip.addListener(new OwnTextTooltip(desc, skin, 10));
