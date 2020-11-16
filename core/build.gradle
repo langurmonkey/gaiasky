@@ -1,6 +1,8 @@
 apply plugin: "java"
 apply plugin: "com.install4j.gradle"
 
+import org.apache.tools.ant.taskdefs.condition.Os
+
 sourceCompatibility = 11
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -215,7 +217,6 @@ task execPermission(type: Exec) {
 task manGen(type: Exec) {
     workingDir "$distDir"
     commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
-
 }
 
 task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
@@ -315,14 +316,18 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
         project.ext.versionFile = file("build/classes/java/main/version").text
         ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
 
-        // Give execute
-        execPermission.exec()
+        if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
+            // Give execute
+            execPermission.exec()
 
-        // Generate man
-        println("Generate man: $distDir/gaiasky.6.gz")
-        manGen.exec()
-        exec {
-            commandLine "gzip", "$distDir/gaiasky.6"
+            if (Os.isFamily(Os.FAMILY_UNIX)) {
+                // Generate man
+                println("Generate man: $distDir/gaiasky.6.gz")
+                manGen.exec()
+                exec {
+                    commandLine "gzip", "$distDir/gaiasky.6"
+                }
+            }
         }
     }
 }
@@ -459,7 +464,7 @@ task pack(dependsOn: install4jMedia, description: "Creates the releases for wind
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
-        if(md5File.exists()) {
+        if (md5File.exists()) {
             String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
             md5Tar = md5Tar.replace("\n", "").replace("\r", "");
             md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
