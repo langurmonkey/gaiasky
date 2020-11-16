@@ -8,12 +8,14 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.TextUtils;
 
 /**
  * A collapsible pane with a detach-to-window button.
@@ -59,10 +61,23 @@ public class CollapsiblePane extends Table {
         this.labelText = labelText;
         this.content = content;
         this.skin = skin;
-        this.space = 4 * GlobalConf.UI_SCALE_FACTOR;
+        this.space = 4f * GlobalConf.UI_SCALE_FACTOR;
         this.collapseSpeed = 1000;
 
-        Label mainLabel = new Label(labelText, skin, labelStyle);
+        OwnLabel mainLabel = new OwnLabel(labelText, skin, labelStyle);
+        float lw = mainLabel.getWidth();
+        LabelStyle ls = skin.get(labelStyle, LabelStyle.class);
+
+        if (lw > width * 0.8f) {
+            com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout(); //dont do this every frame! Store it as member
+            for (int chars = labelText.length() - 1; chars > 0; chars--) {
+                layout.setText(ls.font, TextUtils.capString(labelText, chars));
+                if (layout.width <= width * 0.8f) {
+                    mainLabel.setText(TextUtils.capString(labelText, chars));
+                    break;
+                }
+            }
+        }
 
         // Expand icon
         expandIcon = new OwnImageButton(skin, expandButtonStyle);
@@ -194,7 +209,7 @@ public class CollapsiblePane extends Table {
      * @param stage     The main stage.
      * @param labelText The text of the label.
      * @param content   The content actor.
-     * @param width             The preferred width of this pane.
+     * @param width     The preferred width of this pane.
      * @param skin      The skin to use.
      * @param shortcut  The keyboard shortcut to use.
      * @param topIcons  List of top icons that will be added between the label and the

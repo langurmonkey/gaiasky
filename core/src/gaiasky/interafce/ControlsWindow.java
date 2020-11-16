@@ -39,7 +39,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      * @return The width of the content.
      */
     public static float getContentWidth() {
-        return 190f * GlobalConf.UI_SCALE_FACTOR;
+        return 220f * GlobalConf.UI_SCALE_FACTOR;
     }
 
     /**
@@ -84,6 +84,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     }
 
     public void initialize() {
+        int maxTitleChars = 24;
+
         /** Global layout **/
         guiLayout = new Table();
         guiLayout.pad(0);
@@ -342,7 +344,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         windowScroll.setOverscroll(false, false);
         windowScroll.setSmoothScrolling(true);
         windowScroll.pack();
-        //windowScroll.setWidth(guiLayout.getWidth() + windowScroll.getStyle().vScroll.getMinWidth());
+        windowScroll.setWidth(guiLayout.getWidth() + windowScroll.getStyle().vScroll.getMinWidth());
 
         mainVertical = new VerticalGroup();
         mainVertical.space(padSides);
@@ -396,85 +398,85 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case TIME_STATE_CMD:
-                // Pause has been toggled, update playstop button only if this does
-                // not come from this interface
-                if (!(Boolean) data[1]) {
-                    playstop.setCheckedNoFire((Boolean) data[0]);
-                }
-                break;
-            case GUI_SCROLL_POSITION_CMD:
-                this.windowScroll.setScrollY((float) data[0]);
-                break;
-            case GUI_FOLD_CMD:
-                boolean collapse;
-                if (data.length >= 1) {
-                    collapse = (boolean) data[0];
-                } else {
-                    // Toggle
-                    collapse = !isCollapsed();
-                }
-                if (collapse) {
-                    collapse();
-                } else {
-                    expand();
-                }
-                break;
-            case GUI_MOVE_CMD:
-                float x = (float) data[0];
-                float y = (float) data[1];
-                float width = Gdx.graphics.getWidth();
-                float height = Gdx.graphics.getHeight();
-                float windowWidth = getWidth();
-                float windowHeight = getHeight();
+        case TIME_STATE_CMD:
+            // Pause has been toggled, update playstop button only if this does
+            // not come from this interface
+            if (!(Boolean) data[1]) {
+                playstop.setCheckedNoFire((Boolean) data[0]);
+            }
+            break;
+        case GUI_SCROLL_POSITION_CMD:
+            this.windowScroll.setScrollY((float) data[0]);
+            break;
+        case GUI_FOLD_CMD:
+            boolean collapse;
+            if (data.length >= 1) {
+                collapse = (boolean) data[0];
+            } else {
+                // Toggle
+                collapse = !isCollapsed();
+            }
+            if (collapse) {
+                collapse();
+            } else {
+                expand();
+            }
+            break;
+        case GUI_MOVE_CMD:
+            float x = (float) data[0];
+            float y = (float) data[1];
+            float width = Gdx.graphics.getWidth();
+            float height = Gdx.graphics.getHeight();
+            float windowWidth = getWidth();
+            float windowHeight = getHeight();
 
-                x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
-                y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
+            x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
+            y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
 
-                setPosition(Math.round(x), Math.round(y));
+            setPosition(Math.round(x), Math.round(y));
 
-                break;
-            case RECALCULATE_OPTIONS_SIZE:
-                recalculateSize();
-                break;
-            case EXPAND_PANE_CMD:
-                String paneName = (String) data[0];
-                CollapsiblePane pane = panes.get(paneName);
-                pane.expandPane();
-                break;
-            case COLLAPSE_PANE_CMD:
-                paneName = (String) data[0];
-                pane = panes.get(paneName);
-                pane.collapsePane();
-                break;
-            case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
-                paneName = (String) data[0];
-                pane = panes.get(paneName);
-                pane.togglePane();
-                break;
-            case SHOW_MINIMAP_ACTION:
-                boolean show = (Boolean) data[0];
-                boolean ui = (Boolean) data[1];
-                if (!ui) {
-                    map.setProgrammaticChangeEvents(false);
-                    map.setChecked(show);
-                    map.setProgrammaticChangeEvents(true);
-                }
-                break;
-            case TOGGLE_MINIMAP:
+            break;
+        case RECALCULATE_OPTIONS_SIZE:
+            recalculateSize();
+            break;
+        case EXPAND_PANE_CMD:
+            String paneName = (String) data[0];
+            CollapsiblePane pane = panes.get(paneName);
+            pane.expandPane();
+            break;
+        case COLLAPSE_PANE_CMD:
+            paneName = (String) data[0];
+            pane = panes.get(paneName);
+            pane.collapsePane();
+            break;
+        case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
+            paneName = (String) data[0];
+            pane = panes.get(paneName);
+            pane.togglePane();
+            break;
+        case SHOW_MINIMAP_ACTION:
+            boolean show = (Boolean) data[0];
+            boolean ui = (Boolean) data[1];
+            if (!ui) {
                 map.setProgrammaticChangeEvents(false);
-                map.setChecked(!map.isChecked());
+                map.setChecked(show);
                 map.setProgrammaticChangeEvents(true);
-                break;
-            case RECORD_CAMERA_CMD:
-                boolean state = (Boolean) data[0];
-                ui = (Boolean) data[2];
-                if(!ui){
-                    recCamera.setCheckedNoFire(state);
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        case TOGGLE_MINIMAP:
+            map.setProgrammaticChangeEvents(false);
+            map.setChecked(!map.isChecked());
+            map.setProgrammaticChangeEvents(true);
+            break;
+        case RECORD_CAMERA_CMD:
+            boolean state = (Boolean) data[0];
+            ui = (Boolean) data[2];
+            if (!ui) {
+                recCamera.setCheckedNoFire(state);
+            }
+            break;
+        default:
+            break;
         }
 
     }

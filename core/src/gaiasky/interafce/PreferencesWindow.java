@@ -110,8 +110,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Build UI
         buildSuper();
 
-
         EventManager.instance.subscribe(this, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
+    }
+
+    private OwnTextIconButton createTab(String title, Image img, Skin skin, String style){
+        OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, style);
+        tab.addListener(new OwnTextTooltip(title, skin));
+        tab.pad(pad5);
+        tab.setWidth(310f * GlobalConf.UI_SCALE_FACTOR);
+        return tab;
     }
 
     @Override
@@ -119,7 +126,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float contentw = 700f * GlobalConf.UI_SCALE_FACTOR;
         float contenth = 700f * GlobalConf.UI_SCALE_FACTOR;
         final float tawidth = 600f * GlobalConf.UI_SCALE_FACTOR;
-        float tabwidth = 270f * GlobalConf.UI_SCALE_FACTOR;
         float textwidth = 65f * GlobalConf.UI_SCALE_FACTOR;
         float scrollh = 400f * GlobalConf.UI_SCALE_FACTOR;
         float controlsscrollw = 550f * GlobalConf.UI_SCALE_FACTOR;
@@ -130,42 +136,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         VerticalGroup group = new VerticalGroup();
         group.align(Align.left | Align.top);
 
-        final OwnTextIconButton tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
-        tabGraphics.pad(pad5);
-        tabGraphics.setWidth(tabwidth);
-        final OwnTextIconButton tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
-        tabUI.pad(pad5);
-        tabUI.setWidth(tabwidth);
-        final OwnTextIconButton tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
-        tabPerformance.pad(pad5);
-        tabPerformance.setWidth(tabwidth);
-        final OwnTextIconButton tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
-        tabControls.pad(pad5);
-        tabControls.setWidth(tabwidth);
-        final OwnTextIconButton tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
-        tabScreenshots.pad(pad5);
-        tabScreenshots.setWidth(tabwidth);
-        final OwnTextIconButton tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
-        tabFrames.pad(pad5);
-        tabFrames.setWidth(tabwidth);
-        final OwnTextIconButton tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
-        tabCamera.pad(pad5);
-        tabCamera.setWidth(tabwidth);
-        final OwnTextIconButton tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
-        tab360.pad(pad5);
-        tab360.setWidth(tabwidth);
-        final OwnTextIconButton tabPlanetarium = new OwnTextIconButton(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin, "toggle-big");
-        tabPlanetarium.pad(pad5);
-        tabPlanetarium.setWidth(tabwidth);
-        final OwnTextIconButton tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
-        tabData.pad(pad5);
-        tabData.setWidth(tabwidth);
-        final OwnTextIconButton tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
-        tabGaia.pad(pad5);
-        tabGaia.setWidth(tabwidth);
-        final OwnTextIconButton tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
-        tabSystem.pad(pad5);
-        tabSystem.setWidth(tabwidth);
+        final OwnTextIconButton tabGraphics = createTab(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
+        final OwnTextIconButton tabUI = createTab(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
+        final OwnTextIconButton tabPerformance = createTab(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
+        final OwnTextIconButton tabControls = createTab(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
+        final OwnTextIconButton tabScreenshots = createTab(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
+        final OwnTextIconButton tabFrames = createTab(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
+        final OwnTextIconButton tabCamera = createTab(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
+        final OwnTextIconButton tab360 = createTab(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
+        final OwnTextIconButton tabPlanetarium = createTab(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin, "toggle-big");
+        final OwnTextIconButton tabData = createTab(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
+        final OwnTextIconButton tabGaia = createTab(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
+        final OwnTextIconButton tabSystem = createTab(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
 
         group.addActor(tabGraphics);
         group.addActor(tabUI);
@@ -995,7 +977,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         inverty = new OwnCheckBox(I18n.txt("gui.controller.axis.invert", "Y"), skin, "default", pad5);
         inverty.setChecked(GlobalConf.controls.INVERT_LOOK_Y_AXIS);
 
-
         // KEY BINDINGS
         OwnLabel titleKeybindings = new OwnLabel(I18n.txt("gui.keymappings"), skin, "header");
 
@@ -1525,7 +1506,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dw = new DatasetsWidget(skin);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
-
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
         dataDownload.setSize(150 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
