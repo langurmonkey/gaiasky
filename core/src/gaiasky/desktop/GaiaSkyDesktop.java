@@ -306,10 +306,10 @@ public class GaiaSkyDesktop implements IObserver {
             } else {
                 int w = GlobalConf.screen.getScreenWidth();
                 int h = GlobalConf.screen.getScreenHeight();
-                if(w <= 0 || h <= 0){
-                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    w = (int) (screenSize.width * 0.85f);
-                    h = (int) (screenSize.height * 0.85f);
+                if (w <= 0 || h <= 0) {
+                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                    w = (int) (gd.getDisplayMode().getWidth() * 0.8);
+                    h = (int) (gd.getDisplayMode().getHeight() * 0.8);
                 }
                 cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
@@ -322,7 +322,7 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.useVsync(false);
             int w = GlobalConf.screen.SCREEN_WIDTH;
             int h = GlobalConf.screen.SCREEN_HEIGHT;
-            if(w <= 0 || h <= 0){
+            if (w <= 0 || h <= 0) {
                 Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                 w = (int) (screenSize.width * 0.85f);
                 h = (int) (screenSize.height * 0.85f);
