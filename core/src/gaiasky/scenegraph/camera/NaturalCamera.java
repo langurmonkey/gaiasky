@@ -36,7 +36,9 @@ import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.*;
+import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 import org.lwjgl.opengl.GL30;
@@ -1275,8 +1277,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
-
-
     /**
      * The speed scaling function.
      *
@@ -1285,10 +1285,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public double speedScaling(double min) {
         double dist;
+        double starEdge = 0.5 * Constants.PC_TO_U;
         if (parent.mode.useFocus() && focus != null) {
             dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
-        } else if (parent.mode.useClosest() && closestBody != null) {
-            dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
+        } else if (parent.mode.useClosest()) {
+            if (closestBody != null && closestBody.getDistToCamera() < closestStar.getDistToCamera()) {
+                dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
+            } else if (closestStar != null && (closestStar.getClosestDistToCamera() + MIN_DIST) < starEdge) {
+                dist = distance * Math.pow((closestStar.getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
+            } else {
+                dist = distance;
+            }
         } else {
             dist = distance;
         }
@@ -1296,7 +1303,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double func;
         if (dist < DIST_A) {
             // 0.1 pc < d
-            func = MathUtilsd.lint(dist, 0, DIST_A, 0 , 1e6) * Constants.DISTANCE_SCALE_FACTOR;
+            func = MathUtilsd.lint(dist, 0, DIST_A, 0, 1e6) * Constants.DISTANCE_SCALE_FACTOR;
         } else if (dist < DIST_B) {
             // 0.1 pc < d < 5 Kpc
             func = MathUtilsd.lint(dist, DIST_A, DIST_B, 1e6, 1e10) * Constants.DISTANCE_SCALE_FACTOR;
@@ -1443,7 +1450,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                     pos.add(0, f.getSize() / 2f, -f.getSize() * 4f);
                     posinv.set(pos).scl(-1);
-                    direction.set(0, -1f/8f, 1f);
+                    direction.set(0, -1f / 8f, 1f);
                     up.set(0, 1, 0);
                     rotate(up, 0.01);
                     updatePerspectiveCamera();

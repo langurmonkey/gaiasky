@@ -44,6 +44,8 @@ import java.io.InputStreamReader;
  * <li>TT [-3/11] - Morphology T-type code</li>
  * <li>Mcl [char] - Dwarf galaxy morphology (BCD, HIcld, Im, Ir, S0em, Sm, Sph,
  * Tr, dE, dEem, or dS0em)</li>
+ * <li>Img - path to billboard image</li>
+ * <li>Size - the size [pc]</li>
  * </ul>
  *
  * @author Toni Sagrista

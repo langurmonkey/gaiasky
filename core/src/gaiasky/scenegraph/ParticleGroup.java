@@ -691,7 +691,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 updateFocus(time, camera);
             }
 
-            if (active.length > 0) {
+            if (active.length > 0 && this instanceof StarGroup) {
                 ParticleBean closest = pointData.get(active[0]);
                 closestAbsolutePos.set(closest.x(), closest.y(), closest.z());
                 closestPos.set(closestAbsolutePos).sub(camera.getPos());
