@@ -68,11 +68,12 @@ public class CollapsiblePane extends Table {
         float lw = mainLabel.getWidth();
         LabelStyle ls = skin.get(labelStyle, LabelStyle.class);
 
-        if (lw > width * 0.8f) {
+        float mwidth = width * 0.8f;
+        if (lw > mwidth) {
             com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout(); //dont do this every frame! Store it as member
             for (int chars = labelText.length() - 1; chars > 0; chars--) {
                 layout.setText(ls.font, TextUtils.capString(labelText, chars));
-                if (layout.width <= width * 0.8f) {
+                if (layout.width <= mwidth) {
                     mainLabel.setText(TextUtils.capString(labelText, chars));
                     break;
                 }

@@ -117,7 +117,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, style);
         tab.addListener(new OwnTextTooltip(title, skin));
         tab.pad(pad5);
-        tab.setWidth(310f * GlobalConf.UI_SCALE_FACTOR);
+        tab.setWidth(300f * GlobalConf.UI_SCALE_FACTOR);
         return tab;
     }
 
@@ -133,7 +133,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float sliderWidth = textwidth * 3f;
 
         // Create the tab buttons
-        VerticalGroup group = new VerticalGroup();
+        Table group = new Table(skin);
         group.align(Align.left | Align.top);
 
         final OwnTextIconButton tabGraphics = createTab(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
@@ -149,18 +149,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnTextIconButton tabGaia = createTab(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
         final OwnTextIconButton tabSystem = createTab(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
 
-        group.addActor(tabGraphics);
-        group.addActor(tabUI);
-        group.addActor(tabPerformance);
-        group.addActor(tabControls);
-        group.addActor(tabScreenshots);
-        group.addActor(tabFrames);
-        group.addActor(tabCamera);
-        group.addActor(tab360);
-        group.addActor(tabPlanetarium);
-        group.addActor(tabData);
-        group.addActor(tabGaia);
-        group.addActor(tabSystem);
+        group.add(tabGraphics).row();
+        group.add(tabUI).row();
+        group.add(tabPerformance).row();
+        group.add(tabControls).row();
+        group.add(tabScreenshots).row();
+        group.add(tabFrames).row();
+        group.add(tabCamera).row();
+        group.add(tab360).row();
+        group.add(tabPlanetarium).row();
+        group.add(tabData).row();
+        group.add(tabGaia).row();
+        group.add(tabSystem).row();
         content.add(group).align(Align.left | Align.top).padLeft(pad5);
 
         // Create the tab content. Just using images here for simplicity.
@@ -1669,7 +1669,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabContent.addActor(contentSystem);
 
         /* ADD TO MAIN TABLE */
-        content.add(tabContent).left().padLeft(pad10).expand().fill();
+        content.add(tabContent).left().padLeft(pad15).expand().fill();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state

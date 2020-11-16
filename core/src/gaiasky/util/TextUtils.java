@@ -63,7 +63,7 @@ public class TextUtils {
             if (fromStart) {
                 return "..." + in.substring(in.length() - (targetLength - 3));
             } else {
-                return in.substring(0, targetLength - 3) + "...";
+                return in.substring(0, targetLength - 1) + "...";
             }
         }
     }
