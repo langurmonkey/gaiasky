@@ -10,7 +10,6 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntSet;
-import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -86,8 +85,14 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     }
 
     public boolean updateControllerMappings(String mappingsFile) {
-        if (Files.exists(Path.of(mappingsFile)))
+        if (Files.exists(Path.of(mappingsFile))) {
             mappings = new ControllerMappings(null, Path.of(mappingsFile));
+        } else {
+            Path internalMappings = Path.of(GlobalConf.ASSETS_LOC).resolve(mappingsFile);
+            if(Files.exists(internalMappings)){
+                mappings = new ControllerMappings(null, internalMappings);
+            }
+        }
         return false;
     }
 
