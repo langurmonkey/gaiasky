@@ -405,6 +405,24 @@
       "file": "@mirror-url@galaxies/nbg/20201030_v04/galaxies-nbg.tar.gz"
     },
     {
+      "name": "catalog-nbg",
+      "type": "catalog-gal",
+      "version": 5,
+      "mingsversion": 30000,
+      "size": 15786671,
+      "check": "catalog-nbg.json",
+      "data": [
+        "catalog-nbg.json",
+        "particles-nbg.json",
+        "nbg",
+        "tex/extragal"
+      ],
+      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
+      "releasenotes": "Fix M33 distance",
+      "sha256": "83cc24def980c6816e41b6f4cb41a289422cda341655ecf4118417b9eab49b80",
+      "file": "@mirror-url@galaxies/nbg/20201116_v05/galaxies-nbg.tar.gz"
+    },
+    {
       "name": "catalog-sdss-12",
       "type": "catalog-gal",
       "version": 2,
