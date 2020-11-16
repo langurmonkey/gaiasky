@@ -307,9 +307,16 @@ public class GaiaSkyDesktop implements IObserver {
                 int w = GlobalConf.screen.getScreenWidth();
                 int h = GlobalConf.screen.getScreenHeight();
                 if (w <= 0 || h <= 0) {
-                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                    w = (int) (gd.getDisplayMode().getWidth() * 0.8);
-                    h = (int) (gd.getDisplayMode().getHeight() * 0.8);
+                    try {
+                        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                        w = (int) (gd.getDefaultConfiguration().getBounds().getWidth() * 0.8);
+                        h = (int) (gd.getDefaultConfiguration().getBounds().getHeight() * 0.8);
+                    } catch (HeadlessException e) {
+                        logger.error(e);
+                        // Default
+                        w = 1280;
+                        h = 720;
+                    }
                 }
                 cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
