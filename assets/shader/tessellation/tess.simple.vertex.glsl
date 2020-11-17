@@ -137,9 +137,7 @@ uniform vec3 v3LightPos; /* The direction vector to the light source*/
 uniform vec3 v3InvWavelength; /* 1 / pow(wavelength, 4) for the red, green, and blue channels*/
 
 uniform float fCameraHeight;
-uniform float fCameraHeight2; /* fCameraHeight^2*/
 uniform float fOuterRadius; /* The outer (atmosphere) radius*/
-uniform float fOuterRadius2; /* fOuterRadius^2*/
 uniform float fInnerRadius; /* The inner (planetary) radius*/
 uniform float fKrESun; /* Kr * ESun*/
 uniform float fKmESun; /* Km * ESun*/
@@ -151,7 +149,6 @@ uniform float fScaleOverScaleDepth; /* fScale / fScaleDepth*/
 uniform float fAlpha; /* Atmosphere effect opacity */
 
 uniform int nSamples;
-uniform float fSamples;
 
 
 float scale(float fCos)
@@ -168,6 +165,8 @@ float getNearIntersection(vec3 pos, vec3 ray, float distance2, float radius2) {
 }
 
 void calculateAtmosphereGroundColor() {
+    float fCameraHeight2 = fCameraHeight * fCameraHeight;
+    float fOuterRadius2 = fOuterRadius * fOuterRadius;
     // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
     vec3 v3Pos = (a_position) * fOuterRadius;
     vec3 v3Ray = v3Pos - v3CameraPos;
@@ -190,7 +189,7 @@ void calculateAtmosphereGroundColor() {
     float fTemp = (fLightScale + fCameraScale);
 
     /* Initialize the scattering loop variables*/
-    float fSampleLength = fFar / fSamples;
+    float fSampleLength = fFar / float(nSamples);
     float fScaledLength = fSampleLength * fScale;
     vec3 v3SampleRay = v3Ray * fSampleLength;
     vec3 v3SamplePoint = v3Start + v3SampleRay * 0.5;

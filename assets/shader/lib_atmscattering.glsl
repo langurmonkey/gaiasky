@@ -6,9 +6,7 @@ uniform vec3 v3LightPos; /* The direction vector to the light source*/
 uniform vec3 v3InvWavelength; /* 1 / pow(wavelength, 4) for the red, green, and blue channels*/
 
 uniform float fCameraHeight;
-uniform float fCameraHeight2; /* fCameraHeight^2*/
 uniform float fOuterRadius; /* The outer (atmosphere) radius*/
-uniform float fOuterRadius2; /* fOuterRadius^2*/
 uniform float fInnerRadius; /* The inner (planetary) radius*/
 uniform float fKrESun; /* Kr * ESun*/
 uniform float fKmESun; /* Km * ESun*/
@@ -20,13 +18,11 @@ uniform float fScaleOverScaleDepth; /* fScale / fScaleDepth*/
 uniform float fAlpha; /* Atmosphere effect opacity */
 
 uniform int nSamples;
-uniform float fSamples;
 
 // 0 in the boundary of space, 1 on the ground
 out float v_heightNormalized;
 // Fade factor between hieght-driven opacity and luminosity-driven opacity
 out float v_fadeFactor;
-
 
 float scale(float fCos) {
     float x = 1.0 - fCos;
@@ -52,6 +48,8 @@ out vec4 v_atmosphereColor;
 
 // Computes the ground atmosphere color and puts it in v_atmosphereColor
 void computeAtmosphericScatteringGround() {
+    float fCameraHeight2 = fCameraHeight * fCameraHeight;
+    float fOuterRadius2 = fOuterRadius * fOuterRadius;
     // Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)
     vec3 v3Pos = a_position * fOuterRadius;
     vec3 v3Ray = v3Pos - v3CameraPos;
@@ -75,7 +73,7 @@ void computeAtmosphericScatteringGround() {
     float fTemp = (fLightScale + fCameraScale);
 
     /* Initialize the scattering loop variables*/
-    float fSampleLength = fFar / fSamples;
+    float fSampleLength = fFar / float(nSamples);
     float fScaledLength = fSampleLength * fScale;
     vec3 v3SampleRay = v3Ray * fSampleLength;
     vec3 v3SamplePoint = v3Start + v3SampleRay * 0.5;
@@ -112,6 +110,8 @@ out vec3 v_frontSecondaryColor;
 out vec3 v_direction;
 
 void computeAtmosphericScattering() {
+    float fCameraHeight2 = fCameraHeight * fCameraHeight;
+    float fOuterRadius2 = fOuterRadius * fOuterRadius;
     /* Get the ray from the camera to the vertex, and its length (which is the far point of the ray passing through the atmosphere)*/
     vec3 v3Pos = a_position * fOuterRadius;
     vec3 v3Ray = v3Pos - v3CameraPos;
@@ -141,7 +141,7 @@ void computeAtmosphericScattering() {
     float fStartOffset = fStartDepth * scale(fStartAngle);
 
     /* Initialize the scattering loop variables*/
-    float fSampleLength = fFar / fSamples;
+    float fSampleLength = fFar / float(nSamples);
     float fScaledLength = fSampleLength * fScale;
     vec3 v3SampleRay = v3Ray * fSampleLength;
     vec3 v3SamplePoint = v3Start + v3SampleRay * 0.5;
