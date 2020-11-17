@@ -19,7 +19,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.StarGroup.StarBean;
@@ -28,7 +27,6 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.Nature;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
@@ -36,6 +34,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
@@ -195,7 +195,12 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniform3fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 3);
 
                             // Days since epoch
-                            shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Nature.MS_TO_D));
+                            // Emulate double with floats, for compatibility
+                            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch());
+                            float curRt1 = (float) curRt;
+                            float curRt2 = (float) (curRt - (double) curRt1);
+                            shaderProgram.setUniformf("u_t", curRt1, curRt2);
+                            //shaderProgram.setUniformi("u_t", (int) (AstroUtils.getMsSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch()) * Nature.MS_TO_D));
                             shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
 
                             // Update projection if fovmode is 3
@@ -218,6 +223,13 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             });
             shaderProgram.end();
         }
+    }
+    private static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(Double.toString(value));
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
     protected VertexAttribute[] buildVertexAttributes() {

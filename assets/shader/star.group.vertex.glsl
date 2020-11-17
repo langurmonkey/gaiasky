@@ -2,6 +2,7 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
+#include shader/lib_doublefloat.glsl
 
 in vec3 a_position;
 in vec3 a_pm;
@@ -11,7 +12,8 @@ in vec4 a_color;
 // y - magnitude
 in vec2 a_additional;
 
-uniform int u_t; // time in days since epoch
+// time in days since epoch, as a 64-bit double encoded with two floats
+uniform vec2 u_t;
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
@@ -57,8 +59,15 @@ void main() {
     vec3 pos = a_position - u_camPos;
 
     // Proper motion
-    vec3 pm = a_pm * float(u_t) * day_to_year;
-    pos = pos + pm;
+    vec2 t_yr = ds_mul(u_t, ds_set(day_to_year));
+    vec2 pmx = ds_mul(ds_set(a_pm.x), t_yr);
+    vec2 pmy = ds_mul(ds_set(a_pm.y), t_yr);
+    vec2 pmz = ds_mul(ds_set(a_pm.z), t_yr);
+    pos.x = ds_add(ds_set(pos.x), pmx).x;
+    pos.y = ds_add(ds_set(pos.y), pmy).x;
+    pos.z = ds_add(ds_set(pos.z), pmz).x;
+    // Pm for use downstream
+    vec3 pm = vec3(pmx.x, pmy.x, pmz.x);
 
     // Distance to star
     float dist = length(pos);

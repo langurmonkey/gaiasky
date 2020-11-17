@@ -507,12 +507,24 @@ public class AstroUtils {
     }
 
     /**
+     * Returns the elapsed days since the given julian date jd until the
+     * given date. Can be negative
+     *
+     * @param date     The date
+     * @param epoch_jd The reference epoch in julian days
+     * @return The elapsed days
+     */
+    public static double getDaysSince(Instant date, double epoch_jd){
+        return (getJulianDateCache(date) - epoch_jd);
+    }
+
+    /**
      * Gets the Gregorian calendar quantities given the Julian date.
      *
      * @param julianDate The Julian date
      * @return Vector with {year, month, day, hour, min, sec, nanos}
      */
-    public static int[] getCalendarDay(double julianDate) {
+    public static long[] getCalendarDay(double julianDate) {
         /**
          * y 4716 v 3 j 1401 u 5 m 2 s 153 n 12 w 2 r 4 B 274277 p 1461 C −38
          *
@@ -522,20 +534,20 @@ public class AstroUtils {
          */
 
         // J is the julian date number
-        int J = (int) julianDate;
-        int y = 4716, j = 1401, m = 2, n = 12, r = 4, p = 1461, v = 3, u = 5, s = 153, w = 2, B = 274277, C = -38;
-        int f = J + j + (((4 * J + B) / 146097) * 3) / 4 + C;
-        int e = r * f + v;
-        int g = (e % p) / r;
-        int h = u * g + w;
-        int D = (h % s) / u + 1;
-        int M = ((h / s + m) % n) + 1;
-        int Y = e / p - y + (n + m - M) / n;
+        long J = (int) julianDate;
+        long y = 4716l, j = 1401l, m = 2l, n = 12l, r = 4l, p = 1461l, v = 3l, u = 5l, s = 153l, w = 2l, B = 274277l, C = -38l;
+        long f = J + j + (((4l * J + B) / 146097l) * 3l) / 4l + C;
+        long e = r * f + v;
+        long g = (e % p) / r;
+        long h = u * g + w;
+        long D = (h % s) / u + 1;
+        long M = ((h / s + m) % n) + 1;
+        long Y = e / p - y + (n + m - M) / n;
 
         double dayFraction = julianDate - J;
-        int[] df = getDayQuantities(dayFraction);
+        long[] df = getDayQuantities(dayFraction);
 
-        return new int[]{Y, M, D, df[0], df[1], df[2], df[3]};
+        return new long[]{Y, M, D, df[0], df[1], df[2], df[3]};
 
     }
 
@@ -570,11 +582,11 @@ public class AstroUtils {
      * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaGregorianCalendar(int year, int month, int day) {
-        int a = (14 - month) / 12;
-        int y = year + 4800 - a;
-        int m = month + 12 * a - 3;
+        long a = (14l - month) / 12l;
+        long y = year + 4800l - a;
+        long m = month + 12l * a - 3l;
 
-        return day + ((153 * m + 2) / 5) + 365 * y + (y / 4) - (y / 100) + (y / 400) - 32045.5;
+        return day + ((153l * m + 2l) / 5l) + 365l * y + (y / 4l) - (y / 100l) + (y / 400l) - 32045.5d;
     }
 
     /**
@@ -589,16 +601,16 @@ public class AstroUtils {
      * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaJulianCalendar(int year, int month, int day) {
-        int a = (14 - month) / 12;
-        int y = year + 4800 - a;
-        int m = month + 12 * a - 3;
+        long a = (14l - month) / 12l;
+        long y = year + 4800l - a;
+        long m = month + 12l * a - 3l;
 
-        return day + ((153 * m + 2) / 5) + 365 * y + (y / 4) - 32083.5;
+        return day + ((153l * m + 2l) / 5l) + 365l * y + (y / 4l) - 32083.5d;
     }
 
     public static Instant julianDateToInstant(double jd) {
-        int[] cd = getCalendarDay(jd);
-        LocalDateTime ldt = LocalDateTime.of(cd[0], cd[1], cd[2], cd[3], cd[4], cd[5], cd[6]);
+        long[] cd = getCalendarDay(jd);
+        LocalDateTime ldt = LocalDateTime.of((int) cd[0], (int) cd[1], (int) cd[2], (int) cd[3], (int) cd[4], (int) cd[5], (int) cd[6]);
         return ldt.toInstant(ZoneOffset.UTC);
     }
 
@@ -621,12 +633,12 @@ public class AstroUtils {
      * @param dayFraction
      * @return [hours, minutes, seconds, nanos]
      */
-    public static int[] getDayQuantities(double dayFraction) {
+    public static long[] getDayQuantities(double dayFraction) {
         double hourf = dayFraction * 24.0;
-        double minf = (hourf - (int) hourf) * 60.0;
-        double secf = (minf - (int) minf) * 60.0;
-        double nanosf = (secf - (int) secf) * 1.0E9;
-        return new int[]{(int) hourf, (int) minf, (int) secf, (int) nanosf};
+        double minf = (hourf - (long) hourf) * 60.0;
+        double secf = (minf - (long) minf) * 60.0;
+        double nanosf = (secf - (long) secf) * 1.0E9;
+        return new long[]{(long) hourf, (long) minf, (long) secf, (long) nanosf};
     }
 
     /**

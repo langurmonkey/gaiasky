@@ -78,9 +78,9 @@ public class FileDataLoaderEclipticJulianTime {
 
     private long getTime(String jds) {
         double jd = Double.valueOf(jds);
-        int[] dt = AstroUtils.getCalendarDay(jd);
+        long[] dt = AstroUtils.getCalendarDay(jd);
         Calendar cld = Calendar.getInstance();
-        cld.set(dt[0], dt[1], dt[2], dt[3], dt[4], dt[5]);
+        cld.set((int) dt[0], (int) dt[1], (int) dt[2], (int) dt[3], (int) dt[4], (int) dt[5]);
         return cld.getTimeInMillis();
     }
 }
