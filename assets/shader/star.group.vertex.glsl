@@ -58,7 +58,9 @@ void main() {
 
     vec3 pos = a_position - u_camPos;
 
-    // Proper motion
+    // Proper motion using 64-bit emulated arithmetics:
+    // pm = a_pm * t * day_to_yr
+    // pos = pos + pm
     vec2 t_yr = ds_mul(u_t, ds_set(day_to_year));
     vec2 pmx = ds_mul(ds_set(a_pm.x), t_yr);
     vec2 pmy = ds_mul(ds_set(a_pm.y), t_yr);
