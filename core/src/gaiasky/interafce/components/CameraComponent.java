@@ -290,19 +290,19 @@ public class CameraComponent extends GuiComponent implements IObserver {
         if (GlobalConf.program.isMaster())
             buttonGroup.addActor(buttonMaster);
 
-        VerticalGroup cameraGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        cameraGroup.space(space6);
+        Table cameraGroup = new Table(skin);
+        cameraGroup.align(Align.left);
 
-        cameraGroup.addActor(group(modeLabel, cameraMode, space2));
-        cameraGroup.addActor(group(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2));
-        cameraGroup.addActor(fieldOfView);
-        cameraGroup.addActor(cameraSpeed);
-        cameraGroup.addActor(rotateSpeed);
-        cameraGroup.addActor(turnSpeed);
-        cameraGroup.addActor(cinematic);
-        cameraGroup.addActor(focusLock);
-        cameraGroup.addActor(orientationLock);
-        cameraGroup.addActor(group(new Label("", skin), buttonGroup, space2));
+        cameraGroup.add(group(modeLabel, cameraMode, space2)).top().left().padBottom(space6).row();
+        cameraGroup.add(group(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2)).top().left().padBottom(space6).row();
+        cameraGroup.add(fieldOfView).top().left().padBottom(space6).row();
+        cameraGroup.add(cameraSpeed).top().left().padBottom(space6).row();
+        cameraGroup.add(rotateSpeed).top().left().padBottom(space6).row();
+        cameraGroup.add(turnSpeed).top().left().padBottom(space6).row();
+        cameraGroup.add(cinematic).top().left().padBottom(space6).row();
+        cameraGroup.add(focusLock).top().left().padBottom(space6).row();
+        cameraGroup.add(orientationLock).top().left().padBottom(space6).row();
+        cameraGroup.add(group(new Label("", skin), buttonGroup, space2)).top().center();
 
         component = cameraGroup;
 
