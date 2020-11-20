@@ -207,7 +207,6 @@ public class FullGui extends AbstractGui {
                         // Check version
                         String tagVersion = vce.getTag();
                         Integer versionNumber = vce.getVersionNumber();
-                        Instant tagDate = vce.getTagTime();
 
                         GlobalConf.program.VERSION_LAST_TIME = Instant.now();
 
