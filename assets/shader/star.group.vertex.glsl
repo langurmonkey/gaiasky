@@ -40,7 +40,8 @@ uniform float u_magLimit = 22.0;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
-uniform vec3 u_alphaSizeFovBr;
+// w - rc primitive scale factor
+uniform vec4 u_alphaSizeFovBr;
 
 out vec4 v_col;
 
@@ -99,7 +100,7 @@ void main() {
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = max(4.0, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
+    gl_PointSize = max(3.3 * u_alphaSizeFovBr.w, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);

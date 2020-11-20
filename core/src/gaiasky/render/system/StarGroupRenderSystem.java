@@ -52,7 +52,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
-        this.alphaSizeFovBr = new float[3];
+        this.alphaSizeFovBr = new float[4];
         this.pointAlphaHl = new float[]{2, 4};
         this.aux1 = new Vector3();
         cmap = new Colormap();
@@ -192,7 +192,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
                             alphaSizeFovBr[1] = ((fovMode == 0 ? (GlobalConf.program.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
                             alphaSizeFovBr[2] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
-                            shaderProgram.setUniform3fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 3);
+                            alphaSizeFovBr[3] = rc.scaleFactor;
+                            shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility
