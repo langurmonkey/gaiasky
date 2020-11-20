@@ -453,7 +453,8 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
     dependsOn 'prepareInstall4jScript'
 
     doLast {
-        print("$packageDir/" + project.distName + ".install4j")
+        println("Install4j script location:")
+        println("$packageDir/" + project.distName + ".install4j")
     }
     projectFile = file("$packageDir/" + project.distName + ".install4j")
     variables = [majorVersion: project.tag, build: project.rev]

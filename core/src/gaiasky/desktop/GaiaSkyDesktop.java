@@ -306,17 +306,34 @@ public class GaiaSkyDesktop implements IObserver {
             } else {
                 int w = GlobalConf.screen.getScreenWidth();
                 int h = GlobalConf.screen.getScreenHeight();
-                if (w <= 0 || h <= 0) {
-                    try {
-                        GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                        w = (int) (gd.getDefaultConfiguration().getBounds().getWidth() * 0.8);
-                        h = (int) (gd.getDefaultConfiguration().getBounds().getHeight() * 0.8);
-                    } catch (HeadlessException e) {
-                        logger.error(e);
-                        // Default
-                        w = 1280;
-                        h = 720;
+                if (!SysUtils.isMac()) {
+                    if (w <= 0 || h <= 0) {
+                        try {
+                            GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                            w = (int) (gd.getDefaultConfiguration().getBounds().getWidth() * 0.8);
+                            h = (int) (gd.getDefaultConfiguration().getBounds().getHeight() * 0.8);
+                        } catch (HeadlessException he) {
+                            logger.error("Error getting screen size from GraphicsDevice, trying Toolkit method");
+                            logger.debug(he);
+                        }
                     }
+                    if (w <= 0 || h <= 0) {
+                        try {
+                            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                            w = (int) (screenSize.width * 0.8f);
+                            h = (int) (screenSize.height * 0.8f);
+                        } catch (Exception e) {
+                            logger.error("Error getting screen size from Toolkit, defaulting to 1280x1024");
+                            logger.debug(e);
+                            // Default
+                            w = 1600;
+                            h = 900;
+                        }
+                    }
+                } else {
+                    // macOS is retarded and only likes headless mode, using default
+                    w = 1600;
+                    h = 900;
                 }
                 cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
