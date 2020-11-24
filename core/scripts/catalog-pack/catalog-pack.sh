@@ -97,6 +97,7 @@ cd $LOCATION
 tar -czvf $TAR_FILE catalog catalog-$NAME.json
 
 set -- $(md5sum "$TAR_FILE") && echo $1 > md5
+set -- $(sha256sum "$TAR_FILE") && echo $1 > sha256
 cd -
 
 echo "Done: $LOCATION/$TAR_FILE"
