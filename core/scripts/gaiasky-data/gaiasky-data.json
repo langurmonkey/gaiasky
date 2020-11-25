@@ -496,6 +496,7 @@
         "ocdr2"
       ],
       "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
+      "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "sha256" : "442930f8266cec076f2ae33af289e0093652476ab8f964e64ee04dd8d3a0aa52",
       "file": "@mirror-url@clusters/ocdr2/v01_20201027/ocdr2-clusters.tar.gz"
     },
@@ -512,6 +513,7 @@
         "ocdr2"
       ],
       "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
+      "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "sha256" : "a223caa45440c3f95af249aeeefd2726c9c28cee2625b225fa6c6deb8ed275b7",
       "file": "@mirror-url@clusters/ocdr2/v02_20201030/clusters-ocdr2.tar.gz"
     },
@@ -528,6 +530,7 @@
         "ocdr2"
       ],
       "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
+      "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "releasenotes" : "Update clusters' colors",
       "sha256" : "587d2e70b895facdbc3836f8f365544ca18ee3d7ae3b30301628c94e7b11a2c0",
       "file": "@mirror-url@clusters/ocdr2/v03_20201125/clusters-ocdr2.tar.gz"
@@ -607,6 +610,7 @@
         "shader/postprocess/raymarching/blackhole.fragment"
       ],
       "description": "Gargantua Black Hole - The black hole from Interstellar, somewhere in the galaxy...",
+      "link": "https://www.shadertoy.com/view/tsBXW3",
       "sha256": "ecf2f360558a21ff428a49cb92a3e0c4ef00a83cb04009773409885c1099bb47",
       "file": "@mirror-url@extra/blackhole/v00_20201125/gargantua-blackhole.tar.gz"
     },
@@ -622,6 +626,7 @@
         "meshes/dr2/meshes_dust"
       ],
       "description": "Dust maps based on GDR2 data - Isosurfaces for 15% and 60% density",
+      "link": "https://galaxymap.org",
       "sha256" : "31c3ebc134abaed08247130223c4a48b91b4e9556e1f15e432fd67ca92d04e68",
       "file": "@mirror-url@meshes/dr2/dust/v01_20201030/mesh-dr2-dust.tar.gz"
     },
@@ -637,8 +642,25 @@
         "meshes/dr2/meshes_hii"
       ],
       "description": "HII regions based on GDR2 data - Isosurfaces for HII regions",
+      "link": "https://galaxymap.org",
       "sha256" : "3bd7e15fe9564d97668537273104c04eb27ad185a558bb6c05fabdfd5771491c",
       "file": "@mirror-url@meshes/dr2/hii/v01_20201030/mesh-dr2-hii.tar.gz"
+    },
+    {
+      "name": "mesh-dr2-isodensity",
+      "type": "mesh",
+      "version": 0,
+      "size": 167662175,
+      "check": "catalog-mesh-dr2-isodensity.json",
+      "data": [
+        "catalog-mesh-dr2-isodensity.json",
+        "mesh-dr2-isodensity.json",
+        "meshes/dr2/meshes_hot"
+      ],
+      "description": "Hot star isodensities based on GDR2 - Isodensity surfaces of hot stars for different preset values",
+      "link": "https://galaxymap.org",
+      "sha256" : "420f005d9e382b0c79d065c8c61c6cb03f154a535c086321ebb1790be94e3d9f",
+      "file": "@mirror-url@meshes/dr2/isodensity/v00_20201125/mesh-dr2-isodensity.tar.gz"
     }
   ]
 }
