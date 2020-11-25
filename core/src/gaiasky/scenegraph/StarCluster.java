@@ -140,7 +140,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         mc.env = new Environment();
         mc.env.add(mc.dLight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.4f));
+        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
         mc.instance = new IntModelInstance(model, modelTransform);
 
         // Relativistic effects
@@ -266,12 +266,12 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
             shader.setUniformi("u_texture0", 0);
         }
 
-        float fa = 1;
+        float fa = .3f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
-        shader.setUniformf("u_color", cc[0] * fa, cc[1] * fa, cc[2] * fa, cc[3] * alpha * opacity * 3.5f);
+        shader.setUniformf("u_color", cc[0] * fa, cc[1] * fa, cc[2] * fa, cc[3] * alpha * opacity * 6.5f);
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
