@@ -99,7 +99,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
-        this(names, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[]{0.93f, 0.93f, 0.3f, 1f});
+        this(names, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[] { 0.93f, 0.93f, 0.3f, 1f });
     }
 
     public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
@@ -167,13 +167,13 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public void setColor(double[] color) {
         super.setColor(color);
-        this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
     }
 
     @Override
     public void setColor(float[] color) {
         super.setColor(color);
-        this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
     }
 
     @Override
@@ -250,6 +250,8 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(null, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
+        // Depth reads, no depth writes
+        mc.setDepthTest(GL20.GL_ONE, false);
         mc.instance.transform.set(this.localTransform);
         modelBatch.render(mc.instance, mc.env);
 
@@ -266,7 +268,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
             shader.setUniformi("u_texture0", 0);
         }
 
-        float fa = .3f;
+        float fa = (1 - this.fadeAlpha) * 0.6f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
