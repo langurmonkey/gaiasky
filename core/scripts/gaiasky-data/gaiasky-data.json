@@ -608,7 +608,7 @@
       ],
       "description": "Gargantua Black Hole - The black hole from Interstellar, somewhere in the galaxy...",
       "sha256": "ecf2f360558a21ff428a49cb92a3e0c4ef00a83cb04009773409885c1099bb47",
-      "file": "@mirror-url@extra/v00_20201125/gargantua-blackhole.tar.gz"
+      "file": "@mirror-url@extra/blackhole/v00_20201125/gargantua-blackhole.tar.gz"
     },
     {
       "name": "mesh-dr2-dust",
