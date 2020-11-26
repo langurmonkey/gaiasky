@@ -93,8 +93,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         // gives a chance to filters to perform needed operations just before the rendering operation take place.
         onBeforeRender();
 
-        program.begin();
+        program.bind();
         mesh.render(program);
-        program.end();
     }
 }
