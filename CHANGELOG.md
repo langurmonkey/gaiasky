@@ -2,6 +2,95 @@
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.1...HEAD)
 
+### Bug Fixes
+- star clusters visual appearance
+- min star size scaled by resolution
+- apply scale factor to milky way
+- camera group bottom buttons aligned to center
+- emulate 64-bit float with two 32-bit floats in shader to be able to extend time beyond +-5 Myr
+- controller mappings not found on first startup. Fixes [#341](https://gitlab.com/langurmonkey/gaiasky/issues/341).
+- use java2d instead of toolkit to determine initial screen size
+- data description update
+- controller mappings looking for assets location if not found
+- manpage gen
+- smooth game camera view
+- spacecraft mode fixes
+- gui registry check
+- add timeout to sync behaviour in dataset loading
+- new default startup window size to accomodate welcome screen
+- update default data desc pointers to version 3.0.0
+- default fps limit value, aux vectors in recgrid
+- overwrite coordinate system matrix by recursive grid
+- start some units over XZ plane to avoid conflicting with recursive grid
+- gaiasky script defaults back to system java installation if nothing else is found
+- octreegen empty hip xmatch crash
+- points in vertsobject with wrong uniform name - incorrect location
+- do not round dialog position values
+- blue, orange and red themes crashed
+- controls scroll box resize
+- download data window sizings, update data desc
+- regular color picker does not show dialog
+- music player actually finds audio files
+- size of keyboard shortcuts table in controls pane
+- disable background models' depth test
+- focused widgets in scroll panes capture all keyboard events
+- actually send errors to stderr instead of stdout
+- fix vr properties data pointer
+- motion blur bug producing wrong results for models
+- touchUp on Link objects not working
+- improve logging messages in case of index name conflicts
+- update URL pointers after ARI CMS update
+- graphics quality in log messages
+
+### Build System
+- generate sha256 in catalog-pack script
+- macOS does not query screen size due to exception
+- check OS when trying to use Linux commands
+- remove music files from release, dont use os-dependent system for controller mappings
+- upgrade to libgdx 1.9.12
+- update stil library jar
+- upgrade to libgdx 1.9.11
+- update version and data pointer
+
+### Code Refactoring
+- begin() and end() subsituted with bind()
+- remove unused or derived uniform definitions
+- use java.utils collections whenever possible, libgdx buggy sincd 1.9.11
+- complete font update to more modern, spacey choices
+- all regular UI fonts from Tahoma to Roboto regular
+- use system.out with UTF-8 encoding, improve gen scripts
+- remove ape, gaia scan properties
+- move RenderGroup to render package for consistency
+
+### Features
+- velocity scaling allows approaching stars slowly
+- API call to set the maximum allowed time
+- add arrow caps to polylines
+- add progress bar to dataset loading, touch up some styles
+- download helper accepts local files, reorganize catalogs
+- new API call to get parameters from stars given its name or id
+- add brightness power and reload defaults to visual settings
+- improve loading tips subsystem with custom styles and arbitrary elements
+- 3D fonts can be limited in solid angle size
+- UI adjustments and tweaks
+- new welcome screen reorganizes dataset management
+- add complimentary color to inner recursive grid
+- add projection lines on reference system plane, with distances
+- first final version of recursive grid
+- new recursive grid object
+- catalog selection displayed when more than one Gaia catalog is selected
+- add wavefront converter, update gradle version
+- fix color picker
+- camera speed-from-distance function rescaling
+- first version of gamepad keyboard
+- update eDR3 catalog descriptors
+- controller UI to modify some properties using a gamepad
+- add --debug flag for more info
+- restructure loading GUI layout
+- improve --version information
+- add ascii gaia image
+- update data descriptor with new MW model
+
 
 <a name="2.3.1"></a>
 ## [2.3.1](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.0) (2020-07-08)
@@ -9,10 +98,10 @@
 
 ### Bug Fixes
 - shader lint function 
-- additional check for `http` to `https` redirects 
+- additional check for http->https redirects 
 
 ### Code Refactoring
-- update some URLs from `http` to `https`
+- update some URLs from http to https 
 
 ### Features
 - hot reload of galaxy models 
@@ -24,17 +113,17 @@
 
 ### Bug Fixes
 - update name and source version number 
-- error in lib_math shader code 
+- error in lib_math shadier code 
 - remove default fade-out values in star groups, added to loading dialog 
 - interpolation limits in math shader library 
 - initial update not performed on fade node children if ct is off 
 - uncomment unhandled event debug info 
-- windows crash due to stars `*` not being accepted in paths 
+- windows crash due to stars '*' not being accepted in paths 
 - add notice concerning the selection of more than one Gaia catalog 
 - changing focus to different object in same particle group works 
 - default value for magnitude scale is 0, fix float validator range 
 - disable depth test for billboards 
-- inconsistencies with `STAR_MIN_OPACITY_CMD `
+- inconsistencies with STAR_MIN_OPACITY_CMD 
 - ensure non-empty field in search dialog 
 
 ### Build System
@@ -54,7 +143,7 @@
 - add package-info package documentation, update changelog 
 
 ### Features
-- update server to `HTTPS`
+- update server to HTTPS 
 - add call to set 'all visible' dataset property 
 - add 'invert X look axis' as well as Y 
 - axis power value and sensitivity in config window 
@@ -188,8 +277,8 @@
 
 
 <a name="2.2.5"></a>
-## [2.2.5](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4-1) (2020-03-04)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4-1...2.2.5)
+## [2.2.5](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4) (2020-03-04)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...2.2.5)
 
 ### Bug Fixes
 - some API calls crash when using double[] 
@@ -202,6 +291,8 @@
 - VRAM profiling crash for AMDGPUs [#326](https://gitlab.com/langurmonkey/gaiasky/issues/326) 
 - adapt star brightness in cubemap modes [#318](https://gitlab.com/langurmonkey/gaiasky/issues/318) 
 - reload default configuration file crash 
+- build script typo 
+- ambient light slider 
 
 ### Build System
 - fix versions of sdl2gdx and jsamp, refactor VMemInfo 
@@ -237,15 +328,6 @@
 
 API call setStarSize() now gets the star point size in
 pixels instead of a normalized value between 0 and 100.
-
-
-<a name="2.2.4-1"></a>
-## [2.2.4-1](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4) (2020-01-23)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...2.2.4-1)
-
-### Bug Fixes
-- build script typo 
-- ambient light slider 
 
 
 <a name="2.2.4"></a>
