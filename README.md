@@ -34,8 +34,8 @@ This file contains the following sections:
 
 ### 1.1. Requirements
 
-| | |
-|-|-|
+| Component             | Minimum requirement                                                            |
+|-----------------------|--------------------------------------------------------------------------------|
 | **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
 | **CPU**               | Intel Core i5 3rd Generation or similar. 4 core or higher recommended          |
 | **GPU**               | Support for OpenGL 3.2 (4.x recommended),  1 GB RAM                            |
