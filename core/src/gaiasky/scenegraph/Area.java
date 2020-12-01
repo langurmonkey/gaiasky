@@ -193,7 +193,7 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     @Override
     public float getLineWidth() {
-        return 1;
+        return 0.5f;
     }
 
     @Override
