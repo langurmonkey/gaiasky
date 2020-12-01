@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
@@ -35,6 +36,9 @@ public class DatasetDesc {
 
     public String size;
     public long sizeBytes;
+
+    public String nObjectsStr;
+    public long nObjects;
 
     public String sha256;
 
@@ -103,6 +107,15 @@ public class DatasetDesc {
         } catch (IllegalArgumentException e) {
             sizeBytes = -1;
             size = "?";
+        }
+
+        // Number objects
+        try {
+            nObjects = source.getLong("nobjects");
+            nObjectsStr = I18n.txt("gui.dataset.nobjects", GlobalResources.nObjectsToString(nObjects));
+        } catch (IllegalArgumentException e){
+            nObjects = -1;
+            nObjectsStr = "N/A";
         }
 
         // Digest

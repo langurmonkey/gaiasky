@@ -128,7 +128,7 @@ public class DownloadDataWindow extends GenericDialog {
         me.acceptButton.setDisabled(false);
         float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
         float padLarge = 9f * GlobalConf.UI_SCALE_FACTOR;
-        float minW = !GlobalConf.isHiDPI() ? 570f : 650f;
+        float minW = !GlobalConf.isHiDPI() ? 620f : 690f;
 
         float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
         Cell<Actor> topCell = content.add((Actor) null).left().top();
@@ -279,6 +279,7 @@ public class DownloadDataWindow extends GenericDialog {
                 HorizontalGroup descGroup = new HorizontalGroup();
                 descGroup.space(padLarge);
                 OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
+                desc.addListener(new OwnTextTooltip(dataset.description, skin, 10));
                 desc.setWidth(!GlobalConf.isHiDPI() ? 250f * GlobalConf.UI_SCALE_FACTOR : 210f * GlobalConf.UI_SCALE_FACTOR);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
@@ -327,7 +328,13 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Size
                 OwnLabel size = new OwnLabel(dataset.size, skin);
+                size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
                 size.setWidth(85f * GlobalConf.UI_SCALE_FACTOR);
+
+                // Objects
+                OwnLabel nObjects = new OwnLabel(dataset.nObjectsStr, skin);
+                nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip"), skin, 10));
+                nObjects.setWidth(120f * GlobalConf.UI_SCALE_FACTOR);
 
                 // Delete
                 OwnImageButton rubbish = null;
@@ -388,7 +395,8 @@ public class DownloadDataWindow extends GenericDialog {
                 t.add(vers).center().padRight(padLarge).padBottom(pad);
                 t.add(typeImage).center().padRight(padLarge).padBottom(pad);
                 t.add(size).left().padRight(padLarge).padBottom(pad);
-                t.add(haveit).center().padBottom(pad);
+                t.add(nObjects).left().padRight(padLarge).padBottom(pad);
+                t.add(haveit).left().padBottom(pad);
                 if (dataset.exists) {
                     t.add(rubbish).center().padLeft(padLarge * 2.5f);
                 }
@@ -401,13 +409,14 @@ public class DownloadDataWindow extends GenericDialog {
         }
 
         datasetsTable.align(Align.top | Align.center);
+
         datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
         datasetsScroll.setScrollingDisabled(true, false);
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
         datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 760f * GlobalConf.UI_SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 800f * GlobalConf.UI_SCALE_FACTOR : 900f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 1000f * GlobalConf.UI_SCALE_FACTOR : 1150f * GlobalConf.UI_SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
 
@@ -791,8 +800,8 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void accept() {
         // Select downloaded catalogs
-        for(DatasetDesc dd : downloaded){
-            if(dd.type.startsWith("catalog")){
+        for (DatasetDesc dd : downloaded) {
+            if (dd.type.startsWith("catalog")) {
                 GlobalConf.data.addSelectedCatalog(dd.check);
             }
         }

@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
@@ -170,13 +171,13 @@ public class DatasetsWidget {
                 size = "? MB";
             }
             OwnLabel sizeLabel = new OwnLabel(size, skin);
+            sizeLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.size.tooltip"), skin, 10));
             dsTable.add(sizeLabel).left().padRight(pad * 6f).padBottom(pad);
 
             // # objects
-            String nobjs = "";
-            if (nobjects > 0)
-                nobjs = nobjects + " objs";
-            OwnLabel nobjsLabel = new OwnLabel(nobjs, skin);
+            String nObjectsStr = I18n.txt("gui.dataset.nobjects", GlobalResources.nObjectsToString(nobjects));
+            OwnLabel nobjsLabel = new OwnLabel(nObjectsStr, skin);
+            nobjsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.nobjects.tooltip"), skin, 10));
             dsTable.add(nobjsLabel).left().padBottom(pad).row();
 
             candidates.put(cb, path);
@@ -196,7 +197,7 @@ public class DatasetsWidget {
 
         // No files
         if (catalogFiles.size == 0) {
-            dsTable.add(new OwnLabel("No catalogs found", skin)).center();
+            dsTable.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center();
         }
 
         float maxw = 0;

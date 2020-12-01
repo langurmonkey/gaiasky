@@ -809,4 +809,16 @@ public class GlobalResources {
 
         return combination;
     }
+
+    public static String nObjectsToString(long objs) {
+        if (objs > 1e9) {
+            return (long) (objs / 1e9) + " B";
+        } else if (objs > 1e6) {
+            return (long) (objs / 1e6) + " M";
+        } else if (objs > 1e3) {
+            return (long) (objs / 1e3) + " K";
+        } else {
+            return objs + "";
+        }
+    }
 }

@@ -115,9 +115,9 @@
     {
       "name": "default-data",
       "type": "data-pack",
-      "version": 13,
+      "version": 14,
       "mingsversion": 30000,
-      "size": 100116590,
+      "size": 64895873,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -161,10 +161,10 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "248079617739d6dddd68d4cf0f6b815655290cb1f132819f3f9a6234f920eb8a",
+      "sha256": "857a4a1926c0e0d45ef69a718b519a93ab8c509b4deda48a561ec32db9e33516",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
-      "releasenotes": "Reduce size of spacecraft to about 10 m. Remove dust and HII meshes, they belong in their own package.",
-      "file": "@mirror-url@basedata/v013_20201111/basedata.tar.gz"
+      "releasenotes": "New Milky Way model, update star clusters color. Reduce size of spacecraft to about 10 m. Remove dust and HII meshes, they belong in their own package.",
+      "file": "@mirror-url@basedata/v014_20201125/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -186,154 +186,138 @@
       "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz"
     },
     {
-      "name": "catalog-dr2-verysmall",
+      "name": "catalog-edr3-default",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 546919683,
-      "nobjects": 5131514,
-      "check": "catalog-dr2-verysmall.json",
+      "version": 0,
+      "size": 1541155406,
+      "nobjects": 14950954,
+      "check": "catalog-edr3-default.json",
       "data": [
-        "catalog-dr2-verysmall.json",
-        "catalog/dr2-verysmall"
+        "catalog-edr3-default.json",
+        "catalog/edr3-default"
       ],
-      "description": "Gaia DR2 very small - 5%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos - 5.1 million stars",
-      "sha256": "e0c7acf94db78f807df6b6324d16ca7217f5d2f3d2012b72dc5372c73829dde8",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-verysmall.tar.gz"
+      "description": "Gaia eDR3 default - 20%/1.5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "sha256": "979db6faaa9de142d7973f7205f333762344655bd4ead88450dda47131c704ee",
+      "file": "@mirror-url@edr3/000-default/v00_20201124/catalog-edr3-default.tar.gz"
     },
     {
-      "name": "catalog-dr2-small",
+      "name": "catalog-edr3-small",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 721674583,
-      "nobjects": 6767470,
-      "check": "catalog-dr2-small.json",
+      "version": 0,
+      "size": 860056304,
+      "nobjects": 8149112,
+      "check": "catalog-edr3-small.json",
       "data": [
-        "catalog-dr2-small.json",
-        "catalog/dr2-small"
+        "catalog-edr3-small.json",
+        "catalog/edr3-small"
       ],
-      "description": "Gaia DR2 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos - 6.7 million stars",
-      "sha256": "6b8135ac3311998f9635dbc76a28b2d5308c723effd6ace6c1991ea8e0222757",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-small.tar.gz"
+      "description": "Gaia eDR3 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "sha256": "64fa59cd9947fad6089c550e534dd7479589f7de7f1c2a8ff9478ce0a8471266",
+      "file": "@mirror-url@edr3/001-small/v00_20201124/catalog-edr3-small.tar.gz"
     },
     {
-      "name": "catalog-dr2-default",
+      "name": "catalog-edr3-medium",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 807665123,
-      "nobjects": 7573286,
-      "check": "catalog-dr2-default.json",
+      "version": 0,
+      "size": 4903572538,
+      "nobjects": 48758169,
+      "check": "catalog-edr3-medium.json",
       "data": [
-        "catalog-dr2-default.json",
-        "catalog/dr2-default"
+        "catalog-edr3-medium.json",
+        "catalog/edr3-medium"
       ],
-      "sha256": "1130ccae4c669979cdef0fff70682dad055cb019722a476a7de20f6a577561d7",
-      "description": "Gaia DR2 default - 20%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos - 7.5 million stars",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-default.tar.gz"
+      "description": "Gaia eDR3 medium - 30%/5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
+      "file": "@mirror-url@edr3/002-medium/v00_20201124/catalog-edr3-medium.tar.gz"
     },
     {
-      "name": "catalog-dr2-bright",
+      "name": "catalog-edr3-large",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 826276289,
-      "nobjects": 7741021,
-      "check": "catalog-dr2-bright.json",
+      "version": 0,
+      "size": 11795146564,
+      "nobjects": 118420063,
+      "check": "catalog-edr3-large.json",
       "data": [
-        "catalog-dr2-bright.json",
-        "catalog/dr2-bright"
+        "catalog-edr3-large.json",
+        "catalog/edr3-large"
       ],
-      "description": "Gaia DR2 bright - 90% parallax relative errors for bright stars, includes Hipparcos - 7.7 million stars",
-      "sha256": "c5e17092b7dfff196a60af97373d6325095fcff178c83f5bb43f01a02311c333",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-bright.tar.gz"
+      "description": "Gaia eDR3 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
+      "file": "@mirror-url@edr3/003-large/v00_20201124/catalog-edr3-large.tar.gz"
     },
     {
-      "name": "catalog-dr2-large",
+      "name": "catalog-edr3-verylarge",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 9753276894,
-      "nobjects": 96946780,
-      "check": "catalog-dr2-large.json",
+      "version": 0,
+      "size": 43945743765,
+      "nobjects": 449664356,
+      "check": "catalog-edr3-verylarge.json",
       "data": [
-        "catalog-dr2-large.json",
-        "catalog/dr2-large"
+        "catalog-edr3-verylarge.json",
+        "catalog/edr3-verylarge"
       ],
-      "description": "Gaia DR2 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos - 97 million stars",
-      "sha256": "2fcce87622c3c3da9e637d5075209c3e328580a38d8bea1ef142ce9b52104103",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-large.tar.gz"
+      "description": "Gaia eDR3 very large - 50% parallax relative error, includes Hipparcos",
+      "sha256": "450de5ce51adc958fc4448baac55f891a6322785f92ead977c4a463cae9170c4",
+      "file": "@mirror-url@edr3/004-verylarge/v00_20201124/catalog-edr3-verylarge.tar.gz"
     },
     {
-      "name": "catalog-dr2-ratherlarge",
+      "name": "catalog-edr3-extralarge",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 39095725420,
-      "nobjects": 400491675,
-      "check": "catalog-dr2-ratherlarge.json",
+      "version": 0,
+      "size": 64675214776,
+      "nobjects": 688188981,
+      "check": "catalog-edr3-extralarge.json",
       "data": [
-        "catalog-dr2-ratherlarge.json",
-        "catalog/dr2-ratherlarge"
+        "catalog-edr3-extralarge.json",
+        "catalog/edr3-extralarge"
       ],
-      "description": "Gaia DR2 rather large - 50% parallax relative error, includes Hipparcos - 400 million stars",
-      "sha256": "0ba5ba5b102491f41d6f20cc51b590328bf2b46002094f7bf43f2a6c17098a0b",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-ratherlarge.tar.gz"
+      "description": "Gaia eDR3 extra large - 95% parallax relative error, includes Hipparcos",
+      "sha256": "813815e153c181b6564d80b43da4bb584c96d5fb3023d2637db8be1b156d2fe5",
+      "file": "@mirror-url@edr3/005-verylarge/v00_20201124/catalog-edr3-extralarge.tar.gz"
     },
     {
-      "name": "catalog-dr2-verylarge",
+      "name": "catalog-edr3-bright",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 49826683896,
-      "nobjects": 601336711,
-      "check": "catalog-dr2-verylarge.json",
+      "version": 0,
+      "size": 1167806969,
+      "nobjects": 11203392,
+      "check": "catalog-edr3-bright.json",
       "data": [
-        "catalog-dr2-verylarge.json",
-        "catalog/dr2-verylarge"
+        "catalog-edr3-bright.json",
+        "catalog/edr3-bright"
       ],
-      "description": "Gaia DR2 very large - 90%/90% parallax relative errors for bright/faint stars, includes Hipparcos - 601 million stars",
-      "sha256": "bb22351914e2139c6713a46c8623ba8274ec9f72a5f2ac8be92d34bb13b8bf61",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-verylarge.tar.gz"
+      "description": "Gaia eDR3 bright - 90%/1% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "sha256": "80eb75b855f232c6ae749c80a97961c67f0fe8dff7aa6be95acc583e475f91ff",
+      "file": "@mirror-url@edr3/006-bright/v00_20201124/catalog-edr3-bright.tar.gz"
     },
     {
-      "name": "catalog-dr2-extralarge",
+      "name": "catalog-edr3-ruwe",
       "type": "catalog-lod",
-      "version": 4,
-      "size": 58941736402,
-      "nobjects": 1331910533,
-      "check": "catalog-dr2-extralarge.json",
+      "version": 0,
+      "size": 11053661874,
+      "nobjects": 111845598,
+      "check": "catalog-edr3-ruwe.json",
       "data": [
-        "catalog-dr2-extralarge.json",
-        "catalog/dr2-extralarge"
+        "catalog-edr3-ruwe.json",
+        "catalog/edr3-ruwe"
       ],
-      "description": "Gaia DR2 complete - Based on bayesian geometric distances of Bayler-Jones et al., includes Hipparcos - 1.33 billion stars",
-      "link": "https://arxiv.org/abs/1804.10121",
-      "sha256": "e7dec539021343f97184ebd0b5c7eab77595bb0f01655d39888a8da9baa24e63",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-extralarge.tar.gz"
-    },
-    {
-      "name": "catalog-dr2-ruwe",
-      "type": "catalog-lod",
-      "version": 4,
-      "size": 9228674422,
-      "nobjects": 92082186,
-      "check": "catalog-dr2-ruwe.json",
-      "data": [
-        "catalog-dr2-ruwe.json",
-        "catalog/dr2-ruwe"
-      ],
-      "description": "Gaia DR2 ruwe - Based on Re-normalised Unit Weight Errors, where RUWE < 1.4, includes Hipparcos - 92 million stars",
-      "link": "https://www.cosmos.esa.int/web/gaia/dr2-known-issues#Astrometry2vs5p",
-      "sha256": "54d6e488ed2c5d9f59a761706d5bc7b341ae9b7d3f4b92beebf85c8ba8f9a11c",
-      "file": "@mirror-url@dr2/004_20190402/catalog-dr2-ruwe.tar.gz"
+      "description": "Gaia eDR3 RUWE - Stars for which the RUWE (renormalized unit weight error) is <= 1.4, includes Hipparcos",
+      "sha256": "2bab6aa2e9afcf6418c303df1184bdc800c9f154055db89b00b1a50634f87b55",
+      "file": "@mirror-url@edr3/007-ruwe/v00_20201124/catalog-edr3-ruwe.tar.gz"
     },
     {
       "name": "catalog-whitedwarfs",
       "type": "catalog-gaia",
       "version": 0,
       "size": 34471681,
+      "nobjects": 256082,
       "check": "catalog-wd.json",
       "data": [
         "catalog-wd.json",
         "particles-wd.json",
         "catalog/wd"
       ],
-      "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag - 177955 stars",
+      "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag",
       "link": "https://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
       "sha256": "73473bbc6718ae64bd3a9de5bdd2c00fcf3d75ce318af4b4e334a06e7c1408a9",
       "file": "@mirror-url@whitedwarfs/000_20181217/catalog-wd.tar.gz"
@@ -360,13 +344,14 @@
       "version": 2,
       "mingsversion": 20205,
       "size": 5433177,
+      "nobjects": 117955,
       "check": "catalog-hip.json",
       "data": [
         "catalog-hip.json",
         "particles-hip.json",
         "catalog/hipparcos"
       ],
-      "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) with curated star names, already included in all DR2 catalogs - 177955 stars",
+      "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) with curated star names, already included in all DR2 catalogs",
       "link": "https://adsabs.harvard.edu/abs/2007ASSL..350.....V",
       "sha256": "7c22dfec8f16e8342c6556384c4a715d55a2095430203b27411b69552efc7cbc",
       "file": "@mirror-url@hipparcos/002_20200204/catalog-hipparcos-newreduction.tar.gz"
@@ -393,6 +378,7 @@
       "version": 4,
       "mingsversion": 30000,
       "size": 15786671,
+      "nobjects": 875,
       "check": "catalog-nbg.json",
       "data": [
         "catalog-nbg.json",
@@ -400,7 +386,7 @@
         "nbg",
         "tex/extragal"
       ],
-      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
+      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole",
       "sha256": "0ab22e25ca8e7f82e42602c582a21f23fe4d3438fcdb61b5b5c9bfc7bd57130a",
       "file": "@mirror-url@galaxies/nbg/v04_20201030/galaxies-nbg.tar.gz"
     },
@@ -410,6 +396,7 @@
       "version": 5,
       "mingsversion": 30000,
       "size": 15786671,
+      "nobjects": 875,
       "check": "catalog-nbg.json",
       "data": [
         "catalog-nbg.json",
@@ -417,7 +404,7 @@
         "nbg",
         "tex/extragal"
       ],
-      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
+      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole",
       "releasenotes": "Fix M33 distance",
       "sha256": "83cc24def980c6816e41b6f4cb41a289422cda341655ecf4118417b9eab49b80",
       "file": "@mirror-url@galaxies/nbg/v05_20201116/galaxies-nbg.tar.gz"
@@ -443,13 +430,14 @@
       "version": 3,
       "mingsversion": 30000,
       "size": 10296296,
+      "nobjects": 500000,
       "check": "catalog-sdss-12.json",
       "data": [
         "catalog-sdss-12.json",
         "particles-sdss-12.json",
         "sdss/sdss_dr12_small.csv"
       ],
-      "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
+      "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12",
       "sha256": "1f93ab8ce5d66656cc71a2faa7b01c183d8499eea5c43a1eeb6dde2958a5442d",
       "file": "@mirror-url@galaxies/sdss12/v03_20201030/galaxies-sdss12.tar.gz"
     },
@@ -474,13 +462,14 @@
       "version": 3,
       "mingsversion": 30000,
       "size": 79127288,
+      "nobjects": 3925096,
       "check": "catalog-sdss-14.json",
       "data": [
         "catalog-sdss-14.json",
         "particles-sdss-14.json",
         "sdss/sdss_dr14_large.csv"
       ],
-      "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
+      "description": "SDSS DR14 - Sloan Digital Sky Survey DR14",
       "sha256": "57c6ff79403987b2176765bd437fab4ee4090238b488d71478f7f8462ef3a7de",
       "file": "@mirror-url@galaxies/sdss14/v03_20201030/galaxies-sdss14.tar.gz"
     },
@@ -506,13 +495,14 @@
       "version": 2,
       "mingsversion": 30000,
       "size": 58191,
+      "nobjects":2017,
       "check": "catalog-ocdr2.json",
       "data": [
         "catalog-ocdr2.json",
         "particles-ocdr2.json",
         "ocdr2"
       ],
-      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
+      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
       "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "sha256" : "a223caa45440c3f95af249aeeefd2726c9c28cee2625b225fa6c6deb8ed275b7",
       "file": "@mirror-url@clusters/ocdr2/v02_20201030/clusters-ocdr2.tar.gz"
@@ -523,13 +513,14 @@
       "version": 3,
       "mingsversion": 30000,
       "size": 58503,
+      "nobjects":2017,
       "check": "catalog-ocdr2.json",
       "data": [
         "catalog-ocdr2.json",
         "particles-ocdr2.json",
         "ocdr2"
       ],
-      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al. - 2017 clusters",
+      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
       "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "releasenotes" : "Update clusters' colors",
       "sha256" : "587d2e70b895facdbc3836f8f365544ca18ee3d7ae3b30301628c94e7b11a2c0",
@@ -556,13 +547,14 @@
       "version": 2,
       "mingsversion": 30000,
       "size": 78311,
+      "nobjects": 3017,
       "check": "catalog-mwsc.json",
       "data": [
         "catalog-mwsc.json",
         "particles-mwsc.json",
         "mwsc"
       ],
-      "description": "MWSC - Milky Way Star Clusters catalog - 3017 clusters",
+      "description": "MWSC - Milky Way Star Clusters catalog",
       "sha256" : "f785a73f9b0c4b64c748a85c31ab1d69eb22f245860f001a27dbd2330af0ae22",
       "file": "@mirror-url@clusters/mwsc/v02_20201030/clusters-mwsc.tar.gz"
     },
@@ -587,6 +579,7 @@
       "version": 2,
       "mingsversion": 30000,
       "size": 15407657,
+      "nobjects": 15,
       "check": "catalog-nebulae.json",
       "data": [
         "catalog-nebulae.json",
@@ -603,6 +596,7 @@
       "version": 0,
       "mingsversion": 30000,
       "size": 3122,
+      "nobjects": 1,
       "check": "catalog-gargantua.json",
       "data": [
         "catalog-gargantua.json",
@@ -619,6 +613,7 @@
       "type": "mesh",
       "version": 1,
       "size": 2828332,
+      "nobjects": 2,
       "check": "catalog-mesh-dr2-dust.json",
       "data": [
         "catalog-mesh-dr2-dust.json",
@@ -650,7 +645,8 @@
       "name": "mesh-dr2-isodensity",
       "type": "mesh",
       "version": 0,
-      "size": 167662175,
+      "size": 83981944,
+      "nobjects": 8,
       "check": "catalog-mesh-dr2-isodensity.json",
       "data": [
         "catalog-mesh-dr2-isodensity.json",
@@ -659,7 +655,7 @@
       ],
       "description": "Hot star isodensities based on GDR2 - Isodensity surfaces of hot stars for different preset values",
       "link": "https://galaxymap.org",
-      "sha256" : "420f005d9e382b0c79d065c8c61c6cb03f154a535c086321ebb1790be94e3d9f",
+      "sha256" : "2d526b6446c0bd84668b28f3d0bd9ec2979a539747e86c4156b6c3d8340f88e9",
       "file": "@mirror-url@meshes/dr2/isodensity/v00_20201125/mesh-dr2-isodensity.tar.gz"
     }
   ]
