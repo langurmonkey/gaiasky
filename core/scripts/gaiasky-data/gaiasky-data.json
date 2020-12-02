@@ -56,6 +56,7 @@
       "sha256": "0bc61737d214128f28baf08475b7e6fe47837136a899c8ff2bb4afef00719423",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 2.3.1 and above. Contains the Solar System, constellations, the Milky Way, meshes and more",
       "releasenotes": "Add recursive grid object.",
+      "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/011_20201027/gaiasky_data.tar.gz"
     },
     {
@@ -110,6 +111,7 @@
       "sha256": "7638b28319600f16b2900fca438a66da644f864530b80241f7c9a6d1c7726f98",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
       "releasenotes": "Remove dust and HII meshes, they belong in their own package.",
+      "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v012_20201030/basedata.tar.gz"
     },
     {
@@ -164,6 +166,7 @@
       "sha256": "857a4a1926c0e0d45ef69a718b519a93ab8c509b4deda48a561ec32db9e33516",
       "description": "Default data pack for Gaia Sky - For Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
       "releasenotes": "New Milky Way model, update star clusters color. Reduce size of spacecraft to about 10 m. Remove dust and HII meshes, they belong in their own package.",
+      "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v014_20201125/basedata.tar.gz"
     },
     {
@@ -183,6 +186,7 @@
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
       "releasenotes": "Add high- and ultra-resolution Milky Way skymaps.",
       "sha256": "d48dcff9b47322f570cf51f80a6990d536638e185d82aaee3d31388e270b9dd5",
+      "link": "@mirror-url@tex",
       "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz"
     },
     {
@@ -198,6 +202,7 @@
       ],
       "description": "Gaia eDR3 default - 20%/1.5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "979db6faaa9de142d7973f7205f333762344655bd4ead88450dda47131c704ee",
+      "link": "@mirror-url@edr3/000-default",
       "file": "@mirror-url@edr3/000-default/v00_20201124/catalog-edr3-default.tar.gz"
     },
     {
@@ -213,6 +218,7 @@
       ],
       "description": "Gaia eDR3 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "64fa59cd9947fad6089c550e534dd7479589f7de7f1c2a8ff9478ce0a8471266",
+      "link": "@mirror-url@edr3/001-small",
       "file": "@mirror-url@edr3/001-small/v00_20201124/catalog-edr3-small.tar.gz"
     },
     {
@@ -228,6 +234,7 @@
       ],
       "description": "Gaia eDR3 medium - 30%/5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
+      "link": "@mirror-url@edr3/002-medium",
       "file": "@mirror-url@edr3/002-medium/v00_20201124/catalog-edr3-medium.tar.gz"
     },
     {
@@ -243,6 +250,7 @@
       ],
       "description": "Gaia eDR3 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
+      "link": "@mirror-url@edr3/003-large",
       "file": "@mirror-url@edr3/003-large/v00_20201124/catalog-edr3-large.tar.gz"
     },
     {
@@ -258,6 +266,7 @@
       ],
       "description": "Gaia eDR3 very large - 50% parallax relative error, includes Hipparcos",
       "sha256": "450de5ce51adc958fc4448baac55f891a6322785f92ead977c4a463cae9170c4",
+      "link": "@mirror-url@edr3/004-verylarge",
       "file": "@mirror-url@edr3/004-verylarge/v00_20201124/catalog-edr3-verylarge.tar.gz"
     },
     {
@@ -273,7 +282,8 @@
       ],
       "description": "Gaia eDR3 extra large - 95% parallax relative error, includes Hipparcos",
       "sha256": "813815e153c181b6564d80b43da4bb584c96d5fb3023d2637db8be1b156d2fe5",
-      "file": "@mirror-url@edr3/005-verylarge/v00_20201124/catalog-edr3-extralarge.tar.gz"
+      "link": "@mirror-url@edr3/005-extralarge",
+      "file": "@mirror-url@edr3/005-extralarge/v00_20201124/catalog-edr3-extralarge.tar.gz"
     },
     {
       "name": "catalog-edr3-bright",
@@ -288,6 +298,7 @@
       ],
       "description": "Gaia eDR3 bright - 90%/1% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "80eb75b855f232c6ae749c80a97961c67f0fe8dff7aa6be95acc583e475f91ff",
+      "link": "@mirror-url@edr3/006-bright",
       "file": "@mirror-url@edr3/006-bright/v00_20201124/catalog-edr3-bright.tar.gz"
     },
     {
@@ -303,6 +314,7 @@
       ],
       "description": "Gaia eDR3 RUWE - Stars for which the RUWE (renormalized unit weight error) is <= 1.4, includes Hipparcos",
       "sha256": "2bab6aa2e9afcf6418c303df1184bdc800c9f154055db89b00b1a50634f87b55",
+      "link": "http://www.rssd.esa.int/doc_fetch.php?id=3757412",
       "file": "@mirror-url@edr3/007-ruwe/v00_20201124/catalog-edr3-ruwe.tar.gz"
     },
     {

@@ -288,7 +288,8 @@ public class DownloadDataWindow extends GenericDialog {
                 descGroup.addActor(desc);
                 // Link
                 if (dataset.link != null) {
-                    LinkButton imgLink = new LinkButton(dataset.link, skin);
+                    String link = dataset.link.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
+                    LinkButton imgLink = new LinkButton(link, skin);
                     descGroup.addActor(imgLink);
                 } else {
                     Image emptyImg = new Image(skin, "iconic-empty");
@@ -517,7 +518,6 @@ public class DownloadDataWindow extends GenericDialog {
             DatasetDesc currentDataset = trio.getFirst();
             String name = currentDataset.name;
             String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
-            String type = currentDataset.type;
 
             FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
 
