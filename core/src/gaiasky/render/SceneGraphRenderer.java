@@ -200,7 +200,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         NONE(-1);
 
-        private int index;
+        private final int index;
 
         RenderGroup(int index) {
             this.index = index;
@@ -302,7 +302,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private Vector3d aux1d, aux2d, aux3d, aux4d;
 
     // VRContext, may be null
-    private VRContext vrContext;
+    private final VRContext vrContext;
 
     private List<IRenderable> stars;
 

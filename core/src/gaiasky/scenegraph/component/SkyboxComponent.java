@@ -19,7 +19,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
 public class SkyboxComponent {
-    private static Log logger = Logger.getLogger(SkyboxComponent.class);
+    private static final Log logger = Logger.getLogger(SkyboxComponent.class);
 
     public static Cubemap skybox;
     protected static boolean skyboxLoad = false;

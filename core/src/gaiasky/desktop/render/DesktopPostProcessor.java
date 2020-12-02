@@ -46,7 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
-    private static Log logger = Logger.getLogger(DesktopPostProcessor.class);
+    private static final Log logger = Logger.getLogger(DesktopPostProcessor.class);
     public static DesktopPostProcessor instance;
 
     private AssetManager manager;
@@ -76,7 +76,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
     // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}]] for raymarching post-processors
-    private Map<String, Object[]> raymarchingDef;
+    private final Map<String, Object[]> raymarchingDef;
 
     private void addRayMarchingDef(String name, Object[] list) {
         if (!raymarchingDef.containsKey(name))

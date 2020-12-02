@@ -11,7 +11,9 @@ import com.badlogic.gdx.utils.Array;
 
 public class Intersectord {
 
-    private static Vector3d auxd1 = new Vector3d(), auxd2 = new Vector3d(), auxd3 = new Vector3d();
+    private static final Vector3d auxd1 = new Vector3d();
+    private static final Vector3d auxd2 = new Vector3d();
+    private static final Vector3d auxd3 = new Vector3d();
 
     /**
      * Quick check whether the given {@link Ray} and {@link BoundingBoxd}

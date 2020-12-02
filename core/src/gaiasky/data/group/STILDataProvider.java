@@ -46,8 +46,8 @@ import java.util.logging.Level;
  * @author tsagrista
  */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
-    private static Log logger = Logger.getLogger(STILDataProvider.class);
-    private StarTableFactory factory;
+    private static final Log logger = Logger.getLogger(STILDataProvider.class);
+    private final StarTableFactory factory;
     private long starid = 10000000;
     // Dataset options, may be null
     private DatasetOptions dops;

@@ -58,18 +58,18 @@ public final class PostProcessor implements Disposable {
     private final Color clearColor = Color.CLEAR;
     private int clearBits = GL20.GL_COLOR_BUFFER_BIT;
     private float clearDepth = 1f;
-    private Rectangle viewport = new Rectangle();
+    private final Rectangle viewport = new Rectangle();
     private boolean hasViewport = false;
 
     private boolean enabled;
     private boolean capturing;
     private boolean hasCaptured;
-    private boolean useDepth;
+    private final boolean useDepth;
 
     private PostProcessorListener listener = null;
 
     // maintains a per-frame updated list of enabled effects
-    private Array<PostProcessorEffect> enabledEffects = new Array<>(5);
+    private final Array<PostProcessorEffect> enabledEffects = new Array<>(5);
 
     /** Construct a new PostProcessor with FBO dimensions set to the size of the screen */
     public PostProcessor(RenderType rt, boolean useDepth, boolean useAlphaChannel, boolean use32Bits) {

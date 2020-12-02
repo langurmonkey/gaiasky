@@ -20,7 +20,7 @@ import java.nio.file.Paths;
  * @author Toni Sagrista
  */
 public class SysUtils {
-    private static Log logger = Logger.getLogger(SysUtils.class);
+    private static final Log logger = Logger.getLogger(SysUtils.class);
 
     /**
      * Initialise directories
@@ -43,8 +43,12 @@ public class SysUtils {
         }
     }
 
-    private static String OS;
-    private static boolean linux, mac, windows, unix, solaris;
+    private static final String OS;
+    private static final boolean linux;
+    private static final boolean mac;
+    private static final boolean windows;
+    private static final boolean unix;
+    private static final boolean solaris;
 
     static {
         OS = System.getProperty("os.name").toLowerCase();

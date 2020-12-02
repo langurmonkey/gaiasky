@@ -25,7 +25,7 @@ public class ScriptingServer {
 
     private static ClientServer gatewayServer;
     private static GatewayServerListener listener;
-    private static AtomicInteger connections = new AtomicInteger(0);
+    private static final AtomicInteger connections = new AtomicInteger(0);
 
     public static void initialize() {
         initialize(false);

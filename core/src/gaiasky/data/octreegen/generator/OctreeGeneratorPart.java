@@ -24,9 +24,9 @@ import java.util.*;
  */
 public class OctreeGeneratorPart implements IOctreeGenerator {
 
-    private OctreeGeneratorParams params;
+    private final OctreeGeneratorParams params;
 
-    private IAggregationAlgorithm aggregation;
+    private final IAggregationAlgorithm aggregation;
 
     public OctreeGeneratorPart(OctreeGeneratorParams params) {
         IAggregationAlgorithm aggr = new BrightestStars(25, params.maxPart, params.maxPart, false);
@@ -150,7 +150,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
     private List<ParticleBean> intersect(List<ParticleBean> stars, OctreeNode box) {
         List<ParticleBean> result = new ArrayList<>();
         for (ParticleBean star : stars) {
-            if (((StarBean) star).octant == null && box.box.contains(star.data[StarBean.I_X], star.data[StarBean.I_Y], star.data[StarBean.I_Z])) {
+            if (star.octant == null && box.box.contains(star.data[StarBean.I_X], star.data[StarBean.I_Y], star.data[StarBean.I_Z])) {
                 result.add(star);
             }
         }

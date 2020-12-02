@@ -53,28 +53,29 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     /** The key for rolling the camera **/
     public int rollKey = Keys.SHIFT_LEFT;
     /** FOCUS_MODE comparator **/
-    private Comparator<IFocus> comp;
+    private final Comparator<IFocus> comp;
 
     /** The current (first) button being pressed. */
     protected int button = -1;
 
     private float startX, startY;
     /** Max pixel distance to be considered a click **/
-    private float MOVE_PX_DIST;
+    private final float MOVE_PX_DIST;
     /** Max distance from the click to the actual selected star **/
-    private int MIN_PIX_DIST;
-    private Vector2 gesture = new Vector2();
+    private final int MIN_PIX_DIST;
+    private final Vector2 gesture = new Vector2();
 
     /** dx(mouse pointer) since last time **/
     private double dragDx;
     /** dy(mouse pointer) since last time **/
     private double dragDy;
     /** Smoothing factor applied in the non-cinematic mode **/
-    private double noAccelSmoothing;
+    private final double noAccelSmoothing;
     /** Scaling factor applied in the non-cinematic mode **/
-    private double noAccelFactor;
+    private final double noAccelFactor;
     /** Drag vectors **/
-    private Vector2 currentDrag, lastDrag;
+    private final Vector2 currentDrag;
+    private final Vector2 lastDrag;
 
     /** Save time of last click, in ms */
     private long lastClickTime = -1;

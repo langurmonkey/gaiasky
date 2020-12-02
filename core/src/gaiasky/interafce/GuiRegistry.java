@@ -41,7 +41,7 @@ public class GuiRegistry implements IObserver {
     /**
      * Registered GUI array
      **/
-    private static Array<IGui> guis;
+    private static final Array<IGui> guis;
 
     static {
         guis = new Array<>(true, 2);

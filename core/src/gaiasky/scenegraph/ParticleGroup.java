@@ -400,7 +400,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected double[] metadata;
 
     // Comparator
-    private Comparator<Integer> comp;
+    private final Comparator<Integer> comp;
 
     // Indices list buffer 1
     protected Integer[] indices1;
@@ -435,7 +435,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     // Updates the group
     public class UpdaterTask implements Runnable {
 
-        private ParticleGroup pg;
+        private final ParticleGroup pg;
 
         public UpdaterTask(ParticleGroup pg) {
             this.pg = pg;

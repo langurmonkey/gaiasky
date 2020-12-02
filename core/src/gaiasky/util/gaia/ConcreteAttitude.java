@@ -49,7 +49,7 @@ public class ConcreteAttitude implements Attitude {
     private Quaterniond qDot;
 
     // half the conventional basic angle Gamma [rad]
-    private double halfGamma = Math.toRadians(.5 * BASICANGLE_DEGREE);
+    private final double halfGamma = Math.toRadians(.5 * BASICANGLE_DEGREE);
 
     /**
      * Construct object from time, and a quaternion. This leaves the time

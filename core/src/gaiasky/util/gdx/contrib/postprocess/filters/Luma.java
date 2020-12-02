@@ -35,7 +35,7 @@ public class Luma extends Filter<Luma> {
         // @formatter:on
 
         private final String mnemonic;
-        private int elementSize;
+        private final int elementSize;
 
         Param(String m, int elementSize) {
             this.mnemonic = m;
@@ -53,9 +53,12 @@ public class Luma extends Filter<Luma> {
         }
     }
 
-    private Vector2 texelSize, imageSize;
+    private final Vector2 texelSize;
+    private final Vector2 imageSize;
     private float lodLevel = 0;
-    private ShaderProgram programLuma, programAvg, programMax;
+    private final ShaderProgram programLuma;
+    private final ShaderProgram programAvg;
+    private final ShaderProgram programMax;
 
     public Luma() {
         super(ShaderLoader.fromFile("screenspace", "luma", "#define LUMA"));

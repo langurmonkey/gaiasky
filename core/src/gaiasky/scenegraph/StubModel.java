@@ -19,9 +19,10 @@ import gaiasky.vr.openvr.VRContext.VRDevice;
 public class StubModel extends SceneGraphNode implements IModelRenderable, ILineRenderable {
 
     public IntModelInstance instance;
-    private Environment env;
-    private VRDevice device;
-    private Vector3 beamP0, beamP1;
+    private final Environment env;
+    private final VRDevice device;
+    private final Vector3 beamP0;
+    private final Vector3 beamP1;
 
     public StubModel(VRDevice device, Environment env) {
         super();

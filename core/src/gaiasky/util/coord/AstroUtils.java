@@ -73,7 +73,7 @@ public class AstroUtils {
     /**
      * Julian date cache, since most dates are used more than once
      **/
-    private static LruCache<Long, Double> jdcache = new LruCache<>(50);
+    private static final LruCache<Long, Double> jdcache = new LruCache<>(50);
 
     /**
      * Initialize nsl Sun

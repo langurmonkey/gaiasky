@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GL41;
 import java.util.List;
 
 public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
-    private IntModelBatch batch;
+    private final IntModelBatch batch;
 
     /**
      * Creates a new model batch render component.

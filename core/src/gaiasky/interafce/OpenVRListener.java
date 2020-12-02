@@ -24,13 +24,14 @@ public class OpenVRListener implements VRDeviceListener {
     private static final Log logger = Logger.getLogger(OpenVRListener.class);
 
     /** The natural camera **/
-    private NaturalCamera cam;
+    private final NaturalCamera cam;
     /** Focus comparator **/
-    private Comparator<IFocus> comp;
+    private final Comparator<IFocus> comp;
     /** Map from VR device to model object **/
     private HashMap<VRDevice, StubModel> vrDeviceToModel;
     /** Aux vectors **/
-    private Vector3d p0, p1;
+    private final Vector3d p0;
+    private final Vector3d p1;
 
     private boolean vrControllerHint = false;
     private boolean vrInfoGui = false;
@@ -44,7 +45,7 @@ public class OpenVRListener implements VRDeviceListener {
 
     private long lastAxisMovedFrame = Long.MIN_VALUE;
 
-    private Set<Integer> pressedButtons;
+    private final Set<Integer> pressedButtons;
 
     public OpenVRListener(NaturalCamera cam) {
         this.cam = cam;

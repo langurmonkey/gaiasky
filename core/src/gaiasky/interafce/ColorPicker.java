@@ -130,13 +130,13 @@ public class ColorPicker extends ColorPickerAbstract {
     /** A color picker dialog **/
     private class ColorPickerDialog extends GenericDialog {
         private float[] color;
-        private INumberFormat nf;
+        private final INumberFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
-        private ColorPickerDialog cpd;
+        private final ColorPickerDialog cpd;
 
         public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
@@ -353,10 +353,10 @@ public class ColorPicker extends ColorPickerAbstract {
     }
 
     private class UpdaterListener implements EventListener {
-        private ColorPickerDialog cpd;
-        private float[] color;
-        private int idx;
-        private boolean slider;
+        private final ColorPickerDialog cpd;
+        private final float[] color;
+        private final int idx;
+        private final boolean slider;
 
         public UpdaterListener(boolean slider, ColorPickerDialog cpd, float[] color, int idx) {
             super();

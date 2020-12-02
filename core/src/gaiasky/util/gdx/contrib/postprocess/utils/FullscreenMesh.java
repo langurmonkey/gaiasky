@@ -12,8 +12,9 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 
 public class FullscreenMesh {
-    private Mesh mesh;
-    private int w, h;
+    private final Mesh mesh;
+    private final int w;
+    private final int h;
 
     private float[] verts;
 

@@ -29,14 +29,14 @@ public class BufferedFileImageRenderer implements IFileImageRenderer {
     private static final Log logger = Logger.getLogger(BufferedFileImageRenderer.class);
     
     /** Daemon timer **/
-    private static Timer timer = new Timer(true);
+    private static final Timer timer = new Timer(true);
 
     /**
      * Output frame buffer and BufferedFrame pool
      */
-    private List<BufferedFrame> outputFrameBuffer;
-    private Pool<BufferedFrame> bfPool;
-    private int bufferSize;
+    private final List<BufferedFrame> outputFrameBuffer;
+    private final Pool<BufferedFrame> bfPool;
+    private final int bufferSize;
 
     public BufferedFileImageRenderer(int bufferSize) {
         this.bufferSize = bufferSize;

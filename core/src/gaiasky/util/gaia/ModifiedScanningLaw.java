@@ -150,12 +150,12 @@ public class ModifiedScanningLaw {
      * the nominal sun. Mathematically, it should give exactly the same
      * longitude as used by NSL.
      */
-    private NslSun sun = new NslSun();
+    private final NslSun sun = new NslSun();
 
     /**
      * The Nsl37 object is used for default initialization of the MSL.
      */
-    private Nsl37 nsl = new Nsl37();
+    private final Nsl37 nsl = new Nsl37();
 
     /**
      * Variables for the Runge-Kutta integrator

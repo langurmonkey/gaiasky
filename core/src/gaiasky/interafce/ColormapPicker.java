@@ -49,7 +49,7 @@ import java.util.Set;
  */
 public class ColormapPicker extends ColorPickerAbstract {
 
-    private CatalogInfo catalogInfo;
+    private final CatalogInfo catalogInfo;
     private int cmapIndex;
     private IAttribute cmapAttrib;
     private double cmapMin, cmapMax;
@@ -81,7 +81,8 @@ public class ColormapPicker extends ColorPickerAbstract {
         return cmapList.get(index).getFirst();
     }
 
-    private Drawable drawableColor, drawableColormap;
+    private final Drawable drawableColor;
+    private final Drawable drawableColormap;
 
     private ColormapPicker(String name, CatalogInfo ci, Stage stage, Skin skin) {
         super(name, stage, skin);
@@ -219,25 +220,25 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     // Stores minimum and maximum mapping values for the session
-    private static Map<String, double[]> minMaxMap = new HashMap<>();
+    private static final Map<String, double[]> minMaxMap = new HashMap<>();
 
     /** A color picker and colormap dialog **/
     private class ColorPickerColormapDialog extends GenericDialog {
         private CheckBox plainColor, colormap;
-        private Map<String, Image> cmapImages;
+        private final Map<String, Image> cmapImages;
         private Image cmapImage;
         private Cell cmapImageCell;
         private float[] color;
         private OwnTextField minMap, maxMap;
-        private INumberFormat nf;
+        private final INumberFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
-        private ColorPickerColormapDialog cpd;
-        private Array<ParticleGroup> pgarray;
-        private Array<SceneGraphNode> apearray;
+        private final ColorPickerColormapDialog cpd;
+        private final Array<ParticleGroup> pgarray;
+        private final Array<SceneGraphNode> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
@@ -727,10 +728,10 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     private class UpdaterListener implements EventListener {
-        private ColorPickerColormapDialog cpd;
-        private float[] color;
-        private int idx;
-        private boolean slider;
+        private final ColorPickerColormapDialog cpd;
+        private final float[] color;
+        private final int idx;
+        private final boolean slider;
 
         public UpdaterListener(boolean slider, ColorPickerColormapDialog cpd, float[] color, int idx) {
             super();

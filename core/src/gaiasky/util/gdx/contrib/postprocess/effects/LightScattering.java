@@ -88,12 +88,12 @@ public final class LightScattering extends PostProcessorEffect {
         }
     }
 
-    private PingPongBuffer pingPongBuffer;
+    private final PingPongBuffer pingPongBuffer;
 
-    private Scattering scattering;
-    private Blur blur;
-    private Bias bias;
-    private Combine combine;
+    private final Scattering scattering;
+    private final Blur blur;
+    private final Bias bias;
+    private final Combine combine;
 
     private Settings settings;
 

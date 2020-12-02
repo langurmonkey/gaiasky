@@ -7,5 +7,5 @@ package gaiasky.util;
 
 public interface RunnableLong {
 
-    public void run(long a);
+    void run(long a);
 }

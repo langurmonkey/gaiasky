@@ -11,8 +11,8 @@ import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class MinimapInterface extends TableGuiInterface {
-    private MinimapWidget minimap;
-    private OwnLabel mapName;
+    private final MinimapWidget minimap;
+    private final OwnLabel mapName;
 
     public MinimapInterface(Skin skin) {
         super(skin);

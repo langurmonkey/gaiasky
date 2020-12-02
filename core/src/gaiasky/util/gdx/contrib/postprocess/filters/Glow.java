@@ -32,7 +32,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * rays-whats-that-5a67f26aeac2</a>
  **/
 public final class Glow extends Filter<Glow> {
-    private Vector2 viewport;
+    private final Vector2 viewport;
 
     private float[] lightPositions;
     private float[] lightViewAngles;
@@ -65,8 +65,8 @@ public final class Glow extends Filter<Glow> {
         TextureScale("u_textureScale", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

@@ -25,8 +25,8 @@ public class MathManager implements IObserver {
 
     public ITrigonometry trigo;
 
-    private Trigonometry trigonometry;
-    private FastTrigonometry fastTrigonometry;
+    private final Trigonometry trigonometry;
+    private final FastTrigonometry fastTrigonometry;
 
     MathManager(boolean highAccuracy) {
         trigonometry = new Trigonometry();

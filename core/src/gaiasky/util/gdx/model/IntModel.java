@@ -152,7 +152,7 @@ public class IntModel implements Disposable {
 		}
 	}
 
-	private ObjectMap<IntNodePart, ArrayMap<String, Matrix4>> nodePartBones = new ObjectMap<>();
+	private final ObjectMap<IntNodePart, ArrayMap<String, Matrix4>> nodePartBones = new ObjectMap<>();
 
 	protected void loadNodes (Iterable<IntModelNode> modelNodes) {
 		nodePartBones.clear();

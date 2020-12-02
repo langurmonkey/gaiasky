@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 
 public class OwnLabel extends Label implements Disableable {
     private float ownwidth = 0f, ownheight = 0f;
-    private Color regularColor;
+    private final Color regularColor;
     private boolean disabled = false;
 
     public OwnLabel(CharSequence text, Skin skin, float width) {

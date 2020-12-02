@@ -45,13 +45,13 @@ public class EventManager implements IObserver {
     private static final long START = TimeUtils.millis();
 
     /** Holds a priority queue for each time frame **/
-    private Map<TimeFrame, PriorityQueue<Telegram>> queues;
+    private final Map<TimeFrame, PriorityQueue<Telegram>> queues;
 
     /** Telegram pool **/
     private final Pool<Telegram> pool;
 
     /** Subscriptions Event-Observers **/
-    private Map<Integer, Set<IObserver>> subscriptions = new HashMap<>();
+    private final Map<Integer, Set<IObserver>> subscriptions = new HashMap<>();
 
     /** The time frame to use if none is specified **/
     private TimeFrame defaultTimeFrame;

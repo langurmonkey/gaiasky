@@ -53,7 +53,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     /**
      * Number formatter
      */
-    private INumberFormat nf;
+    private final INumberFormat nf;
 
     /**
      * Load lines in parallel

@@ -21,8 +21,8 @@ public class VSOP87 {
         instance = new VSOP87();
     }
 
-    private Map<String, iVSOP87> elements;
-    private Map<String, Boolean> tried;
+    private final Map<String, iVSOP87> elements;
+    private final Map<String, Boolean> tried;
 
     public VSOP87() {
         elements = new HashMap<String, iVSOP87>();

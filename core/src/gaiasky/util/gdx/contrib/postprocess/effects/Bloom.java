@@ -80,11 +80,11 @@ public final class Bloom extends PostProcessorEffect {
         }
     }
 
-    private PingPongBuffer pingPongBuffer;
+    private final PingPongBuffer pingPongBuffer;
 
-    private Blur blur;
-    private Threshold threshold;
-    private Combine combine;
+    private final Blur blur;
+    private final Threshold threshold;
+    private final Combine combine;
 
     private Settings settings;
 

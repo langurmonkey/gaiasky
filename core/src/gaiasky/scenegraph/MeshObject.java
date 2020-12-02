@@ -49,7 +49,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     public ITransform[] transformations;
 
     // Aux array
-    private float[] auxArray;
+    private final float[] auxArray;
 
     public MeshObject() {
         super();

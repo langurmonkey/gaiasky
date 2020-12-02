@@ -49,7 +49,7 @@ public class DesktopConfInit extends ConfInit {
 
     private CommentedProperties p;
     private Properties vp;
-    private IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
+    private final IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
     public DesktopConfInit(boolean vr) {
         super();
@@ -156,7 +156,7 @@ public class DesktopConfInit extends ConfInit {
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
-            DATA_LOCATION = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");;
+            DATA_LOCATION = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");
 
         String CATALOG_JSON_FILE_SEQUENCE = p.getProperty("data.json.catalog", "");
         Array<String> CATALOG_JSON_FILES = new Array<>();

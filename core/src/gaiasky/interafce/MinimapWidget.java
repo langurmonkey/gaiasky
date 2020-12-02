@@ -24,12 +24,14 @@ import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.TextureWidget;
 
 public class MinimapWidget implements Disposable {
-    private FrameBuffer tfb, sfb;
-    private TextureWidget topProjection, sideProjection;
+    private final FrameBuffer tfb;
+    private final FrameBuffer sfb;
+    private final TextureWidget topProjection;
+    private final TextureWidget sideProjection;
     int side, side2;
     int sideshort, sideshort2;
 
-    private Array<IMinimapScale> scales;
+    private final Array<IMinimapScale> scales;
     private IMinimapScale current;
 
     public MinimapWidget(Skin skin) {

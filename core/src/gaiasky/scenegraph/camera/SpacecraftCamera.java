@@ -46,12 +46,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * Camera to render the attitude indicator system
      **/
-    private PerspectiveCamera guiCam;
+    private final PerspectiveCamera guiCam;
 
     /**
      * The input inputListener attached to this camera
      **/
-    private SpacecraftInputController inputController;
+    private final SpacecraftInputController inputController;
 
     /**
      * Controller listener
@@ -61,17 +61,28 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * Crosshair
      **/
-    private SpriteBatch spriteBatch;
-    private Texture crosshairTex;
-    private float chw2, chh2;
+    private final SpriteBatch spriteBatch;
+    private final Texture crosshairTex;
+    private final float chw2;
+    private final float chh2;
 
     /**
      * Closest body apart from the spacecraft (second closest)
      **/
     private IFocus secondClosest;
 
-    private Vector3d aux1, aux2, todesired, desired, scthrust, scforce, scaccel, scvel, scpos, scdir, scup;
-    private Pair<Vector3d, Vector3d> dirup;
+    private final Vector3d aux1;
+    private final Vector3d aux2;
+    private final Vector3d todesired;
+    private final Vector3d desired;
+    private final Vector3d scthrust;
+    private final Vector3d scforce;
+    private final Vector3d scaccel;
+    private final Vector3d scvel;
+    private Vector3d scpos;
+    private final Vector3d scdir;
+    private final Vector3d scup;
+    private final Pair<Vector3d, Vector3d> dirup;
 
     private double targetDistance;
     private boolean firstTime = true;

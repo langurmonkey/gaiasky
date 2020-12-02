@@ -21,7 +21,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
 public class PFMTextureLoader extends AsynchronousAssetLoader<Texture, PFMTextureLoader.PFMTextureParameter>  {
-    private static Log logger = Logger.getLogger(PFMTextureLoader.class);
+    private static final Log logger = Logger.getLogger(PFMTextureLoader.class);
 
     static public class TextureLoaderInfo {
         String filename;

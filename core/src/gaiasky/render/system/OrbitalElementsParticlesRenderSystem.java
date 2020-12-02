@@ -35,8 +35,8 @@ import org.lwjgl.opengl.GL30;
 import java.util.List;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private Vector3 aux1;
-    private Matrix4 maux;
+    private final Vector3 aux1;
+    private final Matrix4 maux;
     private int elems01Offset, elems02Offset, sizeOffset, count;
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {

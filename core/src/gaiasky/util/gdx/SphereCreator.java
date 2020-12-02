@@ -13,8 +13,9 @@ import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
 
 public class SphereCreator extends ModelCreator {
 
-    private static Vector3 axisY = new Vector3(), axisZ = new Vector3();
-    private static VertexInfo vertTmp3 = new VertexInfo();
+    private static final Vector3 axisY = new Vector3();
+    private static final Vector3 axisZ = new Vector3();
+    private static final VertexInfo vertTmp3 = new VertexInfo();
     private static IntArray tmpIndices = new IntArray();
 
     public static void create(IntIntMeshBuilder builder, final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {

@@ -61,18 +61,19 @@ import java.util.TreeSet;
  * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog implements IObserver {
-    private static Log logger = Logger.getLogger(PreferencesWindow.class);
+    private static final Log logger = Logger.getLogger(PreferencesWindow.class);
 
     // Remember the last tab opened
     private static OwnTextIconButton lastTab;
     private static boolean lastTabFlag = true;
 
-    private Array<Actor> contents;
-    private Array<OwnLabel> labels;
+    private final Array<Actor> contents;
+    private final Array<OwnLabel> labels;
 
     private IValidator widthValidator, heightValidator, screenshotsSizeValidator, frameoutputSizeValidator, limitfpsValidator;
 
-    private INumberFormat nf3, nf1;
+    private final INumberFormat nf3;
+    private final INumberFormat nf1;
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
@@ -448,11 +449,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         elevationSb.setSelectedIndex(GlobalConf.scene.ELEVATION_TYPE.ordinal());
         elevationSb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (elevationSb.getSelected().type.isTessellation()) {
-                    enableComponents(true, tessQuality, tessQualityLabel);
-                } else {
-                    enableComponents(false, tessQuality, tessQualityLabel);
-                }
+                enableComponents(elevationSb.getSelected().type.isTessellation(), tessQuality, tessQualityLabel);
             }
             return false;
         });
@@ -1117,13 +1114,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotMode.setWidth(textwidth * 3f);
         screenshotMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                if (screenshotMode.getSelected().value == 0) {
-                    // Simple
-                    enableComponents(false, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                } else {
-                    // Redraw
-                    enableComponents(true, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                }
+                // Simple
+                // Redraw
+                enableComponents(screenshotMode.getSelected().value != 0, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
                 return true;
             }
             return false;
@@ -1232,13 +1225,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutputMode.setWidth(textwidth * 3f);
         frameoutputMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                if (frameoutputMode.getSelected().value == 0) {
-                    // Simple
-                    enableComponents(false, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                } else {
-                    // Redraw
-                    enableComponents(true, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                }
+                // Simple
+                // Redraw
+                enableComponents(frameoutputMode.getSelected().value != 0, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
                 return true;
             }
             return false;

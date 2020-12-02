@@ -14,7 +14,7 @@ import java.time.Instant;
 
 public class MessageBean {
     private static final String TAG_SEPARATOR = " - ";
-    private static IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
+    private static final IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
     String msg;
     Instant date;
 

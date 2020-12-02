@@ -36,7 +36,7 @@ public class UpdaterTask<T extends SceneGraphNode> implements Callable<Void> {
         int size = nodes.size;
         for (int i = start; i < size; i += step) {
             SceneGraphNode node = nodes.get(i);
-            float opacity = node instanceof Particle && ((Particle) node).octant != null ? ((Particle) node).octant.opacity : (node instanceof FadeNode ? 1f : node.opacity);
+            float opacity = node instanceof Particle && node.octant != null ? node.octant.opacity : (node instanceof FadeNode ? 1f : node.opacity);
             node.update(time, node.parent.translation, camera, opacity);
         }
         return null;

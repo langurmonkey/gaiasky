@@ -35,7 +35,7 @@ public class SearchDialog extends GenericDialog {
     private String currentInputText = "";
     private Cell<OwnLabel> infoCell;
     private OwnLabel infoMessage;
-    private ISceneGraph sg;
+    private final ISceneGraph sg;
 
     public SearchDialog(Skin skin, Stage ui,  final ISceneGraph sg) {
         super(I18n.txt("gui.objects.search"), skin, ui);

@@ -52,7 +52,8 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
     private boolean events = true;
 
-    private Drawable folderIcon, bookmarkIcon;
+    private final Drawable folderIcon;
+    private final Drawable bookmarkIcon;
 
     public BookmarksComponent(Skin skin, Stage stage) {
         super(skin, stage);

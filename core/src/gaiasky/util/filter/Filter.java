@@ -12,7 +12,7 @@ import gaiasky.scenegraph.ParticleGroup.ParticleBean;
  * A filter on a dataset as a set of rules
  */
 public class Filter {
-    private Array<FilterRule> rules;
+    private final Array<FilterRule> rules;
     private IOperation operation;
 
     /**

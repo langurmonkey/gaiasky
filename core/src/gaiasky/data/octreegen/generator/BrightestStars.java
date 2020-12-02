@@ -17,13 +17,13 @@ import java.util.List;
 
 public class BrightestStars implements IAggregationAlgorithm {
     /** Maximum depth of the octree **/
-    private int MAX_DEPTH;
+    private final int MAX_DEPTH;
     /** Maximum number of objects in the densest node of a level **/
-    private int MAX_PART;
+    private final int MAX_PART;
     /**
      * Minimum number of objects under which we do not further break the octree
      **/
-    private int MIN_PART;
+    private final int MIN_PART;
 
     /** Whether to discard stars due to density or not **/
     private boolean DISCARD = false;

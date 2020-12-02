@@ -25,9 +25,13 @@ public class DatasetLoadDialog extends GenericDialog {
     public ColorPicker particleColor, labelColor;
     public OwnSelectBox<ComponentType> componentType;
 
-    private String fileName;
+    private final String fileName;
 
-    private float sliderWidth, fieldWidth, titleWidth, cpSize, taWidth;
+    private final float sliderWidth;
+    private final float fieldWidth;
+    private final float titleWidth;
+    private final float cpSize;
+    private final float taWidth;
 
     public DatasetLoadDialog(String title, String fileName, Skin skin, Stage ui) {
         super(title, skin, ui);

@@ -32,7 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public final class ShaderLoader {
-    private static Log logger = Logger.getLogger(ShaderLoader.class);
+    private static final Log logger = Logger.getLogger(ShaderLoader.class);
 
     public static String BasePath = "";
     public static boolean Pedantic = true;

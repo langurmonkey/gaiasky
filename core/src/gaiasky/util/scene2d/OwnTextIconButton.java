@@ -20,7 +20,7 @@ import gaiasky.util.GlobalConf;
  */
 public class OwnTextIconButton extends OwnTextButton {
 
-    private Skin skin;
+    private final Skin skin;
     private Image icon;
     private TextIconButtonStyle style;
     private float pad = 2f * GlobalConf.UI_SCALE_FACTOR;

@@ -28,11 +28,11 @@ import java.util.Map;
  */
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private VerticalGroup group;
-    private float pad = 3 * GlobalConf.UI_SCALE_FACTOR;
+    private final float pad = 3 * GlobalConf.UI_SCALE_FACTOR;
 
-    private Map<String, WidgetGroup> groupMap;
-    private Map<String, OwnImageButton[]> imageMap;
-    private Map<String, ColormapPicker> colorMap;
+    private final Map<String, WidgetGroup> groupMap;
+    private final Map<String, OwnImageButton[]> imageMap;
+    private final Map<String, ColormapPicker> colorMap;
 
     public DatasetsComponent(Skin skin, Stage stage) {
         super(skin, stage);

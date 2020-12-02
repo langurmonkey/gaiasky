@@ -66,14 +66,24 @@ public class RelativisticEffectsManager implements IObserver {
     public float[] hterms;
 
     /** Intial time for the counter **/
-    private long initime;
+    private final long initime;
 
     /** Unit vector **/
-    private Vector3 unitz, screenCoords;
+    private final Vector3 unitz;
+    private final Vector3 screenCoords;
     /** Aux matrices **/
-    private Matrix3 eplus, etimes, auxm1, auxm2, auxm3, auxm4;
+    private final Matrix3 eplus;
+    private final Matrix3 etimes;
+    private final Matrix3 auxm1;
+    private final Matrix3 auxm2;
+    private final Matrix3 auxm3;
+    private final Matrix3 auxm4;
     /** Aux vectors **/
-    private Vector3d auxd1, auxd2, auxd3, auxd4, auxd5;
+    private final Vector3d auxd1;
+    private final Vector3d auxd2;
+    private final Vector3d auxd3;
+    private final Vector3d auxd4;
+    private final Vector3d auxd5;
 
     private RelativisticEffectsManager(ITimeFrameProvider time) {
         super();

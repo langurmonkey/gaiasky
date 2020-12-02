@@ -38,7 +38,7 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  */
 public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     static private INetworkChecker daemon;
-    static private int MAX_RULER_NAME_LEN = 9;
+    static private final int MAX_RULER_NAME_LEN = 9;
 
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMag, focusAbsMag, focusRadius;
@@ -52,8 +52,14 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     protected IFocus currentFocus;
 
-    private Table focusInfo, pointerInfo, cameraInfo, moreInfo, rulerInfo, focusNames;
-    private Cell<?> focusInfoCell, rulerCell;
+    private final Table focusInfo;
+    private final Table pointerInfo;
+    private final Table cameraInfo;
+    private final Table moreInfo;
+    private final Table rulerInfo;
+    private final Table focusNames;
+    private final Cell<?> focusInfoCell;
+    private final Cell<?> rulerCell;
     Vector3d pos;
 
     INumberFormat nf, sf;

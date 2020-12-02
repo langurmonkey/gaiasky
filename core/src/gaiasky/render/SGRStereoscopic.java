@@ -49,16 +49,22 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     private static final double EYE_ANGLE_DEG = 1.5;
 
     /** Viewport to use in steoeroscopic mode **/
-    private Viewport stretchViewport;
+    private final Viewport stretchViewport;
 
     /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
     Map<Integer, FrameBuffer> fb3D;
 
-    private Anaglyphic anaglyphic;
-    private Copy copy;
+    private final Anaglyphic anaglyphic;
+    private final Copy copy;
 
-    private Vector3 aux1, aux2, aux3;
-    private Vector3d aux1d, aux2d, aux3d, aux4d, aux5d;
+    private final Vector3 aux1;
+    private final Vector3 aux2;
+    private final Vector3 aux3;
+    private final Vector3d aux1d;
+    private final Vector3d aux2d;
+    private final Vector3d aux3d;
+    private final Vector3d aux4d;
+    private final Vector3d aux5d;
 
     public SGRStereoscopic() {
         super();

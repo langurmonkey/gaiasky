@@ -324,9 +324,7 @@ public class SAMPClient implements IObserver {
                 if (idToNode.containsKey(dsName)) {
                     idToNode.removeKey(dsName);
                 }
-                if (idToUrl.containsKey(dsName)) {
-                    idToUrl.remove(dsName);
-                }
+                idToUrl.remove(dsName);
                 break;
             case DISPOSE:
                 if (conn != null) {

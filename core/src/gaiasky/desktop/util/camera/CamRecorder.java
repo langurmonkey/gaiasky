@@ -61,7 +61,7 @@ public class CamRecorder implements IObserver {
     private BufferedWriter os;
     private BufferedReader is;
     private Path f;
-    private DateFormat df;
+    private final DateFormat df;
 
     private long startMs;
     float time;

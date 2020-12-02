@@ -27,7 +27,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.io.FileNotFoundException;
 
 public class SceneGraphJsonLoader {
-    private static Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
+    private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
     public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException, NoSuchMethodException {
         ISceneGraph sg = null;

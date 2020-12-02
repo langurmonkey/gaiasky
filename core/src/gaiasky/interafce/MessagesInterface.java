@@ -25,7 +25,7 @@ import java.util.Map;
 public class MessagesInterface extends TableGuiInterface implements IObserver {
     Label headline, subhead;
     /** Lock object for synchronization **/
-    private Object lock;
+    private final Object lock;
 
     Map<Integer, Widget> customElements;
 

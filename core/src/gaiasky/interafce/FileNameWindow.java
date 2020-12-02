@@ -16,7 +16,7 @@ import gaiasky.util.validator.RegexpValidator;
 
 public class FileNameWindow extends GenericDialog{
 
-    private String defaultName;
+    private final String defaultName;
     private OwnTextField fileName;
 
     public FileNameWindow(String defaultName, Stage stage, Skin skin){

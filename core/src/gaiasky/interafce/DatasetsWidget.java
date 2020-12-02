@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class DatasetsWidget {
 
-    private Skin skin;
+    private final Skin skin;
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
 

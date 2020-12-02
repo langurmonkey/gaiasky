@@ -430,11 +430,11 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected static class DaemonLoader extends Thread {
         private boolean awake;
         private boolean running;
-        private AtomicBoolean abort;
+        private final AtomicBoolean abort;
 
-        private StreamingOctreeLoader loader;
-        private AbstractOctreeWrapper octreeWrapper;
-        private Array<OctreeNode> toLoad;
+        private final StreamingOctreeLoader loader;
+        private final AbstractOctreeWrapper octreeWrapper;
+        private final Array<OctreeNode> toLoad;
 
         public DaemonLoader(AbstractOctreeWrapper aow, StreamingOctreeLoader loader) {
             this.awake = false;

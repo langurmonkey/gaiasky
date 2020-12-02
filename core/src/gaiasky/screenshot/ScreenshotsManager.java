@@ -51,7 +51,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     public IFileImageRenderer frameRenderer, screenshotRenderer;
-    private ScreenshotCmd screenshot;
+    private final ScreenshotCmd screenshot;
     private IGui renderGui;
 
     public ScreenshotsManager() {

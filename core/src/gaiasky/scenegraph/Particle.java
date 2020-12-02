@@ -42,7 +42,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     private static final float DISC_FACTOR = 1.5f;
 
-    private static Random rnd = new Random();
+    private static final Random rnd = new Random();
 
     protected static float thpointTimesFovfactor;
     protected static float thupOverFovfactor;

@@ -388,7 +388,7 @@ public class OctreeGeneratorRun {
 
         OctreeNode octree = og.generateOctree(list);
 
-        PrintStream out = new PrintStream(System.out, true, "UTF-8");
+        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.println(octree.toString(true));
 
         long generatingMs = TimeUtils.millis();

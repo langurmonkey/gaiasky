@@ -89,18 +89,18 @@ public class DownloadDataWindow extends GenericDialog {
     private Cell<OwnTextButton> cancelCell;
     private float scrollX = 0f, scrollY = 0f;
 
-    private Color highlight;
+    private final Color highlight;
 
     // Whether to show the data location chooser
-    private boolean dataLocation;
+    private final boolean dataLocation;
 
-    private INumberFormat nf;
-    private List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choiceList;
+    private final INumberFormat nf;
+    private final List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choiceList;
     private Array<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> toDownload;
-    private Array<OwnImageButton> rubbishes;
+    private final Array<OwnImageButton> rubbishes;
     private int current = -1;
 
-    private Set<DatasetDesc> downloaded;
+    private final Set<DatasetDesc> downloaded;
 
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
         this(stage, skin, dd, true, I18n.txt("gui.ok"));

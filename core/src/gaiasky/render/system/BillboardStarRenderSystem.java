@@ -33,7 +33,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
     private IntMesh mesh;
     private Quaternion quaternion;
     private Texture texture0;
-    private int ctIndex;
+    private final int ctIndex;
 
     public BillboardStarRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, String tex0, int ctIndex, float w, float h) {
         super(rg, alphas, programs);

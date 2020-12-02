@@ -185,7 +185,8 @@ public class TextUtils {
     }
 
     /** Decimal format **/
-    private static INumberFormat nf, nfsci;
+    private static final INumberFormat nf;
+    private static final INumberFormat nfsci;
 
     static {
         nf = NumberFormatFactory.getFormatter("#########.###");

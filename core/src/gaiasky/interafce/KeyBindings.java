@@ -35,11 +35,11 @@ import java.util.*;
  * @author Toni Sagrista
  */
 public class KeyBindings {
-    private static Log logger = Logger.getLogger(KeyBindings.class);
+    private static final Log logger = Logger.getLogger(KeyBindings.class);
 
-    private Map<String, ProgramAction> actions;
-    private Map<TreeSet<Integer>, ProgramAction> mappings;
-    private Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
+    private final Map<String, ProgramAction> actions;
+    private final Map<TreeSet<Integer>, ProgramAction> mappings;
+    private final Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
 
     public static KeyBindings instance;
 

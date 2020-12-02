@@ -59,7 +59,7 @@ import java.util.Map;
  * @author Toni Sagrista
  */
 public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
-    private static Log logger = Logger.getLogger(StarClusterLoader.class);
+    private static final Log logger = Logger.getLogger(StarClusterLoader.class);
     boolean active = true;
 
     private enum ClusterProperties {

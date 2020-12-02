@@ -9,8 +9,8 @@ import gaiasky.util.parse.Parser;
 
 public class DoubleValidator extends CallbackValidator {
 
-    private double min;
-    private double max;
+    private final double min;
+    private final double max;
 
     public DoubleValidator(double min, double max) {
         this(null, min, max);

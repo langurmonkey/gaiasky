@@ -22,9 +22,15 @@ import gaiasky.util.coord.Coordinates;
 
 public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
 
-    private float[] merp, venp, earp, marp;
+    private final float[] merp;
+    private final float[] venp;
+    private final float[] earp;
+    private final float[] marp;
     private Planet mer, ven, ear, mar;
-    private Color merc, venc, marc, earc;
+    private final Color merc;
+    private final Color venc;
+    private final Color marc;
+    private final Color earc;
 
     public InnerSolarSystemMinimapScale() {
         super();

@@ -30,16 +30,19 @@ import java.util.List;
 import java.util.Random;
 
 public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
-    private static int N_PARTICLES = (GlobalConf.scene.GRAPHICS_QUALITY.ordinal() + 1) * 100;
+    private static final int N_PARTICLES = (GlobalConf.scene.GRAPHICS_QUALITY.ordinal() + 1) * 100;
 
-    private Random rand;
-    private Vector3 aux1f;
-    private Vector3d aux1, aux2, aux5;
+    private final Random rand;
+    private final Vector3 aux1f;
+    private final Vector3d aux1;
+    private final Vector3d aux2;
+    private final Vector3d aux5;
     private int sizeOffset, tOffset;
-    private ComponentTypes ct;
-    private Vector3[] positions, additional;
-    private Vector3d[] campositions;
-    private long baset;
+    private final ComponentTypes ct;
+    private final Vector3[] positions;
+    private final Vector3[] additional;
+    private final Vector3d[] campositions;
+    private final long baset;
 
     public ParticleEffectsRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super(rg, alphas, programs);
@@ -59,7 +62,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
             if (i % 2 == 0) {
                 // First in the pair
                 positions[i] = new Vector3((float) (rand.nextFloat() * Constants.AU_TO_U), 0f, (float) (rand.nextFloat() * Constants.AU_TO_U));
-                additional[i] = new Vector3(Color.toFloatBits(1f - rand.nextFloat() * 0.3f, 1f - rand.nextFloat() * 0.3f, 1f - rand.nextFloat() * 0.3f, 1f), 3 + rand.nextInt() % 8, ctm);
+                additional[i] = new Vector3(Color.toFloatBits(1f, 1f, 1f, 1f), 3 + rand.nextInt() % 8, ctm);
                 campositions[i / 2] = new Vector3d();
             } else {
                 // Companion, start with same positions
@@ -78,6 +81,10 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         Gdx.gl.glEnable(GL30.GL_LINE_SMOOTH);
         Gdx.gl.glEnable(GL30.GL_LINE_WIDTH);
         Gdx.gl.glHint(GL30.GL_NICEST, GL30.GL_LINE_SMOOTH_HINT);
+        getShaderProgram().begin();
+        getShaderProgram().setUniformf("u_ttl", 1f);
+        getShaderProgram().end();
+
     }
 
     private double getFactor(double cspeed) {
@@ -99,7 +106,9 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     private void updatePositions(ICamera cam) {
         double tu = cam.getCurrent().speedScaling();
-        double dist = 2600000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
+        double distLimit = 3500000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
+        double dist = distLimit * 0.8;
+        distLimit *= distLimit;
 
         // If focus is very close, stop (jittering errors kick in)
         if (cam.getMode().isFocus()) {
@@ -114,14 +123,13 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 return;
             }
         }
-        double dists = dist * 0.9;
         Vector3d campos = aux1.set(cam.getPos());
         for (int i = 0; i < N_PARTICLES * 2; i++) {
             Vector3d pos = aux5.set(positions[i]);
             if (i % 2 == 0) {
-                // Base particle
-                if (pos.dst(campos) > dist) {
-                    pos.set(rand.nextDouble() - 0.5, rand.nextDouble() - 0.5, rand.nextDouble() - 0.5).scl(dists).add(campos);
+                if (pos.dst2(campos) > distLimit) {
+                    // New particle
+                    pos.set(rand.nextDouble() - 0.5, rand.nextDouble() - 0.5, rand.nextDouble() - 0.5).scl(dist).add(campos);
                     pos.put(positions[i]);
                     additional[i].z = getT();
                     campositions[i / 2].set(campos);
@@ -219,9 +227,10 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1f));
-                shaderProgram.setUniformf("u_alpha", alpha * 0.8f);
+                shaderProgram.setUniformf("u_alpha", alpha * 0.6f);
                 shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor);
                 shaderProgram.setUniformf("u_t", getT());
+                shaderProgram.setUniformf("u_ttl", 0.5f);
 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);

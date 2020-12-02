@@ -33,8 +33,9 @@ import java.util.stream.Stream;
 public class AttitudeXmlParser {
     private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);
 
-    private static Instant endOfMission;
-    private static IDateFormat format, formatWithMs;
+    private static final Instant endOfMission;
+    private static final IDateFormat format;
+    private static final IDateFormat formatWithMs;
 
     static {
         format = DateFormatFactory.getFormatter("yyyy-MM-dd HH:mm:ss");

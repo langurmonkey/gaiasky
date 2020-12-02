@@ -27,9 +27,14 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  */
 public class RunStateInterface extends TableGuiInterface implements IObserver {
 
-    private Cell<?> keyboardImgCell, stopCameraCell, pauseBgCell, frameoutputImgCell;
-    private Image keyboardImg, frameoutputImg;
-    private OwnTextIconButton cancelCamera, bgLoading;
+    private final Cell<?> keyboardImgCell;
+    private final Cell<?> stopCameraCell;
+    private final Cell<?> pauseBgCell;
+    private final Cell<?> frameoutputImgCell;
+    private final Image keyboardImg;
+    private final Image frameoutputImg;
+    private final OwnTextIconButton cancelCamera;
+    private final OwnTextIconButton bgLoading;
     private boolean loadingPaused = false;
 
     public RunStateInterface(Skin skin) {

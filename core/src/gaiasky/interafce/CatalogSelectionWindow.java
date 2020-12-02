@@ -30,7 +30,7 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 public class CatalogSelectionWindow extends GenericDialog {
 
     private DatasetsWidget dw;
-    private String notice;
+    private final String notice;
 
     public CatalogSelectionWindow(Stage stage, Skin skin){
         this(stage, skin, null);

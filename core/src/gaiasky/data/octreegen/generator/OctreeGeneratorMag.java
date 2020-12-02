@@ -27,8 +27,8 @@ import java.util.*;
  */
 public class OctreeGeneratorMag implements IOctreeGenerator {
 
-    private OctreeGeneratorParams params;
-    private Comparator<ParticleBean> comp;
+    private final OctreeGeneratorParams params;
+    private final Comparator<ParticleBean> comp;
     private OctreeNode root;
 
     public OctreeGeneratorMag(OctreeGeneratorParams params) {
@@ -122,7 +122,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         // Tree is ready, create star groups
         Set<OctreeNode> nodes = sbMap.keySet();
         for (OctreeNode node : nodes) {
-            List<ParticleBean> list = (List<ParticleBean>) sbMap.get(node);
+            List<ParticleBean> list = sbMap.get(node);
             StarGroup sg = new StarGroup();
             sg.setData(list, false);
             node.add(sg);

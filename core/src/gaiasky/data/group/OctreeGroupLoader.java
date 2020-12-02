@@ -42,7 +42,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
      * Whether to use the binary file format. If false, we use the java
      * serialization method
      **/
-    private Boolean binary = true;
+    private final Boolean binary = true;
 
     /**
      * Whether to load data using the compatibility mode (for DR1/DR2) or not (DR3)
@@ -52,7 +52,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     /**
      * Binary particle reader
      **/
-    private IStarGroupDataProvider particleReader;
+    private final IStarGroupDataProvider particleReader;
 
     /**
      * Epoch of stars loaded through this

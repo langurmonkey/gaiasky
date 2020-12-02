@@ -95,13 +95,13 @@ public final class LensFlare2 extends PostProcessorEffect {
         }
     }
 
-    private PingPongBuffer pingPongBuffer;
+    private final PingPongBuffer pingPongBuffer;
 
-    private Flare lensBefore;
-    private FlareDirt lensAfter;
-    private Blur blur;
-    private Bias bias;
-    private Combine combine;
+    private final Flare lensBefore;
+    private final FlareDirt lensAfter;
+    private final Blur blur;
+    private final Bias bias;
+    private final Combine combine;
 
     private Settings settings;
 

@@ -50,7 +50,7 @@ import java.util.Date;
 public class AboutWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(AboutWindow.class);
 
-    private LabelStyle linkStyle;
+    private final LabelStyle linkStyle;
     private Table checkTable;
     private OwnLabel checkLabel;
 

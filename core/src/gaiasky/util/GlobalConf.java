@@ -346,7 +346,7 @@ public class GlobalConf {
         /**
          * Keep track of added controller listeners
          */
-        private Map<Controller, Set<ControllerListener>> controllerListenersMap;
+        private final Map<Controller, Set<ControllerListener>> controllerListenersMap;
 
         public ControlsConf() {
             controllerListenersMap = new HashMap<>();
@@ -378,16 +378,14 @@ public class GlobalConf {
                 controllerListenersMap.put(c, cs);
             } else {
                 Set<ControllerListener> cs = controllerListenersMap.get(c);
-                if (!cs.contains(cl))
-                    cs.add(cl);
+                cs.add(cl);
             }
         }
 
         private void removeListener(Controller c, ControllerListener cl) {
             if (controllerListenersMap.containsKey(c)) {
                 Set<ControllerListener> cs = controllerListenersMap.get(c);
-                if (cs.contains(cl))
-                    cs.remove(cl);
+                cs.remove(cl);
             }
         }
 

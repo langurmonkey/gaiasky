@@ -33,13 +33,13 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * @author Toni Sagrista
  */
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
-    private Vector2 viewport;
-    private Vector2 zfark;
-    private Vector3 pos;
-    private float[] additional;
+    private final Vector2 viewport;
+    private final Vector2 zfark;
+    private final Vector3 pos;
+    private final float[] additional;
     private Matrix4 frustumCorners;
-    private Matrix4 camInvView;
-    private Matrix4 modelView;
+    private final Matrix4 camInvView;
+    private final Matrix4 modelView;
     private float timeSecs;
     /**
      * Default depth buffer texture. In our case, it contains the logarithmic
@@ -67,8 +67,8 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         Additional("u_additional", 4);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

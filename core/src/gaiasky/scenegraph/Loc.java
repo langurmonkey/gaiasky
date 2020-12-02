@@ -75,7 +75,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
 
-        if (((ModelBody) parent).viewAngle > ((ModelBody) parent).THRESHOLD_QUAD() * 30f || camera.isFocus(this)) {
+        if (parent.viewAngle > ((ModelBody) parent).THRESHOLD_QUAD() * 30f || camera.isFocus(this)) {
             updateLocalValues(time, camera);
 
             this.translation.add(pos);

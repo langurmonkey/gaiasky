@@ -69,8 +69,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
-    private EventManager em;
-    private AssetManager manager;
+    private final EventManager em;
+    private final AssetManager manager;
     private LruCache<String, Texture> textures;
 
     private static EventScriptingInterface instance = null;
@@ -82,10 +82,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return instance;
     }
 
-    private Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
-    private Vector2d aux2d1;
+    private final Vector3d aux3d1;
+    private final Vector3d aux3d2;
+    private final Vector3d aux3d3;
+    private final Vector3d aux3d4;
+    private final Vector3d aux3d5;
+    private final Vector3d aux3d6;
+    private final Vector2d aux2d1;
 
-    private Set<AtomicBoolean> stops;
+    private final Set<AtomicBoolean> stops;
 
     private EventScriptingInterface() {
         em = EventManager.instance;

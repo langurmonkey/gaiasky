@@ -25,7 +25,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public final class RadialBlur extends Filter<RadialBlur> {
     // ctrl quality
-    private int blur_len;
+    private final int blur_len;
 
     // ctrl quantity
     private float strength, x, y;
@@ -57,8 +57,8 @@ public final class RadialBlur extends Filter<RadialBlur> {
         ;
         // @on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

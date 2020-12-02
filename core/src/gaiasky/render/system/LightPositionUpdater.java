@@ -28,13 +28,13 @@ import java.util.List;
 
 public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
-    private Object lock;
+    private final Object lock;
     private int nLights;
     private float[] positions;
     private float[] viewAngles;
     private float[] colors;
-    private Vector3 auxV;
-    private Vector3d auxD;
+    private final Vector3 auxV;
+    private final Vector3d auxD;
 
     private Texture glowTex;
 

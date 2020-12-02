@@ -14,8 +14,8 @@ import com.badlogic.gdx.math.Matrix4;
 
 public class ShadowMapImpl implements ShadowMap {
 
-    private Matrix4 trans;
-    private TextureDescriptor<Texture> td;
+    private final Matrix4 trans;
+    private final TextureDescriptor<Texture> td;
 
     public ShadowMapImpl(Matrix4 trans, Texture tex) {
         super();

@@ -33,7 +33,7 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * @author Toni Sagrista
  */
 public final class Anaglyphic extends PostProcessorEffect {
-    private AnaglyphicFilter anaglyphic;
+    private final AnaglyphicFilter anaglyphic;
 
     public Anaglyphic() {
         anaglyphic = new AnaglyphicFilter();

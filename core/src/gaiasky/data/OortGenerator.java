@@ -29,10 +29,10 @@ public class OortGenerator {
     private static final boolean writeFile = true;
 
     /** Outer radius in AU **/
-    private static float outer_radius = 15000;
+    private static final float outer_radius = 15000;
 
     /** Number of particles **/
-    private static int N = 10000;
+    private static final int N = 10000;
 
     public static void main(String[] args) {
         try {

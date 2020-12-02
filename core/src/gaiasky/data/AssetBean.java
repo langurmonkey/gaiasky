@@ -20,11 +20,11 @@ import java.util.Set;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AssetBean {
     private static AssetManager assetManager;
-    private static Set<AssetBean> assetDescriptors;
+    private static final Set<AssetBean> assetDescriptors;
 
-    private String assetName;
+    private final String assetName;
 
-    private Class assetClass;
+    private final Class assetClass;
     private AssetLoaderParameters assetParams = null;
 
     static {

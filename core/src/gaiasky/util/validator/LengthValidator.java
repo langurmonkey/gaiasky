@@ -6,7 +6,8 @@
 package gaiasky.util.validator;
 
 public class LengthValidator extends CallbackValidator {
-    private int minLength, maxLength;
+    private final int minLength;
+    private final int maxLength;
 
     public LengthValidator(int minLength, int maxLength) {
         this(null, minLength, maxLength);

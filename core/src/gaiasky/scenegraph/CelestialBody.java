@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  *
  */
 public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
-    private static float[] labelColour = new float[] { 1, 1, 1, 1 };
+    private static final float[] labelColour = new float[] { 1, 1, 1, 1 };
 
     /**
      * radius/distance limit for rendering at all. If angle is smaller than this

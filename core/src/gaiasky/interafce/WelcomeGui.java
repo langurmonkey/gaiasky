@@ -52,8 +52,8 @@ import java.util.Set;
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
 
-    private VRStatus vrStatus;
-    private boolean skipWelcome;
+    private final VRStatus vrStatus;
+    private final boolean skipWelcome;
 
     protected DownloadDataWindow ddw;
     protected CatalogSelectionWindow cdw;

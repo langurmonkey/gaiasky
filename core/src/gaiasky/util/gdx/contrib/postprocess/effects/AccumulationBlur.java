@@ -21,7 +21,7 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  */
 public class AccumulationBlur extends PostProcessorEffect {
     private AccumulationBlurFilter motionFilter;
-    private Copy copyFilter;
+    private final Copy copyFilter;
     private FrameBuffer fbo;
 
     public AccumulationBlur(int width, int height) {

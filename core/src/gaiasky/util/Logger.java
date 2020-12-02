@@ -128,7 +128,7 @@ public class Logger {
         return l.getVal() <= level.getVal();
     }
 
-    private static Map<String, Log> logObjects;
+    private static final Map<String, Log> logObjects;
 
     static {
         logObjects = new HashMap<>();

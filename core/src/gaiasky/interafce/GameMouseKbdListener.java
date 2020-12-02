@@ -20,7 +20,7 @@ import gaiasky.util.Logger.Log;
 import org.lwjgl.glfw.GLFW;
 
 public class GameMouseKbdListener extends MouseKbdListener implements IObserver {
-    private static Log logger = Logger.getLogger(GameMouseKbdListener.class);
+    private static final Log logger = Logger.getLogger(GameMouseKbdListener.class);
 
     private float prevX = 0, prevY = 0;
     private float dx = 0, dy = 0;

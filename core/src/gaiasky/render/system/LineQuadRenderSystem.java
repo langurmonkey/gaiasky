@@ -38,8 +38,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     private MeshDataExt currExt;
     private Array<double[]> provisionalLines;
     private Array<Line> provLines;
-    private LineArraySorter sorter;
-    private Pool<double[]> doublePool;
+    private final LineArraySorter sorter;
+    private final Pool<double[]> doublePool;
 
     private class MeshDataExt extends MeshData {
         int uvOffset;
@@ -131,7 +131,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     private boolean two = false;
-    private Vector3d aux = new Vector3d();
+    private final Vector3d aux = new Vector3d();
 
     public void breakLine() {
         two = false;
@@ -364,7 +364,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     protected class DPool extends Pool<double[]> {
 
-        private int dsize;
+        private final int dsize;
 
         public DPool(int initialCapacity, int max, int dsize) {
             super(initialCapacity, max);

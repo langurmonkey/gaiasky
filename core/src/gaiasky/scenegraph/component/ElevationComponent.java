@@ -19,7 +19,7 @@ import gaiasky.util.noise.OpenSimplexNoise;
  * Contains the parameters and functions for procedural elevation
  */
 public class ElevationComponent {
-    private static Log logger = Logger.getLogger(ElevationComponent.class);
+    private static final Log logger = Logger.getLogger(ElevationComponent.class);
 
     public enum NoiseType {
         PERLIN,

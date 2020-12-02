@@ -28,8 +28,8 @@ import java.util.Set;
  */
 public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver {
 
-    private CubemapProjections cubemapEffect;
-    private Copy copy;
+    private final CubemapProjections cubemapEffect;
+    private final Copy copy;
 
     public SGRCubemapProjections() {
         super();

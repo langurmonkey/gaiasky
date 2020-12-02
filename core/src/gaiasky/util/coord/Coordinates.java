@@ -41,11 +41,23 @@ public class Coordinates {
     private static final double Q = 27.12825;
     private static final double P = 192.85948;
 
-    private static Matrix4d equatorialToEcliptic, eclipticToEquatorial, equatorialToGalactic, galacticToEquatorial, eclipticToGalactic, galacticToEcliptic, mat4didt;
-    private static Matrix4 equatorialToEclipticF, eclipticToEquatorialF, equatorialToGalacticF, galacticToEquatorialF, eclipticToGalacticF, galacticToEclipticF, mat4fidt;
+    private static final Matrix4d equatorialToEcliptic;
+    private static final Matrix4d eclipticToEquatorial;
+    private static final Matrix4d equatorialToGalactic;
+    private static final Matrix4d galacticToEquatorial;
+    private static final Matrix4d eclipticToGalactic;
+    private static final Matrix4d galacticToEcliptic;
+    private static final Matrix4d mat4didt;
+    private static final Matrix4 equatorialToEclipticF;
+    private static final Matrix4 eclipticToEquatorialF;
+    private static final Matrix4 equatorialToGalacticF;
+    private static final Matrix4 galacticToEquatorialF;
+    private static final Matrix4 eclipticToGalacticF;
+    private static final Matrix4 galacticToEclipticF;
+    private static final Matrix4 mat4fidt;
 
-    private static Map<String, Matrix4d> mapd;
-    private static Map<String, Matrix4> mapf;
+    private static final Map<String, Matrix4d> mapd;
+    private static final Map<String, Matrix4> mapf;
 
     static {
         // Initialize matrices

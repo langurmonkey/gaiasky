@@ -23,18 +23,35 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.scene2d.*;
 
 public class DebugInterface extends TableGuiInterface implements IObserver {
-    private OwnLabel debugRuntime, debugRAMUsed, debugRAMFree, debugRAMAlloc, debugRAMTotal, debugVRAMUsed, debugVRAMTotal, debugObjectsDisplay, debugObjectsLoaded, debugOcObserved, debugOcQueue, debugSamp, fps, spf, device;
-    private OwnSlider queueStatus;
+    private final OwnLabel debugRuntime;
+    private final OwnLabel debugRAMUsed;
+    private final OwnLabel debugRAMFree;
+    private final OwnLabel debugRAMAlloc;
+    private final OwnLabel debugRAMTotal;
+    private final OwnLabel debugVRAMUsed;
+    private final OwnLabel debugVRAMTotal;
+    private final OwnLabel debugObjectsDisplay;
+    private final OwnLabel debugObjectsLoaded;
+    private final OwnLabel debugOcObserved;
+    private final OwnLabel debugOcQueue;
+    private final OwnLabel debugSamp;
+    private final OwnLabel fps;
+    private final OwnLabel spf;
+    private final OwnLabel device;
+    private final OwnSlider queueStatus;
     private int previousQueueSize = 0, currentQueueMax = 0;
     /** Lock object for synchronization **/
-    private Object lock;
-    private Skin skin;
+    private final Object lock;
+    private final Skin skin;
 
-    private Cell extraCell;
-    private Table extra;
+    private final Cell extraCell;
+    private final Table extra;
     private boolean maximized;
 
-    private INumberFormat fpsFormatter, spfFormatter, memFormatter, timeFormatter;
+    private final INumberFormat fpsFormatter;
+    private final INumberFormat spfFormatter;
+    private final INumberFormat memFormatter;
+    private final INumberFormat timeFormatter;
 
     public DebugInterface(Skin skin, Object lock) {
         super(skin);

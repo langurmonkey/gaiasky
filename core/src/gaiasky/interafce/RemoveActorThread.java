@@ -8,8 +8,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class RemoveActorThread extends Thread {
-    private Actor actor;
-    private float timeSeconds;
+    private final Actor actor;
+    private final float timeSeconds;
 
     public RemoveActorThread(Actor actor, float seconds) {
         this.actor = actor;

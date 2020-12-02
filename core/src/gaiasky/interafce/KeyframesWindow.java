@@ -51,8 +51,8 @@ import java.util.Map;
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
 
-    private INumberFormat secondsFormatter;
-    private IDateFormat dateFormat;
+    private final INumberFormat secondsFormatter;
+    private final IDateFormat dateFormat;
 
     /**
      * Seconds
@@ -65,7 +65,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Current keyframes
      **/
-    private Array<Keyframe> keyframes;
+    private final Array<Keyframe> keyframes;
     /**
      * Right and left tables
      **/
@@ -81,15 +81,15 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Seconds cells
      **/
-    private Map<Keyframe, Cell> secondsCells;
+    private final Map<Keyframe, Cell> secondsCells;
     /**
      * Names cells
      **/
-    private Map<Keyframe, Cell> namesCells;
+    private final Map<Keyframe, Cell> namesCells;
     /**
      * Keyframe cells
      */
-    private Map<Keyframe, OwnLabel> keyframeNames;
+    private final Map<Keyframe, OwnLabel> keyframeNames;
     /**
      * Scroll for keyframes
      **/
@@ -97,13 +97,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Current camera params
      **/
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private Vector3d pos, dir, up;
     private ITimeFrameProvider t;
     /**
      * Date format
      **/
-    private DateFormat df;
+    private final DateFormat df;
     /**
      * Last loaded keyframe file name
      **/
@@ -114,7 +114,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      **/
     private KeyframesPathObject keyframesPathObject;
 
-    private float buttonSize, buttonSizeL;
+    private final float buttonSize;
+    private final float buttonSizeL;
 
     /**
      * Contains info on field currently being edited
@@ -124,7 +125,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         private Keyframe kf;
         private int index;
         private OwnTextField tf;
-        private Map<String, Object> map;
+        private final Map<String, Object> map;
 
         public Editing() {
             map = new HashMap<>();
@@ -197,7 +198,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     }
 
-    private Editing editing;
+    private final Editing editing;
 
     public KeyframesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.keyframes.title"), skin, stage);

@@ -129,11 +129,7 @@ public class StereoGui extends AbstractGui {
         switch (event) {
         case STEREO_PROFILE_CMD:
             StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
-            if (profile == StereoProfile.ANAGLYPHIC) {
-                notificationsTwo.setVisible(false);
-            } else {
-                notificationsTwo.setVisible(true);
-            }
+            notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPHIC);
             break;
         default:
             break;

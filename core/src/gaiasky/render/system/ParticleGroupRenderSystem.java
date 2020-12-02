@@ -34,10 +34,10 @@ import java.util.List;
 import java.util.Random;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private Vector3 aux1;
+    private final Vector3 aux1;
     private int additionalOffset;
-    private Random rand;
-    private Colormap cmap;
+    private final Random rand;
+    private final Colormap cmap;
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);

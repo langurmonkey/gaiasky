@@ -22,9 +22,9 @@ import java.util.stream.Stream;
  * Loads HIP star names. If given a folder, it will recursively find and load all files which end with '_To_HIP.dat'.
  */
 public class HipNames {
-    private static Log logger = Logger.getLogger(HipNames.class);
+    private static final Log logger = Logger.getLogger(HipNames.class);
 
-    private Map<Integer, Array<String>> hipNames;
+    private final Map<Integer, Array<String>> hipNames;
 
     public HipNames() {
         super();

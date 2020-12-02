@@ -26,11 +26,19 @@ import java.time.Instant;
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     /** Date format **/
-    private IDateFormat dfdate, dftime;
+    private final IDateFormat dfdate;
+    private final IDateFormat dftime;
 
     private final int maxNameLen = 15;
 
-    private OwnLabel date, time, pace, closest, focus, home, s1, s2;
+    private final OwnLabel date;
+    private final OwnLabel time;
+    private final OwnLabel pace;
+    private final OwnLabel closest;
+    private final OwnLabel focus;
+    private final OwnLabel home;
+    private final OwnLabel s1;
+    private final OwnLabel s2;
     private String lastFocusName;
 
     public TopInfoInterface(Skin skin) {

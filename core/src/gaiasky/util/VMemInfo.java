@@ -12,7 +12,7 @@ import org.lwjgl.opengl.NVXGPUMemoryInfo;
 import org.lwjgl.opengl.WGLAMDGPUAssociation;
 
 public class VMemInfo {
-    private static Log logger = Logger.getLogger(VMemInfo.class);
+    private static final Log logger = Logger.getLogger(VMemInfo.class);
 
     private static IGraphicsDeviceInfo graphicsDeviceInfo;
     private static boolean crash = false;
@@ -79,8 +79,8 @@ public class VMemInfo {
     }
 
     private static class NVIDIAVRAM implements IGraphicsDeviceInfo {
-        private int[] buff;
-        private double totalMem;
+        private final int[] buff;
+        private final double totalMem;
 
         public NVIDIAVRAM() {
             buff = new int[1];
@@ -109,9 +109,10 @@ public class VMemInfo {
     }
 
     private static class AMDVRAM implements IGraphicsDeviceInfo {
-        private int[] buff;
-        private double totalMem;
-        private boolean gpuassoc, meminfo;
+        private final int[] buff;
+        private final double totalMem;
+        private final boolean gpuassoc;
+        private final boolean meminfo;
 
         public AMDVRAM(boolean gpuassoc, boolean meminfo) {
             this.buff = new int[4];

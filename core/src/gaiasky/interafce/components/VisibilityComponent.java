@@ -201,11 +201,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmToggleButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (pmGroup != null) {
-                    if (pmToggleButton.isChecked()) {
-                        velocityVectorsEnabled(true);
-                    } else {
-                        velocityVectorsEnabled(false);
-                    }
+                    velocityVectorsEnabled(pmToggleButton.isChecked());
                 }
                 return true;
             }

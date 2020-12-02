@@ -30,10 +30,10 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * @author Toni Sagrista
  **/
 public final class Lens extends Filter<Lens> {
-    private Vector2 lightPosition = new Vector2();
+    private final Vector2 lightPosition = new Vector2();
     private float intensity;
-    private Vector3 color = new Vector3();
-    private Vector2 viewport = new Vector2();
+    private final Vector3 color = new Vector3();
+    private final Vector2 viewport = new Vector2();
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -44,8 +44,8 @@ public final class Lens extends Filter<Lens> {
         Viewport("u_viewport", 2);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

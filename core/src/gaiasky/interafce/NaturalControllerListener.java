@@ -25,11 +25,11 @@ import java.nio.file.Path;
 public class NaturalControllerListener implements ControllerListener, IObserver, IInputListener {
     private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
 
-    private NaturalCamera cam;
+    private final NaturalCamera cam;
     private IControllerMappings mappings;
-    private EventManager em;
+    private final EventManager em;
 
-    private IntSet pressedKeys;
+    private final IntSet pressedKeys;
 
     public NaturalControllerListener(NaturalCamera cam, String mappingsFile) {
         this.cam = cam;

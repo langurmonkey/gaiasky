@@ -37,7 +37,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
     private String currentTrack;
     private int si = 0;
     private int sp = 1;
-    private int w = getTrackWindowSize();
+    private final int w = getTrackWindowSize();
 
     public MusicComponent(Skin skin, Stage stage) {
         super(skin, stage);

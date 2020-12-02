@@ -9,8 +9,8 @@ import com.badlogic.gdx.utils.LongMap;
 
 public class LargeLongMap<T> {
 
-    private int N;
-    private LongMap<T>[] maps;
+    private final int N;
+    private final LongMap<T>[] maps;
     private boolean empty = true;
 
     /**

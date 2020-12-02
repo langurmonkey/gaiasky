@@ -163,7 +163,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     }
 
     protected class LineArraySorter implements Comparator<double[]> {
-        private int idx;
+        private final int idx;
 
         public LineArraySorter(int idx) {
             this.idx = idx;

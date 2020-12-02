@@ -62,11 +62,11 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private boolean label;
 
     private float[] cc;
-    private float[] ccEq = ColorUtils.gRed;
-    private float[] ccEcl = ColorUtils.gGreen;
-    private float[] ccGal = ColorUtils.gBlue;
+    private final float[] ccEq = ColorUtils.gRed;
+    private final float[] ccEcl = ColorUtils.gGreen;
+    private final float[] ccGal = ColorUtils.gBlue;
 
-    private float[] ccL = ColorUtils.gYellow;
+    private final float[] ccL = ColorUtils.gYellow;
 
     private Pair<Double, Double> scalingFading;
     private float fovFactor;

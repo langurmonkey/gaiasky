@@ -19,7 +19,7 @@ public class AccumulationBlurFilter extends Filter<AccumulationBlurFilter> {
 
     private float blurOpacity = 0.5f;
     private float blurRadius = 0.5f;
-    private Vector2 resolution;
+    private final Vector2 resolution;
     private Texture lastFrameTex;
 
     public enum Param implements Parameter {
@@ -31,8 +31,8 @@ public class AccumulationBlurFilter extends Filter<AccumulationBlurFilter> {
         Resolution("u_resolution", 2);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

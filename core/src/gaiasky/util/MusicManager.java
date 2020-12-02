@@ -164,7 +164,7 @@ public class MusicManager implements IObserver {
     }
 
     private class MusicFileFilter implements DirectoryStream.Filter<Path> {
-        private PathMatcher pm = FileSystems.getDefault().getPathMatcher("glob:**.{mp3,wav,ogg,flac}");
+        private final PathMatcher pm = FileSystems.getDefault().getPathMatcher("glob:**.{mp3,wav,ogg,flac}");
         @Override
         public boolean accept(Path dir) {
             return pm.matches(dir);

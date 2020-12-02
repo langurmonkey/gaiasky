@@ -273,7 +273,8 @@ public class VRContext implements Disposable {
     private final VREvent event = VREvent.create();
 
     // default size
-    private int width, height;
+    private final int width;
+    private final int height;
 
     // render models
     private final ObjectMap<String, IntModel> models = new ObjectMap<>();

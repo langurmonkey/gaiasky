@@ -31,8 +31,8 @@ public final class Convolve1D extends Filter<Convolve1D> {
         SampleOffsets("SampleOffsets", 2 /* vec2 */);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

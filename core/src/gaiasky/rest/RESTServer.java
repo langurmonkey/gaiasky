@@ -116,12 +116,12 @@ public class RESTServer {
     /**
      * REST server static files location.
      */
-    private static String rest_static_location = GlobalConf.ASSETS_LOC + "/rest-static";
+    private static final String rest_static_location = GlobalConf.ASSETS_LOC + "/rest-static";
 
     /**
      * Logger
      */
-    private static Log logger = Logger.getLogger(RESTServer.class);
+    private static final Log logger = Logger.getLogger(RESTServer.class);
 
     /**
      * Name to method map

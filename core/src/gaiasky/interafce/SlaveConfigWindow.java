@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 public class SlaveConfigWindow extends GenericDialog implements IObserver {
-    private static Logger.Log logger = Logger.getLogger(SlaveConfigWindow.class);
+    private static final Logger.Log logger = Logger.getLogger(SlaveConfigWindow.class);
 
-    private static Map<String, Map<String, String>> parametersMap;
+    private static final Map<String, Map<String, String>> parametersMap;
 
     static {
         parametersMap = new HashMap();

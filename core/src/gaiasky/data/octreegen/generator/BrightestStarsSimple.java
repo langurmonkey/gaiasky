@@ -17,9 +17,9 @@ import java.util.List;
 
 public class BrightestStarsSimple implements IAggregationAlgorithm {
     /** Maximum number of objects in the densest node of a level **/
-    private int MAX_PART;
+    private final int MAX_PART;
 
-    private Comparator<ParticleBean> comp;
+    private final Comparator<ParticleBean> comp;
 
     /**
      * Constructor using fields

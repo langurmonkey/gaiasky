@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ShapeRenderSystem extends AbstractRenderSystem {
 
-    private ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
 
     public ShapeRenderSystem(RenderGroup rg, float[] alphas) {
         super(rg, alphas, null);

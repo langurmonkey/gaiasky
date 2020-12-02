@@ -16,9 +16,9 @@ import java.util.List;
 
 public class TipGenerator {
 
-    private Skin skin;
-    private List<String[]> tips;
-    private int[] sequence;
+    private final Skin skin;
+    private final List<String[]> tips;
+    private final int[] sequence;
     private int currentIndex = 0;
 
     public TipGenerator(Skin skin) {

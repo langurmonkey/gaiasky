@@ -36,8 +36,8 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  */
 public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFilter> {
 
-    private ShaderProgram[] programs;
-    private Vector2 viewport;
+    private final ShaderProgram[] programs;
+    private final Vector2 viewport;
     private float planetariumAperture, planetariumAngle;
 
     public enum Param implements Parameter {
@@ -48,8 +48,8 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         PlanetariumAngle("u_planetariumAngle", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

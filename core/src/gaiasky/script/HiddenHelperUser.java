@@ -37,7 +37,7 @@ public class HiddenHelperUser implements IObserver {
         instance();
     }
 
-    private Array<HelperTask> currentTasks;
+    private final Array<HelperTask> currentTasks;
 
     private long lastCommandTime;
 

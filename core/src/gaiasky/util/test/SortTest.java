@@ -19,8 +19,8 @@ import java.util.*;
  *
  */
 public class SortTest {
-    private static int N_SORTS = 5;
-    private static int N_ITEMS = 1000000;
+    private static final int N_SORTS = 5;
+    private static final int N_ITEMS = 1000000;
 
     public static void main(String[] args) {
         Random rnd = new Random(5522l);

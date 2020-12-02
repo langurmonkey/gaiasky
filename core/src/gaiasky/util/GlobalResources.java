@@ -63,7 +63,7 @@ public class GlobalResources {
     /** The global skin **/
     public static Skin skin;
 
-    private static Vector3d aux = new Vector3d();
+    private static final Vector3d aux = new Vector3d();
 
     public static void initialize(AssetManager manager) {
         // Sprite shader
@@ -727,7 +727,7 @@ public class GlobalResources {
         throw new RuntimeException("Skybox side '" + side + "' not found in folder: " + skyboxLoc);
     }
 
-    private static IntBuffer buf = BufferUtils.newIntBuffer(16);
+    private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
 
     public static synchronized String getGLExtensions() {
         String extensions = Gdx.gl.glGetString(GL30.GL_EXTENSIONS);

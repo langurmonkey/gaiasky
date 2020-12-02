@@ -34,7 +34,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
     private static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 3e3;
     private static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 2f;
 
-    private Vector3d endLine = new Vector3d();
+    private final Vector3d endLine = new Vector3d();
     static Texture auxTex;
 
     @Override

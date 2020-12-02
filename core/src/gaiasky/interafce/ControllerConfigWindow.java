@@ -37,7 +37,7 @@ import java.util.Map;
  * Dialog to configure a controller interactively
  */
 public class ControllerConfigWindow extends GenericDialog implements IObserver {
-    private static Logger.Log logger = Logger.getLogger(ControllerConfigWindow.class);
+    private static final Logger.Log logger = Logger.getLogger(ControllerConfigWindow.class);
 
     private static final String none = "-none-";
     private static final String button = "Button";
@@ -48,7 +48,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     private Map<Gamepad, Trio<Texture, float[], String>> inputInfo;
     private Map<Gamepad, OwnTextField> inputFields;
 
-    private String controllerName;
+    private final String controllerName;
     private ControllerMappings mappings;
 
     private Gamepad currGamepad;
@@ -58,7 +58,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
     // The cell with the active element
     private Cell<Image> elementCell;
-    private boolean jumpToNext = true;
+    private final boolean jumpToNext = true;
     // Saved file, at the end, if any
     public Path savedFile = null;
 

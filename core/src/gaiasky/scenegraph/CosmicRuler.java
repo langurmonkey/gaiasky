@@ -35,12 +35,15 @@ import net.jafama.FastMath;
  */
 public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, ILineRenderable, IObserver {
     private String name0, name1;
-    private double[] pos0, pos1;
-    private Vector3d p0, p1, m;
+    private final double[] pos0;
+    private final double[] pos1;
+    private final Vector3d p0;
+    private final Vector3d p1;
+    private final Vector3d m;
     private boolean rulerOk = false;
     private String dist;
-    private ISceneGraph sg;
-    private INumberFormat nf;
+    private final ISceneGraph sg;
+    private final INumberFormat nf;
 
     public CosmicRuler() {
         super();

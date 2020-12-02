@@ -15,7 +15,7 @@ import gaiasky.util.scene2d.TextureWidget;
 
 public class MinimapWindow extends GenericDialog {
     private OwnLabel mapName;
-    private MinimapWidget minimap;
+    private final MinimapWidget minimap;
 
 
     public MinimapWindow(Stage stage, Skin skin) {

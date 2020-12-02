@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
-    private Vector2 viewport;
+    private final Vector2 viewport;
     private float fov;
     private int mode = 0;
 
@@ -28,7 +28,7 @@ public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
         // @formatter:on
 
         private final String mnemonic;
-        private int elementSize;
+        private final int elementSize;
 
         Param(String m, int elementSize) {
             this.mnemonic = m;

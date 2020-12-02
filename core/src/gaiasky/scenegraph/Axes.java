@@ -27,7 +27,10 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
     private static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
     private String transformName;
     private Matrix4d coordinateSystem;
-    private Vector3d o, x, y, z;
+    private final Vector3d o;
+    private final Vector3d x;
+    private final Vector3d y;
+    private final Vector3d z;
     private Vector3d b0, b1, b2;
 
     // RGBA colors for each of the bases XYZ -> [3][3]

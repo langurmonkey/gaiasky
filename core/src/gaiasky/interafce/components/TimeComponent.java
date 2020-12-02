@@ -29,7 +29,8 @@ import java.time.ZoneOffset;
 public class TimeComponent extends GuiComponent implements IObserver {
 
     /** Date format **/
-    private IDateFormat dfdate, dftime;
+    private final IDateFormat dfdate;
+    private final IDateFormat dftime;
 
     protected OwnLabel date;
     protected OwnLabel time;

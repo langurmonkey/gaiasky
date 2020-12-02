@@ -50,22 +50,25 @@ public class ControllerGui extends AbstractGui {
     private Cell contentCell, infoCell;
     private OwnTextButton searchButton, cameraButton, timeButton, optionsButton, typesButton, systemButton;
     // Contains a matrix (column major) of actors for each tab
-    private List<Actor[][]> model;
+    private final List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider;
     private OwnTextField searchField;
     private OwnLabel infoMessage;
 
-    private List<OwnTextButton> tabButtons;
-    private List<ScrollPane> tabContents;
+    private final List<OwnTextButton> tabButtons;
+    private final List<ScrollPane> tabContents;
 
     private Actor[][] currentModel;
     private ISceneGraph sg;
 
-    private EventManager em;
-    private GUIControllerListener guiControllerListener;
-    private float pad5, pad10, pad20, pad30;
+    private final EventManager em;
+    private final GUIControllerListener guiControllerListener;
+    private final float pad5;
+    private final float pad10;
+    private final float pad20;
+    private final float pad30;
     private String currentInputText = "";
 
     private int selectedTab = 0;
@@ -1058,9 +1061,12 @@ public class ControllerGui extends AbstractGui {
         private static final long AXIS_POLL_DELAY = 50;
 
         // Left and right stick values
-        private float lStickX = 0, lStickY = 0, rStickX = 0, rStickY = 0;
+        private float lStickX = 0;
+        private float lStickY = 0;
+        private float rStickX = 0;
+        private final float rStickY = 0;
         private long lastAxisEvtTime = 0, lastAxisPollTime = 0;
-        private EventManager em;
+        private final EventManager em;
         private NaturalCamera cam;
         private IControllerMappings mappings;
 

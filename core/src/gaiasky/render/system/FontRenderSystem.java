@@ -22,10 +22,10 @@ import java.util.List;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
-    private ExtSpriteBatch batch;
+    private final ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
-    private Comparator<IRenderable> comp;
-    private float[] red;
+    private final Comparator<IRenderable> comp;
+    private final float[] red;
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(rg, alphas, new ExtShaderProgram[] { program });

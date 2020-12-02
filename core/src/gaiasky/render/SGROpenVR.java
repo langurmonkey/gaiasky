@@ -46,9 +46,9 @@ import java.util.Map;
  * @author tsagrista
  */
 public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
-    private static Log logger = Logger.getLogger(SGROpenVR.class);
+    private static final Log logger = Logger.getLogger(SGROpenVR.class);
 
-    private VRContext vrContext;
+    private final VRContext vrContext;
 
     /**
      * Frame buffers for each eye
@@ -69,7 +69,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private Map<VRDevice, StubModel> vrDeviceToModel;
     private Environment controllersEnv;
 
-    private SpriteBatch sb;
+    private final SpriteBatch sb;
 
     // GUI
     private VRGui<VRInfoGui> infoGui;

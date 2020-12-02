@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
-    private static Log logger = Logger.getLogger(AbstractSceneGraph.class);
+    private static final Log logger = Logger.getLogger(AbstractSceneGraph.class);
 
     /** The root of the tree **/
     public SceneGraphNode root;
@@ -41,7 +41,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** Does it contain a star group **/
     protected boolean hasStarGroup;
 
-    private Vector3d aux3d1;
+    private final Vector3d aux3d1;
 
     public AbstractSceneGraph() {
         // Id = -1 for root

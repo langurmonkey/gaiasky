@@ -112,7 +112,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public boolean leveling, stopping;
 
     /** Aux vectors **/
-    private Quaternion qf;
+    private final Quaternion qf;
 
     private boolean render;
 

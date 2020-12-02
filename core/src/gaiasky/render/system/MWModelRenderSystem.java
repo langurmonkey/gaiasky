@@ -37,13 +37,13 @@ import java.util.List;
 public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {
     private static final String texFolder = "data/galaxy/sprites/";
 
-    private Vector3 aux3f1;
+    private final Vector3 aux3f1;
     private MeshData dust, bulge, stars, hii, gas;
     private GpuData dustA, bulgeA, starsA, hiiA, gasA;
 
     private TextureArray ta;
     // Max sizes for dust, star, bulge, gas and hii
-    private float[] maxSizes;
+    private final float[] maxSizes;
 
     private enum PType {
         DUST(0, new int[] { 3, 5, 7 }),

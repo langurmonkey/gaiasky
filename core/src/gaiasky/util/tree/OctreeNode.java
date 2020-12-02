@@ -41,11 +41,14 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Since OctreeNode is not to be parallelised, these can be static.
      **/
-    private static BoundingBoxd boxcopy = new BoundingBoxd(new Vector3d(), new Vector3d());
-    private static Vector3d auxD1 = new Vector3d(), auxD2 = new Vector3d(), auxD3 = new Vector3d(), auxD4 = new Vector3d();
-    private static Rayd ray = new Rayd(new Vector3d(), new Vector3d());
+    private static final BoundingBoxd boxcopy = new BoundingBoxd(new Vector3d(), new Vector3d());
+    private static final Vector3d auxD1 = new Vector3d();
+    private static final Vector3d auxD2 = new Vector3d();
+    private static final Vector3d auxD3 = new Vector3d();
+    private static final Vector3d auxD4 = new Vector3d();
+    private static final Rayd ray = new Rayd(new Vector3d(), new Vector3d());
 
-    private Vector3d aux3d1;
+    private final Vector3d aux3d1;
 
     /** The load status of this node **/
     private LoadStatus status;
@@ -76,7 +79,7 @@ public class OctreeNode implements ILineRenderable {
     /** List of objects **/
     public List<SceneGraphNode> objects;
 
-    private double radius;
+    private final double radius;
     /** If observed, the view angle in radians of this octant **/
     public double viewAngle;
     /** The distance to the camera in units of the center of this octant **/

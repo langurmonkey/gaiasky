@@ -71,7 +71,8 @@ public class SpacecraftGui extends AbstractGui {
     /**
      * Number format
      **/
-    private INumberFormat nf, sf;
+    private final INumberFormat nf;
+    private final INumberFormat sf;
 
     /**
      * Camera to render the attitude indicator system
@@ -106,7 +107,8 @@ public class SpacecraftGui extends AbstractGui {
     /**
      * Aux vectors
      **/
-    private Vector3 aux3f1, aux3f2;
+    private final Vector3 aux3f1;
+    private final Vector3 aux3f2;
 
     private boolean thrustEvents = true;
 

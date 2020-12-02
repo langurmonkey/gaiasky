@@ -92,7 +92,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     /**
      * Multiplier to primitive size
      **/
-    private float ss = 1f;
+    private final float ss = 1f;
 
     public KeyframesPathObject() {
         super(null, -1);

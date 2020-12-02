@@ -16,7 +16,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.util.List;
 
 public class ConstellationBoundaries extends SceneGraphNode implements ILineRenderable {
-    private float alpha = .2f;
+    private final float alpha = .2f;
     private List<List<Vector3d>> boundaries;
 
     public ConstellationBoundaries() {

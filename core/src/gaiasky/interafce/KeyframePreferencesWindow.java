@@ -26,7 +26,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
     private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
     public OwnTextField camrecFps;
-    private INumberFormat nf3;
+    private final INumberFormat nf3;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.keyframes.preferences"), skin, stage);

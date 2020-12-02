@@ -216,9 +216,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * CLOSEST
      **/
-    private Vector3d closestPm;
+    private final Vector3d closestPm;
     private double closestSize;
-    private float[] closestCol;
+    private final float[] closestCol;
 
     private double modelDist;
 
@@ -479,7 +479,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private boolean rvLines = false;
-    private float[] rgba = new float[4];
+    private final float[] rgba = new float[4];
 
     /**
      * Proper motion rendering

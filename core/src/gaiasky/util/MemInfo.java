@@ -7,7 +7,7 @@ package gaiasky.util;
 
 public class MemInfo {
 
-    private static double BYTE_TO_MB = 1024 * 1024;
+    private static final double BYTE_TO_MB = 1024 * 1024;
 
     public static double getUsedMemory() {
         return (Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / BYTE_TO_MB;

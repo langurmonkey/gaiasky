@@ -96,10 +96,7 @@ public interface IPostProcessor extends Disposable {
          */
         public Map<String, PostProcessorEffect> getAll(Class<? extends PostProcessorEffect> clazz) {
             Map<String, PostProcessorEffect> l = effects.get(clazz);
-            if (l != null) {
-                return l;
-            }
-            return null;
+            return l;
         }
 
         /**

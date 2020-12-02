@@ -6,7 +6,9 @@ import gaiasky.util.math.StdRandom;
 
 public class LoadingTextGenerator {
 
-    private static String[] verbs, adjectives, objects;
+    private static final String[] verbs;
+    private static final String[] adjectives;
+    private static final String[] objects;
     static {
         verbs = read(Gdx.files.internal("text/verbs"));
         adjectives = read(Gdx.files.internal("text/adjectives"));

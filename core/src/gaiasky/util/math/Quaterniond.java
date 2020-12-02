@@ -35,8 +35,8 @@ import java.io.Serializable;
 public class Quaterniond implements Serializable {
     private static final long serialVersionUID = -7661875440774897168L;
     private static final double NORMALIZATION_TOLERANCE = 0.00001;
-    private static Quaterniond tmp1 = new Quaterniond(0, 0, 0, 0);
-    private static Quaterniond tmp2 = new Quaterniond(0, 0, 0, 0);
+    private static final Quaterniond tmp1 = new Quaterniond(0, 0, 0, 0);
+    private static final Quaterniond tmp2 = new Quaterniond(0, 0, 0, 0);
 
     public double x;
     public double y;

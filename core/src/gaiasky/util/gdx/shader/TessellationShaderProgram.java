@@ -115,7 +115,7 @@ public class TessellationShaderProgram extends ExtShaderProgram {
     private boolean invalidated;
 
     /** reference count **/
-    private int refCount = 0;
+    private final int refCount = 0;
 
     public TessellationShaderProgram(String vertexShader, String tessellationControlShader, String tessellationEvaluationShader, String fragmentShader) {
         if (vertexShader == null) throw new IllegalArgumentException("vertex shader must not be null");

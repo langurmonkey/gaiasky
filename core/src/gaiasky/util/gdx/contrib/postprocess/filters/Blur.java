@@ -63,7 +63,8 @@ public final class Blur extends MultipassFilter {
     private int passes;
 
     // fbo, textures
-    private float invWidth, invHeight;
+    private final float invWidth;
+    private final float invHeight;
     private final Map<Integer, Convolve2D> convolve = new HashMap<>(Tap.values().length);
 
     public Blur(int width, int height) {

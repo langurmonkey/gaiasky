@@ -20,7 +20,9 @@ import gaiasky.util.math.Matrix4d;
 
 public class HeliosphereMinimapScale extends AbstractMinimapScale {
 
-    private Color helc, helpc, intc;
+    private final Color helc;
+    private final Color helpc;
+    private final Color intc;
 
     public HeliosphereMinimapScale() {
         super();

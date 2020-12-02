@@ -36,7 +36,7 @@ public class ModelComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
 
     public boolean forceInit = false;
-    private static ColorAttribute ambient;
+    private static final ColorAttribute ambient;
     /**
      * Light never changes; set fixed ambient light for this model
      */

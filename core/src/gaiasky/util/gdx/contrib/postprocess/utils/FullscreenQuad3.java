@@ -33,7 +33,7 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
  * @author bmanuel
  */
 public class FullscreenQuad3 {
-    private Mesh quad;
+    private final Mesh quad;
 
     public FullscreenQuad3() {
         quad = createFullscreenQuad();
@@ -90,7 +90,7 @@ public class FullscreenQuad3 {
     }
 
     private static final int VERT_SIZE = 20;
-    private static float[] verts = new float[VERT_SIZE];
+    private static final float[] verts = new float[VERT_SIZE];
     private static final int X1 = 0;
     private static final int Y1 = 1;
     private static final int I1 = 2;

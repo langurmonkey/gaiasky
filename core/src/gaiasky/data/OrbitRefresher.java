@@ -38,17 +38,17 @@ public class OrbitRefresher {
     /**
      * The loading queue
      */
-    private Queue<OrbitDataLoaderParameter> toLoadQueue;
+    private final Queue<OrbitDataLoaderParameter> toLoadQueue;
 
     /**
      * The daemon
      */
-    private DaemonRefresher daemon;
+    private final DaemonRefresher daemon;
 
     /**
      * Loading is paused
      */
-    private boolean loadingPaused = false;
+    private final boolean loadingPaused = false;
 
     public OrbitRefresher() {
         super();
@@ -90,10 +90,10 @@ public class OrbitRefresher {
     protected static class DaemonRefresher extends Thread {
         private boolean awake;
         private boolean running;
-        private AtomicBoolean abort;
-        private OrbitSamplerDataProvider provider;
+        private final AtomicBoolean abort;
+        private final OrbitSamplerDataProvider provider;
 
-        private Array<OrbitDataLoaderParameter> toLoad;
+        private final Array<OrbitDataLoaderParameter> toLoad;
 
         public DaemonRefresher() {
             this.awake = false;

@@ -32,7 +32,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     public static boolean POINT_UPDATE_FLAG = true;
 
     protected ExtShaderProgram[] programs;
-    private RenderGroup group;
+    private final RenderGroup group;
     protected float[] alphas;
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;

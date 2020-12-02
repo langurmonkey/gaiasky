@@ -41,10 +41,12 @@ import java.util.List;
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
-    private Vector3 aux1;
+    private final Vector3 aux1;
     private int additionalOffset, pmOffset;
-    private float[] pointAlpha, alphaSizeFovBr, pointAlphaHl;
-    private Colormap cmap;
+    private float[] pointAlpha;
+    private final float[] alphaSizeFovBr;
+    private final float[] pointAlphaHl;
+    private final Colormap cmap;
 
     private Texture starTex;
 

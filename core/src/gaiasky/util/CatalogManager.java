@@ -26,8 +26,8 @@ public class CatalogManager implements IObserver {
         return instance;
     }
 
-    private Map<String, CatalogInfo> ciMap;
-    private List<CatalogInfo> cis;
+    private final Map<String, CatalogInfo> ciMap;
+    private final List<CatalogInfo> cis;
 
     CatalogManager() {
         super();

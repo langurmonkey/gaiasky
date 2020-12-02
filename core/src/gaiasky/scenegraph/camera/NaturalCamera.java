@@ -64,7 +64,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * The force acting on the entity and the friction
      **/
-    private Vector3d force, friction;
+    private final Vector3d force;
+    private Vector3d friction;
 
     public Vector3d direction, up, focusDirection;
     /**
@@ -198,8 +199,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public Color[] hudColors;
     public int hudColor;
     public float hudw, hudh;
-    private static double HUD_SCALE_MIN = 0.5f;
-    private static double HUD_SCALE_MAX = 3.0f;
+    private static final double HUD_SCALE_MIN = 0.5f;
+    private static final double HUD_SCALE_MAX = 3.0f;
 
     /**
      * The current listener
@@ -1705,7 +1706,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             shapeRenderer.begin(ShapeType.Line);
             Gdx.gl.glEnable(GL30.GL_BLEND);
             Gdx.gl.glLineWidth(GlobalConf.program.POINTER_GUIDES_WIDTH);
-            float pc[] = GlobalConf.program.POINTER_GUIDES_COLOR;
+            float[] pc = GlobalConf.program.POINTER_GUIDES_COLOR;
             shapeRenderer.setColor(pc[0], pc[1], pc[2], pc[3]);
             shapeRenderer.line(0, rh - mouseY, rw, rh - mouseY);
             shapeRenderer.line(mouseX, 0, mouseX, rh);

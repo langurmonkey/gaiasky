@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 public class OwnCheckBox extends CheckBox {
-    private Color regularColor;
+    private final Color regularColor;
     private float ownwidth = 0f, ownheight = 0f;
 
     public OwnCheckBox(String text, Skin skin, float space) {

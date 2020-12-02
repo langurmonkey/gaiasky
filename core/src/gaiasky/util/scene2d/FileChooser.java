@@ -54,7 +54,7 @@ public class FileChooser extends GenericDialog {
     private boolean fileNameEnabled;
     private TextField fileNameInput;
     private Label fileNameLabel, acceptedFiles;
-    private Path baseDir;
+    private final Path baseDir;
     private OwnTextField location;
     private List<FileListItem> fileList;
     private Table controlsTable;

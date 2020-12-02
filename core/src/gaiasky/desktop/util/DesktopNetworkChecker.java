@@ -35,15 +35,16 @@ import gaiasky.util.scene2d.OwnTextButton;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
 
-    private static String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
+    private static final String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
     // TODO Use Wikipedia API to get localized content to the current language
-    private static String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
+    private static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
 
-    private static int TIMEOUT_MS = 5000;
+    private static final int TIMEOUT_MS = 5000;
 
     private boolean running = true;
 
@@ -215,7 +216,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
         }
     }
 
-    private String[] suffixes = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
+    private final String[] suffixes = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
 
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
@@ -269,7 +270,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     }
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        final PrintStream out = new PrintStream(System.out, true, "UTF-8");
+        final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         Gdx.net = new Lwjgl3Net(new Lwjgl3ApplicationConfiguration());
         DesktopNetworkChecker dnc = new DesktopNetworkChecker();
         dnc.urlCheck("https://ca.ba.de.si.com", new LinkListener() {

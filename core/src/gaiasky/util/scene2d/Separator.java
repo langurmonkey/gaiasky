@@ -38,7 +38,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
  * @since 0.1.0
  */
 public class Separator extends Widget {
-    private SeparatorStyle style;
+    private final SeparatorStyle style;
 
     /** New separator with default style */
     public Separator(Skin skin) {

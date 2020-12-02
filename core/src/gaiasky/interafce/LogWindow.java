@@ -27,7 +27,7 @@ import java.util.List;
 
 public class LogWindow extends GenericDialog {
 
-    private IDateFormat format;
+    private final IDateFormat format;
     private Table logs;
     private ScrollPane scroll;
 

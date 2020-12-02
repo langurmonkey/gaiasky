@@ -152,7 +152,7 @@ public class ExtShaderProgram implements Disposable {
     private boolean invalidated;
 
     /** reference count **/
-    private int refCount = 0;
+    private final int refCount = 0;
 
     public ExtShaderProgram() {
     }

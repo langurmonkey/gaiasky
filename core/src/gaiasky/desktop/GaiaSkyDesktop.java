@@ -44,6 +44,7 @@ import gaiasky.util.math.MathManager;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,25 +79,35 @@ public class GaiaSkyDesktop implements IObserver {
      * Program arguments
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0)
+        private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
+        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1)
+        private boolean version = false;
 
-        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiart = false;
+        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1)
+        private boolean asciiart = false;
 
-        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2) private boolean skipWelcome = false;
+        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
+        private boolean skipWelcome = false;
 
-        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
+        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4)
+        private String propertiesFile = null;
 
-        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5) private String assetsLocation = null;
+        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
+        private String assetsLocation = null;
 
-        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6) private boolean vr = false;
+        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6)
+        private boolean vr = false;
 
-        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
+        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7)
+        private boolean externalView = false;
 
-        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
+        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
+        private boolean noScriptingServer = false;
 
-        @Parameter(names = { "--debug" }, description = "Launch in debug mode.", order = 9) private boolean debugMode = false;
+        @Parameter(names = { "--debug" }, description = "Launch in debug mode.", order = 9)
+        private boolean debugMode = false;
     }
 
     /**
@@ -118,11 +129,7 @@ public class GaiaSkyDesktop implements IObserver {
      * @param args Arguments
      */
     public static void main(String[] args) {
-        try {
-            out = new PrintStream(System.out, true, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            out = new PrintStream(System.out, true);
-        }
+        out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         gsArgs = new GaiaSkyArgs();
         JCommander jc = JCommander.newBuilder().addObject(gsArgs).build();
         jc.setProgramName("gaiasky");

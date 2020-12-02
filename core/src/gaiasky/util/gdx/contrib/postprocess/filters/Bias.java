@@ -39,8 +39,8 @@ public final class Bias extends Filter<Bias> {
         Bias("u_bias", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int elementSize) {
             this.mnemonic = mnemonic;

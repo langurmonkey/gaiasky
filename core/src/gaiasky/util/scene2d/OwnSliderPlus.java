@@ -26,12 +26,12 @@ public class OwnSliderPlus extends Slider {
     private float ownwidth = 0f, ownheight = 0f;
     private float mapMin, mapMax;
     private boolean map = false;
-    private Skin skin;
+    private final Skin skin;
     private OwnLabel titleLabel, valueLabel;
     private boolean displayValueMapped = false;
     private String valuePrefix, valueSuffix;
-    private float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
-    private float padY = 2f * GlobalConf.UI_SCALE_FACTOR;
+    private final float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
+    private final float padY = 2f * GlobalConf.UI_SCALE_FACTOR;
     private INumberFormat nf;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {

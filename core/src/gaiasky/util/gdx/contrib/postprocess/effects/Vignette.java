@@ -28,9 +28,10 @@ import gaiasky.util.gdx.contrib.postprocess.filters.Vignetting;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Vignette extends PostProcessorEffect {
-    private Vignetting vignetting;
-    private boolean controlSaturation;
-    private float oneOnW, oneOnH;
+    private final Vignetting vignetting;
+    private final boolean controlSaturation;
+    private final float oneOnW;
+    private final float oneOnH;
 
     public Vignette(int viewportWidth, int viewportHeight, boolean controlSaturation) {
         this.controlSaturation = controlSaturation;

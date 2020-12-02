@@ -94,7 +94,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Attitude folder
      **/
-    private static String ATTITUDE_FOLDER = "data/attitudexml/";
+    private static final String ATTITUDE_FOLDER = "data/attitudexml/";
 
     /**
      * Singleton instance
@@ -199,22 +199,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Set log level to debug
      */
-    private boolean debugMode;
+    private final boolean debugMode;
 
     /**
      * Whether to attempt a connection to the VR HMD
      */
-    private boolean vr;
+    private final boolean vr;
 
     /**
      * Skip welcome screen if possible
      */
-    private boolean skipWelcome;
+    private final boolean skipWelcome;
 
     /**
      * Forbids the creation of the scripting server
      */
-    private boolean noScripting;
+    private final boolean noScripting;
 
     /**
      * Save state on exit
@@ -235,7 +235,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Runnables
      */
     private final Array<Runnable> parkedRunnables;
-    private Map<String, Runnable> parkedRunnablesMap;
+    private final Map<String, Runnable> parkedRunnablesMap;
 
     /**
      * Creates an instance of Gaia Sky.
@@ -792,7 +792,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Renders the scene
      **/
-    private Runnable runnableRender = () -> {
+    private final Runnable runnableRender = () -> {
 
         // Asynchronous load of textures and resources
         manager.update();
@@ -856,7 +856,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Displays the initial GUI
      **/
-    private Runnable runnableInitialGui = () -> {
+    private final Runnable runnableInitialGui = () -> {
         renderGui(welcomeGui);
         if(GlobalConf.runtime.OPENVR){
             try {
@@ -872,7 +872,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Displays the loading GUI
      **/
-    private Runnable runnableLoadingGui = () -> {
+    private final Runnable runnableLoadingGui = () -> {
         if (manager.update()) {
             doneLoading();
             renderProcess = runnableRender;
@@ -1250,7 +1250,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case SCENE_GRAPH_ADD_OBJECT_CMD:
             final SceneGraphNode nodeToAdd = (SceneGraphNode) data[0];
-            final boolean addToIndex = data.length == 1 ? true : (Boolean) data[1];
+            final boolean addToIndex = data.length == 1 || (Boolean) data[1];
             if (sg != null) {
                 postRunnable(() -> {
                     try {
@@ -1263,7 +1263,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD:
             final SceneGraphNode nodeToAddp = (SceneGraphNode) data[0];
-            final boolean addToIndexp = data.length == 1 ? true : (Boolean) data[1];
+            final boolean addToIndexp = data.length == 1 || (Boolean) data[1];
             if (sg != null) {
                 try {
                     sg.insert(nodeToAddp, addToIndexp);
@@ -1282,7 +1282,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 aux = (SceneGraphNode) data[0];
             }
             final SceneGraphNode nodeToRemove = aux;
-            final boolean removeFromIndex = data.length == 1 ? true : (Boolean) data[1];
+            final boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
             if (sg != null) {
                 postRunnable(() -> {
                     sg.remove(nodeToRemove, removeFromIndex);
