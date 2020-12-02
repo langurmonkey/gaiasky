@@ -1,3 +1,322 @@
+<a name="2.3.0"></a>
+## [2.3.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.6) (2020-07-07)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.6...2.3.0)
+
+### Bug Fixes
+- update name and source version number 
+- error in lib_math shadier code 
+- remove default fade-out values in star groups, added to loading dialog 
+- interpolation limits in math shader library 
+- initial update not performed on fade node children if ct is off 
+- uncomment unhandled event debug info 
+- windows crash due to stars '*' not being accepted in paths 
+- add notice concerning the selection of more than one Gaia catalog 
+- changing focus to different object in same particle group works 
+- default value for magnitude scale is 0, fix float validator range 
+- disable depth test for billboards 
+- inconsistencies with STAR_MIN_OPACITY_CMD 
+- ensure non-empty field in search dialog 
+
+### Build System
+- fix build with text folder 
+- remove all absolute paths to project folder 
+
+### Code Refactoring
+- observer fields final, package name typo 
+- clean up gaia hacks, ray marching plubming 
+- post-processing subsystem made more generic 
+- move render system to java collections and streams 
+
+### Documentation
+- improve readme listings 
+- update acknowledgements 
+- add iconic license 
+- add package-info package documentation, update changelog 
+
+### Features
+- update server to HTTPS 
+- add call to set 'all visible' dataset property 
+- add 'invert X look axis' as well as Y 
+- axis power value and sensitivity in config window 
+- sliders now contain value label 
+- sensitivity sliders for game controllers 
+- add tips to loading screen 
+- post-processor to accept external shader code in the data folder 
+- ray marching shaders 
+- raymarching post-processing shaders 
+- complete move to SDL-back controllers 
+- full refactoring of controller mappings system 
+- interactive gamepad configuration 
+- add support for emissive textures, fix obj loading issue 
+- API call to modify solid angle threshold of orbits 
+- add properties for some star settings 
+- adjust size of star billboards 
+- add API call to scale orbits. Use with caution! 
+- distances in AU and parsec start at 0.1 mark 
+- add star brightness power setter to API 
+
+
+<a name="2.2.6"></a>
+## [2.2.6](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.5) (2020-05-15)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.5...2.2.6)
+
+### Bug Fixes
+- camera turn depends on fov 
+- stars with negative parallaxes use default [#329](https://gitlab.com/langurmonkey/gaiasky/issues/329) 
+- load VO table crash on Windows [#329](https://gitlab.com/langurmonkey/gaiasky/issues/329) 
+- program crash when minimizing in windows [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333) 
+- do not assume default location for hip, pass as agrument 
+- file count value when max number of files is specified 
+- safecheck to prevent window sizes of 0x0 on resize events with AMD graphics on windows 
+- transition from point to billboard in star shading 
+- remove rounding in generic dialog positioning for smooth rendering 
+- adjust brightness scalings, remove unused variables and parameters 
+- wrong synchronize location in streaming octree loader [#332](https://gitlab.com/langurmonkey/gaiasky/issues/332) 
+- camera mode change in SAMP select row call 
+- goToObject() skip fix 
+- SAMP local icon to work with dev version and releases 
+- get object positions by name in particle groups 
+- fix UI layout of date dialog 
+- star cluster loader to use mas/yr instead of deg/yr as proper motion units 
+- several fixes (UI, STIL), see desc 
+- load multiple catalogs with same name 
+- slider step and control buttons size 
+- double stars caused by incorrect shading 
+
+### Build System
+- fix publish-javadoc script 
+- update build script to latest gradle version 
+- more robust way to get size and nobjects from generated catalogs 
+- improve catalog generation scripts for faster deployment 
+- add/update scripts to build catalogs 
+- fix build files 
+- add catalogpack script 
+- update build and installer scripts to install4j8 
+- update data descriptor with new base and hi-res texture packs 
+- add bookmarks and VR.md to build, update modes to gradle 6.x 
+- update to gradle 6.2.2, prepare build files for gradle 7 
+- pkgbuild epoch set to 2 by default 
+
+### Code Refactoring
+- use java collections instead of libgdx's, implement parallel loading in octree gen 
+- update DR2 loader to generic csv loader. Add compatibility mode to binary data format for tycho ids (tgas/DR2) 
+- ColourUtils -> ColorUtils 
+- use local application icon for SAMP 
+- move default location of mappings file to config folder 
+- fix spacing in focus info interface names 
+- update data descriptor for new star clusters load mechanism 
+- star clusters to use the catalog infrastructure 
+- move all file operations to nio (Path) 
+
+### Documentation
+- update gaiasky VR info in repo 
+- improve run from source for Windows in readme file 
+- update VR docs and readme file to include new VR build 
+- fix setCameraSpeedLimit() API docs 
+- fix typos in comments for star/particle groups 
+
+### Features
+- better random text generator 
+- fov-based visibility, autoremove popups 
+- adjust size and intensity of stars in milky way model 
+- add ref epoch to catalog descriptors and loaders 
+- magnitude and color corrections (reddening, extinction) are now applied by default if ag and ebp_min_rp are available. Flag is now needed to explicitly deactivate them 
+- redefine eDR3 catalogs 
+- add procedural star shader, muted for now 
+- new star shading method 
+- replace fibonacci numbers for made-up phrases 
+- update distance font to include more characters 
+- add crash window with tips and instructions on how to fix/report the problem 
+- add shortucts for 'show log' and 'open catalog' 
+- make all limit/target frame rates floating-point numbers 
+- comments in camera path files: prepend '#' to comment 
+- limit framerate to target framerate in camrecorder 
+- API call to record camera path with given filename 
+- use votable units for star clusters if available 
+- load star clusters with STIL so that it also works via SAMP 
+- set fov step to 0.1 to have smoother fov changes 
+- grid annotations contain degree symbol and sign (latitude only) 
+- select first object in newly loaded catalogs 
+- add icons to bookmarks tree 
+- additional cameraTransition() that accepts camera position in Km 
+- add folders to bookmarks 
+- add bookmarks module 
+- move individual visibility to own dialog 
+- several UI fixes and QOL improvements 
+- add label colors to star cluster datasets, update docs ref 
+- multiple name support for star cluster loader 
+- add description to star clusters dataset loader 
+- star clusters can now be loaded with the rest of the catalog info infrastructure 
+- velocity vectors sliders to use new slider plus 
+- cap length of long ids in focus info interface, add tooltips, fix skins 
+- show criteria for catalog chooser 
+- add sensitivity and power function to controller properties 
+- adjust focus info style to make it more compact 
+- add exit confirmation setting and checkbox in preferences window and exit dialog 
+- add pointer guides 
+- adjust star brightness parameters 
+- improve VOTable loader with default units and more safechecks 
+- clean up HiDPI themes, slightly reduce icon sizes and spacings 
+- add URL bar to file chooser 
+- add limits to particle sizes 
+- improve file chooser dialog 
+- particles get right name in focus info interface 
+- particle datasets may have per-particle names 
+
+### Reverts
+- fix: remove rounding in generic dialog positioning for smooth rendering
+
+
+<a name="2.2.5"></a>
+## [2.2.5](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4) (2020-03-04)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...2.2.5)
+
+### Bug Fixes
+- some API calls crash when using double[] 
+- prevent orbit overlapping by rescaling period 
+- macos system detection 
+- land at location crash due to trim() applied to invisible name 
+- add flush frames to postRunnable() actions in scripting implementation 
+- proper extension checking for ATI vram info 
+- proper fix for VMemInfo crash on arcolinux+ATI graphics 
+- VRAM profiling crash for AMDGPUs [#326](https://gitlab.com/langurmonkey/gaiasky/issues/326) 
+- adapt star brightness in cubemap modes [#318](https://gitlab.com/langurmonkey/gaiasky/issues/318) 
+- reload default configuration file crash 
+- build script typo 
+- ambient light slider 
+
+### Build System
+- fix versions of sdl2gdx and jsamp, refactor VMemInfo 
+- update compress, jcommander and jsamp versions, replace gdx-controllers with sdl2glx for better compatibility 
+- update stil library jar 
+- get jsamp from repository 
+- substitute underscore by hyphen in pkgver 
+
+### Code Refactoring
+- add color array to all API calls that need a color, for consistency. Fixi some calls' documentation. 
+- cubemap-related properties organised and cleaned-up 
+- improve error handling of OpenGL 4.x incapable video cards 
+
+### Documentation
+- clean up punctuation in API docs 
+- improve API description of some calls 
+
+### Features
+- dataset options when loaded through SAMP 
+- improve UI elements 
+- proper implementation of FXAA 
+- load datasets as particles or stars 
+- add script to test color map highlighting 
+- implement planetarium deviation angle in shader [#328](https://gitlab.com/langurmonkey/gaiasky/issues/328) 
+- update controller list live in preferences window, fix connection/disconnection events 
+- add extra attributes, colormaps for highlighting 
+- load all attributes from VOTables 
+- STIL provider works with multiple names 
+- support for multiple star names in octree gen 
+- add support for multiple names per object 
+
+### BREAKING CHANGE
+
+API call setStarSize() now gets the star point size in
+pixels instead of a normalized value between 0 and 100.
+
+
+<a name="2.2.4"></a>
+## [2.2.4](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.3) (2020-01-22)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.3...2.2.4)
+
+### Bug Fixes
+- adjust brightness of sun glow, add empty release instructions file 
+- macos shader and sprite batch crashes 
+- libgdx scene2d ui Window snaps to integer pixel positions resulting in text rendering artifacts 
+- assets location when running from source and no properties found 
+- dataset highlighting API calls improved, add test scripts for a few use cases 
+- screenshot/frame advanced mode messes viewport. Fixes [#319](https://gitlab.com/langurmonkey/gaiasky/issues/319) [#319](https://gitlab.com/langurmonkey/gaiasky/issues/319) 
+- properties file version not found. Fixes [#317](https://gitlab.com/langurmonkey/gaiasky/issues/317) [#317](https://gitlab.com/langurmonkey/gaiasky/issues/317) 
+- fullscreen mode before initialization, cursor in slaves 
+- stop the rest server the right way 
+- correct perspective of labels in cubemap modes 
+- master-slave connection messed up by scripting engine 
+- fisheye setting persisted 
+- do not replace backslaches with forward slashes 
+- use fixed keyword for scene graph loader, improve internal catalog path handling 
+- typo - geenden -> beenden 
+- do not apply fog to normal shaders [#312](https://gitlab.com/langurmonkey/gaiasky/issues/312) 
+- default constructor for NBG 
+- milky way adapts to fov changes 
+- toggle buttons for dome, cubemap and stereo 
+- notifications interface background in stereo mode 
+- additive gpu VBOs 
+
+### Build System
+- fix install4j crash, sort out tar.gz md5, update changelog 
+- update changelog, changelog template and scripts 
+- allow more than one instance with the .exe file 
+- update to lwjgl 3.2.3, deprecated annotations 
+- update gradle version to 6.0.1 
+- to openjdk 11 
+- update CI java image to 11 
+- code analyzer, gradle update, build file runners 
+- update checks to java 11 
+- disable motion blur by default 
+
+### Code Refactoring
+- reorganize things for multiple windows 
+
+### Documentation
+- update reference 
+- update docs ref and minor changes 
+- add open iconic to acknowledgements 
+
+### Features
+- replace logo images by ttf text 
+- add cyrillic characters for russian translation 
+- add line width factor to conf and UI controls 
+- edit timedate button is text icon button 
+- new compact sliders 
+- finish blend map implementation for multiple-projector blend support 
+- add slave configuration and status window (S+L+V) to master instances 
+- configure slave instances live 
+- proper image warping for MPCDI support 
+- geometry warp and blend shader, improve reverse mapping 
+- configure slave instance using gaia sky configuration file 
+- add MPCDI parsing and orientation 
+- dataset highlight size factor API call 
+- active planetarium mode uses cubemap method 
+- add fisheye projection to cubemap mode 
+- remember last tab in preferences window 
+- update old preferences window icons 
+- replaced external UI window with external scene view 
+- half-functioning separate UI controls window 
+- add experimental separate UI window (not working yet) 
+- minimap size controls and tooltips 
+- add CTRL+PLUS/MINUS to increase/decrease the FOV 
+- add VR icon 
+- maintain a 1:1 aspect ratio for the fisheye/planetarium effect 
+- adjust mw parameters 
+- add support for per-object primitive in GPU arrays, improved earth-venus-dance script 
+- new API call to convert equatorial cartesian to internal cartesian with unit conversion factor 
+
+### Performance Improvements
+- improve performance of api call method/parameter matching 
+
+<a name="2.2.3"></a>
+## [2.2.3](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.2) (2019-11-05)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.2...2.2.3)
+
+### Bug Fixes
+- last-minute fix 
+- improve user notification if wrong java version is used 
+- windows data loading crash -> [#308](https://gitlab.com/langurmonkey/gaiasky/issues/308) 
+
+### Build System
+- add some extra translations for Catalan, German and Spanish 
+
+### Features
+- update gaia sky icon with more modern version 
+- add more handy information in download manager 
+- add cancel download button to manager 
+- add support for release notes in download manager 
 
 <a name="2.2.2"></a>
 ## [2.2.2](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.1) (2019-10-31)
