@@ -1,100 +1,105 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.1...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.0...HEAD)
+
+
+<a name="3.0.0"></a>
+## [3.0.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.1) (2020-12-02)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.1...3.0.0)
 
 ### Bug Fixes
-- adjust default area line width
-- star clusters visual appearance
-- min star size scaled by resolution
-- apply scale factor to milky way
-- camera group bottom buttons aligned to center
-- emulate 64-bit float with two 32-bit floats in shader to be able to extend time beyond +-5 Myr
-- controller mappings not found on first startup. Fixes [#341](https://gitlab.com/langurmonkey/gaiasky/issues/341).
-- use java2D instead of toolkit to determine initial screen size
-- data description update
-- controller mappings looking for assets location if not found
-- manpage generation
-- smooth game camera view
-- spacecraft mode fixes
-- GUI registry check
-- add timeout to sync behavior in dataset loading
-- new default startup window size to accommodate welcome screen
-- update default data desc pointers to version 3.0.0
-- default fps limit value, aux vectors in recgrid
-- overwrite coordinate system matrix by recursive grid
-- start some units over XZ plane to avoid conflicting with recursive grid
-- gaiasky script defaults back to system java installation if nothing else is found
-- octreegen empty hip x-match crash
-- points in vertsobject with wrong uniform name - incorrect location
-- do not round dialog position values
-- blue, orange and red themes crashed
-- controls scroll box resize
-- download data window sizings, update data desc
-- regular color picker does not show dialog
-- music player actually finds audio files
-- size of keyboard shortcuts table in controls pane
-- disable background models' depth test
-- focused widgets in scroll panes capture all keyboard events
-- actually send errors to `stderr` instead of `stdout`
-- fix VR properties data pointer
-- motion blur bug producing wrong results for models
-- touchUp on Link objects not working
-- improve logging messages in case of index name conflicts
-- update URL pointers after ARI CMS update
-- graphics quality in log messages
+- adjust default area line width 
+- star clusters visual appearance 
+- min star size scaled by resolution 
+- apply scale factor to milky way 
+- camera group bottom buttons aligned to center 
+- emulate 64-bit float with two 32-bit floats in shader to be able to extend time beyond +-5 Myr 
+- controller mappings not found on first startup. Fixes [#341](https://gitlab.com/langurmonkey/gaiasky/issues/341). [#341](https://gitlab.com/langurmonkey/gaiasky/issues/341) 
+- use Java2D instead of Toolkit to determine initial screen size 
+- data description update 
+- controller mappings looking for assets location if not found 
+- manpage gen 
+- smooth game camera view 
+- spacecraft mode fixes 
+- GUI registry check 
+- add timeout to sync behavior in dataset loading 
+- new default startup window size to accommodate welcome screen 
+- update default data desc pointers to version 3.0.0 
+- default fps limit value, aux vectors in recursive grid 
+- overwrite coordinate system matrix by recursive grid 
+- start some units over `XZ` plane to avoid conflicting with recursive grid 
+- gaiasky script defaults back to system java installation if nothing else is found 
+- octreegen empty hip x-match crash 
+- points in VertsObject with wrong uniform name - incorrect location 
+- do not round dialog position values 
+- blue, orange and red themes crashed 
+- controls scroll box resizing 
+- download data window sizings, update data desc 
+- regular color picker does not show dialog 
+- music player actually finds audio files 
+- size of keyboard shortcuts table in controls pane 
+- disable background models' depth test 
+- focused widgets in scroll panes capture all keyboard events 
+- actually send errors to `stderr` instead of `stdout` 
+- fix VR properties data pointer 
+- motion blur bug producing wrong results for models 
+- `touchUp` event on Link and LinkButton objects not working 
+- improve logging messages in case of index name conflicts 
+- update URL pointers after ARI CMS update 
+- graphics quality in log messages 
 
 ### Build System
-- modify installer unpacking message
-- ignore release candidates in changelog, update some defaults
-- generate sha256 in catalog-pack script
-- macOS does not query screen size due to exception
-- check OS when trying to use Linux commands
-- remove music files from release, dont use os-dependent system for controller mappings
-- upgrade to libgdx 1.9.12
-- update stil library jar
-- upgrade to libgdx 1.9.11
-- update version and data pointer
+- modify installer unpacking message 
+- ignore release candidates in changelog, update some defaults 
+- generate `sha256` in catalog-pack script 
+- macOS does not query screen size due to exception 
+- check OS when trying to use Linux commands 
+- remove music files from release, don't use OS-dependent system for controller mappings 
+- upgrade to Libgdx `1.9.12` 
+- update STIL library jar 
+- upgrade to Libgdx `1.9.11` 
+- update version and data pointer 
 
 ### Code Refactoring
-- ran code inspections, cleanup. Improve particle effects
-- begin() and end() subsituted with bind()
-- remove unused or derived uniform definitions
-- use java.utils collections whenever possible, libgdx buggy sincd 1.9.11
-- complete font update to more modern, spacey choices
-- all regular UI fonts from Tahoma to Roboto regular
-- use system.out with UTF-8 encoding, improve gen scripts
-- remove ape, gaia scan properties
-- move RenderGroup to render package for consistency
+- run code inspections, cleanup. Improve particle effects 
+- `begin()` and `end()` substituted with `bind()` 
+- remove unused or derived uniform definitions 
+- use `java.utils` collections whenever possible, Libgdx buggy since `1.9.11`
+- complete font update to more modern, spacey choices 
+- all regular UI fonts from Tahoma to Roboto regular 
+- use `system.out` with UTF-8 encoding, improve gen scripts 
+- remove ape, Gaia scan properties 
+- move RenderGroup to render package for consistency 
 
 ### Features
-- add number of objects to download manager
-- velocity scaling allows approaching stars slowly
-- API call to set the maximum allowed time
-- add arrow caps to polylines
-- add progress bar to dataset loading, touch up some styles
-- download helper accepts local files, reorganize catalogs
-- new API call to get parameters from stars given its name or id
-- add brightness power and reload defaults to visual settings
-- improve loading tips subsystem with custom styles and arbitrary elements
-- 3D fonts can be limited in solid angle size
-- UI adjustments and tweaks
-- new welcome screen reorganizes dataset management
-- add complimentary color to inner recursive grid
-- add projection lines on reference system plane, with distances
-- first final version of recursive grid
-- new recursive grid object
-- catalog selection displayed when more than one Gaia catalog is selected
-- add wavefront converter, update gradle version
-- fix color picker
-- camera speed-from-distance function rescaling
-- first version of gamepad keyboard
-- update eDR3 catalog descriptors
-- controller UI to modify some properties using a gamepad
-- add --debug flag for more info
-- restructure loading GUI layout
-- improve --version information
-- add ascii gaia image
-- update data descriptor with new MW model
+- add number of objects to download manager 
+- velocity scaling allows approaching stars slowly 
+- API call to set the maximum allowed time 
+- add arrow caps to polylines 
+- add progress bar to dataset loading, touch up some styles 
+- download helper accepts local files, reorganize catalogs 
+- new API call to get parameters from stars given its name or id 
+- add brightness power and reload defaults to visual settings 
+- improve loading tips subsystem with custom styles and arbitrary elements 
+- 3D fonts can be limited in solid angle size 
+- UI adjustments and tweaks 
+- new welcome screen reorganizes dataset management 
+- add complimentary color to inner recursive grid 
+- add projection lines on reference system plane, with distances 
+- first final version of recursive grid 
+- new recursive grid object 
+- catalog selection displayed when more than one Gaia catalog is selected 
+- add wavefront converter, update gradle version 
+- fix color picker 
+- camera speed-from-distance function rescaling 
+- first version of gamepad keyboard 
+- update eDR3 catalog descriptors 
+- controller UI to modify some properties using a gamepad 
+- add `--debug` flag for more info 
+- restructure loading GUI layout 
+- improve `--version` information 
+- add ASCII Gaia image to text ouptut
+- update data descriptor with new MW model 
 
 <a name="2.3.1"></a>
 ## [2.3.1](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.0) (2020-07-08)
