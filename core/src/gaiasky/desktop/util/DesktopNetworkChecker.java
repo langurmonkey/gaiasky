@@ -28,10 +28,12 @@ import gaiasky.interafce.INetworkChecker;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.ModelBody;
+import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnTextButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -143,11 +145,14 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                         if (focus instanceof IStarFocus) {
                             Button gaiaButton = new OwnTextButton("Gaia", skin, "link");
                             gaiaButton.addListener(new GaiaButtonListener((IStarFocus) focus));
+                            gaiaButton.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.gaiaarchive"), skin));
                             table.add(gaiaButton).padRight(pad).left();
                         }
 
                         simbadLink = new Link("Simbad", linkStyle, "");
+                        simbadLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.simbad"), skin));
                         wikiLink = new Link("Wikipedia ", linkStyle, "");
+                        wikiLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.wiki"), skin));
 
                         simbadCell = table.add((Link) null).left();
                         wikiCell = table.add((Link) null).left();
