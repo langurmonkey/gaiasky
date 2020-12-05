@@ -79,34 +79,34 @@ public class GaiaSkyDesktop implements IObserver {
      * Program arguments
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0)
+        @Parameter(names = {"-h", "--help"}, description = "Show program options and usage information.", help = true, order = 0)
         private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1)
+        @Parameter(names = {"-v", "--version"}, description = "List Gaia Sky version and relevant information.", order = 1)
         private boolean version = false;
 
-        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1)
+        @Parameter(names = {"-i", "--asciiart"}, description = "Add nice ascii art to --version information.", order = 1)
         private boolean asciiart = false;
 
-        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
+        @Parameter(names = {"-s", "--skip-welcome"}, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
         private boolean skipWelcome = false;
 
-        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4)
+        @Parameter(names = {"-p", "--properties"}, description = "Specify the location of the properties file.", order = 4)
         private String propertiesFile = null;
 
-        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
+        @Parameter(names = {"-a", "--assets"}, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
         private String assetsLocation = null;
 
-        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6)
+        @Parameter(names = {"-vr", "--openvr"}, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6)
         private boolean vr = false;
 
-        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7)
+        @Parameter(names = {"-e", "--externalview"}, description = "Create a window with a view of the scene and no UI.", order = 7)
         private boolean externalView = false;
 
-        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
+        @Parameter(names = {"-n", "--noscript"}, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
         private boolean noScriptingServer = false;
 
-        @Parameter(names = { "--debug" }, description = "Launch in debug mode.", order = 9)
+        @Parameter(names = {"--debug"}, description = "Launch in debug mode.", order = 9)
         private boolean debugMode = false;
     }
 
@@ -120,7 +120,9 @@ public class GaiaSkyDesktop implements IObserver {
         jc.usage();
     }
 
-    /** UTF-8 output stream printer **/
+    /**
+     * UTF-8 output stream printer
+     **/
     private static PrintStream out;
 
     /**
@@ -369,6 +371,9 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useOpenGL3(true, 4, 1);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
+        if (gsArgs.debugMode) {
+            cfg.enableGLDebugOutput(true, System.out);
+        }
 
         if (consoleLogger != null && EventManager.instance.isSubscribedToAny(consoleLogger)) {
             consoleLogger.unsubscribe();
@@ -409,31 +414,31 @@ public class GaiaSkyDesktop implements IObserver {
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-        case SCENE_GRAPH_LOADED:
-            if (REST_ENABLED) {
-                /*
-                 * Notify REST server that GUI is loaded and everything should be in a
-                 * well-defined state
-                 */
-                try {
-                    RESTServer.activate();
-                } catch (SecurityException | IllegalArgumentException e) {
-                    logger.error(e);
+            case SCENE_GRAPH_LOADED:
+                if (REST_ENABLED) {
+                    /*
+                     * Notify REST server that GUI is loaded and everything should be in a
+                     * well-defined state
+                     */
+                    try {
+                        RESTServer.activate();
+                    } catch (SecurityException | IllegalArgumentException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        case DISPOSE:
-            if (REST_ENABLED) {
-                /* Shutdown REST server thread on termination */
-                try {
-                    RESTServer.dispose();
-                } catch (SecurityException | IllegalArgumentException e) {
-                    logger.error(e);
+                break;
+            case DISPOSE:
+                if (REST_ENABLED) {
+                    /* Shutdown REST server thread on termination */
+                    try {
+                        RESTServer.dispose();
+                    } catch (SecurityException | IllegalArgumentException e) {
+                        logger.error(e);
+                    }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
     }
