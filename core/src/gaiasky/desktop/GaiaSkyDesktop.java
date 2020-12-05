@@ -347,7 +347,7 @@ public class GaiaSkyDesktop implements IObserver {
                 cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
-            cfg.setBackBufferConfig(8, 8, 8, 8, 32, 0, 0);
+            cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
             cfg.setIdleFPS(0);
             cfg.useVsync(GlobalConf.screen.VSYNC);
         } else {
