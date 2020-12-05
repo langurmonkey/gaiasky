@@ -106,8 +106,11 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = {"-n", "--noscript"}, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
         private boolean noScriptingServer = false;
 
-        @Parameter(names = {"--debug"}, description = "Launch in debug mode.", order = 9)
-        private boolean debugMode = false;
+        @Parameter(names = {"-d", "--debug"}, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9)
+        private boolean debug = false;
+
+        @Parameter(names = {"-g", "--gpudebug"}, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 9)
+        private boolean debugGpu = false;
     }
 
     /**
@@ -371,7 +374,8 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useOpenGL3(true, 4, 1);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
-        if (gsArgs.debugMode) {
+        // OpenGL debug
+        if (gsArgs.debugGpu) {
             cfg.enableGLDebugOutput(true, System.out);
         }
 
@@ -382,7 +386,7 @@ public class GaiaSkyDesktop implements IObserver {
         // Launch app
         GaiaSky gs = null;
         try {
-            gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
+            gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
             new Lwjgl3Application(gs, cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
@@ -398,7 +402,7 @@ public class GaiaSkyDesktop implements IObserver {
                     GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
                     cfg.useOpenGL3(true, 3, 2);
 
-                    gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
+                    gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
                     new Lwjgl3Application(gs, cfg);
                 } else {
                     logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);
