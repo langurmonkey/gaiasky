@@ -104,7 +104,7 @@ public class WelcomeGui extends AbstractGui {
             clearGui();
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
-            DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
+            DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, null, (digest) -> {
                 GaiaSky.postRunnable(() -> {
                     // Data descriptor ok. Skip welcome screen only if flag and basedata present
                     if (skipWelcome && basicDataPresent()) {

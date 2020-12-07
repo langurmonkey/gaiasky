@@ -34,6 +34,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
@@ -45,9 +46,9 @@ import java.nio.ByteOrder;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Download manager. It gets a descriptor file from the server containing all
@@ -519,12 +520,26 @@ public class DownloadDataWindow extends GenericDialog {
             String name = currentDataset.name;
             String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
 
-            FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
+            String filename = FilenameUtils.getName(url);
+            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/" + filename + ".part");
 
-            ProgressRunnable pr = (read, total, progress, speed) -> {
+            ProgressRunnable progressDownload = (read, total, progress, speed) -> {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
                 final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.downloading", nf.format(progress));
+                double mbPerSecond = speed / 1000d;
+                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
+                // Since we are downloading on a background thread, post a runnable to touch UI
+                GaiaSky.postRunnable(() -> {
+                    downloadButton.setText(progressString);
+                    downloadProgress.setValue((float) progress);
+                    downloadSpeed.setText(speedString);
+                });
+            };
+            ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
+                double readMb = (double) read / 1e6d;
+                double totalMb = (double) total / 1e6d;
+                final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.checksumming", nf.format(progress));
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
                 // Since we are downloading on a background thread, post a runnable to touch UI
@@ -559,16 +574,17 @@ public class DownloadDataWindow extends GenericDialog {
                     logger.info("No digest found for dataset: " + name);
                 }
 
-                if (errors == 0)
+                if (errors == 0) {
                     try {
                         // Extract
                         decompress(tempDownload.path(), new File(dataLocation), downloadButton, downloadProgress);
                         // Remove archive
-                        cleanupTempFiles();
+                        cleanupTempFile(tempDownload.path());
                     } catch (Exception e) {
                         logger.error(e, "Error decompressing: " + name);
                         errors++;
                     }
+                }
 
                 // Done
                 GaiaSky.postRunnable(() -> {
@@ -630,7 +646,7 @@ public class DownloadDataWindow extends GenericDialog {
             downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
             setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentDataset.name));
-            final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
+            final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
 
             // Cancel button
             OwnTextButton cancelDownloadButton = new OwnTextButton(I18n.txt("gui.download.cancel"), skin);
@@ -733,25 +749,50 @@ public class DownloadDataWindow extends GenericDialog {
         return fileSize;
     }
 
+    /**
+     * We should never need to call this, as the main {@link GaiaSky#dispose()} method
+     * already cleans up the temp directory.
+     * This way, we allow download resumes within the same session.
+     */
     private void cleanupTempFiles() {
-        Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
-        Path gsDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "gaiasky_data.tar.gz");
+        cleanupTempFiles(true, false);
+    }
 
-        deleteFile(tempDownload);
-        deleteFile(gsDownload);
+    private void cleanupTempFile(String file){
+        deleteFile(Path.of(file));
+    }
+
+    private void cleanupTempFiles(boolean dataDownloads, boolean dataDescriptor) {
+        if(dataDownloads) {
+            Path testPath = SysUtils.getDefaultTmpDir();
+            // Clean up partial downloads
+            try {
+                Stream<Path> stream = java.nio.file.Files.find(testPath, 2, (path, basicFileAttributes) -> {
+                    File file = path.toFile();
+                    return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
+                });
+                stream.forEach(f -> deleteFile(f));
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+
+        if(dataDescriptor) {
+            // Clean up data descriptor
+            Path gsDownload = SysUtils.getDefaultTmpDir().resolve("gaiasky-data.json");
+            deleteFile(gsDownload);
+        }
     }
 
     private void deleteFile(Path p) {
-        if (Files.exists(p)) {
+        if (java.nio.file.Files.exists(p)) {
             try {
-                Files.delete(p);
+                java.nio.file.Files.delete(p);
             } catch (IOException e) {
                 logger.error(e, "Failed cleaning up file: " + p.toString());
             }
         }
-
     }
-
     private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.outdated"));
         label.setColor(ColorUtils.gYellowC);
@@ -805,12 +846,10 @@ public class DownloadDataWindow extends GenericDialog {
                 GlobalConf.data.addSelectedCatalog(dd.check);
             }
         }
-        cleanupTempFiles();
     }
 
     @Override
     protected void cancel() {
-        cleanupTempFiles();
     }
 
     private void backupScrollValues() {

@@ -16,7 +16,10 @@ import gaiasky.util.Logger.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 
@@ -33,7 +36,7 @@ public class DownloadHelper {
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
      * when finished.
      */
-    public static HttpRequest downloadFile(String url, FileHandle to, ProgressRunnable progress, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
+    public static HttpRequest downloadFile(String url, FileHandle to, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
 
         if (url.startsWith("file://")) {
             // Local file!
@@ -63,6 +66,18 @@ public class DownloadHelper {
             request.setTimeOut(2500);
             request.setUrl(url);
 
+            // Resume download if target file (?.tar.gz.part) exists
+            final boolean resume = to.exists() && to.name().endsWith(".part");
+            final long startSize;
+
+            if (resume) {
+                startSize = to.file().length();
+                request.setHeader("Range", "bytes=" + startSize + "-");
+                logger.info("Resuming download, part file found: " + to);
+            } else {
+                startSize = 0;
+            }
+
             // Send the request, listen for the response
             Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
                 private boolean cancelled = false;
@@ -76,16 +91,18 @@ public class DownloadHelper {
                     if (status < 400) {
                         // We're going to download the file, create the streams
                         InputStream is = httpResponse.getResultAsStream();
-                        OutputStream os = to.write(false);
+                        OutputStream os = to.write(resume);
 
                         byte[] bytes = new byte[1024];
-                        int count = -1;
+                        int count;
                         long read = 0;
                         long lastTimeMs = System.currentTimeMillis();
                         long lastRead = 0;
                         double bytesPerMs = 0;
                         try {
+                            long totalLength = length + startSize;
                             logger.info(I18n.txt("gui.download.starting", url));
+                            logger.info("Reading " + length + " bytes " + (resume ? "(resuming from " + startSize + ", total is " + totalLength + ")" : ""));
                             MessageDigest md = MessageDigest.getInstance("SHA-256");
                             DigestInputStream dis = new DigestInputStream(is, md);
                             // Keep reading bytes and storing them until there are no more.
@@ -94,7 +111,7 @@ public class DownloadHelper {
                                 read += count;
 
                                 // Compute progress value
-                                final double progressValue = ((double) read / (double) length) * 100;
+                                final double progressValue = ((double) (startSize + read) / (double) totalLength) * 100;
 
                                 // Compute speed
                                 long currentTimeMs = System.currentTimeMillis();
@@ -107,8 +124,8 @@ public class DownloadHelper {
                                 }
 
                                 // Run progress runnable
-                                if (progress != null)
-                                    progress.run(read, length, progressValue, bytesPerMs);
+                                if (progressDownload != null)
+                                    progressDownload.run(startSize + read, totalLength, progressValue, bytesPerMs);
 
                                 // Reset
                                 if (updateSpeed) {
@@ -120,18 +137,45 @@ public class DownloadHelper {
                             os.close();
                             logger.info(I18n.txt("gui.download.finished", to.path()));
 
-                            // Run finish runnable
+                            // Get digest and run finish runnable
                             if (finish != null && !cancelled) {
-                                byte[] digestBytes = md.digest();
-                                StringBuffer digestString = new StringBuffer();
-                                for (int i = 0; i < digestBytes.length; i++) {
-                                    if ((0xff & digestBytes[i]) < 0x10) {
-                                        digestString.append("0" + Integer.toHexString((0xFF & digestBytes[i])));
-                                    } else {
-                                        digestString.append(Integer.toHexString(0xFF & digestBytes[i]));
+                                if (resume) {
+                                    // We have only read part of the file, the digest in dis is not valid!
+                                    // Compute digest
+                                    try {
+                                        logger.info("Recomputing sha156 checksum due to being a resumed download: " + to.path());
+                                        md.reset();
+                                        InputStream fis = to.read();
+                                        length = to.length();
+                                        read = 0;
+                                        while ((count = fis.read(bytes, 0, bytes.length)) != -1) {
+                                            md.update(bytes, 0, count);
+                                            read += count;
+
+                                            // Compute progress value
+                                            final double progressValue = ((double) read / (double) length) * 100;
+
+                                            // Compute speed
+                                            long currentTimeMs = System.currentTimeMillis();
+                                            // Update each second
+                                            boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
+                                            if (updateSpeed) {
+                                                long elapsedMs = currentTimeMs - lastTimeMs;
+                                                long readInterval = read - lastRead;
+                                                bytesPerMs = readInterval / elapsedMs;
+                                            }
+
+                                            // Run progress runnable
+                                            if (progressHashResume != null)
+                                                progressHashResume.run(read, length, progressValue, bytesPerMs);
+                                        }
+                                    } catch (IOException e) {
+                                        logger.error("Failed computing sha256 checksum of resumed download.", e);
                                     }
+
                                 }
-                                String digest = digestString.toString();
+                                byte[] digestBytes = md.digest();
+                                String digest = bytesToHex(digestBytes);
                                 finish.run(digest);
                             }
                         } catch (Exception e) {
@@ -144,6 +188,18 @@ public class DownloadHelper {
                         if (fail != null)
                             fail.run();
                     }
+                }
+
+                private String bytesToHex(byte[] hash) {
+                    StringBuilder hexString = new StringBuilder(2 * hash.length);
+                    for (int i = 0; i < hash.length; i++) {
+                        String hex = Integer.toHexString(0xff & hash[i]);
+                        if (hex.length() == 1) {
+                            hexString.append('0');
+                        }
+                        hexString.append(hex);
+                    }
+                    return hexString.toString();
                 }
 
                 @Override
@@ -164,6 +220,5 @@ public class DownloadHelper {
             return request;
         }
     }
-
 
 }

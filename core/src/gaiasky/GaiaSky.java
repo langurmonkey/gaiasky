@@ -789,6 +789,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     }
 
+
     /**
      * Renders the scene
      **/

@@ -325,9 +325,15 @@ public class GlobalResources {
         return false;
     }
 
+    /**
+     * Deletes recursively all non-partial files from the path.
+     * @param path The path to delete.
+     * @throws IOException
+     */
     public static void deleteRecursively(Path path) throws IOException {
         Files.walk(path)
                 .sorted(Comparator.reverseOrder())
+                .filter(p -> !p.toString().endsWith(".part") && !Files.isDirectory(p))
                 .map(Path::toFile)
                 .forEach(java.io.File::delete);
     }
