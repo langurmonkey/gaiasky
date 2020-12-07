@@ -19,7 +19,7 @@
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" dpiAware="false">
         <versionInfo include="true" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx8g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -36,7 +36,7 @@
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx3g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx8g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>
@@ -53,7 +53,7 @@
       <executable name="${compiler:sys.shortName}vr" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gsvr_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
         <versionInfo include="true" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
-      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx4g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
+      <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx8g -XX:+UseG1GC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
         <classPath>
           <scanDirectory location="lib" failOnError="false" />
         </classPath>

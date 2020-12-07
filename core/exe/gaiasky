@@ -49,7 +49,7 @@ JAVA=$(printf %q "$JAVA")
 #OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
 
 # Memory
-OPTS="$OPTS -Xms2g -Xmx4g"
+OPTS="$OPTS -Xms2g -Xmx8g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
