@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 
 public class CrashReporter {
-    private static final Log logger = Logger.getLogger(CrashReporter.class);
 
     public static void reportCrash(Throwable t, Log logger) {
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
