@@ -1917,7 +1917,7 @@ public interface IScriptingInterface {
      * this call returns.
      * The actual loading process is carried out
      * making educated guesses about semantics using UCDs and column names.
-     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
@@ -1936,7 +1936,7 @@ public interface IScriptingInterface {
      * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
      * to check whether the dataset is already loaded and available.
      * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
-     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
