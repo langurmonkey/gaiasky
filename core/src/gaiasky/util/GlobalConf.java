@@ -1008,6 +1008,8 @@ public class GlobalConf {
         public boolean SHOW_DEBUG_INFO;
         // Safe graphics mode disables Float buffers and fancy pixel formats. Does not use velocity buffer (no motion blur)
         public boolean SAFE_GRAPHICS_MODE = false;
+        // Flag to mark whether safe mode is activated via command line argument
+        public boolean SAFE_GRAPHICS_MODE_FLAG = false;
 
         // Update checker
         public static long VERSION_CHECK_INTERVAL_MS = 1 * 24 * 60 * 60 * 1000;

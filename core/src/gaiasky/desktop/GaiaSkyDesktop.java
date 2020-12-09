@@ -101,6 +101,8 @@ public class GaiaSkyDesktop implements IObserver {
         @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9) private boolean debug = false;
 
         @Parameter(names = { "-g", "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 9) private boolean debugGpu = false;
+
+        @Parameter(names = { "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 10) private boolean safeMode = false;
     }
 
     /**
@@ -186,6 +188,12 @@ public class GaiaSkyDesktop implements IObserver {
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
 
+            // Safe mode
+            if(gsArgs.safeMode && !GlobalConf.program.SAFE_GRAPHICS_MODE){
+                GlobalConf.program.SAFE_GRAPHICS_MODE = true;
+                GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG = true;
+            }
+
             // VR resolution
             if (gsArgs.vr) {
                 Graphics.DisplayMode dm = Lwjgl3ApplicationConfiguration.getDisplayMode();
@@ -270,11 +278,6 @@ public class GaiaSkyDesktop implements IObserver {
         } catch (Exception e) {
             CrashReporter.reportCrash(e, logger);
         }
-
-    }
-
-    // Let Display manage our OpenGL version
-    private void normalCreate() {
     }
 
     public GaiaSkyDesktop() {

@@ -210,7 +210,7 @@ public class DesktopConfInit extends ConfInit {
         boolean DISPLAY_HUD = Parser.parseBoolean(p.getProperty("program.display.hud", "false"));
         boolean DISPLAY_POINTER_COORDS = Parser.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
         String catChoos = p.getProperty("program.catalog.chooser", "default");
-        if(catChoos.equalsIgnoreCase("true") || catChoos.equalsIgnoreCase("false"))
+        if (catChoos.equalsIgnoreCase("true") || catChoos.equalsIgnoreCase("false"))
             catChoos = "default";
         boolean DISPLAY_MINIMAP = Parser.parseBoolean(p.getProperty("program.display.minimap", "true"));
         float MINIMAP_SIZE = MathUtilsd.clamp(Parser.parseFloat(p.getProperty("program.minimap.size", "220.0")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
@@ -487,7 +487,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("data.skybox.location", GlobalConf.data.SKYBOX_LOCATION);
 
         /** SCREEN **/
-        if(Gdx.graphics != null) {
+        if (Gdx.graphics != null) {
             p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : getValidWidth()));
             p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : getValidHeight()));
             p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : getValidWidth()));
@@ -500,7 +500,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("graphics.screen.screenoutput", Boolean.toString(GlobalConf.screen.SCREEN_OUTPUT));
 
         /** PROGRAM **/
-        p.setProperty("program.safe.graphics.mode", Boolean.toString(GlobalConf.program.SAFE_GRAPHICS_MODE));
         p.setProperty("program.display.hud", Boolean.toString(GlobalConf.program.DISPLAY_HUD));
         p.setProperty("program.pointer.coords.display", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_COORDS));
         p.setProperty("program.pointer.guides.display", Boolean.toString(GlobalConf.program.DISPLAY_POINTER_GUIDES));
@@ -530,8 +529,12 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.net.slave.yaw", Float.toString(GlobalConf.program.NET_SLAVE_YAW));
         p.setProperty("program.net.slave.pitch", Float.toString(GlobalConf.program.NET_SLAVE_PITCH));
         p.setProperty("program.net.slave.roll", Float.toString(GlobalConf.program.NET_SLAVE_ROLL));
+        // Persist last location if file chooser
         if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
             p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
+        // Only persist if flag is down, otherwise it has been set via CLI argument and must not be persisted
+        if (GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG)
+            p.setProperty("program.safe.graphics.mode", Boolean.toString(GlobalConf.program.SAFE_GRAPHICS_MODE));
 
         /** SCENE **/
         p.setProperty("scene.object.startup", GlobalConf.scene.STARTUP_OBJECT);
@@ -621,7 +624,7 @@ public class DesktopConfInit extends ConfInit {
     private String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
         Path userFolder = SysUtils.getConfigDir();
-        Path userFolderConfFile =userFolder.resolve(getConfigFileName(vr));
+        Path userFolderConfFile = userFolder.resolve(getConfigFileName(vr));
 
         if (ow || !Files.exists(userFolderConfFile)) {
             // Copy file
