@@ -322,8 +322,9 @@ public class GaiaSkyDesktop implements IObserver {
                     if (w <= 0 || h <= 0) {
                         try {
                             GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                            w = (int) (gd.getDefaultConfiguration().getBounds().getWidth() * 0.8);
-                            h = (int) (gd.getDefaultConfiguration().getBounds().getHeight() * 0.8);
+                            GraphicsConfiguration gc = gd.getDefaultConfiguration();
+                            w = (int) (gc.getBounds().getWidth() * 0.85f);
+                            h = (int) (gc.getBounds().getHeight() * 0.85f);
                         } catch (HeadlessException he) {
                             logger.error("Error getting screen size from GraphicsDevice, trying Toolkit method");
                             logger.debug(he);
@@ -332,8 +333,8 @@ public class GaiaSkyDesktop implements IObserver {
                     if (w <= 0 || h <= 0) {
                         try {
                             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                            w = (int) (screenSize.width * 0.8f);
-                            h = (int) (screenSize.height * 0.8f);
+                            w = (int) (screenSize.width * 0.85f);
+                            h = (int) (screenSize.height * 0.85f);
                         } catch (Exception e) {
                             logger.error("Error getting screen size from Toolkit, defaulting to 1280x1024");
                             logger.debug(e);
