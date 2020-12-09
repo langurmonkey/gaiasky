@@ -350,8 +350,8 @@ public class GaiaSkyDesktop implements IObserver {
                 cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
-            cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
-            cfg.setIdleFPS(0);
+            //cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
+            //cfg.setIdleFPS(30);
             cfg.useVsync(GlobalConf.screen.VSYNC);
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
