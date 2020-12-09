@@ -464,6 +464,7 @@ public class GlobalConf {
         public boolean RECORD_KEYFRAME_CAMERA;
         public float LIMIT_MAG_RUNTIME;
 
+
         /**
          * Whether octree drawing is active or not
          **/
@@ -1003,7 +1004,10 @@ public class GlobalConf {
          **/
         public String NET_SLAVE_BLEND;
 
+        // Display debug information box at the top right
         public boolean SHOW_DEBUG_INFO;
+        // Safe graphics mode disables Float buffers and fancy pixel formats. Does not use velocity buffer (no motion blur)
+        public boolean SAFE_GRAPHICS_MODE = false;
 
         // Update checker
         public static long VERSION_CHECK_INTERVAL_MS = 1 * 24 * 60 * 60 * 1000;
@@ -1051,7 +1055,7 @@ public class GlobalConf {
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
                 List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, OriginType rECURSIVE_GRID_ORIGIN, boolean rECURSIVE_GRID_ORIGIN_LINES, boolean eXIT_CONFIRMATION,
-                String mIRROR) {
+                String mIRROR, boolean sAFE_GRAPHICS_MODE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -1089,6 +1093,7 @@ public class GlobalConf {
             RECURSIVE_GRID_ORIGIN = rECURSIVE_GRID_ORIGIN;
             RECURSIVE_GRID_ORIGIN_LINES = rECURSIVE_GRID_ORIGIN_LINES;
             EXIT_CONFIRMATION = eXIT_CONFIRMATION;
+            SAFE_GRAPHICS_MODE = sAFE_GRAPHICS_MODE;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {

@@ -75,7 +75,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final INumberFormat nf3;
     private final INumberFormat nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb, safeGraphics;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -370,7 +370,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LENS FLARE
         lensflareBak = GlobalConf.postprocess.POSTPROCESS_LENS_FLARE;
-        CheckBox lensFlare = new CheckBox(" " + I18n.txt("gui.lensflare"), skin);
+        CheckBox lensFlare = new OwnCheckBox(I18n.txt("gui.lensflare"), skin, pad5);
         lensFlare.setName("lens flare");
         lensFlare.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -383,7 +383,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LIGHT GLOW
         lightglowBak = GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING;
-        CheckBox lightGlow = new CheckBox(" " + I18n.txt("gui.lightscattering"), skin);
+        CheckBox lightGlow = new OwnCheckBox(I18n.txt("gui.lightscattering"), skin, pad5);
         lightGlow.setName("light scattering");
         lightGlow.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         lightGlow.addListener(event -> {
@@ -396,9 +396,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // MOTION BLUR
         motionblurBak = GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
-        CheckBox motionBlur = new CheckBox(" " + I18n.txt("gui.motionblur"), skin);
+        CheckBox motionBlur = new OwnCheckBox(I18n.txt("gui.motionblur"), skin, pad5);
         motionBlur.setName("motion blur");
-        motionBlur.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        motionBlur.setChecked(!GlobalConf.program.SAFE_GRAPHICS_MODE && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        motionBlur.setDisabled(GlobalConf.program.SAFE_GRAPHICS_MODE);
         motionBlur.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlur.isChecked(), true);
@@ -407,25 +408,40 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        graphics.add(gqualityLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        graphics.add(gquality).left().padRight(pad5 * 2).padBottom(pad5);
+
+        // SAFE GRAPHICS
+        safeGraphics = new OwnCheckBox(I18n.txt("gui.safegraphics"), skin, pad5);
+        safeGraphics.setName("safe graphics");
+        safeGraphics.setChecked(GlobalConf.program.SAFE_GRAPHICS_MODE);
+
+        OwnImageButton safeGraphicsTooltip = new OwnImageButton(skin, "tooltip");
+        safeGraphicsTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.safegraphics.info"), skin));
+
+        Table safeGraphicsTable = new Table(skin);
+        safeGraphicsTable.add(safeGraphics).left().padRight(pad10);
+        safeGraphicsTable.add(safeGraphicsTooltip);
+
+
+        graphics.add(gqualityLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(gquality).left().padRight(pad10).padBottom(pad5);
         graphics.add(gqualityTooltip).left().padBottom(pad5).row();
         noticeHiResCell = graphics.add();
         noticeHiResCell.colspan(2).left().row();
         final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
         noticeGraphicsCell.colspan(2).left().row();
-        graphics.add(aaLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        graphics.add(aa).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(aa).left().padRight(pad10).padBottom(pad5);
         graphics.add(aaTooltip).left().padBottom(pad5).row();
-        graphics.add(orbitsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(orbitsLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(orbitRenderer).left().padBottom(pad5).row();
-        graphics.add(lrLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(lrLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(lineRenderer).left().padBottom(pad5).row();
-        graphics.add(bloomLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(bloomEffect).left().padBottom(pad5).row();
         graphics.add(lensFlare).colspan(2).left().padBottom(pad5).row();
         graphics.add(lightGlow).colspan(2).left().padBottom(pad5).row();
-        graphics.add(motionBlur).colspan(2).left().padBottom(pad5).row();
+        graphics.add(motionBlur).colspan(2).left().padBottom(pad15).row();
+        graphics.add(safeGraphicsTable).colspan(2).left().padBottom(pad5).row();
 
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
@@ -1905,6 +1921,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Tess quality
         EventManager.instance.post(Events.TESSELLATION_QUALITY_CMD, tessQuality.getValue());
+
+        // Safe graphics
+        GlobalConf.program.SAFE_GRAPHICS_MODE = safeGraphics.isChecked();
 
         // Shadow mapping
         GlobalConf.scene.SHADOW_MAPPING = shadowsCb.isChecked();

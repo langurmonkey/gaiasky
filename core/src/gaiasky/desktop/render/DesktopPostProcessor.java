@@ -367,6 +367,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         } else {
             cameraMotionBlur.setBlurMaxSamples(20);
         }
+        // Disable motion blur if velocity buffer not present
+        if(ppb.pp.getCombinedBuffer().getMainBuffer().getVelocityBufferTexture() == null && cameraMotionBlur.isEnabled()){
+            cameraMotionBlur.setEnabled(false);
+            logger.warn("Disabling motion blur effect due to velocity buffer not being present: safe mode?");
+        }
     }
 
     private void updateFxaa(PostProcessBean ppb, GraphicsQuality gq) {
