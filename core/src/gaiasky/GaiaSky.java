@@ -787,7 +787,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } catch (Exception e) {
             logger.error(e, "Error deleting tmp directory");
         }
-
     }
 
 

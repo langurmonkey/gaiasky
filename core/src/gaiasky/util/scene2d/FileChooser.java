@@ -409,7 +409,8 @@ public class FileChooser extends GenericDialog {
             items.insert(0, new FileListItem("..", directory.getParent()));
         }
 
-        acceptButton.setDisabled(true);
+        if(target != FileChooserTarget.DIRECTORIES)
+            acceptButton.setDisabled(true);
         fileList.setItems(items);
         scrollPane.layout();
 
