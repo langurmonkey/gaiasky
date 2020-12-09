@@ -38,7 +38,7 @@ This file contains the following sections:
 |-----------------------|--------------------------------------------------------------------------------|
 | **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
 | **CPU**               | Intel Core i5 3rd Generation or similar. 4 core or higher recommended          |
-| **GPU**               | Support for OpenGL 3.2 (4.x recommended),  1 GB RAM                            |
+| **GPU**               | Support for OpenGL `3.2` (`4.x` recommended) and GLSL `3.3`,  1 GB RAM         |
 | **Memory**            | 4-8 GB RAM depending on catalog                                                |
 | **Hard drive**        | 1 GB of free disk space (depending on datasets)                                |
 

@@ -412,10 +412,10 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private static void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
-        logger.info("Enabling SAFE GRAPHICS MODE (OpenGL 3.1)");
+        logger.info("Enabling SAFE GRAPHICS MODE (OpenGL 3.2)");
         GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
         GlobalConf.program.SAFE_GRAPHICS_MODE = true;
-        cfg.useOpenGL3(true, 3, 1);
+        cfg.useOpenGL3(true, 3, 2);
     }
 
     private static void checkLogger(ConsoleLogger consoleLogger) {
