@@ -25,7 +25,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer.FrameBufferBuilder;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -99,24 +98,15 @@ public final class PingPongBuffer {
 
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasVelocity, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
-        if(GlobalConf.program.SAFE_GRAPHICS_MODE){
-            // SAFE GRAPHICS MODE: no float buffers. Only color and depth.
-            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, true);
-            // Depth buffer
-            if (hasDepth) {
-                addDepthRenderTarget(frameBufferBuilder, false);
-            }
-        } else {
-            // Main color render target
-            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-            // Depth buffer
-            if (hasDepth) {
-                addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
-            }
-            // Velocity buffer
-            if (hasVelocity) {
-                addFloatRenderTarget(frameBufferBuilder, frameBufferFormat);
-            }
+        // Main color render target
+        addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        // Depth buffer
+        if (hasDepth) {
+            addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
+        }
+        // Velocity buffer
+        if (hasVelocity) {
+            addFloatRenderTarget(frameBufferBuilder, frameBufferFormat);
         }
 
         return new GaiaSkyFrameBuffer(frameBufferBuilder);

@@ -863,8 +863,8 @@ public class GlobalConf {
         public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS) {
             SCREEN_WIDTH = sCREEN_WIDTH;
             SCREEN_HEIGHT = sCREEN_HEIGHT;
-            BACKBUFFER_WIDTH = sCREEN_WIDTH;
-            BACKBUFFER_HEIGHT = sCREEN_HEIGHT;
+            BACKBUFFER_WIDTH = (int) (sCREEN_WIDTH * BACKBUFFER_SCALE);
+            BACKBUFFER_HEIGHT = (int) (sCREEN_HEIGHT * BACKBUFFER_SCALE);
             FULLSCREEN_WIDTH = fULLSCREEN_WIDTH;
             FULLSCREEN_HEIGHT = fULLSCREEN_HEIGHT;
             FULLSCREEN = fULLSCREEN;

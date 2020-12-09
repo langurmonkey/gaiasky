@@ -148,11 +148,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         PostProcessBean ppb = new PostProcessBean();
 
         GraphicsQuality gq = GlobalConf.scene.GRAPHICS_QUALITY;
+        boolean safeMode = GlobalConf.program.SAFE_GRAPHICS_MODE;
+        boolean vr = GlobalConf.runtime.OPENVR;
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true);
-        ppb.pp.setViewport(new Rectangle(0, 0, width, height));
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, safeMode || vr);
+        ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS
         raymarchingDef.forEach((key, list) -> {
@@ -191,7 +193,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setLightGlowTexture(glow);
         lightGlow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
         lightGlow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
-        lightGlow.setBackbufferScale(GlobalConf.screen.BACKBUFFER_SCALE);
+        lightGlow.setBackbufferScale(GlobalConf.runtime.OPENVR ? GlobalConf.screen.BACKBUFFER_SCALE : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
@@ -937,15 +939,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         return (Antialiasing) ppe;
     }
 
-    /**
-     * Reloads the postprocessor at the given index with the given width and
-     * height.new Runnable() {
-     *
-     * @param rt
-     * @param width
-     * @param height
-     * @Override public void run()
-     */
     private void replace(RenderType rt, final float width, final float height, final float targetWidth, final float targetHeight) {
         // Dispose of old post processor, if exists
         if (pps[rt.index] != null)

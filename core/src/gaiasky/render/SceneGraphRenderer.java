@@ -854,7 +854,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    Array<StubModel> controllers = new Array<StubModel>();
+    Array<StubModel> controllers = new Array<>();
 
     private void copyCamera(PerspectiveCamera from, PerspectiveCamera to) {
         to.combined.set(from.combined);
@@ -1366,20 +1366,20 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    public void resize(final int w, final int h) {
-        resize(w, h, false);
+    public void resize(final int w, final int h, final int rw, final int rh) {
+        resize(w, h, rw, rh, false);
     }
 
-    public void resize(final int w, final int h, boolean resizeRenderSys) {
+    public void resize(final int w, final int h, final int rw, final int rh, boolean resizeRenderSys) {
         if (resizeRenderSys)
-            resizeRenderSystems(w, h);
+            resizeRenderSystems(w, h, rw, rh);
 
         for (ISGR sgr : sgrs) {
             sgr.resize(w, h);
         }
     }
 
-    public void resizeRenderSystems(final int w, final int h) {
+    public void resizeRenderSystems(final int w, final int h, final int rw, final int rh) {
         for (IRenderSystem rendSys : renderProcesses) {
             rendSys.resize(w, h);
         }

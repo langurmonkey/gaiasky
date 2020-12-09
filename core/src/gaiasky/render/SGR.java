@@ -23,12 +23,12 @@ public class SGR extends SGRAbstract implements ISGR {
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postproc = postprocessCapture(ppb, fb, tw, th);
+        boolean postproc = postprocessCapture(ppb, fb, rw, rh);
 
         // Viewport
         extendViewport.setCamera(camera.getCamera());
         extendViewport.setWorldSize(rw, rh);
-        extendViewport.setScreenSize(tw, th);
+        extendViewport.setScreenSize(rw * rw / tw, rh * rh / th);
         extendViewport.apply();
 
         // Render
@@ -50,7 +50,7 @@ public class SGR extends SGRAbstract implements ISGR {
         // GLFW reports a window size of 0x0 with AMD Graphics on windows when minimizing
         if (rw > 0 && rh > 0) {
             sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postprocessRender(ppb, fb, postproc, camera, tw * tw / rw, th * th / rh);
+            postprocessRender(ppb, fb, postproc, camera, tw, th);
         }
 
     }
