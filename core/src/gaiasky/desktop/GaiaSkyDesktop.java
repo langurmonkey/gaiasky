@@ -42,6 +42,7 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -272,6 +273,10 @@ public class GaiaSkyDesktop implements IObserver {
 
     }
 
+    // Let Display manage our OpenGL version
+    private void normalCreate() {
+    }
+
     public GaiaSkyDesktop() {
         super();
         EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
@@ -395,8 +400,21 @@ public class GaiaSkyDesktop implements IObserver {
                     setSafeMode(cfg);
                     consoleLogger.unsubscribe();
 
-                    gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
-                    new Lwjgl3Application(gs, cfg);
+                    try {
+                        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+                        new Lwjgl3Application(gs, cfg);
+                    } catch (GdxRuntimeException e1) {
+                        logger.error("Gaia Sky needs at least OpenGL 3.2 and GLSL 3.3 to run. Your graphics card does not seem to support these.");
+                        try {
+                            // Swing info dialog
+                            JFrame f = new JFrame("OpenGL version too low");
+                            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                            JOptionPane.showMessageDialog(f, "Gaia Sky needs at least OpenGL 3.2 and GLSL 3.3 to run! Your graphics card does not seem to support these.\nPlease upgrade your drivers or your graphic card to continue.");
+                            f.dispose();
+                        } catch (HeadlessException he) {
+                        }
+
+                    }
                 } else {
                     checkLogger(consoleLogger);
                     logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);
@@ -404,6 +422,14 @@ public class GaiaSkyDesktop implements IObserver {
             } else {
                 checkLogger(consoleLogger);
                 logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
+                try {
+                    // Swing info dialog
+                    JFrame f = new JFrame("Java version mismatch");
+                    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                    JOptionPane.showMessageDialog(f, "Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
+                    f.dispose();
+                } catch (HeadlessException he) {
+                }
             }
         } catch (Exception e) {
             checkLogger(consoleLogger);
