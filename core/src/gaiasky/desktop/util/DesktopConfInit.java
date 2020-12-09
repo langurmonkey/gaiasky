@@ -487,11 +487,13 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("data.skybox.location", GlobalConf.data.SKYBOX_LOCATION);
 
         /** SCREEN **/
-        p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : getValidWidth()));
-        p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : getValidHeight()));
-        p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : getValidWidth()));
-        p.setProperty("graphics.screen.fullscreen.height", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_HEIGHT : getValidHeight()));
-        p.setProperty("graphics.screen.fullscreen", Boolean.toString(Gdx.graphics.isFullscreen()));
+        if(Gdx.graphics != null) {
+            p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : getValidWidth()));
+            p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : getValidHeight()));
+            p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : getValidWidth()));
+            p.setProperty("graphics.screen.fullscreen.height", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_HEIGHT : getValidHeight()));
+            p.setProperty("graphics.screen.fullscreen", Boolean.toString(Gdx.graphics.isFullscreen()));
+        }
         p.setProperty("graphics.screen.resizable", Boolean.toString(GlobalConf.screen.RESIZABLE));
         p.setProperty("graphics.screen.vsync", Boolean.toString(GlobalConf.screen.VSYNC));
         p.setProperty("graphics.limit.fps", Double.toString(GlobalConf.screen.LIMIT_FPS));
