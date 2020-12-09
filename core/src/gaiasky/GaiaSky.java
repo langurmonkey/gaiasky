@@ -747,8 +747,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     @Override
     public void dispose() {
         if (saveState) {
-            ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
-            BookmarksManager.instance.persistBookmarks();
+            if (ConfInit.instance != null)
+                ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
+            if (BookmarksManager.instance != null)
+                BookmarksManager.instance.persistBookmarks();
         }
 
         if (vrContext != null)
@@ -793,6 +795,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             logger.error(e, "Error deleting tmp directory");
         }
     }
+
     /**
      * Renders the scene
      **/
@@ -853,7 +856,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         if (GlobalConf.screen.LIMIT_FPS > 0.0) {
             sleep(GlobalConf.screen.LIMIT_FPS);
-        } else if (dynamicResolutionScaling && TimeUtils.millis() - startTime > 10000 &&  TimeUtils.millis() - lastResolutionChange > 2000 && !GlobalConf.runtime.OPENVR) {
+        } else if (dynamicResolutionScaling && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastResolutionChange > 2000 && !GlobalConf.runtime.OPENVR) {
             // Dynamic resolution
             float fps = 1f / graphics.getDeltaTime();
             if (!lowResolution && fps < 20) {

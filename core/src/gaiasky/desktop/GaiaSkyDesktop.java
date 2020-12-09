@@ -369,7 +369,6 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.enableGLDebugOutput(true, System.out);
         }
 
-
         // Launch app
         GaiaSky gs = null;
         try {
@@ -385,8 +384,13 @@ public class GaiaSkyDesktop implements IObserver {
                 if (gs == null || !gs.windowCreated) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
                     checkLogger(consoleLogger);
-                    if (gs != null)
-                        gs.dispose();
+                    if (gs != null) {
+                        try {
+                            gs.dispose();
+                        } catch (Exception e1) {
+                            logger.error("Crashed disposing failed Gaia Sky instance", e1);
+                        }
+                    }
                     logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
                     setSafeMode(cfg);
                     consoleLogger.unsubscribe();
