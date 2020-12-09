@@ -367,11 +367,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         } else {
             cameraMotionBlur.setBlurMaxSamples(20);
         }
-        // Disable motion blur if velocity buffer not present
-        if(ppb.pp.getCombinedBuffer().getMainBuffer().getVelocityBufferTexture() == null && cameraMotionBlur.isEnabled()){
-            cameraMotionBlur.setEnabled(false);
-            logger.warn("Disabling motion blur effect due to velocity buffer not being present: safe mode?");
-        }
     }
 
     private void updateFxaa(PostProcessBean ppb, GraphicsQuality gq) {
@@ -382,8 +377,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private void initCameraBlur(PostProcessBean ppb, float width, float height, GraphicsQuality gq) {
         CameraMotion camblur = new CameraMotion(width, height);
-        camblur.setBlurScale(1f);
-        camblur.setEnabled(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR);
+        camblur.setBlurScale(.8f);
+        camblur.setEnabled(!GlobalConf.program.SAFE_GRAPHICS_MODE && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR);
         ppb.set(camblur);
         updateCameraBlur(ppb, gq);
 
@@ -736,7 +731,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.get(CameraMotion.class).setEnabled(enabled && !GlobalConf.runtime.OPENVR);
+                    ppb.get(CameraMotion.class).setEnabled(enabled && !GlobalConf.program.SAFE_GRAPHICS_MODE && !GlobalConf.runtime.OPENVR);
                 }
             }
             break;

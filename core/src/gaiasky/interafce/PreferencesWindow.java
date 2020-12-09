@@ -440,8 +440,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(bloomEffect).left().padBottom(pad5).row();
         graphics.add(lensFlare).colspan(2).left().padBottom(pad5).row();
         graphics.add(lightGlow).colspan(2).left().padBottom(pad5).row();
-        graphics.add(motionBlur).colspan(2).left().padBottom(pad15).row();
-        graphics.add(safeGraphicsTable).colspan(2).left().padBottom(pad5).row();
+        graphics.add(motionBlur).colspan(2).left().padBottom(pad5).row();
+        //graphics.add(safeGraphicsTable).colspan(2).left().padBottom(pad5).row();
 
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();

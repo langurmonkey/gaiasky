@@ -369,16 +369,17 @@ public class GaiaSkyDesktop implements IObserver {
             cfg.enableGLDebugOutput(true, System.out);
         }
 
-        if (consoleLogger != null && EventManager.instance.isSubscribedToAny(consoleLogger)) {
-            consoleLogger.unsubscribe();
-        }
 
         // Launch app
         GaiaSky gs = null;
         try {
-            throw new GdxRuntimeException("WOah");
-            //gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
-            //new Lwjgl3Application(gs, cfg);
+            if (GlobalConf.program.SAFE_GRAPHICS_MODE) {
+                setSafeMode(cfg);
+            }
+            consoleLogger.unsubscribe();
+
+            gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+            new Lwjgl3Application(gs, cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
                 if (gs == null || !gs.windowCreated) {
@@ -387,11 +388,8 @@ public class GaiaSkyDesktop implements IObserver {
                     if (gs != null)
                         gs.dispose();
                     logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
-                    logger.info("Enabling safe graphics mode, disabling tessellation...");
+                    setSafeMode(cfg);
                     consoleLogger.unsubscribe();
-                    GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
-                    GlobalConf.program.SAFE_GRAPHICS_MODE = true;
-                    cfg.useOpenGL3(true, 3, 1);
 
                     gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
                     new Lwjgl3Application(gs, cfg);
@@ -407,6 +405,13 @@ public class GaiaSkyDesktop implements IObserver {
             checkLogger(consoleLogger);
             logger.error(e);
         }
+    }
+
+    private static void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
+        logger.info("Enabling SAFE GRAPHICS MODE (OpenGL 3.1)");
+        GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
+        GlobalConf.program.SAFE_GRAPHICS_MODE = true;
+        cfg.useOpenGL3(true, 3, 1);
     }
 
     private static void checkLogger(ConsoleLogger consoleLogger) {
