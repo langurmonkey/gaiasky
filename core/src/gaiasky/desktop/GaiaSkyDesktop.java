@@ -9,7 +9,6 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
@@ -399,8 +398,7 @@ public class GaiaSkyDesktop implements IObserver {
             }
             consoleLogger.unsubscribe();
 
-            gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
-            new Lwjgl3Application(gs, cfg);
+            gs = runGaiaSky(cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
                 if (gs == null || !gs.windowCreated) {
@@ -418,11 +416,10 @@ public class GaiaSkyDesktop implements IObserver {
                     consoleLogger.unsubscribe();
 
                     try {
-                        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
-                        new Lwjgl3Application(gs, cfg);
+                        gs = runGaiaSky(cfg);
                     } catch (GdxRuntimeException e1) {
                         logger.error(I18n.txt("error.opengl", MIN_OPENGL, MIN_GLSL));
-                        showDialog(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
+                        showDialogSwing(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
                     checkLogger(consoleLogger);
@@ -431,12 +428,19 @@ public class GaiaSkyDesktop implements IObserver {
             } else {
                 checkLogger(consoleLogger);
                 logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
-                showDialog(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
+                showDialogSwing(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
             checkLogger(consoleLogger);
             logger.error(e);
         }
+    }
+
+    private static GaiaSky runGaiaSky(Lwjgl3ApplicationConfiguration cfg){
+        throw new GdxRuntimeException("A");
+        //GaiaSky gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+        //new Lwjgl3Application(gs, cfg);
+        //return gs;
     }
 
     private static void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
@@ -446,7 +450,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
-    private static void showDialog(String title, String message) {
+    private static void showDialogSwing(String title, String message) {
         try {
             // Swing info dialog
             if(SysUtils.isLinux()) {
@@ -454,13 +458,71 @@ public class GaiaSkyDesktop implements IObserver {
             } else if (SysUtils.isWindows()){
                 UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
             }
-            JFrame f = new JFrame(title);
-            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            JOptionPane.showMessageDialog(f, message);
-            f.dispose();
+            if(true){
+                Main.main(null);
+            }else {
+                JFrame f = new JFrame(title);
+                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                JOptionPane.showMessageDialog(f, message);
+                f.dispose();
+            }
         } catch (HeadlessException | ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException he) {
         }
 
+    }
+    public static class Main extends JFrame {
+        MyPanel panel;
+
+        public Main() {
+            setTitle("This is a frame");
+            setSize(300, 200);
+            panel = new MyPanel(this);
+            add(panel);
+
+            setLocationRelativeTo(null);
+            setDefaultCloseOperation(EXIT_ON_CLOSE);
+        }
+
+        public static void main(String[] args) {
+            EventQueue.invokeLater(() -> {
+                Main frame = new Main();
+                frame.pack();
+                frame.setVisible(true);
+            });
+        }
+
+        private static class MyPanel extends JPanel {
+
+            int dialogCounter = 1;
+            final JFrame theParent;
+
+            public MyPanel(JFrame parent) {
+                super();
+                theParent = parent;
+                setPreferredSize(new Dimension(300, 200));
+                JButton button = new JButton("Press the button");
+                button.addActionListener(e -> showDialog(theParent));
+
+                add(button);
+            }
+
+            private void showDialog(Frame parent) {
+                JDialog dialog = new JDialog(parent, "This is dialog " + dialogCounter, true);
+                setupDialog(dialog);
+            }
+
+            private void setupDialog(JDialog dialog) {
+                JPanel dialogPanel = new JPanel();
+                dialogPanel.setPreferredSize(new Dimension(300, 200));
+                dialogPanel.add(new JLabel("Current dialog count: " + dialogCounter++));
+                JButton button = new JButton("Open a new modal dialog");
+                button.addActionListener(e -> showDialog(theParent));
+                dialogPanel.add(button);
+                dialog.add(dialogPanel);
+                dialog.pack();
+                dialog.setVisible(true);
+            }
+        }
     }
 
     private static void checkLogger(ConsoleLogger consoleLogger) {

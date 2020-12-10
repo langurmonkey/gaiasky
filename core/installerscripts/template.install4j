@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="8.0.5" transformSequenceNumber="8">
+<install4j version="8.0.7" transformSequenceNumber="8">
   <directoryPresets config="@gs-git-folder@/assets/img" />
   <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="11" >
     <languages>
@@ -727,7 +727,7 @@ return console.askYesNo(message, true);
         <entry location="gs_icon.png" />
         <entry location="gsvr_icon.png" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="/home/tsagrista/Programs/install4j8/jres/windows-amd64-11.0.2.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="preCreated" includedJre="/home/tsagrista/Programs/install4j8/jres/OpenJDK11U-jre_x64_windows_hotspot_11.0.9.1_1.zip" manualJreEntry="true" />
     </windows>
     <macos name="macOS Single Bundle" id="221" launcherId="573">
       <exclude>
@@ -736,7 +736,7 @@ return console.askYesNo(message, true);
         <entry location="gaiasky.6.gz" />
         <entry location="gaiasky.cmd" />
       </exclude>
-      <jreBundle jreBundleSource="preCreated" includedJre="/home/tsagrista/Programs/install4j8/jres/macosx-amd64-11.0.2.tar.gz" manualJreEntry="true" />
+      <jreBundle jreBundleSource="preCreated" includedJre="/home/tsagrista/Programs/install4j8/jres/OpenJDK11U-jre_x64_mac_hotspot_11.0.9.1_1.tar.gz" manualJreEntry="true" />
     </macos>
     <unixInstaller name="Unix Installer" id="28">
       <excludedLaunchers>
