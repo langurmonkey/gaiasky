@@ -9,12 +9,14 @@ import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
 import gaiasky.data.DesktopSceneGraphImplementationProvider;
 import gaiasky.data.SceneGraphImplementationProvider;
@@ -416,10 +418,10 @@ public class GaiaSkyDesktop implements IObserver {
                     consoleLogger.unsubscribe();
 
                     try {
-                        gs = runGaiaSky(cfg);
+                        runGaiaSky(cfg);
                     } catch (GdxRuntimeException e1) {
                         logger.error(I18n.txt("error.opengl", MIN_OPENGL, MIN_GLSL));
-                        showDialogSwing(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
+                        showDialogOGL(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
                     checkLogger(consoleLogger);
@@ -428,7 +430,7 @@ public class GaiaSkyDesktop implements IObserver {
             } else {
                 checkLogger(consoleLogger);
                 logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
-                showDialogSwing(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
+                showDialogOGL(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
             checkLogger(consoleLogger);
@@ -436,11 +438,11 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    private static GaiaSky runGaiaSky(Lwjgl3ApplicationConfiguration cfg){
-        throw new GdxRuntimeException("A");
-        //GaiaSky gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
-        //new Lwjgl3Application(gs, cfg);
-        //return gs;
+    private static GaiaSky runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {
+        //throw new GdxRuntimeException("A");
+        GaiaSky gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+        new Lwjgl3Application(gs, cfg);
+        return gs;
     }
 
     private static void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
@@ -450,26 +452,17 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
-    private static void showDialogSwing(String title, String message) {
-        try {
-            // Swing info dialog
-            if(SysUtils.isLinux()) {
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-            } else if (SysUtils.isWindows()){
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            }
-            if(true){
-                Main.main(null);
-            }else {
-                JFrame f = new JFrame(title);
-                f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                JOptionPane.showMessageDialog(f, message);
-                f.dispose();
-            }
-        } catch (HeadlessException | ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException he) {
-        }
+    private static void showDialogOGL(String title, String message) {
+        Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
+        cfg.setHdpiMode(HdpiMode.Pixels);
+        cfg.useVsync(true);
+        cfg.setWindowedMode(980, 200);
+        cfg.setResizable(false);
+        cfg.setTitle(title);
 
+        new Lwjgl3Application(new ErrorDialog(title, message), cfg);
     }
+
     public static class Main extends JFrame {
         MyPanel panel;
 
