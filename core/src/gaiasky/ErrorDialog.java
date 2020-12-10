@@ -9,12 +9,9 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.util.GlobalConf;
 
 public class ErrorDialog implements ApplicationListener {
@@ -29,10 +26,7 @@ public class ErrorDialog implements ApplicationListener {
 
     @Override
     public void create() {
-        ShaderProgram sp = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch2.0.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch2.0.fragment.glsl"));
-        SpriteBatch sb = new SpriteBatch(100, sp);
-        sb.enableBlending();
-        ui = new Stage(new ScreenViewport(), sb);
+        ui = new Stage();
         FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
         if (!fh.exists()) {
             // Default to dark-green
