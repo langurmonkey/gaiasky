@@ -48,7 +48,7 @@ public class ErrorDialog implements ApplicationListener {
             return true;
         });
         b.pad(10);
-        t.add(l).center().padBottom(50).row();
+        t.add(l).center().padBottom(30).row();
         t.add(b).center().row();
 
         Gdx.input.setInputProcessor(ui);

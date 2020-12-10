@@ -363,8 +363,6 @@ public class GaiaSkyDesktop implements IObserver {
                 cfg.setWindowedMode(w, h);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
-            //cfg.setBackBufferConfig(8, 8, 8, 8, 24, 8, 0);
-            //cfg.setIdleFPS(30);
             cfg.useVsync(GlobalConf.screen.VSYNC);
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
@@ -403,7 +401,7 @@ public class GaiaSkyDesktop implements IObserver {
             gs = runGaiaSky(cfg);
         } catch (GdxRuntimeException e) {
             if (!JAVA_VERSION_FLAG) {
-                if (gs == null || !gs.windowCreated) {
+                if ((gs == null || !gs.windowCreated)) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
                     checkLogger(consoleLogger);
                     if (gs != null) {
@@ -425,7 +423,8 @@ public class GaiaSkyDesktop implements IObserver {
                     }
                 } else {
                     checkLogger(consoleLogger);
-                    logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES));
+                    logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
                 checkLogger(consoleLogger);
@@ -435,6 +434,7 @@ public class GaiaSkyDesktop implements IObserver {
         } catch (Exception e) {
             checkLogger(consoleLogger);
             logger.error(e);
+            showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
     }
 
