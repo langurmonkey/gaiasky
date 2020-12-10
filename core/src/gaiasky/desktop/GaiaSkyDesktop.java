@@ -76,6 +76,20 @@ public class GaiaSkyDesktop implements IObserver {
 
     private static GaiaSkyArgs gsArgs;
 
+    private static final int DEFAULT_OPENGL_MAJOR = 4;
+    private static final int DEFAULT_OPENGL_MINOR = 1;
+    private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
+    private static final int DEFAULT_GLSL_MAJOR = 4;
+    private static final int DEFAULT_GLSL_MINOR = 1;
+    private static final String DEFAULT_GLSL = DEFAULT_GLSL_MAJOR + "." + DEFAULT_GLSL_MINOR;
+
+    private static final int MIN_OPENGL_MAJOR = 3;
+    private static final int MIN_OPENGL_MINOR = 2;
+    private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
+    private static final int MIN_GLSL_MAJOR = 3;
+    private static final int MIN_GLSL_MINOR = 3;
+    private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
+
     /**
      * Program arguments
      */
@@ -189,7 +203,7 @@ public class GaiaSkyDesktop implements IObserver {
             ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
 
             // Safe mode
-            if(gsArgs.safeMode && !GlobalConf.program.SAFE_GRAPHICS_MODE){
+            if (gsArgs.safeMode && !GlobalConf.program.SAFE_GRAPHICS_MODE) {
                 GlobalConf.program.SAFE_GRAPHICS_MODE = true;
                 GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG = true;
             }
@@ -306,7 +320,7 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 if (mymode == null) {
                     // Fall back to windowed
-                    logger.warn("Warning: no full screen mode with the given resolution found (" + GlobalConf.screen.FULLSCREEN_WIDTH + "x" + GlobalConf.screen.FULLSCREEN_HEIGHT + "). Falling back to windowed mode.");
+                    logger.warn(I18n.txt("error.fullscreen.notfound", GlobalConf.screen.FULLSCREEN_WIDTH, GlobalConf.screen.FULLSCREEN_HEIGHT));
                     cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
                     cfg.setResizable(GlobalConf.screen.RESIZABLE);
                 } else {
@@ -323,7 +337,7 @@ public class GaiaSkyDesktop implements IObserver {
                             w = (int) (gc.getBounds().getWidth() * 0.85f);
                             h = (int) (gc.getBounds().getHeight() * 0.85f);
                         } catch (HeadlessException he) {
-                            logger.error("Error getting screen size from GraphicsDevice, trying Toolkit method");
+                            logger.error(I18n.txt("error.screensize.gd"));
                             logger.debug(he);
                         }
                     }
@@ -333,11 +347,11 @@ public class GaiaSkyDesktop implements IObserver {
                             w = (int) (screenSize.width * 0.85f);
                             h = (int) (screenSize.height * 0.85f);
                         } catch (Exception e) {
-                            logger.error("Error getting screen size from Toolkit, defaulting to 1280x1024");
-                            logger.debug(e);
                             // Default
                             w = 1600;
                             h = 900;
+                            logger.error(I18n.txt("error.screensize.toolkit", w, h));
+                            logger.debug(e);
                         }
                     }
                 } else {
@@ -369,7 +383,7 @@ public class GaiaSkyDesktop implements IObserver {
         } else {
             cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
         }
-        cfg.useOpenGL3(true, 4, 1);
+        cfg.useOpenGL3(true, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
         // OpenGL debug
@@ -396,10 +410,10 @@ public class GaiaSkyDesktop implements IObserver {
                         try {
                             gs.dispose();
                         } catch (Exception e1) {
-                            logger.error("Crashed disposing failed Gaia Sky instance", e1);
+                            logger.error(I18n.txt("error.dispose"), e1);
                         }
                     }
-                    logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
+                    logger.error(I18n.txt("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
                     setSafeMode(cfg);
                     consoleLogger.unsubscribe();
 
@@ -407,32 +421,17 @@ public class GaiaSkyDesktop implements IObserver {
                         gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
                         new Lwjgl3Application(gs, cfg);
                     } catch (GdxRuntimeException e1) {
-                        logger.error("Gaia Sky needs at least OpenGL 3.2 and GLSL 3.3 to run. Your graphics card does not seem to support these.");
-                        try {
-                            // Swing info dialog
-                            JFrame f = new JFrame("OpenGL version too low");
-                            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                            JOptionPane.showMessageDialog(f, "Gaia Sky needs at least OpenGL 3.2 and GLSL 3.3 to run! Your graphics card does not seem to support these.\nPlease upgrade your drivers or your graphic card to continue.");
-                            f.dispose();
-                        } catch (HeadlessException he) {
-                        }
-
+                        logger.error(I18n.txt("error.opengl", MIN_OPENGL, MIN_GLSL));
+                        showDialog(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
                     checkLogger(consoleLogger);
-                    logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);
+                    logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES));
                 }
             } else {
                 checkLogger(consoleLogger);
-                logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
-                try {
-                    // Swing info dialog
-                    JFrame f = new JFrame("Java version mismatch");
-                    f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    JOptionPane.showMessageDialog(f, "Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
-                    f.dispose();
-                } catch (HeadlessException he) {
-                }
+                logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
+                showDialog(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
             checkLogger(consoleLogger);
@@ -441,10 +440,27 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private static void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
-        logger.info("Enabling SAFE GRAPHICS MODE (OpenGL 3.2)");
+        logger.info(I18n.txt("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
         GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
         GlobalConf.program.SAFE_GRAPHICS_MODE = true;
-        cfg.useOpenGL3(true, 3, 2);
+        cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
+    }
+
+    private static void showDialog(String title, String message) {
+        try {
+            // Swing info dialog
+            if(SysUtils.isLinux()) {
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            } else if (SysUtils.isWindows()){
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            }
+            JFrame f = new JFrame(title);
+            f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JOptionPane.showMessageDialog(f, message);
+            f.dispose();
+        } catch (HeadlessException | ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException he) {
+        }
+
     }
 
     private static void checkLogger(ConsoleLogger consoleLogger) {
