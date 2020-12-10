@@ -1,7 +1,40 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.0...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...HEAD)
 
+
+<a name="3.0.1"></a>
+## [3.0.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.0) (2020-12-10)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.0...3.0.1)
+
+### Bug Fixes
+- show information dialog in case of OpenGL or java version problems 
+- disposing bookmarks manager without it being initialized 
+- update default screen size 
+- remove idle FPS and backbuffer config 
+- file chooser allows selection when entering directories if in DIRECTORIES mode 
+- update default max number of stars 
+- increase max heap space from 4 to 8 GB in all configurations 
+- JSON pointer from DR2 to eDR3 
+
+### Build System
+- update bundled JRE version to `11.0.9+11`
+
+### Code Refactoring
+- all startup messages to I18N bundle, fix swing themes 
+
+### Documentation
+- update pointers to documentation 
+
+### Features
+- saner error reporting with new dialog 
+- add error dialog that works with OpenGL 2.0 and informs the user of insufficient OpenGL or Java versions 
+- add safe graphics mode CLI argument `--safemode` 
+- dynamic resolution scaling - first implementation, deactivated 
+- add safe graphics mode, which does not use float buffers at all. It is activated by default if the context creation for `4.1` fails. It uses OpenGL `3.2`. 
+- download manager is capable of resuming downloads
+- special flag to enable OpenGL debug output 
+- enable GPU debug info with `--debug` flag 
 
 <a name="3.0.0"></a>
 ## [3.0.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.1) (2020-12-02)
@@ -114,7 +147,7 @@
 
 ### Features
 - hot reload of galaxy models 
-
+    
 <a name="2.3.0"></a>
 ## [2.3.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.6) (2020-07-07)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.6...2.3.0)

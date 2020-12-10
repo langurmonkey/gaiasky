@@ -364,9 +364,13 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
 
         File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
         ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
+        ant.checksum(file: tarFile, algorithm: "sha-256", todir: "$packageDir/")
 
         String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
+
+        String sha256Tar = new File("$packageDir/" + project.distName + ".tar.gz.sha-256").text
+        sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
 
         String tagRevEscaped = "$tagRev"
         tagRevEscaped = tagRevEscaped.replace(":", "_").replace("/", "_").replace("-", "_").replace(" ", "_");
@@ -374,6 +378,7 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision.escaped@', value: "$tagRevEscaped")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@sha256checksum@', value: sha256Tar)
 
         copy {
             from "$baseDir/CHANGELOG.md"
@@ -475,6 +480,17 @@ task pack(dependsOn: install4jMedia, description: "Creates the releases for wind
             println("md5 file not found: " + md5File)
         }
 
+        println("Appending sha256 checksum of " + project.distName + ".tar.gz to sha256sums file")
+        File sha256File = file("$packageDir/" + 'sha256sums')
+        if (sha256File.exists()) {
+            String sha256Tar = file("$packageDir/" + project.distName + ".tar.gz.sha-256").text
+            sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
+            sha256File.text = file("$packageDir/" + 'sha256sums').text + sha256Tar + " *" + project.distName + ".tar.gz\n"
+            println("Removing file " + project.distName + ".tar.gz.sha-256")
+            file("$packageDir/" + project.distName + ".tar.gz.sha-256").delete()
+        } else {
+            println("sha256 file not found: " + sha256File)
+        }
     }
 }
 
