@@ -533,7 +533,7 @@ public class DesktopConfInit extends ConfInit {
         if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
             p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
         // Only persist if flag is down, otherwise it has been set via CLI argument and must not be persisted
-        if (GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG)
+        if (!GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG)
             p.setProperty("program.safe.graphics.mode", Boolean.toString(GlobalConf.program.SAFE_GRAPHICS_MODE));
 
         /** SCENE **/

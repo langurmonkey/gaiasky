@@ -102,7 +102,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      * Creates a filter with the given viewport size.
      *
      * @param fragmentShader Name of fragment shader file without extension
-     * @param viewportSize The viewport size in pixels.
+     * @param viewportSize   The viewport size in pixels.
      */
     public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
         super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
@@ -136,7 +136,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.Pos, this.pos);
     }
 
-    public void setTime(float seconds){
+    public void setTime(float seconds) {
         this.timeSecs = seconds;
         setParam(Param.Time, timeSecs);
     }
@@ -150,23 +150,24 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.zfark.set(zfar, k);
         setParam(Param.ZfarK, this.zfark);
     }
-    public void setDepthTexture(Texture tex){
+
+    public void setDepthTexture(Texture tex) {
         this.depthTexture = tex;
         setParam(Param.TextureDepth, u_texture1);
     }
 
-    public void setAdditionalTexture(Texture tex){
+    public void setAdditionalTexture(Texture tex) {
         this.additionalTexture = tex;
         setParam(Param.TextureAdditional, u_texture2);
     }
 
-    public void setAdditional(float[] additional){
+    public void setAdditional(float[] additional) {
         int len = Math.min(additional.length, 4);
         System.arraycopy(additional, 0, this.additional, 0, len);
         setParamv(Param.Additional, this.additional, 0, 4);
     }
 
-    public void setAdditional(float a, float b, float c, float d){
+    public void setAdditional(float a, float b, float c, float d) {
         this.additional[0] = a;
         this.additional[1] = b;
         this.additional[2] = c;
@@ -174,10 +175,10 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParamv(Param.Additional, this.additional, 0, 4);
     }
 
-    public void setAdditional(int index, float value){
-        if(index >= 0 && index < 4){
-           this.additional[index] = value;
-           setParamv(Param.Additional, this.additional, 0, 4);
+    public void setAdditional(int index, float value) {
+        if (index >= 0 && index < 4) {
+            this.additional[index] = value;
+            setParamv(Param.Additional, this.additional, 0, 4);
         } else {
             Logger.getLogger(RaymarchingFilter.class).error("Additional index must be in [0, 3]: " + index);
         }
@@ -206,9 +207,11 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
 
     @Override
     protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
-        depthTexture.bind(u_texture1);
-        if(additionalTexture != null)
+        if (inputTexture != null && depthTexture != null) {
+            inputTexture.bind(u_texture0);
+            depthTexture.bind(u_texture1);
+        }
+        if (additionalTexture != null)
             additionalTexture.bind(u_texture2);
     }
 }
