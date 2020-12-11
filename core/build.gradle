@@ -57,7 +57,7 @@ sourceSets {
     }
 }
 
-class GaiaSkyRun extends JavaExec {
+abstract class GaiaSkyRun extends JavaExec {
     public void setup() {
         main = project.mainClassName
         systemProperties['properties.file'] = ''
