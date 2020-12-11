@@ -11,20 +11,23 @@ print_usage() {
   echo "Usage: $0 [OPTION]"
   echo
   echo "Options:"
-  echo " -v    Print version and exit"
-  echo " -vr   Launch Gaia Sky in VR mode"
-  echo " -h    Print help"
-  echo " -d    Show download manager at startup"
-  echo " -c    Show catalog chooser at startup"
+  echo " -v          Print version and exit"
+  echo " -h          Print help"
+  echo " -s          Skip welcome screen"
+  echo " -e          Create an extra window with the view of the scene and no UI"
+  echo " -n          Do not start the scripting server"
+  echo " -d          Start in debug mode"
+  echo " -g          Start OpenGL in debug mode"
 }
 
-while getopts 'hvdcr' flag; do
+while getopts 'hvsiend' flag; do
   case "${flag}" in
     h) args="-h " ;;
     v) args="-v " ;;
+    s) args="-s " ;;
+    e) args="-e " ;;
+    n) args="-n " ;;
     d) args="-d " ;;
-    c) args="-c " ;;
-    r) args="-vr " ;;
     *) print_usage
        exit 1 ;;
   esac
