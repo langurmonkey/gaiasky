@@ -422,7 +422,7 @@ public class UCDParser {
                 Set<UCD> set = ucdmap.get(type);
                 // Check column names
                 for (UCD candidate : set) {
-                    if (TextUtils.contains(colnames, candidate.colname)) {
+                    if (TextUtils.contains(colnames, candidate.colname, true)) {
                         if (defaultunit != null && (candidate.unit == null || candidate.unit.isEmpty()))
                             candidate.unit = defaultunit;
                         candidates.add(candidate);

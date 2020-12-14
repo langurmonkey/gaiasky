@@ -338,8 +338,8 @@ public class GuiRegistry implements IObserver {
 
                     FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
                     fc.setAcceptText(I18n.txt("gui.loadcatalog"));
-                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv"));
-                    fc.setAcceptedFiles("*.vot, *.csv");
+                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits"));
+                    fc.setAcceptedFiles("*.vot, *.csv, *.fits");
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (Files.exists(result) && Files.exists(result)) {
