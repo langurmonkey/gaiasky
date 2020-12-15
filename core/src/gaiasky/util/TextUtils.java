@@ -248,4 +248,15 @@ public class TextUtils {
         });
         return contained.get();
     }
+    public static boolean containsOrMatches(String[] list, String key, boolean ignoreCase) {
+        AtomicBoolean contained = new AtomicBoolean(false);
+        Arrays.stream(list).forEach(candidate -> {
+            if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
+                contained.set(true);
+            } else if (key.matches(candidate)) {
+                contained.set(true);
+            }
+        });
+        return contained.get();
+    }
 }

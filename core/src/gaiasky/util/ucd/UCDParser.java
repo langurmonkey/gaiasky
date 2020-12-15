@@ -24,8 +24,10 @@ import java.util.Set;
  * @author tsagrista
  */
 public class UCDParser {
+    // The following column names can either be strings or regular expressions. They are checked
+    // first with equals() and then with matches()
     public static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    public static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
+    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "proper", "proper_name", "common_name", "designation" };
     public static String[] racolnames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
     public static String[] xcolnames = new String[] { "x", "X" };
     public static String[] decolnames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
@@ -422,7 +424,7 @@ public class UCDParser {
                 Set<UCD> set = ucdmap.get(type);
                 // Check column names
                 for (UCD candidate : set) {
-                    if (TextUtils.contains(colnames, candidate.colname, true)) {
+                    if (TextUtils.containsOrMatches(colnames, candidate.colname, true)) {
                         if (defaultunit != null && (candidate.unit == null || candidate.unit.isEmpty()))
                             candidate.unit = defaultunit;
                         candidates.add(candidate);

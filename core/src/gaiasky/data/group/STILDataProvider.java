@@ -52,6 +52,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     // Dataset options, may be null
     private DatasetOptions dops;
 
+    // These names are not allowed
+    private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
+
     public STILDataProvider() {
         super();
         // Disable logging
@@ -115,13 +118,32 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     private Pair<UCD, String> getStringUcd(Array<UCD> ucds, Object[] row) {
         for (UCD ucd : ucds) {
             try {
-                String str = row[ucd.index].toString();
+                String str = row[ucd.index].toString().strip();
                 return new Pair<>(ucd, str);
             } catch (Exception e) {
                 // not working, try next
             }
         }
         return null;
+    }
+
+    private Pair<UCD, String>[] getAllStringsUcd(Array<UCD> ucds, Object[] row) {
+        Array<Pair<UCD, String>> strs = new Array<>(2);
+        for (UCD ucd : ucds) {
+            try {
+                String str = row[ucd.index].toString().strip();
+                strs.add(new Pair<>(ucd, str));
+            } catch (Exception e) {
+                // not working, try next
+            }
+        }
+        Pair<UCD, String>[] result = new Pair[strs.size];
+        int i = 0;
+        for (Pair<UCD, String> value : strs) {
+            result[i++] = value;
+        }
+        return result;
+
     }
 
     public List<? extends ParticleBean> loadData(DataSource ds, double factor) {
@@ -271,7 +293,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                         /* IDENTIFIER AND NAME */
                         String[] names;
-                        Long id;
+                        Long id = -1l;
                         int hip = -1;
                         if (ucdp.NAME.isEmpty()) {
                             // Empty name
@@ -292,8 +314,25 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                         } else {
                             // We have name
-                            Pair<UCD, String> namePair = getStringUcd(ucdp.NAME, row);
-                            names = namePair.getSecond().split(Constants.nameSeparatorRegex);
+                            Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdp.NAME, row);
+                            Array<String> namesArray = new Array<>(namePairs.length);
+                            for (Pair<UCD, String> pair : namePairs) {
+                                String[] currNames = pair.getSecond().split(Constants.nameSeparatorRegex);
+                                for (String actualName : currNames) {
+                                    if (actualName != null && !actualName.isEmpty() && !TextUtils.contains(forbiddenNameValues, actualName, true)) {
+                                        namesArray.add(actualName);
+                                    }
+                                }
+                            }
+                            names = new String[namesArray.size];
+                            int k = 0;
+                            for (String n : namesArray) {
+                                names[k++] = n;
+                            }
+                            if (names.length == 0) {
+                                names = new String[] { id.toString() };
+                            }
+
                             // Take care of HIP stars
                             if (!ucdp.ID.isEmpty()) {
                                 Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
