@@ -6,6 +6,7 @@
 package gaiasky.screenshot;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
@@ -149,7 +150,6 @@ public class ScreenshotsManager implements IObserver {
             renderGui().render(width, height);
         }
 
-
         frameBuffer.getColorBufferTexture().getTextureData().getFormat();
         String res = renderer.saveScreenshot(folder, filename, width, height, false, type, quality);
 
@@ -195,7 +195,7 @@ public class ScreenshotsManager implements IObserver {
     private IGui renderGui() {
         // Lazy initialised
         if (renderGui == null) {
-            renderGui = new RenderGui();
+            renderGui = new RenderGui((Lwjgl3Graphics) Gdx.graphics, GlobalConf.program.UI_SCALE);
             renderGui.initialize(null);
             renderGui.doneLoading(null);
         }

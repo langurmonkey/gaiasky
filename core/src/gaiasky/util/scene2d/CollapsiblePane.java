@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 
@@ -61,7 +60,7 @@ public class CollapsiblePane extends Table {
         this.labelText = labelText;
         this.content = content;
         this.skin = skin;
-        this.space = 4f * GlobalConf.UI_SCALE_FACTOR;
+        this.space = 6.4f;
         this.collapseSpeed = 1000;
 
         OwnLabel mainLabel = new OwnLabel(labelText, skin, labelStyle);
@@ -117,7 +116,7 @@ public class CollapsiblePane extends Table {
         Table headerTable = new Table(skin);
 
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
+        titleGroup.space(6.4f);
         titleGroup.addActor(expandIcon);
         titleGroup.addActor(mainLabel);
         if (shortcut != null && !shortcut.isEmpty())
@@ -138,8 +137,8 @@ public class CollapsiblePane extends Table {
         //headerGroupRight.addActor(expandIcon);
         headerGroupRight.addActor(detachIcon);
 
-        headerTable.add(titleGroup).left().padRight(4f * GlobalConf.UI_SCALE_FACTOR);
-        headerTable.add(headerGroupLeft).left().pad(4f * GlobalConf.UI_SCALE_FACTOR);
+        headerTable.add(titleGroup).left().padRight(6.4f);
+        headerTable.add(headerGroupLeft).left().pad(6.4f);
         headerTable.add().expandX();
         headerTable.add(headerGroupRight).right();
 
@@ -227,7 +226,7 @@ public class CollapsiblePane extends Table {
         OwnScrollPane contentScroll = new OwnScrollPane(content, skin, "minimalist-nobg");
         contentScroll.setSize(content.getWidth(), content.getHeight() * 1.1f);
 
-        window.add(contentScroll).pad(5f * GlobalConf.UI_SCALE_FACTOR).row();
+        window.add(contentScroll).pad(8f).row();
 
         /** Close button **/
         OwnTextButton close = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
@@ -246,10 +245,10 @@ public class CollapsiblePane extends Table {
             return false;
         });
         Container<Button> closeContainer = new Container<>(close);
-        close.setWidth(70f * GlobalConf.UI_SCALE_FACTOR);
+        close.setWidth(112f);
         closeContainer.align(Align.right);
 
-        window.add(closeContainer).pad(5f * GlobalConf.UI_SCALE_FACTOR).bottom().right();
+        window.add(closeContainer).pad(8f).bottom().right();
         window.getTitleTable().align(Align.left);
         window.align(Align.left);
         window.pack();

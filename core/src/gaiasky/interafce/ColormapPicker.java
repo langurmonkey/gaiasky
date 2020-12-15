@@ -315,7 +315,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private void addColormapWidget(Table container) {
-            float sbwidth = 170 * GlobalConf.UI_SCALE_FACTOR;
+            float sbwidth = 272f;
 
             // Color map
             container.add(new OwnLabel(I18n.txt("gui.colorpicker.colormap"), skin)).left().padRight(pad10).padBottom(pad5).padTop(pad10 * 2);
@@ -539,9 +539,9 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private void addColorPickerWidget(Table container) {
-            float textfieldLen = 50f * GlobalConf.UI_SCALE_FACTOR;
-            float sliderLen = 150f * GlobalConf.UI_SCALE_FACTOR;
-            float colsize = 100f * GlobalConf.UI_SCALE_FACTOR;
+            float textfieldLen = 80f;
+            float sliderLen = 240f;
+            float colsize = 160f;
 
             HorizontalGroup hg = new HorizontalGroup();
             hg.space(pad10);
@@ -605,8 +605,8 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             /* Color table */
             Table coltable = new Table();
-            float size = 15f * GlobalConf.UI_SCALE_FACTOR;
-            float cpad = 1f * GlobalConf.UI_SCALE_FACTOR;
+            float size = 24f;
+            float cpad = 1.6f;
             int i = 1;
             int n = 4 * 4 * 4;
             float a = 1f;

@@ -2,6 +2,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -17,7 +18,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -74,8 +74,8 @@ public class ControllerGui extends AbstractGui {
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
-    public ControllerGui() {
-        super();
+    public ControllerGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
         this.skin = GlobalResources.skin;
         this.em = EventManager.instance;
         model = new ArrayList<>();
@@ -84,10 +84,10 @@ public class ControllerGui extends AbstractGui {
         guiControllerListener = new GUIControllerListener();
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
-        pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
+        pad5 = 8f;
+        pad10 = 16f;
+        pad20 = 32f;
+        pad30 = 48;
     }
 
     @Override
@@ -100,16 +100,16 @@ public class ControllerGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float w = 900f * GlobalConf.UI_SCALE_FACTOR;
-        float h = 400f * GlobalConf.UI_SCALE_FACTOR;
+        float w = 1440f;
+        float h = 640f;
         // Widget width
-        float ww = 250f * GlobalConf.UI_SCALE_FACTOR;
-        float wh = 50f * GlobalConf.UI_SCALE_FACTOR;
+        float ww = 400f;
+        float wh = 128;
         float sw = ww;
-        float sh = 60f * GlobalConf.UI_SCALE_FACTOR;
-        float tfw = 150f * GlobalConf.UI_SCALE_FACTOR;
+        float sh = 96f;
+        float tfw = 240f;
         // Tab width
-        float tw = 140f * GlobalConf.UI_SCALE_FACTOR;
+        float tw = 224f;
 
         // Create contents
 
@@ -414,8 +414,8 @@ public class ControllerGui extends AbstractGui {
 
         typesT = new Table(skin);
 
-        float buttonPadHor = (GlobalConf.isHiDPI() ? 6f : 4f) * GlobalConf.UI_SCALE_FACTOR;
-        float buttonPadVert = (GlobalConf.isHiDPI() ? 2.5f : 2.2f) * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPadHor = 9.6f;
+        float buttonPadVert = 4f;
         Set<Button> buttons = new HashSet<>();
         ComponentType[] visibilityEntities = ComponentType.values();
         boolean[] visible = new boolean[visibilityEntities.length];
@@ -664,7 +664,7 @@ public class ControllerGui extends AbstractGui {
         updateTabs();
         updateFocused(true);
 
-        if(sg == null)
+        if (sg == null)
             sg = GaiaSky.instance.sg;
     }
 
@@ -757,7 +757,8 @@ public class ControllerGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager) {
         // User interface
-        Viewport vp = new ScreenViewport();
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
 
         // Comment to hide this whole dialog and functionality

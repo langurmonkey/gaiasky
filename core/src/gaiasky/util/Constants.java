@@ -285,6 +285,10 @@ public class Constants {
     public final static float MIN_AXIS_SENSITIVITY = 0.1f;
     public final static float MAX_AXIS_SENSITIVITY = 10f;
 
+    public static final float UI_SCALE_INTERNAL_MIN = 0.4f;
+    public static final float UI_SCALE_INTERNAL_MAX = 1.5f;
+    public static final float UI_SCALE_MIN = 0.75f;
+    public static final float UI_SCALE_MAX = 2.0f;
 
     // Max time for VSOP87 algorithms
     public static final long MAX_VSOP_TIME_MS = 20000l * (long) Nature.Y_TO_MS;

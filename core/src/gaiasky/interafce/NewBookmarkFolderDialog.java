@@ -37,7 +37,7 @@ public class NewBookmarkFolderDialog extends GenericDialog {
         // Info message
         IValidator val = new FolderValidator();
         input = new OwnTextField("", skin, val);
-        input.setWidth(300 * GlobalConf.UI_SCALE_FACTOR);
+        input.setWidth(480f);
         input.setMessageText("New folder");
 
         content.add(input).top().left().expand().row();

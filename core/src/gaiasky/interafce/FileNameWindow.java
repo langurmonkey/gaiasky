@@ -38,7 +38,7 @@ public class FileNameWindow extends GenericDialog{
         LengthValidator lengthValidator = new LengthValidator(3, 40);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
         fileName = new OwnTextField(defaultName, skin, nameValidator);
-        fileName.setWidth(250 * GlobalConf.UI_SCALE_FACTOR);
+        fileName.setWidth(400f);
 
         content.add(label).padRight(pad10).padBottom(pad10);
         content.add(fileName).padBottom(pad10);

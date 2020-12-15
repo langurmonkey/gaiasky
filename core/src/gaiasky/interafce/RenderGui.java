@@ -6,6 +6,7 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -33,13 +34,15 @@ public class RenderGui extends AbstractGui {
 
     protected IDateFormat df;
 
-    public RenderGui() {
-        super();
+    public RenderGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
     @Override
     public void initialize(AssetManager assetManager) {
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, GlobalResources.spriteBatch);
         df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
     }
 

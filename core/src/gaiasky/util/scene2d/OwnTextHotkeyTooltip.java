@@ -84,7 +84,7 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
 
         setStyle(style);
 
-        getContainer().pad(5f * GlobalConf.UI_SCALE_FACTOR);
+        getContainer().pad(8f);
     }
 
     public void setStyle(TextTooltipStyle style) {

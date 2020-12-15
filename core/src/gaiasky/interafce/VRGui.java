@@ -116,4 +116,9 @@ public class VRGui<T extends IGui> implements IGui {
     public boolean mustDraw() {
         return right.mustDraw() || left.mustDraw();
     }
+
+    @Override
+    public boolean updateUnitsPerPixel(float upp) {
+        return right.updateUnitsPerPixel(upp) && left.updateUnitsPerPixel(upp);
+    }
 }

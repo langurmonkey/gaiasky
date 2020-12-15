@@ -24,7 +24,6 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
-import gaiasky.util.GlobalConf;
 
 /** A tooltip that shows a label.
  * @author Nathan Sweet */
@@ -87,7 +86,7 @@ public class OwnTextTooltip extends Tooltip<Label> {
 
         setStyle(style);
 
-        getContainer().pad(5f * GlobalConf.UI_SCALE_FACTOR);
+        getContainer().pad(8f);
     }
 
     public void setStyle(TextTooltipStyle style) {

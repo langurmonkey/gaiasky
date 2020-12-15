@@ -44,7 +44,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
     public RunStateInterface(Skin skin, boolean horizontal) {
         super(skin);
 
-        float pad = 2 * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 3.2f;
 
         keyboardImg = new Image(skin.getDrawable("no-input"));
         keyboardImg.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.noinput"), skin));

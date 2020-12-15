@@ -144,7 +144,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
             buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
             buttonMaster.setProgrammaticChangeEvents(false);
-            buttonMaster.setSize(25f * GlobalConf.UI_SCALE_FACTOR, 26f * GlobalConf.UI_SCALE_FACTOR);
+            buttonMaster.setSize(28f, 29.6f);
             String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
             buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.slave.config")), hkmaster, skin));
             buttonMaster.setName("master");

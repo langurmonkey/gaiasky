@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.color.ColorUtils;
@@ -162,9 +161,9 @@ public class ColorPicker extends ColorPickerAbstract {
 
         @Override
         protected void build() {
-            float textfieldLen = 50f * GlobalConf.UI_SCALE_FACTOR;
-            float sliderLen = 150f * GlobalConf.UI_SCALE_FACTOR;
-            float colsize = 100f * GlobalConf.UI_SCALE_FACTOR;
+            float textfieldLen = 80f;
+            float sliderLen = 240f;
+            float colsize = 160f;
             content.clear();
 
             HorizontalGroup hg = new HorizontalGroup();
@@ -229,8 +228,8 @@ public class ColorPicker extends ColorPickerAbstract {
 
             /* Color table */
             Table coltable = new Table();
-            float size = 15f * GlobalConf.UI_SCALE_FACTOR;
-            float cpad = 1f * GlobalConf.UI_SCALE_FACTOR;
+            float size = 24f;
+            float cpad = 1.6f;
             int i = 1;
             int n = 4 * 4 * 4;
             float a = 1f;

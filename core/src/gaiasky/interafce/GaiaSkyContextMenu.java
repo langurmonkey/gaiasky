@@ -56,11 +56,11 @@ public class GaiaSkyContextMenu extends ContextMenu {
     public GaiaSkyContextMenu(Skin skin, String styleName, int screenX, int screenY, IFocus candidate) {
         super(skin, styleName);
         this.skin = skin;
-        this.screenX = screenX;
+        this.screenX = (int) (screenX / GlobalConf.program.UI_SCALE);
         this.screenY = screenY;
         this.sg = GaiaSky.instance.sg;
         this.candidate = candidate;
-        this.pad = 5f * GlobalConf.UI_SCALE_FACTOR;
+        this.pad = 8f;
         if (candidate != null) {
             this.cname = candidate.getCandidateName();
             this.cnameShort = TextUtils.capString(this.cname, 10);

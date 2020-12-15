@@ -1702,13 +1702,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Pointer guides
         if (GlobalConf.program.DISPLAY_POINTER_GUIDES) {
             int mouseX = Gdx.input.getX();
-            int mouseY = Gdx.input.getY();
+            int mouseY = rh - Gdx.input.getY();
             shapeRenderer.begin(ShapeType.Line);
             Gdx.gl.glEnable(GL30.GL_BLEND);
             Gdx.gl.glLineWidth(GlobalConf.program.POINTER_GUIDES_WIDTH);
             float[] pc = GlobalConf.program.POINTER_GUIDES_COLOR;
             shapeRenderer.setColor(pc[0], pc[1], pc[2], pc[3]);
-            shapeRenderer.line(0, rh - mouseY, rw, rh - mouseY);
+            shapeRenderer.line(0, mouseY, rw, mouseY);
             shapeRenderer.line(mouseX, 0, mouseX, rh);
             shapeRenderer.end();
         }
@@ -1956,6 +1956,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     @Override
     public void resize(int width, int height) {
         spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        shapeRenderer.dispose();
+        shapeRenderer = new ShapeRenderer(10);
     }
 
     @Override

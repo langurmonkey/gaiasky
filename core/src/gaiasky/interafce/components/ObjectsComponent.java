@@ -175,7 +175,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         focusListScrollPane.setFadeScrollBars(false);
         focusListScrollPane.setScrollingDisabled(true, false);
 
-        focusListScrollPane.setHeight(100 * GlobalConf.UI_SCALE_FACTOR);
+        focusListScrollPane.setHeight(160f);
         focusListScrollPane.setWidth(contentWidth);
 
         /*

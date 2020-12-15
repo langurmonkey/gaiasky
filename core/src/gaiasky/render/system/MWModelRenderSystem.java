@@ -211,7 +211,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                 // SIZE, TYPE, TEX LAYER
                 double starSize = particle.data[3];
-                ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * GlobalConf.UI_SCALE_FACTOR);
+                ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
                 ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
                 ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[StdRandom.uniform(nLayers)];
 

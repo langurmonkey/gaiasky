@@ -35,7 +35,9 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.*;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class BookmarksComponent extends GuiComponent implements IObserver {
     static private final Vector2 tmpCoords = new Vector2();
@@ -55,10 +57,13 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     private final Drawable folderIcon;
     private final Drawable bookmarkIcon;
 
+    private final Set<ContextMenu> contextMenus;
+
     public BookmarksComponent(Skin skin, Stage stage) {
         super(skin, stage);
         folderIcon = skin.getDrawable("iconic-folder-small");
         bookmarkIcon = skin.getDrawable("iconic-bookmark-small");
+        contextMenus = new HashSet<>();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL);
     }
 
@@ -226,8 +231,8 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                     }
                                 }
 
-
-                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
+                                newMenu(cm);
+                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()) / GlobalConf.program.UI_SCALE, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / GlobalConf.program.UI_SCALE);
                             });
                         } else {
                             // New folder
@@ -250,10 +255,13 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                     return false;
                                 });
                                 cm.addItem(newFolder);
+                                newMenu(cm);
                                 cm.showMenu(stage, Gdx.input.getX(ie.getPointer()), Gdx.graphics.getHeight() - Gdx.input.getY(ie.getPointer()));
                             });
                         }
                     }
+                    event.setBubbles(false);
+                    return true;
                 }
             return false;
         });
@@ -264,7 +272,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksScrollPane.setFadeScrollBars(false);
         bookmarksScrollPane.setScrollingDisabled(true, false);
 
-        bookmarksScrollPane.setHeight(100 * GlobalConf.UI_SCALE_FACTOR);
+        bookmarksScrollPane.setHeight(160f);
         bookmarksScrollPane.setWidth(contentWidth);
 
         /*
@@ -279,6 +287,13 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
 
         component = objectsGroup;
 
+    }
+
+    private void newMenu(ContextMenu cm){
+        for(ContextMenu menu : contextMenus){
+            menu.remove();
+        }
+        contextMenus.add(cm);
     }
 
     private class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
@@ -379,7 +394,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         infoTable.pack();
     }
 
-
     private void info(boolean visible) {
         if (visible) {
             infoCell1.setActor(infoMessage1);
@@ -394,31 +408,31 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case FOCUS_CHANGED:
-                // Update focus selection in focus list
-                SceneGraphNode sgn;
-                if (data[0] instanceof String) {
-                    sgn = sg.getNode((String) data[0]);
-                } else {
-                    sgn = (SceneGraphNode) data[0];
-                }
-                // Select only if data[1] is true
-                if (sgn != null) {
-                    SceneGraphNode node = (SceneGraphNode) data[0];
-                    selectBookmark(node.getName(), false);
-                }
-                break;
-            case BOOKMARKS_ADD:
-                String name = (String) data[0];
-                reloadBookmarksTree();
-                selectBookmark(name, false);
-                break;
-            case BOOKMARKS_REMOVE:
-            case BOOKMARKS_REMOVE_ALL:
-                reloadBookmarksTree();
-                break;
-            default:
-                break;
+        case FOCUS_CHANGED:
+            // Update focus selection in focus list
+            SceneGraphNode sgn;
+            if (data[0] instanceof String) {
+                sgn = sg.getNode((String) data[0]);
+            } else {
+                sgn = (SceneGraphNode) data[0];
+            }
+            // Select only if data[1] is true
+            if (sgn != null) {
+                SceneGraphNode node = (SceneGraphNode) data[0];
+                selectBookmark(node.getName(), false);
+            }
+            break;
+        case BOOKMARKS_ADD:
+            String name = (String) data[0];
+            reloadBookmarksTree();
+            selectBookmark(name, false);
+            break;
+        case BOOKMARKS_REMOVE:
+        case BOOKMARKS_REMOVE_ALL:
+            reloadBookmarksTree();
+            break;
+        default:
+            break;
         }
 
     }

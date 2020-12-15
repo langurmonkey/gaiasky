@@ -58,7 +58,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         FloatValidator angleVal = new FloatValidator(-1000f, 1000f);
         FloatValidator fovVal = new FloatValidator(Constants.MIN_FOV, 170f);
 
-        float tw = 60 * GlobalConf.UI_SCALE_FACTOR;
+        float tw = 96f;
 
         // Send button (does not close dialog)
         OwnTextButton sendButton = new OwnTextButton(I18n.txt("gui.send"), skin, "default");

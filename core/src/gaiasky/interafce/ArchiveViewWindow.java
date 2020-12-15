@@ -23,7 +23,6 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.IStarFocus;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -70,7 +69,7 @@ public class ArchiveViewWindow extends GenericDialog {
     @Override
     protected void build(){
         this.linkStyle = skin.get("link", LabelStyle.class);
-        this.pad = 5 * GlobalConf.UI_SCALE_FACTOR;
+        this.pad = 8f;
 
         /** TABLE and SCROLL **/
         table = new Table(skin);

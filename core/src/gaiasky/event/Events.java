@@ -290,6 +290,11 @@ public enum Events {
     DISPLAY_MEM_INFO_WINDOW,
 
     /**
+     * Change UI scale factor. Contains the new internal scale factor
+     */
+    UI_SCALE_CMD,
+
+    /**
      * Contains a boolean with the display status
      */
     DISPLAY_POINTER_COORDS_CMD,

@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
@@ -23,8 +22,8 @@ public class OwnSlider extends Slider {
     private boolean showValueLabel = true;
     private OwnLabel valueLabel;
     private String valuePrefix, valueSuffix;
-    private float padX = 3f * GlobalConf.UI_SCALE_FACTOR;
-    private float padY = 3f * GlobalConf.UI_SCALE_FACTOR;
+    private float padX = 4.8f;
+    private float padY = 4.8f;
     private INumberFormat nf;
 
     public OwnSlider(float min, float max, float stepSize, float mapMin, float mapMax, boolean vertical, Skin skin) {

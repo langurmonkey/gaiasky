@@ -63,7 +63,7 @@ public class DatasetsWidget {
     }
 
     public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn, int maxCharsDescription) {
-        float pad = 3f * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 4.8f;
 
         JsonReader reader = new JsonReader();
 
@@ -80,7 +80,7 @@ public class DatasetsWidget {
         OwnScrollPane scroll = null;
         if (scrollOn) {
             scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
-            scroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.75f, 400f * GlobalConf.UI_SCALE_FACTOR));
+            scroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.75f, 640f));
             scroll.setFadeScrollBars(false);
             scroll.setScrollingDisabled(true, false);
             scroll.setSmoothScrolling(true);
@@ -192,7 +192,7 @@ public class DatasetsWidget {
 
         dsTable.pack();
         if (scroll != null) {
-            scroll.setWidth(Math.min(950f * GlobalConf.UI_SCALE_FACTOR, dsTable.getWidth() + pad * 15f));
+            scroll.setWidth(Math.min(1520f, dsTable.getWidth() + pad * 15f));
         }
 
         // No files
@@ -206,7 +206,7 @@ public class DatasetsWidget {
                 maxw = b.getWidth();
         }
         for (Button b : cbs)
-            b.setWidth(maxw + 10f * GlobalConf.UI_SCALE_FACTOR);
+            b.setWidth(maxw + 16f);
 
         return result;
     }

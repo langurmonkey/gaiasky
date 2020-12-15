@@ -64,7 +64,7 @@ public class CatalogSelectionWindow extends GenericDialog {
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
 
         cell.clearActor();
-        cell.space(3f * GlobalConf.UI_SCALE_FACTOR);
+        cell.space(4.8f);
         cell.padTop(pad5);
         cell.padLeft(pad20).padRight(pad20);
         cell.setActor(dw.buildDatasetsWidget(catalogFiles));

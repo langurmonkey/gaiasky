@@ -95,7 +95,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
     }
 
     private void generateFilterTable(Filter filter) {
-        float minSelectWidth = 100f * GlobalConf.UI_SCALE_FACTOR;
+        float minSelectWidth = 160f;
         filterTable.clearChildren();
         if (filter != null && filter.hasRules()) {
             // Operation

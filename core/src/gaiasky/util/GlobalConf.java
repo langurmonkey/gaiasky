@@ -81,20 +81,8 @@ public class GlobalConf {
         }
     }
 
-    // Interface scale factor (for HiDPI)
-    public static float UI_SCALE_FACTOR = -1.0f;
-
     public static String getApplicationTitle(boolean vr) {
         return APPLICATION_NAME_TITLE + (vr ? "  VR" : "");
-    }
-
-    public static void updateScaleFactor(float sf) {
-        UI_SCALE_FACTOR = sf;
-        logger.debug("GUI scale factor set to " + GlobalConf.UI_SCALE_FACTOR);
-    }
-
-    public static boolean isHiDPI() {
-        return UI_SCALE_FACTOR > 1.5f;
     }
 
     public interface IConf {
@@ -1020,6 +1008,7 @@ public class GlobalConf {
         public String DATA_MIRROR_URL = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
         public String DATA_DESCRIPTOR_URL;
         public String UI_THEME;
+        public float UI_SCALE;
         public String SCRIPT_LOCATION;
         public String LAST_OPEN_LOCATION;
         public int REST_PORT;
@@ -1052,10 +1041,10 @@ public class GlobalConf {
         public boolean EXIT_CONFIRMATION;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, float uI_SCALE, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
                 List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, OriginType rECURSIVE_GRID_ORIGIN, boolean rECURSIVE_GRID_ORIGIN_LINES, boolean eXIT_CONFIRMATION,
                 String mIRROR, boolean sAFE_GRAPHICS_MODE) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
@@ -1065,6 +1054,7 @@ public class GlobalConf {
             DATA_DESCRIPTOR_URL = dATA_DESCRIPTOR_URL;
             DATA_MIRROR_URL = mIRROR;
             UI_THEME = uI_THEME;
+            UI_SCALE = uI_SCALE;
             SCRIPT_LOCATION = sCRIPT_LOCATION;
             REST_PORT = rEST_PORT;
             LOCALE = lOCALE;
@@ -1277,7 +1267,9 @@ public class GlobalConf {
                         }
                     }
                 }
-
+                break;
+            case UI_SCALE_CMD:
+                UI_SCALE = (Float) data[0];
                 break;
             default:
                 break;

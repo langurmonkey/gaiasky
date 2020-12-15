@@ -39,7 +39,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      * @return The width of the content.
      */
     public static float getContentWidth() {
-        return 220f * GlobalConf.UI_SCALE_FACTOR;
+        return 352f;
     }
 
     /**
@@ -239,7 +239,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Table buttonsTable;
         /** BUTTONS **/
-        float bw = 30f * GlobalConf.UI_SCALE_FACTOR, bh = 30f * GlobalConf.UI_SCALE_FACTOR;
+        float bw = 48f, bh = 48f;
         KeyBindings kb = KeyBindings.instance;
         Image icon = new Image(skin.getDrawable("map-icon"));
         map = new OwnTextIconButton("", icon, skin, "toggle");
@@ -319,16 +319,16 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /** ADD GROUPS TO VERTICAL LAYOUT **/
 
-        int padBottom = Math.round(10 * GlobalConf.UI_SCALE_FACTOR);
-        int padSides = Math.round(5 * GlobalConf.UI_SCALE_FACTOR);
-        int padSeparator = Math.round(2 * GlobalConf.UI_SCALE_FACTOR);
+        int padBottom = Math.round(16f);
+        int padSides = Math.round(8f);
+        int padSeparator = Math.round(3.2f);
 
         guiLayout.padTop(padSides);
 
         int size = mainActors.size();
         for (int i = 0; i < size; i++) {
             Actor actor = mainActors.get(i);
-            guiLayout.add(actor).prefWidth(185f * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
+            guiLayout.add(actor).prefWidth(188f).left().padBottom(padBottom).padLeft(padSides);
             if (i < size - 1) {
                 // Not last
                 guiLayout.row();

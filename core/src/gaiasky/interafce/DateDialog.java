@@ -42,7 +42,7 @@ public class DateDialog extends CollapsibleWindow {
         this.me = this;
         this.stage = stage;
 
-        float pad = 5 * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 8f;
 
         /** SET NOW **/
         setNow = new OwnTextButton("Set current time (UTC)", skin);
@@ -53,7 +53,7 @@ public class DateDialog extends CollapsibleWindow {
             }
             return false;
         });
-        setNow.setSize(180 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
+        setNow.setSize(288f, 28f);
         add(setNow).center().colspan(2).padTop(pad);
         row();
 
@@ -62,7 +62,7 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.space(pad);
         day = new OwnTextField("", skin);
         day.setMaxLength(2);
-        day.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        day.setWidth(64f);
         day.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -76,11 +76,11 @@ public class DateDialog extends CollapsibleWindow {
 
         month = new SelectBox<String>(skin);
         month.setItems("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
-        month.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        month.setWidth(64f);
 
         year = new OwnTextField("", skin);
         year.setMaxLength(5);
-        year.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        year.setWidth(64f);
         year.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -107,7 +107,7 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.space(pad);
         hour = new OwnTextField("", skin);
         hour.setMaxLength(2);
-        hour.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        hour.setWidth(64f);
         hour.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -121,7 +121,7 @@ public class DateDialog extends CollapsibleWindow {
 
         min = new OwnTextField("", skin);
         min.setMaxLength(2);
-        min.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        min.setWidth(64f);
         min.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -135,7 +135,7 @@ public class DateDialog extends CollapsibleWindow {
 
         sec = new OwnTextField("", skin);
         sec.setMaxLength(2);
-        sec.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        sec.setWidth(64f);
         sec.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -198,9 +198,9 @@ public class DateDialog extends CollapsibleWindow {
             return false;
         });
         buttonGroup.addActor(ok);
-        ok.setSize(70 * GlobalConf.UI_SCALE_FACTOR, 20 * GlobalConf.UI_SCALE_FACTOR);
+        ok.setSize(112f, 32f);
         buttonGroup.addActor(cancel);
-        cancel.setSize(70 * GlobalConf.UI_SCALE_FACTOR, 20 * GlobalConf.UI_SCALE_FACTOR);
+        cancel.setSize(112f, 32f);
         buttonGroup.align(Align.right).space(10);
 
         add(buttonGroup).colspan(2).pad(pad).bottom().right();

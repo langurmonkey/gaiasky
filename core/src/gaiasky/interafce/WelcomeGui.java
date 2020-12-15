@@ -8,6 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
@@ -74,7 +75,8 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(boolean skipWelcome, VRStatus vrStatus) {
+    public WelcomeGui(Lwjgl3Graphics graphics, float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
+        super(graphics, unitsPerPixel);
         lock = new Object();
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
@@ -82,9 +84,10 @@ public class WelcomeGui extends AbstractGui {
 
     @Override
     public void initialize(AssetManager assetManager) {
-
         // User interface
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, GlobalResources.spriteBatch);
         skin = GlobalResources.skin;
 
         if (vrStatus.vrInitFailed()) {
@@ -166,13 +169,13 @@ public class WelcomeGui extends AbstractGui {
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 
-        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        float pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
-        float pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
-        float pad25 = 25f * GlobalConf.UI_SCALE_FACTOR;
+        float pad10 = 16f;
+        float pad15 = 18f;
+        float pad20 = 32f;
+        float pad25 = 28f;
 
-        float bw = 350f * GlobalConf.UI_SCALE_FACTOR;
-        float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
+        float bw = 540f;
+        float bh = 110f;
 
         Set<String> removed = removeNonExistent();
         if (removed.size() > 0) {

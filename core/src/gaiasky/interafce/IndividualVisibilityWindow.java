@@ -30,9 +30,9 @@ public class IndividualVisibilityWindow extends GenericDialog {
         super(I18n.txt("gui.visibility.individual"), skin, stage);
 
         this.sg = sg;
-        space8 = 8f * GlobalConf.UI_SCALE_FACTOR;
-        space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
-        space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
+        space8 = 12.8f;
+        space4 = 6.4f;
+        space2 = 3.2f;
 
         setAcceptText(I18n.txt("gui.close"));
         setModal(false);
@@ -115,7 +115,7 @@ public class IndividualVisibilityWindow extends GenericDialog {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        scrollPane.setHeight(Math.min(100f * GlobalConf.UI_SCALE_FACTOR, objectsGroup.getHeight()));
+        scrollPane.setHeight(Math.min(160f, objectsGroup.getHeight()));
         scrollPane.setWidth(componentWidth);
 
         HorizontalGroup buttons = new HorizontalGroup();

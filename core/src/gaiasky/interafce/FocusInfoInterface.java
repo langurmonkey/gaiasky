@@ -78,13 +78,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         nf = NumberFormatFactory.getFormatter("##0.##");
         sf = NumberFormatFactory.getFormatter("0.###E0");
 
-        float buttonSize = 15f * GlobalConf.UI_SCALE_FACTOR;
-        float imgSize = 18f * GlobalConf.UI_SCALE_FACTOR;
-        pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-        pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-        pad1 = 1f * GlobalConf.UI_SCALE_FACTOR;
+        float buttonSize = 24f;
+        float imgSize = 28.8f;
+        pad15 = 24f;
+        pad10 = 16f;
+        pad5 = 8f;
+        pad3 = 4.8f;
+        pad1 = 1.6f;
 
         focusInfo = new Table();
         focusInfo.pad(pad5);
@@ -203,7 +203,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         landAt.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
-        bw += 2 * GlobalConf.UI_SCALE_FACTOR;
+        bw += 3.2f;
 
         goTo.setWidth(bw);
         landOn.setWidth(bw);
@@ -217,7 +217,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusNameGroup.addActor(landOn);
         focusNameGroup.addActor(landAt);
 
-        float w = 130 * GlobalConf.UI_SCALE_FACTOR;
+        float w = 208f;
         focusId.setWidth(w);
 
         focusRA.setWidth(w);
@@ -365,7 +365,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 }
                 currentFocus = focus;
 
-                final int focusFieldMaxLength = !GlobalConf.isHiDPI() ? 17 : 20;
+                final int focusFieldMaxLength = 20;
 
                 // ID
                 boolean cappedId = false;

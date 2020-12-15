@@ -2,6 +2,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -9,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
@@ -20,7 +20,8 @@ public class VRControllerInfoGui extends AbstractGui {
     protected Container<Table> container;
     protected Table contents;
 
-    public VRControllerInfoGui() {
+    public VRControllerInfoGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
     @Override
@@ -28,7 +29,8 @@ public class VRControllerInfoGui extends AbstractGui {
         // User interface
         float h = GlobalConf.screen.BACKBUFFER_HEIGHT;
         float w = GlobalConf.screen.BACKBUFFER_WIDTH;
-        Viewport vp = new ScreenViewport();
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
         vp.update((int) w, (int) h, true);
         skin = GlobalResources.skin;

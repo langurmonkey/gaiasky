@@ -33,9 +33,9 @@ public class UpdatePopup extends GenericDialog {
 
     @Override
     protected void build() {
-        float padb = 5 * GlobalConf.UI_SCALE_FACTOR;
+        float padb = 8f;
         content.clear();
-        content.pad(10 * GlobalConf.UI_SCALE_FACTOR);
+        content.pad(16f);
         content.add(new OwnLabel(I18n.txt("gui.newversion.new.current") + ":", skin)).left().padRight(padb).padBottom(padb);
         content.add(new OwnLabel(GlobalConf.version.version, skin)).left().padBottom(padb).row();
 

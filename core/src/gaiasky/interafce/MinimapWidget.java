@@ -35,9 +35,9 @@ public class MinimapWidget implements Disposable {
     private IMinimapScale current;
 
     public MinimapWidget(Skin skin) {
-        side = (int) (GlobalConf.UI_SCALE_FACTOR * GlobalConf.program.MINIMAP_SIZE);
+        side = (int) (1.4f * GlobalConf.program.MINIMAP_SIZE);
         side2 = side / 2;
-        sideshort = (int) (GlobalConf.UI_SCALE_FACTOR * GlobalConf.program.MINIMAP_SIZE * 0.5f);
+        sideshort = (int) (0.7f * GlobalConf.program.MINIMAP_SIZE);
         sideshort2 = sideshort / 2;
 
         OrthographicCamera ortho = new OrthographicCamera();
@@ -47,7 +47,7 @@ public class MinimapWidget implements Disposable {
 
         SpriteBatch sb = new SpriteBatch(1000, GlobalResources.spriteShader);
 
-        BitmapFont font = skin.getFont(GlobalConf.isHiDPI() ? "ui-20" : "ui-12");
+        BitmapFont font = skin.getFont("ui-20");
 
         tfb = new FrameBuffer(Format.RGBA8888, side, side, true);
         sfb = new FrameBuffer(Format.RGBA8888, side, sideshort, true);

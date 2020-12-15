@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
-import gaiasky.util.GlobalConf;
 
 /** 
  * A GUI component
@@ -28,13 +27,13 @@ public abstract class GuiComponent {
     public GuiComponent(Skin skin, Stage stage) {
         this.skin = skin;
         this.stage = stage;
-        pad = 5f * GlobalConf.UI_SCALE_FACTOR;
-        space8 = 8f * GlobalConf.UI_SCALE_FACTOR;
-        space6 = 6f * GlobalConf.UI_SCALE_FACTOR;
-        space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
-        space3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-        space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
-        space1 = 1f * GlobalConf.UI_SCALE_FACTOR;
+        pad = 8f;
+        space8 = 12.8f;
+        space6 = 9.6f;
+        space4 = 6.4f;
+        space3 = 4.8f;
+        space2 = 3.2f;
+        space1 = 1.6f;
     }
 
     /**

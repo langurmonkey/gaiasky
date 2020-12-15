@@ -7,11 +7,10 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -19,7 +18,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -50,16 +48,16 @@ public class LoadingGui extends AbstractGui {
     private long lastFunnyTime;
     private long lastTipTime;
 
-    public LoadingGui() {
-        this(0, false);
+    public LoadingGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+        this(graphics, unitsPerPixel, 0, false);
     }
 
-    public LoadingGui(Boolean vr) {
-        this(0, vr);
+    public LoadingGui(Lwjgl3Graphics graphics, float unitsPerPixel, Boolean vr) {
+        this(graphics, unitsPerPixel, 0, vr);
     }
 
-    public LoadingGui(Integer hoffset, Boolean vr) {
-        super();
+    public LoadingGui(Lwjgl3Graphics graphics, float unitsPerPixel, Integer hoffset, Boolean vr) {
+        super(graphics, unitsPerPixel);
         this.vr = vr;
         this.hoffset = hoffset;
     }
@@ -67,10 +65,11 @@ public class LoadingGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager) {
         interfaces = new Array<>();
-        float pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
-        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        float pad30 = 48f;
+        float pad10 = 16f;
         // User interface
-        Viewport vp = new ScreenViewport();
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);

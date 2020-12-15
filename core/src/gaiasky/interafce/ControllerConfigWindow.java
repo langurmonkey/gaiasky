@@ -192,8 +192,8 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
     @Override
     protected void build() {
-        float lw = (GlobalConf.isHiDPI() ? 140f : 160f) * GlobalConf.UI_SCALE_FACTOR;
-        float iw = (GlobalConf.isHiDPI() ? 110f : 180f) * GlobalConf.UI_SCALE_FACTOR ;
+        float lw = 224f;
+        float iw = 176f;
 
         // Main tips
         OwnLabel tip = new OwnLabel("Press the button/axis indicated on the controller image. Click any input on the right\nto edit its value. Click the first input to restart the full sequence.", skin);
@@ -221,7 +221,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         OwnLabel fileLabel = new OwnLabel("Filename:", skin, "header");
         LengthValidator lv = new LengthValidator(3, 100);
         filename = new OwnTextField(this.controllerName.replaceAll("\\s+", "_"), skin, lv);
-        filename.setWidth(240f * GlobalConf.UI_SCALE_FACTOR);
+        filename.setWidth(384f);
         OwnImageButton filenameTooltip = new OwnImageButton(skin, "tooltip");
         filenameTooltip.addListener(new OwnTextTooltip("Filename without extension.\nThe controller file will be saved in " + SysUtils.getDefaultMappingsDir().toAbsolutePath(), skin));
 

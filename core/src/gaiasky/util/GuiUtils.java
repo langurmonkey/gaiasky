@@ -143,7 +143,7 @@ public class GuiUtils {
     }
 
     public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, Skin skin){
-        return getTooltipHorizontalGroup(actor, tooltipText, 8f * GlobalConf.UI_SCALE_FACTOR, skin);
+        return getTooltipHorizontalGroup(actor, tooltipText, 12.8f, skin);
     }
 
     public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, float space, Skin skin){
@@ -157,7 +157,7 @@ public class GuiUtils {
     }
 
     public static HorizontalGroup tooltipHg(Actor actor, String key, Skin skin){
-       return getTooltipHorizontalGroup(actor, I18n.txt(key), 8f * GlobalConf.UI_SCALE_FACTOR, skin);
+       return getTooltipHorizontalGroup(actor, I18n.txt(key), 12.8f, skin);
     }
 
 }

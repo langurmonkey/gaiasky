@@ -90,8 +90,8 @@ public class TipGenerator {
     }
 
     private void addTip(WidgetGroup g, String[] tip) {
-        float pad5 = GlobalConf.UI_SCALE_FACTOR * 5f;
-        float pad2 = GlobalConf.UI_SCALE_FACTOR * 2f;
+        float pad5 = 8f;
+        float pad2 = 3.2f;
         g.clear();
 
         for (String part : tip) {

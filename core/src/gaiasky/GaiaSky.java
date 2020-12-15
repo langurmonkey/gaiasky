@@ -407,7 +407,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
-        welcomeGui = new WelcomeGui(skipWelcome, vrStatus);
+        welcomeGui = new WelcomeGui(graphics, 1f / GlobalConf.program.UI_SCALE, skipWelcome, vrStatus);
         welcomeGui.initialize(manager);
         Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
@@ -589,7 +589,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.PARK_RUNNABLE, Events.UNPARK_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.PARK_RUNNABLE, Events.UNPARK_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD, Events.UI_SCALE_CMD);
 
         // Re-enable input
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
@@ -678,19 +678,19 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             guis.clear();
         }
 
-        mainGui = new FullGui(graphics);
+        mainGui = new FullGui(graphics, 1f / GlobalConf.program.UI_SCALE);
         mainGui.initialize(manager);
 
-        debugGui = new DebugGui();
+        debugGui = new DebugGui(graphics, 1f / GlobalConf.program.UI_SCALE);
         debugGui.initialize(manager);
 
-        spacecraftGui = new SpacecraftGui();
+        spacecraftGui = new SpacecraftGui(graphics, 1f / GlobalConf.program.UI_SCALE);
         spacecraftGui.initialize(manager);
 
-        stereoGui = new StereoGui();
+        stereoGui = new StereoGui(graphics, 1f / GlobalConf.program.UI_SCALE);
         stereoGui.initialize(manager);
 
-        controllerGui = new ControllerGui();
+        controllerGui = new ControllerGui(graphics, 1f / GlobalConf.program.UI_SCALE);
         controllerGui.initialize(manager);
 
         if (guis != null) {
@@ -966,7 +966,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // Report the crash
             CrashReporter.reportCrash(t, logger);
             // Set up crash window
-            crashGui = new CrashGui(t);
+            crashGui = new CrashGui(graphics, 1f / GlobalConf.program.UI_SCALE, t);
             crashGui.initialize(manager);
             Gdx.input.setInputProcessor(crashGui.getGuiStage());
             // Flag up
@@ -1194,7 +1194,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             pp.initialize(manager);
 
             // Initialise loading screen
-            loadingGui = new LoadingGui(vr);
+            loadingGui = new LoadingGui(graphics, 1f / GlobalConf.program.UI_SCALE, vr);
             loadingGui.initialize(manager);
 
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
@@ -1314,6 +1314,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 postRunnable(() -> {
                     sg.remove(nodeToRemove, removeFromIndex);
                 });
+            }
+            break;
+        case UI_SCALE_CMD:
+            if (guis != null) {
+                float uiScale = (Float) data[0];
+                for (IGui gui : guis) {
+                    gui.updateUnitsPerPixel(1f / uiScale);
+                }
             }
             break;
         case HOME_CMD:

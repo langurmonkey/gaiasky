@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public class DatasetsComponent extends GuiComponent implements IObserver {
     private VerticalGroup group;
-    private final float pad = 3 * GlobalConf.UI_SCALE_FACTOR;
+    private final float pad = 4.8f;
 
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
@@ -132,14 +132,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         });
         colorMap.put(ci.name, cp);
 
-        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, GlobalConf.isHiDPI() ? 26 : 23), skin, "hud-subheader");
+        OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 26), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
         if (ci.isRegular()) {
             t.add(nameLabel).left().padBottom(pad);
-            t.add(cp).size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
+            t.add(cp).size(28.8f).right().padBottom(pad).row();
         } else {
             t.add(nameLabel).left().padBottom(pad);
-            t.add().size(18f * GlobalConf.UI_SCALE_FACTOR).right().padBottom(pad).row();
+            t.add().size(28.8f).right().padBottom(pad).row();
         }
         if (ci.isRegular()) {
             t.add(controls).left().padBottom(pad);
@@ -170,8 +170,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(ControlsWindow.getContentWidth() * (GlobalConf.isHiDPI() ? 0.96f : 1f));
-        scroll.setHeight(GlobalConf.isHiDPI() ? 120f : 75f);
+        scroll.setWidth(ControlsWindow.getContentWidth() * 0.96f);
+        scroll.setHeight(120f);
 
         //ciGroup.addActor(controls);
         ciGroup.addActor(scroll);

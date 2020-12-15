@@ -21,7 +21,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.desktop.util.MemInfoWindow;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
@@ -53,7 +52,6 @@ import java.util.List;
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
 
-    protected Lwjgl3Graphics graphics;
     protected ControlsWindow controlsWindow;
     protected MinimapWindow minimapWindow;
 
@@ -84,15 +82,15 @@ public class FullGui extends AbstractGui {
 
     private List<Actor> invisibleInStereoMode;
 
-    public FullGui(Lwjgl3Graphics graphics) {
-        super();
-        this.graphics = graphics;
+    public FullGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
     @Override
     public void initialize(AssetManager assetManager) {
         // User interface
-        Viewport vp = new ScreenViewport();
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
         this.ui = new Stage(vp, GlobalResources.spriteBatch);
         vp.update(graphics.getWidth(), graphics.getHeight(), true);
     }
@@ -115,8 +113,8 @@ public class FullGui extends AbstractGui {
     }
 
     protected void buildGui() {
-        pad = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+        pad = 16f;
+        pad5 = 8f;
         // Component types name init
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
@@ -216,7 +214,7 @@ public class FullGui extends AbstractGui {
                             UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
                             newVersion.pack();
                             float ww = newVersion.getWidth();
-                            float margin = 5 * GlobalConf.UI_SCALE_FACTOR;
+                            float margin = 8f;
                             newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
                             ui.addActor(newVersion);
                         } else {
@@ -260,7 +258,7 @@ public class FullGui extends AbstractGui {
                 recalculateOptionsSize();
                 if (collapsed)
                     controlsWindow.collapseInstant();
-                controlsWindow.setPosition(0, graphics.getHeight() - controlsWindow.getHeight());
+                controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
                 ui.addActor(controlsWindow);
             }
             if (ni != null)
@@ -433,28 +431,32 @@ public class FullGui extends AbstractGui {
             break;
         case RA_DEC_UPDATED:
             if (GlobalConf.program.DISPLAY_POINTER_COORDS) {
+                Stage ui = pointerYCoord.getStage();
+                float uiScale = GlobalConf.program.UI_SCALE;
                 Double ra = (Double) data[0];
                 Double dec = (Double) data[1];
                 Integer x = (Integer) data[4];
                 Integer y = (Integer) data[5];
 
                 pointerXCoord.setText("RA/".concat(nf.format(ra)).concat("°"));
-                pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
+                pointerXCoord.setPosition(x / uiScale, 1.6f);
                 pointerYCoord.setText("DEC/".concat(nf.format(dec)).concat("°"));
-                pointerYCoord.setPosition(graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, graphics.getHeight() - y);
+                pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
             }
             break;
         case LON_LAT_UPDATED:
             if (GlobalConf.program.DISPLAY_POINTER_COORDS) {
+                Stage ui = pointerYCoord.getStage();
+                float uiScale = GlobalConf.program.UI_SCALE;
                 Double lon = (Double) data[0];
                 Double lat = (Double) data[1];
                 Integer x = (Integer) data[2];
                 Integer y = (Integer) data[3];
 
                 pointerXCoord.setText("Lon/".concat(nf.format(lon)).concat("°"));
-                pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
+                pointerXCoord.setPosition(x / uiScale, 1.6f);
                 pointerYCoord.setText("Lat/".concat(nf.format(lat)).concat("°"));
-                pointerYCoord.setPosition(graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, graphics.getHeight() - y);
+                pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
             }
             break;
         case DISPLAY_POINTER_COORDS_CMD:
@@ -469,10 +471,10 @@ public class FullGui extends AbstractGui {
 
             GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate);
 
-            int h = graphics.getHeight();
+            int h = (int) getGuiStage().getHeight();
 
-            float px = screenX;
-            float py = h - screenY - 20 * GlobalConf.UI_SCALE_FACTOR;
+            float px = screenX / GlobalConf.program.UI_SCALE;
+            float py = h - screenY / GlobalConf.program.UI_SCALE - 32f;
 
             popup.showMenu(ui, px, py);
 
@@ -608,4 +610,12 @@ public class FullGui extends AbstractGui {
         showMinimapWindow(ui, minimapWindow == null || (!minimapWindow.isVisible() || !minimapWindow.hasParent()));
     }
 
+    @Override
+    public boolean updateUnitsPerPixel(float upp) {
+        boolean cool = super.updateUnitsPerPixel(upp);
+        if (cool) {
+            controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
+        }
+        return cool;
+    }
 }

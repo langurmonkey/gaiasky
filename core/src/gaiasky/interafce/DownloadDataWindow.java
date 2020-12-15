@@ -127,11 +127,11 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void build() {
         me.acceptButton.setDisabled(false);
-        float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
-        float padLarge = 9f * GlobalConf.UI_SCALE_FACTOR;
-        float minW = !GlobalConf.isHiDPI() ? 620f : 690f;
+        float pad = 3.2f;
+        float padLarge = 14.4f;
+        float minW = 690f;
 
-        float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPad = 1.6f;
         Cell<Actor> topCell = content.add((Actor) null).left().top();
         topCell.row();
 
@@ -142,7 +142,7 @@ public class DownloadDataWindow extends GenericDialog {
         OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location") + ":", skin);
 
         HorizontalGroup hg = new HorizontalGroup();
-        hg.space(15f * GlobalConf.UI_SCALE_FACTOR);
+        hg.space(18f);
         Image system = new Image(skin.getDrawable("tooltip-icon"));
         OwnLabel downloadInfo = new OwnLabel(I18n.txt("gui.download.info"), skin);
         hg.addActor(system);
@@ -249,7 +249,7 @@ public class DownloadDataWindow extends GenericDialog {
                 // Add dataset to desc table
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
                 cb.left();
-                cb.setMinWidth(!GlobalConf.isHiDPI() ? 240f * GlobalConf.UI_SCALE_FACTOR : 200f * GlobalConf.UI_SCALE_FACTOR);
+                cb.setMinWidth(320f);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -260,7 +260,7 @@ public class DownloadDataWindow extends GenericDialog {
                     return false;
                 });
                 OwnLabel haveit = new OwnLabel("", skin);
-                haveit.setWidth(65f * GlobalConf.UI_SCALE_FACTOR);
+                haveit.setWidth(68f);
                 if (dataset.exists) {
                     if (dataset.outdated) {
                         setStatusOutdated(dataset, haveit);
@@ -281,7 +281,7 @@ public class DownloadDataWindow extends GenericDialog {
                 descGroup.space(padLarge);
                 OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
                 desc.addListener(new OwnTextTooltip(dataset.description, skin, 10));
-                desc.setWidth(!GlobalConf.isHiDPI() ? 250f * GlobalConf.UI_SCALE_FACTOR : 210f * GlobalConf.UI_SCALE_FACTOR);
+                desc.setWidth(336f);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
@@ -309,7 +309,7 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 OwnLabel vers = new OwnLabel(vstring, skin);
-                vers.setWidth(80f * GlobalConf.UI_SCALE_FACTOR);
+                vers.setWidth(128f);
                 if (!dataset.exists) {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
                 } else if (dataset.outdated) {
@@ -331,12 +331,12 @@ public class DownloadDataWindow extends GenericDialog {
                 // Size
                 OwnLabel size = new OwnLabel(dataset.size, skin);
                 size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
-                size.setWidth(85f * GlobalConf.UI_SCALE_FACTOR);
+                size.setWidth(88f);
 
                 // Objects
                 OwnLabel nObjects = new OwnLabel(dataset.nObjectsStr, skin);
                 nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip"), skin, 10));
-                nObjects.setWidth(120f * GlobalConf.UI_SCALE_FACTOR);
+                nObjects.setWidth(192f);
 
                 // Delete
                 OwnImageButton rubbish = null;
@@ -417,8 +417,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 760f * GlobalConf.UI_SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 1000f * GlobalConf.UI_SCALE_FACTOR : 1150f * GlobalConf.UI_SCALE_FACTOR));
+        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 1216f));
+        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, 1600f));
 
         downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
 
@@ -430,7 +430,7 @@ public class DownloadDataWindow extends GenericDialog {
         downloadButton = new OwnTextButton(I18n.txt("gui.download.download"), skin, "download");
         downloadButton.pad(buttonPad * 4f);
         downloadButton.setMinWidth(minW);
-        downloadButton.setMinHeight(50f * GlobalConf.UI_SCALE_FACTOR);
+        downloadButton.setMinHeight(80f);
         downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
 
         // Progress bar
@@ -650,7 +650,7 @@ public class DownloadDataWindow extends GenericDialog {
 
             // Cancel button
             OwnTextButton cancelDownloadButton = new OwnTextButton(I18n.txt("gui.download.cancel"), skin);
-            cancelDownloadButton.pad(9f * GlobalConf.UI_SCALE_FACTOR);
+            cancelDownloadButton.pad(14.4f);
             cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
             cancelDownloadButton.addListener(new ChangeListener() {
                 @Override

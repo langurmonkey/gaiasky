@@ -194,8 +194,9 @@ public class DesktopConfInit extends ConfInit {
         String DATA_DESCRIPTOR_URL = p.getProperty("program.url.data.descriptor");
         String MIRROR_URL = p.getProperty("program.url.data.mirror");
         String UI_THEME = p.getProperty("program.ui.theme");
-        // Update scale factor according to theme - for HiDPI screens
-        GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 1.6f : 1f);
+        float externalUIScale = Parser.parseFloat(p.getProperty("program.ui.scale", "1.0"));
+        float UI_SCALE = MathUtilsd.lint(externalUIScale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+
         String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty() ? System.getProperty("user.dir") + File.separatorChar + "scripts" : p.getProperty("program.scriptlocation");
         SCRIPT_LOCATION = SCRIPT_LOCATION.replaceAll("\\\\", "/");
         int REST_PORT = Parser.parseInt(p.getProperty("program.restport", "-1"));
@@ -246,7 +247,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, UI_SCALE, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -515,6 +516,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.url.data.descriptor", GlobalConf.program.DATA_DESCRIPTOR_URL);
         p.setProperty("program.url.data.mirror", GlobalConf.program.DATA_MIRROR_URL);
         p.setProperty("program.ui.theme", GlobalConf.program.UI_THEME);
+        p.setProperty("program.ui.scale", Float.toString(MathUtilsd.lint(GlobalConf.program.UI_SCALE, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX)));
         p.setProperty("program.exit.confirmation", Boolean.toString(GlobalConf.program.EXIT_CONFIRMATION));
         p.setProperty("program.scriptlocation", GlobalConf.program.SCRIPT_LOCATION);
         p.setProperty("program.restport", Integer.toString(GlobalConf.program.REST_PORT));

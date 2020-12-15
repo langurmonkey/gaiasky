@@ -7,11 +7,11 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.GlobalConf;
@@ -32,12 +32,12 @@ public class CrashGui extends AbstractGui {
     protected Throwable crash;
     protected CrashWindow crashWindow;
 
-    public CrashGui(Throwable crash) {
-        this(crash, 0, false);
+    public CrashGui(Lwjgl3Graphics graphics, float unitsPerPixel, Throwable crash) {
+        this(graphics, unitsPerPixel, crash, 0, false);
     }
 
-    public CrashGui(Throwable crash, Integer hoffset, Boolean vr) {
-        super();
+    public CrashGui(Lwjgl3Graphics graphics, float unitsPerPixel, Throwable crash, Integer hoffset, Boolean vr) {
+        super(graphics, unitsPerPixel);
         this.crash = crash;
         this.vr = vr;
         this.hoffset = hoffset;
@@ -46,7 +46,8 @@ public class CrashGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager) {
         // User interface
-        Viewport vp = new ScreenViewport();
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
@@ -114,8 +115,8 @@ public class CrashGui extends AbstractGui {
             content.add(new Link(GlobalConf.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), GlobalConf.REPO_ISSUES)).left().padBottom(pad10 * 3f).row();
 
             // Stack trace
-            float taw = 450f * GlobalConf.UI_SCALE_FACTOR;
-            float tah = 150f * GlobalConf.UI_SCALE_FACTOR;
+            float taw = 720f;
+            float tah = 240f;
             content.add(new OwnLabel(I18n.txt("gui.crash.stack"), skin, "ui-15")).left().padBottom(pad5).row();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -130,7 +131,7 @@ public class CrashGui extends AbstractGui {
             TextArea stackTrace = new OwnTextArea(sts, skin.get("regular", TextField.TextFieldStyle.class));
             stackTrace.setDisabled(true);
             stackTrace.setPrefRows(lines);
-            stackTrace.setWidth(700f * GlobalConf.UI_SCALE_FACTOR);
+            stackTrace.setWidth(1120f);
             OwnScrollPane stScroll = new OwnScrollPane(stackTrace, skin, "default-nobg");
             stScroll.setWidth(taw);
             stScroll.setHeight(tah);

@@ -67,10 +67,10 @@ public class AboutWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float taWidth = GlobalConf.isHiDPI() ? 700 : 440;
-        float taWidth2 = 800 * GlobalConf.UI_SCALE_FACTOR;
-        float taHeight = 100 * GlobalConf.UI_SCALE_FACTOR;
-        float tabWidth = 150 * GlobalConf.UI_SCALE_FACTOR;
+        float taWidth = 700f;
+        float taWidth2 = 1280f;
+        float taHeight = 160f;
+        float tabWidth = 240f;
 
         // Create the tab buttons
         HorizontalGroup group = new HorizontalGroup();
@@ -296,7 +296,7 @@ public class AboutWindow extends GenericDialog {
 
         TextButton memoryinfobutton = new OwnTextButton(I18n.txt("gui.help.meminfo"), skin, "default");
         memoryinfobutton.setName("memoryinfo");
-        memoryinfobutton.setSize(150f * GlobalConf.UI_SCALE_FACTOR, 20f * GlobalConf.UI_SCALE_FACTOR);
+        memoryinfobutton.setSize(240f, 32f);
         memoryinfobutton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW);
@@ -463,7 +463,7 @@ public class AboutWindow extends GenericDialog {
         systemScroll.setScrollingDisabled(true, false);
         systemScroll.setOverscroll(false, false);
         systemScroll.setSmoothScrolling(true);
-        systemScroll.setHeight(500f * GlobalConf.UI_SCALE_FACTOR);
+        systemScroll.setHeight(800f);
         systemScroll.pack();
 
 

@@ -52,9 +52,9 @@ public class CurtainTable extends Table {
 
         this.container = new Container<>(this.content);
 
-        this.pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-        this.pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        this.pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
+        this.pad5 = 8f;
+        this.pad10 = 16f;
+        this.pad15 = 18f;
 
         contentCell = add(this.container).top().expandY().pad(0);
         collapseButton = new OwnTextButton(collapsed ? ">" : "<", skin);

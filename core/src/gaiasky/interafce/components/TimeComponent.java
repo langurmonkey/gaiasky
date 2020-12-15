@@ -15,7 +15,6 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.DateDialog;
 import gaiasky.interafce.KeyBindings;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.format.DateFormatFactory;
@@ -54,11 +53,11 @@ public class TimeComponent extends GuiComponent implements IObserver {
         // Time
         date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
-        date.setWidth(165f * GlobalConf.UI_SCALE_FACTOR);
+        date.setWidth(168f);
 
         time = new OwnLabel("time UT", skin, "mono");
         time.setName("label time");
-        time.setWidth(165f * GlobalConf.UI_SCALE_FACTOR);
+        time.setWidth(168f);
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
@@ -105,13 +104,13 @@ public class TimeComponent extends GuiComponent implements IObserver {
         timeWarp.setName("time warp");
         timeWarp.setAlignment(Align.center);
         Container<Label> wrapWrapper = new Container<>(timeWarp);
-        wrapWrapper.width(120f * GlobalConf.UI_SCALE_FACTOR);
+        wrapWrapper.width(192f);
         wrapWrapper.align(Align.center);
 
-        VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.UI_SCALE_FACTOR).padTop(3 * GlobalConf.UI_SCALE_FACTOR);
+        VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(4.8f).padTop(4.8f);
 
         HorizontalGroup dateGroup = new HorizontalGroup();
-        dateGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
+        dateGroup.space(6.4f);
         VerticalGroup datetimeGroup = new VerticalGroup();
         datetimeGroup.addActor(date);
         datetimeGroup.addActor(time);
@@ -120,7 +119,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         timeGroup.addActor(dateGroup);
 
         HorizontalGroup paceGroup = new HorizontalGroup();
-        paceGroup.space(3f * GlobalConf.UI_SCALE_FACTOR);
+        paceGroup.space(4.8f);
         paceGroup.addActor(paceLabel);
         paceGroup.addActor(minus);
         paceGroup.addActor(wrapWrapper);

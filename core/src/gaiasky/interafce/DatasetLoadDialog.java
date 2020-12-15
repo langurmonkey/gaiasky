@@ -37,11 +37,11 @@ public class DatasetLoadDialog extends GenericDialog {
         super(title, skin, ui);
 
         this.fileName = fileName;
-        sliderWidth = !GlobalConf.isHiDPI() ? 370f * GlobalConf.UI_SCALE_FACTOR : 415f * GlobalConf.UI_SCALE_FACTOR;
-        fieldWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
-        titleWidth = 180f * GlobalConf.UI_SCALE_FACTOR;
-        cpSize = 20f * GlobalConf.UI_SCALE_FACTOR;
-        taWidth = 500 * GlobalConf.UI_SCALE_FACTOR;
+        sliderWidth = 664f;
+        fieldWidth = 288f;
+        titleWidth = 288f;
+        cpSize = 32f;
+        taWidth = 800f;
 
         setAcceptText(I18n.txt("gui.ok"));
         setCancelText(I18n.txt("gui.cancel"));

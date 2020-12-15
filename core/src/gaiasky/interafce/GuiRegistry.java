@@ -427,9 +427,9 @@ public class GuiRegistry implements IObserver {
                         if (mpi != null) {
                             // Add
                             Float seconds = (Float) data[2];
-                            float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-                            float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-                            float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
+                            float pad10 = 16f;
+                            float pad5 = 8f;
+                            float pad3 = 4.8f;
                             if (modeChangeTable != null) {
                                 modeChangeTable.remove();
                             }

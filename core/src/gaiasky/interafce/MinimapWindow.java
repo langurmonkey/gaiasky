@@ -33,7 +33,7 @@ public class MinimapWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float pb = 10 * GlobalConf.UI_SCALE_FACTOR;
+        float pb = 16f;
         mapName = new OwnLabel("", skin, "header");
         OwnLabel headerSide = new OwnLabel(I18n.txt("gui.minimap.side"), skin);
         Container<TextureWidget> mapSide = new Container<>();
