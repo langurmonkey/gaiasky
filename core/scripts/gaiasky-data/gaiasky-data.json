@@ -318,6 +318,24 @@
       "file": "@mirror-url@edr3/007-ruwe/v00_20201124/catalog-edr3-ruwe.tar.gz"
     },
     {
+      "name": "catalog-gcns",
+      "type": "catalog-gaia",
+      "version": 1,
+      "mingsversion": 30000,
+      "size": 145106200,
+      "nobjects": 331078,
+      "check": "catalog-gcns.json",
+      "data": [
+        "catalog-gcns.json",
+        "particles-gcns.json",
+        "catalog/gcns"
+      ],
+      "description": "Gaia Catalog of Nearby Stars - GCNS, Gaia Catalog of Nearby Stars (R.L. Smart et. al., 2020)",
+      "link": "https://arxiv.org/abs/2012.02061",
+      "sha256": "649962f72b48fd9815dc7e3def3bcba459a2d18400385335e526b402c4bdd68d",
+      "file": "@mirror-url@gcns/v01_20201215/catalog-gcns.tar.gz"
+    },
+    {
       "name": "catalog-whitedwarfs",
       "type": "catalog-gaia",
       "version": 0,

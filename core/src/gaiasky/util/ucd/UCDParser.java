@@ -27,7 +27,7 @@ public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked
     // first with equals() and then with matches()
     public static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "proper", "proper_name", "common_name", "designation" };
+    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "proper", "proper_name", "common_name", "designation" };
     public static String[] racolnames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
     public static String[] xcolnames = new String[] { "x", "X" };
     public static String[] decolnames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
@@ -44,52 +44,52 @@ public class UCDParser {
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
 
     public static boolean isName(String colname){
-        return TextUtils.contains(namecolnames, colname);
+        return TextUtils.contains(namecolnames, colname, true);
     }
     public static boolean isId(String colname){
-        return TextUtils.contains(idcolnames, colname);
+        return TextUtils.contains(idcolnames, colname, true);
     }
     public static boolean isRa(String colname){
-        return TextUtils.contains(racolnames, colname);
+        return TextUtils.contains(racolnames, colname, true);
     }
     public static boolean isX(String colname){
-        return TextUtils.contains(xcolnames, colname);
+        return TextUtils.contains(xcolnames, colname, true);
     }
     public static boolean isDec(String colname){
-        return TextUtils.contains(decolnames, colname);
+        return TextUtils.contains(decolnames, colname, true);
     }
     public static boolean isY(String colname){
-        return TextUtils.contains(ycolnames, colname);
+        return TextUtils.contains(ycolnames, colname, true);
     }
     public static boolean isDist(String colname){
-        return TextUtils.contains(distcolnames, colname);
+        return TextUtils.contains(distcolnames, colname, true);
     }
     public static boolean isZ(String colname){
-        return TextUtils.contains(zcolnames, colname);
+        return TextUtils.contains(zcolnames, colname, true);
     }
     public static boolean isPllx(String colname){
-        return TextUtils.contains(pllxcolnames, colname);
+        return TextUtils.contains(pllxcolnames, colname, true);
     }
     public static boolean isMag(String colname){
-        return TextUtils.contains(magcolnames, colname);
+        return TextUtils.contains(magcolnames, colname, true);
     }
     public static boolean isColor(String colname){
-        return TextUtils.contains(colorcolnames, colname);
+        return TextUtils.contains(colorcolnames, colname, true);
     }
     public static boolean isPmra(String colname){
-        return TextUtils.contains(pmracolnames, colname);
+        return TextUtils.contains(pmracolnames, colname, true);
     }
     public static boolean isPmde(String colname){
-        return TextUtils.contains(pmdeccolnames, colname);
+        return TextUtils.contains(pmdeccolnames, colname, true);
     }
     public static boolean isRadvel(String colname){
-        return TextUtils.contains(radvelcolnames, colname);
+        return TextUtils.contains(radvelcolnames, colname, true);
     }
     public static boolean isRadius(String colname){
-        return TextUtils.contains(radiuscolnames, colname);
+        return TextUtils.contains(radiuscolnames, colname, true);
     }
     public static boolean isNstars(String colname){
-        return TextUtils.contains(nstarscolnames, colname);
+        return TextUtils.contains(nstarscolnames, colname, true);
     }
 
     public Map<UCDType, Set<UCD>> ucdmap;
