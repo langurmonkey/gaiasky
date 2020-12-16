@@ -62,61 +62,6 @@
     {
       "name": "default-data",
       "type": "data-pack",
-      "version": 12,
-      "mingsversion": 30000,
-      "size": 100116590,
-      "check": "data-main.json",
-      "data": [
-        "asteroids-dr2.json",
-        "asteroids.json",
-        "attitudexml",
-        "constellations",
-        "countries",
-        "data-main.json",
-        "extra.json",
-        "galaxy",
-        "locations-earth.json",
-        "locations.json",
-        "locations-moon.json",
-        "models",
-        "moons.json",
-        "oort",
-        "orbit",
-        "orbits-asteroid.json",
-        "orbits-asteroids-dr2.json",
-        "orbits-moon.json",
-        "orbits-planet.json",
-        "orbits-satellite.json",
-        "planets.json",
-        "satellites.json",
-        "tex/base/*-low.jpg",
-        "tex/base/*-med.jpg",
-        "tex/base/*-low.png",
-        "tex/base/*-med.png",
-        "tex/base/all-mild-specular.jpg",
-        "tex/base/attitudeindicator.png",
-        "tex/base/cluster-tex.png",
-        "tex/base/debug-color.jpg",
-        "tex/base/debug-height.jpg",
-        "tex/base/lenscolor.png",
-        "tex/base/lensstarburst.jpg",
-        "tex/base/lut.jpg",
-        "tex/base/sso.png",
-        "tex/base/star.jpg",
-        "tex/base/static.jpg",
-        "tex/base/telescopebeam.png",
-        "tex/base/mw-sprites",
-        "tex/skybox/gaiasky"
-      ],
-      "sha256": "7638b28319600f16b2900fca438a66da644f864530b80241f7c9a6d1c7726f98",
-      "description": "Default data pack for Gaia Sky - For Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
-      "releasenotes": "Remove dust and HII meshes, they belong in their own package.",
-      "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v012_20201030/basedata.tar.gz"
-    },
-    {
-      "name": "default-data",
-      "type": "data-pack",
       "version": 14,
       "mingsversion": 30000,
       "size": 64895873,
@@ -164,7 +109,7 @@
         "tex/skybox/gaiasky"
       ],
       "sha256": "857a4a1926c0e0d45ef69a718b519a93ab8c509b4deda48a561ec32db9e33516",
-      "description": "Default data pack for Gaia Sky - For Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
+      "description": "Base data pack - Required, for Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
       "releasenotes": "New Milky Way model, update star clusters color. Reduce size of spacecraft to about 10 m. Remove dust and HII meshes, they belong in their own package.",
       "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v014_20201125/basedata.tar.gz"
@@ -320,7 +265,7 @@
     {
       "name": "catalog-gcns",
       "type": "catalog-gaia",
-      "version": 1,
+      "version": 2,
       "mingsversion": 30000,
       "size": 145106200,
       "nobjects": 331078,
@@ -330,15 +275,16 @@
         "particles-gcns.json",
         "catalog/gcns"
       ],
-      "description": "Gaia Catalog of Nearby Stars - GCNS, Gaia Catalog of Nearby Stars (R.L. Smart et. al., 2020)",
+      "description" : "Gaia Catalog of Nearby Stars - GCNS, Gaia Catalog of Nearby Stars (R.L. Smart et. al., 2020)",
       "link": "https://arxiv.org/abs/2012.02061",
-      "sha256": "649962f72b48fd9815dc7e3def3bcba459a2d18400385335e526b402c4bdd68d",
-      "file": "@mirror-url@gcns/v01_20201215/catalog-gcns.tar.gz"
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "4f3b6f7d409d41678e5c4e061da1b0117dc0b08f853ba1ad52514c29b62eabc9",
+      "file": "@mirror-url@gcns/v02_20201216/catalog-gcns.tar.gz"
     },
     {
       "name": "catalog-whitedwarfs",
       "type": "catalog-gaia",
-      "version": 0,
+      "version": 1,
       "size": 34471681,
       "nobjects": 256082,
       "check": "catalog-wd.json",
@@ -349,31 +295,34 @@
       ],
       "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag",
       "link": "https://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
-      "sha256": "73473bbc6718ae64bd3a9de5bdd2c00fcf3d75ce318af4b4e334a06e7c1408a9",
-      "file": "@mirror-url@whitedwarfs/000_20181217/catalog-wd.tar.gz"
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "161b964e8ba9c5319d9a087b5804088ce985f1f014aa938f2dfa2cb068a35935",
+      "file": "@mirror-url@whitedwarfs/v01_20201216/catalog-wd.tar.gz"
     },
     {
-      "name": "catalog-hipparcos-newred",
-      "type": "catalog-star",
+      "name": "catalog-gd1",
+      "type": "catalog-gaia",
       "version": 1,
-      "size": 5360300,
-      "check": "catalog-hip.json",
+      "size": 112421,
+      "nobjects": 1365,
+      "check": "catalog-gd1.json",
       "data": [
-        "catalog-hip.json",
-        "particles-hip.json",
-        "catalog/hipparcos"
+        "catalog-gd1.json",
+        "particles-gd1.json",
+        "catalog/gd1"
       ],
-      "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007), already included in all DR2 catalogs - 177955 stars",
-      "link": "https://adsabs.harvard.edu/abs/2007ASSL..350.....V",
-      "sha256": "31cfcba1b5ee633514f72cc7fee6a50a579dc639d89345720e2c3c861af843b1",
-      "file": "@mirror-url@hipparcos/001_20181218/catalog-hipparcos-newreduction.tar.gz"
+      "description": "GD1 stream - GD-1 star stream with brighter magnitudes for visibility",
+      "link": "https://arxiv.org/abs/1805.00425",
+      "releasenotes" : "Publish first version of GD-1",
+      "sha256": "f3ee78bd98e46e0dcc028476195c24108c6bf1d3f02e150f6f6f503a4763efa3",
+      "file": "@mirror-url@other/gd1/v01_20201216/gd1-data-brighter.tar.gz"
     },
     {
       "name": "catalog-hipparcos-newred",
       "type": "catalog-star",
-      "version": 2,
+      "version": 3,
       "mingsversion": 20205,
-      "size": 5433177,
+      "size": 5433186,
       "nobjects": 117955,
       "check": "catalog-hip.json",
       "data": [
@@ -383,8 +332,9 @@
       ],
       "description": "Hipparcos - Hipparcos new reduction (van Leeuwen, 2007) with curated star names, already included in all DR2 catalogs",
       "link": "https://adsabs.harvard.edu/abs/2007ASSL..350.....V",
-      "sha256": "7c22dfec8f16e8342c6556384c4a715d55a2095430203b27411b69552efc7cbc",
-      "file": "@mirror-url@hipparcos/002_20200204/catalog-hipparcos-newreduction.tar.gz"
+      "releasenotes" : "Add type in catalog descriptor file",
+      "sha256": "8cf20f7a4401d9756670de22c630799c4844574bd47ff24ea31750e5b78e0e80",
+      "file": "@mirror-url@hipparcos/v03_20201216/catalog-hipparcos-newreduction.tar.gz"
     },
     {
       "name": "catalog-nbg",
@@ -401,24 +351,6 @@
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
       "sha256": "cf1f56feb25abb964e31afc798a57179547ffa640e92894da349990e048f71f9",
       "file": "@mirror-url@galaxies/003_20190411/nbg-galaxies.tar.gz"
-    },
-    {
-      "name": "catalog-nbg",
-      "type": "catalog-gal",
-      "version": 4,
-      "mingsversion": 30000,
-      "size": 15786671,
-      "nobjects": 875,
-      "check": "catalog-nbg.json",
-      "data": [
-        "catalog-nbg.json",
-        "particles-nbg.json",
-        "nbg",
-        "tex/extragal"
-      ],
-      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole",
-      "sha256": "0ab22e25ca8e7f82e42602c582a21f23fe4d3438fcdb61b5b5c9bfc7bd57130a",
-      "file": "@mirror-url@galaxies/nbg/v04_20201030/galaxies-nbg.tar.gz"
     },
     {
       "name": "catalog-nbg",
@@ -522,25 +454,7 @@
     {
       "name": "catalog-ocdr2",
       "type": "catalog-cluster",
-      "version": 2,
-      "mingsversion": 30000,
-      "size": 58191,
-      "nobjects":2017,
-      "check": "catalog-ocdr2.json",
-      "data": [
-        "catalog-ocdr2.json",
-        "particles-ocdr2.json",
-        "ocdr2"
-      ],
-      "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
-      "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
-      "sha256" : "a223caa45440c3f95af249aeeefd2726c9c28cee2625b225fa6c6deb8ed275b7",
-      "file": "@mirror-url@clusters/ocdr2/v02_20201030/clusters-ocdr2.tar.gz"
-    },
-    {
-      "name": "catalog-ocdr2",
-      "type": "catalog-cluster",
-      "version": 3,
+      "version": 4,
       "mingsversion": 30000,
       "size": 58503,
       "nobjects":2017,
@@ -552,9 +466,9 @@
       ],
       "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
       "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
-      "releasenotes" : "Update clusters' colors",
-      "sha256" : "587d2e70b895facdbc3836f8f365544ca18ee3d7ae3b30301628c94e7b11a2c0",
-      "file": "@mirror-url@clusters/ocdr2/v03_20201125/clusters-ocdr2.tar.gz"
+      "releasenotes" : "Add type in catalog descriptor file",
+      "sha256" : "6682c3abf8ffb7657cc180f5f8ade036809936056f33c74835c3f8ee35e9a14c",
+      "file": "@mirror-url@clusters/ocdr2/v04_20201216/clusters-ocdr2.tar.gz"
     },
     {
       "name": "catalog-mwsc",
@@ -568,13 +482,14 @@
         "mwsc"
       ],
       "description": "MWSC - Milky Way Star Clusters catalog - 3017 clusters",
+      "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
       "sha256" : "d64a87a04416a84c90000568d255088575b1c7480cef4906def773451f031125",
       "file": "@mirror-url@clusters/001_20200326/mwsc-clusters.tar.gz"
     },
     {
       "name": "catalog-mwsc",
       "type": "catalog-cluster",
-      "version": 2,
+      "version": 3,
       "mingsversion": 30000,
       "size": 78311,
       "nobjects": 3017,
@@ -584,9 +499,11 @@
         "particles-mwsc.json",
         "mwsc"
       ],
-      "description": "MWSC - Milky Way Star Clusters catalog",
-      "sha256" : "f785a73f9b0c4b64c748a85c31ab1d69eb22f245860f001a27dbd2330af0ae22",
-      "file": "@mirror-url@clusters/mwsc/v02_20201030/clusters-mwsc.tar.gz"
+      "description" : "MWSC - Milky Way Star Clusters catalog",
+      "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
+      "releasenotes" : "Add type in catalog descriptor file",
+      "sha256" : "0a9d59bcb34388249d313e1a6370f64f10d04260f40c8eb8884150e80116041d",
+      "file": "@mirror-url@clusters/mwsc/v03_20201216/clusters-mwsc.tar.gz"
     },
     {
       "name": "catalog-nebulae",
@@ -623,9 +540,9 @@
     {
       "name": "gargantua-blackhole",
       "type": "catalog-other",
-      "version": 0,
+      "version": 1,
       "mingsversion": 30000,
-      "size": 3122,
+      "size": 3144,
       "nobjects": 1,
       "check": "catalog-gargantua.json",
       "data": [
@@ -635,8 +552,9 @@
       ],
       "description": "Gargantua Black Hole - The black hole from Interstellar, somewhere in the galaxy...",
       "link": "https://www.shadertoy.com/view/tsBXW3",
-      "sha256": "ecf2f360558a21ff428a49cb92a3e0c4ef00a83cb04009773409885c1099bb47",
-      "file": "@mirror-url@extra/blackhole/v00_20201125/gargantua-blackhole.tar.gz"
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "545a02d1cf11a22bf028526217665f3c25ac007a5bca8d87b759d30b811f175d",
+      "file": "@mirror-url@extra/blackhole/v01_20201216/gargantua-blackhole.tar.gz"
     },
     {
       "name": "mesh-dr2-dust",

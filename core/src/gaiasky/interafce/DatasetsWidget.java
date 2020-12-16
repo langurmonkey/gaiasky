@@ -130,7 +130,7 @@ public class DatasetsWidget {
             Collections.sort(type.datasets, byName);
 
             for (DatasetDesc dataset : type.datasets) {
-                OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
+                OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "default", pad * 2f);
                 cb.bottom().left();
 
                 cb.setChecked(contains(dataset.catalogFile.path(), currentSetting));
