@@ -272,7 +272,7 @@ public class DownloadDataWindow extends GenericDialog {
                 // Add dataset to desc table
                 OwnCheckBox cb = new OwnCheckBox(dataset.shortDescription, skin, "default", pad * 2f);
                 cb.left();
-                cb.setMinWidth(320f);
+                cb.setMinWidth(420f);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -440,8 +440,8 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 1216f));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, 1600f));
+        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1256f));
+        datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
 
         downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
 

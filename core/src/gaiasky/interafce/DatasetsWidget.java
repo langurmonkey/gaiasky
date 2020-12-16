@@ -202,7 +202,7 @@ public class DatasetsWidget {
         dsTable.pack();
         if (scroll != null) {
             scroll.setWidth(Math.min(1520f, dsTable.getWidth() + pad * 15f));
-            scroll.setHeight(Math.min(ui.getHeight() * 0.8f, 850f));
+            scroll.setHeight(Math.min(ui.getHeight() * 0.8f, 950f));
         }
 
         // No files
