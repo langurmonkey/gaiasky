@@ -50,14 +50,16 @@ public class TimeComponent extends GuiComponent implements IObserver {
     public void initialize() {
         KeyBindings kb = KeyBindings.instance;
 
+        float dateTimeWidth = 280f;
+
         // Time
         date = new OwnLabel("date UT", skin, "mono");
         date.setName("label date");
-        date.setWidth(168f);
+        date.setWidth(dateTimeWidth);
 
         time = new OwnLabel("time UT", skin, "mono");
         time.setName("label time");
-        time.setWidth(168f);
+        time.setWidth(dateTimeWidth);
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
@@ -74,7 +76,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dateEdit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dateedit"), skin));
 
         // Pace
-        Label paceLabel = new Label(I18n.txt("gui.pace") + " ", skin);
+        Label paceLabel = new Label(I18n.txt("gui.pace"), skin);
         plus = new OwnImageButton(skin, "plus");
         plus.setName("plus");
         plus.addListener(event -> {
@@ -107,25 +109,27 @@ public class TimeComponent extends GuiComponent implements IObserver {
         wrapWrapper.width(192f);
         wrapWrapper.align(Align.center);
 
-        VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(4.8f).padTop(4.8f);
+        Table timeGroup = new Table(skin);
 
-        HorizontalGroup dateGroup = new HorizontalGroup();
-        dateGroup.space(6.4f);
-        VerticalGroup datetimeGroup = new VerticalGroup();
-        datetimeGroup.addActor(date);
-        datetimeGroup.addActor(time);
-        dateGroup.addActor(datetimeGroup);
-        dateGroup.addActor(dateEdit);
-        timeGroup.addActor(dateGroup);
+        // Date time
+        Table dateGroup = new Table(skin);
+        Table datetimeGroup = new Table(skin);
+        datetimeGroup.add(date).padBottom(pad8).row();
+        datetimeGroup.add(time);
+        dateGroup.add(datetimeGroup).left().padRight(pad8);
+        dateGroup.add(dateEdit).left();
 
-        HorizontalGroup paceGroup = new HorizontalGroup();
-        paceGroup.space(4.8f);
-        paceGroup.addActor(paceLabel);
-        paceGroup.addActor(minus);
-        paceGroup.addActor(wrapWrapper);
-        paceGroup.addActor(plus);
+        // Pace
+        Table paceGroup = new Table(skin);
+        paceGroup.add(paceLabel).left().padRight(pad12 * 3f);
+        paceGroup.add(minus).left().padRight(pad8);
+        paceGroup.add(wrapWrapper).left().padRight(pad8);
+        paceGroup.add(plus).left().padRight(pad8);
 
-        timeGroup.addActor(paceGroup);
+        // Add to table
+        timeGroup.add(dateGroup).left().padBottom(pad8).row();
+        timeGroup.add(paceGroup).left();
+
         timeGroup.pack();
 
         component = timeGroup;

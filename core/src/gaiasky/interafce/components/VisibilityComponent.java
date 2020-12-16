@@ -224,8 +224,8 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // Set button width to max width
         Table content = new Table(skin);
         content.add(visibilityTable).center().row();
-        content.add(individualVisibility).center().padTop(pad).row();
-        content.add(pmGroup).left().padTop(pad);
+        content.add(individualVisibility).center().padTop(pad8).row();
+        content.add(pmGroup).left().padTop(pad8);
 
         component = content;
     }

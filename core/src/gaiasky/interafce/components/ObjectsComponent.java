@@ -24,7 +24,6 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -182,7 +181,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
          * ADD TO CONTENT
          */
 
-        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(space8);
+        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(pad12);
         objectsGroup.addActor(searchBox);
         if (focusListScrollPane != null) {
             objectsGroup.addActor(focusListScrollPane);

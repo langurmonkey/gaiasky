@@ -43,7 +43,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
 
-        cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad);
+        cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
         cinematic.setChecked(GlobalConf.scene.CINEMATIC_CAMERA);
         cinematic.addListener(event -> {
@@ -283,7 +283,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
 
         HorizontalGroup buttonGroup = new HorizontalGroup();
-        buttonGroup.space(space3);
+        buttonGroup.space(pad4);
         buttonGroup.addActor(button3d);
         buttonGroup.addActor(buttonDome);
         buttonGroup.addActor(buttonCubemap);
@@ -293,16 +293,16 @@ public class CameraComponent extends GuiComponent implements IObserver {
         Table cameraGroup = new Table(skin);
         cameraGroup.align(Align.left);
 
-        cameraGroup.add(group(modeLabel, cameraMode, space2)).top().left().padBottom(space6).row();
-        cameraGroup.add(group(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, space2)).top().left().padBottom(space6).row();
-        cameraGroup.add(fieldOfView).top().left().padBottom(space6).row();
-        cameraGroup.add(cameraSpeed).top().left().padBottom(space6).row();
-        cameraGroup.add(rotateSpeed).top().left().padBottom(space6).row();
-        cameraGroup.add(turnSpeed).top().left().padBottom(space6).row();
-        cameraGroup.add(cinematic).top().left().padBottom(space6).row();
-        cameraGroup.add(focusLock).top().left().padBottom(space6).row();
-        cameraGroup.add(orientationLock).top().left().padBottom(space6).row();
-        cameraGroup.add(group(new Label("", skin), buttonGroup, space2)).top().center();
+        cameraGroup.add(group(modeLabel, cameraMode, pad3)).top().left().padBottom(pad9).row();
+        cameraGroup.add(group(new Label(I18n.txt("gui.camera.speedlimit"), skin, "default"), cameraSpeedLimit, pad3)).top().left().padBottom(pad9).row();
+        cameraGroup.add(fieldOfView).top().left().padBottom(pad9).row();
+        cameraGroup.add(cameraSpeed).top().left().padBottom(pad9).row();
+        cameraGroup.add(rotateSpeed).top().left().padBottom(pad9).row();
+        cameraGroup.add(turnSpeed).top().left().padBottom(pad9).row();
+        cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
+        cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
+        cameraGroup.add(orientationLock).top().left().padBottom(pad9).row();
+        cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
 
         component = cameraGroup;
 

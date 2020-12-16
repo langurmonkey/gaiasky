@@ -22,18 +22,18 @@ public abstract class GuiComponent {
     protected Skin skin;
     protected Stage stage;
 
-    protected float pad, space8, space6, space4, space3, space2, space1;
+    protected float pad8, pad12, pad9, pad6, pad4, pad3, pad1;
 
     public GuiComponent(Skin skin, Stage stage) {
         this.skin = skin;
         this.stage = stage;
-        pad = 8f;
-        space8 = 12.8f;
-        space6 = 9.6f;
-        space4 = 6.4f;
-        space3 = 4.8f;
-        space2 = 3.2f;
-        space1 = 1.6f;
+        pad8 = 8f;
+        pad12 = 12.8f;
+        pad9 = 9.6f;
+        pad6 = 6.4f;
+        pad4 = 4.8f;
+        pad3 = 3.2f;
+        pad1 = 1.6f;
     }
 
     /**

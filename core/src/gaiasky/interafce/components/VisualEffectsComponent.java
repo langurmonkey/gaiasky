@@ -198,7 +198,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
         /** Add to group **/
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
-        lightingGroup.space(space6);
+        lightingGroup.space(pad9);
         lightingGroup.addActor(starBrightness);
         lightingGroup.addActor(starBrightnessPower);
         lightingGroup.addActor(starSize);

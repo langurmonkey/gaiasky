@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -371,13 +372,14 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         // Calculate new size
         guiLayout.pack();
         if (windowScroll != null) {
-            windowScroll.setHeight(Math.min(guiLayout.getHeight(), Gdx.graphics.getHeight() - 120));
+            float unitsPerPixel = ((ScreenViewport)ui.getViewport()).getUnitsPerPixel();
+            windowScroll.setHeight(Math.min(guiLayout.getHeight(), ui.getHeight() - 120 * unitsPerPixel));
             windowScroll.pack();
 
-            mainVertical.setHeight(windowScroll.getHeight() + 30);
+            mainVertical.setHeight(windowScroll.getHeight() + 30 * unitsPerPixel);
             mainVertical.pack();
 
-            setHeight(windowScroll.getHeight() + 40);
+            setHeight(windowScroll.getHeight() + 40 * unitsPerPixel);
         }
         pack();
         validate();

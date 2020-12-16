@@ -615,6 +615,11 @@ public class FullGui extends AbstractGui {
         boolean cool = super.updateUnitsPerPixel(upp);
         if (cool) {
             controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
+            controlsWindow.recalculateSize();
+            if(ui.getHeight() < controlsWindow.getHeight()){
+                // Collapse
+                controlsWindow.collapseInstant();
+            }
         }
         return cool;
     }

@@ -278,7 +278,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         /*
          * ADD TO CONTENT
          */
-        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(space8);
+        VerticalGroup objectsGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(pad12);
         objectsGroup.addActor(searchBox);
         if (bookmarksScrollPane != null) {
             objectsGroup.addActor(bookmarksScrollPane);
