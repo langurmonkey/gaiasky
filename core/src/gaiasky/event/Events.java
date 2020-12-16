@@ -676,14 +676,6 @@ public enum Events {
      */
     ORIENTATION_LOCK_CMD,
     /**
-     * Contains the new pace
-     **/
-    PACE_CHANGED_INFO,
-    /**
-     * Contains a float with the pace
-     **/
-    PACE_CHANGE_CMD,
-    /**
      * Posts a recurrent runnable. Contains an identifier (String) and the runnable object
      **/
     PARK_RUNNABLE,
@@ -1179,6 +1171,17 @@ public enum Events {
      * Double the pace
      **/
     TIME_WARP_INCREASE_CMD,
+
+    /**
+     * Contains a double with the new warp and a boolean saying whether it comes from the UI
+     **/
+    TIME_WARP_CMD,
+
+    /**
+     * Contains the new time warp factor
+     **/
+    TIME_WARP_CHANGED_INFO,
+
 
     /**
      * Contains the name of the check box and a boolean

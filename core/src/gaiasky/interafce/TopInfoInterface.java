@@ -86,7 +86,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         pack();
 
-        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.PACE_CHANGED_INFO, Events.TIME_STATE_CMD, Events.CAMERA_CLOSEST_INFO, Events.CAMERA_MODE_CMD, Events.FOCUS_CHANGE_CMD);
+        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.TIME_STATE_CMD, Events.CAMERA_CLOSEST_INFO, Events.CAMERA_MODE_CMD, Events.FOCUS_CHANGE_CMD);
     }
 
     private void unsubscribe() {
@@ -107,7 +107,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             });
 
             break;
-        case PACE_CHANGED_INFO:
+        case TIME_WARP_CHANGED_INFO:
             if (data.length == 1)
                 pace.setText("(" + TextUtils.getFormattedTimeWarp((double) data[0]) + ")");
             break;

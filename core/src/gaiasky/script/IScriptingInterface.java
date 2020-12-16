@@ -773,12 +773,17 @@ public interface IScriptingInterface {
     boolean isSimulationTimeOn();
 
     /**
-     * Changes the pace of time.
-     *
-     * @param pace The pace as a factor of real physical time pace. 2.0 sets the
-     *             pace to be twice as fast as real time.
+     * @deprectaed use {@link IScriptingInterface#setTimeWarp(double)} instead.
      */
     void setSimulationPace(double pace);
+
+    /**
+     * Sets the simulation time warp factor.
+     *
+     * @param pace The warp as a factor of real physical time pace. 2.0 sets the
+     *             time to be twice as fast as real time.
+     */
+    void setTimeWarp(double pace);
 
     /**
      * Sets a time bookmark in the global clock that, when reached, the clock

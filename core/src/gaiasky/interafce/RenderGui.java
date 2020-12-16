@@ -51,7 +51,7 @@ public class RenderGui extends AbstractGui {
         skin = GlobalResources.skin;
 
         mainTable = new Table(skin);
-        time = new OwnLabel("", skin, "ui-13");
+        time = new OwnLabel("", skin, "ui-17");
         mainTable.add(time);
         mainTable.setFillParent(true);
         mainTable.right().bottom();

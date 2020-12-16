@@ -296,8 +296,10 @@ public class Constants {
     // Min time for VSOP87 algorithms
     public static final long MIN_VSOP_TIME_MS = -MAX_VSOP_TIME_MS;
 
+    // Warp steps per side (positive and negative)
+    public static final int WARP_STEPS = 45;
     // Maximum time warp factor
-    public static final double MAX_WARP = 35184372088832d;
+    public static final double MAX_WARP = Math.pow(2, WARP_STEPS);
     // Minimum time warp factor
     public static final double MIN_WARP = -MAX_WARP;
 

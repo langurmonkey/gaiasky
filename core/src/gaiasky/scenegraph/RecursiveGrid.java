@@ -480,7 +480,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         Matrix4d inv = coordinateSystemd;
         Matrix4d trf = mat4daux.set(inv).inv();
         camera.getPos().put(cpos).mul(trf);
-        focus.getAbsolutePosition(fpos).mul(trf);
+        focus.getPredictedPosition(fpos, GaiaSky.instance.time, camera, false).mul(trf);
+        //focus.getAbsolutePosition(fpos).mul(trf);
         fpos.sub(cpos);
     }
 

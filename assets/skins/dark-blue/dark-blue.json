@@ -36,12 +36,6 @@
     "title-60": {
       "file": "skins/fonts/title-60.fnt"
     },
-    "ui-09": {
-      "file": "skins/fonts/ui-09.fnt"
-    },
-    "ui-10": {
-      "file": "skins/fonts/ui-10.fnt"
-    },
     "ui-11": {
       "file": "skins/fonts/ui-11.fnt"
     },
@@ -324,7 +318,7 @@
     },
     "link": {
       "font": "ui-18",
-      "fontColor": "theme",
+      "fontColor": "blue",
       "downFontColor": "theme"
     },
     "link-big": {
@@ -597,8 +591,8 @@
       "imageUp": "land-on"
     },
     "rubbish-bin": {
-      "imageUp": "bin-icon",
-      "imageDisabled": "bin-icon-grey"
+      "imageUp": "bin-s-icon",
+      "imageDisabled": "bin-s-icon-grey"
     },
     "eye-toggle": {
       "imageUp": "eye-icon",
@@ -718,6 +712,10 @@
       "knob": "big-slider-knob",
       "knobBefore": "big-slider-knob-before"
     },
+    "big-horizontal-arrow": {
+      "background": "big-slider",
+      "knob": "big-slider-knob-arrow"
+    },
     "sc-engine": {
       "background": "sc-engine-power-bg",
       "knob": "sc-engine-power-knob",
@@ -759,7 +757,7 @@
     },
     "default-blue": {
       "font": "ui-18",
-      "fontColor": "theme"
+      "fontColor": "blue"
     },
     "default-red": {
       "font": "ui-18",
@@ -773,23 +771,23 @@
       "font": "ui-18",
       "fontColor": "black"
     },
-    "ui-10": {
+    "ui-13": {
       "font": "ui-13",
       "fontColor": "white"
     },
-    "ui-11": {
+    "ui-14": {
       "font": "ui-14",
       "fontColor": "white"
     },
-    "ui-12": {
+    "ui-15": {
       "font": "ui-15",
       "fontColor": "white"
     },
-    "ui-13": {
+    "ui-17": {
       "font": "ui-17",
       "fontColor": "white"
     },
-    "ui-15": {
+    "ui-19": {
       "font": "ui-19",
       "fontColor": "white"
     },
@@ -797,47 +795,47 @@
       "font": "ui-23",
       "fontColor": "white"
     },
-    "msg-10": {
+    "msg-13": {
       "font": "ui-13",
       "fontColor": "white"
     },
-    "msg-11": {
+    "msg-14": {
       "font": "ui-14",
       "fontColor": "white"
     },
-    "msg-12": {
+    "msg-15": {
       "font": "ui-15",
       "fontColor": "white"
     },
-    "msg-13": {
-      "font": "ui-17-bold",
-      "fontColor": "white"
-    },
-    "msg-14": {
-      "font": "ui-19",
-      "fontColor": "white"
-    },
-    "msg-15": {
-      "font": "ui-21",
-      "fontColor": "white"
-    },
     "msg-17": {
-      "font": "ui-21",
+      "font": "ui-17",
       "fontColor": "white"
     },
     "msg-18": {
-      "font": "ui-21",
+      "font": "ui-19",
       "fontColor": "white"
     },
     "msg-19": {
-      "font": "ui-23",
+      "font": "ui-19",
+      "fontColor": "white"
+    },
+    "msg-20": {
+      "font": "ui-21",
       "fontColor": "white"
     },
     "msg-21": {
-      "font": "ui-23",
+      "font": "ui-21",
+      "fontColor": "white"
+    },
+    "msg-22": {
+      "font": "ui-21",
       "fontColor": "white"
     },
     "msg-23": {
+      "font": "ui-23",
+      "fontColor": "white"
+    },
+    "msg-24": {
       "font": "ui-23",
       "fontColor": "white"
     },
@@ -903,7 +901,7 @@
     },
     "link": {
       "font": "ui-17",
-      "fontColor": "theme"
+      "fontColor": "blue"
     },
     "sc-header": {
       "font": "ui-19-bold",
@@ -974,11 +972,6 @@
     },
     "regular": {
       "font": "ui-18",
-      "fontColor": "white",
-      "background": null
-    },
-    "msg-10": {
-      "font": "ui-10",
       "fontColor": "white",
       "background": null
     },

@@ -39,7 +39,7 @@ public class ErrorDialog implements ApplicationListener {
         t.setFillParent(true);
         ui.addActor(t);
 
-        Label l = new Label(message, skin, "ui-15");
+        Label l = new Label(message, skin, "ui-19");
         Button b = new TextButton("Close", skin, "big");
         b.addListener((event) -> {
             if(event instanceof ChangeListener.ChangeEvent){

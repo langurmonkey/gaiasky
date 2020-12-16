@@ -474,7 +474,7 @@ public class ControllerGui extends AbstractGui {
         optT = new Table(skin);
 
         // Slider
-        bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-15");
+        bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
         bloomSlider.setWidth(sw);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);

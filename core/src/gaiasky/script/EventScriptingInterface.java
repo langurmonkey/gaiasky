@@ -729,12 +729,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setSimulationPace(final double pace) {
-        em.post(Events.PACE_CHANGE_CMD, pace);
+    public void setSimulationPace(final double warp) {
+        setSimulationPace(warp);
     }
 
-    public void setSimulationPace(final long pace) {
-        setSimulationPace((double) pace);
+    public void setSimulationPace(final long warp) {
+        setTimeWarp((double) warp);
+    }
+
+    @Override
+    public void setTimeWarp(final double warp) {
+        em.post(Events.TIME_WARP_CMD, warp, false);
+    }
+
+    public void setTimeWarp(final long warp) {
+        setTimeWarp((double) warp);
     }
 
     @Override

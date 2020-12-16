@@ -223,6 +223,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
                 start2w = 0;
                 start2h = boundsh;
             }
+            boundsw /= GlobalConf.program.UI_SCALE;
+            boundsh /= GlobalConf.program.UI_SCALE;
+            start2w /= GlobalConf.program.UI_SCALE;
+            start2h /= GlobalConf.program.UI_SCALE;
 
             // Side by side rendering
             Viewport viewport = stretch ? stretchViewport : extendViewport;

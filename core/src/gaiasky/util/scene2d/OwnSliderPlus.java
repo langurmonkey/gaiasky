@@ -12,10 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
+
+import java.util.function.Function;
 
 /**
  * Same as a regular slider, but contains the title (name) and the value within its bounds.
@@ -33,6 +34,9 @@ public class OwnSliderPlus extends Slider {
     private final float padX = 4.8f;
     private final float padY = 3.2f;
     private INumberFormat nf;
+    // This function is applied to the value of this slider in order to
+    // produce the label to be displayed.
+    private Function<Float, String> valueLabelTransform;
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, float mapMin, float mapMax, Skin skin) {
         super(min, max, stepSize, false, skin, "big-horizontal");
@@ -44,6 +48,11 @@ public class OwnSliderPlus extends Slider {
         super(min, max, stepSize, false, skin, "big-horizontal");
         this.skin = skin;
         setUp(title, min, max, "default");
+    }
+    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style, String labelStyle) {
+        super(min, max, stepSize, false, skin, style);
+        this.skin = skin;
+        setUp(title, min, max, labelStyle);
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {
@@ -94,6 +103,10 @@ public class OwnSliderPlus extends Slider {
         });
     }
 
+    public void setValueLabelTransform(Function<Float, String> transform){
+        this.valueLabelTransform = transform;
+    }
+
     public void setNumberFormatter(INumberFormat nf) {
         this.nf = nf;
     }
@@ -115,7 +128,9 @@ public class OwnSliderPlus extends Slider {
     }
 
     public String getValueString() {
-        return (valuePrefix != null ? valuePrefix : "") + nf.format((displayValueMapped ? getMappedValue() : getValue())) + (valueSuffix != null ? valueSuffix : "");
+        float actualValue = displayValueMapped ? getMappedValue() : getValue();
+        String valueString = valueLabelTransform != null ? valueLabelTransform.apply(actualValue) : nf.format(actualValue);
+        return (valuePrefix != null ? valuePrefix : "") + valueString + (valueSuffix != null ? valueSuffix : "");
     }
 
     public float getMappedValue() {

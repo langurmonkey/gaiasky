@@ -117,7 +117,7 @@ public class CrashGui extends AbstractGui {
             // Stack trace
             float taw = 720f;
             float tah = 240f;
-            content.add(new OwnLabel(I18n.txt("gui.crash.stack"), skin, "ui-15")).left().padBottom(pad5).row();
+            content.add(new OwnLabel(I18n.txt("gui.crash.stack"), skin, "ui-19")).left().padBottom(pad5).row();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             crash.printStackTrace(pw);

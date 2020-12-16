@@ -70,7 +70,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
             Stage ui = new Stage(vp, sb);
             vp.update(graphics.getWidth(), graphics.getHeight(), true);
 
-            OwnLabel l = new OwnLabel("The external view will appear here as soon as Gaia Sky finishes loading", skin, "ui-15");
+            OwnLabel l = new OwnLabel("The external view will appear here as soon as Gaia Sky finishes loading", skin, "ui-19");
             Container<OwnLabel> c = new Container<>(l);
             c.center();
             c.setFillParent(true);

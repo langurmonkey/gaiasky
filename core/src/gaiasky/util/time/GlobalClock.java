@@ -58,7 +58,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
         time = instant;
         targetTime = null;
         lastTime = time.toEpochMilli();
-        EventManager.instance.subscribe(this, Events.PACE_CHANGE_CMD, Events.TIME_WARP_DECREASE_CMD, Events.TIME_WARP_INCREASE_CMD, Events.TIME_CHANGE_CMD, Events.TARGET_TIME_CMD);
+        EventManager.instance.subscribe(this, Events.TIME_WARP_CMD, Events.TIME_WARP_DECREASE_CMD, Events.TIME_WARP_INCREASE_CMD, Events.TIME_CHANGE_CMD, Events.TARGET_TIME_CMD);
     }
 
     /**
@@ -149,7 +149,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 targetTime = null;
             }
             break;
-        case PACE_CHANGE_CMD:
+        case TIME_WARP_CMD:
             // Update pace
             setTimeWarp((Double) data[0]);
             break;
@@ -208,7 +208,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     public void setTimeWarp(double tw) {
         this.timeWarp = tw;
         checkTimeWarpValue();
-        EventManager.instance.post(Events.PACE_CHANGED_INFO, this.timeWarp);
+        EventManager.instance.post(Events.TIME_WARP_CHANGED_INFO, this.timeWarp);
     }
 
     private void checkTimeWarpValue() {
