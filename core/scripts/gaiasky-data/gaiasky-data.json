@@ -147,8 +147,8 @@
       ],
       "description": "Gaia eDR3 default - 20%/1.5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "979db6faaa9de142d7973f7205f333762344655bd4ead88450dda47131c704ee",
-      "link": "@mirror-url@edr3/000-default",
-      "file": "@mirror-url@edr3/000-default/v00_20201124/catalog-edr3-default.tar.gz"
+      "link": "@mirror-url@catalog/edr3/000-default",
+      "file": "@mirror-url@catalog/edr3/000-default/v00_20201124/catalog-edr3-default.tar.gz"
     },
     {
       "name": "catalog-edr3-small",
@@ -163,8 +163,8 @@
       ],
       "description": "Gaia eDR3 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "64fa59cd9947fad6089c550e534dd7479589f7de7f1c2a8ff9478ce0a8471266",
-      "link": "@mirror-url@edr3/001-small",
-      "file": "@mirror-url@edr3/001-small/v00_20201124/catalog-edr3-small.tar.gz"
+      "link": "@mirror-url@catalog/edr3/001-small",
+      "file": "@mirror-url@catalog/edr3/001-small/v00_20201124/catalog-edr3-small.tar.gz"
     },
     {
       "name": "catalog-edr3-medium",
@@ -179,8 +179,8 @@
       ],
       "description": "Gaia eDR3 medium - 30%/5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
-      "link": "@mirror-url@edr3/002-medium",
-      "file": "@mirror-url@edr3/002-medium/v00_20201124/catalog-edr3-medium.tar.gz"
+      "link": "@mirror-url@catalog/edr3/002-medium",
+      "file": "@mirror-url@catalog/edr3/002-medium/v00_20201124/catalog-edr3-medium.tar.gz"
     },
     {
       "name": "catalog-edr3-large",
@@ -195,8 +195,8 @@
       ],
       "description": "Gaia eDR3 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
-      "link": "@mirror-url@edr3/003-large",
-      "file": "@mirror-url@edr3/003-large/v00_20201124/catalog-edr3-large.tar.gz"
+      "link": "@mirror-url@catalog/edr3/003-large",
+      "file": "@mirror-url@catalog/edr3/003-large/v00_20201124/catalog-edr3-large.tar.gz"
     },
     {
       "name": "catalog-edr3-verylarge",
@@ -211,8 +211,8 @@
       ],
       "description": "Gaia eDR3 very large - 50% parallax relative error, includes Hipparcos",
       "sha256": "450de5ce51adc958fc4448baac55f891a6322785f92ead977c4a463cae9170c4",
-      "link": "@mirror-url@edr3/004-verylarge",
-      "file": "@mirror-url@edr3/004-verylarge/v00_20201124/catalog-edr3-verylarge.tar.gz"
+      "link": "@mirror-url@catalog/edr3/004-verylarge",
+      "file": "@mirror-url@catalog/edr3/004-verylarge/v00_20201124/catalog-edr3-verylarge.tar.gz"
     },
     {
       "name": "catalog-edr3-extralarge",
@@ -227,8 +227,8 @@
       ],
       "description": "Gaia eDR3 extra large - 95% parallax relative error, includes Hipparcos",
       "sha256": "813815e153c181b6564d80b43da4bb584c96d5fb3023d2637db8be1b156d2fe5",
-      "link": "@mirror-url@edr3/005-extralarge",
-      "file": "@mirror-url@edr3/005-extralarge/v00_20201124/catalog-edr3-extralarge.tar.gz"
+      "link": "@mirror-url@catalog/edr3/005-extralarge",
+      "file": "@mirror-url@catalog/edr3/005-extralarge/v00_20201124/catalog-edr3-extralarge.tar.gz"
     },
     {
       "name": "catalog-edr3-bright",
@@ -243,8 +243,8 @@
       ],
       "description": "Gaia eDR3 bright - 90%/1% parallax relative errors for bright/faint stars, includes Hipparcos",
       "sha256": "80eb75b855f232c6ae749c80a97961c67f0fe8dff7aa6be95acc583e475f91ff",
-      "link": "@mirror-url@edr3/006-bright",
-      "file": "@mirror-url@edr3/006-bright/v00_20201124/catalog-edr3-bright.tar.gz"
+      "link": "@mirror-url@catalog/edr3/006-bright",
+      "file": "@mirror-url@catalog/edr3/006-bright/v00_20201124/catalog-edr3-bright.tar.gz"
     },
     {
       "name": "catalog-edr3-ruwe",
@@ -260,7 +260,7 @@
       "description": "Gaia eDR3 RUWE - Stars for which the RUWE (renormalized unit weight error) is <= 1.4, includes Hipparcos",
       "sha256": "2bab6aa2e9afcf6418c303df1184bdc800c9f154055db89b00b1a50634f87b55",
       "link": "http://www.rssd.esa.int/doc_fetch.php?id=3757412",
-      "file": "@mirror-url@edr3/007-ruwe/v00_20201124/catalog-edr3-ruwe.tar.gz"
+      "file": "@mirror-url@catalog/edr3/007-ruwe/v00_20201124/catalog-edr3-ruwe.tar.gz"
     },
     {
       "name": "catalog-gcns",
@@ -279,7 +279,7 @@
       "link": "https://arxiv.org/abs/2012.02061",
       "releasenotes" : "Add type to catalog descriptor file",
       "sha256": "4f3b6f7d409d41678e5c4e061da1b0117dc0b08f853ba1ad52514c29b62eabc9",
-      "file": "@mirror-url@gcns/v02_20201216/catalog-gcns.tar.gz"
+      "file": "@mirror-url@catalog/gcns/v02_20201216/catalog-gcns.tar.gz"
     },
     {
       "name": "catalog-whitedwarfs",
@@ -297,7 +297,7 @@
       "link": "https://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
       "releasenotes" : "Add type to catalog descriptor file",
       "sha256": "161b964e8ba9c5319d9a087b5804088ce985f1f014aa938f2dfa2cb068a35935",
-      "file": "@mirror-url@whitedwarfs/v01_20201216/catalog-wd.tar.gz"
+      "file": "@mirror-url@catalog/whitedwarfs/v01_20201216/catalog-wd.tar.gz"
     },
     {
       "name": "catalog-gd1",
@@ -315,7 +315,7 @@
       "link": "https://arxiv.org/abs/1805.00425",
       "releasenotes" : "Publish first version of GD-1",
       "sha256": "f3ee78bd98e46e0dcc028476195c24108c6bf1d3f02e150f6f6f503a4763efa3",
-      "file": "@mirror-url@other/gd1/v01_20201216/gd1-data-brighter.tar.gz"
+      "file": "@mirror-url@catalog/gd1/v01_20201216/gd1-data-brighter.tar.gz"
     },
     {
       "name": "catalog-hipparcos-newred",
@@ -334,7 +334,7 @@
       "link": "https://adsabs.harvard.edu/abs/2007ASSL..350.....V",
       "releasenotes" : "Add type in catalog descriptor file",
       "sha256": "8cf20f7a4401d9756670de22c630799c4844574bd47ff24ea31750e5b78e0e80",
-      "file": "@mirror-url@hipparcos/v03_20201216/catalog-hipparcos-newreduction.tar.gz"
+      "file": "@mirror-url@catalog/hipparcos/v03_20201216/catalog-hipparcos-newreduction.tar.gz"
     },
     {
       "name": "catalog-nbg",
@@ -355,9 +355,9 @@
     {
       "name": "catalog-nbg",
       "type": "catalog-gal",
-      "version": 5,
+      "version": 6,
       "mingsversion": 30000,
-      "size": 15786671,
+      "size": 15786675,
       "nobjects": 875,
       "check": "catalog-nbg.json",
       "data": [
@@ -367,9 +367,9 @@
         "tex/extragal"
       ],
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole",
-      "releasenotes": "Fix M33 distance",
-      "sha256": "83cc24def980c6816e41b6f4cb41a289422cda341655ecf4118417b9eab49b80",
-      "file": "@mirror-url@galaxies/nbg/v05_20201116/galaxies-nbg.tar.gz"
+      "releasenotes" : "Add type in catalog descriptor file",
+      "sha256": "457dd553a527a6d4e3be7e17c7accdbf5b0493d9696419ee6a5e02add0e0998f",
+      "file": "@mirror-url@galaxies/nbg/v06_20201216/galaxies-nbg.tar.gz"
     },
     {
       "name": "catalog-sdss-12",
@@ -389,7 +389,7 @@
     {
       "name": "catalog-sdss-12",
       "type": "catalog-gal",
-      "version": 3,
+      "version": 4,
       "mingsversion": 30000,
       "size": 10296296,
       "nobjects": 500000,
@@ -400,8 +400,9 @@
         "sdss/sdss_dr12_small.csv"
       ],
       "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12",
-      "sha256": "1f93ab8ce5d66656cc71a2faa7b01c183d8499eea5c43a1eeb6dde2958a5442d",
-      "file": "@mirror-url@galaxies/sdss12/v03_20201030/galaxies-sdss12.tar.gz"
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "4282f728e79a74c84516d52e57e5b41a04543ec0312fe66c972e709ed8191637",
+      "file": "@mirror-url@galaxies/sdss12/v04_20201216/galaxies-sdss12.tar.gz"
     },
     {
       "name": "catalog-sdss-14",
@@ -421,7 +422,7 @@
     {
       "name": "catalog-sdss-14",
       "type": "catalog-gal",
-      "version": 3,
+      "version": 4,
       "mingsversion": 30000,
       "size": 79127288,
       "nobjects": 3925096,
@@ -432,8 +433,9 @@
         "sdss/sdss_dr14_large.csv"
       ],
       "description": "SDSS DR14 - Sloan Digital Sky Survey DR14",
-      "sha256": "57c6ff79403987b2176765bd437fab4ee4090238b488d71478f7f8462ef3a7de",
-      "file": "@mirror-url@galaxies/sdss14/v03_20201030/galaxies-sdss14.tar.gz"
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "65198f46c45d2b593660f0a7129ff49bb17f7fab3f8e2ec9c118b427478bfa3e",
+      "file": "@mirror-url@galaxies/sdss14/v04_20201216/galaxies-sdss14.tar.gz"
     },
     {
       "name": "catalog-ocdr2",
@@ -465,8 +467,8 @@
         "ocdr2"
       ],
       "description": "Open Clusters DR2 - Open Clusters catalog based on DR2 data, by A. Castro-Ginard et al.",
-      "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "releasenotes" : "Add type in catalog descriptor file",
+      "link": "https://ui.adsabs.harvard.edu/abs/2020A&A...635A..45C/",
       "sha256" : "6682c3abf8ffb7657cc180f5f8ade036809936056f33c74835c3f8ee35e9a14c",
       "file": "@mirror-url@clusters/ocdr2/v04_20201216/clusters-ocdr2.tar.gz"
     },
@@ -500,8 +502,8 @@
         "mwsc"
       ],
       "description" : "MWSC - Milky Way Star Clusters catalog",
-      "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
       "releasenotes" : "Add type in catalog descriptor file",
+      "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
       "sha256" : "0a9d59bcb34388249d313e1a6370f64f10d04260f40c8eb8884150e80116041d",
       "file": "@mirror-url@clusters/mwsc/v03_20201216/clusters-mwsc.tar.gz"
     },
@@ -523,9 +525,9 @@
     {
       "name": "catalog-nebulae",
       "type": "catalog-other",
-      "version": 2,
+      "version": 3,
       "mingsversion": 30000,
-      "size": 15407657,
+      "size": 15407675,
       "nobjects": 15,
       "check": "catalog-nebulae.json",
       "data": [
@@ -534,8 +536,9 @@
         "tex/nebulae"
       ],
       "description": "Nebulae - Catalog of 15 nebulae with textures",
-      "sha256": "2ec68156cf2b5a4a3f698e5cdd30132acbeeddb7a0bf71f08bcf0eaa41d2f593",
-      "file": "@mirror-url@nebulae/v02_20201030/nebulae.tar.gz"
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "c3ffc2a04d02188dd64c139759fb606a870162bbdf6b74a473ada4d11e8d523b",
+      "file": "@mirror-url@nebulae/v03_20201216/nebulae.tar.gz"
     },
     {
       "name": "gargantua-blackhole",
