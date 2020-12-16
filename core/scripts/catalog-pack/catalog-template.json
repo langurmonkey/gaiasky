@@ -4,6 +4,7 @@
 	"description" : "<DESCRIPTION>",
 	"link" : "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/dr2/",
 	"size" : <SIZE_BYTES>,
+	"type" : "catalog-lod",
 	"nobjects" : <NOBJECTS>,
 	"data" : [
 	{

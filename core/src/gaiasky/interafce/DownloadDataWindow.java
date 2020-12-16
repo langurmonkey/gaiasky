@@ -76,10 +76,33 @@ public class DownloadDataWindow extends GenericDialog {
         iconMap.put("texture-pack", "icon-elem-moons");
     }
 
-    private static String getIcon(String type) {
+    public static int getTypeWeight(String type) {
+        switch (type) {
+        case "catalog-lod":
+            return 0;
+        case "catalog-gaia":
+            return 1;
+        case "catalog-star":
+            return 2;
+        case "catalog-gal":
+            return 3;
+        case "catalog-cluster":
+            return 4;
+        case "catalog-other":
+            return 5;
+        case "mesh":
+            return 6;
+        case "other":
+            return 8;
+        default:
+            return 10;
+        }
+    }
+
+    public static String getIcon(String type) {
         if (type != null && iconMap.containsKey(type))
             return iconMap.get(type);
-        return "icon-elements-other";
+        return "icon-elem-others";
     }
 
     private DataDescriptor dd;
@@ -758,12 +781,12 @@ public class DownloadDataWindow extends GenericDialog {
         cleanupTempFiles(true, false);
     }
 
-    private void cleanupTempFile(String file){
+    private void cleanupTempFile(String file) {
         deleteFile(Path.of(file));
     }
 
     private void cleanupTempFiles(boolean dataDownloads, boolean dataDescriptor) {
-        if(dataDownloads) {
+        if (dataDownloads) {
             Path testPath = SysUtils.getDefaultTmpDir();
             // Clean up partial downloads
             try {
@@ -777,7 +800,7 @@ public class DownloadDataWindow extends GenericDialog {
             }
         }
 
-        if(dataDescriptor) {
+        if (dataDescriptor) {
             // Clean up data descriptor
             Path gsDownload = SysUtils.getDefaultTmpDir().resolve("gaiasky-data.json");
             deleteFile(gsDownload);
@@ -793,6 +816,7 @@ public class DownloadDataWindow extends GenericDialog {
             }
         }
     }
+
     private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.outdated"));
         label.setColor(ColorUtils.gYellowC);

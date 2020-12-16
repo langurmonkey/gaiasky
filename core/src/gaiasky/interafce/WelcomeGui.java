@@ -100,7 +100,7 @@ public class WelcomeGui extends AbstractGui {
             // If slave, data load can start
             gaiaSky();
         } else {
-            dw = new DatasetsWidget(skin);
+            dw = new DatasetsWidget(ui, skin);
             catalogFiles = dw.buildCatalogFiles();
 
             // Otherwise, check for updates, etc.
@@ -350,7 +350,7 @@ public class WelcomeGui extends AbstractGui {
      */
     private void reloadView() {
         if (dw == null) {
-            dw = new DatasetsWidget(skin);
+            dw = new DatasetsWidget(ui, skin);
         }
         catalogFiles = dw.buildCatalogFiles();
         clearGui();

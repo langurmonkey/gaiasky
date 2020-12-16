@@ -1519,7 +1519,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.setWidth(tawidth);
         dataSourceInfo.clearListeners();
 
-        dw = new DatasetsWidget(skin);
+        dw = new DatasetsWidget(stage, skin);
         Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
         Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
 

@@ -456,7 +456,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
-        cfg.setWindowedMode(700, 200);
+        cfg.setWindowedMode(900, 350);
         cfg.setResizable(false);
         cfg.setTitle(title);
 
