@@ -176,6 +176,10 @@ public abstract class AbstractCamera implements ICamera {
     public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
         return isVisible(time, cb.viewAngle, cb.translation, cb.distToCamera);
     }
+    @Override
+    public boolean isVisible(ITimeFrameProvider time, Vector3d pos) {
+        return isVisible(time, 1e-8, pos, pos.len());
+    }
 
     @Override
     public boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera) {

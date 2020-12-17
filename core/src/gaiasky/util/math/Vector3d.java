@@ -309,11 +309,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	/** @return The euclidian length */
 	public static double len(final double x, final double y, final double z) {
-		return Math.sqrt(x * x + y * y + z * z);
+		return FastMath.sqrt(x * x + y * y + z * z);
 	}
 
 	public double len() {
-		return Math.sqrt(x * x + y * y + z * z);
+		return FastMath.sqrt(x * x + y * y + z * z);
 	}
 
 	/** @return The squared euclidian length */

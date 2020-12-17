@@ -207,6 +207,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         annotation(100000000000d * Constants.PC_TO_U, "100 Gpc");
     }
 
+    public Matrix4d getCoordinateSystemd(){
+        return coordinateSystemd;
+    }
+
     private void annotation(double dist, String text) {
         annotations.add(new Pair<>(dist, text));
     }
