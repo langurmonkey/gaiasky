@@ -36,6 +36,7 @@ public class DatasetsWidget {
     private final Skin skin;
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
+    private OwnScrollPane scroll;
 
     public DatasetsWidget(Stage ui, Skin skin) {
         super();
@@ -77,7 +78,7 @@ public class DatasetsWidget {
 
         Actor result;
 
-        OwnScrollPane scroll = null;
+        scroll = null;
         if (scrollOn) {
             scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
             scroll.setFadeScrollBars(false);
@@ -201,8 +202,9 @@ public class DatasetsWidget {
 
         dsTable.pack();
         if (scroll != null) {
+
             scroll.setWidth(Math.min(1520f, dsTable.getWidth() + pad * 15f));
-            scroll.setHeight(Math.min(ui.getHeight() * 0.8f, 950f));
+            scroll.setHeight(Math.min(ui.getHeight() * 0.7f, 1500f));
         }
 
         // No files

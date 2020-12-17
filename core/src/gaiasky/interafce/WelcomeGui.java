@@ -469,6 +469,8 @@ public class WelcomeGui extends AbstractGui {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 reloadView();
             });
+        } else {
+            ddw.refresh();
         }
         ddw.show(ui);
     }

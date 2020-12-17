@@ -137,7 +137,7 @@
     {
       "name": "catalog-edr3-default",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 1541155406,
       "nobjects": 14950954,
       "check": "catalog-edr3-default.json",
@@ -146,14 +146,15 @@
         "catalog/edr3-default"
       ],
       "description": "Gaia eDR3 default - 20%/1.5% parallax relative errors for bright/faint stars, includes Hipparcos",
-      "sha256": "979db6faaa9de142d7973f7205f333762344655bd4ead88450dda47131c704ee",
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "afab580b3253cd37665df00afe7ecc6c51a6751ee93aa2d0b5be88a8a2e008fa",
       "link": "@mirror-url@catalog/edr3/000-default",
-      "file": "@mirror-url@catalog/edr3/000-default/v00_20201124/catalog-edr3-default.tar.gz"
+      "file": "@mirror-url@catalog/edr3/000-default/v01_20201217/catalog-edr3-default.tar.gz"
     },
     {
       "name": "catalog-edr3-small",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 860056304,
       "nobjects": 8149112,
       "check": "catalog-edr3-small.json",
@@ -162,14 +163,15 @@
         "catalog/edr3-small"
       ],
       "description": "Gaia eDR3 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos",
-      "sha256": "64fa59cd9947fad6089c550e534dd7479589f7de7f1c2a8ff9478ce0a8471266",
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "f91531e3d81dd53915d2adf47b0790e83137d0e5916d5c21a99f2705c6531b72",
       "link": "@mirror-url@catalog/edr3/001-small",
-      "file": "@mirror-url@catalog/edr3/001-small/v00_20201124/catalog-edr3-small.tar.gz"
+      "file": "@mirror-url@catalog/edr3/001-small/v01_20201217/catalog-edr3-small.tar.gz"
     },
     {
       "name": "catalog-edr3-medium",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 4903572538,
       "nobjects": 48758169,
       "check": "catalog-edr3-medium.json",
@@ -178,14 +180,15 @@
         "catalog/edr3-medium"
       ],
       "description": "Gaia eDR3 medium - 30%/5% parallax relative errors for bright/faint stars, includes Hipparcos",
-      "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "6833db07326dfec19bdcce0420872058c58fd18d2f228e65e954c6441d8c5916",
       "link": "@mirror-url@catalog/edr3/002-medium",
-      "file": "@mirror-url@catalog/edr3/002-medium/v00_20201124/catalog-edr3-medium.tar.gz"
+      "file": "@mirror-url@catalog/edr3/002-medium/v01_20201217/catalog-edr3-medium.tar.gz"
     },
     {
       "name": "catalog-edr3-large",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 11795146564,
       "nobjects": 118420063,
       "check": "catalog-edr3-large.json",
@@ -194,9 +197,10 @@
         "catalog/edr3-large"
       ],
       "description": "Gaia eDR3 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos",
-      "sha256": "b4d9250d9c947c44e335694164d4a103456f82ac343bd335cd36722af9e35491",
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "2e3f0b938b374752ac36248b2fb9dfd5cd5b53c9ee8f9eefbb62f844a1a4b0f9",
       "link": "@mirror-url@catalog/edr3/003-large",
-      "file": "@mirror-url@catalog/edr3/003-large/v00_20201124/catalog-edr3-large.tar.gz"
+      "file": "@mirror-url@catalog/edr3/003-large/v01_20201217/catalog-edr3-large.tar.gz"
     },
     {
       "name": "catalog-edr3-verylarge",
@@ -233,7 +237,7 @@
     {
       "name": "catalog-edr3-bright",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 1167806969,
       "nobjects": 11203392,
       "check": "catalog-edr3-bright.json",
@@ -242,14 +246,15 @@
         "catalog/edr3-bright"
       ],
       "description": "Gaia eDR3 bright - 90%/1% parallax relative errors for bright/faint stars, includes Hipparcos",
-      "sha256": "80eb75b855f232c6ae749c80a97961c67f0fe8dff7aa6be95acc583e475f91ff",
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "3869dc0e280a33dbdb0d47ae484fc5c792dae21dde937bb9726f3893f2479a4f",
       "link": "@mirror-url@catalog/edr3/006-bright",
-      "file": "@mirror-url@catalog/edr3/006-bright/v00_20201124/catalog-edr3-bright.tar.gz"
+      "file": "@mirror-url@catalog/edr3/006-bright/v01_20201217/catalog-edr3-bright.tar.gz"
     },
     {
       "name": "catalog-edr3-ruwe",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 11053661874,
       "nobjects": 111845598,
       "check": "catalog-edr3-ruwe.json",
@@ -258,9 +263,10 @@
         "catalog/edr3-ruwe"
       ],
       "description": "Gaia eDR3 RUWE - Stars for which the RUWE (renormalized unit weight error) is <= 1.4, includes Hipparcos",
-      "sha256": "2bab6aa2e9afcf6418c303df1184bdc800c9f154055db89b00b1a50634f87b55",
+      "releasenotes" : "Add type to catalog descriptor file",
+      "sha256": "dbe9995d2dca893aeccbc1965405615fba707f057e1c91235db81aeadae5e8e0",
       "link": "http://www.rssd.esa.int/doc_fetch.php?id=3757412",
-      "file": "@mirror-url@catalog/edr3/007-ruwe/v00_20201124/catalog-edr3-ruwe.tar.gz"
+      "file": "@mirror-url@catalog/edr3/007-ruwe/v01_20201217/catalog-edr3-ruwe.tar.gz"
     },
     {
       "name": "catalog-gcns",
@@ -554,16 +560,16 @@
         "shader/postprocess/raymarching/blackhole.fragment"
       ],
       "description": "Gargantua Black Hole - The black hole from Interstellar, somewhere in the galaxy...",
-      "link": "https://www.shadertoy.com/view/tsBXW3",
       "releasenotes" : "Add type to catalog descriptor file",
+      "link": "https://www.shadertoy.com/view/tsBXW3",
       "sha256": "545a02d1cf11a22bf028526217665f3c25ac007a5bca8d87b759d30b811f175d",
       "file": "@mirror-url@extra/blackhole/v01_20201216/gargantua-blackhole.tar.gz"
     },
     {
       "name": "mesh-dr2-dust",
       "type": "mesh",
-      "version": 1,
-      "size": 2828332,
+      "version": 2,
+      "size": 2828359,
       "nobjects": 2,
       "check": "catalog-mesh-dr2-dust.json",
       "data": [
@@ -572,15 +578,16 @@
         "meshes/dr2/meshes_dust"
       ],
       "description": "Dust maps based on GDR2 data - Isosurfaces for 15% and 60% density",
+      "releasenotes" : "Add type to catalog descriptor file",
       "link": "https://galaxymap.org",
-      "sha256" : "31c3ebc134abaed08247130223c4a48b91b4e9556e1f15e432fd67ca92d04e68",
-      "file": "@mirror-url@meshes/dr2/dust/v01_20201030/mesh-dr2-dust.tar.gz"
+      "sha256" : "fda5c94e9ac1790c7e81366dc7d1b6a6b4c815a58f2d93d80878bfb8dc627619",
+      "file": "@mirror-url@meshes/dr2/dust/v02_20201217/mesh-dr2-dust.tar.gz"
     },
     {
       "name": "mesh-dr2-hii",
       "type": "mesh",
-      "version": 1,
-      "size": 2475023,
+      "version": 2,
+      "size": 2475047,
       "check": "catalog-mesh-dr2-hii.json",
       "data": [
         "catalog-mesh-dr2-hii.json",
@@ -588,15 +595,16 @@
         "meshes/dr2/meshes_hii"
       ],
       "description": "HII regions based on GDR2 data - Isosurfaces for HII regions",
+      "releasenotes" : "Add type to catalog descriptor file",
       "link": "https://galaxymap.org",
-      "sha256" : "3bd7e15fe9564d97668537273104c04eb27ad185a558bb6c05fabdfd5771491c",
-      "file": "@mirror-url@meshes/dr2/hii/v01_20201030/mesh-dr2-hii.tar.gz"
+      "sha256" : "021946b8d85be4c625592390d918cc473eae37c262cd85a3aeea014c438b0502",
+      "file": "@mirror-url@meshes/dr2/hii/v02_20201217/mesh-dr2-hii.tar.gz"
     },
     {
       "name": "mesh-dr2-isodensity",
       "type": "mesh",
-      "version": 0,
-      "size": 83981944,
+      "version": 1,
+      "size": 83981902,
       "nobjects": 8,
       "check": "catalog-mesh-dr2-isodensity.json",
       "data": [
@@ -606,8 +614,8 @@
       ],
       "description": "Hot star isodensities based on GDR2 - Isodensity surfaces of hot stars for different preset values",
       "link": "https://galaxymap.org",
-      "sha256" : "2d526b6446c0bd84668b28f3d0bd9ec2979a539747e86c4156b6c3d8340f88e9",
-      "file": "@mirror-url@meshes/dr2/isodensity/v00_20201125/mesh-dr2-isodensity.tar.gz"
+      "sha256" : "67b7d601ca39d1cca8ab8ce258abc2ed540091c9b4c8a1694d5b85438a4146d8",
+      "file": "@mirror-url@meshes/dr2/isodensity/v01_20201217/mesh-dr2-isodensity.tar.gz"
     }
   ]
 }

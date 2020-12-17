@@ -440,8 +440,6 @@ public class DownloadDataWindow extends GenericDialog {
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1256f));
-        datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
 
         downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
 
@@ -486,6 +484,10 @@ public class DownloadDataWindow extends GenericDialog {
 
         topCell.setActor(downloadTable);
 
+        downloadTable.pack();
+        datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
+        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+
         // Update selected
         updateDatasetsSelected();
     }
@@ -528,6 +530,12 @@ public class DownloadDataWindow extends GenericDialog {
         current = -1;
         downloadNext();
 
+    }
+
+    public void refresh(){
+        content.clear();
+        bottom.clear();
+        build();
     }
 
     private void downloadNext() {
