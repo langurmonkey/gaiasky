@@ -272,7 +272,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private List<IRenderSystem> renderProcesses;
 
-    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, noDepthWritesR, depthWritesR, clearDepthR, noBlendR;
+    private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, noDepthWritesR, depthWritesR, clearDepthR, noBlendR;
 
     /**
      * The particular current scene graph renderer
@@ -401,6 +401,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         depthTestR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthMask(true);
+        };
+        depthTestNoWritesR = (renderSystem, renderables, camera) -> {
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthMask(false);
         };
         noDepthWritesR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glDepthMask(false);
@@ -608,9 +612,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         spriteBatch = GlobalResources.extSpriteBatch;
         spriteBatch.enableBlending();
 
-        // Font batch
+        // Font batch - additive, no depth writes
         fontBatch = new ExtSpriteBatch(2000, distanceFieldFontShader);
         fontBatch.enableBlending();
+        fontBatch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE);
 
         ComponentType[] comps = ComponentType.values();
 
@@ -743,7 +748,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // LABELS
         AbstractRenderSystem labelsProc = new FontRenderSystem(FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
-        labelsProc.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);
 
         // BILLBOARD SSO
         AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);

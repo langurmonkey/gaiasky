@@ -223,8 +223,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             if (!copy) {
                 addToRender(this, RenderGroup.POINT_STAR);
 
-                viewAngle = (radius / distToCamera) / camera.getFovFactor();
-                viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
+                viewAngle = (radius / distToCamera);
+                viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
 
                 addToRenderLists(camera);
             }

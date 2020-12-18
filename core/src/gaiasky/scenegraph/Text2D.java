@@ -52,7 +52,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         setParentOpacity();
 
         this.viewAngle = 80f;
-        this.viewAngleApparent = this.viewAngle;
+        this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
     }
 
     protected void setParentOpacity() {

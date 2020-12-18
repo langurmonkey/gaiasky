@@ -480,7 +480,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         Vector3d aux = aux3d1.get();
         this.distToCamera = (float) aux.set(translation).len();
         this.viewAngle = (float) FastMath.atan(size / distToCamera);
-        this.viewAngleApparent = this.viewAngle;
+        this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
         if (!copy) {
             addToRenderLists(camera);
         }
@@ -1142,20 +1142,19 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, float scale, float size) {
-       render3DLabel(batch, shader, font, camera, rc, label, pos, scale, size, -1, -1);
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size) {
+       render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 
-        if (getRadius() == 0 || distToCamera > getRadius() * 2d) {
+        double r = getRadius();
+        if (r == 0 || distToCamera > r * 2d) {
 
             size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
 
-            // Enable or disable blending
-            ((I3DTextRenderable) this).textDepthBuffer();
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
@@ -1168,6 +1167,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
             }
 
             shader.setUniformf("u_pos", pos.put(aux3f1.get()));
+
+            // Enable or disable blending
+            ((I3DTextRenderable) this).textDepthBuffer();
 
             DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }

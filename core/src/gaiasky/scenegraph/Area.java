@@ -19,9 +19,8 @@ import net.jafama.FastMath;
 
 /**
  * Represents the outline of a country
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class Area extends SceneGraphNode implements ILineRenderable {
 
@@ -104,8 +103,8 @@ public class Area extends SceneGraphNode implements ILineRenderable {
             this.opacity = (float) MathUtilsd.lint(parent.viewAngleApparent, angleLow, angleHigh, 0, 1);
 
             this.distToCamera = (float) translation.len();
-            this.viewAngle = (float) FastMath.atan(size / distToCamera) / camera.getFovFactor();
-            this.viewAngleApparent = this.viewAngle;
+            this.viewAngle = (float) FastMath.atan(size / distToCamera);
+            this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
             if (!copy) {
                 addToRenderLists(camera);
             }

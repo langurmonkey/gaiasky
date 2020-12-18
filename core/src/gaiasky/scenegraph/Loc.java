@@ -82,8 +82,8 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
             Vector3d aux = aux3d1.get();
             this.distToCamera = (float) translation.put(aux).len();
-            this.viewAngle = (float) FastMath.atan(size / distToCamera) / camera.getFovFactor();
-            this.viewAngleApparent = this.viewAngle * camera.getFovFactor();
+            this.viewAngle = (float) FastMath.atan(size / distToCamera);
+            this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
             if (!copy) {
                 addToRenderLists(camera);
             }
@@ -141,7 +141,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thOverFactor", ((ModelBody) parent).locThOverFactor / (float) Constants.DISTANCE_SCALE_FACTOR);
         shader.setUniformf("u_thOverFactorScl", 1f);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
     }
 
     @Override
@@ -151,7 +151,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
     @Override
     public float textSize() {
-        return size / 3.5f;
+        return size / 1.5f;
     }
 
     @Override
@@ -174,7 +174,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override

@@ -31,7 +31,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRenderable, ILineRenderable {
     private static final double TH_ANGLE_NONE = ModelBody.TH_ANGLE_POINT / 1e6;
-    private static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 3e3;
+    private static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 3e4;
     private static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 2f;
 
     private final Vector3d endLine = new Vector3d();

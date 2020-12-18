@@ -742,7 +742,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * 2f * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, pos.len(), textScale() * 2f * camera.getFovFactor(), textSize() * camera.getFovFactor());
 
         // Particle labels
         float thOverFactor = 1e-15f;
@@ -763,7 +763,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                 float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                 textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names[0], lpos, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names[0], lpos, distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
             }
         }
     }
@@ -839,7 +839,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override
