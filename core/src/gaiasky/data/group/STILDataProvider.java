@@ -47,7 +47,7 @@ import java.util.logging.Level;
  */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(STILDataProvider.class);
-    private final StarTableFactory factory;
+    private StarTableFactory factory;
     private long starid = 10000000;
     // Dataset options, may be null
     private DatasetOptions dops;
@@ -58,10 +58,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public STILDataProvider() {
         super();
         // Disable logging
-        java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.OFF);
-        factory = new StarTableFactory();
-        countsPerMag = new long[22];
-        initLists();
+        try {
+            java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.OFF);
+            factory = new StarTableFactory();
+            countsPerMag = new long[22];
+            initLists();
+        } catch (Exception e) {
+            factory = null;
+            logger.error(e);
+        }
     }
 
     public void setDatasetOptions(DatasetOptions dops) {
@@ -170,253 +175,255 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      */
     public List<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
-            // Add extra builders
-            List builders = factory.getDefaultBuilders();
-            builders.add(new CsvTableBuilder());
-            builders.add(new AsciiTableBuilder());
+            if (factory != null) {
 
-            if (preCallback != null)
-                preCallback.run();
+                // Add extra builders
+                List builders = factory.getDefaultBuilders();
+                builders.add(new CsvTableBuilder());
+                builders.add(new AsciiTableBuilder());
 
-            // Try to load
-            StarTable table = factory.makeStarTable(ds);
+                if (preCallback != null)
+                    preCallback.run();
 
-            long count = table.getRowCount();
-            initLists((int) count);
+                // Try to load
+                StarTable table = factory.makeStarTable(ds);
 
-            UCDParser ucdp = new UCDParser();
-            ucdp.parse(table);
+                long count = table.getRowCount();
+                initLists((int) count);
 
-            if (ucdp.haspos) {
-                int nInvalidPllx = 0;
-                long i = 0l;
-                long step = Math.max(1l, Math.round(count / 100d));
+                UCDParser ucdp = new UCDParser();
+                ucdp.parse(table);
 
-                RowSequence rs = table.getRowSequence();
-                while (rs.next()) {
-                    Object[] row = rs.getRow();
-                    boolean skip = false;
-                    try {
-                        /* POSITION */
-                        Pair<UCD, Double> a = getDoubleUcd(ucdp.POS1, row);
-                        Pair<UCD, Double> b = getDoubleUcd(ucdp.POS2, row);
-                        Pair<UCD, Double> c;
-                        String unitc;
+                if (ucdp.haspos) {
+                    int nInvalidPllx = 0;
+                    long i = 0l;
+                    long step = Math.max(1l, Math.round(count / 100d));
 
-                        Pair<UCD, Double> pos3 = getDoubleUcd(ucdp.POS3, row);
-                        // Check missing pos3 -> Use default parallax
-                        if (ucdp.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
-                            c = new Pair<>(null, 0.04);
-                            unitc = "mas";
-                            nInvalidPllx++;
-                        } else {
-                            c = getDoubleUcd(ucdp.POS3, row);
-                            unitc = c.getFirst().unit;
-                        }
+                    RowSequence rs = table.getRowSequence();
+                    while (rs.next()) {
+                        Object[] row = rs.getRow();
+                        boolean skip = false;
+                        try {
+                            /* POSITION */
+                            Pair<UCD, Double> a = getDoubleUcd(ucdp.POS1, row);
+                            Pair<UCD, Double> b = getDoubleUcd(ucdp.POS2, row);
+                            Pair<UCD, Double> c;
+                            String unitc;
 
-                        PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
-                        // Check negative parallaxes -> Use default for consistency
-                        if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
-                            c.setSecond(0.04);
-                            unitc = "mas";
-                            nInvalidPllx++;
-                        }
-
-                        Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
-
-                        double distpc = p.gsposition.len();
-                        if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distpc) || distpc < 0) {
-                            // Next
-                            break;
-                        }
-
-                        p.gsposition.scl(Constants.PC_TO_U);
-                        // Find out RA/DEC/Dist
-                        Vector3d sph = new Vector3d();
-                        Coordinates.cartesianToSpherical(p.gsposition, sph);
-
-                        /* PROPER MOTION */
-                        Vector3d pm;
-                        double mualphastar = 0, mudelta = 0, radvel = 0;
-                        // Only supported if position is equatorial spherical coordinates (ra/dec)
-                        if (pt == PositionType.EQ_SPH_DIST || pt == PositionType.EQ_SPH_PLX) {
-                            Pair<UCD, Double> pma = getDoubleUcd(ucdp.PMRA, row);
-                            Pair<UCD, Double> pmb = getDoubleUcd(ucdp.PMDEC, row);
-                            Pair<UCD, Double> pmc = getDoubleUcd(ucdp.RADVEL, row);
-
-                            mualphastar = pma != null ? pma.getSecond() : 0;
-                            mudelta = pmb != null ? pmb.getSecond() : 0;
-                            radvel = pmc != null ? pmc.getSecond() : 0;
-
-                            double rarad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
-                            double decrad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
-                            pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc);
-                        } else {
-                            pm = new Vector3d(Vector3d.Zero);
-                        }
-
-                        /* MAGNITUDE */
-                        double appmag;
-                        if (!ucdp.MAG.isEmpty()) {
-                            Pair<UCD, Double> appmagPair = getDoubleUcd(ucdp.MAG, row);
-                            appmag = appmagPair.getSecond();
-                        } else {
-                            // Default magnitude
-                            appmag = 15;
-                        }
-                        // Scale magnitude if needed
-                        double magscl = (dops != null && dops.type == DatasetOptions.DatasetLoadType.STARS) ? dops.magnitudeScale : 0f;
-                        appmag -= magscl;
-
-                        double absmag = appmag - 5 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5;
-                        // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
-                        double pseudoL = Math.pow(10, -0.4 * absmag);
-                        double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-                        double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
-                        size *= Constants.DISTANCE_SCALE_FACTOR;
-
-                        /* COLOR */
-                        float color;
-                        if (!ucdp.COL.isEmpty()) {
-                            Pair<UCD, Double> colPair = getDoubleUcd(ucdp.COL, row);
-                            if (colPair == null) {
-                                color = 0.656f;
+                            Pair<UCD, Double> pos3 = getDoubleUcd(ucdp.POS3, row);
+                            // Check missing pos3 -> Use default parallax
+                            if (ucdp.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
+                                c = new Pair<>(null, 0.04);
+                                unitc = "mas";
+                                nInvalidPllx++;
                             } else {
-                                color = colPair.getSecond().floatValue();
+                                c = getDoubleUcd(ucdp.POS3, row);
+                                unitc = c.getFirst().unit;
                             }
-                        } else {
-                            // Default color
-                            color = 0.656f;
-                        }
-                        float[] rgb = ColorUtils.BVtoRGB(color);
-                        double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        /* IDENTIFIER AND NAME */
-                        String[] names;
-                        Long id = -1l;
-                        int hip = -1;
-                        if (ucdp.NAME.isEmpty()) {
-                            // Empty name
-                            if (!ucdp.ID.isEmpty()) {
-                                // We have ID
-                                Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
-                                names = new String[] { namePair.getSecond() };
-                                if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                    hip = Integer.valueOf(namePair.getSecond());
-                                    id = (long) hip;
+                            PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
+                            // Check negative parallaxes -> Use default for consistency
+                            if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
+                                c.setSecond(0.04);
+                                unitc = "mas";
+                                nInvalidPllx++;
+                            }
+
+                            Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
+
+                            double distpc = p.gsposition.len();
+                            if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distpc) || distpc < 0) {
+                                // Next
+                                break;
+                            }
+
+                            p.gsposition.scl(Constants.PC_TO_U);
+                            // Find out RA/DEC/Dist
+                            Vector3d sph = new Vector3d();
+                            Coordinates.cartesianToSpherical(p.gsposition, sph);
+
+                            /* PROPER MOTION */
+                            Vector3d pm;
+                            double mualphastar = 0, mudelta = 0, radvel = 0;
+                            // Only supported if position is equatorial spherical coordinates (ra/dec)
+                            if (pt == PositionType.EQ_SPH_DIST || pt == PositionType.EQ_SPH_PLX) {
+                                Pair<UCD, Double> pma = getDoubleUcd(ucdp.PMRA, row);
+                                Pair<UCD, Double> pmb = getDoubleUcd(ucdp.PMDEC, row);
+                                Pair<UCD, Double> pmc = getDoubleUcd(ucdp.RADVEL, row);
+
+                                mualphastar = pma != null ? pma.getSecond() : 0;
+                                mudelta = pmb != null ? pmb.getSecond() : 0;
+                                radvel = pmc != null ? pmc.getSecond() : 0;
+
+                                double rarad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
+                                double decrad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
+                                pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc);
+                            } else {
+                                pm = new Vector3d(Vector3d.Zero);
+                            }
+
+                            /* MAGNITUDE */
+                            double appmag;
+                            if (!ucdp.MAG.isEmpty()) {
+                                Pair<UCD, Double> appmagPair = getDoubleUcd(ucdp.MAG, row);
+                                appmag = appmagPair.getSecond();
+                            } else {
+                                // Default magnitude
+                                appmag = 15;
+                            }
+                            // Scale magnitude if needed
+                            double magscl = (dops != null && dops.type == DatasetOptions.DatasetLoadType.STARS) ? dops.magnitudeScale : 0f;
+                            appmag -= magscl;
+
+                            double absmag = appmag - 5 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5;
+                            // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
+                            double pseudoL = Math.pow(10, -0.4 * absmag);
+                            double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
+                            double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
+                            size *= Constants.DISTANCE_SCALE_FACTOR;
+
+                            /* COLOR */
+                            float color;
+                            if (!ucdp.COL.isEmpty()) {
+                                Pair<UCD, Double> colPair = getDoubleUcd(ucdp.COL, row);
+                                if (colPair == null) {
+                                    color = 0.656f;
                                 } else {
-                                    id = ++starid;
+                                    color = colPair.getSecond().floatValue();
                                 }
                             } else {
-                                // Emtpy ID
-                                id = ++starid;
-                                names = new String[] { id.toString() };
+                                // Default color
+                                color = 0.656f;
                             }
-                        } else {
-                            // We have name
-                            Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdp.NAME, row);
-                            Array<String> namesArray = new Array<>(namePairs.length);
-                            for (Pair<UCD, String> pair : namePairs) {
-                                String[] currNames = pair.getSecond().split(Constants.nameSeparatorRegex);
-                                for (String actualName : currNames) {
-                                    if (actualName != null && !actualName.isEmpty() && !TextUtils.contains(forbiddenNameValues, actualName, true)) {
-                                        namesArray.add(actualName);
+                            float[] rgb = ColorUtils.BVtoRGB(color);
+                            double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+
+                            /* IDENTIFIER AND NAME */
+                            String[] names;
+                            Long id = -1l;
+                            int hip = -1;
+                            if (ucdp.NAME.isEmpty()) {
+                                // Empty name
+                                if (!ucdp.ID.isEmpty()) {
+                                    // We have ID
+                                    Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
+                                    names = new String[] { namePair.getSecond() };
+                                    if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                        hip = Integer.valueOf(namePair.getSecond());
+                                        id = (long) hip;
+                                    } else {
+                                        id = ++starid;
+                                    }
+                                } else {
+                                    // Emtpy ID
+                                    id = ++starid;
+                                    names = new String[] { id.toString() };
+                                }
+                            } else {
+                                // We have name
+                                Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdp.NAME, row);
+                                Array<String> namesArray = new Array<>(namePairs.length);
+                                for (Pair<UCD, String> pair : namePairs) {
+                                    String[] currNames = pair.getSecond().split(Constants.nameSeparatorRegex);
+                                    for (String actualName : currNames) {
+                                        if (actualName != null && !actualName.isEmpty() && !TextUtils.contains(forbiddenNameValues, actualName, true)) {
+                                            namesArray.add(actualName);
+                                        }
                                     }
                                 }
-                            }
-                            names = new String[namesArray.size];
-                            int k = 0;
-                            for (String n : namesArray) {
-                                names[k++] = n;
-                            }
-                            if (names.length == 0) {
-                                names = new String[] { id.toString() };
-                            }
+                                names = new String[namesArray.size];
+                                int k = 0;
+                                for (String n : namesArray) {
+                                    names[k++] = n;
+                                }
+                                if (names.length == 0) {
+                                    names = new String[] { id.toString() };
+                                }
 
-                            // Take care of HIP stars
-                            if (!ucdp.ID.isEmpty()) {
-                                Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
-                                if (idpair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                    hip = Integer.valueOf(idpair.getSecond());
-                                    id = (long) hip;
+                                // Take care of HIP stars
+                                if (!ucdp.ID.isEmpty()) {
+                                    Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
+                                    if (idpair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                        hip = Integer.valueOf(idpair.getSecond());
+                                        id = (long) hip;
+                                    } else {
+                                        id = ++starid;
+                                    }
                                 } else {
                                     id = ++starid;
                                 }
-                            } else {
-                                id = ++starid;
                             }
+
+                            if (mustLoad(id)) {
+                                // Check must load
+                                skip = false;
+                            }
+
+                            if (skip) {
+                                // Next
+                                continue;
+                            }
+
+                            // Populate provider lists
+                            colors.put(id, rgb);
+                            sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
+
+                            if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
+                                double[] point = new double[StarBean.SIZE + 3];
+                                point[StarBean.I_HIP] = hip;
+                                point[StarBean.I_X] = p.gsposition.x;
+                                point[StarBean.I_Y] = p.gsposition.y;
+                                point[StarBean.I_Z] = p.gsposition.z;
+                                point[StarBean.I_PMX] = pm.x;
+                                point[StarBean.I_PMY] = pm.y;
+                                point[StarBean.I_PMZ] = pm.z;
+                                point[StarBean.I_MUALPHA] = mualphastar;
+                                point[StarBean.I_MUDELTA] = mudelta;
+                                point[StarBean.I_RADVEL] = radvel;
+                                point[StarBean.I_COL] = col;
+                                point[StarBean.I_SIZE] = size;
+                                point[StarBean.I_APPMAG] = appmag;
+                                point[StarBean.I_ABSMAG] = absmag;
+
+                                // Extra
+                                Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
+
+                                StarBean sb = new StarBean(point, id, names, extraAttributes);
+                                list.add(sb);
+
+                                int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
+                                countsPerMag[appclmp] += 1;
+                            } else if (dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
+                                double[] point = new double[3];
+                                point[ParticleBean.I_X] = p.gsposition.x;
+                                point[ParticleBean.I_Y] = p.gsposition.y;
+                                point[ParticleBean.I_Z] = p.gsposition.z;
+
+                                // TODO reorganise existing star properties into extra attributes
+
+                                // Extra
+                                Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
+
+                                ParticleBean pb = new ParticleBean(point, names, extraAttributes);
+                                list.add(pb);
+                            }
+
+                        } catch (Exception e) {
+                            logger.debug(e);
+                            logger.debug("Exception parsing row " + i + ": skipping");
                         }
-
-                        if (mustLoad(id)) {
-                            // Check must load
-                            skip = false;
+                        i++;
+                        if (updateCallback != null && i % step == 0) {
+                            updateCallback.run(i, count);
                         }
-
-                        if (skip) {
-                            // Next
-                            continue;
-                        }
-
-                        // Populate provider lists
-                        colors.put(id, rgb);
-                        sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
-
-                        if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                            double[] point = new double[StarBean.SIZE + 3];
-                            point[StarBean.I_HIP] = hip;
-                            point[StarBean.I_X] = p.gsposition.x;
-                            point[StarBean.I_Y] = p.gsposition.y;
-                            point[StarBean.I_Z] = p.gsposition.z;
-                            point[StarBean.I_PMX] = pm.x;
-                            point[StarBean.I_PMY] = pm.y;
-                            point[StarBean.I_PMZ] = pm.z;
-                            point[StarBean.I_MUALPHA] = mualphastar;
-                            point[StarBean.I_MUDELTA] = mudelta;
-                            point[StarBean.I_RADVEL] = radvel;
-                            point[StarBean.I_COL] = col;
-                            point[StarBean.I_SIZE] = size;
-                            point[StarBean.I_APPMAG] = appmag;
-                            point[StarBean.I_ABSMAG] = absmag;
-
-                            // Extra
-                            Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
-
-                            StarBean sb = new StarBean(point, id, names, extraAttributes);
-                            list.add(sb);
-
-                            int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                            countsPerMag[appclmp] += 1;
-                        } else if (dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
-                            double[] point = new double[3];
-                            point[ParticleBean.I_X] = p.gsposition.x;
-                            point[ParticleBean.I_Y] = p.gsposition.y;
-                            point[ParticleBean.I_Z] = p.gsposition.z;
-
-                            // TODO reorganise existing star properties into extra attributes
-
-                            // Extra
-                            Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
-
-                            ParticleBean pb = new ParticleBean(point, names, extraAttributes);
-                            list.add(pb);
-                        }
-
-                    } catch (Exception e) {
-                        logger.debug(e);
-                        logger.debug("Exception parsing row " + i + ": skipping");
                     }
-                    i++;
-                    if (updateCallback != null && i % step == 0) {
-                        updateCallback.run(i, count);
+                    if (nInvalidPllx > 0) {
+                        logger.warn("Found " + nInvalidPllx + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
                     }
+                } else {
+                    logger.error("Table not loaded: Position not found");
                 }
-                if (nInvalidPllx > 0) {
-                    logger.warn("Found " + nInvalidPllx + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
-                }
-            } else {
-                logger.error("Table not loaded: Position not found");
             }
-
         } catch (Exception e) {
             logger.error(e);
         } finally {

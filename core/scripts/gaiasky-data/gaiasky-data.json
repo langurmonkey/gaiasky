@@ -205,7 +205,7 @@
     {
       "name": "catalog-edr3-verylarge",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 43945743765,
       "nobjects": 449664356,
       "check": "catalog-edr3-verylarge.json",
@@ -214,14 +214,14 @@
         "catalog/edr3-verylarge"
       ],
       "description": "Gaia eDR3 very large - 50% parallax relative error, includes Hipparcos",
-      "sha256": "450de5ce51adc958fc4448baac55f891a6322785f92ead977c4a463cae9170c4",
+      "sha256": "d8610bf481d0776bb2ab9a6174515756eb1550369ceb3ed612295cc1e9699146",
       "link": "@mirror-url@catalog/edr3/004-verylarge",
-      "file": "@mirror-url@catalog/edr3/004-verylarge/v00_20201124/catalog-edr3-verylarge.tar.gz"
+      "file": "@mirror-url@catalog/edr3/004-verylarge/v01_20201217/catalog-edr3-verylarge.tar.gz"
     },
     {
       "name": "catalog-edr3-extralarge",
       "type": "catalog-lod",
-      "version": 0,
+      "version": 1,
       "size": 64675214776,
       "nobjects": 688188981,
       "check": "catalog-edr3-extralarge.json",
@@ -230,9 +230,9 @@
         "catalog/edr3-extralarge"
       ],
       "description": "Gaia eDR3 extra large - 95% parallax relative error, includes Hipparcos",
-      "sha256": "813815e153c181b6564d80b43da4bb584c96d5fb3023d2637db8be1b156d2fe5",
+      "sha256": "87cff91dc5080fd5a74a54824b70c61646a0cea3d6b532821f3d6457d4334e9e",
       "link": "@mirror-url@catalog/edr3/005-extralarge",
-      "file": "@mirror-url@catalog/edr3/005-extralarge/v00_20201124/catalog-edr3-extralarge.tar.gz"
+      "file": "@mirror-url@catalog/edr3/005-extralarge/v01_20201217/catalog-edr3-extralarge.tar.gz"
     },
     {
       "name": "catalog-edr3-bright",

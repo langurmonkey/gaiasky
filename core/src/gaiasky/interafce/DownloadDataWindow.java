@@ -465,7 +465,8 @@ public class DownloadDataWindow extends GenericDialog {
         Table infoCancel = new Table(skin);
         downloadSpeed = new OwnLabel("", skin);
         downloadSpeed.setVisible(false);
-        infoCancel.add(downloadSpeed).padRight(padLarge * 2f);
+        downloadSpeed.setWidth(300f);
+        infoCancel.add(downloadSpeed).center().padRight(padLarge * 2f);
         cancelCell = infoCancel.add();
         downloadTable.add(infoCancel).colspan(2).padBottom(padLarge).row();
 
