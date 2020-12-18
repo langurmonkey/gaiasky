@@ -169,7 +169,7 @@ public class SlaveManager {
                 Element root = doc.getDocumentElement();
                 String profile = root.getAttribute("profile");
                 if (!profile.equalsIgnoreCase("3d")) {
-                    logger.warn("Gaya Sky only supports the '3d' profile");
+                    logger.warn("Gaia Sky only supports the '3d' profile");
                 }
                 // Display
                 NodeList displays = root.getElementsByTagName("display");

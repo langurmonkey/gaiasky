@@ -62,9 +62,9 @@
     {
       "name": "default-data",
       "type": "data-pack",
-      "version": 14,
+      "version": 15,
       "mingsversion": 30000,
-      "size": 64895873,
+      "size": 64895887,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -108,11 +108,11 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "857a4a1926c0e0d45ef69a718b519a93ab8c509b4deda48a561ec32db9e33516",
+      "sha256": "b20ab5cca1e58d5c158f5942310807f8996d238cafe9158723dbe34f3b08871f",
       "description": "Base data pack - Required, for Gaia Sky 3.0.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
-      "releasenotes": "New Milky Way model, update star clusters color. Reduce size of spacecraft to about 10 m. Remove dust and HII meshes, they belong in their own package.",
+      "releasenotes": "Adjust color and opacity of Gaia orbit",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v014_20201125/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v015_20201218/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
