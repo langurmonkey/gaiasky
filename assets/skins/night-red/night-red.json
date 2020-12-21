@@ -179,6 +179,12 @@
       "g": 0.8,
       "r": 0.8
     },
+    "disabled-font": {
+      "a": 1,
+      "b": 0.5,
+      "g": 0.5,
+      "r": 1
+    }
     "theme": {
       "a": 1,
       "b": 0,
@@ -243,7 +249,7 @@
       "focused": "default-round-sel",
       "font": "title-17",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray"
+      "disabledFontColor": "disabled-font"
     },
     "big": {
       "down": "default-round-down",
@@ -252,7 +258,7 @@
       "focused": "default-round-sel",
       "font": "title-23",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray"
+      "disabledFontColor": "disabled-font"
     },
     "huge": {
       "down": "default-round-down",
@@ -261,7 +267,7 @@
       "focused": "default-round-sel",
       "font": "title-27",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray"
+      "disabledFontColor": "disabled-font"
     },
     "download": {
       "down": "default-round-down",
@@ -269,7 +275,7 @@
       "disabled": "default-round-disabled",
       "font": "title-21",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray"
+      "disabledFontColor": "disabled-font"
     },
     "download-big": {
       "down": "default-round-down",
@@ -277,7 +283,7 @@
       "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray"
+      "disabledFontColor": "disabled-font"
     },
     "toggle": {
       "down": "default-round-down",
@@ -481,7 +487,7 @@
       "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray",
+      "disabledFontColor": "disabled-font",
       "imageUp": "car-icon"
     },
     "cloud-download": {
@@ -490,7 +496,7 @@
       "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray",
+      "disabledFontColor": "disabled-font",
       "imageUp": "iconic-cloud-download"
     },
     "check": {
@@ -499,7 +505,7 @@
       "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "theme",
-      "disabledFontColor": "dark-gray",
+      "disabledFontColor": "disabled-font",
       "imageUp": "iconic-check"
     }
   },
@@ -663,7 +669,7 @@
     "default": {
       "font": "ui-18",
       "fontColor": "black",
-      "disabledFontColor": "grey",
+      "disabledFontColor": "disabled-font",
       "background": "default-select",
       "backgroundDisabled": "default-select-disabled",
       "scrollStyle": "default",
@@ -942,7 +948,7 @@
       "disabledBackground": "textfield-disabled",
       "font": "ui-18",
       "fontColor": "black",
-      "disabledFontColor": "grey",
+      "disabledFontColor": "disabled-font",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
@@ -952,7 +958,7 @@
       "disabledBackground": "textfield-disabled",
       "font": "ui-30",
       "fontColor": "black",
-      "disabledFontColor": "grey",
+      "disabledFontColor": "disabled-font",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
@@ -1166,7 +1172,7 @@
       "disabled": "button",
       "font": "ui-18",
       "fontColor": "theme",
-      "disabledFontColor": "grey"
+      "disabledFontColor": "disabled-font"
     },
     "toggle": {
       "checked": "button-down",
@@ -1176,7 +1182,7 @@
       "fontColor": "theme",
       "over": "button-over",
       "disabled": "button",
-      "disabledFontColor": "grey",
+      "disabledFontColor": "disabled-font",
       "subMenu": "sub-menu"
     }
   }

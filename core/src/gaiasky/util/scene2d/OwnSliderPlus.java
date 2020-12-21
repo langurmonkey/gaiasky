@@ -49,10 +49,10 @@ public class OwnSliderPlus extends Slider {
         this.skin = skin;
         setUp(title, min, max, "default");
     }
-    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style, String labelStyle) {
+    public OwnSliderPlus(String title, float min, float max, float stepSize, Skin skin, String style) {
         super(min, max, stepSize, false, skin, style);
         this.skin = skin;
-        setUp(title, min, max, labelStyle);
+        setUp(title, min, max, "default");
     }
 
     public OwnSliderPlus(String title, float min, float max, float stepSize, boolean vertical, Skin skin) {

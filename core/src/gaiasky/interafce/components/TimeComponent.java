@@ -89,7 +89,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         // Pace
         timeWarpVector = generateTimeWarpVector(warpSteps);
-        warp = new OwnSliderPlus(I18n.txt("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow", "menuitem-shortcut");
+        warp = new OwnSliderPlus(I18n.txt("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow");
         warp.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
         warp.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
         warp.setWidth(300f);
