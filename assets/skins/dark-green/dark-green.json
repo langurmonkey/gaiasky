@@ -239,6 +239,7 @@
     "default": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-17",
       "fontColor": "white",
@@ -247,6 +248,7 @@
     "big": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-23",
       "fontColor": "white",
@@ -255,6 +257,7 @@
     "huge": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-27",
       "fontColor": "white",
@@ -263,7 +266,7 @@
     "download": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
+      "disabled": "default-round-disabled",
       "font": "title-21",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
@@ -271,7 +274,7 @@
     "download-big": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
+      "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
@@ -279,6 +282,7 @@
     "toggle": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
@@ -289,6 +293,7 @@
     "toggle-big": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
@@ -299,6 +304,7 @@
     "toggle-huge": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
@@ -472,7 +478,7 @@
     "start": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
+      "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray",
@@ -481,7 +487,7 @@
     "cloud-download": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
+      "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
@@ -490,7 +496,7 @@
     "check": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
+      "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
