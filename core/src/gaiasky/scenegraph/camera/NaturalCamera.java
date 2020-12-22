@@ -827,8 +827,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             if (focusLookKeyPressed) {
                 diverted = true;
-                addYaw(deltaX, acceleration);
-                addPitch(deltaY, acceleration);
+                addYaw(deltaX * fovFactor, acceleration);
+                addPitch(deltaY * fovFactor, acceleration);
             } else {
                 // This factor slows the rotation as the focus gets closer and closer
                 double factor = vadeg > th ? Math.pow(th / vadeg, 3) : 1.0;
@@ -895,7 +895,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public void setHorizontal(double amount) {
         horizontal.x = 0;
-        horizontal.y = amount;
+        horizontal.y = amount * fovFactor;
     }
 
     /**
@@ -908,7 +908,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public void setVertical(double amount) {
         vertical.x = 0;
-        vertical.y = amount;
+        vertical.y = amount * fovFactor;
     }
 
     /**
