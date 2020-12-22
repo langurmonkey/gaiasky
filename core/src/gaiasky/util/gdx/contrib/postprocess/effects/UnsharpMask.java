@@ -34,16 +34,20 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 public final class UnsharpMask extends PostProcessorEffect {
     private UnsharpMaskFilter filter = null;
 
-    public UnsharpMask(float viewportWidth, float viewportHeight) {
-        setup(viewportWidth, viewportHeight);
+    public UnsharpMask() {
+        setup();
     }
 
-    private void setup(float viewportWidth, float viewportHeight) {
-        filter = new UnsharpMaskFilter(viewportWidth, viewportHeight);
+    private void setup() {
+        filter = new UnsharpMaskFilter();
     }
 
-    public void setViewportSize(int width, int height) {
-        filter.setViewportSize(width, height);
+    /**
+     * The sharpen factor. 0 to disable, 1 is default.
+     * @param sf The sharpen factor
+     */
+    public void setSharpenFactor(float sf){
+        filter.setSharpenFactor(sf);
     }
 
     @Override

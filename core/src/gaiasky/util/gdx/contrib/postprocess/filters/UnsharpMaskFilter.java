@@ -20,7 +20,6 @@
 
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
-import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
@@ -29,12 +28,12 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * @author Toni Sagrista
  */
 public final class UnsharpMaskFilter extends Filter<UnsharpMaskFilter> {
-    private final Vector2 viewport;
+    private float u_sharpenFactor = 1f;
 
     public enum Param implements Parameter {
         // @formatter:off
         Texture("u_texture0", 0),
-        Viewport("u_viewport", 2);
+        SharpenFactor("u_sharpenFactor", 0);
         // @formatter:on
 
         private final String mnemonic;
@@ -56,43 +55,27 @@ public final class UnsharpMaskFilter extends Filter<UnsharpMaskFilter> {
         }
     }
 
-    /**
-     * Creates an unsharp mask filter with the given viewport size and quality.
-     *
-     * @param viewportWidth  The viewport width in pixels.
-     * @param viewportHeight The viewport height in pixels.
-     */
-    public UnsharpMaskFilter(float viewportWidth, float viewportHeight) {
-        this(new Vector2(viewportWidth, viewportHeight));
-    }
 
 
     /**
-     * Creates an unsharp mask filter with the given viewport size and quality.
+     * Creates an unsharp mask filter.
      *
-     * @param viewportSize The viewport size in pixels.
      */
-    public UnsharpMaskFilter(Vector2 viewportSize) {
+    public UnsharpMaskFilter() {
         super(ShaderLoader.fromFile("screenspace", "unsharpmask"));
-        this.viewport = viewportSize;
         rebind();
     }
 
-
-    public void setViewportSize(float width, float height) {
-        this.viewport.set(width, height);
-        setParam(Param.Viewport, this.viewport);
-    }
-
-    public Vector2 getViewportSize() {
-        return viewport;
+    public void setSharpenFactor(float sf){
+        this.u_sharpenFactor = sf;
+        setParam(Param.SharpenFactor, this.u_sharpenFactor);
     }
 
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Texture, u_texture0);
-        setParams(Param.Viewport, viewport);
+        setParams(Param.SharpenFactor, u_sharpenFactor);
         endParams();
     }
 
@@ -100,4 +83,5 @@ public final class UnsharpMaskFilter extends Filter<UnsharpMaskFilter> {
     protected void onBeforeRender() {
         inputTexture.bind(u_texture0);
     }
+
 }

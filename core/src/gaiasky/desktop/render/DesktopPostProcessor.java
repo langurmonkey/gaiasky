@@ -183,10 +183,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //DepthBuffer depthBuffer = new DepthBuffer();
         //ppb.set(depthBuffer);
 
-        // UNSHARP MASK
-        //UnsharpMask unsharp = new UnsharpMask(width, height);
-        //unsharp.setEnabled(true);
-        //ppb.set(unsharp);
 
         // CAMERA MOTION BLUR
         initCameraBlur(ppb, width, height, gq);
@@ -241,6 +237,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lensFlare.setBias(-0.98f);
         lensFlare.setBlurPasses(35);
         ppb.set(lensFlare);
+
+        // UNSHARP MASK
+        UnsharpMask unsharp = new UnsharpMask();
+        unsharp.setSharpenFactor(1);
+        unsharp.setEnabled(false);
+        ppb.set(unsharp);
 
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
