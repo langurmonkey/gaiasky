@@ -239,10 +239,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
-        bloom.setBloomIntesity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
-        bloom.setThreshold(0.4f);
-        bloom.setBlurPasses(15);
-        bloom.setBlurAmount(25f);
+        bloom.setBloomIntesnity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
+        bloom.setBlurPasses(40);
+        bloom.setBlurAmount(20);
+        bloom.setThreshold(0.15f);
         bloom.setEnabled(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY > 0);
         ppb.set(bloom);
 
@@ -645,7 +645,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
                         Bloom bloom = (Bloom) ppb.get(Bloom.class);
-                        bloom.setBloomIntesity(intensity);
+                        bloom.setBloomIntesnity(intensity);
                         bloom.setEnabled(intensity > 0);
                     }
                 }

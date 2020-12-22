@@ -109,7 +109,7 @@ public final class Bloom extends PostProcessorEffect {
         pingPongBuffer.dispose();
     }
 
-    public void setBaseIntesity(float intensity) {
+    public void setBaseIntensity(float intensity) {
         combine.setSource1Intensity(intensity);
     }
 
@@ -117,7 +117,7 @@ public final class Bloom extends PostProcessorEffect {
         combine.setSource1Saturation(saturation);
     }
 
-    public void setBloomIntesity(float intensity) {
+    public void setBloomIntesnity(float intensity) {
         combine.setSource2Intensity(intensity);
     }
 
@@ -150,9 +150,9 @@ public final class Bloom extends PostProcessorEffect {
         setThreshold(settings.bloomThreshold);
 
         // setup combine filter
-        setBaseIntesity(settings.baseIntensity);
+        setBaseIntensity(settings.baseIntensity);
         setBaseSaturation(settings.baseSaturation);
-        setBloomIntesity(settings.bloomIntensity);
+        setBloomIntesnity(settings.bloomIntensity);
         setBloomSaturation(settings.bloomSaturation);
 
         // setup blur filter
