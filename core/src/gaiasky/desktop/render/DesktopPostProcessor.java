@@ -183,6 +183,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //DepthBuffer depthBuffer = new DepthBuffer();
         //ppb.set(depthBuffer);
 
+        // UNSHARP MASK
+        //UnsharpMask unsharp = new UnsharpMask(width, height);
+        //unsharp.setEnabled(true);
+        //ppb.set(unsharp);
+
         // CAMERA MOTION BLUR
         initCameraBlur(ppb, width, height, gq);
 
