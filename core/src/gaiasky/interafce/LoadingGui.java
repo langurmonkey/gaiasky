@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -63,14 +64,14 @@ public class LoadingGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         interfaces = new Array<>();
         float pad30 = 48f;
         float pad10 = 16f;
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
         } else {

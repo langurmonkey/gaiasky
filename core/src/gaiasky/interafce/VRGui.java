@@ -2,6 +2,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import gaiasky.render.ComponentTypes;
@@ -36,9 +37,9 @@ public class VRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
-        right.initialize(assetManager);
-        left.initialize(assetManager);
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        right.initialize(assetManager, sb);
+        left.initialize(assetManager, sb);
     }
 
     @Override

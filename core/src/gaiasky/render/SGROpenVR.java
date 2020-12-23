@@ -70,9 +70,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private Map<VRDevice, StubModel> vrDeviceToModel;
     private Environment controllersEnv;
 
-    private final SpriteBatch sb;
-
     // GUI
+    private SpriteBatch sb;
     private VRGui<VRInfoGui> infoGui;
     private VRGui<VRControllerInfoGui> controllerHintGui;
     private VRGui<VRSelectionGui> selectionGui;
@@ -85,8 +84,6 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         super();
         // VR Context
         this.vrContext = vrContext;
-        // Sprite batch for screen rendering
-        this.sb = GlobalResources.spriteBatch;
 
         if (vrContext != null) {
             // Left eye, fb and texture
@@ -102,6 +99,9 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // Aux vectors
             auxf1 = new Vector3();
             auxd1 = new Vector3d();
+
+            // Sprite batch
+            this.sb = GlobalResources.spriteBatchVR;
 
             // Controllers
             Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
@@ -128,15 +128,15 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // GUI
             float scl = 0.835f;
             infoGui = new VRGui(VRInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            infoGui.initialize(null);
+            infoGui.initialize(null, sb);
             infoGui.updateViewportSize((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
 
             controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            controllerHintGui.initialize(null);
+            controllerHintGui.initialize(null, sb);
             controllerHintGui.updateViewportSize((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
 
             selectionGui = new VRGui(VRSelectionGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            selectionGui.initialize(null);
+            selectionGui.initialize(null, sb);
 
             Viewport vp = new ScreenViewport();
             emptyStage = new Stage(vp, sb);

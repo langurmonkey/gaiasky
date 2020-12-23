@@ -122,9 +122,9 @@ public class SpacecraftGui extends AbstractGui {
         sf = NumberFormatFactory.getFormatter("#0.###E0");
     }
 
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        this.sb = sb;
         // User interface
-        sb = GlobalResources.spriteBatch;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
@@ -599,7 +599,6 @@ public class SpacecraftGui extends AbstractGui {
     @Override
     public void resizeImmediate(final int width, final int height) {
         ui.getViewport().update(width, height, true);
-        sb.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         rebuildGui();
     }
 

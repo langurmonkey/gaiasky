@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -44,11 +45,11 @@ public class CrashGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
         } else {

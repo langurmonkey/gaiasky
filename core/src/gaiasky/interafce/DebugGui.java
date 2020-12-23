@@ -7,6 +7,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -25,13 +26,13 @@ public class DebugGui extends AbstractGui {
 
     public DebugGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
-        ScreenViewport vp = new ScreenViewport();
-        vp.setUnitsPerPixel(unitsPerPixel);
-        this.ui = new Stage(vp, GlobalResources.spriteBatch);
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        this.ui = new Stage(vp, sb);
     }
 
     @Override

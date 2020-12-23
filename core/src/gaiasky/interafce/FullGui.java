@@ -8,6 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -87,11 +88,11 @@ public class FullGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        this.ui = new Stage(vp, GlobalResources.spriteBatch);
+        this.ui = new Stage(vp, sb);
         vp.update(graphics.getWidth(), graphics.getHeight(), true);
     }
 

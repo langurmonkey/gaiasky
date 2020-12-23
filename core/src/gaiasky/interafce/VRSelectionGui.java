@@ -2,6 +2,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -27,13 +28,13 @@ public class VRSelectionGui extends AbstractGui {
 
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         float h = GlobalConf.screen.BACKBUFFER_HEIGHT;
         float w = GlobalConf.screen.BACKBUFFER_WIDTH;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
         skin = GlobalResources.skin;
 
         container = new Container<>();

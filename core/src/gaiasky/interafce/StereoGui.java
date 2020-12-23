@@ -8,6 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
@@ -39,11 +40,11 @@ public class StereoGui extends AbstractGui {
         super(graphics, unitsPerPixel);
     }
 
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
     }
 
     /**
