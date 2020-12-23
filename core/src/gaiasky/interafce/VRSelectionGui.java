@@ -21,7 +21,7 @@ public class VRSelectionGui extends AbstractGui {
     private boolean selectionState = false;
     private double selectionCompletion = 0d;
 
-    public VRSelectionGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public VRSelectionGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
     }
 
@@ -34,7 +34,6 @@ public class VRSelectionGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
-        vp.update((int) w, (int) h, true);
         skin = GlobalResources.skin;
 
         container = new Container<>();

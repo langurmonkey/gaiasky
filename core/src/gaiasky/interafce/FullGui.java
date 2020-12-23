@@ -82,7 +82,7 @@ public class FullGui extends AbstractGui {
 
     private List<Actor> invisibleInStereoMode;
 
-    public FullGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public FullGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
     }
 

@@ -48,15 +48,15 @@ public class LoadingGui extends AbstractGui {
     private long lastFunnyTime;
     private long lastTipTime;
 
-    public LoadingGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         this(graphics, unitsPerPixel, 0, false);
     }
 
-    public LoadingGui(Lwjgl3Graphics graphics, float unitsPerPixel, Boolean vr) {
+    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Boolean vr) {
         this(graphics, unitsPerPixel, 0, vr);
     }
 
-    public LoadingGui(Lwjgl3Graphics graphics, float unitsPerPixel, Integer hoffset, Boolean vr) {
+    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Integer hoffset, Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
         this.hoffset = hoffset;

@@ -113,7 +113,7 @@ public class SpacecraftGui extends AbstractGui {
 
     private boolean thrustEvents = true;
 
-    public SpacecraftGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public SpacecraftGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         aux3f1 = new Vector3();
         aux3f2 = new Vector3();

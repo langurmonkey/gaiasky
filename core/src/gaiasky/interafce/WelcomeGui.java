@@ -75,7 +75,7 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(Lwjgl3Graphics graphics, float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
+    public WelcomeGui(Lwjgl3Graphics graphics, Float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
         super(graphics, unitsPerPixel);
         lock = new Object();
         this.skipWelcome = skipWelcome;

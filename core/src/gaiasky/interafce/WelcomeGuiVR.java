@@ -14,7 +14,7 @@ public class WelcomeGuiVR extends AbstractGui {
 
     private Table center;
 
-    public WelcomeGuiVR(Lwjgl3Graphics graphics, float unitsPerPixel){
+    public WelcomeGuiVR(Lwjgl3Graphics graphics, Float unitsPerPixel){
         super(graphics, unitsPerPixel);
     }
     @Override
@@ -23,11 +23,6 @@ public class WelcomeGuiVR extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
-        if (vr) {
-            vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
-        } else {
-            vp.update(GaiaSky.graphics.getWidth(), GaiaSky.graphics.getHeight(), true);
-        }
         skin = GlobalResources.skin;
 
         center = new Table();

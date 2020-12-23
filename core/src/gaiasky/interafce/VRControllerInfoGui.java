@@ -20,7 +20,7 @@ public class VRControllerInfoGui extends AbstractGui {
     protected Container<Table> container;
     protected Table contents;
 
-    public VRControllerInfoGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public VRControllerInfoGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
     }
 
@@ -32,7 +32,6 @@ public class VRControllerInfoGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, GlobalResources.spriteBatch);
-        vp.update((int) w, (int) h, true);
         skin = GlobalResources.skin;
 
         container = new Container<>();
@@ -43,7 +42,7 @@ public class VRControllerInfoGui extends AbstractGui {
         Texture vrctrl_tex = new Texture(Gdx.files.internal("img/controller/hud-info-ui.png"));
         vrctrl_tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image vrctrl = new Image(vrctrl_tex);
-        float texScale = 0.7f * GlobalConf.screen.SCREEN_HEIGHT / 1780f;
+        float texScale = 0.7f * h / 1780f;
         vrctrl.setScale(texScale);
         contents.addActor(vrctrl);
 

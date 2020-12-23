@@ -23,7 +23,7 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container di;
 
-    public DebugGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public DebugGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);

@@ -46,7 +46,7 @@ public class HUDGui implements IGui {
     private Lwjgl3Graphics graphics;
     private float unitsPerPixel;
 
-    public HUDGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public HUDGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super();
         this.graphics = graphics;
         this.unitsPerPixel = unitsPerPixel;

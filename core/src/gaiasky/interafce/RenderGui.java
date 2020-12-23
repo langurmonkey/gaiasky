@@ -34,7 +34,7 @@ public class RenderGui extends AbstractGui {
 
     protected IDateFormat df;
 
-    public RenderGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public RenderGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
     }
 

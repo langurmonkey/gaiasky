@@ -1,6 +1,7 @@
 package gaiasky.render;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -122,19 +123,24 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 addVRController(controller);
             }
 
+            Lwjgl3Graphics graphics = (Lwjgl3Graphics) Gdx.graphics;
+
             // GUI
-            infoGui = new VRGui(VRInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f));
+            float scl = 0.835f;
+            infoGui = new VRGui(VRInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
             infoGui.initialize(null);
+            infoGui.updateViewportSize((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
 
-            controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f));
+            controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
             controllerHintGui.initialize(null);
+            controllerHintGui.updateViewportSize((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
 
-            selectionGui = new VRGui(VRSelectionGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f));
+            selectionGui = new VRGui(VRSelectionGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
             selectionGui.initialize(null);
 
             Viewport vp = new ScreenViewport();
             emptyStage = new Stage(vp, sb);
-            vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+            vp.update((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
 
             FloatBuffer fovt = BufferUtils.newFloatBuffer(1);
             FloatBuffer fovb = BufferUtils.newFloatBuffer(1);
@@ -200,7 +206,6 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             camera.render(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
 
             // GUI
-            emptyStage.draw();
             if (controllerHintGui.mustDraw()) {
                 renderGui(controllerHintGui.left());
             } else {
@@ -233,11 +238,13 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             if (controllerHintGui.mustDraw()) {
                 renderGui(controllerHintGui.right());
             } else {
-                if (infoGui.mustDraw())
+                if (infoGui.mustDraw()) {
                     renderGui(infoGui.right());
+                }
 
-                if (selectionGui.mustDraw())
+                if (selectionGui.mustDraw()) {
                     renderGui(selectionGui.right());
+                }
             }
 
             sendOrientationUpdate(camera.getCamera(), rw, rh);
@@ -250,7 +257,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             /** Render to screen **/
             com.badlogic.gdx.graphics.Texture screenTex = fbRight.getColorBufferTexture();
             sb.begin();
-            sb.draw(screenTex, 0, 0, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, 0, 0, rw, rh, false, true);
+            sb.draw(screenTex, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0, 0, screenTex.getWidth(), screenTex.getHeight(), false, true);
             sb.end();
         }
 
@@ -297,7 +304,9 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
     private void renderGui(IGui gui) {
         gui.update(Gdx.graphics.getDeltaTime());
-        gui.render(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
+        int width = GlobalConf.screen.BACKBUFFER_WIDTH;
+        int height = GlobalConf.screen.BACKBUFFER_HEIGHT;
+        gui.render(width, height);
     }
 
     public void resize(final int w, final int h) {
@@ -333,24 +342,24 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case VR_DEVICE_CONNECTED:
-                VRDevice device = (VRDevice) data[0];
-                if (device.getType() == VRDeviceType.Controller) {
-                    GaiaSky.postRunnable(() -> {
-                        addVRController(device);
-                    });
-                }
-                break;
-            case VR_DEVICE_DISCONNECTED:
-                device = (VRDevice) data[0];
-                if (device.getType() == VRDeviceType.Controller) {
-                    GaiaSky.postRunnable(() -> {
-                        removeVRController(device);
-                    });
-                }
-                break;
-            default:
-                break;
+        case VR_DEVICE_CONNECTED:
+            VRDevice device = (VRDevice) data[0];
+            if (device.getType() == VRDeviceType.Controller) {
+                GaiaSky.postRunnable(() -> {
+                    addVRController(device);
+                });
+            }
+            break;
+        case VR_DEVICE_DISCONNECTED:
+            device = (VRDevice) data[0];
+            if (device.getType() == VRDeviceType.Controller) {
+                GaiaSky.postRunnable(() -> {
+                    removeVRController(device);
+                });
+            }
+            break;
+        default:
+            break;
         }
 
     }

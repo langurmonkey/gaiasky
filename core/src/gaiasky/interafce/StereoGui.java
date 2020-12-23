@@ -35,7 +35,7 @@ public class StereoGui extends AbstractGui {
 
     protected INumberFormat nf;
 
-    public StereoGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public StereoGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
     }
 

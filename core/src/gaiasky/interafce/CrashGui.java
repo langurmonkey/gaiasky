@@ -32,11 +32,11 @@ public class CrashGui extends AbstractGui {
     protected Throwable crash;
     protected CrashWindow crashWindow;
 
-    public CrashGui(Lwjgl3Graphics graphics, float unitsPerPixel, Throwable crash) {
+    public CrashGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Throwable crash) {
         this(graphics, unitsPerPixel, crash, 0, false);
     }
 
-    public CrashGui(Lwjgl3Graphics graphics, float unitsPerPixel, Throwable crash, Integer hoffset, Boolean vr) {
+    public CrashGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Throwable crash, Integer hoffset, Boolean vr) {
         super(graphics, unitsPerPixel);
         this.crash = crash;
         this.vr = vr;

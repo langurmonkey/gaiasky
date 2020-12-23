@@ -1452,6 +1452,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     double dx = 0d;
                     double dy = f.getSize() / 4d;
                     double dz = -f.getSize() * 4d;
+                    if(GlobalConf.runtime.OPENVR){
+                        dz = -dz;
+                    }
 
                     pos.add(dx, dy, dz);
                     posinv.set(pos).scl(-1d);

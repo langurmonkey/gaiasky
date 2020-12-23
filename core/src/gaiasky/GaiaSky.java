@@ -412,7 +412,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
         if (GlobalConf.runtime.OPENVR) {
-            welcomeGuiVR = new VRGui(WelcomeGuiVR.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f));
+            welcomeGuiVR = new VRGui(WelcomeGuiVR.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
             welcomeGuiVR.initialize(manager);
         }
 
@@ -834,7 +834,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 /* RENDER THE SCENE */
                 preRenderScene();
                 if (GlobalConf.runtime.OPENVR) {
-                    renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, null, pp.getPostProcessBean(RenderType.screen));
+                    renderSgr(cam, t, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, tw, th, null, pp.getPostProcessBean(RenderType.screen));
                 } else {
                     PostProcessBean ppb = pp.getPostProcessBean(RenderType.screen);
                     if (ppb != null)
@@ -1201,7 +1201,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Also VR
             if (GlobalConf.runtime.OPENVR) {
-                loadingGuiVR = new VRGui(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f));
+                loadingGuiVR = new VRGui(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
                 loadingGuiVR.initialize(manager);
             }
 
