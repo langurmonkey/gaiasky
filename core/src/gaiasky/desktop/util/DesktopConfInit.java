@@ -134,7 +134,7 @@ public class DesktopConfInit extends ConfInit {
         PostprocessConf ppc = new PostprocessConf();
         Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Parser.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Parser.parseFloat(p.getProperty("postprocess.bloom.intensity"));
-        float POSTPROCESS_UNSHARPMASK_FACTOR = Parser.parseFloat(p.getProperty("postprocess.unsharpmask.factor", "0.0"));
+        float POSTPROCESS_UNSHARPMASK_FACTOR = Parser.parseFloat(p.getProperty("postprocess.unsharpmask.factor", "0.3"));
         boolean POSTPROCESS_MOTION_BLUR = Parser.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
         boolean POSTPROCESS_LENS_FLARE = Parser.parseBoolean(p.getProperty("postprocess.lensflare"));
         boolean POSTPROCESS_LIGHT_SCATTERING = Parser.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));

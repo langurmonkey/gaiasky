@@ -26,7 +26,7 @@ vec4 unsharpMask (sampler2D tex, vec2 fragCoord) {
     vec4 s = textureOffset(tex, fragCoord, ivec2(0, 1));
 
     // Return edge detection
-    return (1.0 + 4.0 * u_sharpenFactor) * c - u_sharpenFactor * (n + w + e + s);
+    return clamp((1.0 + 4.0 * u_sharpenFactor) * c - u_sharpenFactor * (n + w + e + s), 0.0, 1.0);
 }
 
 void main() {

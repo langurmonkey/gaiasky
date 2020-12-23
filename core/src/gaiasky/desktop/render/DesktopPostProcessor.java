@@ -183,7 +183,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //DepthBuffer depthBuffer = new DepthBuffer();
         //ppb.set(depthBuffer);
 
-
         // CAMERA MOTION BLUR
         initCameraBlur(ppb, width, height, gq);
 
@@ -198,6 +197,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
+
+        // UNSHARP MASK
+        UnsharpMask unsharp = new UnsharpMask();
+        unsharp.setSharpenFactor(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
+        unsharp.setEnabled(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR > 0);
+        ppb.set(unsharp);
+
+        // ANTIALIAS
+        initAntiAliasing(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS, width, height, ppb);
 
         /*
             TODO
@@ -238,12 +246,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lensFlare.setBlurPasses(35);
         ppb.set(lensFlare);
 
-        // UNSHARP MASK
-        UnsharpMask unsharp = new UnsharpMask();
-        unsharp.setSharpenFactor(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
-        unsharp.setEnabled(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR > 0);
-        ppb.set(unsharp);
-
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
         bloom.setBloomIntesnity(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY);
@@ -266,9 +268,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         fisheye.setMode(0);
         fisheye.setEnabled(GlobalConf.postprocess.POSTPROCESS_FISHEYE);
         ppb.set(fisheye);
-
-        // ANTIALIAS
-        initAntiAliasing(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS, width, height, ppb);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
         initLevels(ppb);
