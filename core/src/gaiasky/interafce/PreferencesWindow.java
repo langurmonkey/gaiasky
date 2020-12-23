@@ -73,9 +73,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private IValidator widthValidator, heightValidator, screenshotsSizeValidator, frameoutputSizeValidator, limitfpsValidator;
 
     private final INumberFormat nf3;
-    private final INumberFormat nf1;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb, safeGraphics;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -93,7 +92,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     // Backup values
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
     private boolean lensflareBak, lightglowBak, debugInfoBak, motionblurBak;
 
     public PreferencesWindow(Stage stage, Skin skin) {
@@ -102,7 +101,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         this.contents = new Array<>();
         this.labels = new Array<>();
 
-        this.nf1 = NumberFormatFactory.getFormatter("0.0");
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
         setAcceptText(I18n.txt("gui.saveprefs"));
@@ -352,13 +350,28 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // BLOOM
         bloomBak = GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY;
         OwnLabel bloomLabel = new OwnLabel(I18n.txt("gui.bloom"), skin, "default");
-        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1, skin);
+        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, Constants.SLIDER_STEP, skin);
         bloomEffect.setName("bloom effect");
         bloomEffect.setWidth(sliderWidth);
         bloomEffect.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
         bloomEffect.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.BLOOM_CMD, bloomEffect.getValue() / 10f, true);
+                return true;
+            }
+            return false;
+        });
+
+        // UNSHARP MASK
+        unsharpMaskBak = GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR;
+        OwnLabel unsharpMaskLabel = new OwnLabel(I18n.txt("gui.unsharpmask"), skin, "default");
+        Slider unsharpMaskFactor = new OwnSlider(Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
+        unsharpMaskFactor.setName("unsharp mask factor");
+        unsharpMaskFactor.setWidth(sliderWidth);
+        unsharpMaskFactor.setValue(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
+        unsharpMaskFactor.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.UNSHARP_MASK_CMD, unsharpMaskFactor.getValue(), true);
                 return true;
             }
             return false;
@@ -407,18 +420,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // SAFE GRAPHICS
-        safeGraphics = new OwnCheckBox(I18n.txt("gui.safegraphics"), skin, pad5);
-        safeGraphics.setName("safe graphics");
-        safeGraphics.setChecked(GlobalConf.program.SAFE_GRAPHICS_MODE);
-
-        OwnImageButton safeGraphicsTooltip = new OwnImageButton(skin, "tooltip");
-        safeGraphicsTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.safegraphics.info"), skin));
-
-        Table safeGraphicsTable = new Table(skin);
-        safeGraphicsTable.add(safeGraphics).left().padRight(pad10);
-        safeGraphicsTable.add(safeGraphicsTooltip);
-
         graphics.add(gqualityLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(gquality).left().padRight(pad10).padBottom(pad5);
         graphics.add(gqualityTooltip).left().padBottom(pad5).row();
@@ -435,10 +436,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(lineRenderer).left().padBottom(pad5).row();
         graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(bloomEffect).left().padBottom(pad5).row();
+        graphics.add(unsharpMaskLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(unsharpMaskFactor).left().padBottom(pad5).row();
         graphics.add(lensFlare).colspan(2).left().padBottom(pad5).row();
         graphics.add(lightGlow).colspan(2).left().padBottom(pad5).row();
         graphics.add(motionBlur).colspan(2).left().padBottom(pad5).row();
-        //graphics.add(safeGraphicsTable).colspan(2).left().padBottom(pad5).row();
 
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
@@ -1933,9 +1935,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Tess quality
         EventManager.instance.post(Events.TESSELLATION_QUALITY_CMD, tessQuality.getValue());
 
-        // Safe graphics
-        GlobalConf.program.SAFE_GRAPHICS_MODE = safeGraphics.isChecked();
-
         // Shadow mapping
         GlobalConf.scene.SHADOW_MAPPING = shadowsCb.isChecked();
         int newshadowres = Integer.parseInt(smResolution.getText());
@@ -2123,6 +2122,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.instance.post(Events.LENS_FLARE_CMD, lensflareBak, true);
         EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightglowBak, true);
         EventManager.instance.post(Events.BLOOM_CMD, bloomBak, true);
+        EventManager.instance.post(Events.UNSHARP_MASK_CMD, unsharpMaskBak, true);
         EventManager.instance.post(Events.EXPOSURE_CMD, exposureBak, true);
         EventManager.instance.post(Events.TONEMAPPING_TYPE_CMD, toneMappingBak, true);
         EventManager.instance.post(Events.SHOW_DEBUG_CMD, debugInfoBak);

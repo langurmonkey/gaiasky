@@ -134,6 +134,7 @@ public class DesktopConfInit extends ConfInit {
         PostprocessConf ppc = new PostprocessConf();
         Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Parser.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Parser.parseFloat(p.getProperty("postprocess.bloom.intensity"));
+        float POSTPROCESS_UNSHARPMASK_FACTOR = Parser.parseFloat(p.getProperty("postprocess.unsharpmask.factor", "0.0"));
         boolean POSTPROCESS_MOTION_BLUR = Parser.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
         boolean POSTPROCESS_LENS_FLARE = Parser.parseBoolean(p.getProperty("postprocess.lensflare"));
         boolean POSTPROCESS_LIGHT_SCATTERING = Parser.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
@@ -145,7 +146,7 @@ public class DesktopConfInit extends ConfInit {
         float POSTPROCESS_GAMMA = Parser.parseFloat(p.getProperty("postprocess.gamma", "1"));
         PostprocessConf.ToneMapping POSTPROCESS_TONEMAPPING_TYPE = PostprocessConf.ToneMapping.valueOf(p.getProperty("postprocess.tonemapping.type", "auto").toUpperCase());
         float POSTPROCESS_EXPOSURE = Parser.parseFloat(p.getProperty("postprocess.exposure", "0"));
-        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
+        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_UNSHARPMASK_FACTOR, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
 
         /** RUNTIME CONF **/
         RuntimeConf rc = new RuntimeConf();
@@ -451,6 +452,7 @@ public class DesktopConfInit extends ConfInit {
         /** POSTPROCESS **/
         p.setProperty("postprocess.antialiasing", Integer.toString(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.getAACode()));
         p.setProperty("postprocess.bloom.intensity", Float.toString(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY));
+        p.setProperty("postprocess.unsharpmask.factor", Float.toString(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR));
         p.setProperty("postprocess.motionblur", GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR ? "1.0" : "0.0");
         p.setProperty("postprocess.lensflare", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE));
         p.setProperty("postprocess.lightscattering", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING));

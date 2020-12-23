@@ -118,7 +118,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATE, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_ORIENTATION_UPDATE, Events.GRAPHICS_QUALITY_UPDATED, Events.STAR_TEXTURE_IDX_CMD, Events.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.UNSHARP_MASK_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATE, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_ORIENTATION_UPDATE, Events.GRAPHICS_QUALITY_UPDATED, Events.STAR_TEXTURE_IDX_CMD, Events.SCENE_GRAPH_LOADED);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -240,8 +240,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();
-        unsharp.setSharpenFactor(1);
-        unsharp.setEnabled(false);
+        unsharp.setSharpenFactor(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
+        unsharp.setEnabled(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR > 0);
         ppb.set(unsharp);
 
         // BLOOM
@@ -654,6 +654,19 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         Bloom bloom = (Bloom) ppb.get(Bloom.class);
                         bloom.setBloomIntesnity(intensity);
                         bloom.setEnabled(intensity > 0);
+                    }
+                }
+            });
+            break;
+        case UNSHARP_MASK_CMD:
+            GaiaSky.postRunnable(() -> {
+                float sharpenFactor = (float) data[0];
+                for (int i = 0; i < RenderType.values().length; i++) {
+                    if (pps[i] != null) {
+                        PostProcessBean ppb = pps[i];
+                        UnsharpMask unsharp = (UnsharpMask) ppb.get(UnsharpMask.class);
+                        unsharp.setSharpenFactor(sharpenFactor);
+                        unsharp.setEnabled(sharpenFactor > 0);
                     }
                 }
             });

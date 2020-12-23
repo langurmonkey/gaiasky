@@ -105,6 +105,10 @@ public enum Events {
      **/
     BLOOM_CMD,
     /**
+     * Contains the sharpen factor between 0 and 2 and a boolean if it comes from the UI
+     */
+    UNSHARP_MASK_CMD,
+    /**
      * Contains the brightness level (float) in [-1..1] and an optional boolean
      * indicating whether this comes from the interface
      **/
