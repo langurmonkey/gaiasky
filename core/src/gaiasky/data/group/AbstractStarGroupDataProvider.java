@@ -115,7 +115,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * to {@link ColId}
      */
     protected String[] additionalFiles = null;
-    private String additionalSplit = ",";
+    private String additionalSplit = ",|\\s+";
 
     /**
      * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
@@ -445,7 +445,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     private void loadAdditional() {
         for (String additionalFile : additionalFiles) {
-            additionalSplit = ",";
             AdditionalCols addit = new AdditionalCols();
             addit.indices = new HashMap<>();
             addit.values = new LargeLongMap<>(10);
@@ -498,10 +497,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         // Read header
         String[] header = br.readLine().strip().split(additionalSplit);
-        if (header.length < 2) {
-            additionalSplit = "\\s+";
-            header = br.readLine().strip().split(additionalSplit);
-        }
         int i = 0;
         for (String col : header) {
             col = col.strip();
