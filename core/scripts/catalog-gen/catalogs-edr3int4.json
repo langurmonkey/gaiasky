@@ -92,11 +92,10 @@
             "name" : "full",
             "maxpart" : 100000,
             "pllxzeropoint" : -0.017,
-            "geodistfile" : "$DR_BASE/geo_distances/",
             "postprocess" : null,
             "childcount" : 10000,
             "parentcount" : 50000,
-            "additional" : "$DATA_LOC/data/ag-e/edr3int4/",
+            "additional" : "$DATA_LOC/data/ag-e/edr3int4/,$DR_BASE/geo_distances/",
             "hip" : "$DATA_LOC/data/catalog/hipparcos/hipparcos.vot",
             "xmatchfile" : "$DATA_LOC/data/hip-gaia-xmatch/edr3int4/xmatch.csv"
         }
