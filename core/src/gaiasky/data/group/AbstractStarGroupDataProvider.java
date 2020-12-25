@@ -263,10 +263,13 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected float getRuweValue(long sourceId, String[] tokens) {
         if (hasCol(ColId.ruwe)) {
             return Parser.parseFloat(tokens[idx(ColId.ruwe)]);
-        } else if (hasAdditional(ColId.ruwe, sourceId)) {
-            return getAdditionalValue(ColId.ruwe, sourceId).floatValue();
+        } else {
+              Double ruwe = getAdditionalValue(ColId.ruwe, sourceId);
+              if(ruwe == null || ruwe.isInfinite() || ruwe.isNaN()){
+                  return Float.NaN;
+              }
+              return ruwe.floatValue();
         }
-        return Float.NaN;
     }
 
     /**
@@ -277,10 +280,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @return The geometric distance in parsecs if it exists, -1 otherwise.
      */
     protected double getGeoDistance(long sourceId) {
-        if (hasAdditional(ColId.geodist, sourceId)) {
-            return getAdditionalValue(ColId.geodist, sourceId);
-        }
-        return -1;
+        Double geodist = getAdditionalValue(ColId.geodist, sourceId);
+        if (geodist == null || geodist.isInfinite() || geodist.isNaN())
+            return -1;
+        return geodist;
     }
 
     /**
@@ -447,7 +450,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         for (String additionalFile : additionalFiles) {
             AdditionalCols addit = new AdditionalCols();
             addit.indices = new HashMap<>();
-            addit.values = new LargeLongMap<>(10);
+            addit.values = new LargeLongMap<>(80);
 
             logger.info("Loading additional columns from " + additionalFile);
 
@@ -509,15 +512,15 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             }
             i++;
         }
-        int n = header.length - 1;
+        int ncols = header.length - 1;
         String line;
         i = 0;
         try {
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(additionalSplit);
                 Long sourceId = Parser.parseLong(tokens[0].trim());
-                double[] vals = new double[n];
-                for (int j = 1; j <= n; j++) {
+                double[] vals = new double[ncols];
+                for (int j = 1; j <= ncols; j++) {
                     if (tokens[j] != null && !tokens[j].strip().isBlank()) {
                         Double val = Parser.parseDouble(tokens[j].strip());
                         vals[j - 1] = val;
