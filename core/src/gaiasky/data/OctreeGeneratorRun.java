@@ -48,6 +48,7 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * Generates an octree of star groups.
@@ -139,6 +140,9 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--serialized", description = "Use java serialization instead of the binary format to output particle files")
     private boolean serialized = false;
 
+    @Parameter(names = "--parallelism", description = "The ForkJoinPool parallelism setting. Set <=0 to use the system default. Set to 1 to disable parallelism")
+    private int parallelism = -1;
+
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
 
@@ -156,6 +160,7 @@ public class OctreeGeneratorRun {
             }
             if (!outFolder.endsWith("/"))
                 outFolder += "/";
+
 
             Path outPath = Path.of(outFolder);
             Files.createDirectories(outPath);
@@ -183,6 +188,12 @@ public class OctreeGeneratorRun {
                 dummyv = Path.of(ASSETS_LOC, "dummyversion");
             }
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(Path.of(ASSETS_LOC, "conf/global.properties").toFile()), new FileInputStream(dummyv.toFile())));
+
+            // Parallelism
+            if(parallelism > 0){
+                System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(parallelism));
+            }
+            logger.info("Parallelism set to " + ForkJoinPool.commonPool().getParallelism());
 
             OctreeNode root = generateOctree();
 

@@ -70,6 +70,7 @@ for CURRENT_CATALOG in "${TORUN[@]}"; do
         NAME=$(jq ".catalogs[$j].name" $CATDEF)
         # Remove quotes
         NAME=$(sed -e 's/^"//' -e 's/"$//' <<<"$NAME")
+
         if [ "$NAME" == "$CURRENT_CATALOG" ]; then
             DSNAME="00$j-$(date +'%Y%m%d')-$CATALOG_NAME-$NAME"
             echo $DSNAME
