@@ -2,6 +2,30 @@
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...HEAD)
 
+### Bug Fixes
+- pan scaled with fov factor
+- red-night theme disabled styles
+- proper 'disabled' textures for buttons
+- labels occlude objects behind, buffer writes disabled.
+- download speed moving cancel button in dataset manager
+- safemode flag used correctly, fix raymarching not being setup in safe mode
+
+### Build System
+- fix helper script args
+- update release instructions with flatpak, fix build script
+
+### Code Refactoring
+- modify default bloom settings (default intensity, passes, amount)
+
+### Features
+- add unsharp mask post-processing filter
+- new checkbox textures, adjust window visuals
+- dataset selection dialog uses same structure as dataset manager
+- time warp slider instead of buttons
+- new fractional UI scaling from x0.7 to x3.0
+- add regexp to some column names for STIL loader, add invalid names array
+- case-insensitive columns in STIL loader, enable FITS loading
+
 
 <a name="3.0.1"></a>
 ## [3.0.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.0) (2020-12-10)
@@ -15,13 +39,14 @@
 - file chooser allows selection when entering directories if in DIRECTORIES mode 
 - update default max number of stars 
 - increase max heap space from 4 to 8 GB in all configurations 
-- JSON pointer from DR2 to eDR3 
+- 24-bit depth buffer, 8-bit stencil 
+- JSON pointer from dr2 to edr3 
 
 ### Build System
-- update bundled JRE version to `11.0.9+11`
+- update bundled jre version to 11.0.9+11 
 
 ### Code Refactoring
-- all startup messages to I18N bundle, fix swing themes 
+- all startup messages to i18n bundle, fix swing themes 
 
 ### Documentation
 - update pointers to documentation 
@@ -29,12 +54,12 @@
 ### Features
 - saner error reporting with new dialog 
 - add error dialog that works with OpenGL 2.0 and informs the user of insufficient OpenGL or Java versions 
-- add safe graphics mode CLI argument `--safemode` 
+- add safe graphics mode CLI argument '--safemode' 
 - dynamic resolution scaling - first implementation, deactivated 
-- add safe graphics mode, which does not use float buffers at all. It is activated by default if the context creation for `4.1` fails. It uses OpenGL `3.2`. 
-- download manager is capable of resuming downloads
+- add safe graphics mode, which does not use float buffers at all. It is activated by default if the context creation for 4.1 fails. It uses OpenGL 3.1. 
+- download manager is capable of resuming downloads 
 - special flag to enable OpenGL debug output 
-- enable GPU debug info with `--debug` flag 
+- enable GPU debug info with --debug flag 
 
 <a name="3.0.0"></a>
 ## [3.0.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.1) (2020-12-02)

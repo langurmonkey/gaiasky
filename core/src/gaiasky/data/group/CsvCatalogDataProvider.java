@@ -61,7 +61,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     private boolean parallel = true;
 
     // Buffer in number of lines
-    private int parallelBufferSize = 750000;
+    private int parallelBufferSize = 100000;
 
     public CsvCatalogDataProvider() {
         super();
