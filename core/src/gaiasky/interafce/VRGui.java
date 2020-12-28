@@ -1,6 +1,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import gaiasky.render.ComponentTypes;
@@ -13,13 +15,13 @@ public class VRGui<T extends IGui> implements IGui {
     private T right;
     private T left;
 
-    public VRGui(Class<T> clazz, int hoffset) {
+    public VRGui(Class<T> clazz, int hoffset, Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super();
         try {
-            right = clazz.getDeclaredConstructor().newInstance();
+            right = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
             right.setVr(true);
             right.setHoffset(-hoffset);
-            left = clazz.getDeclaredConstructor().newInstance();
+            left = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
             left.setVr(true);
             left.setHoffset(hoffset);
         } catch (Exception e) {
@@ -35,9 +37,9 @@ public class VRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
-        right.initialize(assetManager);
-        left.initialize(assetManager);
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        right.initialize(assetManager, sb);
+        left.initialize(assetManager, sb);
     }
 
     @Override
@@ -110,6 +112,11 @@ public class VRGui<T extends IGui> implements IGui {
     public void setVr(boolean vr) {
         right.setVr(vr);
         left.setVr(vr);
+    }
+
+    public void updateViewportSize(int w, int h, boolean centerCamera){
+        right.getGuiStage().getViewport().update(w, h, centerCamera);
+        left.getGuiStage().getViewport().update(w, h, centerCamera);
     }
 
     @Override

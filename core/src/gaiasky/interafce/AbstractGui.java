@@ -18,6 +18,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.util.GlobalConf;
 
 /**
  * Provides general methods and attributes that all GUIs should have
@@ -67,7 +68,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     /** Lock for sync **/
     protected Object lock;
 
-    public AbstractGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public AbstractGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         this.graphics = graphics;
         this.unitsPerPixel = unitsPerPixel;
         lock = new Object();

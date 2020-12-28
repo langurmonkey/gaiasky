@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -54,6 +55,8 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
     Map<Integer, FrameBuffer> fb3D;
 
+    private final SpriteBatch sb;
+
     private final Anaglyphic anaglyphic;
     private final Copy copy;
 
@@ -70,6 +73,8 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         super();
         // INIT VIEWPORT
         stretchViewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        sb = GlobalResources.spriteBatch;
 
         // INIT FRAME BUFFER FOR 3D MODE
         fb3D = new HashMap<>();
@@ -258,10 +263,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             resultBuffer.begin();
-            GlobalResources.spriteBatch.begin();
-            GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
-            GlobalResources.spriteBatch.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
-            GlobalResources.spriteBatch.end();
+            sb.begin();
+            sb.setColor(1f, 1f, 1f, 1f);
+            sb.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
+            sb.end();
             resultBuffer.end();
 
             /** RIGHT EYE **/
@@ -287,10 +292,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             resultBuffer.begin();
-            GlobalResources.spriteBatch.begin();
-            GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
-            GlobalResources.spriteBatch.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
-            GlobalResources.spriteBatch.end();
+            sb.begin();
+            sb.setColor(1f, 1f, 1f, 1f);
+            sb.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
+            sb.end();
             resultBuffer.end();
 
             /* Restore viewport */

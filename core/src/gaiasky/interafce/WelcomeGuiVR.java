@@ -2,6 +2,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -14,20 +15,15 @@ public class WelcomeGuiVR extends AbstractGui {
 
     private Table center;
 
-    public WelcomeGuiVR(Lwjgl3Graphics graphics, float unitsPerPixel){
+    public WelcomeGuiVR(Lwjgl3Graphics graphics, Float unitsPerPixel){
         super(graphics, unitsPerPixel);
     }
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
-        if (vr) {
-            vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
-        } else {
-            vp.update(GaiaSky.graphics.getWidth(), GaiaSky.graphics.getHeight(), true);
-        }
+        ui = new Stage(vp, sb);
         skin = GlobalResources.skin;
 
         center = new Table();

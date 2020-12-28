@@ -20,6 +20,7 @@ import gaiasky.render.IPostProcessor.RenderType;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.ImageFormat;
+import gaiasky.util.GlobalResources;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -196,7 +197,7 @@ public class ScreenshotsManager implements IObserver {
         // Lazy initialised
         if (renderGui == null) {
             renderGui = new RenderGui((Lwjgl3Graphics) Gdx.graphics, GlobalConf.program.UI_SCALE);
-            renderGui.initialize(null);
+            renderGui.initialize(null, GlobalResources.spriteBatch);
             renderGui.doneLoading(null);
         }
         return renderGui;

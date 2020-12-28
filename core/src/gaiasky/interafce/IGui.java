@@ -6,6 +6,7 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
@@ -25,8 +26,9 @@ public interface IGui extends Disposable {
      * for loading
      *
      * @param assetManager The asset manager to load the resources with
+     * @param batch The sprite batch to use for this GUI's stage
      */
-    void initialize(AssetManager assetManager);
+    void initialize(AssetManager assetManager, SpriteBatch batch);
 
     /**
      * Hook that runs after the assets have been loaded. Completes the

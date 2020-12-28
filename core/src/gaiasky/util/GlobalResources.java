@@ -56,7 +56,7 @@ public class GlobalResources {
 
     public static ShaderProgram spriteShader;
     /** Global all-purpose sprite batch **/
-    public static SpriteBatch spriteBatch;
+    public static SpriteBatch spriteBatch, spriteBatchVR;
 
     public static ExtShaderProgram extSpriteShader;
     /** Sprite batch using int indices **/
@@ -74,8 +74,8 @@ public class GlobalResources {
         if (!spriteShader.isCompiled()) {
             logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
         }
-        // Sprite batch
-        spriteBatch = new SpriteBatch(1000, spriteShader);
+        // Sprite batch - uses screen resolution
+        spriteBatch = new SpriteBatch(500, spriteShader);
 
         // ExtSprite shader
         extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));

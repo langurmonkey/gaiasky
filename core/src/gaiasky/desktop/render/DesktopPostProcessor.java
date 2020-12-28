@@ -198,15 +198,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
-        // UNSHARP MASK
-        UnsharpMask unsharp = new UnsharpMask();
-        unsharp.setSharpenFactor(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
-        unsharp.setEnabled(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR > 0);
-        ppb.set(unsharp);
-
-        // ANTIALIAS
-        initAntiAliasing(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS, width, height, ppb);
-
         /*
             TODO
             This is a pretty brutal patch for macOS. For some obscure reason,
@@ -245,6 +236,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lensFlare.setBias(-0.98f);
         lensFlare.setBlurPasses(35);
         ppb.set(lensFlare);
+
+        // UNSHARP MASK
+        UnsharpMask unsharp = new UnsharpMask();
+        unsharp.setSharpenFactor(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
+        unsharp.setEnabled(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR > 0);
+        ppb.set(unsharp);
+
+        // ANTIALIAS
+        initAntiAliasing(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS, width, height, ppb);
 
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));

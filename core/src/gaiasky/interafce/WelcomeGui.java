@@ -13,6 +13,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -75,7 +76,7 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(Lwjgl3Graphics graphics, float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
+    public WelcomeGui(Lwjgl3Graphics graphics, Float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
         super(graphics, unitsPerPixel);
         lock = new Object();
         this.skipWelcome = skipWelcome;
@@ -83,11 +84,11 @@ public class WelcomeGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
         skin = GlobalResources.skin;
 
         if (vrStatus.vrInitFailed()) {

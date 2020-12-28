@@ -7,6 +7,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -46,18 +47,18 @@ public class HUDGui implements IGui {
     private Lwjgl3Graphics graphics;
     private float unitsPerPixel;
 
-    public HUDGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public HUDGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super();
         this.graphics = graphics;
         this.unitsPerPixel = unitsPerPixel;
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
         lock = new Object();
     }
 

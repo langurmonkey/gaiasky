@@ -5,6 +5,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -20,19 +21,18 @@ public class VRControllerInfoGui extends AbstractGui {
     protected Container<Table> container;
     protected Table contents;
 
-    public VRControllerInfoGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public VRControllerInfoGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         float h = GlobalConf.screen.BACKBUFFER_HEIGHT;
         float w = GlobalConf.screen.BACKBUFFER_WIDTH;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
-        vp.update((int) w, (int) h, true);
+        ui = new Stage(vp, sb);
         skin = GlobalResources.skin;
 
         container = new Container<>();
@@ -43,7 +43,7 @@ public class VRControllerInfoGui extends AbstractGui {
         Texture vrctrl_tex = new Texture(Gdx.files.internal("img/controller/hud-info-ui.png"));
         vrctrl_tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image vrctrl = new Image(vrctrl_tex);
-        float texScale = 0.7f * GlobalConf.screen.SCREEN_HEIGHT / 1780f;
+        float texScale = 0.7f * h / 1780f;
         vrctrl.setScale(texScale);
         contents.addActor(vrctrl);
 

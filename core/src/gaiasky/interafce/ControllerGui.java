@@ -6,6 +6,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -74,7 +75,7 @@ public class ControllerGui extends AbstractGui {
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
-    public ControllerGui(Lwjgl3Graphics graphics, float unitsPerPixel) {
+    public ControllerGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = GlobalResources.skin;
         this.em = EventManager.instance;
@@ -755,11 +756,11 @@ public class ControllerGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ui = new Stage(vp, sb);
 
         // Comment to hide this whole dialog and functionality
         EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION, Events.TIME_STATE_CMD, Events.SCENE_GRAPH_LOADED);
