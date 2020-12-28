@@ -493,7 +493,6 @@ public class VRContext implements Disposable {
             case VR.EVREventType_VREvent_DualAnalog_Cancel:
             case VR.EVREventType_VREvent_DualAnalog_ModeSwitch1:
             case VR.EVREventType_VREvent_DualAnalog_ModeSwitch2:
-                getLogger(this.getClass()).debug("Dual analog event: move/press/touch/unpress/untouch");
                 for (VRDeviceListener l : listeners)
                     l.event(event.eventType());
                 break;
@@ -549,7 +548,7 @@ public class VRContext implements Disposable {
                 }
                 break;
             case VR.EVREventType_VREvent_ActionBindingReloaded:
-
+                // Ignore
                 break;
             default:
                 for (VRDeviceListener l : listeners)

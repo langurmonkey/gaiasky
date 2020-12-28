@@ -7,7 +7,6 @@ package gaiasky.desktop;
 
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -209,16 +208,6 @@ public class GaiaSkyDesktop implements IObserver {
                 GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG = true;
             }
 
-            // VR resolution
-            if (gsArgs.vr) {
-                Graphics.DisplayMode dm = Lwjgl3ApplicationConfiguration.getDisplayMode();
-                double sh = Math.min(dm.height, 1780);
-                double aspect = 0.8383d;
-                double scale = 1d;
-                GlobalConf.screen.SCREEN_WIDTH = (int) (sh * aspect * scale);
-                GlobalConf.screen.SCREEN_HEIGHT = (int) (sh * scale);
-            }
-
             // Reinitialize with user-defined locale
             I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
@@ -310,7 +299,7 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setTitle(GlobalConf.APPLICATION_NAME);
         if (!gsArgs.vr) {
             if (GlobalConf.screen.FULLSCREEN) {
-                // Get mode
+                // Fullscreen mode
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
                 DisplayMode mymode = null;
                 for (DisplayMode mode : modes) {
@@ -328,53 +317,16 @@ public class GaiaSkyDesktop implements IObserver {
                     cfg.setFullscreenMode(mymode);
                 }
             } else {
-                int w = GlobalConf.screen.getScreenWidth();
-                int h = GlobalConf.screen.getScreenHeight();
-                if (!SysUtils.isMac()) {
-                    if (w <= 0 || h <= 0) {
-                        try {
-                            GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                            GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                            w = (int) (gc.getBounds().getWidth() * 0.85f);
-                            h = (int) (gc.getBounds().getHeight() * 0.85f);
-                        } catch (HeadlessException he) {
-                            logger.error(I18n.txt("error.screensize.gd"));
-                            logger.debug(he);
-                        }
-                    }
-                    if (w <= 0 || h <= 0) {
-                        try {
-                            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                            w = (int) (screenSize.width * 0.85f);
-                            h = (int) (screenSize.height * 0.85f);
-                        } catch (Exception e) {
-                            // Default
-                            w = 1600;
-                            h = 900;
-                            logger.error(I18n.txt("error.screensize.toolkit", w, h));
-                            logger.debug(e);
-                        }
-                    }
-                } else {
-                    // macOS is retarded and only likes headless mode, using default
-                    w = 1600;
-                    h = 900;
-                }
-                cfg.setWindowedMode(w, h);
+                // Windowed mode
+                configureWindowSize(cfg);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
             cfg.useVsync(GlobalConf.screen.VSYNC);
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
             cfg.useVsync(false);
-            int w = GlobalConf.screen.SCREEN_WIDTH;
-            int h = GlobalConf.screen.SCREEN_HEIGHT;
-            if (w <= 0 || h <= 0) {
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                w = (int) (screenSize.width * 0.85f);
-                h = (int) (screenSize.height * 0.85f);
-            }
-            cfg.setWindowedMode(w, h);
+            // Always windowed, actual render sent to headset
+            configureWindowSize(cfg);
             cfg.setResizable(true);
         }
         if (gsArgs.vr) {
@@ -436,6 +388,52 @@ public class GaiaSkyDesktop implements IObserver {
             logger.error(e);
             showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
+    }
+
+    private static void configureWindowSize(Lwjgl3ApplicationConfiguration cfg){
+        int w = GlobalConf.screen.getScreenWidth();
+        int h = GlobalConf.screen.getScreenHeight();
+        if (!SysUtils.isMac()) {
+            // Graphics device method
+            if (w <= 0 || h <= 0) {
+                try {
+                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                    GraphicsConfiguration gc = gd.getDefaultConfiguration();
+                    w = (int) (gc.getBounds().getWidth() * 0.85f);
+                    h = (int) (gc.getBounds().getHeight() * 0.85f);
+                    GlobalConf.screen.SCREEN_WIDTH = w;
+                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                } catch (HeadlessException he) {
+                    logger.error(I18n.txt("error.screensize.gd"));
+                    logger.debug(he);
+                }
+            }
+            // Toolkit method
+            if (w <= 0 || h <= 0) {
+                try {
+                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    w = (int) (screenSize.width * 0.85f);
+                    h = (int) (screenSize.height * 0.85f);
+                    GlobalConf.screen.SCREEN_WIDTH = w;
+                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                } catch (Exception e) {
+                    // Default
+                    w = 1600;
+                    h = 900;
+                    GlobalConf.screen.SCREEN_WIDTH = w;
+                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                    logger.error(I18n.txt("error.screensize.toolkit", w, h));
+                    logger.debug(e);
+                }
+            }
+        } else {
+            // macOS is retarded and only likes headless mode, using default
+            w = 1600;
+            h = 900;
+            GlobalConf.screen.SCREEN_WIDTH = w;
+            GlobalConf.screen.SCREEN_HEIGHT = h;
+        }
+        cfg.setWindowedMode(w, h);
     }
 
     private static GaiaSky runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {

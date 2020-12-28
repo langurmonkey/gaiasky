@@ -211,9 +211,6 @@ public class DesktopConfInit extends ConfInit {
         float PLANETARIUM_ANGLE = Parser.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
         boolean DISPLAY_HUD = Parser.parseBoolean(p.getProperty("program.display.hud", "false"));
         boolean DISPLAY_POINTER_COORDS = Parser.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
-        String catChoos = p.getProperty("program.catalog.chooser", "default");
-        if (catChoos.equalsIgnoreCase("true") || catChoos.equalsIgnoreCase("false"))
-            catChoos = "default";
         boolean DISPLAY_MINIMAP = Parser.parseBoolean(p.getProperty("program.display.minimap", "true"));
         float MINIMAP_SIZE = MathUtilsd.clamp(Parser.parseFloat(p.getProperty("program.minimap.size", "220.0")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
         boolean NET_MASTER = Parser.parseBoolean(p.getProperty("program.net.master", "false"));

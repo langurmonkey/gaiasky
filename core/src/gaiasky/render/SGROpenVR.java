@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
@@ -23,10 +23,7 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
@@ -69,14 +66,18 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private Environment controllersEnv;
 
     // GUI
-    private SpriteBatch sb;
+    private SpriteBatch sb, sbScreen;
     private VRGui<VRInfoGui> infoGui;
     private VRGui<VRControllerInfoGui> controllerHintGui;
     private VRGui<VRSelectionGui> selectionGui;
-    private Stage emptyStage;
+
+    // Render parameters - fit
+    private int startX, startY, renderW, renderH;
 
     private Vector3 auxf1;
     private Vector3d auxd1;
+
+    private Vector2 lastSize;
 
     public SGROpenVR(VRContext vrContext) {
         super();
@@ -97,9 +98,11 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // Aux vectors
             auxf1 = new Vector3();
             auxd1 = new Vector3d();
+            lastSize = new Vector2();
 
             // Sprite batch
             this.sb = GlobalResources.spriteBatchVR;
+            sb.getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE, GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE);
 
             // Controllers
             Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
@@ -121,8 +124,11 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 addVRController(controller);
             }
 
-            // UI
+            // VR UI
             initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
+
+            // Screen
+            sbScreen = new SpriteBatch();
 
             FloatBuffer fovt = BufferUtils.newFloatBuffer(1);
             FloatBuffer fovb = BufferUtils.newFloatBuffer(1);
@@ -154,24 +160,24 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
     private void initializeVRGUI(Lwjgl3Graphics graphics){
         float uiScale = GlobalConf.program.UI_SCALE;
-        float near = 8f;
+        float uiDistance = 8f;
         // GUI
         if(infoGui != null)
             infoGui.dispose();
-        infoGui = new VRGui(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / near), graphics, 1f / uiScale);
+        infoGui = new VRGui(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         infoGui.initialize(null, sb);
         infoGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
 
 
         if(controllerHintGui != null)
             controllerHintGui.dispose();
-        controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / near), graphics, 1f / uiScale);
+        controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         controllerHintGui.initialize(null, sb);
         controllerHintGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
 
         if(selectionGui != null)
             selectionGui.dispose();
-        selectionGui = new VRGui(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / near), graphics, 1f / uiScale);
+        selectionGui = new VRGui(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         selectionGui.initialize(null, sb);
         selectionGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
     }
@@ -260,11 +266,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, texRight, null, VR.EVRSubmitFlags_Submit_Default);
 
             /** Render to screen **/
-            com.badlogic.gdx.graphics.Texture screenTex = fbRight.getColorBufferTexture();
-            sb.getProjectionMatrix().setToOrtho2D(0, 0, tw * GlobalConf.program.UI_SCALE, th * GlobalConf.program.UI_SCALE);
-            sb.begin();
-            sb.draw(screenTex, 0, 0, tw * GlobalConf.program.UI_SCALE, th * GlobalConf.program.UI_SCALE, 0, 0, rw, rh, false, true);
-            sb.end();
+            RenderUtils.renderKeepAspect(fbLeft, sbScreen, Gdx.graphics, lastSize);
+
         }
 
     }
@@ -315,8 +318,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         gui.render(width, height);
     }
 
-    public void resize(final int w, final int h) {
-
+    public void resize(final int screenWidth, final int screenHeight) {
+        lastSize.set(-1, -1);
     }
 
     public void dispose() {
@@ -365,6 +368,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             }
             break;
         case UI_SCALE_CMD:
+            sb.getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE, GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE);
             initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
             break;
         default:

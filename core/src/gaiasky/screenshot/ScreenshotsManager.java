@@ -74,9 +74,9 @@ public class ScreenshotsManager implements IObserver {
                 break;
             case redraw:
                 // Do not resize post processor
-                GaiaSky.instance.resizeImmediate(GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, false, true, false);
+                GaiaSky.instance.resizeImmediate(GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, false, true, false, true);
                 renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.frame), GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, frameRenderer, GlobalConf.frame.FRAME_FORMAT, GlobalConf.frame.FRAME_QUALITY);
-                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false);
+                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false, true);
                 break;
             }
         }
@@ -92,9 +92,9 @@ public class ScreenshotsManager implements IObserver {
                 break;
             case redraw:
                 // Do not resize post processor
-                GaiaSky.instance.resizeImmediate(screenshot.width, screenshot.height, false, true, false);
+                GaiaSky.instance.resizeImmediate(screenshot.width, screenshot.height, false, true, false, true);
                 file = renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.screenshot), screenshot.width, screenshot.height, screenshot.folder, filename, screenshotRenderer, GlobalConf.screenshot.SCREENSHOT_FORMAT, GlobalConf.screenshot.SCREENSHOT_QUALITY);
-                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false);
+                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false, true);
                 break;
             }
             if (file != null) {

@@ -606,7 +606,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             gui.resize(graphics.getWidth(), graphics.getHeight());
 
         if (GlobalConf.runtime.OPENVR) {
-            resize(vrContext.getWidth(), vrContext.getHeight());
+            // Resize post-processors and render systems
+            postRunnable(() -> resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, false, false, false));
         }
 
         // Initialise frames
@@ -867,13 +868,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 // Set to low rez
                 GlobalConf.screen.BACKBUFFER_SCALE = 0.6f;
                 resize(graphics.getWidth(), graphics.getHeight());
-                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true));
+                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true, true));
                 lowResolution = true;
                 lastResolutionChange = TimeUtils.millis();
             } else if (lowResolution && fps > 60) {
                 // Set to high rez
                 GlobalConf.screen.BACKBUFFER_SCALE = 1f;
-                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true));
+                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true, true));
                 lowResolution = false;
                 lastResolutionChange = TimeUtils.millis();
             }
@@ -909,15 +910,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             renderProcess = runnableRender;
         } else {
             // Display loading screen
-            renderGui(loadingGui);
             if (GlobalConf.runtime.OPENVR) {
+                renderGui(loadingGui);
+
                 try {
                     vrContext.pollEvents();
                 } catch (Exception e) {
                     logger.error(e);
                 }
-
                 renderVRGui((VRGui) loadingGuiVR);
+            } else {
+                renderGui(loadingGui);
             }
         }
     };
@@ -1075,30 +1078,25 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void resize(final int width, final int height) {
-        if (GlobalConf.runtime.OPENVR) {
-            postRunnable(() -> resizeImmediate(width, height, true, false, false));
-        } else {
-            if (!initialized) {
-                resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true);
-            }
-            resizeWidth = graphics.getWidth();
-            resizeHeight = graphics.getHeight();
-            lastResizeTime = System.currentTimeMillis();
-
+        if (!initialized) {
+            resizeImmediate(width, height, true, true, true, true);
         }
+        resizeWidth = width;
+        resizeHeight = height;
+        lastResizeTime = System.currentTimeMillis();
 
-        renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, graphics.getWidth(), graphics.getHeight());
+        renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
 
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
         if (currResizeTime - lastResizeTime > 100l) {
-            resizeImmediate(resizeWidth, resizeHeight, true, true, true);
+            resizeImmediate(resizeWidth, resizeHeight, true, true, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
     }
 
-    public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis) {
+    public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis, boolean resizeScreenConf) {
         try {
             int renderWidth = Math.round(width * GlobalConf.screen.BACKBUFFER_SCALE);
             int renderHeight = Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
@@ -1121,7 +1119,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 sgr.resize(width, height, renderWidth, renderHeight, resizeRenderSys);
 
-                GlobalConf.screen.resize(width, height);
+                if (resizeScreenConf)
+                    GlobalConf.screen.resize(width, height);
             }
 
             cam.updateAngleEdge(renderWidth, renderHeight);
@@ -1137,6 +1136,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param gui The GUI to render
      */
     private void renderGui(IGui gui) {
+        gui.update(graphics.getDeltaTime());
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        gui.render(graphics.getWidth(), graphics.getHeight());
+    }
+
+    private void renderGui(IGui gui, int w, int h) {
         gui.update(graphics.getDeltaTime());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -1202,7 +1209,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             pp.initialize(manager);
 
             // Initialise loading screen
-            loadingGui = new LoadingGui(graphics, 1f / GlobalConf.program.UI_SCALE, vr);
+            loadingGui = new LoadingGui(graphics, 1f / GlobalConf.program.UI_SCALE, false);
             loadingGui.initialize(manager, GlobalResources.spriteBatch);
 
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
