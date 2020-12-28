@@ -14,8 +14,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -123,24 +121,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 addVRController(controller);
             }
 
-            Lwjgl3Graphics graphics = (Lwjgl3Graphics) Gdx.graphics;
-
-            // GUI
-            float scl = 0.835f;
-            infoGui = new VRGui(VRInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            infoGui.initialize(null, sb);
-            infoGui.updateViewportSize((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
-
-            controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            controllerHintGui.initialize(null, sb);
-            controllerHintGui.updateViewportSize((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
-
-            selectionGui = new VRGui(VRSelectionGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 10f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            selectionGui.initialize(null, sb);
-
-            Viewport vp = new ScreenViewport();
-            emptyStage = new Stage(vp, sb);
-            vp.update((int) (graphics.getWidth() * scl), (int) (graphics.getHeight() * scl), true);
+            // UI
+            initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
 
             FloatBuffer fovt = BufferUtils.newFloatBuffer(1);
             FloatBuffer fovb = BufferUtils.newFloatBuffer(1);
@@ -166,8 +148,32 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 // Default
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
             }
-            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED);
+            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED, Events.UI_SCALE_CMD);
         }
+    }
+
+    private void initializeVRGUI(Lwjgl3Graphics graphics){
+        float uiScale = GlobalConf.program.UI_SCALE;
+        float near = 8f;
+        // GUI
+        if(infoGui != null)
+            infoGui.dispose();
+        infoGui = new VRGui(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / near), graphics, 1f / uiScale);
+        infoGui.initialize(null, sb);
+        infoGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+
+
+        if(controllerHintGui != null)
+            controllerHintGui.dispose();
+        controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / near), graphics, 1f / uiScale);
+        controllerHintGui.initialize(null, sb);
+        controllerHintGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+
+        if(selectionGui != null)
+            selectionGui.dispose();
+        selectionGui = new VRGui(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / near), graphics, 1f / uiScale);
+        selectionGui.initialize(null, sb);
+        selectionGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
     }
 
     @Override
@@ -198,12 +204,12 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Left);
 
-            boolean postproc = postprocessCapture(ppb, fbLeft, tw, th);
+            boolean postproc = postprocessCapture(ppb, fbLeft, rw, rh);
 
             // Render scene
             sgr.renderScene(camera, t, rc);
             // Camera
-            camera.render(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
+            camera.render(rw, rh);
 
             // GUI
             if (controllerHintGui.mustDraw()) {
@@ -226,15 +232,14 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Right);
 
-            postproc = postprocessCapture(ppb, fbRight, tw, th);
+            postproc = postprocessCapture(ppb, fbRight, rw, rh);
 
             // Render scene
             sgr.renderScene(camera, t, rc);
             // Camera
-            camera.render(GlobalConf.screen.SCREEN_WIDTH, GlobalConf.screen.SCREEN_HEIGHT);
+            camera.render(rw, rh);
 
             // GUI
-            emptyStage.draw();
             if (controllerHintGui.mustDraw()) {
                 renderGui(controllerHintGui.right());
             } else {
@@ -256,8 +261,9 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             /** Render to screen **/
             com.badlogic.gdx.graphics.Texture screenTex = fbRight.getColorBufferTexture();
+            sb.getProjectionMatrix().setToOrtho2D(0, 0, tw * GlobalConf.program.UI_SCALE, th * GlobalConf.program.UI_SCALE);
             sb.begin();
-            sb.draw(screenTex, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 0, 0, screenTex.getWidth(), screenTex.getHeight(), false, true);
+            sb.draw(screenTex, 0, 0, tw * GlobalConf.program.UI_SCALE, th * GlobalConf.program.UI_SCALE, 0, 0, rw, rh, false, true);
             sb.end();
         }
 
@@ -357,6 +363,9 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                     removeVRController(device);
                 });
             }
+            break;
+        case UI_SCALE_CMD:
+            initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
             break;
         default:
             break;

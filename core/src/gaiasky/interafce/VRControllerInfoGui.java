@@ -28,8 +28,8 @@ public class VRControllerInfoGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        float h = GlobalConf.screen.BACKBUFFER_HEIGHT;
-        float w = GlobalConf.screen.BACKBUFFER_WIDTH;
+        float h = GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE;
+        float w = GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);

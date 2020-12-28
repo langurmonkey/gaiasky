@@ -17,7 +17,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.scenes.scene2d.ui.TooltipManager;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.*;
@@ -454,7 +453,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                     // Do not resize the screen!
                     GlobalConf.screen.BACKBUFFER_HEIGHT = vrContext.getHeight();
                     GlobalConf.screen.BACKBUFFER_WIDTH = vrContext.getWidth();
-                    this.resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, true, true);
+                    //this.resizeImmediate(vrContext.getWidth(), vrContext.getHeight(), true, true, true);
                 }
                 GlobalConf.screen.VSYNC = false;
 

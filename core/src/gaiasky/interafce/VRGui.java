@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 
 public class VRGui<T extends IGui> implements IGui {
@@ -50,7 +49,6 @@ public class VRGui<T extends IGui> implements IGui {
 
     @Override
     public void update(double dt) {
-        setHoffset((int) (GlobalConf.screen.BACKBUFFER_WIDTH / 5f));
         right.update(dt);
         left.update(dt);
     }
