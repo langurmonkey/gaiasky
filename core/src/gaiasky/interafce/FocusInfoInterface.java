@@ -322,9 +322,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         if (daemon == null && !vr) {
             daemon = NetworkCheckerManager.getNewtorkChecker();
-            daemon.setParameters(moreInfo, skin, pad10);
             daemon.start();
         }
+        daemon.setParameters(moreInfo, skin, pad10);
 
         pos = new Vector3d();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);

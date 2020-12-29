@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.GlobalResources;
 
 /**
@@ -178,10 +177,6 @@ public class HUDGui implements IGui {
     @Override
     public Stage getGuiStage() {
         return ui;
-    }
-
-    @Override
-    public void setSceneGraph(ISceneGraph sg) {
     }
 
     @Override

@@ -24,6 +24,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
+import gaiasky.util.TextUtils;
 
 /** A tooltip that shows a label.
  * @author Nathan Sweet */
@@ -58,21 +59,7 @@ public class OwnTextTooltip extends Tooltip<Label> {
         super(null, manager);
 
         // Warp text if breakSpaces <= 0
-        if (breakSpaces > 0) {
-            StringBuilder sb = new StringBuilder(text);
-            int spaces = 0;
-            for (int i = 0; i < sb.length(); i++) {
-                char c = sb.charAt(i);
-                if (c == ' ') {
-                    spaces++;
-                }
-                if (spaces == breakSpaces) {
-                    sb.setCharAt(i, '\n');
-                    spaces = 0;
-                }
-            }
-            text = sb.toString();
-        }
+        text = TextUtils.breakSpaces(text, breakSpaces);
 
         label = new Label(text, style.label);
         label.setWrap(true);

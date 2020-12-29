@@ -31,6 +31,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.IStarFocus;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.format.INumberFormat;
@@ -68,9 +69,10 @@ public class FullGui extends AbstractGui {
     protected MinimapInterface minimapInterface;
     protected LoadProgressInterface loadProgressInterface;
 
-    protected SearchDialog searchDialog;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
+    protected WikiInfoWindow wikiInfoWindow;
+    protected ArchiveViewWindow archiveViewWindow;
 
     protected INumberFormat nf;
     protected Label pointerXCoord, pointerYCoord;
@@ -110,7 +112,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_WIKI_INFO_ACTION, Events.UPDATE_WIKI_INFO_ACTION, Events.SHOW_ARCHIVE_VIEW_ACTION, Events.UPDATE_ARCHIVE_VIEW_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS);
     }
 
     protected void buildGui() {
@@ -361,14 +363,6 @@ public class FullGui extends AbstractGui {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case SHOW_SEARCH_ACTION:
-            if (searchDialog == null) {
-                searchDialog = new SearchDialog(skin, ui, sg);
-            } else {
-                searchDialog.clearText();
-            }
-            searchDialog.show(ui);
-            break;
         case SHOW_LAND_AT_LOCATION_ACTION:
             CelestialBody target = (CelestialBody) data[0];
             LandAtWindow landAtLocation = new LandAtWindow(target, ui, skin);
@@ -396,14 +390,48 @@ public class FullGui extends AbstractGui {
             if (memInfoWindow == null) {
                 memInfoWindow = new MemInfoWindow(ui, skin);
             }
-            memInfoWindow.show(ui);
+            if (!memInfoWindow.isVisible() || !memInfoWindow.hasParent())
+                memInfoWindow.show(ui);
             break;
         case SHOW_LOG_ACTION:
             if (logWindow == null) {
                 logWindow = new LogWindow(ui, skin);
             }
             logWindow.update();
-            logWindow.show(ui);
+            if (!logWindow.isVisible() || !logWindow.hasParent())
+                logWindow.show(ui);
+            break;
+        case UPDATE_WIKI_INFO_ACTION:
+            if(wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent()){
+                // Update
+                String searchName = (String) data[0];
+                wikiInfoWindow.update(searchName);
+            }
+            break;
+        case SHOW_WIKI_INFO_ACTION:
+            String searchName = (String) data[0];
+            if (wikiInfoWindow == null) {
+                wikiInfoWindow = new WikiInfoWindow(ui, skin);
+            }
+            wikiInfoWindow.update(searchName);
+            if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
+                wikiInfoWindow.show(ui);
+            break;
+        case UPDATE_ARCHIVE_VIEW_ACTION:
+            if(archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()){
+                // Update
+                IStarFocus starFocus = (IStarFocus) data[0];
+                archiveViewWindow.update(starFocus);
+            }
+            break;
+        case SHOW_ARCHIVE_VIEW_ACTION:
+            IStarFocus starFocus = (IStarFocus) data[0];
+            if (archiveViewWindow == null) {
+                archiveViewWindow = new ArchiveViewWindow(ui, skin);
+            }
+            archiveViewWindow.update(starFocus);
+            if (!archiveViewWindow.isVisible() || !archiveViewWindow.hasParent())
+                archiveViewWindow.show(ui);
             break;
         case REMOVE_KEYBOARD_FOCUS:
             ui.setKeyboardFocus(null);
@@ -503,7 +531,6 @@ public class FullGui extends AbstractGui {
         }
     }
 
-    @Override
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
     }
@@ -617,7 +644,7 @@ public class FullGui extends AbstractGui {
         if (cool) {
             controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
             controlsWindow.recalculateSize();
-            if(ui.getHeight() < controlsWindow.getHeight()){
+            if (ui.getHeight() < controlsWindow.getHeight()) {
                 // Collapse
                 controlsWindow.collapseInstant();
             }

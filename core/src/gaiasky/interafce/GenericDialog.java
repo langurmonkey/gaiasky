@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.scene2d.CollapsibleWindow;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -50,6 +49,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected Table content, bottom;
     private String acceptText = null, cancelText = null;
     protected boolean modal = true;
+
+    protected float lastPosX = -1, lastPosY = -1;
 
     protected HorizontalGroup buttonGroup;
     protected TextButton acceptButton, cancelButton;
@@ -274,7 +275,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage) {
         show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
-        setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+        if(lastPosX >= 0 && lastPosY >= 0){
+            setPosition(Math.round(lastPosX), Math.round(lastPosY));
+        } else {
+            setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+        }
         setKeyboardFocus();
         return this;
     }
@@ -302,6 +307,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * stage.
      */
     public void hide(Action action) {
+        lastPosX = this.getX();
+        lastPosY = this.getY();
+
         Stage stage = getStage();
         if (stage != null) {
             if (previousKeyboardFocus != null && previousKeyboardFocus.getStage() == null)

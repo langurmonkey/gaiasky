@@ -12,7 +12,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * An interface to be implemented by all top-level GUIs in Gaia Sky
@@ -83,13 +82,6 @@ public interface IGui extends Disposable {
      * @return The stage
      */
     Stage getGuiStage();
-
-    /**
-     * Sets the scene graph to this GUI
-     *
-     * @param sg The scene graph
-     */
-    void setSceneGraph(ISceneGraph sg);
 
     /**
      * Sets the visibility state of the component entities

@@ -741,6 +741,10 @@
       "font": "ui-13",
       "fontColor": "lightblue"
     },
+    "header-large": {
+      "font": "title-40",
+      "fontColor": "theme"
+    },
     "header": {
       "font": "title-21",
       "fontColor": "theme"
@@ -795,6 +799,10 @@
     },
     "ui-19": {
       "font": "ui-19",
+      "fontColor": "white"
+    },
+    "ui-21": {
+      "font": "ui-21",
       "fontColor": "white"
     },
     "ui-23": {

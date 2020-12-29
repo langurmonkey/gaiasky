@@ -985,6 +985,20 @@ public enum Events {
     SHOW_QUIT_ACTION,
     SHOW_SEARCH_ACTION,
     /**
+     * Shows a window with a summary of the search object in the data (string)
+     * as taken from the wikipedia API
+     */
+    SHOW_WIKI_INFO_ACTION,
+    /** Updates the wiki info window if it is open **/
+    UPDATE_WIKI_INFO_ACTION,
+    /**
+     * Shows a window with the Gaia or Hipparcos archive info for the object in the data,
+     * which must be a {@link gaiasky.scenegraph.IStarFocus}
+     */
+    SHOW_ARCHIVE_VIEW_ACTION,
+    /** Updates the archive view if it is open **/
+    UPDATE_ARCHIVE_VIEW_ACTION,
+    /**
      * Show uncertainties for Tycho star, if available. Contains the star
      */
     SHOW_UNCERTAINTIES,

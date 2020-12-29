@@ -524,7 +524,7 @@ public class OctreeGeneratorRun {
                     map.put(sourceId, hip);
                 }
                 br.close();
-                logger.error("Cross-match table read with " + map.size() + " entries: " + xmatchFile);
+                logger.info("Cross-match table read with " + map.size() + " entries: " + xmatchFile);
             } catch (Exception e) {
                 logger.error(e);
             }

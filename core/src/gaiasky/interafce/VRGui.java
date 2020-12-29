@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import gaiasky.render.ComponentTypes;
-import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.Logger;
 
 public class VRGui<T extends IGui> implements IGui {
@@ -85,10 +84,6 @@ public class VRGui<T extends IGui> implements IGui {
     @Override
     public Stage getGuiStage() {
         return null;
-    }
-
-    @Override
-    public void setSceneGraph(ISceneGraph sg) {
     }
 
     @Override

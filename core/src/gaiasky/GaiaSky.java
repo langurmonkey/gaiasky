@@ -714,13 +714,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Reinitialise registry to listen to relevant events
         if (guiRegistry != null)
             guiRegistry.dispose();
-        guiRegistry = new GuiRegistry(GlobalResources.skin);
+        guiRegistry = new GuiRegistry(GlobalResources.skin, sg);
 
         // Unregister all current GUIs
         GuiRegistry.unregisterAll();
 
         // Only for the Full GUI
-        mainGui.setSceneGraph(sg);
+        ((FullGui) mainGui).setSceneGraph(sg);
         mainGui.setVisibilityToggles(ComponentType.values(), SceneGraphRenderer.visible);
 
         for (IGui gui : guis)

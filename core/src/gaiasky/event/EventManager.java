@@ -151,6 +151,12 @@ public class EventManager implements IObserver {
         }
     }
 
+    public void clearAllSubscriptions() {
+        synchronized (subscriptions) {
+            subscriptions.clear();
+        }
+    }
+
     /**
      * Posts or registers a new event type with the given data.
      *

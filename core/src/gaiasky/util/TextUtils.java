@@ -22,6 +22,52 @@ public class TextUtils {
         return pre + in + post;
     }
 
+    public static String breakCharacters(CharSequence in, int breakChars) {
+        return breakCharacters(in.toString(), breakChars);
+    }
+
+    public static String breakCharacters(String in, int breakChars) {
+        // Warp text if breakChars <= 0
+        if (breakChars > 0) {
+            java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
+            int chars = 0;
+            for (int i = 0; i < sb.length(); i++) {
+                char c = sb.charAt(i);
+                chars++;
+                if (chars > breakChars && Character.isSpaceChar(c)) {
+                    sb.setCharAt(i, '\n');
+                    chars = 0;
+                }
+            }
+            in = sb.toString();
+        }
+        return in;
+    }
+
+    public static String breakSpaces(CharSequence in, int breakSpaces) {
+        return breakSpaces(in.toString(), breakSpaces);
+    }
+
+    public static String breakSpaces(String in, int breakSpaces) {
+        // Warp text if breakSpaces <= 0
+        if (breakSpaces > 0) {
+            java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
+            int spaces = 0;
+            for (int i = 0; i < sb.length(); i++) {
+                char c = sb.charAt(i);
+                if (Character.isSpaceChar(c)) {
+                    spaces++;
+                }
+                if (spaces == breakSpaces) {
+                    sb.setCharAt(i, '\n');
+                    spaces = 0;
+                }
+            }
+            in = sb.toString();
+        }
+        return in;
+    }
+
     public static void capLabelWidth(Label l, float targetWidth) {
         while (l.getWidth() > targetWidth) {
             StringBuilder currText = l.getText();
@@ -248,6 +294,7 @@ public class TextUtils {
         });
         return contained.get();
     }
+
     public static boolean containsOrMatches(String[] list, String key, boolean ignoreCase) {
         AtomicBoolean contained = new AtomicBoolean(false);
         Arrays.stream(list).forEach(candidate -> {

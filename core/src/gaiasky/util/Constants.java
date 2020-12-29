@@ -323,6 +323,15 @@ public class Constants {
     // Asterisks must be substituted becasue windows does not allow them in paths
     public static final String STAR_SUBSTITUTE = "%#QUAL#%";
 
+    // URLS for external queries
+    public static final String URL_GAIA_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiaedr3.gaia_source+WHERE+source_id=";
+    public static final String URL_HIP_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+extcat.hipparcos+WHERE+hip=";
+    public static final String URL_GAIA_WEB_SOURCE = "https://gaia.ari.uni-heidelberg.de/singlesource.html#id=";
+    public static final String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
+    // TODO Use Wikipedia API to get localized content to the current language
+    public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
+    public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
      * algorithms.

@@ -17,8 +17,6 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.util.GlobalConf;
 
 /**
  * Provides general methods and attributes that all GUIs should have
@@ -140,11 +138,6 @@ public abstract class AbstractGui implements IObserver, IGui {
 
     @Override
     public void setVisibilityToggles(ComponentType[] entities, ComponentTypes visible) {
-        // Empty by default
-    }
-
-    @Override
-    public void setSceneGraph(ISceneGraph sg) {
         // Empty by default
     }
 

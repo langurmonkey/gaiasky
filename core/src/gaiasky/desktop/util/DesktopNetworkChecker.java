@@ -15,7 +15,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Net;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -23,11 +22,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
-import gaiasky.interafce.ArchiveViewWindow;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.interafce.INetworkChecker;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.ModelBody;
+import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -42,10 +43,6 @@ import java.nio.charset.StandardCharsets;
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
 
-    private static final String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
-    // TODO Use Wikipedia API to get localized content to the current language
-    private static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
-
     private static final int TIMEOUT_MS = 5000;
 
     private boolean running = true;
@@ -56,8 +53,9 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     public boolean executing = false;
     private LabelStyle linkStyle;
 
-    private Cell<Link> wikiCell, simbadCell;
-    private Link wikiLink, simbadLink;
+    private Cell<Link> infoCell, gaiaCell, simbadCell;
+    private Link simbadLink;
+    private OwnTextButton infoButton, gaiaButton;
 
     // The table to modify
     private Table table;
@@ -118,9 +116,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
         @Override
         public boolean handle(Event event) {
             if (event instanceof ChangeEvent) {
-                ArchiveViewWindow gaiaWindow = new ArchiveViewWindow(GaiaSky.instance.mainGui.getGuiStage(), skin);
-                gaiaWindow.initialize(focus);
-                gaiaWindow.display();
+                EventManager.instance.post(Events.SHOW_ARCHIVE_VIEW_ACTION, focus);
                 return true;
             }
             return false;
@@ -141,32 +137,46 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                     if (focus != null) {
                         logger.debug(this.getClass().getSimpleName(), "Looking up network resources for '" + focus.getName() + "'");
 
+                        infoCell = table.add().left();
+                        gaiaCell = table.add().left();
+                        simbadCell = table.add().left();
+
                         // Add table
                         if (focus instanceof IStarFocus) {
-                            Button gaiaButton = new OwnTextButton("Gaia", skin, "link");
+                            EventManager.instance.post(Events.UPDATE_ARCHIVE_VIEW_ACTION, focus);
+                            if(gaiaButton != null)
+                                gaiaButton.remove();
+                            gaiaButton = new OwnTextButton("Archive", skin);
+                            gaiaButton.pad(pad / 3f, pad, pad / 3f, pad);
                             gaiaButton.addListener(new GaiaButtonListener((IStarFocus) focus));
                             gaiaButton.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.gaiaarchive"), skin));
-                            table.add(gaiaButton).padRight(pad).left();
+                            gaiaCell.setActor(gaiaButton).padRight(pad);
+                        } else {
+                            gaiaCell.padRight(0);
                         }
-
-                        simbadLink = new Link("Simbad", linkStyle, "");
-                        simbadLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.simbad"), skin));
-                        wikiLink = new Link("Wikipedia ", linkStyle, "");
-                        wikiLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.wiki"), skin));
-
-                        simbadCell = table.add((Link) null).left();
-                        wikiCell = table.add((Link) null).left();
 
                         String wikiname = focus.getName().replace(' ', '_');
 
                         setWikiLink(wikiname, focus, new LinkListener() {
                             @Override
                             public void ok(String link) {
-                                if (wikiLink != null && wikiCell != null) {
+                                if (infoCell != null) {
                                     try {
-                                        wikiLink.setLinkURL(link);
-                                        wikiCell.setActor(wikiLink);
-                                        wikiCell.padRight(pad);
+                                        String actualWikiname = link.substring(Constants.URL_WIKIPEDIA.length());
+                                        EventManager.instance.post(Events.UPDATE_WIKI_INFO_ACTION, actualWikiname);
+                                        if (infoButton != null)
+                                            infoButton.remove();
+                                        infoButton = new OwnTextButton("+ Info", skin);
+                                        infoButton.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.wiki"), skin));
+                                        infoButton.pad(pad / 3f, pad, pad / 3f, pad);
+                                        infoButton.addListener((event) -> {
+                                            if (event instanceof ChangeEvent) {
+                                                EventManager.instance.post(Events.SHOW_WIKI_INFO_ACTION, actualWikiname);
+                                                return true;
+                                            }
+                                            return false;
+                                        });
+                                        infoCell.setActor(infoButton).padRight(pad);
                                     } catch (Exception e) {
                                     }
                                 }
@@ -174,17 +184,22 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
                             @Override
                             public void ko(String link) {
+                                if(infoCell != null)
+                                    infoCell.padRight(0);
                             }
                         });
                         setSimbadLink(focus, new LinkListener() {
-
                             @Override
                             public void ok(String link) {
-                                if (simbadLink != null && simbadCell != null) {
+                                if (simbadCell != null) {
                                     try {
+                                        if (simbadLink != null) {
+                                            simbadLink.remove();
+                                        }
+                                        simbadLink = new Link("Simbad", linkStyle, "");
+                                        simbadLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.simbad"), skin));
                                         simbadLink.setLinkURL(link);
                                         simbadCell.setActor(simbadLink);
-                                        simbadCell.padRight(pad);
                                     } catch (Exception e) {
                                     }
                                 }
@@ -209,7 +224,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
     private void setSimbadLink(IFocus focus, LinkListener listener) {
         if (focus instanceof IStarFocus) {
-            String url = URL_SIMBAD;
+            String url = Constants.URL_SIMBAD;
             IStarFocus st = (IStarFocus) focus;
             if (st.getHip() > 0) {
                 listener.ok(url + "HIP+" + st.getHip());
@@ -225,7 +240,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
-            String url = URL_WIKIPEDIA;
+            String url = Constants.URL_WIKIPEDIA;
             if (focus instanceof ModelBody) {
                 ModelBody f = (ModelBody) focus;
                 if (f.wikiname != null) {

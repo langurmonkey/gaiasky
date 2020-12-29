@@ -352,9 +352,11 @@ public class GaiaSkyDesktop implements IObserver {
 
             gs = runGaiaSky(cfg);
         } catch (GdxRuntimeException e) {
+            logger.error(e);
             if (!JAVA_VERSION_FLAG) {
                 if ((gs == null || !gs.windowCreated)) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
+                    EventManager.instance.clearAllSubscriptions();
                     checkLogger(consoleLogger);
                     if (gs != null) {
                         try {
