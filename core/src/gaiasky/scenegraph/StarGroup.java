@@ -256,6 +256,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
+        initSortingData();
         initModel();
     }
 

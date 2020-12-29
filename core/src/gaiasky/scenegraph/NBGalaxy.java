@@ -51,7 +51,8 @@ public class NBGalaxy extends Particle {
     /** Alternative name **/
     String altname;
 
-    public NBGalaxy(){}
+    public NBGalaxy() {
+    }
 
     public NBGalaxy(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
         super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
@@ -122,7 +123,7 @@ public class NBGalaxy extends Particle {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if(GaiaSky.instance.isOn(ct)) {
+        if (GaiaSky.instance.isOn(ct)) {
             camera.checkClosestBody(this);
             if (opacity > 0) {
 
