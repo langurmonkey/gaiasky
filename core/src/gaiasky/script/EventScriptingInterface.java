@@ -1399,7 +1399,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             }
 
-            sg.remove(invisible, true);
+            EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, invisible, true);
         }
     }
 

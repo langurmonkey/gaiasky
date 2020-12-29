@@ -5,6 +5,7 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -110,7 +111,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 addItem(landOn);
 
                 double[] lonlat = new double[2];
-                boolean ok = CameraUtils.getLonLat((Planet) candidate, GaiaSky.instance.getICamera(), screenX, screenY, new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
+                boolean ok = CameraUtils.getLonLat((Planet) candidate, GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
                 if (ok) {
                     final Double pointerLon = lonlat[0];
                     final Double pointerLat = lonlat[1];

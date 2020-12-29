@@ -158,24 +158,23 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         }
     }
 
-    private void initializeVRGUI(Lwjgl3Graphics graphics){
+    private void initializeVRGUI(Lwjgl3Graphics graphics) {
         float uiScale = GlobalConf.program.UI_SCALE;
         float uiDistance = 8f;
         // GUI
-        if(infoGui != null)
+        if (infoGui != null)
             infoGui.dispose();
         infoGui = new VRGui(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         infoGui.initialize(null, sb);
         infoGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
 
-
-        if(controllerHintGui != null)
+        if (controllerHintGui != null)
             controllerHintGui.dispose();
         controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         controllerHintGui.initialize(null, sb);
         controllerHintGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
 
-        if(selectionGui != null)
+        if (selectionGui != null)
             selectionGui.dispose();
         selectionGui = new VRGui(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         selectionGui.initialize(null, sb);
@@ -319,7 +318,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     }
 
     public void resize(final int screenWidth, final int screenHeight) {
-        lastSize.set(-1, -1);
+        if (lastSize != null)
+            lastSize.set(-1, -1);
     }
 
     public void dispose() {
