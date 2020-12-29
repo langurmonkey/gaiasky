@@ -185,6 +185,7 @@ public class WikiInfoWindow extends GenericDialog {
                                         if(imgCell != null){
                                             imgCell.setActor(thumbnailImage);
                                             finish();
+                                            scroll.setHeight(Math.min(table.getMinHeight(), Gdx.graphics.getHeight()) * 1.2f + pad);
                                         }
                                     });
                                 } catch (FileNotFoundException e) {
@@ -235,7 +236,7 @@ public class WikiInfoWindow extends GenericDialog {
             table.add(wikiLink).center().colspan(2);
             table.pack();
 
-            scroll.setHeight(Math.min(table.getMinHeight(), Gdx.graphics.getHeight()) * 1.6f + pad);
+            scroll.setHeight(Math.min(table.getMinHeight(), Gdx.graphics.getHeight()) * 1.2f + pad);
             finish();
         }
 
