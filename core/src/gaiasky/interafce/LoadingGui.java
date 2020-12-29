@@ -94,7 +94,7 @@ public class LoadingGui extends AbstractGui {
         else if (hoffset < 0)
             center.padRight(-hoffset);
 
-        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(vr), skin, "main-title");
+        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(GlobalConf.runtime.OPENVR), skin, "main-title");
 
         // Funny text
         lastFunnyTime = 0;

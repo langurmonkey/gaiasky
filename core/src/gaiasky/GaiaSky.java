@@ -1091,7 +1091,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
         if (currResizeTime - lastResizeTime > 100l) {
-            resizeImmediate(resizeWidth, resizeHeight, true, true, true, true);
+            resizeImmediate(resizeWidth, resizeHeight, !GlobalConf.runtime.OPENVR, !GlobalConf.runtime.OPENVR, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
     }

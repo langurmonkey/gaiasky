@@ -1308,7 +1308,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 }
                 break;
             case CUBEMAP_CMD:
-                boolean cubemap = (Boolean) data[0];
+                boolean cubemap = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
                 if (cubemap) {
                     sgr = sgrs[SGR_CUBEMAP_IDX];
                 } else {

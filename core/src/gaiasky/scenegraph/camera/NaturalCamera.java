@@ -249,7 +249,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void initialize(AssetManager assetManager) {
-        camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        if(vr){
+            camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
+        } else {
+            camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        }
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
         fovBackup = GlobalConf.scene.CAMERA_FOV;
@@ -304,6 +308,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         // Shape renderer (pointer guide lines)
         shapeRenderer = new ShapeRenderer(10);
+        shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
 
         // Init sprite batch for crosshair
         spriteBatch = new SpriteBatch(50, GlobalResources.spriteShader);
@@ -1383,7 +1388,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case CUBEMAP_CMD:
             boolean state = (boolean) data[0];
             CubemapProjection p = (CubemapProjection) data[1];
-            if (p.isPlanetarium() && state) {
+            if (p.isPlanetarium() && state && !GlobalConf.runtime.OPENVR) {
                 fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
             }
             break;
@@ -1958,9 +1963,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void resize(int width, int height) {
-        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
-        shapeRenderer.dispose();
-        shapeRenderer = new ShapeRenderer(10);
+        if(!vr) {
+            camera.viewportHeight = height;
+            camera.viewportWidth = width;
+            camera.update(true);
+        }
+        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
+        shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
     }
 
     @Override

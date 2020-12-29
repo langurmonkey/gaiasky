@@ -75,94 +75,96 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        List<Button> buttonList = new ArrayList<>();
+        if (!GlobalConf.runtime.OPENVR) {
+            List<Button> buttonList = new ArrayList<>();
 
-        Image icon3d = new Image(skin.getDrawable("3d-icon"));
-        button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
-        String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
-        button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), hk3d, skin));
-        button3d.setName("3d");
-        button3d.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (button3d.isChecked()) {
-                    buttonCubemap.setProgrammaticChangeEvents(true);
-                    buttonCubemap.setChecked(false);
-                    buttonDome.setProgrammaticChangeEvents(true);
-                    buttonDome.setChecked(false);
-                }
-                // Enable/disable
-                EventManager.instance.post(Events.STEREOSCOPIC_CMD, button3d.isChecked(), true);
-                return true;
-            }
-            return false;
-        });
-
-        Image iconDome = new Image(skin.getDrawable("dome-icon"));
-        buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
-        String hkdome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
-        buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), hkdome, skin));
-        buttonDome.setName("dome");
-        buttonDome.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (buttonDome.isChecked()) {
-                    buttonCubemap.setProgrammaticChangeEvents(true);
-                    buttonCubemap.setChecked(false);
-                    button3d.setProgrammaticChangeEvents(true);
-                    button3d.setChecked(false);
-                }
-                // Enable/disable
-                EventManager.instance.post(Events.CUBEMAP_CMD, buttonDome.isChecked(), CubemapProjection.FISHEYE, true);
-                fieldOfView.setDisabled(buttonDome.isChecked());
-                return true;
-            }
-            return false;
-        });
-
-        Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
-        buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
-        buttonCubemap.setProgrammaticChangeEvents(false);
-        String hkcubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
-        buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.360")), hkcubemap, skin));
-        buttonCubemap.setName("cubemap");
-        buttonCubemap.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                if (buttonCubemap.isChecked()) {
-                    buttonDome.setProgrammaticChangeEvents(true);
-                    buttonDome.setChecked(false);
-                    button3d.setProgrammaticChangeEvents(true);
-                    button3d.setChecked(false);
-                }
-                // Enable/disable
-                EventManager.instance.post(Events.CUBEMAP_CMD, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR, true);
-                fieldOfView.setDisabled(buttonCubemap.isChecked());
-                return true;
-            }
-            return false;
-        });
-
-        if (GlobalConf.program.isMaster()) {
-            Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
-            buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
-            buttonMaster.setProgrammaticChangeEvents(false);
-            buttonMaster.setSize(28f, 29.6f);
-            String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
-            buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.slave.config")), hkmaster, skin));
-            buttonMaster.setName("master");
-            buttonMaster.addListener(event -> {
+            Image icon3d = new Image(skin.getDrawable("3d-icon"));
+            button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
+            String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
+            button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), hk3d, skin));
+            button3d.setName("3d");
+            button3d.addListener(event -> {
                 if (event instanceof ChangeEvent) {
+                    if (button3d.isChecked()) {
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        buttonCubemap.setChecked(false);
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        buttonDome.setChecked(false);
+                    }
                     // Enable/disable
-                    EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION);
+                    EventManager.instance.post(Events.STEREOSCOPIC_CMD, button3d.isChecked(), true);
                     return true;
                 }
                 return false;
             });
-        }
 
-        buttonList.add(button3d);
-        buttonList.add(buttonDome);
-        buttonList.add(buttonCubemap);
-        if (GlobalConf.program.isMaster())
-            buttonList.add(buttonMaster);
+            Image iconDome = new Image(skin.getDrawable("dome-icon"));
+            buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
+            String hkdome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
+            buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), hkdome, skin));
+            buttonDome.setName("dome");
+            buttonDome.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (buttonDome.isChecked()) {
+                        buttonCubemap.setProgrammaticChangeEvents(true);
+                        buttonCubemap.setChecked(false);
+                        button3d.setProgrammaticChangeEvents(true);
+                        button3d.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.instance.post(Events.CUBEMAP_CMD, buttonDome.isChecked(), CubemapProjection.FISHEYE, true);
+                    fieldOfView.setDisabled(buttonDome.isChecked());
+                    return true;
+                }
+                return false;
+            });
+
+            Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
+            buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
+            buttonCubemap.setProgrammaticChangeEvents(false);
+            String hkcubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
+            buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.360")), hkcubemap, skin));
+            buttonCubemap.setName("cubemap");
+            buttonCubemap.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    if (buttonCubemap.isChecked()) {
+                        buttonDome.setProgrammaticChangeEvents(true);
+                        buttonDome.setChecked(false);
+                        button3d.setProgrammaticChangeEvents(true);
+                        button3d.setChecked(false);
+                    }
+                    // Enable/disable
+                    EventManager.instance.post(Events.CUBEMAP_CMD, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR, true);
+                    fieldOfView.setDisabled(buttonCubemap.isChecked());
+                    return true;
+                }
+                return false;
+            });
+
+            if (GlobalConf.program.isMaster()) {
+                Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
+                buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
+                buttonMaster.setProgrammaticChangeEvents(false);
+                buttonMaster.setSize(28f, 29.6f);
+                String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
+                buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.slave.config")), hkmaster, skin));
+                buttonMaster.setName("master");
+                buttonMaster.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        // Enable/disable
+                        EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION);
+                        return true;
+                    }
+                    return false;
+                });
+            }
+
+            buttonList.add(button3d);
+            buttonList.add(buttonDome);
+            buttonList.add(buttonCubemap);
+            if (GlobalConf.program.isMaster())
+                buttonList.add(buttonMaster);
+        }
 
         fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);
         fieldOfView.setValueSuffix("°");
@@ -178,7 +180,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-
 
         /** CAMERA SPEED LIMIT **/
         String[] speedLimits = new String[19];
@@ -281,14 +282,16 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-
-        HorizontalGroup buttonGroup = new HorizontalGroup();
-        buttonGroup.space(pad4);
-        buttonGroup.addActor(button3d);
-        buttonGroup.addActor(buttonDome);
-        buttonGroup.addActor(buttonCubemap);
-        if (GlobalConf.program.isMaster())
-            buttonGroup.addActor(buttonMaster);
+        HorizontalGroup buttonGroup = null;
+        if (!GlobalConf.runtime.OPENVR) {
+            buttonGroup = new HorizontalGroup();
+            buttonGroup.space(pad4);
+            buttonGroup.addActor(button3d);
+            buttonGroup.addActor(buttonDome);
+            buttonGroup.addActor(buttonCubemap);
+            if (GlobalConf.program.isMaster())
+                buttonGroup.addActor(buttonMaster);
+        }
 
         Table cameraGroup = new Table(skin);
         cameraGroup.align(Align.left);
@@ -302,7 +305,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
         cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
         cameraGroup.add(orientationLock).top().left().padBottom(pad9).row();
-        cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
+        if (!GlobalConf.runtime.OPENVR)
+            cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
 
         component = cameraGroup;
 
@@ -313,126 +317,126 @@ public class CameraComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case CAMERA_CINEMATIC_CMD:
+        case CAMERA_CINEMATIC_CMD:
 
-                boolean gui = (Boolean) data[1];
-                if (!gui) {
-                    cinematic.setProgrammaticChangeEvents(false);
-                    cinematic.setChecked((Boolean) data[0]);
-                    cinematic.setProgrammaticChangeEvents(true);
-                }
+            boolean gui = (Boolean) data[1];
+            if (!gui) {
+                cinematic.setProgrammaticChangeEvents(false);
+                cinematic.setChecked((Boolean) data[0]);
+                cinematic.setProgrammaticChangeEvents(true);
+            }
 
-                break;
-            case CAMERA_MODE_CMD:
-                // Update camera mode selection
-                CameraMode mode = (CameraMode) data[0];
-                Array<CameraComboBoxBean> cModes = cameraMode.getItems();
-                CameraComboBoxBean selected = null;
-                for (CameraComboBoxBean ccbb : cModes) {
-                    if (ccbb.mode == mode) {
-                        selected = ccbb;
-                        break;
-                    }
+            break;
+        case CAMERA_MODE_CMD:
+            // Update camera mode selection
+            CameraMode mode = (CameraMode) data[0];
+            Array<CameraComboBoxBean> cModes = cameraMode.getItems();
+            CameraComboBoxBean selected = null;
+            for (CameraComboBoxBean ccbb : cModes) {
+                if (ccbb.mode == mode) {
+                    selected = ccbb;
+                    break;
                 }
-                if (selected != null) {
-                    cameraMode.getSelection().setProgrammaticChangeEvents(false);
-                    cameraMode.setSelected(selected);
-                    cameraMode.getSelection().setProgrammaticChangeEvents(true);
-                } else {
-                    // Error?
-                }
-                break;
-            case ROTATION_SPEED_CMD:
-                Boolean interf = (Boolean) data[1];
-                if (!interf) {
-                    float value = (Float) data[0];
-                    fieldLock = true;
-                    rotateSpeed.setMappedValue(value);
-                    fieldLock = false;
-                }
-                break;
-            case CAMERA_SPEED_CMD:
+            }
+            if (selected != null) {
+                cameraMode.getSelection().setProgrammaticChangeEvents(false);
+                cameraMode.setSelected(selected);
+                cameraMode.getSelection().setProgrammaticChangeEvents(true);
+            } else {
+                // Error?
+            }
+            break;
+        case ROTATION_SPEED_CMD:
+            Boolean interf = (Boolean) data[1];
+            if (!interf) {
+                float value = (Float) data[0];
+                fieldLock = true;
+                rotateSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+            break;
+        case CAMERA_SPEED_CMD:
+            interf = (Boolean) data[1];
+            if (!interf) {
+                float value = (Float) data[0];
+                fieldLock = true;
+                cameraSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+            break;
+
+        case TURNING_SPEED_CMD:
+            interf = (Boolean) data[1];
+            if (!interf) {
+                float value = (Float) data[0];
+                fieldLock = true;
+                turnSpeed.setMappedValue(value);
+                fieldLock = false;
+            }
+            break;
+        case SPEED_LIMIT_CMD:
+            interf = false;
+            if (data.length > 1)
                 interf = (Boolean) data[1];
-                if (!interf) {
-                    float value = (Float) data[0];
-                    fieldLock = true;
-                    cameraSpeed.setMappedValue(value);
-                    fieldLock = false;
-                }
-                break;
-
-            case TURNING_SPEED_CMD:
-                interf = (Boolean) data[1];
-                if (!interf) {
-                    float value = (Float) data[0];
-                    fieldLock = true;
-                    turnSpeed.setMappedValue(value);
-                    fieldLock = false;
-                }
-                break;
-            case SPEED_LIMIT_CMD:
-                interf = false;
-                if (data.length > 1)
-                    interf = (Boolean) data[1];
-                if (!interf) {
-                    int value = (Integer) data[0];
-                    cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
-                    cameraSpeedLimit.setSelectedIndex(value);
-                    cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(true);
-                }
-                break;
-            case ORIENTATION_LOCK_CMD:
-                interf = false;
-                if (data.length > 2)
-                    interf = (Boolean) data[2];
-                if (!interf) {
-                    boolean lock = (Boolean) data[1];
-                    orientationLock.setProgrammaticChangeEvents(false);
-                    orientationLock.setChecked(lock);
-                    orientationLock.setProgrammaticChangeEvents(true);
-                }
-                break;
-            case STEREOSCOPIC_CMD:
-                if (!(boolean) data[1]) {
-                    button3d.setProgrammaticChangeEvents(false);
-                    button3d.setChecked((boolean) data[0]);
-                    button3d.setProgrammaticChangeEvents(true);
-                }
-                break;
-            case FOV_CHANGE_NOTIFICATION:
-                fovFlag = false;
-                fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
-                fovFlag = true;
-                break;
-            case CUBEMAP_CMD:
-                if (!(boolean) data[2]) {
-                    CubemapProjection proj = (CubemapProjection) data[1];
-                    boolean enable = (boolean) data[0];
-                    if (proj.isPanorama()) {
-                        buttonCubemap.setProgrammaticChangeEvents(false);
-                        buttonCubemap.setChecked(enable);
-                        buttonCubemap.setProgrammaticChangeEvents(true);
-                        fieldOfView.setDisabled(enable);
-                    } else if (proj.isPlanetarium()) {
-                        buttonDome.setProgrammaticChangeEvents(false);
-                        buttonDome.setChecked(enable);
-                        buttonDome.setProgrammaticChangeEvents(true);
-                        fieldOfView.setDisabled(enable);
-                    }
-
-                }
-                break;
-            case PLANETARIUM_CMD:
-                if (!(boolean) data[1]) {
-                    boolean enable = (boolean) data[0];
+            if (!interf) {
+                int value = (Integer) data[0];
+                cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
+                cameraSpeedLimit.setSelectedIndex(value);
+                cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(true);
+            }
+            break;
+        case ORIENTATION_LOCK_CMD:
+            interf = false;
+            if (data.length > 2)
+                interf = (Boolean) data[2];
+            if (!interf) {
+                boolean lock = (Boolean) data[1];
+                orientationLock.setProgrammaticChangeEvents(false);
+                orientationLock.setChecked(lock);
+                orientationLock.setProgrammaticChangeEvents(true);
+            }
+            break;
+        case STEREOSCOPIC_CMD:
+            if (!(boolean) data[1] && !GlobalConf.runtime.OPENVR) {
+                button3d.setProgrammaticChangeEvents(false);
+                button3d.setChecked((boolean) data[0]);
+                button3d.setProgrammaticChangeEvents(true);
+            }
+            break;
+        case FOV_CHANGE_NOTIFICATION:
+            fovFlag = false;
+            fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
+            fovFlag = true;
+            break;
+        case CUBEMAP_CMD:
+            if (!(boolean) data[2] && !GlobalConf.runtime.OPENVR) {
+                CubemapProjection proj = (CubemapProjection) data[1];
+                boolean enable = (boolean) data[0];
+                if (proj.isPanorama()) {
+                    buttonCubemap.setProgrammaticChangeEvents(false);
+                    buttonCubemap.setChecked(enable);
+                    buttonCubemap.setProgrammaticChangeEvents(true);
+                    fieldOfView.setDisabled(enable);
+                } else if (proj.isPlanetarium()) {
                     buttonDome.setProgrammaticChangeEvents(false);
                     buttonDome.setChecked(enable);
                     buttonDome.setProgrammaticChangeEvents(true);
                     fieldOfView.setDisabled(enable);
                 }
-                break;
-            default:
-                break;
+
+            }
+            break;
+        case PLANETARIUM_CMD:
+            if (!(boolean) data[1] && !GlobalConf.runtime.OPENVR) {
+                boolean enable = (boolean) data[0];
+                buttonDome.setProgrammaticChangeEvents(false);
+                buttonDome.setChecked(enable);
+                buttonDome.setProgrammaticChangeEvents(true);
+                fieldOfView.setDisabled(enable);
+            }
+            break;
+        default:
+            break;
         }
 
     }

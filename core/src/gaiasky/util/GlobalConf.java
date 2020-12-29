@@ -1223,7 +1223,7 @@ public class GlobalConf {
                 STEREO_PROFILE = StereoProfile.values()[(Integer) data[0]];
                 break;
             case CUBEMAP_CMD:
-                CUBEMAP_MODE = (Boolean) data[0];
+                CUBEMAP_MODE = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
                 if (CUBEMAP_MODE) {
                     CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[1];
 

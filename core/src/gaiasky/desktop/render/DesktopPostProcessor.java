@@ -758,7 +758,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case CUBEMAP_CMD:
             boolean cubemap = (Boolean) data[0];
-            enabled = !cubemap && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
+            enabled = !cubemap && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.OPENVR;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];

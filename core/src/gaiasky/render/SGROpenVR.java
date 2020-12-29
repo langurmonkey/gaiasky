@@ -296,6 +296,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         }
 
         // Update Eye camera
+        camera.viewportWidth = rc.w();
+        camera.viewportHeight = rc.h();
         camera.view.idt();
         camera.view.setToLookAt(pos, auxf1.set(pos).add(dir), up);
 
