@@ -1176,7 +1176,7 @@ public interface IScriptingInterface {
      * @param name         The proper name of the object.
      * @param locationName The name of the location to land on
      */
-    void landOnObjectLocation(String name, String locationName);
+    void landAtObjectLocation(String name, String locationName);
 
     /**
      * Lands on the object with the given <code>name</code>, if it is an
@@ -1187,7 +1187,7 @@ public interface IScriptingInterface {
      * @param longitude The location longitude, in degrees.
      * @param latitude  The location latitude, in degrees.
      */
-    void landOnObjectLocation(String name, double longitude, double latitude);
+    void landAtObjectLocation(String name, double longitude, double latitude);
 
     /**
      * Returns the distance to the surface of the object identified with the

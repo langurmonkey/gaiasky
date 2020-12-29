@@ -86,12 +86,11 @@ public class HiddenHelperUser implements IObserver {
             HelperTask landAtTask;
             if (data[1] instanceof String) {
                 String locname = (String) data[1];
-                landAtTask = new LandOnLocationTask(body, locname, currentTasks);
+                landAtTask = new LandAtLocationTask(body, locname, currentTasks);
             } else {
                 Double lon = (Double) data[1];
                 Double lat = (Double) data[2];
-                landAtTask = new LandOnLocationTask(body, lon, lat, currentTasks);
-
+                landAtTask = new LandAtLocationTask(body, lon, lat, currentTasks);
             }
             Thread landAtLoc = new Thread(landAtTask);
             landAtLoc.start();
@@ -163,18 +162,18 @@ public class HiddenHelperUser implements IObserver {
 
     }
 
-    private class LandOnLocationTask extends HelperTask {
+    private class LandAtLocationTask extends HelperTask {
         IFocus body;
         String locName;
         Double lon, lat;
 
-        LandOnLocationTask(IFocus body, String locName, Array<HelperTask> currentTasks) {
+        LandAtLocationTask(IFocus body, String locName, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
             this.locName = locName;
         }
 
-        LandOnLocationTask(IFocus body, double lon, double lat, Array<HelperTask> currentTasks) {
+        LandAtLocationTask(IFocus body, double lon, double lat, Array<HelperTask> currentTasks) {
             super(currentTasks);
             this.body = body;
             this.lon = lon;
@@ -184,9 +183,9 @@ public class HiddenHelperUser implements IObserver {
         @Override
         public void run() {
             if (locName == null)
-                EventScriptingInterface.instance().landOnObjectLocation(body, lon, lat, stop);
+                EventScriptingInterface.instance().landAtObjectLocation(body, lon, lat, stop);
             else
-                EventScriptingInterface.instance().landOnObjectLocation(body, locName, stop);
+                EventScriptingInterface.instance().landAtObjectLocation(body, locName, stop);
             currentTasks.removeValue(this, true);
         }
 

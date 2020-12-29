@@ -1261,20 +1261,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void landOnObjectLocation(String name, String locationName) {
-        landOnObjectLocation(name, locationName, null);
+    public void landAtObjectLocation(String name, String locationName) {
+        landAtObjectLocation(name, locationName, null);
     }
 
-    public void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(String name, String locationName, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             stops.add(stop);
             SceneGraphNode sgn = getObject(name);
             if (sgn instanceof IFocus)
-                landOnObjectLocation((IFocus) sgn, locationName, stop);
+                landAtObjectLocation((IFocus) sgn, locationName, stop);
         }
     }
 
-    public void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
             stops.add(stop);
@@ -1283,7 +1283,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 SceneGraphNode sgn = planet.getChildByNameAndType(locationName.toLowerCase().trim(), Loc.class);
                 if (sgn != null) {
                     Loc location = (Loc) sgn;
-                    landOnObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
+                    landAtObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
                     return;
                 }
                 logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
@@ -1292,15 +1292,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void landOnObjectLocation(String name, double longitude, double latitude) {
+    public void landAtObjectLocation(String name, double longitude, double latitude) {
         if (checkString(name, "name")) {
             SceneGraphNode sgn = getObject(name);
             if (sgn instanceof IFocus)
-                landOnObjectLocation((IFocus) sgn, longitude, latitude, null);
+                landAtObjectLocation((IFocus) sgn, longitude, latitude, null);
         }
     }
 
-    void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
+    void landAtObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             stops.add(stop);
             ISceneGraph sg = GaiaSky.instance.sg;
