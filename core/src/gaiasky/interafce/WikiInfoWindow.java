@@ -44,7 +44,7 @@ public class WikiInfoWindow extends GenericDialog {
     private boolean updating = false;
 
     public WikiInfoWindow(Stage stg, Skin skin) {
-        super(I18n.txt("gui.help.meminfo"), skin, stg);
+        super(I18n.txt("gui.wiki.title", "?"), skin, stg);
 
         this.reader = new JsonReader();
         this.pad = 8f;
@@ -62,7 +62,7 @@ public class WikiInfoWindow extends GenericDialog {
 
     public void update(String searchName) {
         updating = true;
-        this.getTitleLabel().setText("Object information: " + searchName);
+        this.getTitleLabel().setText(I18n.txt("gui.wiki.title", searchName));
 
         table.clear();
         getDataByWikiName(searchName, new WikiDataListener(searchName));
@@ -161,11 +161,11 @@ public class WikiInfoWindow extends GenericDialog {
 
         public void ok(JsonValue root) {
             if (!root.has("displaytitle")) {
-                ko("'displaytitle' attribute missing");
+                ko(I18n.txt("gui.wiki.attributemissing", "displaytitle"));
                 return;
             }
             String title = TextUtils.html2text(root.getString("displaytitle"));
-            getTitleLabel().setText("Object information: " + title);
+            getTitleLabel().setText(I18n.txt("gui.wiki.title", title));
 
             // Thumbnail
             if (root.has("thumbnail")) {
@@ -207,29 +207,29 @@ public class WikiInfoWindow extends GenericDialog {
                                     // Convert to RGB if necessary
                                     try {
                                         if (ImageUtils.monochromeToRGB(imageFile.toFile())) {
-                                            logger.info("Image converted to RGB: " + imageFile.toString());
+                                            logger.info(I18n.txt("gui.wiki.imageconverted", imageFile.toString()));
                                         }
                                         // And send to UI
                                         buildImage(imageFile);
                                     } catch (Exception e) {
-                                        logger.error("Error converting monochrome image to RGB: " + imageFile.toString());
+                                        logger.error(I18n.txt("error.wiki.rgbconversion", imageFile.toString()));
                                     }
                                 } else {
                                     // Ko with code
-                                    logger.error("Error getting thumbnail image from " + thumbUrl);
+                                    logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
                                 }
                             }
 
                             @Override
                             public void failed(Throwable t) {
                                 // Failed
-                                logger.error("Error getting thumbnail image from " + thumbUrl);
+                                logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
                             }
 
                             @Override
                             public void cancelled() {
                                 // Cancelled
-                                logger.error("Error getting thumbnail image from " + thumbUrl);
+                                logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
                             }
                         });
                     } else {
@@ -243,7 +243,7 @@ public class WikiInfoWindow extends GenericDialog {
             OwnLabel titleLabel = new OwnLabel(title, skin, "header-large");
             // Text
             if (!root.has("extract")) {
-                ko("'extract' attribute missing");
+                ko(I18n.txt("gui.wiki.attributemissing", "extract"));
                 return;
             }
             String text = TextUtils.html2text(root.getString("extract"));
@@ -252,7 +252,7 @@ public class WikiInfoWindow extends GenericDialog {
             Link wikiLink = null;
             if (root.has("content_urls")) {
                 String link = root.get("content_urls").get("desktop").getString("page");
-                wikiLink = new Link("More information...", skin, link);
+                wikiLink = new Link(I18n.txt("gui.wiki.moreinfo"), skin, link);
             }
 
             // Populate table
@@ -268,7 +268,7 @@ public class WikiInfoWindow extends GenericDialog {
         public void ko() {
             // Error getting data
             GaiaSky.postRunnable(() -> {
-                String msg = I18n.bundle.format("error.gaiacatalog.data", wikiname);
+                String msg = I18n.bundle.format("error.wiki.data", wikiname);
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 table.pack();
                 finish();
