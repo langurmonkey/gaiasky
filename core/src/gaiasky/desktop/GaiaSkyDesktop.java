@@ -42,7 +42,6 @@ import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -293,6 +292,8 @@ public class GaiaSkyDesktop implements IObserver {
         launchMainApp();
     }
 
+    private GaiaSky gs;
+
     public void launchMainApp() {
         ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
@@ -343,28 +344,25 @@ public class GaiaSkyDesktop implements IObserver {
         }
 
         // Launch app
-        GaiaSky gs = null;
         try {
             if (GlobalConf.program.SAFE_GRAPHICS_MODE) {
                 setSafeMode(cfg);
             }
             consoleLogger.unsubscribe();
 
-            gs = runGaiaSky(cfg);
+            runGaiaSky(cfg);
         } catch (GdxRuntimeException e) {
+            checkLogger(consoleLogger);
             logger.error(e);
+            gs.setCrashed(true);
+            try {
+                gs.dispose();
+            } catch (Exception e1) {
+                logger.error(I18n.txt("error.dispose"), e1);
+            }
             if (!JAVA_VERSION_FLAG) {
-                if ((gs == null || !gs.windowCreated)) {
+                if (!gs.windowCreated) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
-                    EventManager.instance.clearAllSubscriptions();
-                    checkLogger(consoleLogger);
-                    if (gs != null) {
-                        try {
-                            gs.dispose();
-                        } catch (Exception e1) {
-                            logger.error(I18n.txt("error.dispose"), e1);
-                        }
-                    }
                     logger.error(I18n.txt("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
                     setSafeMode(cfg);
                     consoleLogger.unsubscribe();
@@ -376,23 +374,20 @@ public class GaiaSkyDesktop implements IObserver {
                         showDialogOGL(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
-                    checkLogger(consoleLogger);
                     logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                     showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
-                checkLogger(consoleLogger);
                 logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
                 showDialogOGL(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
-            checkLogger(consoleLogger);
             logger.error(e);
             showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
     }
 
-    private static void configureWindowSize(Lwjgl3ApplicationConfiguration cfg){
+    private void configureWindowSize(Lwjgl3ApplicationConfiguration cfg) {
         int w = GlobalConf.screen.getScreenWidth();
         int h = GlobalConf.screen.getScreenHeight();
         if (!SysUtils.isMac()) {
@@ -438,21 +433,19 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setWindowedMode(w, h);
     }
 
-    private static GaiaSky runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {
-        //throw new GdxRuntimeException("A");
-        GaiaSky gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+    private void runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {
+        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
         new Lwjgl3Application(gs, cfg);
-        return gs;
     }
 
-    private static void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
+    private void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
         logger.info(I18n.txt("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
         GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
         GlobalConf.program.SAFE_GRAPHICS_MODE = true;
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
-    private static void showDialogOGL(String title, String message) {
+    private void showDialogOGL(String title, String message) {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
@@ -463,65 +456,9 @@ public class GaiaSkyDesktop implements IObserver {
         new Lwjgl3Application(new ErrorDialog(title, message), cfg);
     }
 
-    public static class Main extends JFrame {
-        MyPanel panel;
-
-        public Main() {
-            setTitle("This is a frame");
-            setSize(300, 200);
-            panel = new MyPanel(this);
-            add(panel);
-
-            setLocationRelativeTo(null);
-            setDefaultCloseOperation(EXIT_ON_CLOSE);
-        }
-
-        public static void main(String[] args) {
-            EventQueue.invokeLater(() -> {
-                Main frame = new Main();
-                frame.pack();
-                frame.setVisible(true);
-            });
-        }
-
-        private static class MyPanel extends JPanel {
-
-            int dialogCounter = 1;
-            final JFrame theParent;
-
-            public MyPanel(JFrame parent) {
-                super();
-                theParent = parent;
-                setPreferredSize(new Dimension(300, 200));
-                JButton button = new JButton("Press the button");
-                button.addActionListener(e -> showDialog(theParent));
-
-                add(button);
-            }
-
-            private void showDialog(Frame parent) {
-                JDialog dialog = new JDialog(parent, "This is dialog " + dialogCounter, true);
-                setupDialog(dialog);
-            }
-
-            private void setupDialog(JDialog dialog) {
-                JPanel dialogPanel = new JPanel();
-                dialogPanel.setPreferredSize(new Dimension(300, 200));
-                dialogPanel.add(new JLabel("Current dialog count: " + dialogCounter++));
-                JButton button = new JButton("Open a new modal dialog");
-                button.addActionListener(e -> showDialog(theParent));
-                dialogPanel.add(button);
-                dialog.add(dialogPanel);
-                dialog.pack();
-                dialog.setVisible(true);
-            }
-        }
-    }
-
     private static void checkLogger(ConsoleLogger consoleLogger) {
-        if (!EventManager.instance.isSubscribedToAny(consoleLogger)) {
-            consoleLogger.subscribe();
-        }
+        EventManager.instance.clearAllSubscriptions();
+        consoleLogger.subscribe();
     }
 
     @Override

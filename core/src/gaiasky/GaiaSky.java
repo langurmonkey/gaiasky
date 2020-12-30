@@ -751,7 +751,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void dispose() {
-        if (saveState) {
+        if (saveState && !crashed) {
             if (ConfInit.instance != null)
                 ConfInit.instance.persistGlobalConf(new File(System.getProperty("properties.file")));
             if (BookmarksManager.instance != null)
@@ -765,8 +765,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.FLUSH_FRAMES);
 
         // Dispose all
-        for (IGui gui : guis)
-            gui.dispose();
+        if (guis != null)
+            for (IGui gui : guis)
+                gui.dispose();
 
         EventManager.instance.post(Events.DISPOSE);
         if (sg != null) {
@@ -941,6 +942,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     // Has the application crashed?
     private boolean crashed = false;
+
+    public void setCrashed(boolean crashed) {
+        this.crashed = crashed;
+    }
+
+    public boolean isCrashed() {
+        return crashed;
+    }
 
     @Override
     public void render() {

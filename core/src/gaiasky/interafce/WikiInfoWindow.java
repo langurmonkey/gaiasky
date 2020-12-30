@@ -21,9 +21,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.util.Constants;
-import gaiasky.util.I18n;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
@@ -32,6 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class WikiInfoWindow extends GenericDialog {
@@ -42,6 +41,7 @@ public class WikiInfoWindow extends GenericDialog {
     private JsonReader reader;
 
     private float pad;
+    private boolean updating = false;
 
     public WikiInfoWindow(Stage stg, Skin skin) {
         super(I18n.txt("gui.help.meminfo"), skin, stg);
@@ -56,7 +56,12 @@ public class WikiInfoWindow extends GenericDialog {
         buildSuper();
     }
 
+    public boolean isUpdating() {
+        return updating;
+    }
+
     public void update(String searchName) {
+        updating = true;
         this.getTitleLabel().setText("Object information: " + searchName);
 
         table.clear();
@@ -129,114 +134,134 @@ public class WikiInfoWindow extends GenericDialog {
 
         private String wikiname;
         private Cell imgCell;
+        private Texture currentImageTexture;
 
         public WikiDataListener(String wikiname) {
             this.wikiname = wikiname;
         }
 
-        private boolean checkAttrib(JsonValue json, String attrib) {
-            if (!json.has(attrib)) {
-                ko("Could not parse wikipedia API JSON response object");
-                return false;
-            }
-            return true;
+        private void buildImage(Path imageFile) {
+            GaiaSky.postRunnable(() -> {
+                // Load image into texture
+                try {
+                    if (currentImageTexture != null) {
+                        currentImageTexture.dispose();
+                    }
+                    currentImageTexture = new Texture(imageFile.toString());
+                    Image thumbnailImage = new Image(currentImageTexture);
+                    if (imgCell != null) {
+                        imgCell.setActor(thumbnailImage);
+                        finish();
+                    }
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            });
         }
 
         public void ok(JsonValue root) {
-            if (!checkAttrib(root, "displaytitle"))
+            if (!root.has("displaytitle")) {
+                ko("'displaytitle' attribute missing");
                 return;
-            String title = root.getString("displaytitle");
+            }
+            String title = TextUtils.html2text(root.getString("displaytitle"));
             getTitleLabel().setText("Object information: " + title);
 
             // Thumbnail
-            if (checkAttrib(root, "thumbnail")) {
+            if (root.has("thumbnail")) {
                 JsonValue thumb = root.get("thumbnail");
-                if (checkAttrib(thumb, "source")) {
+                if (thumb.has("source")) {
                     // Get image
                     String thumbUrl = thumb.getString("source");
+                    String filename = Path.of(thumbUrl).getFileName().toString();
+                    Path cacheDir = SysUtils.getCacheDir();
 
-                    Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-                    request.setUrl(thumbUrl);
-                    request.setTimeOut(5000);
+                    Path imageFile = cacheDir.resolve(filename);
 
-                    Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-                        @Override
-                        public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                            if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-                                // Ok, have image
-                                logger.info("Got image: " + thumbUrl);
-                                Path cacheDir = SysUtils.getCacheDir();
-                                InputStream is = httpResponse.getResultAsStream();
+                    if (!Files.exists(imageFile) || !Files.isRegularFile(imageFile) || !Files.isReadable(imageFile)) {
+                        // Download image file!
+                        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
+                        request.setUrl(thumbUrl);
+                        request.setTimeOut(5000);
 
-                                Path fileName = Path.of(thumbUrl).getFileName();
-                                Path imageFile = cacheDir.resolve(fileName);
-                                try (FileOutputStream outputStream = new FileOutputStream(imageFile.toString())) {
-                                    int read;
-                                    byte[] bytes = new byte[1024];
+                        logger.info(I18n.txt("gui.download.starting", thumbUrl));
+                        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+                            @Override
+                            public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                                if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+                                    // Ok
+                                    InputStream is = httpResponse.getResultAsStream();
+                                    // Write to cache
+                                    try (FileOutputStream outputStream = new FileOutputStream(imageFile.toString())) {
+                                        int read;
+                                        byte[] bytes = new byte[1024];
 
-                                    while ((read = is.read(bytes)) != -1) {
-                                        outputStream.write(bytes, 0, read);
-                                    }
-
-                                    GaiaSky.postRunnable(()-> {
-                                        // Load image
-                                        Texture tex = new Texture(imageFile.toString());
-                                        Image thumbnailImage = new Image(tex);
-                                        if(imgCell != null){
-                                            imgCell.setActor(thumbnailImage);
-                                            finish();
-                                            scroll.setHeight(Math.min(table.getMinHeight(), Gdx.graphics.getHeight()) * 1.2f + pad);
+                                        while ((read = is.read(bytes)) != -1) {
+                                            outputStream.write(bytes, 0, read);
                                         }
-                                    });
-                                } catch (FileNotFoundException e) {
-                                    logger.error(e);
-                                } catch (IOException e) {
-                                    logger.error(e);
+                                    } catch (FileNotFoundException e) {
+                                        logger.error(e);
+                                    } catch (IOException e) {
+                                        logger.error(e);
+                                    }
+                                    // Convert to RGB if necessary
+                                    try {
+                                        if (ImageUtils.monochromeToRGB(imageFile.toFile())) {
+                                            logger.info("Image converted to RGB: " + imageFile.toString());
+                                        }
+                                        // And send to UI
+                                        buildImage(imageFile);
+                                    } catch (Exception e) {
+                                        logger.error("Error converting monochrome image to RGB: " + imageFile.toString());
+                                    }
+                                } else {
+                                    // Ko with code
+                                    logger.error("Error getting thumbnail image from " + thumbUrl);
                                 }
+                            }
 
-                            } else {
-                                // Ko with code
+                            @Override
+                            public void failed(Throwable t) {
+                                // Failed
                                 logger.error("Error getting thumbnail image from " + thumbUrl);
                             }
 
-                        }
-
-                        @Override
-                        public void failed(Throwable t) {
-                            // Failed
-                            logger.error("Error getting thumbnail image from " + thumbUrl);
-                        }
-
-                        @Override
-                        public void cancelled() {
-                            // Cancelled
-                            logger.error("Error getting thumbnail image from " + thumbUrl);
-                        }
-                    });
+                            @Override
+                            public void cancelled() {
+                                // Cancelled
+                                logger.error("Error getting thumbnail image from " + thumbUrl);
+                            }
+                        });
+                    } else {
+                        // Image already in local cache
+                        buildImage(imageFile);
+                    }
                 }
             }
 
             // Title
             OwnLabel titleLabel = new OwnLabel(title, skin, "header-large");
             // Text
-            if (!checkAttrib(root, "extract"))
+            if (!root.has("extract")) {
+                ko("'extract' attribute missing");
                 return;
-            String text = root.getString("extract");
-            OwnLabel textLabel = new OwnLabel(text, skin, "ui-21", 70);
+            }
+            String text = TextUtils.html2text(root.getString("extract"));
+            OwnLabel textLabel = new OwnLabel(text, skin, "ui-23", 60);
             // Link
-            if (!checkAttrib(root, "content_urls"))
-                return;
-            String link = root.get("content_urls").get("desktop").getString("page");
-            Link wikiLink = new Link("More information...", skin, link);
+            Link wikiLink = null;
+            if (root.has("content_urls")) {
+                String link = root.get("content_urls").get("desktop").getString("page");
+                wikiLink = new Link("More information...", skin, link);
+            }
 
             // Populate table
             table.add(titleLabel).left().colspan(2).padTop(pad * 3f).padBottom(pad * 3f).row();
             imgCell = table.add().left().padBottom(pad * 5f);
-            table.add(textLabel).left().padBottom(pad * 5f).padLeft(pad).row();
-            table.add(wikiLink).center().colspan(2);
+            table.add(textLabel).left().padBottom(pad * 5f).padLeft(pad * 3f).row();
+            if (wikiLink != null)
+                table.add(wikiLink).center().colspan(2);
             table.pack();
-
-            scroll.setHeight(Math.min(table.getMinHeight(), Gdx.graphics.getHeight()) * 1.2f + pad);
             finish();
         }
 
@@ -246,7 +271,6 @@ public class WikiInfoWindow extends GenericDialog {
                 String msg = I18n.bundle.format("error.gaiacatalog.data", wikiname);
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 table.pack();
-                scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.6f) + pad);
                 finish();
             });
         }
@@ -257,7 +281,6 @@ public class WikiInfoWindow extends GenericDialog {
                 String msg = error;
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 table.pack();
-                scroll.setHeight(table.getHeight() + pad);
                 finish();
             });
         }
@@ -265,7 +288,9 @@ public class WikiInfoWindow extends GenericDialog {
         private void finish() {
             table.pack();
             scroll.setWidth(table.getWidth() + scroll.getStyle().vScroll.getMinWidth());
+            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight()) + pad);
             pack();
+            updating = false;
         }
 
     }

@@ -361,7 +361,7 @@
     {
       "name": "catalog-nbg",
       "type": "catalog-gal",
-      "version": 6,
+      "version": 7,
       "mingsversion": 30000,
       "size": 15786675,
       "nobjects": 875,
@@ -373,9 +373,9 @@
         "tex/extragal"
       ],
       "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole",
-      "releasenotes" : "Add type in catalog descriptor file",
-      "sha256": "457dd553a527a6d4e3be7e17c7accdbf5b0493d9696419ee6a5e02add0e0998f",
-      "file": "@mirror-url@galaxies/nbg/v06_20201216/galaxies-nbg.tar.gz"
+      "releasenotes" : "Update LMC and SMC names for the new Wiki connection feature",
+      "sha256": "c8a4db2a3c071a57c091432e6680394a31b9e08fe3319077e4c8010131f17e0f",
+      "file": "@mirror-url@galaxies/nbg/v07_20201230/galaxies-nbg.tar.gz"
     },
     {
       "name": "catalog-sdss-12",

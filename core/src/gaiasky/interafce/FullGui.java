@@ -402,7 +402,7 @@ public class FullGui extends AbstractGui {
                 logWindow.show(ui);
             break;
         case UPDATE_WIKI_INFO_ACTION:
-            if(wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent()){
+            if(wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()){
                 // Update
                 String searchName = (String) data[0];
                 wikiInfoWindow.update(searchName);
@@ -413,9 +413,11 @@ public class FullGui extends AbstractGui {
             if (wikiInfoWindow == null) {
                 wikiInfoWindow = new WikiInfoWindow(ui, skin);
             }
-            wikiInfoWindow.update(searchName);
-            if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
-                wikiInfoWindow.show(ui);
+            if(!wikiInfoWindow.isUpdating()) {
+                wikiInfoWindow.update(searchName);
+                if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
+                    wikiInfoWindow.show(ui);
+            }
             break;
         case UPDATE_ARCHIVE_VIEW_ACTION:
             if(archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()){

@@ -48,6 +48,8 @@ public class ArchiveViewWindow extends GenericDialog {
     private float pad;
 
     private IStarFocus st;
+    private boolean updating = false;
+
 
     public ArchiveViewWindow(Stage stage, Skin skin){
         super(I18n.txt("gui.data.catalog", "Gaia", "?"), skin, stage);
@@ -60,7 +62,12 @@ public class ArchiveViewWindow extends GenericDialog {
 
     }
 
+    public boolean isUpdating(){
+        return updating;
+    }
+
     public void update(IStarFocus st) {
+        updating = true;
         this.st = st;
 
         this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Gaia", st.getName()));
@@ -303,7 +310,6 @@ public class ArchiveViewWindow extends GenericDialog {
                     left();
                     table.row();
                 }
-                scroll.setHeight(Math.min(table.getMinHeight(), Gdx.graphics.getHeight() * 0.6f) + pad);
                 finish();
             });
         }
@@ -313,8 +319,6 @@ public class ArchiveViewWindow extends GenericDialog {
             GaiaSky.postRunnable(() -> {
                 String msg = I18n.bundle.format("error.gaiacatalog.data", st.getName());
                 table.add(new OwnLabel(msg, skin, "ui-21"));
-                table.pack();
-                scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.6f) + pad);
                 finish();
             });
         }
@@ -324,8 +328,6 @@ public class ArchiveViewWindow extends GenericDialog {
             GaiaSky.postRunnable(() -> {
                 String msg = error;
                 table.add(new OwnLabel(msg, skin, "ui-21"));
-                table.pack();
-                scroll.setHeight(table.getHeight() + pad);
                 finish();
             });
         }
@@ -334,17 +336,15 @@ public class ArchiveViewWindow extends GenericDialog {
             // Not found
             String msg = I18n.bundle.format("error.gaiacatalog.notfound", st.getName());
             table.add(new OwnLabel(msg, skin, "ui-21"));
-            table.pack();
-            scroll.setHeight(table.getHeight() + pad);
             finish();
         }
 
         private void finish() {
             table.pack();
-
             scroll.setWidth(table.getWidth() + scroll.getStyle().vScroll.getMinWidth());
-
+            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.8f) + pad);
             pack();
+            updating = false;
         }
 
     }

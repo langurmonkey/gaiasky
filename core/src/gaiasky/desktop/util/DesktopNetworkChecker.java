@@ -10,8 +10,6 @@ import com.badlogic.gdx.Net.HttpMethods;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Net;
 import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
@@ -25,9 +23,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interafce.INetworkChecker;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.IStarFocus;
-import gaiasky.scenegraph.ModelBody;
+import gaiasky.scenegraph.*;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -36,9 +32,7 @@ import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnTextButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
-import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     private static final Log logger = Logger.getLogger(DesktopNetworkChecker.class);
@@ -144,7 +138,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                         // Add table
                         if (focus instanceof IStarFocus) {
                             EventManager.instance.post(Events.UPDATE_ARCHIVE_VIEW_ACTION, focus);
-                            if(gaiaButton != null)
+                            if (gaiaButton != null)
                                 gaiaButton.remove();
                             gaiaButton = new OwnTextButton("Archive", skin);
                             gaiaButton.pad(pad / 3f, pad, pad / 3f, pad);
@@ -184,7 +178,7 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
 
                             @Override
                             public void ko(String link) {
-                                if(infoCell != null)
+                                if (infoCell != null)
                                     infoCell.padRight(0);
                             }
                         });
@@ -236,7 +230,11 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
         }
     }
 
-    private final String[] suffixes = { "_(planet)", "_(moon)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
+    private final String[] suffixes = { "_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", "" };
+    private final String[] suffixes_model = { "_(planet)", "_(moon)",  "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "" };
+    private final String[] suffixes_gal = { "_(dwarf_galaxy)", "_(galaxy)", "_Dwarf", "_Cluster", "" };
+    private final String[] suffixes_cluster = { "_(planet)", "_(moon)",  "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
+    private final String[] suffixes_star = { "_(star)", "" };
 
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
@@ -246,82 +244,68 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
                 if (f.wikiname != null) {
                     listener.ok(url + f.wikiname.replace(' ', '_'));
                 } else {
-                    for (int i = 0; i < suffixes.length; i++) {
-                        String suffix = suffixes[i];
-                        urlCheck(url + wikiname + suffix, listener);
-                    }
+                    urlCheck(url, wikiname, suffixes_model, listener);
                 }
+            }else if (focus instanceof NBGalaxy) {
+                urlCheck(url, wikiname, suffixes_gal, listener);
+            } else if (focus instanceof StarCluster){
+                urlCheck(url, wikiname, suffixes_cluster, listener);
+            } else if (focus instanceof IStarFocus){
+                urlCheck(url, wikiname, suffixes_star, listener);
+            } else if (focus instanceof BillboardGalaxy){
+                urlCheck(url, wikiname, suffixes_star, listener);
             } else {
-                urlCheck(url + wikiname, listener);
+                urlCheck(url, wikiname, suffixes, listener);
             }
 
         } catch (Exception e) {
             logger.error(e);
             listener.ko(null);
         }
-
     }
 
-    private void urlCheck(final String url, final LinkListener listener) {
-        HttpRequest request = new HttpRequest(HttpMethods.GET);
-        request.setUrl(url);
-        request.setTimeOut(TIMEOUT_MS);
-        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-            @Override
-            public void handleHttpResponse(HttpResponse httpResponse) {
-                if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-                    listener.ok(url);
-                } else {
-                    listener.ko(url);
+    private void urlCheck(final String base, final String name, final String[] suffixes, LinkListener listener){
+        final AtomicInteger index = new AtomicInteger(0);
+        createRequest(base, name, suffixes, index, listener);
+    }
+
+    private void createRequest(final String base, final String name, final String[] suffixes, final AtomicInteger index, LinkListener listener){
+        if(index.get() < suffixes.length) {
+            final String url = base + name + suffixes[index.get()];
+            HttpRequest request = new HttpRequest(HttpMethods.GET);
+            request.setUrl(url);
+            request.setTimeOut(TIMEOUT_MS);
+
+            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+                @Override
+                public void handleHttpResponse(HttpResponse httpResponse) {
+                    if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+                        listener.ok(url);
+                    } else {
+                        // Next
+                        index.incrementAndGet();
+                        createRequest(base, name, suffixes, index, listener);
+                    }
                 }
-            }
 
-            @Override
-            public void failed(Throwable t) {
-                listener.ko(url);
-            }
+                @Override
+                public void failed(Throwable t) {
+                    // Next
+                    index.incrementAndGet();
+                    createRequest(base, name, suffixes, index, listener);
+                }
 
-            @Override
-            public void cancelled() {
-                listener.ko(url);
-            }
-        });
-
-    }
-
-    public static void main(String[] args) throws UnsupportedEncodingException {
-        final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
-        Gdx.net = new Lwjgl3Net(new Lwjgl3ApplicationConfiguration());
-        DesktopNetworkChecker dnc = new DesktopNetworkChecker();
-        dnc.urlCheck("https://ca.ba.de.si.com", new LinkListener() {
-            @Override
-            public void ok(String link) {
-                out.println("ok : " + link);
-            }
-
-            @Override
-            public void ko(String link) {
-                out.println("ko : " + link);
-            }
-        });
-        dnc.urlCheck("https://www.google.com", new LinkListener() {
-            @Override
-            public void ok(String link) {
-                out.println("ok : " + link);
-            }
-
-            @Override
-            public void ko(String link) {
-                out.println("ko : " + link);
-            }
-        });
-
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+                @Override
+                public void cancelled() {
+                    // Next
+                    index.incrementAndGet();
+                    createRequest(base, name, suffixes, index, listener);
+                }
+            });
+        } else {
+            // Ran out of suffixes!
+            listener.ko(base + name);
         }
-
     }
 
     private interface LinkListener {

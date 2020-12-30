@@ -184,7 +184,11 @@ public class GuiRegistry implements IObserver {
             synchronized (guirenderlock) {
                 for (int i = 0; i < guis.size; i++) {
                     guis.get(i).getGuiStage().getViewport().apply();
-                    guis.get(i).render(rw, rh);
+                    try {
+                        guis.get(i).render(rw, rh);
+                    } catch (Exception e) {
+
+                    }
                 }
             }
         }

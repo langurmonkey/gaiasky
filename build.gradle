@@ -22,10 +22,12 @@ allprojects {
         jafamaVersion = "2.1.0"
         compressVersion = "1.20"
         commonsioVersion = "2.6"
+        commonsimagingVersion = "+"
         py4jVersion = "0.10.8.1"
         oshiVersion = "4.0.0"
         jsampVersion = "+"
         sdl2gdxVersion = "1.0.4"
+        jsoupVersion = "+"
     }
 
     repositories {
@@ -127,11 +129,15 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
+
         // Use GDX
         //api "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
         // Use SDL
         api "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
 
+        // *****************
+        // OTHER SERVER DEPS
+        // *****************
         api group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         api "org.apache.commons:commons-compress:$compressVersion"
         api "com.beust:jcommander:$jcommanderVersion"
@@ -140,6 +146,10 @@ project(":core") {
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
         api group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
+
+        api group: "org.jsoup", name: "jsoup", version: "$jsoupVersion"
+        api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
+
 
         // ****************
         // REST SERVER DEPS
