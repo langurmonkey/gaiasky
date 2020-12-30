@@ -55,8 +55,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     private final INumberFormat nf;
 
-    private ThreadLocal<Vector3d> aux3d1, aux3d2, aux3d3;
-
     // Buffer in number of lines
     private int parallelBufferSize = 100000;
 
@@ -65,9 +63,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         indexMap = new HashMap<>();
         countsPerMag = new long[22];
         nf = NumberFormatFactory.getFormatter("###.##");
-        aux3d1 = new ThreadLocal<>();
-        aux3d2 = new ThreadLocal<>();
-        aux3d3 = new ThreadLocal<>();
     }
 
     /**
@@ -272,7 +267,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         double rarad = Math.toRadians(ra);
                         double decrad = Math.toRadians(dec);
                         // If distance is negative due to mustLoad, we need to be able to retrieve sph pos later on, so we use 1 m to mark it
-                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, Math.max(dist, NEGATIVE_DIST), aux3d1.get());
+                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, Math.max(dist, NEGATIVE_DIST), new Vector3d());
 
                         /** PROPER MOTIONS in mas/yr **/
                         double mualphastar = Parser.parseDouble(tokens[idx(ColId.pmra)]);
@@ -285,12 +280,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         /** PROPER MOTION VECTOR **/
-                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, aux3d2.get());
+                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, new Vector3d());
 
                         // Line of sight extinction in the G band
                         double ag = 0;
                         // Galactic latitude in radians
-                        Vector3d posgal = aux3d3.get().set(pos);
+                        Vector3d posgal = new Vector3d().set(pos);
                         posgal.mul(Coordinates.eqToGal());
                         Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, posgal);
                         double b = posgalsph.y;
