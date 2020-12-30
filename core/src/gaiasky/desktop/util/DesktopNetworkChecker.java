@@ -231,8 +231,8 @@ public class DesktopNetworkChecker extends Thread implements INetworkChecker {
     }
 
     private final String[] suffixes = { "_(planet)", "_(moon)", "_(star)", "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(star_cluster)", "" };
-    private final String[] suffixes_model = { "_(planet)", "_(moon)",  "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "" };
-    private final String[] suffixes_gal = { "_(dwarf_galaxy)", "_(galaxy)", "_Dwarf", "_Cluster", "" };
+    private final String[] suffixes_model = { "_(planet)", "_(moon)",  "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "_(galaxy)", "_Galaxy", "_Dwarf", "" };
+    private final String[] suffixes_gal = { "_(dwarf_galaxy)", "_(galaxy)", "_Galaxy", "_Dwarf", "_Cluster", "" };
     private final String[] suffixes_cluster = { "_(planet)", "_(moon)",  "_(asteroid)", "_(dwarf_planet)", "_(spacecraft)", "" };
     private final String[] suffixes_star = { "_(star)", "" };
 
