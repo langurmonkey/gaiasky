@@ -689,7 +689,7 @@ public class AstroUtils {
      * @param distpc      Distance in parsecs to the star
      * @return The proper motion vector in internal_units/year
      */
-    public static Vector3d properMotionsToCartesian(double mualphastar, double mudelta, double radvel, double ra, double dec, double distpc) {
+    public static Vector3d properMotionsToCartesian(double mualphastar, double mudelta, double radvel, double ra, double dec, double distpc, Vector3d out) {
         double ma = mualphastar * Nature.MILLIARCSEC_TO_ARCSEC;
         double md = mudelta * Nature.MILLIARCSEC_TO_ARCSEC;
 
@@ -716,7 +716,7 @@ public class AstroUtils {
         double vy = (radvel * cosdelta * sinalpha) + (vta * cosalpha) - (vtd * sindelta * sinalpha);
         double vz = (radvel * sindelta) + (vtd * cosdelta);
 
-        return (new Vector3d(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
+        return (out.set(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
 
     }
 }

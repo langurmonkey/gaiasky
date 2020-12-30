@@ -55,10 +55,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     private final INumberFormat nf;
 
-    /**
-     * Load lines in parallel
-     */
-    private boolean parallel = true;
+    private ThreadLocal<Vector3d> aux3d1, aux3d2, aux3d3;
 
     // Buffer in number of lines
     private int parallelBufferSize = 100000;
@@ -68,6 +65,9 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         indexMap = new HashMap<>();
         countsPerMag = new long[22];
         nf = NumberFormatFactory.getFormatter("###.##");
+        aux3d1 = new ThreadLocal<>();
+        aux3d2 = new ThreadLocal<>();
+        aux3d3 = new ThreadLocal<>();
     }
 
     /**
@@ -170,29 +170,32 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 discardedStars.incrementAndGet();
         };
         try {
-            List<String> lineBuffer = new ArrayList<>(parallelBufferSize);
-            int i = 0;
-            String line;
-            while ((line = br.readLine()) != null) {
-                // Add to buffer
-                if (i > 0)
-                    lineBuffer.add(line);
-                if (lineBuffer.size() >= parallelBufferSize) {
-                    if (parallel)
+            if (parallelism > 1) {
+                // Use parallel stream with buffer
+                List<String> lineBuffer = new ArrayList<>(parallelBufferSize);
+                long i = 0;
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Add to buffer
+                    if (i > 0)
+                        lineBuffer.add(line);
+                    if (lineBuffer.size() >= parallelBufferSize) {
                         lineBuffer.parallelStream().forEach(c);
-                    else
-                        lineBuffer.stream().forEach(c);
+                        lineBuffer.clear();
+                    }
+                    i++;
+                }
+                // Flush resting
+                if (lineBuffer.size() > 0) {
+                    lineBuffer.parallelStream().forEach(c);
                     lineBuffer.clear();
                 }
-                i++;
-            }
-            // Flush resting
-            if (lineBuffer.size() > 0) {
-                if (parallel)
-                    lineBuffer.parallelStream().forEach(c);
-                else
-                    lineBuffer.stream().forEach(c);
-                lineBuffer.clear();
+            } else {
+                // Just read line by line
+                String line;
+                while ((line = br.readLine()) != null) {
+                    c.accept(line);
+                }
             }
         } catch (IOException e) {
             logger.error(e);
@@ -269,7 +272,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         double rarad = Math.toRadians(ra);
                         double decrad = Math.toRadians(dec);
                         // If distance is negative due to mustLoad, we need to be able to retrieve sph pos later on, so we use 1 m to mark it
-                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, Math.max(dist, NEGATIVE_DIST), new Vector3d());
+                        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, Math.max(dist, NEGATIVE_DIST), aux3d1.get());
 
                         /** PROPER MOTIONS in mas/yr **/
                         double mualphastar = Parser.parseDouble(tokens[idx(ColId.pmra)]);
@@ -282,14 +285,14 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         /** PROPER MOTION VECTOR **/
-                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc);
+                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, aux3d2.get());
 
                         // Line of sight extinction in the G band
                         double ag = 0;
                         // Galactic latitude in radians
-                        Vector3d posgal = new Vector3d(pos);
+                        Vector3d posgal = aux3d3.get().set(pos);
                         posgal.mul(Coordinates.eqToGal());
-                        Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
+                        Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, posgal);
                         double b = posgalsph.y;
                         double magcorraux = Math.min(distpc, 150d / Math.abs(Math.sin(b)));
 
@@ -438,10 +441,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 }
         }
         return null;
-    }
-
-    public void setParallel(boolean parallel) {
-        this.parallel = parallel;
     }
 
     public void setParallelBufferSize(int size) {

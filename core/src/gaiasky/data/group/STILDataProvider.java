@@ -257,7 +257,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                                 double rarad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
                                 double decrad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
-                                pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc);
+                                pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, new Vector3d());
                             } else {
                                 pm = new Vector3d(Vector3d.Zero);
                             }

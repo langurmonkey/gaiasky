@@ -202,7 +202,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
     private void addCluster(String[] names, double ra, double rarad, double dec, double decrad, double dist, double distpc, double mualphastar, double mudelta, double radvel, double radius, int nstars, Array<StarCluster> clusters){
         Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
 
-        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc);
+        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc, new Vector3d());
 
         Vector3d posSph = new Vector3d((float) ra, (float) dec, (float) dist);
         Vector3 pmSph = new Vector3((float) (mualphastar), (float) (mudelta), (float) radvel);

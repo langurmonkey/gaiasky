@@ -18,6 +18,7 @@ import java.util.List;
 public class SerializedDataProvider extends AbstractStarGroupDataProvider {
 
     public SerializedDataProvider() {
+        super();
     }
 
     public List<ParticleBean> loadData(String file, double factor, boolean compat) {

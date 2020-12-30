@@ -25,6 +25,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
@@ -32,10 +33,30 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
     public enum ColId {
-        sourceid, ra, dec, pllx, ra_err, dec_err,
-        pllx_err, pmra, pmdec, radvel, pmra_err,
-        pmdec_err, radvel_err, gmag, bpmag, rpmag, bp_rp,
-        ref_epoch, teff, radius, ag, ebp_min_rp, ruwe, geodist
+        sourceid,
+        ra,
+        dec,
+        pllx,
+        ra_err,
+        dec_err,
+        pllx_err,
+        pmra,
+        pmdec,
+        radvel,
+        pmra_err,
+        pmdec_err,
+        radvel_err,
+        gmag,
+        bpmag,
+        rpmag,
+        bp_rp,
+        ref_epoch,
+        teff,
+        radius,
+        ag,
+        ebp_min_rp,
+        ruwe,
+        geodist
     }
 
     protected Map<ColId, Integer> indexMap;
@@ -163,8 +184,14 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      */
     protected boolean magCorrections = false;
 
+    /**
+     * Parallelism value
+     */
+    protected final int parallelism;
+
     public AbstractStarGroupDataProvider() {
         super();
+        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     /**
@@ -186,7 +213,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Initialises the lists and structures given number of elements
      */
     protected void initLists(int elems) {
-        list = Collections.synchronizedList(new ArrayList<>(elems));
+        if (parallelism > 1)
+            list = Collections.synchronizedList(new ArrayList<>(elems));
+        else
+            list = new ArrayList<>(elems);
     }
 
     protected void initLists() {
@@ -214,7 +244,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     public List<ParticleBean> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, true);
     }
-
 
     /**
      * Returns whether the star must be loaded or not
@@ -264,11 +293,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         if (hasCol(ColId.ruwe)) {
             return Parser.parseFloat(tokens[idx(ColId.ruwe)]);
         } else {
-              Double ruwe = getAdditionalValue(ColId.ruwe, sourceId);
-              if(ruwe == null || ruwe.isInfinite() || ruwe.isNaN()){
-                  return Float.NaN;
-              }
-              return ruwe.floatValue();
+            Double ruwe = getAdditionalValue(ColId.ruwe, sourceId);
+            if (ruwe == null || ruwe.isInfinite() || ruwe.isNaN()) {
+                return Float.NaN;
+            }
+            return ruwe.floatValue();
         }
     }
 
@@ -483,7 +512,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             }
         }
     }
-
 
     /**
      * Loads a single file, optionally gzipped into the given {@link AdditionalCols}

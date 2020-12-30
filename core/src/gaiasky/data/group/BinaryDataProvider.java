@@ -24,6 +24,11 @@ import java.util.List;
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
+    public BinaryDataProvider(){
+        super();
+    }
+
+
     @Override
     public List<ParticleBean> loadData(String file, double factor, boolean compatibility) {
         logger.info(I18n.bundle.format("notif.datafile", file));
