@@ -507,6 +507,15 @@
       "fontColor": "theme",
       "disabledFontColor": "disabled-font",
       "imageUp": "iconic-check"
+    },
+    "plus": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "disabled": "default-round-disabled",
+      "font": "title-17",
+      "fontColor": "theme",
+      "disabledFontColor": "disabled-font",
+      "imageUp": "iconic-plus"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {

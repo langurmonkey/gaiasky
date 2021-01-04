@@ -39,6 +39,7 @@ public class WikiInfoWindow extends GenericDialog {
     private Table table;
     private OwnScrollPane scroll;
     private JsonReader reader;
+    private Cell linkCell;
 
     private float pad;
     private boolean updating = false;
@@ -65,7 +66,7 @@ public class WikiInfoWindow extends GenericDialog {
         this.getTitleLabel().setText(I18n.txt("gui.wiki.title", searchName));
 
         table.clear();
-        getDataByWikiName(searchName, new WikiDataListener(searchName));
+        getWikipediaSummary(searchName, new WikiDataListener(searchName));
     }
 
     @Override
@@ -79,7 +80,8 @@ public class WikiInfoWindow extends GenericDialog {
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
 
-        content.add(scroll);
+        content.add(scroll).row();
+        linkCell = content.add();
         getTitleTable().align(Align.left);
 
         pack();
@@ -93,7 +95,7 @@ public class WikiInfoWindow extends GenericDialog {
     protected void cancel() {
     }
 
-    private void getDataByWikiName(final String wikiname, final WikiDataListener listener) {
+    private void getWikipediaSummary(final String wikiname, final WikiDataListener listener) {
         getJSONData(Constants.URL_WIKI_API_SUMMARY + wikiname, listener);
     }
 
@@ -134,6 +136,7 @@ public class WikiInfoWindow extends GenericDialog {
 
         private String wikiname;
         private Cell imgCell;
+        //private Cell moreInfoCell;
         private Texture currentImageTexture;
 
         public WikiDataListener(String wikiname) {
@@ -248,19 +251,81 @@ public class WikiInfoWindow extends GenericDialog {
             }
             String text = TextUtils.html2text(root.getString("extract"));
             OwnLabel textLabel = new OwnLabel(text, skin, "ui-23", 60);
+
+            // More info
+            // OwnTextButton moreInfo = new OwnTextButton("+ " + I18n.txt("gui.wiki.moreinfo"), skin);
+            // moreInfo.addListener(event -> {
+            //     if (event instanceof ChangeEvent) {
+
+            //         Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
+            //         request.setUrl(Constants.URL_WIKI_API_MOBILEHTML + wikiname);
+            //         request.setTimeOut(5000);
+
+            //         Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            //             @Override
+            //             public void handleHttpResponse(Net.HttpResponse httpResponse) {
+            //                 if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+            //                     // Ok
+            //                     if(moreInfoCell != null){
+            //                         String strippedText = TextUtils.capString(TextUtils.html2text(httpResponse.getResultAsString()), 1000);
+            //                         OwnLabel moreInfoText = new OwnLabel(strippedText, skin, "ui-17", 100);
+            //                         moreInfoCell.clearActor();
+            //                         moreInfoCell.setActor(moreInfoText).left();
+            //                         finish();
+            //                     }
+
+            //                 } else {
+            //                     // Ko
+            //                     String err = I18n.txt("gui.download.error.httpstatus", Integer.toString(httpResponse.getStatus().getStatusCode()));
+            //                     if(moreInfoCell != null){
+            //                         moreInfoCell.clearActor();
+            //                         moreInfoCell.setActor(new OwnLabel(err, skin, "default-red")).center();
+            //                         finish();
+            //                     }
+            //                 }
+            //             }
+
+            //             @Override
+            //             public void failed(Throwable t) {
+            //                 if(moreInfoCell != null){
+            //                     moreInfoCell.clearActor();
+            //                     moreInfoCell.setActor(new OwnLabel(I18n.txt("error.data.get"), skin, "default-red")).center();
+            //                     finish();
+            //                 }
+            //             }
+
+            //             @Override
+            //             public void cancelled() {
+            //                 if(moreInfoCell != null){
+            //                     moreInfoCell.clearActor();
+            //                     moreInfoCell.setActor(new OwnLabel(I18n.txt("error.data.get"), skin, "default-red")).center();
+            //                     finish();
+            //                 }
+            //             }
+            //         });
+
+            //         return true;
+            //     }
+            //     return false;
+            // });
+
             // Link
             Link wikiLink = null;
             if (root.has("content_urls")) {
                 String link = root.get("content_urls").get("desktop").getString("page");
-                wikiLink = new Link(I18n.txt("gui.wiki.moreinfo"), skin, link);
+                wikiLink = new Link(TextUtils.capString(link, 50), skin, link);
+            }
+            if (linkCell != null && wikiLink != null) {
+                linkCell.clearActor();
+                linkCell.setActor(wikiLink).padTop(pad * 5f);
             }
 
             // Populate table
             table.add(titleLabel).left().colspan(2).padTop(pad * 3f).padBottom(pad * 3f).row();
             imgCell = table.add().left().padBottom(pad * 5f);
             table.add(textLabel).left().padBottom(pad * 5f).padLeft(pad * 3f).row();
-            if (wikiLink != null)
-                table.add(wikiLink).center().colspan(2);
+            //moreInfoCell = table.add().colspan(2);
+            //moreInfoCell.setActor(moreInfo).right();
             table.pack();
             finish();
         }
@@ -288,7 +353,8 @@ public class WikiInfoWindow extends GenericDialog {
         private void finish() {
             table.pack();
             scroll.setWidth(table.getWidth() + scroll.getStyle().vScroll.getMinWidth());
-            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight()) + pad);
+            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.8f) + pad);
+            scroll.setPosition(0, 0);
             pack();
             updating = false;
         }
