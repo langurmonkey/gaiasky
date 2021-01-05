@@ -339,14 +339,14 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		final double a = x2 - x1;
 		final double b = y2 - y1;
 		final double c = z2 - z1;
-		return Math.sqrt(a * a + b * b + c * c);
+		return FastMath.sqrt(a * a + b * b + c * c);
 	}
 
 	public double dst(final Vector3d vector) {
 		final double a = vector.x - x;
 		final double b = vector.y - y;
 		final double c = vector.z - z;
-		return Math.sqrt(a * a + b * b + c * c);
+		return FastMath.sqrt(a * a + b * b + c * c);
 	}
 
 	/** @return the distance between this point and the given point */
@@ -354,7 +354,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		final double a = x - this.x;
 		final double b = y - this.y;
 		final double c = z - this.z;
-		return Math.sqrt(a * a + b * b + c * c);
+		return FastMath.sqrt(a * a + b * b + c * c);
 	}
 
 	/** @return the squared distance between the given points */

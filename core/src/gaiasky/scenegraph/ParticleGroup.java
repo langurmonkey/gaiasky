@@ -485,20 +485,39 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     // Minimum amount of time [ms] between two update calls
     protected static final double MIN_UPDATE_TIME_MS = 200;
 
-    // Metadata, for sorting
+    // Metadata, for sorting - holds distances from each particle to the camera, squared
     protected double[] metadata;
 
     // Comparator
     private final Comparator<Integer> comp;
 
     // Indices list buffer 1
-    protected Integer[] indices1;
+    protected int[] indices1;
     // Indices list buffer 2
-    protected Integer[] indices2;
+    protected int[] indices2;
     // Active indices list
-    protected Integer[] active;
+    protected int[] active;
     // Background indices list (the one we sort)
-    protected Integer[] background;
+    protected int[] background;
+    // Background wrapper, for sorting
+    List<Integer> backgroundWrapper = new AbstractList<>() {
+        @Override
+        public Integer get(int index) {
+            return background[index];
+        }
+
+        @Override
+        public int size() {
+            return background.length;
+        }
+
+        @Override
+        public Integer set(int index, Integer element) {
+            int v = background[index];
+            background[index] = element;
+            return v;
+        }
+    };
 
     // Is it updating?
     protected volatile boolean updating = false;
@@ -512,7 +531,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected Vector3d lastSortCameraPos;
 
     /**
-     * Uses whatever precomputed value is in index 8 to compare the values
+     * User order in metadata arrays to compare indices
      */
     private class ParticleGroupComparator implements Comparator<Integer> {
         @Override
@@ -638,8 +657,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order
-        indices1 = new Integer[pointData.size()];
-        indices2 = new Integer[pointData.size()];
+        indices1 = new int[pointData.size()];
+        indices2 = new int[pointData.size()];
         for (int i = 0; i < pointData.size(); i++) {
             indices1[i] = i;
             indices2[i] = i;
@@ -1558,7 +1577,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             ParticleRecord d = pointData.get(i);
             // Pos
             Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z());
-            metadata[i] = filter(i) ? camPos.dst(x) : Double.MAX_VALUE;
+            metadata[i] = filter(i) ? camPos.dst2(x) : Double.MAX_VALUE;
         }
     }
 
@@ -1567,7 +1586,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         updateMetadata(time, camera);
 
         // Sort background list of indices
-        Arrays.sort(background, comp);
+        backgroundWrapper.sort(comp);
 
         // Synchronously with the render thread, update indices, lastSortTime and updating state
         GaiaSky.postRunnable(() -> {
@@ -1586,4 +1605,5 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             background = indices2;
         }
     }
+
 }
