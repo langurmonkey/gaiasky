@@ -23,6 +23,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 
 import java.util.List;
 
@@ -164,8 +165,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan, boolean rec) {
         double distToSegment = MathUtilsd.distancePointSegment(x0, y0, z0, x1, y1, z1, 0, 0, 0);
 
-        double dist0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
-        double dist1 = Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+        double dist0 = FastMath.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
+        double dist1 = FastMath.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
 
         Vector3d p15 = auxd;
 

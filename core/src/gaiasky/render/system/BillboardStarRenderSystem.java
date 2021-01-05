@@ -56,7 +56,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         setStarTexture(tex0);
 
         // Init comparator
-        comp = new DistToCameraComparator<IRenderable>();
+        comp = new DistToCameraComparator<>();
         // Init vertices
         float[] vertices = new float[20];
         fillVertices(vertices, w, h);
@@ -128,7 +128,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 
-            // Calculate billobard rotation quaternion ONCE
+            // Calculate billboard rotation quaternion ONCE
             DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
 
             ExtShaderProgram shaderProgram = getShaderProgram();
