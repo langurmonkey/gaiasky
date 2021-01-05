@@ -28,8 +28,7 @@ import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
@@ -223,7 +222,7 @@ public class OctreeGeneratorRun {
         OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        List<ParticleBean> listLoader = null, list = null;
+        List<ParticleRecord> listLoader = null, list = null;
         Map<Long, Integer> xmatchTable = null;
         long[] countsPerMagGaia = null;
 
@@ -268,7 +267,7 @@ public class OctreeGeneratorRun {
                 stil.setMustLoadIds(mustLoad);
             }
 
-            List<ParticleBean> listHip = stil.loadData(hip);
+            List<ParticleRecord> listHip = stil.loadData(hip);
 
             // Update HIP names using external source, if needed
             if (hipNamesDir != null) {
@@ -276,8 +275,8 @@ public class OctreeGeneratorRun {
                 hipNames.load(Paths.get(hipNamesDir));
 
                 Map<Integer, Array<String>> hn = hipNames.getHipNames();
-                for (ParticleBean pb : listHip) {
-                    StarBean star = (StarBean) pb;
+                for (ParticleRecord pb : listHip) {
+                    ParticleRecord star = pb;
                     if (hn.containsKey(star.hip())) {
                         Array<String> names = hn.get(star.hip());
                         for (String name : names)
@@ -291,9 +290,9 @@ public class OctreeGeneratorRun {
             combineCountsPerMag(countsPerMagGaia, countsPerMagHip);
 
             // Create HIP map
-            Map<Integer, StarBean> hipMap = new HashMap<>();
-            for (ParticleBean star : listHip) {
-                hipMap.put(((StarBean) star).hip(), (StarBean) star);
+            Map<Integer, ParticleRecord> hipMap = new HashMap<>();
+            for (ParticleRecord star : listHip) {
+                hipMap.put(star.hip(), star);
             }
 
             // Check x-match file
@@ -304,8 +303,8 @@ public class OctreeGeneratorRun {
             Vector3d aux1 = new Vector3d();
             Vector3d aux2 = new Vector3d();
             if (listLoader != null) {
-                for (ParticleBean pb : listLoader) {
-                    StarBean gaiaStar = (StarBean) pb;
+                for (ParticleRecord pb : listLoader) {
+                    ParticleRecord gaiaStar = pb;
                     // Check if star is also in HIP catalog
                     if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
                         // No hit, add to main list
@@ -316,7 +315,7 @@ public class OctreeGeneratorRun {
                         int hipId = xmatchTable.get(gaiaStar.id);
                         if (hipMap.containsKey(hipId)) {
                             // Hip Star
-                            StarBean hipStar = hipMap.get(hipId);
+                            ParticleRecord hipStar = hipMap.get(hipId);
 
                             // Check parallax errors
                             Double gaiaPllxErr = gaiaStar.getExtra("pllx_err");
@@ -354,19 +353,19 @@ public class OctreeGeneratorRun {
                                 }
 
                                 hipStar.id = gaiaStar.id;
-                                hipStar.data[StarBean.I_X] = x;
-                                hipStar.data[StarBean.I_Y] = y;
-                                hipStar.data[StarBean.I_Z] = z;
-                                hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
-                                hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
-                                hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
-                                hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
-                                hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
-                                hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
-                                hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
-                                hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
-                                hipStar.data[StarBean.I_COL] = gaiaStar.col();
-                                hipStar.data[StarBean.I_SIZE] = size;
+                                hipStar.data[ParticleRecord.I_X] = x;
+                                hipStar.data[ParticleRecord.I_Y] = y;
+                                hipStar.data[ParticleRecord.I_Z] = z;
+                                hipStar.data[ParticleRecord.I_PMX] = gaiaStar.pmx();
+                                hipStar.data[ParticleRecord.I_PMY] = gaiaStar.pmy();
+                                hipStar.data[ParticleRecord.I_PMZ] = gaiaStar.pmz();
+                                hipStar.data[ParticleRecord.I_MUALPHA] = gaiaStar.mualpha();
+                                hipStar.data[ParticleRecord.I_MUDELTA] = gaiaStar.mudelta();
+                                hipStar.data[ParticleRecord.I_RADVEL] = gaiaStar.radvel();
+                                hipStar.data[ParticleRecord.I_APPMAG] = gaiaStar.appmag();
+                                hipStar.data[ParticleRecord.I_ABSMAG] = gaiaStar.absmag();
+                                hipStar.data[ParticleRecord.I_COL] = gaiaStar.col();
+                                hipStar.data[ParticleRecord.I_SIZE] = size;
                                 hipStar.addNames(gaiaStar.names);
                                 starhits++;
                             }
@@ -543,13 +542,13 @@ public class OctreeGeneratorRun {
         element.delete();
     }
 
-    protected void dumpToDiskCsv(Array<StarBean> data, String filename) {
+    protected void dumpToDiskCsv(Array<ParticleRecord> data, String filename) {
         String sep = ", ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name, x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
-            for (StarBean star : data) {
+            for (ParticleRecord star : data) {
                 float[] col = colors.get(star.id);
                 gal.set(star.x(), star.y(), star.z()).scl(Constants.U_TO_KM);
                 //gal.mul(Coordinates.equatorialToGalactic());

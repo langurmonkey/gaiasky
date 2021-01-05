@@ -19,7 +19,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
@@ -82,8 +82,17 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     @Override
     public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size() > 0) {
+            boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
             ExtShaderProgram shaderProgram = getShaderProgram();
             shaderProgram.begin();
+            // Global uniforms
+            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+            shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
+            shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
+            shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
+            shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
+            addEffectsUniforms(shaderProgram, camera);
+
             renderables.forEach(rend -> {
                 ParticleGroup particleGroup = (ParticleGroup) rend;
                 synchronized (particleGroup) {
@@ -104,7 +113,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (particleGroup.filter(i)) {
-                                    ParticleBean pb = particleGroup.get(i);
+                                    ParticleRecord pb = particleGroup.get(i);
                                     double[] p = pb.data;
                                     // COLOR
                                     if (particleGroup.isHighlighted()) {
@@ -154,21 +163,12 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                         curr = meshes.get(particleGroup.offset);
                         if (curr != null) {
-                            boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
                             float meanDist = (float) (particleGroup.getMeanDistance());
 
-                            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                             shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
-                            shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
                             shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
                             shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * GlobalConf.getStarPointSize() * 0.05)) * particleGroup.highlightedSizeFactor() * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                             shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] / camera.getFovFactor()), (float) (particleGroup.particleSizeLimits[1] / camera.getFovFactor()));
-                            shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
-                            shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
-                            shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
-
-                            // Rel, grav, z-buffer
-                            addEffectsUniforms(shaderProgram, camera);
 
                             curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 

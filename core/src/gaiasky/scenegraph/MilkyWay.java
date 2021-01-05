@@ -24,7 +24,7 @@ import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.GalaxydataComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -46,7 +46,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
     String transformName;
     Matrix4 coordinateSystem;
 
-    public List<? extends ParticleBean> starData, bulgeData, dustData, hiiData, gasData;
+    public List<ParticleRecord> starData, bulgeData, dustData, hiiData, gasData;
     protected String provider;
     public GalaxydataComponent gc;
 
@@ -84,7 +84,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
         PointDataProvider provider = new PointDataProvider();
         try {
             boolean reload = false;
-            Pair<List<? extends ParticleBean>, String> p;
+            Pair<List<ParticleRecord>, String> p;
             if (gc.starsource != null) {
                 p = reloadFile(provider, gc.starsource, gc.starsourceUnpack, starData);
                 reload = reload || !p.getSecond().equals(gc.starsourceUnpack);
@@ -122,7 +122,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
         return false;
     }
 
-    private Pair<List<? extends ParticleBean>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<? extends ParticleBean> curr) {
+    private Pair<List<ParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<ParticleRecord> curr) {
         String upk = GlobalResources.unpackAssetPath(GlobalConf.data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
             return new Pair<>(prov.loadData(upk), upk);
@@ -164,10 +164,10 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
         Vector3 aux = new Vector3();
         Vector3 pos3 = pos.toVector3();
 
-        List<? extends ParticleBean>[] all = new List[] { starData, hiiData, dustData, bulgeData, gasData };
+        List<ParticleRecord>[] all = new List[] { starData, hiiData, dustData, bulgeData, gasData };
 
         // Transform all
-        for (List<? extends ParticleBean> a : all) {
+        for (List<ParticleRecord> a : all) {
             if (a != null) {
                 for (int i = 0; i < a.size(); i++) {
                     double[] pointf = a.get(i).data;

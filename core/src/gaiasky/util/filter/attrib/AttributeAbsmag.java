@@ -5,12 +5,12 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.I18n;
 
-public class AttributeAbsmag extends AttributeAbstract implements IAttribute<StarBean> {
+public class AttributeAbsmag extends AttributeAbstract implements IAttribute<ParticleRecord> {
     @Override
-    public double get(StarBean pb) {
+    public double get(ParticleRecord pb) {
         return pb.absmag();
     }
 

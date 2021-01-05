@@ -13,7 +13,7 @@ import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.ConfInit;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -70,7 +70,7 @@ public class MilkyWayReshaper {
 
                 // Load
                 PointDataProvider provider = new PointDataProvider();
-                List<? extends ParticleBean> particles = provider.loadData(fileIn);
+                List<ParticleRecord> particles = provider.loadData(fileIn);
 
                 String out = GlobalConf.data.dataFile(fileOut);
                 if (Files.exists(Paths.get(out))) {
@@ -96,7 +96,7 @@ public class MilkyWayReshaper {
                     }
                     int particle = 0;
                     int added = 0;
-                    for (ParticleBean pb : particles) {
+                    for (ParticleRecord pb : particles) {
                         if (modulus == 0 || particle % modulus == 0) {
                             double[] d = pb.data;
                             for (int i = 0; i < d.length; i++) {

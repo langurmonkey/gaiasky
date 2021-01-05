@@ -7,7 +7,7 @@ package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.data.octreegen.StarBrightnessComparator;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.util.tree.OctreeNode;
 
@@ -28,7 +28,7 @@ public class BrightestStars implements IAggregationAlgorithm {
     /** Whether to discard stars due to density or not **/
     private boolean DISCARD = false;
 
-    Comparator<ParticleBean> comp;
+    Comparator<ParticleRecord> comp;
 
     int discarded = 0;
 
@@ -54,18 +54,18 @@ public class BrightestStars implements IAggregationAlgorithm {
     }
 
     @Override
-    public boolean sample(List<ParticleBean> inputStars, OctreeNode octant, float percentage) {
+    public boolean sample(List<ParticleRecord> inputStars, OctreeNode octant, float percentage) {
         // Calculate nObjects for this octant based on maxObjs and the MAX_PART
         int nInput = inputStars.size();
         int nObjects = MathUtils.clamp(Math.round(nInput * percentage), 1, Integer.MAX_VALUE);
 
         StarGroup sg = new StarGroup();
-        List<ParticleBean> data = new ArrayList<>();
+        List<ParticleRecord> data = new ArrayList<>();
 
         if (nInput <= MIN_PART || octant.depth >= MAX_DEPTH) {
             if (!DISCARD) {
                 // Never discard any
-                for (ParticleBean s : inputStars) {
+                for (ParticleRecord s : inputStars) {
 
                     if (s.octant == null) {
                         data.add(s);
@@ -75,7 +75,7 @@ public class BrightestStars implements IAggregationAlgorithm {
             } else {
                 if (nInput <= MIN_PART) {
                     // Downright use all stars that have not been assigned
-                    for (ParticleBean s : inputStars) {
+                    for (ParticleRecord s : inputStars) {
                         if (s.octant == null) {
                             data.add(s);
                             s.octant = octant;
@@ -85,7 +85,7 @@ public class BrightestStars implements IAggregationAlgorithm {
                     // Select sample, discard the rest
                     inputStars.sort(comp);
                     for (int i = 0; i < nObjects; i++) {
-                        ParticleBean s = inputStars.get(i);
+                        ParticleRecord s = inputStars.get(i);
                         if (s.octant == null) {
                             data.add(s);
                             s.octant = octant;
@@ -106,7 +106,7 @@ public class BrightestStars implements IAggregationAlgorithm {
             int added = 0;
             int i = 0;
             while (added < nObjects && i < inputStars.size()) {
-                ParticleBean s = inputStars.get(i);
+                ParticleRecord s = inputStars.get(i);
                 if (s.octant == null) {
                     // Add star
                     data.add(s);

@@ -5,7 +5,7 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 
 import java.io.InputStream;
 import java.util.List;
@@ -22,7 +22,7 @@ public interface IParticleGroupDataProvider {
      * @param file The file to load
      * @return Array of particle beans
      */
-    List<ParticleBean> loadData(String file);
+    List<ParticleRecord> loadData(String file);
 
     /**
      * Loads the data applying a factor using a memory mapped file for improved speed.
@@ -31,7 +31,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    List<ParticleBean> loadDataMapped(String file, double factor);
+    List<ParticleRecord> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -40,7 +40,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    List<ParticleBean> loadData(String file, double factor);
+    List<ParticleRecord> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -49,7 +49,7 @@ public interface IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    List<ParticleBean> loadData(InputStream is, double factor);
+    List<ParticleRecord> loadData(InputStream is, double factor);
 
     /**
      * Sets a cap on the number of files to load. Set to 0 or negative for

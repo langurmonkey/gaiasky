@@ -167,14 +167,17 @@ public class LineQuadRenderSystem extends LineRenderSystem {
         double dist0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
         double dist1 = Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
 
-        Vector3d p15;
+        Vector3d p15 = auxd;
 
         if (rec && distToSegment < dist0 && distToSegment < dist1) {
             // Projection falls in line, split line
-            p15 = MathUtilsd.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0);
+            p15 = MathUtilsd.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0, p15);
+            double px = p15.x;
+            double py = p15.y;
+            double pz = p15.z;
 
-            addLineInternal(x0, y0, z0, p15.x, p15.y, p15.z, r, g, b, a, widthAngleTan, true);
-            addLineInternal(p15.x, p15.y, p15.z, x1, y1, z1, r, g, b, a, widthAngleTan, true);
+            addLineInternal(x0, y0, z0, px, py, pz, r, g, b, a, widthAngleTan, true);
+            addLineInternal(px, py, pz, x1, y1, z1, r, g, b, a, widthAngleTan, true);
         } else {
             // Add line to list
             // x0 y0 z0 x1 y1 z1 r g b a dist0 dist1 distMean

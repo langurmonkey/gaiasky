@@ -8,7 +8,7 @@ package gaiasky.data.group;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.galaxy.GalaxyGenerator;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 
@@ -23,7 +23,7 @@ public class PointDataWriter {
 
     private static final String separator = " ";
 
-    public void writeData(Array<? extends ParticleBean> particles, String filePath, boolean overwrite) throws Exception {
+    public void writeData(Array<ParticleRecord> particles, String filePath, boolean overwrite) throws Exception {
         if (particles != null && particles.size > 0) {
             FileHandle fh = new FileHandle(filePath);
             File f = fh.file();

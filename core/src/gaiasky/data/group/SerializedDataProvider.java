@@ -6,8 +6,7 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 
@@ -21,7 +20,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
         super();
     }
 
-    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(String file, double factor, boolean compat) {
         logger.info(I18n.bundle.format("notif.datafile", file));
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -31,11 +30,11 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(InputStream is, double factor, boolean compat) {
         try {
             ObjectInputStream ois = new ObjectInputStream(is);
             @SuppressWarnings("unchecked")
-            List<StarBean> l = (List<StarBean>) ois.readObject(); // cast is needed.
+            List<ParticleRecord> l = (List<ParticleRecord>) ois.readObject(); // cast is needed.
             ois.close();
 
             // Convert to Array, reconstruct index
@@ -43,7 +42,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
             initLists(n);
 
             for (int i = 0; i < n; i++) {
-                StarBean point = l.get(i);
+                ParticleRecord point = l.get(i);
                 list.add(point);
             }
 
@@ -55,7 +54,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor, boolean compat) {
         // TODO Auto-generated method stub
         return null;
     }

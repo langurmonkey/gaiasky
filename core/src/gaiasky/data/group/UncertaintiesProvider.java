@@ -6,7 +6,7 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -26,16 +26,16 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(UncertaintiesProvider.class);
     
     @Override
-    public List<ParticleBean> loadData(String file) {
+    public List<ParticleRecord> loadData(String file) {
         return loadData(file, 1);
     }
 
     @Override
-    public List<ParticleBean> loadData(String file, double factor) {
+    public List<ParticleRecord> loadData(String file, double factor) {
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         @SuppressWarnings("unchecked")
-        List<ParticleBean> pointData = loadData(f.read(), factor);
+        List<ParticleRecord> pointData = loadData(f.read(), factor);
 
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size(), file));
@@ -44,8 +44,8 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadData(InputStream is, double factor) {
-        List<ParticleBean> pointData = new ArrayList<>();
+    public List<ParticleRecord> loadData(InputStream is, double factor) {
+        List<ParticleRecord> pointData = new ArrayList<>();
         try {
             int tokenslen;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -69,7 +69,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
                     point[1] = pos.y;
                     point[2] = pos.z;
 
-                    pointData.add(new ParticleBean(point));
+                    pointData.add(new ParticleRecord(point));
                 }
             }
 
@@ -87,7 +87,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;
     }

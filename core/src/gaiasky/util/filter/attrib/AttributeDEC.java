@@ -5,12 +5,12 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.I18n;
 
-public class AttributeDEC extends AttributeAbstract implements IAttribute<ParticleBean> {
+public class AttributeDEC extends AttributeAbstract implements IAttribute<ParticleRecord> {
     @Override
-    public double get(ParticleBean bean) {
+    public double get(ParticleRecord bean) {
         return bean.dec();
     }
     public String getUnit(){

@@ -7,8 +7,7 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -108,11 +107,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         fileNumberCap = cap;
     }
 
-    public List<ParticleBean> loadData(String file) {
+    public List<ParticleRecord> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(String file, double factor, boolean compat) {
         initLists(1000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -146,7 +145,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(InputStream is, double factor, boolean compat) {
         initLists(100000);
 
         loadFileIs(is, factor, new AtomicLong(0l), new AtomicLong(0l));
@@ -211,12 +210,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     private boolean addStar(String line) {
         String[] tokens = line.split(separator);
-        double[] point = new double[StarBean.SIZE + 3];
+        double[] point = new double[ParticleRecord.SIZE + 3];
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[idx(ColId.pllx)].isEmpty()) {
             /** Extra attributes **/
-            Map<UCD, Double> extra = new HashMap<>();
+            Map<UCD, Double> extra = new HashMap<>(2, 0.9f);
 
             /** ID **/
             long sourceid = Parser.parseLong(tokens[idx(ColId.sourceid)]);
@@ -356,24 +355,24 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         float[] rgb = ColorUtils.teffToRGB(teff);
                         double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        point[StarBean.I_HIP] = -1;
-                        point[StarBean.I_X] = pos.x;
-                        point[StarBean.I_Y] = pos.y;
-                        point[StarBean.I_Z] = pos.z;
-                        point[StarBean.I_PMX] = pm.x;
-                        point[StarBean.I_PMY] = pm.y;
-                        point[StarBean.I_PMZ] = pm.z;
-                        point[StarBean.I_MUALPHA] = mualphastar;
-                        point[StarBean.I_MUDELTA] = mudelta;
-                        point[StarBean.I_RADVEL] = radvel;
-                        point[StarBean.I_COL] = col;
-                        point[StarBean.I_SIZE] = size;
-                        //point[StarBean.I_RADIUS] = radius;
-                        //point[StarBean.I_TEFF] = teff;
-                        point[StarBean.I_APPMAG] = appmag;
-                        point[StarBean.I_ABSMAG] = absmag;
+                        point[ParticleRecord.I_HIP] = -1;
+                        point[ParticleRecord.I_X] = pos.x;
+                        point[ParticleRecord.I_Y] = pos.y;
+                        point[ParticleRecord.I_Z] = pos.z;
+                        point[ParticleRecord.I_PMX] = pm.x;
+                        point[ParticleRecord.I_PMY] = pm.y;
+                        point[ParticleRecord.I_PMZ] = pm.z;
+                        point[ParticleRecord.I_MUALPHA] = mualphastar;
+                        point[ParticleRecord.I_MUDELTA] = mudelta;
+                        point[ParticleRecord.I_RADVEL] = radvel;
+                        point[ParticleRecord.I_COL] = col;
+                        point[ParticleRecord.I_SIZE] = size;
+                        //point[ParticleRecord.I_RADIUS] = radius;
+                        //point[ParticleRecord.I_TEFF] = teff;
+                        point[ParticleRecord.I_APPMAG] = appmag;
+                        point[ParticleRecord.I_ABSMAG] = absmag;
 
-                        list.add(new StarBean(point, sourceid, name, extra));
+                        list.add(new ParticleRecord(point, sourceid, name, extra));
 
                         int appClamp = (int) MathUtilsd.clamp(appmag, 0, 21);
                         countsPerMag[appClamp] += 1;
@@ -386,7 +385,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor, boolean compat) {
         return loadDataMapped(file, factor, -1, -1);
     }
 
@@ -399,7 +398,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * @param totalFiles Total number of files
      * @return
      */
-    public List<ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;

@@ -20,7 +20,6 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.NumberUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IStarGroupDataProvider;
@@ -49,7 +48,6 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
 import java.util.HashMap;
@@ -64,106 +62,6 @@ import java.util.TreeMap;
  * @author tsagrista
  */
 public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFocus, IQuadRenderable, IModelRenderable, IObserver {
-
-    /**
-     * Contains info on one star
-     */
-    public static class StarBean extends ParticleBean {
-        private static final long serialVersionUID = 1L;
-
-        public static final int SIZE = 14;
-        /* INDICES */
-
-        /* Stored doubles */
-        public static final int I_PMX = 3;
-        public static final int I_PMY = 4;
-        public static final int I_PMZ = 5;
-        public static final int I_MUALPHA = 6;
-        public static final int I_MUDELTA = 7;
-        public static final int I_RADVEL = 8;
-
-        /* Stored as float */
-        public static final int I_APPMAG = 9;
-        public static final int I_ABSMAG = 10;
-        public static final int I_COL = 11;
-        public static final int I_SIZE = 12;
-
-        /* Stored as int */
-        public static final int I_HIP = 13;
-
-        public Long id;
-
-        public StarBean(double[] data, Long id, String[] names, Map<UCD, Double> extra) {
-            super(data, names, extra);
-            this.id = id;
-            this.octant = null;
-        }
-
-        public StarBean(double[] data, Long id, String[] names) {
-            this(data, id, names, null);
-        }
-
-        public StarBean(double[] data, Long id, String name) {
-            this(data, id, new String[]{name});
-        }
-
-        public StarBean(double[] data, Long id, String name, Map<UCD, Double> extra) {
-            this(data, id, new String[]{name}, extra);
-        }
-
-        public double pmx() {
-            return data[I_PMX];
-        }
-
-        public double pmy() {
-            return data[I_PMY];
-        }
-
-        public double pmz() {
-            return data[I_PMZ];
-        }
-
-        public double appmag() {
-            return data[I_APPMAG];
-        }
-
-        public double absmag() {
-            return data[I_ABSMAG];
-        }
-
-        public double col() {
-            return data[I_COL];
-        }
-
-        public double size() {
-            return data[I_SIZE];
-        }
-
-        public double radius() {
-            return size() * Constants.STAR_SIZE_FACTOR;
-        }
-
-        public int hip() {
-            return (int) data[I_HIP];
-        }
-
-        public double mualpha() {
-            return data[I_MUALPHA];
-        }
-
-        public double mudelta() {
-            return data[I_MUDELTA];
-        }
-
-        public double radvel() {
-            return data[I_RADVEL];
-        }
-
-        public double[] rgb() {
-            Color c = new Color(NumberUtils.floatToIntColor((float) data[I_COL]));
-            return new double[]{c.r, c.g, c.b};
-        }
-    }
 
     /**
      * Star model
@@ -241,7 +139,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 factor = 1d;
 
             // Set data, generate index
-            List<ParticleBean> l = provider.loadData(datafile, factor);
+            List<ParticleRecord> l = provider.loadData(datafile, factor);
             this.setData(l);
 
         } catch (Exception e) {
@@ -266,11 +164,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @return The data list
      */
     @SuppressWarnings("unchecked")
-    public List<ParticleBean> data() {
+    public List<ParticleRecord> data() {
         return pointData;
     }
 
-    public void setData(List<ParticleBean> pointData, boolean regenerateIndex) {
+    public void setData(List<ParticleRecord> pointData, boolean regenerateIndex) {
         super.setData(pointData, regenerateIndex);
     }
 
@@ -280,11 +178,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
      */
-    public Map<String, Integer> generateIndex(Array<? extends ParticleBean> pointData) {
+    public Map<String, Integer> generateIndex(Array<ParticleRecord> pointData) {
         Map<String, Integer> index = new HashMap<>();
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
-            StarBean sb = (StarBean) pointData.get(i);
+            ParticleRecord sb = pointData.get(i);
             if (sb.names != null) {
                 for (String lcname : sb.names) {
                     lcname = lcname.toLowerCase();
@@ -313,7 +211,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             super.update(time, parentTransform, camera, opacity);
 
             // Update closest star
-            StarBean closestStar = (StarBean) pointData.get(active[0]);
+            ParticleRecord closestStar = pointData.get(active[0]);
 
             closestPm.set(closestStar.pmx(), closestStar.pmy(), closestStar.pmz()).scl(currDeltaYears);
             closestAbsolutePos.set(closestStar.x(), closestStar.y(), closestStar.z()).add(closestPm);
@@ -342,7 +240,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param camera The current camera
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
-        StarBean focus = (StarBean) pointData.get(focusIndex);
+        ParticleRecord focus = pointData.get(focusIndex);
         Vector3d aux = this.fetchPosition(focus, camera.getPos(), aux3d1.get(), currDeltaYears);
 
         this.focusPosition.set(aux).add(camera.getPos());
@@ -415,7 +313,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     Color c = new Color();
 
     private void renderCloseupStar(int idx, ICamera camera, ExtShaderProgram shader, IntMesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
-        StarBean star = (StarBean) pointData.get(idx);
+        ParticleRecord star = pointData.get(idx);
         double size = getSize(idx);
         double radius = size * Constants.STAR_SIZE_FACTOR;
         Vector3d starPos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
@@ -506,7 +404,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
         int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
-            StarBean star = (StarBean) pointData.get(active[i]);
+            ParticleRecord star = pointData.get(active[i]);
             if ((star.radvel() == 0 && !rvLines) || (star.radvel() != 0 && rvLines)) {
                 float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
                 // Position
@@ -636,7 +534,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
             int n = (int) getMaxProjectionLines();
             for (int i = n; i >= 0; i--) {
-                StarBean star = (StarBean) pointData.get(active[i]);
+                ParticleRecord star = pointData.get(active[i]);
                 Vector3d fpos = fetchPosition(star, camera.getPos(), aux3d3.get(), currDeltaYears);
                 float distToCamera = (float) fpos.len();
                 float radius = (float) getRadius(active[i]);
@@ -696,7 +594,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_NEAREST);
         if (camera.getCurrent() instanceof FovCamera) {
             for (int i = 0; i < n; i++) {
-                StarBean star = (StarBean) pointData.get(active[i]);
+                ParticleRecord star = pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
                 float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
@@ -708,7 +606,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             }
         } else {
             for (int i = 0; i < n; i++) {
-                StarBean star = (StarBean) pointData.get(active[i]);
+                ParticleRecord star = pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
                 float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
@@ -732,7 +630,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public double getFocusSize() {
-        return focus.data[StarBean.I_SIZE];
+        return focus.data[ParticleRecord.I_SIZE];
     }
 
     // Radius in stars is different!
@@ -746,16 +644,16 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getAppmag() {
-        return (float) focus.data[StarBean.I_APPMAG];
+        return (float) focus.data[ParticleRecord.I_APPMAG];
     }
 
     public float getAbsmag() {
-        return (float) focus.data[StarBean.I_ABSMAG];
+        return (float) focus.data[ParticleRecord.I_ABSMAG];
     }
 
     public long getId() {
         if (focus != null)
-            return ((StarBean) focus).id;
+            return focus.id;
         else
             return -1;
     }
@@ -763,7 +661,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuAlpha() {
         if (focus != null)
-            return focus.data[StarBean.I_MUALPHA];
+            return focus.data[ParticleRecord.I_MUALPHA];
         else
             return 0;
     }
@@ -771,7 +669,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuDelta() {
         if (focus != null)
-            return focus.data[StarBean.I_MUDELTA];
+            return focus.data[ParticleRecord.I_MUDELTA];
         else
             return 0;
     }
@@ -779,7 +677,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getRadialVelocity() {
         if (focus != null)
-            return focus.data[StarBean.I_RADVEL];
+            return focus.data[ParticleRecord.I_RADVEL];
         else
             return 0;
     }
@@ -791,7 +689,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @return The size
      */
     public double getSize(int i) {
-        return ((StarBean) pointData.get(i)).size();
+        return pointData.get(i).size();
     }
 
     @Override
@@ -811,14 +709,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public int getHip() {
-        if (focus != null && focus.data[StarBean.I_HIP] > 0)
-            return (int) focus.data[StarBean.I_HIP];
+        if (focus != null && focus.data[ParticleRecord.I_HIP] > 0)
+            return (int) focus.data[ParticleRecord.I_HIP];
         return -1;
     }
 
     @Override
     public long getCandidateId() {
-        return ((StarBean) pointData.get(candidateFocusIndex)).id;
+        return pointData.get(candidateFocusIndex).id;
     }
 
     @Override
@@ -829,7 +727,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getCandidateViewAngleApparent() {
         if (candidateFocusIndex >= 0) {
-            StarBean candidate = (StarBean) pointData.get(candidateFocusIndex);
+            ParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(aux3d1.get());
             ICamera camera = GaiaSky.instance.getICamera();
             double va = (float) ((candidate.radius() / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
@@ -886,7 +784,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
         if (index.containsKey(name)) {
             int idx = index.get(name);
-            StarBean sb = (StarBean) pointData.get(idx);
+            ParticleRecord sb = pointData.get(idx);
             fetchPosition(sb, null, aux, currDeltaYears);
             return aux;
         } else {
@@ -895,8 +793,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d destination, double deltaYears) {
-        StarBean sb = (StarBean) pb;
+    protected Vector3d fetchPosition(ParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
+        ParticleRecord sb = pb;
         Vector3d pm = aux3d2.get().set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
         if (campos != null && !campos.hasNaN())
             return destination.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
@@ -946,7 +844,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getColor(int index) {
-        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : (float) ((StarBean) pointData.get(index)).col();
+        return highlighted ? Color.toFloatBits(hlc[0], hlc[1], hlc[2], hlc[3]) : (float) pointData.get(index).col();
     }
 
     /**
@@ -957,7 +855,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param dops The dataset options
      * @return A new star group with the given parameters
      */
-    public static StarGroup getStarGroup(String name, List<ParticleBean> data, DatasetOptions dops) {
+    public static StarGroup getStarGroup(String name, List<ParticleRecord> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
         double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
@@ -984,7 +882,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param data The data of the star group
      * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, List<ParticleBean> data) {
+    public static StarGroup getDefaultStarGroup(String name, List<ParticleRecord> data) {
         return getDefaultStarGroup(name, data, true);
     }
 
@@ -996,7 +894,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param fullInit Initializes the group right away
      * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, List<ParticleBean> data, boolean fullInit) {
+    public static StarGroup getDefaultStarGroup(String name, List<ParticleRecord> data, boolean fullInit) {
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");
@@ -1025,7 +923,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (pointData != null) {
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
-                StarBean d = (StarBean) pointData.get(i);
+                ParticleRecord d = pointData.get(i);
 
                 // Pm
                 Vector3d dx = aux3d2.get().set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);

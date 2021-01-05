@@ -7,8 +7,7 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.LargeLongMap;
 import gaiasky.util.Logger;
@@ -72,7 +71,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
     }
 
-    protected List<ParticleBean> list;
+    protected List<ParticleRecord> list;
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
@@ -226,22 +225,22 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public List<ParticleBean> loadData(String file) {
+    public List<ParticleRecord> loadData(String file) {
         return loadData(file, 1.0f);
     }
 
     @Override
-    public List<ParticleBean> loadData(String file, double factor) {
+    public List<ParticleRecord> loadData(String file, double factor) {
         return loadData(file, factor, true);
     }
 
     @Override
-    public List<ParticleBean> loadData(InputStream is, double factor) {
+    public List<ParticleRecord> loadData(InputStream is, double factor) {
         return loadData(is, factor, true);
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, true);
     }
 
@@ -364,18 +363,18 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return (count == 0 && !empty) ? 1 : count;
     }
 
-    protected void dumpToDisk(List<StarBean> data, String filename, String format) {
+    protected void dumpToDisk(List<ParticleRecord> data, String filename, String format) {
         if (format.equals("bin"))
             dumpToDiskBin(data, filename, false);
         else if (format.equals("csv"))
             dumpToDiskCsv(data, filename);
     }
 
-    protected void dumpToDiskBin(List<StarBean> data, String filename, boolean serialized) {
+    protected void dumpToDiskBin(List<ParticleRecord> data, String filename, boolean serialized) {
         if (serialized) {
             // Use java serialization method
-            List<StarBean> l = new ArrayList<>(data.size());
-            for (StarBean p : data)
+            List<ParticleRecord> l = new ArrayList<>(data.size());
+            for (ParticleRecord p : data)
                 l.add(p);
 
             try {
@@ -399,14 +398,14 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    protected void dumpToDiskCsv(List<StarBean> data, String filename) {
+    protected void dumpToDiskCsv(List<ParticleRecord> data, String filename) {
         String sep = "' ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name(s), x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
             int n = 0;
-            for (StarBean star : data) {
+            for (ParticleRecord star : data) {
                 float[] col = colors.get(star.id);
                 double x = star.z();
                 double y = -star.x();

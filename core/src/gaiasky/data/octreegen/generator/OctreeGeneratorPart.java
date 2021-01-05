@@ -7,8 +7,7 @@ package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;
@@ -34,14 +33,14 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         this.params = params;
     }
 
-    public OctreeNode generateOctree(List<ParticleBean> catalog) {
+    public OctreeNode generateOctree(List<ParticleRecord> catalog) {
         OctreeNode root = IOctreeGenerator.startGeneration(catalog, params);
 
         Array<OctreeNode>[] octantsPerLevel = new Array[25];
         octantsPerLevel[0] = new Array<>(1);
         octantsPerLevel[0].add(root);
 
-        Map<OctreeNode, List<ParticleBean>> inputLists = new HashMap<>();
+        Map<OctreeNode, List<ParticleRecord>> inputLists = new HashMap<>();
         inputLists.put(root, catalog);
 
         treatLevel(inputLists, 0, octantsPerLevel, MathUtils.clamp((float) aggregation.getMaxPart() / (float) catalog.size(), 0f, 1f));
@@ -60,7 +59,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param octantsPerLevel Octants of each level
      * @param percentage Percentage
      */
-    private void treatLevel(Map<OctreeNode, List<ParticleBean>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
+    private void treatLevel(Map<OctreeNode, List<ParticleRecord>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
         logger.info("Generating level " + level);
         Array<OctreeNode> levelOctants = octantsPerLevel[level];
 
@@ -70,7 +69,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         Iterator<OctreeNode> it = levelOctants.iterator();
         while (it.hasNext()) {
             OctreeNode octant = it.next();
-            List<ParticleBean> list = inputLists.get(octant);
+            List<ParticleRecord> list = inputLists.get(octant);
 
             if (list.size() == 0) {
                 // Empty node, remove
@@ -113,17 +112,17 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
             int maxSublevelObjs = 0;
             double maxSublevelMag = Double.MAX_VALUE;
             double minSublevelMag = 0;
-            Map<OctreeNode, List<ParticleBean>> lists = new HashMap<>();
+            Map<OctreeNode, List<ParticleRecord>> lists = new HashMap<>();
 
             for (OctreeNode octant : octantsPerLevel[level + 1]) {
-                List<ParticleBean> list = intersect(inputLists.get(octant.parent), octant);
+                List<ParticleRecord> list = intersect(inputLists.get(octant.parent), octant);
                 lists.put(octant, list);
                 if (list.size() > maxSublevelObjs) {
                     maxSublevelObjs = list.size();
                 }
                 // Adapt levels by magnitude
-                for (ParticleBean pb : list) {
-                    StarBean sb = (StarBean) pb;
+                for (ParticleRecord pb : list) {
+                    ParticleRecord sb = pb;
                     if (sb.absmag() < maxSublevelMag) {
                         maxSublevelMag = sb.absmag();
                     }
@@ -147,10 +146,10 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param box
      * @return
      */
-    private List<ParticleBean> intersect(List<ParticleBean> stars, OctreeNode box) {
-        List<ParticleBean> result = new ArrayList<>();
-        for (ParticleBean star : stars) {
-            if (star.octant == null && box.box.contains(star.data[StarBean.I_X], star.data[StarBean.I_Y], star.data[StarBean.I_Z])) {
+    private List<ParticleRecord> intersect(List<ParticleRecord> stars, OctreeNode box) {
+        List<ParticleRecord> result = new ArrayList<>();
+        for (ParticleRecord star : stars) {
+            if (star.octant == null && box.box.contains(star.data[ParticleRecord.I_X], star.data[ParticleRecord.I_Y], star.data[ParticleRecord.I_Z])) {
                 result.add(star);
             }
         }

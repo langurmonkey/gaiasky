@@ -5,7 +5,7 @@
 
 package gaiasky.data.octreegen.generator;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public interface IAggregationAlgorithm {
      *            The percentage of objects to be included in the octant.
      * @return True if we are in a leaf.
      */
-    boolean sample(List<ParticleBean> inputStars, OctreeNode octant, float percentage);
+    boolean sample(List<ParticleRecord> inputStars, OctreeNode octant, float percentage);
 
     /**
      * Gets the maximum number of particles in a single node

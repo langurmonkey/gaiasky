@@ -6,7 +6,7 @@
 package gaiasky.data.octreegen;
 
 import gaiasky.data.group.BinaryDataProvider;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 
@@ -57,7 +57,7 @@ public class StarGroupBinaryIO implements IStarGroupIO {
     }
 
     public List<SceneGraphNode> readParticles(InputStream in, boolean compat) {
-        List<ParticleBean> data = provider.loadData(in, 1.0, compat);
+        List<ParticleRecord> data = provider.loadData(in, 1.0, compat);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

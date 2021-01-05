@@ -19,7 +19,7 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.MilkyWay;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
@@ -189,7 +189,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @param type The type
      * @return
      */
-    private GpuData convertDataToGpu(List<? extends ParticleBean> data, ColorGenerator cg, PType type) {
+    private GpuData convertDataToGpu(List<ParticleRecord> data, ColorGenerator cg, PType type) {
         GpuData ad = new GpuData();
 
         int vertexSize = 3 + 1 + 3;
@@ -200,7 +200,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         int nLayers = type.layers.length;
 
         int i = 0;
-        for (ParticleBean particle : data) {
+        for (ParticleRecord particle : data) {
             if (type.modulus == 0 || i % type.modulus == 0) {
                 // COLOR
                 float[] col = particle.data.length >= 7 ? new float[] { (float) particle.data[4], (float) particle.data[5], (float) particle.data[6] } : cg.generateColor();

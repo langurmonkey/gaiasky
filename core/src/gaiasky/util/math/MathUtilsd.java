@@ -517,7 +517,7 @@ public final class MathUtilsd {
         return result.sub(w2);
     }
 
-    public static Vector3d getClosestPoint2(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0) {
+    public static Vector3d getClosestPoint2(double x1, double y1, double z1, double x2, double y2, double z2, double x0, double y0, double z0, Vector3d result) {
         //           (P2-P1)dot(v)
         //Pr = P1 +  ------------- * v.
         //           (v)dot(v)
@@ -530,7 +530,7 @@ public final class MathUtilsd {
         double denom = v.dot(v);
         Vector3d frac = aux4.set(v).scl(nomin / denom);
 
-        Vector3d result = new Vector3d(p1).add(frac);
+        result.set(p1).add(frac);
         return result;
     }
 

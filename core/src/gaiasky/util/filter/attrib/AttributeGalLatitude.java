@@ -5,11 +5,11 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 
-public class AttributeGalLatitude extends AttributeAbstract implements IAttribute<ParticleBean> {
+public class AttributeGalLatitude extends AttributeAbstract implements IAttribute<ParticleRecord> {
     @Override
-    public double get(ParticleBean bean) {
+    public double get(ParticleRecord bean) {
         return bean.b();
     }
     public String getUnit(){

@@ -7,10 +7,12 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.NumberUtils;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
@@ -42,7 +44,6 @@ import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -55,8 +56,8 @@ import java.util.*;
  * @author tsagrista
  */
 public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus, IObserver {
-    public static class ParticleBean implements Serializable {
-        private static final long serialVersionUID = 1L;
+    public static class ParticleRecord {
+        public static final int SIZE = 14;
 
         /* INDICES */
 
@@ -65,7 +66,27 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         public static final int I_Y = 1;
         public static final int I_Z = 2;
 
-        // Main attributes
+        /* Stored doubles */
+        public static final int I_PMX = 3;
+        public static final int I_PMY = 4;
+        public static final int I_PMZ = 5;
+        public static final int I_MUALPHA = 6;
+        public static final int I_MUDELTA = 7;
+        public static final int I_RADVEL = 8;
+
+        /* Stored as float */
+        public static final int I_APPMAG = 9;
+        public static final int I_ABSMAG = 10;
+        public static final int I_COL = 11;
+        public static final int I_SIZE = 12;
+
+        /* Stored as int */
+        public static final int I_HIP = 13;
+
+        // Particle ID
+        public Long id;
+
+        // Data array
         public double[] data;
 
         // Particle names (optional)
@@ -77,22 +98,157 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Octant, if in octree
         public OctreeNode octant;
 
-        public ParticleBean(double[] data, String[] names, Map<UCD, Double> extra) {
+        public ParticleRecord(double[] data) {
             this.data = data;
+        }
+
+        public ParticleRecord(double[] data, Long id) {
+            this(data);
+            this.id = id;
+        }
+
+        public ParticleRecord(double[] data, String[] names) {
+            this(data);
+            this.names = names;
+        }
+
+        public ParticleRecord(double[] data, Long id, String[] names) {
+            this(data, id);
+            this.names = names;
+        }
+
+        public ParticleRecord(double[] data, Long id, String[] names, Map<UCD, Double> extra) {
+            this(data, id, names);
             this.names = names;
             this.extra = extra;
         }
 
-        public ParticleBean(double[] data) {
-            this(data, null, null);
+        public ParticleRecord(double[] data, Long id, String name) {
+            this(data, id, new String[] { name });
         }
 
-        public ParticleBean(double[] data, String[] names) {
-            this(data, names, null);
+        public ParticleRecord(double[] data, Long id, String name, Map<UCD, Double> extra) {
+            this(data, id, new String[] { name }, extra);
         }
 
-        public ParticleBean(double[] data, Map<UCD, Double> extra) {
-            this(data, null, extra);
+        public double x() {
+            return data[I_X];
+        }
+
+        public double y() {
+            return data[I_Y];
+        }
+
+        public double z() {
+            return data[I_Z];
+        }
+
+        public String namesConcat() {
+            return TextUtils.concatenate(Constants.nameSeparator, names);
+        }
+
+        public boolean hasName(String candidate) {
+            return hasName(candidate, false);
+        }
+
+        public boolean hasName(String candidate, boolean matchCase) {
+            if (names == null) {
+                return false;
+            } else {
+                for (String name : names) {
+                    if (matchCase) {
+                        if (name.equals(candidate))
+                            return true;
+                    } else {
+                        if (name.equalsIgnoreCase(candidate))
+                            return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public void setNames(String... names) {
+            this.names = names;
+        }
+
+        public void setName(String name) {
+            if (names != null)
+                names[0] = name;
+            else
+                names = new String[] { name };
+        }
+
+        public void addName(String name) {
+            name = name.strip();
+            if (!hasName(name))
+                if (names != null) {
+                    // Extend array
+                    String[] newNames = new String[names.length + 1];
+                    System.arraycopy(names, 0, newNames, 0, names.length);
+                    newNames[names.length] = name;
+                    names = newNames;
+                } else {
+                    setName(name);
+                }
+        }
+
+        public void addNames(String... names) {
+            for (String name : names)
+                addName(name);
+        }
+
+        public double pmx() {
+            return data[I_PMX];
+        }
+
+        public double pmy() {
+            return data[I_PMY];
+        }
+
+        public double pmz() {
+            return data[I_PMZ];
+        }
+
+        public double appmag() {
+            return data[I_APPMAG];
+        }
+
+        public double absmag() {
+            return data[I_ABSMAG];
+        }
+
+        public double col() {
+            return data[I_COL];
+        }
+
+        public double size() {
+            return data[I_SIZE];
+        }
+
+        public double radius() {
+            return size() * Constants.STAR_SIZE_FACTOR;
+        }
+
+        public int hip() {
+            return (int) data[I_HIP];
+        }
+
+        public double mualpha() {
+            return data[I_MUALPHA];
+        }
+
+        public double mudelta() {
+            return data[I_MUDELTA];
+        }
+
+        public double radvel() {
+            return data[I_RADVEL];
+        }
+
+        public double[] rgb() {
+            Color c = new Color(NumberUtils.floatToIntColor((float) data[I_COL]));
+            return new double[] { c.r, c.g, c.b };
         }
 
         public Vector3d pos(Vector3d aux) {
@@ -183,73 +339,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return MathUtilsd.radDeg * sphPos.y;
         }
 
-        public double x() {
-            return data[I_X];
-        }
-
-        public double y() {
-            return data[I_Y];
-        }
-
-        public double z() {
-            return data[I_Z];
-        }
-
-        public String namesConcat() {
-            return TextUtils.concatenate(Constants.nameSeparator, names);
-        }
-
-        public boolean hasName(String candidate) {
-            return hasName(candidate, false);
-        }
-
-        public boolean hasName(String candidate, boolean matchCase) {
-            if (names == null) {
-                return false;
-            } else {
-                for (String name : names) {
-                    if (matchCase) {
-                        if (name.equals(candidate))
-                            return true;
-                    } else {
-                        if (name.equalsIgnoreCase(candidate))
-                            return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public void setNames(String... names) {
-            this.names = names;
-        }
-
-        public void setName(String name) {
-            if (names != null)
-                names[0] = name;
-            else
-                names = new String[] { name };
-        }
-
-        public void addName(String name) {
-            name = name.strip();
-            if (!hasName(name))
-                if (names != null) {
-                    // Extend array
-                    String[] newNames = new String[names.length + 1];
-                    System.arraycopy(names, 0, newNames, 0, names.length);
-                    newNames[names.length] = name;
-                    names = newNames;
-                } else {
-                    setName(name);
-                }
-        }
-
-        public void addNames(String... names) {
-            for (String name : names)
-                addName(name);
-        }
-
         public boolean hasExtra(String name) {
             if (extra != null) {
                 Set<UCD> ucds = extra.keySet();
@@ -282,7 +371,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * List that contains the point data. It contains only [x y z]
      */
-    protected List<ParticleBean> pointData;
+    protected List<ParticleRecord> pointData;
 
     /**
      * Fully qualified name of data provider class
@@ -378,7 +467,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Reference to the current focus
      */
-    protected ParticleBean focus;
+    protected ParticleRecord focus;
 
     /**
      * Closest
@@ -504,7 +593,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         maxDistance = Double.MIN_VALUE;
         minDistance = Double.MAX_VALUE;
         List<Double> distances = new ArrayList<>();
-        for (ParticleBean point : pointData) {
+        for (ParticleRecord point : pointData) {
             // Add sample to mean distance
             double dist = len(point.data[0], point.data[1], point.data[2]);
             if (Double.isFinite(dist)) {
@@ -522,7 +611,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public void computeMeanPosition() {
         if (!fixedMeanPosition) {
             // Mean position
-            for (ParticleBean point : data()) {
+            for (ParticleRecord point : data()) {
                 pos.add(point.x(), point.y(), point.z());
             }
             pos.scl(1d / pointData.size());
@@ -567,15 +656,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      *
      * @return The data list
      */
-    public List<? extends ParticleBean> data() {
+    public List<ParticleRecord> data() {
         return pointData;
     }
 
-    public void setData(List<ParticleBean> pointData) {
+    public void setData(List<ParticleRecord> pointData) {
         setData(pointData, true);
     }
 
-    public void setData(List<ParticleBean> pointData, boolean regenerateIndex) {
+    public void setData(List<ParticleRecord> pointData, boolean regenerateIndex) {
         this.pointData = pointData;
 
         // Regenerate index
@@ -597,11 +686,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param pointData The data
      * @return An map{string,int} mapping names to indices
      */
-    public Map<String, Integer> generateIndex(List<? extends ParticleBean> pointData) {
+    public Map<String, Integer> generateIndex(List<ParticleRecord> pointData) {
         Map<String, Integer> index = new HashMap<>();
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
-            ParticleBean pb = pointData.get(i);
+            ParticleRecord pb = pointData.get(i);
             if (pb.names != null) {
                 for (String lcname : pb.names) {
                     lcname = lcname.toLowerCase();
@@ -632,7 +721,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
-    public ParticleBean get(int index) {
+    public ParticleRecord get(int index) {
         return pointData.get(index);
     }
 
@@ -643,7 +732,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     public String getRandomParticleName() {
         if (pointData != null)
-            for (ParticleBean pb : pointData) {
+            for (ParticleRecord pb : pointData) {
                 if (pb.names != null && pb.names.length > 0)
                     return pb.names[0];
             }
@@ -667,7 +756,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             geomCentre = new Vector3d(0, 0, 0);
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
-                ParticleBean pb = pointData.get(i);
+                ParticleRecord pb = pointData.get(i);
                 geomCentre.add(pb.x(), pb.y(), pb.z());
             }
             geomCentre.scl(1d / (double) n);
@@ -694,7 +783,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             }
 
             if (this instanceof StarGroup && active.length > 0) {
-                ParticleBean closest = pointData.get(active[0]);
+                ParticleRecord closest = pointData.get(active[0]);
                 closestAbsolutePos.set(closest.x(), closest.y(), closest.z());
                 closestPos.set(closestAbsolutePos).sub(camera.getPos());
                 closestDist = closestPos.len() - getRadius(active[0]);
@@ -750,7 +839,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         if (active != null) {
             float thOverFactor = 1e-15f;
             for (int i = 0; i < Math.min(50, pointData.size()); i++) {
-                ParticleBean pb = pointData.get(active[i]);
+                ParticleRecord pb = pointData.get(active[i]);
                 if (pb.names != null) {
                     Vector3d lpos = fetchPosition(pb, camera.getPos(), aux3d1.get(), 0);
                     float distToCamera = (float) lpos.len();
@@ -948,7 +1037,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public Vector3d getAbsolutePosition(String name, Vector3d out) {
         if (index.containsKey(name)) {
             int idx = index.get(name);
-            ParticleBean pb = pointData.get(idx);
+            ParticleRecord pb = pointData.get(idx);
             out.set(pb.x(), pb.y(), pb.z());
             return out;
         } else {
@@ -1058,7 +1147,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             Array<Pair<Integer, Double>> temporalHits = new Array<>();
             for (int i = 0; i < n; i++) {
                 if (filter(i)) {
-                    ParticleBean pb = pointData.get(i);
+                    ParticleRecord pb = pointData.get(i);
                     Vector3 pos = aux3f1.get();
                     Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
                     pos.set(posd.valuesf());
@@ -1128,7 +1217,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
             for (int i = 0; i < n; i++) {
                 if (filter(i)) {
-                    ParticleBean pb = pointData.get(i);
+                    ParticleRecord pb = pointData.get(i);
                     Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
                     beamDir.set(p1).sub(p0);
                     if (camera.direction.dot(posd) > 0) {
@@ -1237,7 +1326,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public double getCandidateViewAngleApparent() {
         if (candidateFocusIndex >= 0) {
-            ParticleBean candidate = pointData.get(candidateFocusIndex);
+            ParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(aux3d1.get());
             ICamera camera = GaiaSky.instance.getICamera();
             return (float) ((size * .5e2f / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
@@ -1255,7 +1344,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return this;
     }
 
-    public ParticleBean getCandidateBean() {
+    public ParticleRecord getCandidateBean() {
         if (candidateFocusIndex >= 0)
             return pointData.get(candidateFocusIndex);
         else
@@ -1289,7 +1378,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param deltaYears  The delta years
      * @return The vector for chaining
      */
-    protected Vector3d fetchPosition(ParticleBean pb, Vector3d campos, Vector3d destination, double deltaYears) {
+    protected Vector3d fetchPosition(ParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
         if (campos != null)
             return destination.set(pb.data[0], pb.data[1], pb.data[2]).sub(campos);
         else
@@ -1426,7 +1515,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param dops The dataset options
      * @return A new particle group with the given parameters
      */
-    public static ParticleGroup getParticleGroup(String name, List<ParticleBean> data, DatasetOptions dops) {
+    public static ParticleGroup getParticleGroup(String name, List<ParticleRecord> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
         double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
@@ -1466,7 +1555,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         Vector3d camPos = camera.getPos();
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
-            ParticleBean d = pointData.get(i);
+            ParticleRecord d = pointData.get(i);
             // Pos
             Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z());
             metadata[i] = filter(i) ? camPos.dst(x) : Double.MAX_VALUE;

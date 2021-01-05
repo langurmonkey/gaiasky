@@ -8,8 +8,7 @@ package gaiasky.data.group;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -74,7 +73,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(String file, double factor, boolean compat) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor, compat);
@@ -151,15 +150,15 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    public List<? extends ParticleBean> loadData(DataSource ds, double factor) {
+    public List<ParticleRecord> loadData(DataSource ds, double factor) {
         return loadData(ds, factor, null, null, null);
     }
 
-    public List<? extends ParticleBean> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
+    public List<ParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         return loadData(ds, factor, true, preCallback, updateCallback, postCallback);
     }
 
-    public List<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(DataSource ds, double factor, boolean compat) {
         return loadData(ds, factor, compat, null, null, null);
     }
 
@@ -173,7 +172,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param postCallback   A function that runs after the data has been loaded.
      * @return
      */
-    public List<? extends ParticleBean> loadData(DataSource ds, double factor, boolean compat, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
+    public List<ParticleRecord> loadData(DataSource ds, double factor, boolean compat, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
             if (factory != null) {
 
@@ -369,42 +368,42 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
                             if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                                double[] point = new double[StarBean.SIZE + 3];
-                                point[StarBean.I_HIP] = hip;
-                                point[StarBean.I_X] = p.gsposition.x;
-                                point[StarBean.I_Y] = p.gsposition.y;
-                                point[StarBean.I_Z] = p.gsposition.z;
-                                point[StarBean.I_PMX] = pm.x;
-                                point[StarBean.I_PMY] = pm.y;
-                                point[StarBean.I_PMZ] = pm.z;
-                                point[StarBean.I_MUALPHA] = mualphastar;
-                                point[StarBean.I_MUDELTA] = mudelta;
-                                point[StarBean.I_RADVEL] = radvel;
-                                point[StarBean.I_COL] = col;
-                                point[StarBean.I_SIZE] = size;
-                                point[StarBean.I_APPMAG] = appmag;
-                                point[StarBean.I_ABSMAG] = absmag;
+                                double[] point = new double[ParticleRecord.SIZE + 3];
+                                point[ParticleRecord.I_HIP] = hip;
+                                point[ParticleRecord.I_X] = p.gsposition.x;
+                                point[ParticleRecord.I_Y] = p.gsposition.y;
+                                point[ParticleRecord.I_Z] = p.gsposition.z;
+                                point[ParticleRecord.I_PMX] = pm.x;
+                                point[ParticleRecord.I_PMY] = pm.y;
+                                point[ParticleRecord.I_PMZ] = pm.z;
+                                point[ParticleRecord.I_MUALPHA] = mualphastar;
+                                point[ParticleRecord.I_MUDELTA] = mudelta;
+                                point[ParticleRecord.I_RADVEL] = radvel;
+                                point[ParticleRecord.I_COL] = col;
+                                point[ParticleRecord.I_SIZE] = size;
+                                point[ParticleRecord.I_APPMAG] = appmag;
+                                point[ParticleRecord.I_ABSMAG] = absmag;
 
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                                StarBean sb = new StarBean(point, id, names, extraAttributes);
+                                ParticleRecord sb = new ParticleRecord(point, id, names, extraAttributes);
                                 list.add(sb);
 
                                 int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
                                 countsPerMag[appclmp] += 1;
                             } else if (dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                                 double[] point = new double[3];
-                                point[ParticleBean.I_X] = p.gsposition.x;
-                                point[ParticleBean.I_Y] = p.gsposition.y;
-                                point[ParticleBean.I_Z] = p.gsposition.z;
+                                point[ParticleRecord.I_X] = p.gsposition.x;
+                                point[ParticleRecord.I_Y] = p.gsposition.y;
+                                point[ParticleRecord.I_Z] = p.gsposition.z;
 
                                 // TODO reorganise existing star properties into extra attributes
 
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                                ParticleBean pb = new ParticleBean(point, names, extraAttributes);
+                                ParticleRecord pb = new ParticleRecord(point, null, names, extraAttributes);
                                 list.add(pb);
                             }
 
@@ -449,20 +448,20 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 }
             }
             if (extraAttributes == null)
-                extraAttributes = new HashMap<>();
+                extraAttributes = new HashMap<>((int) (ucdp.extra.size * 1.25f), 0.8f);
             extraAttributes.put(extra, val);
         }
         return extraAttributes;
     }
 
     @Override
-    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(InputStream is, double factor, boolean compat) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor, boolean compat) {
         return null;
     }
 

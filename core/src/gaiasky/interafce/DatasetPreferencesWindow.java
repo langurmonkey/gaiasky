@@ -13,7 +13,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.interafce.beans.AttributeComboBoxBean;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
@@ -147,7 +147,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 if (ci.object instanceof ParticleGroup) {
                     ParticleGroup pg = (ParticleGroup) ci.object;
                     if (pg.size() > 0) {
-                        ParticleBean first = pg.get(0);
+                        ParticleRecord first = pg.get(0);
                         if (first.extra != null) {
                             Set<UCD> ucds = first.extra.keySet();
                             for (UCD ucd : ucds)

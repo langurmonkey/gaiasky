@@ -5,8 +5,7 @@
 
 package gaiasky.data.octreegen.generator;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -20,11 +19,11 @@ import java.util.List;
 public interface IOctreeGenerator {
     Log logger = Logger.getLogger(IOctreeGenerator.class);
 
-    OctreeNode generateOctree(List<ParticleBean> catalog);
+    OctreeNode generateOctree(List<ParticleRecord> catalog);
 
     int getDiscarded();
 
-    static OctreeNode startGeneration(List<ParticleBean> catalog, OctreeGeneratorParams params) {
+    static OctreeNode startGeneration(List<ParticleRecord> catalog, OctreeGeneratorParams params) {
         
         logger.info("Starting generation of octree");
 
@@ -32,15 +31,15 @@ public interface IOctreeGenerator {
         double maxdist = Double.MIN_VALUE;
 
         /** Furthest star from origin **/
-        StarBean furthest = null;
+        ParticleRecord furthest = null;
 
         // Aux vectors
         Vector3d pos0 = new Vector3d();
         Vector3d pos1 = new Vector3d();
 
-        Iterator<ParticleBean> it = catalog.iterator();
+        Iterator<ParticleRecord> it = catalog.iterator();
         while (it.hasNext()) {
-            StarBean s = (StarBean) it.next();
+            ParticleRecord s = it.next();
 
             double dist = pos(s.data, pos0).len();
             if (dist * Constants.U_TO_PC > params.maxDistanceCap) {
@@ -65,7 +64,7 @@ public interface IOctreeGenerator {
             BoundingBoxd box = new BoundingBoxd();
             // Lets try to maximize the volume: from furthest star to star where axis-aligned bounding box volume is maximum
             pos(furthest.data, pos1);
-            for (ParticleBean s : catalog) {
+            for (ParticleRecord s : catalog) {
                 pos(s.data, pos0);
                 aux.set(pos1, pos0);
                 double vol = aux.getVolume();
@@ -81,6 +80,6 @@ public interface IOctreeGenerator {
     }
 
     static Vector3d pos(double[] s, Vector3d p) {
-        return p.set(s[StarBean.I_X], s[StarBean.I_Y], s[StarBean.I_Z]);
+        return p.set(s[ParticleRecord.I_X], s[ParticleRecord.I_Y], s[ParticleRecord.I_Z]);
     }
 }

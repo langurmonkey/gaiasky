@@ -6,7 +6,7 @@
 package gaiasky.util.filter;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 
 /**
  * A filter on a dataset as a set of rules
@@ -51,7 +51,7 @@ public class Filter {
         return copy;
     }
 
-    public boolean evaluate(ParticleBean pb) {
+    public boolean evaluate(ParticleRecord pb) {
         synchronized (this) {
             return operation.evaluate(rules, pb);
         }
@@ -96,7 +96,7 @@ public class Filter {
     }
 
     private interface IOperation {
-        boolean evaluate(Array<FilterRule> rules, ParticleBean pb);
+        boolean evaluate(Array<FilterRule> rules, ParticleRecord pb);
 
         String getOperationString();
     }
@@ -109,7 +109,7 @@ public class Filter {
         }
 
         @Override
-        public boolean evaluate(Array<FilterRule> rules, ParticleBean bean) {
+        public boolean evaluate(Array<FilterRule> rules, ParticleRecord bean) {
             boolean result = true;
             for (FilterRule rule : rules) {
                 result = result && rule.evaluate(bean);
@@ -131,7 +131,7 @@ public class Filter {
         }
 
         @Override
-        public boolean evaluate(Array<FilterRule> rules, ParticleBean bean) {
+        public boolean evaluate(Array<FilterRule> rules, ParticleRecord bean) {
             boolean result = false;
             for (FilterRule rule : rules) {
                 result = result || rule.evaluate(bean);
