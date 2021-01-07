@@ -129,10 +129,9 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra.add(deviceGroup).colspan(2).right().padBottom(pad05).row();
 
         if(GlobalConf.program.SAFE_GRAPHICS_MODE){
-            OwnLabel safeMode = new OwnLabel("**Safe graphics mode**", skin, "hud-big");
+            OwnLabel safeMode = new OwnLabel(I18n.txt("gui.debug.safemode"), skin, "hud-big");
             safeMode.setColor(ColorUtils.gRedC);
-
-            safeMode.addListener(new OwnTextTooltip("You are running in safe mode, which disables some fancy graphics options. Uses an old OpenGL profile (3.1)", skin));
+            safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
 
             extra.add(safeMode).colspan(2).right().padBottom(pad10).row();
         }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -38,6 +39,7 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
@@ -327,15 +329,32 @@ public class WelcomeGui extends AbstractGui {
         center.add(catalogGroup).left().top().padBottom(pad15 * 8f).row();
         center.add(quitButton).center().top().colspan(2);
 
-        // Bottom left table
-        Table bottomRight = new Table();
-        bottomRight.setFillParent(true);
-        bottomRight.right().bottom();
-        bottomRight.pad(pad10);
-        bottomRight.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
+        // Top left table
+        Table topLeft = new Table();
+        topLeft.setFillParent(true);
+        topLeft.top().left();
+        topLeft.pad(pad10);
+
+        topLeft.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med")).left().padRight(pad20);
+        OwnLabel device =new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-med");
+        device.setColor(ColorUtils.oDarkGrayC);
+        topLeft.add(device).left().padRight(pad20);
+        OwnLabel glvers =new OwnLabel("GL: " + Gdx.gl.glGetString(GL20.GL_VERSION), skin, "hud-med");
+        glvers.setColor(ColorUtils.oDarkGrayC);
+        topLeft.add(glvers).left().padRight(pad20);
+        OwnLabel glslvers =new OwnLabel("GLSL: " + Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin, "hud-med");
+        glslvers.setColor(ColorUtils.oDarkGrayC);
+        topLeft.add(glslvers).left().padRight(pad20);
+        if(GlobalConf.program.SAFE_GRAPHICS_MODE){
+            OwnLabel safeMode = new OwnLabel(I18n.txt("gui.debug.safemode"), skin, "hud-big");
+            safeMode.setColor(ColorUtils.gRedC);
+            safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
+
+            topLeft.add(safeMode).left().padRight(pad20);
+        }
 
         ui.addActor(center);
-        ui.addActor(bottomRight);
+        ui.addActor(topLeft);
 
     }
 
