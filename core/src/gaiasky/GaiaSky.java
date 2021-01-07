@@ -836,7 +836,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (GlobalConf.screen.SCREEN_OUTPUT) {
                 int tw = graphics.getWidth();
                 int th = graphics.getHeight();
-                if(tw == 0 || th == 0){
+                if (tw == 0 || th == 0) {
                     // Hack - on Windows the reported width and height is 0 when the window is minimized
                     tw = GlobalConf.screen.SCREEN_WIDTH;
                     th = GlobalConf.screen.SCREEN_HEIGHT;
@@ -1093,14 +1093,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void resize(final int width, final int height) {
-        if (!initialized) {
-            resizeImmediate(width, height, true, true, true, true);
-        }
-        resizeWidth = width;
-        resizeHeight = height;
-        lastResizeTime = System.currentTimeMillis();
+        if (width != 0 && height != 0) {
+            if (!initialized) {
+                resizeImmediate(width, height, true, true, true, true);
+            }
 
-        renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+            resizeWidth = width;
+            resizeHeight = height;
+            lastResizeTime = System.currentTimeMillis();
+
+            renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+        }
     }
 
     private void updateResize() {
