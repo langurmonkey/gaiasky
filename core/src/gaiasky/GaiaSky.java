@@ -836,6 +836,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             if (GlobalConf.screen.SCREEN_OUTPUT) {
                 int tw = graphics.getWidth();
                 int th = graphics.getHeight();
+                if(tw == 0 || th == 0){
+                    // Hack - on Windows the reported width and height is 0 when the window is minimized
+                    tw = GlobalConf.screen.SCREEN_WIDTH;
+                    th = GlobalConf.screen.SCREEN_HEIGHT;
+                }
                 int w = (int) (tw * GlobalConf.screen.BACKBUFFER_SCALE);
                 int h = (int) (th * GlobalConf.screen.BACKBUFFER_SCALE);
                 /* RENDER THE SCENE */

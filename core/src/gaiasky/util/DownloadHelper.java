@@ -22,6 +22,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Contains utilities to download files
@@ -78,147 +80,165 @@ public class DownloadHelper {
                 startSize = 0;
             }
 
-            // Send the request, listen for the response
-            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-                private boolean cancelled = false;
+            sendRequest(request, url, resume, to, startSize, progressDownload, progressHashResume, finish, fail, cancel);
 
-                @Override
-                public void handleHttpResponse(HttpResponse httpResponse) {
-                    // Determine how much we have to download
-                    long length = Long.parseLong(httpResponse.getHeader("Content-Length"));
+            return request;
+        }
+    }
 
-                    int status = httpResponse.getStatus().getStatusCode();
-                    if (status < 400) {
-                        // We're going to download the file, create the streams
-                        InputStream is = httpResponse.getResultAsStream();
-                        OutputStream os = to.write(resume);
+    public static void sendRequest(HttpRequest request, String url, boolean resume, FileHandle to, long startSize, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
+        // Send the request, listen for the response
+        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+            private boolean cancelled = false;
 
-                        byte[] bytes = new byte[1024];
-                        int count;
-                        long read = 0;
-                        long lastTimeMs = System.currentTimeMillis();
-                        long lastRead = 0;
-                        double bytesPerMs = 0;
+            @Override
+            public void handleHttpResponse(HttpResponse httpResponse) {
+                // Determine how much we have to download
+                int status = httpResponse.getStatus().getStatusCode();
+                if (status == 416) {
+                    // Range not satisfiable, clean and try again
+                    if (resume) {
                         try {
-                            long totalLength = length + startSize;
-                            logger.info(I18n.txt("gui.download.starting", url));
-                            logger.info("Reading " + length + " bytes " + (resume ? "(resuming from " + startSize + ", total is " + totalLength + ")" : ""));
-                            MessageDigest md = MessageDigest.getInstance("SHA-256");
-                            DigestInputStream dis = new DigestInputStream(is, md);
-                            // Keep reading bytes and storing them until there are no more.
-                            while ((count = dis.read(bytes, 0, bytes.length)) != -1 && !cancelled) {
-                                os.write(bytes, 0, count);
-                                read += count;
-
-                                // Compute progress value
-                                final double progressValue = ((double) (startSize + read) / (double) totalLength) * 100;
-
-                                // Compute speed
-                                long currentTimeMs = System.currentTimeMillis();
-                                // Update each second
-                                boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
-                                if (updateSpeed) {
-                                    long elapsedMs = currentTimeMs - lastTimeMs;
-                                    long readInterval = read - lastRead;
-                                    bytesPerMs = readInterval / elapsedMs;
-                                }
-
-                                // Run progress runnable
-                                if (progressDownload != null)
-                                    progressDownload.run(startSize + read, totalLength, progressValue, bytesPerMs);
-
-                                // Reset
-                                if (updateSpeed) {
-                                    lastTimeMs = currentTimeMs;
-                                    lastRead = read;
-                                }
-                            }
-                            is.close();
-                            os.close();
-                            logger.info(I18n.txt("gui.download.finished", to.path()));
-
-                            // Get digest and run finish runnable
-                            if (finish != null && !cancelled) {
-                                if (resume) {
-                                    // We have only read part of the file, the digest in dis is not valid!
-                                    // Compute digest
-                                    try {
-                                        logger.info("Recomputing sha156 checksum due to being a resumed download: " + to.path());
-                                        md.reset();
-                                        InputStream fis = to.read();
-                                        length = to.length();
-                                        read = 0;
-                                        while ((count = fis.read(bytes, 0, bytes.length)) != -1) {
-                                            md.update(bytes, 0, count);
-                                            read += count;
-
-                                            // Compute progress value
-                                            final double progressValue = ((double) read / (double) length) * 100;
-
-                                            // Compute speed
-                                            long currentTimeMs = System.currentTimeMillis();
-                                            // Update each second
-                                            boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
-                                            if (updateSpeed) {
-                                                long elapsedMs = currentTimeMs - lastTimeMs;
-                                                long readInterval = read - lastRead;
-                                                bytesPerMs = readInterval / elapsedMs;
-                                            }
-
-                                            // Run progress runnable
-                                            if (progressHashResume != null)
-                                                progressHashResume.run(read, length, progressValue, bytesPerMs);
-                                        }
-                                    } catch (IOException e) {
-                                        logger.error("Failed computing sha256 checksum of resumed download.", e);
-                                    }
-
-                                }
-                                byte[] digestBytes = md.digest();
-                                String digest = bytesToHex(digestBytes);
-                                finish.run(digest);
-                            }
-                        } catch (Exception e) {
+                            Files.delete(to.file().toPath());
+                        } catch (IOException e) {
                             logger.error(e);
-                            if (fail != null)
-                                fail.run();
                         }
-                    } else {
-                        logger.error(I18n.txt("gui.download.error.httpstatus", status));
+                    }
+                    sendRequest(request, url, false, to, 0, progressDownload, progressHashResume, finish, fail, cancel);
+
+                    return;
+                }
+                long length = Long.parseLong(httpResponse.getHeader("Content-Length"));
+
+                if (status < 400) {
+                    // We're going to download the file, create the streams
+                    InputStream is = httpResponse.getResultAsStream();
+                    OutputStream os = to.write(resume);
+
+                    byte[] bytes = new byte[1024];
+                    int count;
+                    long read = 0;
+                    long lastTimeMs = System.currentTimeMillis();
+                    long lastRead = 0;
+                    double bytesPerMs = 0;
+                    try {
+                        long totalLength = length + startSize;
+                        logger.info(I18n.txt("gui.download.starting", url));
+                        logger.info("Reading " + length + " bytes " + (resume ? "(resuming from " + startSize + ", total is " + totalLength + ")" : ""));
+                        MessageDigest md = MessageDigest.getInstance("SHA-256");
+                        DigestInputStream dis = new DigestInputStream(is, md);
+                        // Keep reading bytes and storing them until there are no more.
+                        while ((count = dis.read(bytes, 0, bytes.length)) != -1 && !cancelled) {
+                            os.write(bytes, 0, count);
+                            read += count;
+
+                            // Compute progress value
+                            final double progressValue = ((double) (startSize + read) / (double) totalLength) * 100;
+
+                            // Compute speed
+                            long currentTimeMs = System.currentTimeMillis();
+                            // Update each second
+                            boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
+                            if (updateSpeed) {
+                                long elapsedMs = currentTimeMs - lastTimeMs;
+                                long readInterval = read - lastRead;
+                                bytesPerMs = readInterval / elapsedMs;
+                            }
+
+                            // Run progress runnable
+                            if (progressDownload != null)
+                                progressDownload.run(startSize + read, totalLength, progressValue, bytesPerMs);
+
+                            // Reset
+                            if (updateSpeed) {
+                                lastTimeMs = currentTimeMs;
+                                lastRead = read;
+                            }
+                        }
+                        is.close();
+                        os.close();
+                        logger.info(I18n.txt("gui.download.finished", to.path()));
+
+                        // Get digest and run finish runnable
+                        if (finish != null && !cancelled) {
+                            if (resume) {
+                                // We have only read part of the file, the digest in dis is not valid!
+                                // Compute digest
+                                try {
+                                    logger.info("Recomputing sha156 checksum due to being a resumed download: " + to.path());
+                                    md.reset();
+                                    InputStream fis = to.read();
+                                    length = to.length();
+                                    read = 0;
+                                    while ((count = fis.read(bytes, 0, bytes.length)) != -1) {
+                                        md.update(bytes, 0, count);
+                                        read += count;
+
+                                        // Compute progress value
+                                        final double progressValue = ((double) read / (double) length) * 100;
+
+                                        // Compute speed
+                                        long currentTimeMs = System.currentTimeMillis();
+                                        // Update each second
+                                        boolean updateSpeed = currentTimeMs - lastTimeMs >= 1000;
+                                        if (updateSpeed) {
+                                            long elapsedMs = currentTimeMs - lastTimeMs;
+                                            long readInterval = read - lastRead;
+                                            bytesPerMs = readInterval / elapsedMs;
+                                        }
+
+                                        // Run progress runnable
+                                        if (progressHashResume != null)
+                                            progressHashResume.run(read, length, progressValue, bytesPerMs);
+                                    }
+                                } catch (IOException e) {
+                                    logger.error("Failed computing sha256 checksum of resumed download.", e);
+                                }
+
+                            }
+                            byte[] digestBytes = md.digest();
+                            String digest = bytesToHex(digestBytes);
+                            finish.run(digest);
+                        }
+                    } catch (Exception e) {
+                        logger.error(e);
                         if (fail != null)
                             fail.run();
                     }
-                }
-
-                private String bytesToHex(byte[] hash) {
-                    StringBuilder hexString = new StringBuilder(2 * hash.length);
-                    for (int i = 0; i < hash.length; i++) {
-                        String hex = Integer.toHexString(0xff & hash[i]);
-                        if (hex.length() == 1) {
-                            hexString.append('0');
-                        }
-                        hexString.append(hex);
-                    }
-                    return hexString.toString();
-                }
-
-                @Override
-                public void failed(Throwable t) {
-                    logger.error(I18n.txt("gui.download.fail"));
+                } else {
+                    logger.error(I18n.txt("gui.download.error.httpstatus", status));
                     if (fail != null)
                         fail.run();
                 }
+            }
 
-                @Override
-                public void cancelled() {
-                    logger.error(I18n.txt("gui.download.cancelled", url));
-                    cancelled = true;
-                    if (cancel != null)
-                        cancel.run();
+            private String bytesToHex(byte[] hash) {
+                StringBuilder hexString = new StringBuilder(2 * hash.length);
+                for (int i = 0; i < hash.length; i++) {
+                    String hex = Integer.toHexString(0xff & hash[i]);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex);
                 }
-            });
-            return request;
-        }
+                return hexString.toString();
+            }
+
+            @Override
+            public void failed(Throwable t) {
+                logger.error(I18n.txt("gui.download.fail"));
+                if (fail != null)
+                    fail.run();
+            }
+
+            @Override
+            public void cancelled() {
+                logger.error(I18n.txt("gui.download.cancelled", url));
+                cancelled = true;
+                if (cancel != null)
+                    cancel.run();
+            }
+        });
     }
 
 }
