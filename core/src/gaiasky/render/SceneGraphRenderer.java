@@ -340,11 +340,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram.pedantic = false;
 
         /* DATA LOAD */
-        String[] defines = GlobalResources.combinations(new String[]{"#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n"});
-        String[] names = GlobalResources.combinations(new String[]{"Velbuff", "Rel", "Grav"});
+        String[] defines = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
+        String[] names = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav" });
         // Color mapping in shaders
-        String[] definesCmap = GlobalResources.combinations(new String[]{"#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n"});
-        String[] namesCmap = GlobalResources.combinations(new String[]{"Velbuff", "Rel", "Grav", "Colmap"});
+        String[] definesCmap = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
+        String[] namesCmap = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav", "Colmap" });
 
         // Add shaders to load (no providers)
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
@@ -474,7 +474,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int maxTexSize = intBuffer.get();
         logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
-        String[] names = GlobalResources.combinations(new String[]{" (vel)", " (rel)", " (grav)"});
+        String[] names = GlobalResources.combinations(new String[] { " (vel)", " (rel)", " (grav)" });
 
         /*
           STAR BILLBOARD SHADER
@@ -837,7 +837,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
 
     }
-
 
     private void initSGR(ICamera camera) {
         if (GlobalConf.runtime.OPENVR) {
@@ -1263,88 +1262,88 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     @Override
     public void notify(Events event, final Object... data) {
         switch (event) {
-            case TOGGLE_VISIBILITY_CMD:
-                ComponentType ct = ComponentType.getFromKey((String) data[0]);
-                if (ct != null) {
-                    int idx = ct.ordinal();
-                    if (data.length == 3) {
-                        // We have the boolean
-                        boolean currvis = visible.get(ct.ordinal());
-                        boolean newvis = (boolean) data[2];
-                        if (currvis != newvis) {
-                            // Only update if visibility different
-                            if (newvis)
-                                visible.set(ct.ordinal());
-                            else
-                                visible.clear(ct.ordinal());
-                            times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
-                        }
-                    } else {
-                        // Only toggle
-                        visible.flip(ct.ordinal());
+        case TOGGLE_VISIBILITY_CMD:
+            ComponentType ct = ComponentType.getFromKey((String) data[0]);
+            if (ct != null) {
+                int idx = ct.ordinal();
+                if (data.length == 3) {
+                    // We have the boolean
+                    boolean currvis = visible.get(ct.ordinal());
+                    boolean newvis = (boolean) data[2];
+                    if (currvis != newvis) {
+                        // Only update if visibility different
+                        if (newvis)
+                            visible.set(ct.ordinal());
+                        else
+                            visible.clear(ct.ordinal());
                         times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                     }
-                }
-                break;
-
-            case PIXEL_RENDERER_UPDATE:
-                GaiaSky.postRunnable(() -> {
-                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                    // updatePixelRenderSystem();
-                });
-                break;
-            case LINE_RENDERER_UPDATE:
-                GaiaSky.postRunnable(() -> updateLineRenderSystem());
-                break;
-            case STEREOSCOPIC_CMD:
-                boolean stereo = (Boolean) data[0];
-                if (stereo)
-                    sgr = sgrs[SGR_STEREO_IDX];
-                else {
-                    if (GlobalConf.runtime.OPENVR)
-                        sgr = sgrs[SGR_OPENVR_IDX];
-                    else
-                        sgr = sgrs[SGR_DEFAULT_IDX];
-                }
-                break;
-            case CUBEMAP_CMD:
-                boolean cubemap = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
-                if (cubemap) {
-                    sgr = sgrs[SGR_CUBEMAP_IDX];
                 } else {
-                    if (GlobalConf.runtime.OPENVR)
-                        sgr = sgrs[SGR_OPENVR_IDX];
-                    else
-                        sgr = sgrs[SGR_DEFAULT_IDX];
+                    // Only toggle
+                    visible.flip(ct.ordinal());
+                    times[idx] = (long) (GaiaSky.instance.getT() * 1000f);
                 }
-                break;
-            case CAMERA_MODE_CMD:
-                CameraMode cm = (CameraMode) data[0];
-                if (cm.isGaiaFov())
-                    sgr = sgrs[SGR_FOV_IDX];
-                else {
-                    if (GlobalConf.runtime.OPENVR)
-                        sgr = sgrs[SGR_OPENVR_IDX];
-                    else if (GlobalConf.program.STEREOSCOPIC_MODE)
-                        sgr = sgrs[SGR_STEREO_IDX];
-                    else if (GlobalConf.program.CUBEMAP_MODE)
-                        sgr = sgrs[SGR_CUBEMAP_IDX];
-                    else
-                        sgr = sgrs[SGR_DEFAULT_IDX];
+            }
+            break;
 
-                }
-                break;
-            case REBUILD_SHADOW_MAP_DATA_CMD:
-                buildShadowMapData();
-                break;
-            case LIGHT_SCATTERING_CMD:
-                boolean glow = (Boolean) data[0];
-                if (glow) {
-                    buildGlowData();
-                }
-                break;
-            default:
-                break;
+        case PIXEL_RENDERER_UPDATE:
+            GaiaSky.postRunnable(() -> {
+                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                // updatePixelRenderSystem();
+            });
+            break;
+        case LINE_RENDERER_UPDATE:
+            GaiaSky.postRunnable(() -> updateLineRenderSystem());
+            break;
+        case STEREOSCOPIC_CMD:
+            boolean stereo = (Boolean) data[0];
+            if (stereo)
+                sgr = sgrs[SGR_STEREO_IDX];
+            else {
+                if (GlobalConf.runtime.OPENVR)
+                    sgr = sgrs[SGR_OPENVR_IDX];
+                else
+                    sgr = sgrs[SGR_DEFAULT_IDX];
+            }
+            break;
+        case CUBEMAP_CMD:
+            boolean cubemap = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
+            if (cubemap) {
+                sgr = sgrs[SGR_CUBEMAP_IDX];
+            } else {
+                if (GlobalConf.runtime.OPENVR)
+                    sgr = sgrs[SGR_OPENVR_IDX];
+                else
+                    sgr = sgrs[SGR_DEFAULT_IDX];
+            }
+            break;
+        case CAMERA_MODE_CMD:
+            CameraMode cm = (CameraMode) data[0];
+            if (cm.isGaiaFov())
+                sgr = sgrs[SGR_FOV_IDX];
+            else {
+                if (GlobalConf.runtime.OPENVR)
+                    sgr = sgrs[SGR_OPENVR_IDX];
+                else if (GlobalConf.program.STEREOSCOPIC_MODE)
+                    sgr = sgrs[SGR_STEREO_IDX];
+                else if (GlobalConf.program.CUBEMAP_MODE)
+                    sgr = sgrs[SGR_CUBEMAP_IDX];
+                else
+                    sgr = sgrs[SGR_DEFAULT_IDX];
+
+            }
+            break;
+        case REBUILD_SHADOW_MAP_DATA_CMD:
+            buildShadowMapData();
+            break;
+        case LIGHT_SCATTERING_CMD:
+            boolean glow = (Boolean) data[0];
+            if (glow) {
+                buildGlowData();
+            }
+            break;
+        default:
+            break;
         }
     }
 
