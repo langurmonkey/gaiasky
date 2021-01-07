@@ -19,6 +19,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TextUtils {
 
+    public static String surroundBrackets(String in) {
+        return surround(in, "[", "]");
+    }
+
     public static String surround(String in, String pre, String post) {
         return pre + in + post;
     }

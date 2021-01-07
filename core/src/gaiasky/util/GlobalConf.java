@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 /**
@@ -1304,6 +1307,7 @@ public class GlobalConf {
         public String builder;
         public String system;
         public String build;
+        private DateTimeFormatter dateFormatter;
 
         public void initialize(String version, Instant buildtime, String builder, String system, String build) {
             this.version = version;
@@ -1312,11 +1316,18 @@ public class GlobalConf {
             this.builder = builder;
             this.system = system;
             this.build = build;
+            dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                            .withLocale(Locale.getDefault())
+                            .withZone(ZoneId.systemDefault());
         }
 
         @Override
         public String toString() {
             return version;
+        }
+
+        public String getBuildTimePretty(){
+            return dateFormatter.format(buildtime);
         }
     }
 

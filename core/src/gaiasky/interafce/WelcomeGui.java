@@ -172,10 +172,10 @@ public class WelcomeGui extends AbstractGui {
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 
-        float pad10 = 16f;
-        float pad15 = 18f;
-        float pad20 = 32f;
-        float pad25 = 28f;
+        float pad16 = 16f;
+        float pad18 = 18f;
+        float pad32 = 32f;
+        float pad28 = 28f;
 
         float bw = 540f;
         float bh = 110f;
@@ -193,7 +193,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad20);
+        titleGroup.space(pad32);
         OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", GlobalConf.APPLICATION_NAME, GlobalConf.version.version), skin, "main-title");
         OwnLabel gs = new OwnLabel(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version, skin, "main-title");
         gs.setColor(skin.getColor("theme"));
@@ -204,7 +204,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Start Gaia Sky button
         OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", GlobalConf.APPLICATION_NAME), skin, "start");
-        startButton.setSpace(pad15);
+        startButton.setSpace(pad18);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
         startButton.setSize(bw, bh);
@@ -216,7 +216,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel).top().left().padTop(pad10).padBottom(pad10).row();
+        startGroup.add(startLabel).top().left().padTop(pad16).padBottom(pad16).row();
         if (!basicDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
@@ -241,7 +241,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Data manager button
         OwnTextIconButton downloadButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
-        downloadButton.setSpace(pad15);
+        downloadButton.setSpace(pad18);
         downloadButton.setContentAlign(Align.center);
         downloadButton.align(Align.center);
         downloadButton.setSize(bw, bh);
@@ -254,7 +254,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table downloadGroup = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
-        downloadGroup.add(downloadLabel).top().left().padTop(pad10).padBottom(pad10);
+        downloadGroup.add(downloadLabel).top().left().padTop(pad16).padBottom(pad16);
         if (dd != null && dd.updatesAvailable) {
             downloadGroup.row();
             OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
@@ -269,7 +269,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Catalog selection button
         OwnTextIconButton catalogButton = new OwnTextIconButton(I18n.txt("gui.welcome.catalogsel"), skin, "check");
-        catalogButton.setSpace(pad15);
+        catalogButton.setSpace(pad18);
         catalogButton.setContentAlign(Align.center);
         catalogButton.align(Align.center);
         catalogButton.setSize(bw, bh);
@@ -287,7 +287,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table catalogGroup = new Table(skin);
         OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
-        catalogGroup.add(catalogLabel).top().left().padTop(pad10).padBottom(pad10).row();
+        catalogGroup.add(catalogLabel).top().left().padTop(pad16).padBottom(pad16).row();
         if (numCatalogsAvailable == 0) {
             // No catalog files, disable and add notice
             catalogButton.setDisabled(true);
@@ -311,7 +311,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Exit button
         OwnTextIconButton quitButton = new OwnTextIconButton(I18n.txt("gui.exit"), skin, "quit");
-        quitButton.setSpace(pad10);
+        quitButton.setSpace(pad16);
         quitButton.align(Align.center);
         quitButton.setSize(bw * 0.5f, bh * 0.6f);
         quitButton.addListener(new ClickListener() {
@@ -320,38 +320,17 @@ public class WelcomeGui extends AbstractGui {
             }
         });
 
-        center.add(titleGroup).center().padBottom(pad15 * 5f).colspan(2).row();
-        center.add(startButton).center().top().padBottom(pad15 * 4f).padRight(pad25);
-        center.add(startGroup).top().left().padBottom(pad15 * 4f).row();
-        center.add(downloadButton).center().top().padBottom(pad20).padRight(pad25);
-        center.add(downloadGroup).left().top().padBottom(pad20).row();
-        center.add(catalogButton).center().top().padBottom(pad15 * 8f).padRight(pad25);
-        center.add(catalogGroup).left().top().padBottom(pad15 * 8f).row();
+        center.add(titleGroup).center().padBottom(pad18 * 5f).colspan(2).row();
+        center.add(startButton).center().top().padBottom(pad18 * 4f).padRight(pad28);
+        center.add(startGroup).top().left().padBottom(pad18 * 4f).row();
+        center.add(downloadButton).center().top().padBottom(pad32).padRight(pad28);
+        center.add(downloadGroup).left().top().padBottom(pad32).row();
+        center.add(catalogButton).center().top().padBottom(pad18 * 8f).padRight(pad28);
+        center.add(catalogGroup).left().top().padBottom(pad18 * 8f).row();
         center.add(quitButton).center().top().colspan(2);
 
-        // Top left table
-        Table topLeft = new Table();
-        topLeft.setFillParent(true);
-        topLeft.top().left();
-        topLeft.pad(pad10);
-
-        topLeft.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med")).left().padRight(pad20);
-        OwnLabel device =new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin, "hud-med");
-        device.setColor(ColorUtils.oDarkGrayC);
-        topLeft.add(device).left().padRight(pad20);
-        OwnLabel glvers =new OwnLabel("GL: " + Gdx.gl.glGetString(GL20.GL_VERSION), skin, "hud-med");
-        glvers.setColor(ColorUtils.oDarkGrayC);
-        topLeft.add(glvers).left().padRight(pad20);
-        OwnLabel glslvers =new OwnLabel("GLSL: " + Gdx.gl.glGetString(GL20.GL_SHADING_LANGUAGE_VERSION), skin, "hud-med");
-        glslvers.setColor(ColorUtils.oDarkGrayC);
-        topLeft.add(glslvers).left().padRight(pad20);
-        if(GlobalConf.program.SAFE_GRAPHICS_MODE){
-            OwnLabel safeMode = new OwnLabel(I18n.txt("gui.debug.safemode"), skin, "hud-big");
-            safeMode.setColor(ColorUtils.gRedC);
-            safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
-
-            topLeft.add(safeMode).left().padRight(pad20);
-        }
+        // Version line table
+        Table topLeft = new VersionLineTable(skin);
 
         ui.addActor(center);
         ui.addActor(topLeft);

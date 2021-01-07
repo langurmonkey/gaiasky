@@ -118,11 +118,7 @@ public class LoadingGui extends AbstractGui {
         bottomMiddle.add(tip);
 
         // Version and build
-        topLeft = new Table(skin);
-        topLeft.setFillParent(true);
-        topLeft.left().top();
-        topLeft.pad(pad10);
-        topLeft.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
+        topLeft = new VersionLineTable(skin);
 
         // SCREEN MODE BUTTON - TOP RIGHT
         screenMode = new Table(skin);

@@ -128,8 +128,22 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         }
         extra.add(deviceGroup).colspan(2).right().padBottom(pad05).row();
 
+        if(GlobalConf.program.NET_MASTER){
+            OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.master.instance")), skin, "hud-big");
+            master.setColor(ColorUtils.gYellowC);
+            master.addListener(new OwnTextTooltip(I18n.txt("gui.master.instance.tooltip"), skin));
+
+            extra.add(master).colspan(2).right().padBottom(pad10).row();
+        }
+        if(GlobalConf.program.NET_SLAVE){
+            OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.slave.instance")), skin, "hud-big");
+            slave.setColor(ColorUtils.gYellowC);
+            slave.addListener(new OwnTextTooltip(I18n.txt("gui.slave.instance.tooltip"), skin));
+
+            extra.add(slave).colspan(2).right().padBottom(pad10).row();
+        }
         if(GlobalConf.program.SAFE_GRAPHICS_MODE){
-            OwnLabel safeMode = new OwnLabel(I18n.txt("gui.debug.safemode"), skin, "hud-big");
+            OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.debug.safemode")), skin, "hud-big");
             safeMode.setColor(ColorUtils.gRedC);
             safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
 
