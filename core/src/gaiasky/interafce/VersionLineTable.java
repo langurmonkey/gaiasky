@@ -50,6 +50,14 @@ public class VersionLineTable extends Table {
         glslvers.setColor(ColorUtils.oDarkGrayC);
         add(glslvers).left().padRight(pad32);
 
+        // VR
+        if (GlobalConf.runtime.OPENVR) {
+            OwnLabel vr = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.vr.mode")), skin, "hud-med");
+            vr.setColor(ColorUtils.gPinkC);
+            vr.addListener(new OwnTextTooltip(I18n.txt("gui.vr.mode.tooltip"), skin));
+            add(vr).left().padRight(pad32);
+        }
+
         // Master instance
         if (GlobalConf.program.NET_MASTER) {
             OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.master.instance")), skin, "hud-med");
