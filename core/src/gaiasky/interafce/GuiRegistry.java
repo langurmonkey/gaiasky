@@ -397,7 +397,7 @@ public class GuiRegistry implements IObserver {
                                                 EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
                                             }
                                         });
-                                        t.setName("Dataset loader thread (scripting)");
+                                        t.setName("gaiasky-worker-datasetload");
                                         t.start();
                                     } catch (Exception e) {
                                         logger.error(I18n.txt("notif.error", fileName), e);

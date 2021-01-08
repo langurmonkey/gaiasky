@@ -151,6 +151,7 @@ public class GaiaSkyDesktop implements IObserver {
      * @param args Arguments
      */
     public static void main(String[] args) {
+        Thread.currentThread().setName("gaiasky-main-thread");
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         gsArgs = new GaiaSkyArgs();
         JCommander jc = JCommander.newBuilder().addObject(gsArgs).build();

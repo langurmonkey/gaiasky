@@ -361,6 +361,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Init timer if needed
         Timer.instance();
 
+
         // Initialise Cameras
         cam = new CameraManager(manager, CameraMode.FOCUS_MODE, vr);
 
@@ -743,7 +744,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void pause() {
-        EventManager.instance.post(Events.FLUSH_FRAMES);
     }
 
     @Override

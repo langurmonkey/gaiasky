@@ -21,7 +21,7 @@ public class DatasetUpdater {
 
         @Override
         public Thread newThread(Runnable r) {
-            Thread t = new Thread(r, "updater-daemon-" + sequence);
+            Thread t = new Thread(r, "gaiasky-worker-" + sequence);
             sequence++;
             t.setDaemon(true);
             return t;

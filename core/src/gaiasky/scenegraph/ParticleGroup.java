@@ -483,7 +483,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected Map<String, Integer> index;
 
     // Minimum amount of time [ms] between two update calls
-    protected static final double MIN_UPDATE_TIME_MS = 200;
+    protected static final double UPDATE_INTERVAL_MS = 1500;
 
     // Metadata, for sorting - holds distances from each particle to the camera, squared
     protected double[] metadata;
@@ -1292,7 +1292,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (updaterTask != null && pointData.get(0).names != null) {
                 final Vector3d currentCameraPos = (Vector3d) data[0];
                 long t = TimeUtils.millis() - lastSortTime;
-                if (!updating && this.opacity > 0 && (t > MIN_UPDATE_TIME_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > MIN_UPDATE_TIME_MS))) {
+                if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
                     updating = DatasetUpdater.execute(updaterTask);
                 }
             }
