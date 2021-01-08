@@ -321,7 +321,7 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
             // Give execute
             execPermission.exec()
 
-            if (DefaultNativePlatform.currentOperatingSystem.unix) {
+            if (DefaultNativePlatform.currentOperatingSystem.linux) {
                 // Generate man
                 println("Generate man: $distDir/gaiasky.6.gz")
                 manGen.exec()
