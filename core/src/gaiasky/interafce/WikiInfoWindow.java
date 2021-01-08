@@ -25,11 +25,14 @@ import gaiasky.util.*;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -176,68 +179,76 @@ public class WikiInfoWindow extends GenericDialog {
                 if (thumb.has("source")) {
                     // Get image
                     String thumbUrl = thumb.getString("source");
-                    String filename = Path.of(thumbUrl).getFileName().toString();
-                    Path cacheDir = SysUtils.getCacheDir();
+                    Path imageFile;
+                    try {
+                        URL turl = new URL(thumbUrl);
+                        String filename = FilenameUtils.getName(turl.getPath());
+                        Path cacheDir = SysUtils.getCacheDir();
 
-                    Path imageFile = cacheDir.resolve(filename);
+                        imageFile = cacheDir.resolve(filename);
 
-                    if (!Files.exists(imageFile) || !Files.isRegularFile(imageFile) || !Files.isReadable(imageFile)) {
-                        // Download image file!
-                        Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
-                        request.setUrl(thumbUrl);
-                        request.setTimeOut(5000);
+                        if (!Files.exists(imageFile) || !Files.isRegularFile(imageFile) || !Files.isReadable(imageFile)) {
+                            // Download image file!
+                            Net.HttpRequest request = new Net.HttpRequest(HttpMethods.GET);
+                            request.setUrl(thumbUrl);
+                            request.setTimeOut(5000);
 
-                        logger.info(I18n.txt("gui.download.starting", thumbUrl));
-                        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-                            @Override
-                            public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                                if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-                                    // Ok
-                                    InputStream is = httpResponse.getResultAsStream();
-                                    // Write to cache
-                                    try (FileOutputStream outputStream = new FileOutputStream(imageFile.toString())) {
-                                        int read;
-                                        byte[] bytes = new byte[1024];
+                            logger.info(I18n.txt("gui.download.starting", thumbUrl));
+                            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+                                @Override
+                                public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                                    if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+                                        // Ok
+                                        InputStream is = httpResponse.getResultAsStream();
+                                        // Write to cache
+                                        try (FileOutputStream outputStream = new FileOutputStream(imageFile.toString())) {
+                                            int read;
+                                            byte[] bytes = new byte[1024];
 
-                                        while ((read = is.read(bytes)) != -1) {
-                                            outputStream.write(bytes, 0, read);
+                                            while ((read = is.read(bytes)) != -1) {
+                                                outputStream.write(bytes, 0, read);
+                                            }
+                                        } catch (FileNotFoundException e) {
+                                            logger.error(e);
+                                        } catch (IOException e) {
+                                            logger.error(e);
                                         }
-                                    } catch (FileNotFoundException e) {
-                                        logger.error(e);
-                                    } catch (IOException e) {
-                                        logger.error(e);
-                                    }
-                                    // Convert to RGB if necessary
-                                    try {
-                                        if (ImageUtils.monochromeToRGB(imageFile.toFile())) {
-                                            logger.info(I18n.txt("gui.wiki.imageconverted", imageFile.toString()));
+                                        // Convert to RGB if necessary
+                                        try {
+                                            if (ImageUtils.monochromeToRGB(imageFile.toFile())) {
+                                                logger.info(I18n.txt("gui.wiki.imageconverted", imageFile.toString()));
+                                            }
+                                            // And send to UI
+                                            buildImage(imageFile);
+                                        } catch (Exception e) {
+                                            logger.error(I18n.txt("error.wiki.rgbconversion", imageFile.toString()));
                                         }
-                                        // And send to UI
-                                        buildImage(imageFile);
-                                    } catch (Exception e) {
-                                        logger.error(I18n.txt("error.wiki.rgbconversion", imageFile.toString()));
+                                    } else {
+                                        // Ko with code
+                                        logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
                                     }
-                                } else {
-                                    // Ko with code
+                                }
+
+                                @Override
+                                public void failed(Throwable t) {
+                                    // Failed
                                     logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
                                 }
-                            }
 
-                            @Override
-                            public void failed(Throwable t) {
-                                // Failed
-                                logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
-                            }
-
-                            @Override
-                            public void cancelled() {
-                                // Cancelled
-                                logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
-                            }
-                        });
-                    } else {
-                        // Image already in local cache
-                        buildImage(imageFile);
+                                @Override
+                                public void cancelled() {
+                                    // Cancelled
+                                    logger.error(I18n.txt("error.wiki.thumbnail", thumbUrl));
+                                }
+                            });
+                        } else {
+                            // Image already in local cache
+                            buildImage(imageFile);
+                        }
+                    } catch (MalformedURLException e) {
+                        logger.error("Error parsing thumbnail URL!");
+                        logger.error(e);
+                        return;
                     }
                 }
             }

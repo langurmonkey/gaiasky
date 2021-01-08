@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.SnapshotArray;
 import gaiasky.GaiaSky;
+import gaiasky.desktop.util.ExternalInformationUpdater;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -37,7 +38,6 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * @author tsagrista
  */
 public class FocusInfoInterface extends TableGuiInterface implements IObserver {
-    static private INetworkChecker daemon;
     static private final int MAX_RULER_NAME_LEN = 9;
 
     protected Skin skin;
@@ -51,6 +51,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected HorizontalGroup focusNameGroup;
 
     protected IFocus currentFocus;
+    private ExternalInformationUpdater externalInfoUpdater;
 
     private final Table focusInfo;
     private final Table pointerInfo;
@@ -320,11 +321,10 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         pack();
         rulerCell.clearActor();
 
-        if (daemon == null && !vr) {
-            daemon = NetworkCheckerManager.getNewtorkChecker();
-            daemon.start();
+        if (!vr) {
+            externalInfoUpdater = new ExternalInformationUpdater();
+            externalInfoUpdater.setParameters(moreInfo, skin, pad10);
         }
-        daemon.setParameters(moreInfo, skin, pad10);
 
         pos = new Vector3d();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
@@ -502,11 +502,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 }
 
                 // Update more info table
-                if (!daemon.executing()) {
-                    moreInfo.clear();
-                    daemon.setFocus(focus);
-                    daemon.doNotify();
-                }
+                moreInfo.clear();
+                externalInfoUpdater.update(focus);
 
                 break;
             case FOCUS_INFO_UPDATED:

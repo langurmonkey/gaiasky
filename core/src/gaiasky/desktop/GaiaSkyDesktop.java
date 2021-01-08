@@ -31,7 +31,6 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.MusicActorsManager;
-import gaiasky.interafce.NetworkCheckerManager;
 import gaiasky.render.PostProcessorFactory;
 import gaiasky.rest.RESTServer;
 import gaiasky.screenshot.ScreenshotsManager;
@@ -281,9 +280,6 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Initialize screenshots manager
             ScreenshotsManager.initialize();
-
-            // Network checker
-            NetworkCheckerManager.initialize(new DesktopNetworkChecker());
 
             // Math
             MathManager.initialize();
