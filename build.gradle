@@ -106,12 +106,6 @@ project(":core") {
 
     tasks.withType(JavaCompile) { options.compilerArgs << "-parameters" }
 
-    // TODO - this is an ugly hack until sdl2gdx is updated to work with gdx-controllers:2.0.0
-    // TODO - PR submitted to https://github.com/electronstudio/sdl2gdx/pull/27
-    configurations {
-        api.exclude group: "com.badlogicgames.gdx", module: "gdx-controllers"
-    }
-
     dependencies {
         // *****************************
         // GENERATE SKINS (PackTextures)
@@ -130,11 +124,9 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
-        // Use GDX
+        // gdx-controllers:2.+ bases up on SDL 2.0.12
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
         api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
-        // Use SDL
-        api "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
 
         // *****************
         // OTHER SERVER DEPS
