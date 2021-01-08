@@ -1,7 +1,8 @@
 apply plugin: "java"
 apply plugin: "com.install4j.gradle"
 
-import org.apache.tools.ant.taskdefs.condition.Os
+import org.gradle.internal.os.OperatingSystem
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 sourceCompatibility = 11
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -73,7 +74,7 @@ abstract class GaiaSkyRun extends JavaExec {
         //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
         // G1 GC
         jvmArgs "-XX:+UseG1GC"
-        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+        if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
             // Required to run lwjgl3 java apps on macOS
             jvmArgs("-XstartOnFirstThread")
         }
@@ -316,11 +317,11 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
         project.ext.versionFile = file("build/classes/java/main/version").text
         ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
 
-        if (!Os.isFamily(Os.FAMILY_WINDOWS)) {
+        if (!DefaultNativePlatform.currentOperatingSystem.windows) {
             // Give execute
             execPermission.exec()
 
-            if (Os.isFamily(Os.FAMILY_UNIX)) {
+            if (DefaultNativePlatform.currentOperatingSystem.unix) {
                 // Generate man
                 println("Generate man: $distDir/gaiasky.6.gz")
                 manGen.exec()

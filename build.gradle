@@ -1,4 +1,4 @@
-import org.apache.tools.ant.taskdefs.condition.Os 
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
   id "com.install4j.gradle" version "8.0.5"
@@ -9,7 +9,7 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '2.2.5'
+    version = '3.0.2'
 
     ext {
         appName = "GaiaSky"
@@ -52,9 +52,9 @@ project(":core") {
     proc = cmd.execute()
     project.ext.rev = proc.text.trim()
 
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    if (DefaultNativePlatform.currentOperatingSystem.windows) {
         project.ext.system = "Windows10 x86_64"
-    }else {
+    } else {
         cmd = "uname -snmr"
         proc = cmd.execute()
         project.ext.system = proc.text.trim()
@@ -106,6 +106,12 @@ project(":core") {
 
     tasks.withType(JavaCompile) { options.compilerArgs << "-parameters" }
 
+    // TODO - this is an ugly hack until sdl2gdx is updated to work with gdx-controllers:2.0.0
+    // TODO - PR submitted to https://github.com/electronstudio/sdl2gdx/pull/27
+    configurations {
+        api.exclude group: "com.badlogicgames.gdx", module: "gdx-controllers"
+    }
+
     dependencies {
         // *****************************
         // GENERATE SKINS (PackTextures)
@@ -123,7 +129,6 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-
 
         // Use GDX
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
@@ -145,7 +150,6 @@ project(":core") {
 
         api group: "org.jsoup", name: "jsoup", version: "$jsoupVersion"
         api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
-
 
         // ****************
         // REST SERVER DEPS
