@@ -14,6 +14,7 @@ allprojects {
     ext {
         appName = "GaiaSky"
         gdxVersion = "1.9.13"
+        gdxcontrollersVersion = "2.0.0"
         lwjglVersion = "3.2.3"
         jcommanderVersion = "1.80"
         slf4jVersion = "1.7.25"
@@ -26,7 +27,7 @@ allprojects {
         py4jVersion = "0.10.8.1"
         oshiVersion = "4.0.0"
         jsampVersion = "+"
-        sdl2gdxVersion = "1.0.4"
+        sdl2gdxVersion = "1.0.+"
         jsoupVersion = "+"
     }
 
@@ -114,12 +115,6 @@ project(":core") {
         // ************
         // REGULAR DEPS
         // ************
-        api group: "org.lwjgl", name: "lwjgl", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
-        
         api group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
         api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
         api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
@@ -131,7 +126,8 @@ project(":core") {
 
 
         // Use GDX
-        //api "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
+        api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
+        api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
         // Use SDL
         api "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
 

@@ -105,7 +105,7 @@ public class ControllerGui extends AbstractGui {
         float h = 640f;
         // Widget width
         float ww = 400f;
-        float wh = 128;
+        float wh = 64f;
         float sw = ww;
         float sh = 96f;
         float tfw = 240f;
@@ -556,7 +556,7 @@ public class ControllerGui extends AbstractGui {
         updatePads(sysT);
 
         // Create tab buttons
-        searchButton = new OwnTextButton(I18n.txt("gui.search"), skin, "toggle-huge");
+        searchButton = new OwnTextButton(I18n.txt("gui.search"), skin, "toggle-big");
         tabButtons.add(searchButton);
         searchButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -566,7 +566,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        cameraButton = new OwnTextButton(I18n.txt("gui.camera"), skin, "toggle-huge");
+        cameraButton = new OwnTextButton(I18n.txt("gui.camera"), skin, "toggle-big");
         tabButtons.add(cameraButton);
         cameraButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -576,7 +576,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        timeButton = new OwnTextButton(I18n.txt("gui.time"), skin, "toggle-huge");
+        timeButton = new OwnTextButton(I18n.txt("gui.time"), skin, "toggle-big");
         tabButtons.add(timeButton);
         timeButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -586,7 +586,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        typesButton = new OwnTextButton(I18n.txt("gui.types"), skin, "toggle-huge");
+        typesButton = new OwnTextButton(I18n.txt("gui.types"), skin, "toggle-big");
         tabButtons.add(typesButton);
         typesButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -596,7 +596,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        optionsButton = new OwnTextButton(I18n.txt("gui.options"), skin, "toggle-huge");
+        optionsButton = new OwnTextButton(I18n.txt("gui.options"), skin, "toggle-big");
         tabButtons.add(optionsButton);
         optionsButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -606,7 +606,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        systemButton = new OwnTextButton(I18n.txt("gui.system"), skin, "toggle-huge");
+        systemButton = new OwnTextButton(I18n.txt("gui.system"), skin, "toggle-big");
         tabButtons.add(systemButton);
         systemButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -843,7 +843,7 @@ public class ControllerGui extends AbstractGui {
      *
      * @param i    The column
      * @param j    The row
-     * @param down Whehter scan up or down
+     * @param down Whether scan up or down
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1158,26 +1158,6 @@ public class ControllerGui extends AbstractGui {
             }
 
             return true;
-        }
-
-        @Override
-        public boolean povMoved(Controller controller, int povCode, PovDirection value) {
-            return false;
-        }
-
-        @Override
-        public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
-            return false;
-        }
-
-        @Override
-        public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
-            return false;
-        }
-
-        @Override
-        public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
-            return false;
         }
 
         @Override

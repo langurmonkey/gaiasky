@@ -1102,7 +1102,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             resizeHeight = height;
             lastResizeTime = System.currentTimeMillis();
 
-            renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
+            if (renderBatch != null)
+                renderBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
         }
     }
 

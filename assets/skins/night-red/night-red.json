@@ -307,17 +307,6 @@
       "fontColor": "theme",
       "downFontColor": "theme"
     },
-    "toggle-huge": {
-      "down": "default-round-down",
-      "up": "default-round",
-      "disabled": "default-round-disabled",
-      "focused": "default-round-sel",
-      "checked": "default-round-down",
-      "checkedFocused": "default-round-down-sel",
-      "font": "title-40",
-      "fontColor": "white",
-      "downFontColor": "theme"
-    },
     "key": {
       "up": "key",
       "font": "ui-18",
