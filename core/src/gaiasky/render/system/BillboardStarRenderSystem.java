@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -124,7 +125,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 

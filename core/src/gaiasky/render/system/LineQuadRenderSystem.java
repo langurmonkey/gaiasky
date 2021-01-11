@@ -312,7 +312,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
         // Reset

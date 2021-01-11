@@ -82,7 +82,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (isLine()) {
             // Enable GL_LINE_SMOOTH
             Gdx.gl20.glEnable(GL11.GL_LINE_SMOOTH);

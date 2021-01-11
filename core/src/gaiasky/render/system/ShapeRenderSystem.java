@@ -7,6 +7,7 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IRenderable;
 import gaiasky.render.IShapeRenderable;
 import gaiasky.render.SceneGraphRenderer;
@@ -26,7 +27,7 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         shapeRenderer.begin(ShapeType.Line);
         renderables.forEach(r ->{
             IShapeRenderable sr = (IShapeRenderable) r;

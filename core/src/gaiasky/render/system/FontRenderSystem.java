@@ -5,6 +5,7 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IAnnotationsRenderable;
@@ -45,11 +46,11 @@ public class FontRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         renderables.sort(comp);
         batch.begin();
 
-        int size = renderables.size();
+        int size = renderables.size;
         ExtShaderProgram program = programs[0];
         if (program == null) {
             for (int i = 0; i < size; i++) {
@@ -64,7 +65,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
 
     }
 
-    private void renderFont3D(List<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float lalpha) {
+    private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float lalpha) {
 
         fontDistanceField.getData().setScale(0.6f);
         renderables.forEach(r -> {

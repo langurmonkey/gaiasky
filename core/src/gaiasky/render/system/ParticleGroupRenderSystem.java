@@ -80,8 +80,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size() > 0) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size > 0) {
             boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
             ExtShaderProgram shaderProgram = getShaderProgram();
             shaderProgram.begin();

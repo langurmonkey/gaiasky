@@ -78,8 +78,8 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        int n = renderables.size();
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        int n = renderables.size;
         if (n > 0 && renderables.get(0).getOpacity() > 0) {
             Orbit first = (Orbit) renderables.get(0);
             if (!first.elemsInGpu) {

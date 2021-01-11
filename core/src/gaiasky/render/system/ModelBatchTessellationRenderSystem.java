@@ -5,6 +5,7 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IModelRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer;
@@ -33,7 +34,7 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (mustRender()) {
             // Triangles for tessellation
             GL41.glPatchParameteri(GL41.GL_PATCH_VERTICES, 3);

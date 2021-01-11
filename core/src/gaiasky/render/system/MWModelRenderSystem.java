@@ -258,8 +258,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size() > 0) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size > 0) {
             MilkyWay mw = (MilkyWay) renderables.get(0);
 
             switch (mw.status) {

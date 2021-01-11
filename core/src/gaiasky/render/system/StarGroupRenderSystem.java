@@ -110,8 +110,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size() > 0) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
             float starPointSize = GlobalConf.getStarPointSize();
 

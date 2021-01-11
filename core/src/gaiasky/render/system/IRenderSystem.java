@@ -5,6 +5,7 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -21,7 +22,7 @@ public interface IRenderSystem {
 
     RenderGroup getRenderGroup();
 
-    void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc);
+    void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc);
 
     void resize(int w, int h);
 

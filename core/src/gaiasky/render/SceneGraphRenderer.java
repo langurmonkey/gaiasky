@@ -265,7 +265,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /**
      * Render lists for all render groups
      **/
-    public static List<List<IRenderable>> render_lists;
+    public static Array<Array<IRenderable>> render_lists;
 
     // Two model batches, for front (models), back and atmospheres
     private ExtSpriteBatch fontBatch, spriteBatch;
@@ -304,7 +304,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     // VRContext, may be null
     private final VRContext vrContext;
 
-    private List<IRenderable> stars;
+    private Array<IRenderable> stars;
 
     private AbstractRenderSystem billboardStarsProc;
     private MWModelRenderSystem mwrs;
@@ -390,7 +390,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("font/font2d.fnt", BitmapFont.class, bfp);
         manager.load("font/font-titles.fnt", BitmapFont.class, bfp);
 
-        stars = new ArrayList<>();
+        stars = new Array<>();
 
         renderProcesses = new NoDuplicatesList<>();
 
@@ -550,9 +550,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
 
         RenderGroup[] renderGroups = values();
-        render_lists = new ArrayList<>(renderGroups.length);
+        render_lists = new Array(renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
-            render_lists.add(new ArrayList<>(100));
+            render_lists.add(new Array(20));
         }
 
         // Per-vertex lighting shaders
@@ -877,7 +877,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             fb = glowFb;
         if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && fb != null) {
             // Get all billboard stars
-            List<IRenderable> bbStars = render_lists.get(BILLBOARD_STAR.ordinal());
+            Array<IRenderable> bbStars = render_lists.get(BILLBOARD_STAR.ordinal());
 
             stars.clear();
             for (IRenderable st : bbStars) {
@@ -888,15 +888,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
 
             // Get all models
-            List<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
-            List<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
+            Array<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
+            Array<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers
             if (GlobalConf.runtime.OPENVR) {
                 SGROpenVR sgrov = (SGROpenVR) sgrs[SGR_OPENVR_IDX];
                 if (vrContext != null) {
                     for (StubModel m : sgrov.controllerObjects) {
-                        if (!models.contains(m))
+                        if (!models.contains(m, true))
                             controllers.add(m);
                     }
                 }
@@ -921,7 +921,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             mbPixelLightingOpaque.end();
 
             // Render tessellated models
-            if (modelsTess.size() > 0) {
+            if (modelsTess.size > 0) {
                 mbPixelLightingOpaqueTessellation.begin(camera.getCamera());
                 for (IRenderable model : modelsTess) {
                     if (model instanceof ModelBody) {
@@ -944,12 +944,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
-    private void addCandidates(List<IRenderable> models, List<ModelBody> candidates, boolean clear) {
+    private void addCandidates(Array<IRenderable> models, List<ModelBody> candidates, boolean clear) {
         if (candidates != null) {
             if (clear)
                 candidates.clear();
             int num = 0;
-            for (int i = 0; i < models.size(); i++) {
+            for (int i = 0; i < models.size; i++) {
                 if (models.get(i) instanceof ModelBody) {
                     ModelBody mr = (ModelBody) models.get(i);
                     if (mr.isShadow()) {
@@ -1107,8 +1107,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
              * shadow if different</li>
              * </ul>
              */
-            List<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
-            List<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
+            Array<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
+            Array<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(a -> a.getDistToCamera()));
 
             int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP_MODE ? 6 : 1;
@@ -1171,7 +1171,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    List<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
+                    Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, rc);
                 } else {
                     process.render(null, camera, t, rc);
@@ -1204,7 +1204,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    List<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
+                    Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, rc);
                 } else {
                     process.render(null, camera, t, rc);

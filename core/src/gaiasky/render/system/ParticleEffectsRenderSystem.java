@@ -185,7 +185,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
     }
 
     @Override
-    public void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
+    public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
         this.rc = rc;
         run(preRunnables, renderables, camera);
         renderStud(renderables, camera, t);
@@ -193,7 +193,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         float alpha = getAlpha(ct);
         if (alpha > 0) {
             updatePositions(camera);
