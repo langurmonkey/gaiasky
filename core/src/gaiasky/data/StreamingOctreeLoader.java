@@ -166,14 +166,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             }, 1000, 1000);
 
             // Add octreeWrapper to result list and return
-            Array<SceneGraphNode> result = new Array<>(1);
+            Array<SceneGraphNode> result = new Array<>(false, 1);
             result.add(octreeWrapper);
 
             logger.info(I18n.bundle.format("notif.catalog.init", octreeWrapper.root.countObjects()));
 
             return result;
         } else {
-            return new Array<>(1);
+            return new Array<>(false, 1);
         }
     }
 

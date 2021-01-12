@@ -132,7 +132,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     private Pair<UCD, String>[] getAllStringsUcd(Array<UCD> ucds, Object[] row) {
-        Array<Pair<UCD, String>> strs = new Array<>(2);
+        Array<Pair<UCD, String>> strs = new Array<>(false, 2);
         for (UCD ucd : ucds) {
             try {
                 String str = row[ucd.index].toString().strip();
@@ -321,7 +321,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // We have name
                                 Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdp.NAME, row);
-                                Array<String> namesArray = new Array<>(namePairs.length);
+                                Array<String> namesArray = new Array<>(false, namePairs.length);
                                 for (Pair<UCD, String> pair : namePairs) {
                                     String[] currNames = pair.getSecond().split(Constants.nameSeparatorRegex);
                                     for (String actualName : currNames) {

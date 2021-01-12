@@ -43,7 +43,7 @@ public class HiddenHelperUser implements IObserver {
 
     private HiddenHelperUser() {
         super();
-        currentTasks = new Array<>(5);
+        currentTasks = new Array<>(false, 5);
         lastCommandTime = -1;
         EventManager.instance.subscribe(this, Events.NAVIGATE_TO_OBJECT, Events.LAND_ON_OBJECT, Events.LAND_AT_LOCATION_OF_OBJECT, Events.INPUT_EVENT);
     }

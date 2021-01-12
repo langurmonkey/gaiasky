@@ -117,7 +117,7 @@ public class NBGalaxy extends Particle {
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
+        SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
         return true;
     }
 

@@ -57,7 +57,7 @@ public class ColormapPicker extends ColorPickerAbstract {
     public static Array<Pair<String, Integer>> cmapList;
 
     static {
-        cmapList = new Array<>(9);
+        cmapList = new Array<>(false, 9);
         cmapList.add(new Pair<>("reds", 0));
         cmapList.add(new Pair<>("greens", 1));
         cmapList.add(new Pair<>("blues", 2));
@@ -346,7 +346,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             container.add(new OwnLabel(I18n.txt("gui.colorpicker.attribute"), skin)).left().padRight(pad10).padBottom(pad5);
             FadeNode catalog = catalogInfo.object;
             boolean stars = catalog instanceof StarGroup || catalog instanceof OctreeWrapper;
-            Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 12 : 7);
+            Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
             // Add particle attributes (dist, alpha, delta)
             attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
             attrs.add(new AttributeComboBoxBean(new AttributeRA()));

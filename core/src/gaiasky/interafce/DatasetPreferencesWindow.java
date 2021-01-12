@@ -126,7 +126,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
                 // ATTRIBUTE
                 boolean stars = ci.object instanceof StarGroup || ci.object instanceof OctreeWrapper;
-                Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 12 : 7);
+                Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
                 // Add particle attributes (dist, alpha, delta)
                 attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
                 attrs.add(new AttributeComboBoxBean(new AttributeRA()));

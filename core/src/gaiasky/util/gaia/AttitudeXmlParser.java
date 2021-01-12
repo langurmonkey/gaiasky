@@ -47,7 +47,7 @@ public class AttitudeXmlParser {
         final Array<FileHandle> list;
         try (Stream<Path> paths = Files.walk(Paths.get(GlobalConf.data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
-            list = new Array<>(ps.size());
+            list = new Array<>(false, ps.size());
             for (Path p : ps) {
                 if (p.toFile().getName().endsWith(".xml"))
                     list.add(new FileHandle(p.toFile()));

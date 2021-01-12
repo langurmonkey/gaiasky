@@ -263,7 +263,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         if (renderOn) {
-            SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
+            SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
             return true;
         }
         return false;

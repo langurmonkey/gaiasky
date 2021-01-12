@@ -37,7 +37,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         OctreeNode root = IOctreeGenerator.startGeneration(catalog, params);
 
         Array<OctreeNode>[] octantsPerLevel = new Array[25];
-        octantsPerLevel[0] = new Array<>(1);
+        octantsPerLevel[0] = new Array<>(false, 1);
         octantsPerLevel[0].add(root);
 
         Map<OctreeNode, List<ParticleRecord>> inputLists = new HashMap<>();
@@ -63,7 +63,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         logger.info("Generating level " + level);
         Array<OctreeNode> levelOctants = octantsPerLevel[level];
 
-        octantsPerLevel[level + 1] = new Array<OctreeNode>(levelOctants.size * 8);
+        octantsPerLevel[level + 1] = new Array<>(false, levelOctants.size * 8);
 
         /** CREATE OCTANTS FOR LEVEL+1 **/
         Iterator<OctreeNode> it = levelOctants.iterator();

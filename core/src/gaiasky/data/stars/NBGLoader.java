@@ -57,7 +57,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 
     @Override
     public Array<CelestialBody> loadData() {
-        Array<CelestialBody> galaxies = new Array<>(900);
+        Array<CelestialBody> galaxies = new Array<>(false, 900);
         long baseid = 5000;
         long offset = 0;
         if (active)

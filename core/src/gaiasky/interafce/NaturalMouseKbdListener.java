@@ -165,7 +165,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
         if (kpo != null)
             return kpo;
 
-        Array<SceneGraphNode> l = GaiaSky.instance.sg.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<>(1));
+        Array<SceneGraphNode> l = GaiaSky.instance.sg.getRoot().getChildrenByType(KeyframesPathObject.class, new Array<>(false, 1));
         if (!l.isEmpty()) {
             kpo = (KeyframesPathObject) l.get(0);
             return kpo;

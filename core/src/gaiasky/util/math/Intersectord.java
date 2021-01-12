@@ -103,7 +103,7 @@ public class Intersectord {
         // discriminant
         double D = B * B - 4 * A * C;
 
-        Array<Vector3d> result = new Array<Vector3d>(2);
+        Array<Vector3d> result = new Array<>(false, 2);
 
         if (D < 0) {
             return result;
@@ -159,7 +159,7 @@ public class Intersectord {
         if (n <= 0) {
             return solutions;
         } else {
-            Array<Vector3d> newSolutions = new Array<Vector3d>(n);
+            Array<Vector3d> newSolutions = new Array<>(false, n);
             // Test each point
             for (int i = 0; i < n; i++) {
                 if (isBetween(linePoint0, linePoint1, solutions.get(i))) {

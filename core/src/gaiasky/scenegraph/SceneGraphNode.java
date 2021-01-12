@@ -800,7 +800,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         boolean on = ct.isEmpty() || ct.intersects(SceneGraphRenderer.visible);
         if (on || SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0) {
-            SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
+            SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
             return true;
         }
         return false;
@@ -814,17 +814,17 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * @return True if removed, false otherwise
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
-        return SceneGraphRenderer.render_lists.get(rg.ordinal()).removeValue(renderable, true);
+        return SceneGraphRenderer.renderLists().get(rg.ordinal()).removeValue(renderable, true);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup rg) {
-        return SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable, true);
+        return SceneGraphRenderer.renderLists().get(rg.ordinal()).contains(renderable, true);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup... rgs) {
         boolean is = false;
         for (RenderGroup rg : rgs)
-            is = is || SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable, true);
+            is = is || SceneGraphRenderer.renderLists().get(rg.ordinal()).contains(renderable, true);
         return is;
     }
 

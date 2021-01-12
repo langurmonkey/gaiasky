@@ -43,7 +43,7 @@ public class Filter {
     }
 
     public Filter deepCopy() {
-        Array<FilterRule> rulesCopy = new Array<>(rules.size);
+        Array<FilterRule> rulesCopy = new Array<>(false, rules.size);
         for (int i = 0; i < rules.size; i++) {
             rulesCopy.add(rules.get(i).copy());
         }

@@ -117,7 +117,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             // Controller objects
             vrDeviceToModel = GaiaSky.instance.getVRDeviceToModel();
-            controllerObjects = new Array<>(controllers.size);
+            controllerObjects = new Array<>(false, controllers.size);
             for (VRDevice controller : controllers) {
                 if (!controller.isInitialized())
                     controller.initialize();

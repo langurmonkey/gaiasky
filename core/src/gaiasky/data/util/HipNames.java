@@ -62,7 +62,7 @@ public class HipNames {
                             if (!l.contains(name, false))
                                 l.add(name);
                         } else {
-                            Array<String> l = new Array<>(1);
+                            Array<String> l = new Array<>(false, 1);
                             l.add(name);
                             hipNames.put(hip, l);
                         }

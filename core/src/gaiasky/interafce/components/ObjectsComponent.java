@@ -116,7 +116,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
         final com.badlogic.gdx.scenes.scene2d.ui.List<String> focusList = new com.badlogic.gdx.scenes.scene2d.ui.List<>(skin);
         focusList.setName("objects list");
         Array<IFocus> focusableObjects = sg.getFocusableObjects();
-        Array<String> names = new Array<>(focusableObjects.size);
+        Array<String> names = new Array<>(false, focusableObjects.size);
 
         for (IFocus focus : focusableObjects) {
             // Omit stars with no proper names

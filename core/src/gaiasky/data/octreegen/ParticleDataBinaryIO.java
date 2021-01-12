@@ -128,7 +128,7 @@ public class ParticleDataBinaryIO {
         try {
             // Read size of stars
             int size = data_in.readInt();
-            stars = new Array<SceneGraphNode>(size);
+            stars = new Array<>(false, size);
 
             for (int idx = 0; idx < size; idx++) {
                 try {

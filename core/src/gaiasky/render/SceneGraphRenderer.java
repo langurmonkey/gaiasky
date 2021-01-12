@@ -246,6 +246,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         instance.initialize(manager);
     }
 
+    public static Array<Array<IRenderable>> renderLists(){
+        return instance.renderLists;
+    }
+
     /**
      * Contains the flags representing each type's visibility
      **/
@@ -265,12 +269,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /**
      * Render lists for all render groups
      **/
-    public static Array<Array<IRenderable>> render_lists;
+    public Array<Array<IRenderable>> renderLists;
 
     // Two model batches, for front (models), back and atmospheres
     private ExtSpriteBatch fontBatch, spriteBatch;
 
-    private List<IRenderSystem> renderProcesses;
+    private Array<IRenderSystem> renderSystems;
 
     private RenderSystemRunnable depthTestR, additiveBlendR, noDepthTestR, regularBlendR, depthTestNoWritesR, noDepthWritesR, depthWritesR, clearDepthR, noBlendR;
 
@@ -299,7 +303,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private LightPositionUpdater lpu;
 
     private Vector3 aux1;
-    private Vector3d aux1d, aux2d, aux3d, aux4d;
+    private Vector3d aux1d, aux2d, aux3d;
 
     // VRContext, may be null
     private final VRContext vrContext;
@@ -392,7 +396,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         stars = new Array<>();
 
-        renderProcesses = new NoDuplicatesList<>();
+        renderSystems = new Array<>();
 
         noDepthTestR = (renderSystem, renderables, camera) -> {
             Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
@@ -444,7 +448,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             aux1d = new Vector3d();
             aux2d = new Vector3d();
             aux3d = new Vector3d();
-            aux4d = new Vector3d();
 
             // Build frame buffers and arrays
             buildShadowMapData();
@@ -550,9 +553,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         orbitElemShaders = fetchShaderProgram(manager, orbitElemDesc, TextUtils.concatAll("orbitelem", names));
 
         RenderGroup[] renderGroups = values();
-        render_lists = new Array(renderGroups.length);
+        renderLists = new Array(false, renderGroups.length);
         for (int i = 0; i < renderGroups.length; i++) {
-            render_lists.add(new Array(20));
+            renderLists.add(new Array(false, 20));
         }
 
         // Per-vertex lighting shaders
@@ -774,60 +777,60 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
         // Add components to set
-        renderProcesses.add(modelBackgroundProc);
-        renderProcesses.add(modelGridsProc);
-        renderProcesses.add(pixelStarProc);
-        renderProcesses.add(annotationsProc);
+        addRenderSystem(modelBackgroundProc);
+        addRenderSystem(modelGridsProc);
+        addRenderSystem(pixelStarProc);
+        addRenderSystem(annotationsProc);
 
         // Opaque meshes
-        renderProcesses.add(modelMeshOpaqueProc);
+        addRenderSystem(modelMeshOpaqueProc);
 
         // Milky way
-        renderProcesses.add(milkyWayProc);
+        addRenderSystem(milkyWayProc);
 
         // Billboards
-        renderProcesses.add(billboardStarsProc);
+        addRenderSystem(billboardStarsProc);
 
         // Stars, particles
-        renderProcesses.add(particleGroupProc);
-        renderProcesses.add(starGroupProc);
-        renderProcesses.add(orbitElemProc);
+        addRenderSystem(particleGroupProc);
+        addRenderSystem(starGroupProc);
+        addRenderSystem(orbitElemProc);
 
         // Additive meshes
-        renderProcesses.add(modelMeshAdditiveProc);
+        addRenderSystem(modelMeshAdditiveProc);
         // Diffuse meshes
-        renderProcesses.add(modelMeshDiffuse);
+        addRenderSystem(modelMeshDiffuse);
 
         // Models
-        renderProcesses.add(modelPerPixelLighting);
-        renderProcesses.add(modelPerPixelLightingTess);
-        renderProcesses.add(modelBeamProc);
+        addRenderSystem(modelPerPixelLighting);
+        addRenderSystem(modelPerPixelLightingTess);
+        addRenderSystem(modelBeamProc);
 
         // Labels
-        renderProcesses.add(labelsProc);
+        addRenderSystem(labelsProc);
 
         // Galaxy & nebulae billboards, recursive grid
-        renderProcesses.add(billboardSpritesProc);
-        renderProcesses.add(billboardGalaxiesProc);
-        renderProcesses.add(modelRecGridProc);
+        addRenderSystem(billboardSpritesProc);
+        addRenderSystem(billboardGalaxiesProc);
+        addRenderSystem(modelRecGridProc);
 
         // Primitives
-        renderProcesses.add(pointProc);
-        renderProcesses.add(pointGpuProc);
+        addRenderSystem(pointProc);
+        addRenderSystem(pointGpuProc);
 
         // Lines
-        renderProcesses.add(lineProc);
-        renderProcesses.add(lineGpuProc);
+        addRenderSystem(lineProc);
+        addRenderSystem(lineGpuProc);
 
         // Billboards SSO
-        renderProcesses.add(billboardSSOProc);
+        addRenderSystem(billboardSSOProc);
 
         // Models
-        renderProcesses.add(modelStarsProc);
-        renderProcesses.add(modelAtmProc);
-        renderProcesses.add(modelCloudProc);
-        renderProcesses.add(shapeProc);
-        renderProcesses.add(particleEffectsProc);
+        addRenderSystem(modelStarsProc);
+        addRenderSystem(modelAtmProc);
+        addRenderSystem(modelCloudProc);
+        addRenderSystem(shapeProc);
+        addRenderSystem(particleEffectsProc);
 
         // INIT GL STATE
         GL30.glClampColor(GL30.GL_CLAMP_READ_COLOR, GL30.GL_FALSE);
@@ -836,6 +839,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
 
+    }
+
+    private void addRenderSystem(IRenderSystem ars){
+       if(!renderSystems.contains(ars, true)){
+          renderSystems.add(ars);
+       }
     }
 
     private void initSGR(ICamera camera) {
@@ -877,7 +886,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             fb = glowFb;
         if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && fb != null) {
             // Get all billboard stars
-            Array<IRenderable> bbStars = render_lists.get(BILLBOARD_STAR.ordinal());
+            Array<IRenderable> bbStars = renderLists.get(BILLBOARD_STAR.ordinal());
 
             stars.clear();
             for (IRenderable st : bbStars) {
@@ -888,8 +897,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
 
             // Get all models
-            Array<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
-            Array<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
+            Array<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
+            Array<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers
             if (GlobalConf.runtime.OPENVR) {
@@ -1107,8 +1116,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
              * shadow if different</li>
              * </ul>
              */
-            Array<IRenderable> models = render_lists.get(MODEL_PIX.ordinal());
-            Array<IRenderable> modelsTess = render_lists.get(MODEL_PIX_TESS.ordinal());
+            Array<IRenderable> models = renderLists.get(MODEL_PIX.ordinal());
+            Array<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(a -> a.getDistToCamera()));
 
             int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP_MODE ? 6 : 1;
@@ -1165,13 +1174,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 alphas[ct.ordinal()] = calculateAlpha(ct, t);
             }
 
-            int size = renderProcesses.size();
+            int size = renderSystems.size;
             for (int i = 0; i < size; i++) {
-                IRenderSystem process = renderProcesses.get(i);
+                IRenderSystem process = renderSystems.get(i);
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
+                    Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, rc);
                 } else {
                     process.render(null, camera, t, rc);
@@ -1197,14 +1206,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             alphas[ct.ordinal()] = calculateAlpha(ct, t);
         }
 
-        int size = renderProcesses.size();
+        int size = renderSystems.size;
         for (int i = 0; i < size; i++) {
-            IRenderSystem process = renderProcesses.get(i);
+            IRenderSystem process = renderSystems.get(i);
             if (clazz.isInstance(process)) {
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
-                    Array<IRenderable> l = render_lists.get(process.getRenderGroup().ordinal());
+                    Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
                     process.render(l, camera, t, rc);
                 } else {
                     process.render(null, camera, t, rc);
@@ -1219,7 +1228,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      */
     public void clearLists() {
         for (RenderGroup rg : values()) {
-            render_lists.get(rg.ordinal()).clear();
+            renderLists.get(rg.ordinal()).clear();
         }
     }
 
@@ -1383,7 +1392,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     public void resizeRenderSystems(final int w, final int h, final int rw, final int rh) {
-        for (IRenderSystem rendSys : renderProcesses) {
+        for (IRenderSystem rendSys : renderSystems) {
             rendSys.resize(w, h);
         }
     }
@@ -1443,16 +1452,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     public void updateLineRenderSystem() {
         LineRenderSystem current = null;
-        for (IRenderSystem proc : renderProcesses) {
+        for (IRenderSystem proc : renderSystems) {
             if (proc instanceof LineRenderSystem) {
                 current = (LineRenderSystem) proc;
             }
         }
-        final int idx = renderProcesses.indexOf(current);
+        final int idx = renderSystems.indexOf(current, true);
         if ((current instanceof LineQuadRenderSystem && GlobalConf.scene.isNormalLineRenderer()) || (!(current instanceof LineQuadRenderSystem) && !GlobalConf.scene.isNormalLineRenderer())) {
-            renderProcesses.remove(idx);
+            renderSystems.removeIndex(idx);
             AbstractRenderSystem lineSys = getLineRenderSystem();
-            renderProcesses.add(idx, lineSys);
+            renderSystems.insert(idx, lineSys);
             current.dispose();
         }
     }

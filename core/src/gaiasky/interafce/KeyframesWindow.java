@@ -872,7 +872,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Remove keyframe
-                Array<Keyframe> newKfs = new Array<>(keyframes.size - 1);
+                Array<Keyframe> newKfs = new Array<>(false, keyframes.size - 1);
                 for (Keyframe k : keyframes) {
                     if (k != kf)
                         newKfs.add(k);

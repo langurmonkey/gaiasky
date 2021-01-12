@@ -551,7 +551,7 @@ public class RESTServer {
                 if (methodMap.containsKey(method.getName())) {
                     matches = methodMap.get(method.getName());
                 } else {
-                    matches = new Array(1);
+                    matches = new Array(false, 1);
                 }
                 if (!matches.contains(method, true))
                     matches.add(method);

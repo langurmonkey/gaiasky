@@ -77,7 +77,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.me = this;
         this.content = new Table(skin);
         this.bottom = new Table(skin);
-        this.scrolls = new Array<>(5);
+        this.scrolls = new Array<>(false, 5);
     }
 
     public void setAcceptText(String acceptText) {

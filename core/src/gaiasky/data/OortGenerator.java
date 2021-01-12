@@ -76,7 +76,7 @@ public class OortGenerator {
     private static Array<double[]> generateOort() throws IOException, RuntimeException {
         StdRandom.setSeed(100l);
 
-        Array<double[]> particles = new Array<double[]>(N);
+        Array<double[]> particles = new Array<>(false, N);
 
         Vector3d particle = new Vector3d();
         int n = 0;

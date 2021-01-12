@@ -52,8 +52,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         this.programs = programs;
         this.aux = new Vector3();
         this.auxd = new Vector3d();
-        this.preRunnables = new Array<>(1);
-        this.postRunnables = new Array<>(1);
+        this.preRunnables = new Array<>(false, 1);
+        this.postRunnables = new Array<>(false, 1);
     }
 
     @Override

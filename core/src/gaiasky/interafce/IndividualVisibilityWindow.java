@@ -68,7 +68,7 @@ public class IndividualVisibilityWindow extends GenericDialog {
         Array<SceneGraphNode> objects = new Array<>();
         List<OwnCheckBox> cbs = new ArrayList<>();
         sg.getRoot().getChildrenByType(clazz, objects);
-        Array<String> names = new Array<>(objects.size);
+        Array<String> names = new Array<>(false, objects.size);
         Map<String, IVisibilitySwitch> cMap = new HashMap<>();
 
         for (SceneGraphNode object : objects) {
