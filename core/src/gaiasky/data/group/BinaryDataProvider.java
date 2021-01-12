@@ -23,10 +23,6 @@ import java.util.List;
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
-    private static final int COMPATIBILITY_INT_MARKER = 12343210;
-    private static final char COMPATIBILITY_CHAR_TRUE = 't';
-    private static final char COMPATIBILITY_CHAR_FALSE = 'f';
-
     public BinaryDataProvider() {
         super();
     }
@@ -47,22 +43,22 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public void writeData(List<ParticleRecord> data, OutputStream out) {
-        writeData(data, out, false);
+        writeData(data, out, 2);
     }
 
-    public void writeData(List<ParticleRecord> data, OutputStream out, boolean compatibility) {
+    public void writeData(List<ParticleRecord> data, OutputStream out, int version) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
-            // In new version, write compatibility mode
-            // The readers will check for this int, and use the next char as
-            // compatibility ('t' or 'f'). If the int is not there, compat is set to true.
-            data_out.writeInt(COMPATIBILITY_INT_MARKER);
-            data_out.writeChar(COMPATIBILITY_CHAR_FALSE);
-            // Size of stars
+            if (version >= 2) {
+                // In new version, write token as negative int. Version afterwards
+                data_out.writeInt(-1);
+                data_out.writeInt(version);
+            }
+            // Number of stars
             data_out.writeInt(data.size());
             for (ParticleRecord sb : data) {
-                writeParticleRecord(sb, data_out, compatibility);
+                writeParticleRecord(sb, data_out, version);
             }
 
         } catch (Exception e) {
@@ -80,24 +76,26 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     /**
      * Write the star bean to the output stream
      *
-     * @param sb     The star bean
-     * @param out    The output stream
-     * @param compatibility Use compatibility with DR1/DR2 model (with tycho ids)
+     * @param sb      The star bean
+     * @param out     The output stream
+     * @param version Format version number (0 - nine doubles, four floats, one int with tycho ids, 1 - same, no tycho ids, 2 - six doubles, seven floats, one int)
      * @throws IOException
      */
-    protected void writeParticleRecord(ParticleRecord sb, DataOutputStream out, boolean compatibility) throws IOException {
+    protected void writeParticleRecord(ParticleRecord sb, DataOutputStream out, int version) throws IOException {
+        int ds = version < 2 ? 9 : ParticleRecord.STAR_SIZE_D;
+        int fs = version < 2 ? 4 : ParticleRecord.STAR_SIZE_F;
         // Double
-        for (int i = 0; i < sb.dataD.length; i++) {
+        for (int i = 0; i < ds; i++) {
             out.writeDouble(sb.dataD[i]);
         }
         // Float
-        for (int i = 0; i < sb.dataF.length - 1; i++) {
+        for (int i = 0; i < fs; i++) {
             out.writeFloat(sb.dataF[i]);
         }
         // Int
         out.writeInt((int) sb.dataF[ParticleRecord.I_FHIP]);
 
-        if (compatibility) {
+        if (version == 0) {
             // 3 integers, keep compatibility
             out.writeInt(-1);
             out.writeInt(-1);
@@ -117,11 +115,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         DataInputStream data_in = new DataInputStream(in);
 
         try {
-            boolean compat = true;
+            int version = 1;
             data_in.mark(0);
-            int markerInt = data_in.readInt();
-            if(markerInt == COMPATIBILITY_INT_MARKER){
-               compat = data_in.readChar() == COMPATIBILITY_CHAR_TRUE;
+            int versionToken = data_in.readInt();
+            if (versionToken < 0) {
+                version = data_in.readInt();
             } else {
                 // Rewind
                 data_in.reset();
@@ -130,7 +128,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = data_in.readInt();
             data = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                data.add(readParticleRecord(data_in, compat));
+                data.add(readParticleRecord(data_in, version));
             }
 
         } catch (IOException e) {
@@ -149,14 +147,17 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     /**
      * Read a star bean from input stream
      *
-     * @param in     Input stream
-     * @param compat Use compatibility with DR1/DR2 model (with tycho ids)
+     * @param in      Input stream
+     * @param version Format version number (0 - nine doubles, four floats, one int with tycho ids, 1 - same, no tycho ids, 2 - six doubles, seven floats, one int)
      * @return The star bean
      * @throws IOException
      */
-    protected ParticleRecord readParticleRecord(DataInputStream in, boolean compat) throws IOException {
-        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
-        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+    protected ParticleRecord readParticleRecord(DataInputStream in, int version) throws IOException {
+        int ds = version < 2 ? 9 : ParticleRecord.STAR_SIZE_D;
+        int fs = version < 2 ? 4 : ParticleRecord.STAR_SIZE_F;
+
+        double[] dataD = new double[ds];
+        float[] dataF = new float[fs];
         // Double
         for (int i = 0; i < dataD.length; i++) {
             dataD[i] = in.readDouble();
@@ -172,7 +173,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Int
         dataF[ParticleRecord.I_FHIP] = in.readInt();
 
-        if (compat) {
+        if (version == 0) {
             // Skip unused tycho numbers, 3 Integers
             in.readInt();
             in.readInt();
@@ -195,11 +196,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
-            boolean compat = false;
+            int version = 1;
             mem.mark();
-            int markerInt = mem.getInt();
-            if(markerInt == COMPATIBILITY_INT_MARKER){
-                compat = mem.getChar() == COMPATIBILITY_CHAR_TRUE;
+            int versionToken = mem.getInt();
+            if (versionToken < 0) {
+                version = mem.getInt();
             } else {
                 // Rewind
                 mem.reset();
@@ -208,7 +209,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = mem.getInt();
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                list.add(readParticleRecord(mem, factor, compat));
+                list.add(readParticleRecord(mem, factor, version));
             }
 
             fc.close();
@@ -221,9 +222,52 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor, boolean compat) {
-        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
-        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+    /**
+     * Loads data mapped with a version hint.
+     * @param file The file to load
+     * @param factor Distance factor, if any
+     * @param versionHint Data version number, in case of version 0 or 1, since these formats were
+     *                    not annotated. If version >=2, it is read from the data themselves
+     * @return
+     */
+    public List<ParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
+        try {
+            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
+
+            MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+
+            int version = versionHint;
+            mem.mark();
+            int versionToken = mem.getInt();
+            if (versionToken < 0) {
+                version = mem.getInt();
+            } else {
+                // Rewind
+                mem.reset();
+            }
+            // Read size of stars
+            int size = mem.getInt();
+            list = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                list.add(readParticleRecord(mem, factor, version));
+            }
+
+            fc.close();
+
+            return list;
+
+        } catch (Exception e) {
+            logger.error(e);
+        }
+        return null;
+    }
+
+    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor, int version) {
+        int ds = version < 2 ? 9 : ParticleRecord.STAR_SIZE_D;
+        int fs = version < 2 ? 4 : ParticleRecord.STAR_SIZE_F;
+
+        double[] dataD = new double[ds];
+        float[] dataF = new float[fs];
         // Double
         for (int i = 0; i < dataD.length; i++) {
             dataD[i] = mem.getDouble();
@@ -241,7 +285,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         // Int
         dataF[ParticleRecord.I_FHIP] = mem.getInt();
 
-        if (compat) {
+        if (version == 0) {
             // Skip unused tycho numbers, 3 Integers
             mem.getInt();
             mem.getInt();

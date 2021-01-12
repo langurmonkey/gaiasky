@@ -423,7 +423,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     Vector3d p2 = aux3d3.get().set(ppm).add(p1);
 
                     // Max speed in km/s, to normalize
-                    double maxSpeedKms = 100;
+                    float maxSpeedKms = 100;
                     float r, g, b;
                     switch (GlobalConf.scene.PM_COLOR_MODE) {
                     case 0:
@@ -460,12 +460,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         break;
                     case 3:
                         // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
-                        double rav = star.radvel();
+                        float rav = star.radvel();
                         if (rav != 0) {
-                            double max = maxSpeedKms;
+                            float max = maxSpeedKms;
                             // rv in [0:1]
-                            double rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
-                            ColorUtils.colormap_blue_white_red((float) rv, rgba);
+                            float rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
+                            ColorUtils.colormap_blue_white_red(rv, rgba);
                             r = rgba[0];
                             g = rgba[1];
                             b = rgba[2];
@@ -664,7 +664,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuAlpha() {
         if (focus != null)
-            return focus.dataD[ParticleRecord.I_MUALPHA];
+            return focus.dataD[ParticleRecord.I_FMUALPHA];
         else
             return 0;
     }
@@ -672,7 +672,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuDelta() {
         if (focus != null)
-            return focus.dataD[ParticleRecord.I_MUDELTA];
+            return focus.dataD[ParticleRecord.I_FMUDELTA];
         else
             return 0;
     }
@@ -680,7 +680,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getRadialVelocity() {
         if (focus != null)
-            return focus.dataD[ParticleRecord.I_RADVEL];
+            return focus.dataD[ParticleRecord.I_FRADVEL];
         else
             return 0;
     }

@@ -43,10 +43,10 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      *            The output stream to write to
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
-        writeParticles(list, out, true);
+        writeParticles(list, out, 1);
     }
 
-    public void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat) {
+    public void writeParticles(List<SceneGraphNode> list, OutputStream out, int version) {
         if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
             List<ParticleRecord> l = new ArrayList<>(sg.size());
@@ -72,7 +72,7 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      *            The input stream to read the star group from
      * @return A list with a single star group object
      */
-    public List<SceneGraphNode> readParticles(InputStream in) throws FileNotFoundException {
+    public List<SceneGraphNode> readParticles(InputStream in) {
         List<ParticleRecord> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);

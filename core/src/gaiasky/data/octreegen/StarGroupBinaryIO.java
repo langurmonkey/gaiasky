@@ -36,13 +36,13 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @param out  The output stream to write to
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
-        writeParticles(list, out, false);
+        writeParticles(list, out, 2);
     }
 
-    public void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat) {
+    public void writeParticles(List<SceneGraphNode> list, OutputStream out, int version) {
         if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
-            provider.writeData(sg.data(), out, compat);
+            provider.writeData(sg.data(), out, version);
         }
     }
 

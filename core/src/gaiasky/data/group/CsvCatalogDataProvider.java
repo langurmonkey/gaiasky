@@ -354,25 +354,25 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         float[] rgb = ColorUtils.teffToRGB(teff);
                         float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        double[] data = new double[ParticleRecord.STAR_SIZE_D];
+                        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
                         float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
-                        data[ParticleRecord.I_X] = pos.x;
-                        data[ParticleRecord.I_Y] = pos.y;
-                        data[ParticleRecord.I_Z] = pos.z;
-                        data[ParticleRecord.I_PMX] = pm.x;
-                        data[ParticleRecord.I_PMY] = pm.y;
-                        data[ParticleRecord.I_PMZ] = pm.z;
-                        data[ParticleRecord.I_MUALPHA] = mualphastar;
-                        data[ParticleRecord.I_MUDELTA] = mudelta;
-                        data[ParticleRecord.I_RADVEL] = radvel;
+                        dataD[ParticleRecord.I_X] = pos.x;
+                        dataD[ParticleRecord.I_Y] = pos.y;
+                        dataD[ParticleRecord.I_Z] = pos.z;
+                        dataD[ParticleRecord.I_PMX] = pm.x;
+                        dataD[ParticleRecord.I_PMY] = pm.y;
+                        dataD[ParticleRecord.I_PMZ] = pm.z;
 
+                        dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
+                        dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
+                        dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
                         dataF[ParticleRecord.I_FHIP] = -1;
                         dataF[ParticleRecord.I_FCOL] = col;
                         dataF[ParticleRecord.I_FSIZE] = size;
                         dataF[ParticleRecord.I_FAPPMAG] = appmag;
                         dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
 
-                        list.add(new ParticleRecord(data, dataF, sourceid, name, extra));
+                        list.add(new ParticleRecord(dataD, dataF, sourceid, name, extra));
 
                         int appClamp = (int) MathUtilsd.clamp(appmag, 0, 21);
                         countsPerMag[appClamp] += 1;

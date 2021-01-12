@@ -367,10 +367,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataD[ParticleRecord.I_PMX] = pm.x;
                                 dataD[ParticleRecord.I_PMY] = pm.y;
                                 dataD[ParticleRecord.I_PMZ] = pm.z;
-                                dataD[ParticleRecord.I_MUALPHA] = mualphastar;
-                                dataD[ParticleRecord.I_MUDELTA] = mudelta;
-                                dataD[ParticleRecord.I_RADVEL] = radvel;
 
+                                dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
+                                dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
+                                dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
                                 dataF[ParticleRecord.I_FHIP] = hip;
                                 dataF[ParticleRecord.I_FCOL] = col;
                                 dataF[ParticleRecord.I_FSIZE] = size;

@@ -57,8 +57,8 @@ import java.util.*;
  */
 public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus, IObserver {
     public static class ParticleRecord {
-        public static final int STAR_SIZE_D = 9;
-        public static final int STAR_SIZE_F = 5;
+        public static final int STAR_SIZE_D = 6;
+        public static final int STAR_SIZE_F = 8;
 
         /* INDICES */
 
@@ -67,22 +67,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         public static final int I_Y = 1;
         public static final int I_Z = 2;
 
-        /* Stored doubles */
+        /* doubles (stars) */
         public static final int I_PMX = 3;
         public static final int I_PMY = 4;
         public static final int I_PMZ = 5;
-        public static final int I_MUALPHA = 6;
-        public static final int I_MUDELTA = 7;
-        public static final int I_RADVEL = 8;
 
-        /* Stored as float */
-        public static final int I_FAPPMAG = 0;
-        public static final int I_FABSMAG = 1;
-        public static final int I_FCOL = 2;
-        public static final int I_FSIZE = 3;
+        /* floats (stars) */
+        public static final int I_FMUALPHA = 0;
+        public static final int I_FMUDELTA = 1;
+        public static final int I_FRADVEL = 2;
+        public static final int I_FAPPMAG = 3;
+        public static final int I_FABSMAG = 4;
+        public static final int I_FCOL = 5;
+        public static final int I_FSIZE = 6;
 
-        /* Stored as int */
-        public static final int I_FHIP = 4;
+        /* int */
+        public static final int I_FHIP = 7;
 
         // Particle ID
         public long id;
@@ -134,11 +134,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
 
         public ParticleRecord(double[] dataD, float[] dataF, Long id, String name) {
-            this(dataD, dataF, id, new String[] { name });
+            this(dataD, dataF, id, new String[]{name});
         }
 
         public ParticleRecord(double[] dataD, float[] dataF, Long id, String name, Map<UCD, Double> extra) {
-            this(dataD, dataF, id, new String[] { name }, extra);
+            this(dataD, dataF, id, new String[]{name}, extra);
         }
 
         public double x() {
@@ -186,7 +186,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (names != null)
                 names[0] = name;
             else
-                names = new String[] { name };
+                names = new String[]{name};
         }
 
         public void addName(String name) {
@@ -244,21 +244,21 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return (int) dataF[I_FHIP];
         }
 
-        public double mualpha() {
-            return dataD[I_MUALPHA];
+        public float mualpha() {
+            return dataF[I_FMUALPHA];
         }
 
-        public double mudelta() {
-            return dataD[I_MUDELTA];
+        public float mudelta() {
+            return dataF[I_FMUDELTA];
         }
 
-        public double radvel() {
-            return dataD[I_RADVEL];
+        public float radvel() {
+            return dataF[I_FRADVEL];
         }
 
         public double[] rgb() {
             Color c = new Color(NumberUtils.floatToIntColor(dataF[I_FCOL]));
-            return new double[] { c.r, c.g, c.b };
+            return new double[]{c.r, c.g, c.b};
         }
 
         public Vector3d pos(Vector3d aux) {
@@ -406,7 +406,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Particle size limits, in pixels
      */
-    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
+    public double[] particleSizeLimits = new double[]{3.5d, 800d};
 
     /**
      * Are the data of this group in the GPU memory?
@@ -1289,26 +1289,26 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case FOCUS_CHANGED:
-            if (data[0] instanceof String) {
-                focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
-            } else {
-                focusIndex = data[0] == this ? focusIndex : -1;
-            }
-            updateFocusDataPos();
-            break;
-        case CAMERA_MOTION_UPDATE:
-            // Check that the particles have names
-            if (updaterTask != null && pointData.get(0).names != null) {
-                final Vector3d currentCameraPos = (Vector3d) data[0];
-                long t = TimeUtils.millis() - lastSortTime;
-                if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
-                    updating = DatasetUpdater.execute(updaterTask);
+            case FOCUS_CHANGED:
+                if (data[0] instanceof String) {
+                    focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
+                } else {
+                    focusIndex = data[0] == this ? focusIndex : -1;
                 }
-            }
-            break;
-        default:
-            break;
+                updateFocusDataPos();
+                break;
+            case CAMERA_MOTION_UPDATE:
+                // Check that the particles have names
+                if (updaterTask != null && pointData.get(0).names != null) {
+                    final Vector3d currentCameraPos = (Vector3d) data[0];
+                    long t = TimeUtils.millis() - lastSortTime;
+                    if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
+                        updating = DatasetUpdater.execute(updaterTask);
+                    }
+                }
+                break;
+            default:
+                break;
         }
 
     }
@@ -1547,11 +1547,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public static ParticleGroup getParticleGroup(String name, List<ParticleRecord> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
-        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
+        double[] particleColor = dops == null || dops.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.particleColor;
         double colorNoise = dops == null ? 0 : dops.particleColorNoise;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
         double particleSize = dops == null ? 0 : dops.particleSize;
-        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
+        double[] minParticleSize = dops == null ? new double[]{2d, 200d} : dops.particleSizeLimits;
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 

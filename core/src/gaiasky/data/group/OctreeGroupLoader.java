@@ -39,15 +39,16 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     private static final Log logger = Logger.getLogger(OctreeGroupLoader.class);
 
     /**
-     * Whether to use the binary file format. If false, we use the java
-     * serialization method
-     **/
-    private final Boolean binary = true;
+     * The version of the data to load - before version 2, the data
+     * format was not annotated with the version, so this info must come
+     * from outside
+     */
+    private int dataVersion;
 
     /**
      * Binary particle reader
      **/
-    private final IStarGroupDataProvider particleReader;
+    private final BinaryDataProvider particleReader;
 
     /**
      * Epoch of stars loaded through this
@@ -56,9 +57,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
 
     public OctreeGroupLoader() {
         instance = this;
-
-        particleReader = binary ? new BinaryDataProvider() : new SerializedDataProvider();
-
+        particleReader = new BinaryDataProvider();
     }
 
     @Override
@@ -86,6 +85,8 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
+            dataVersion = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
+
             /**
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
              */
@@ -110,7 +111,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             return false;
         }
         @SuppressWarnings("unchecked")
-        List<ParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0);
+        List<ParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersion);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setEpoch(epoch);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());
