@@ -458,12 +458,14 @@ task prepareInstall4jScript(dependsOn: createArch, description: "Prepares the in
 task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs the install4j task to create the installers") {
     dependsOn 'prepareInstall4jScript'
 
+    projectFile = file("$packageDir/" + project.distName + ".install4j")
+    variables = [majorVersion: project.tag, build: project.rev]
+    release = project.tag
+
     doLast {
         println("Install4j script location:")
         println("$packageDir/" + project.distName + ".install4j")
     }
-    projectFile = file("$packageDir/" + project.distName + ".install4j")
-    variables = [majorVersion: project.tag, build: project.rev]
 }
 
 

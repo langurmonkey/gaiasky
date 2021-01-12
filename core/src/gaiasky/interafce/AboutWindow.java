@@ -72,6 +72,9 @@ public class AboutWindow extends GenericDialog {
         float taHeight = 160f;
         float tabWidth = 240f;
 
+        // Only show update tab if not launched via install4j
+        boolean showUpdateTab = !SysUtils.launchedViaInstall4j();
+
         // Create the tab buttons
         HorizontalGroup group = new HorizontalGroup();
         group.align(Align.left);
@@ -85,14 +88,18 @@ public class AboutWindow extends GenericDialog {
         final Button tabSystem = new OwnTextButton(I18n.txt("gui.help.system"), skin, "toggle-big");
         tabSystem.pad(pad5);
         tabSystem.setWidth(tabWidth);
-        final Button tabUpdates = new OwnTextButton(I18n.txt("gui.newversion"), skin, "toggle-big");
-        tabUpdates.pad(pad5);
-        tabUpdates.setWidth(tabWidth);
+        final Button tabUpdates = showUpdateTab ? new OwnTextButton(I18n.txt("gui.newversion"), skin, "toggle-big") : null;
+        if (showUpdateTab) {
+            tabUpdates.pad(pad5);
+            tabUpdates.setWidth(tabWidth);
+        }
 
         group.addActor(tabHelp);
         group.addActor(tabAbout);
         group.addActor(tabSystem);
-        group.addActor(tabUpdates);
+        if (showUpdateTab)
+            group.addActor(tabUpdates);
+
         content.add(group).align(Align.left).padLeft(pad5);
         content.row();
         content.pad(pad10);
@@ -275,7 +282,6 @@ public class AboutWindow extends GenericDialog {
         Label cameratitle = new OwnLabel(I18n.txt("gui.help.paths.camera"), skin);
         Label camera = new OwnLabel(SysUtils.getDefaultCameraDir().toAbsolutePath().toString(), skin);
 
-
         // Java info
         Label javainfo = new OwnLabel(I18n.txt("gui.help.javainfo"), skin, "header");
 
@@ -307,7 +313,6 @@ public class AboutWindow extends GenericDialog {
 
         // System info
         Label sysinfo = new OwnLabel(I18n.txt("gui.help.sysinfo"), skin, "header");
-
 
         Label sysostitle = new OwnLabel(I18n.txt("gui.help.os"), skin);
         Label sysos = new OwnLabel(System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), skin);
@@ -433,7 +438,7 @@ public class AboutWindow extends GenericDialog {
             contentSystem.add(cpuarchtitle).align(Align.topLeft).padRight(pad10).padTop(pad5).padBottom(pad5);
             contentSystem.add(cpuarch).align(Align.left).padTop(pad5).padBottom(pad5);
             contentSystem.row();
-        }catch(Error e){
+        } catch (Error e) {
             contentSystem.add(new OwnLabel(I18n.txt("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad10).padBottom(pad10).row();
         }
         contentSystem.add(sysostitle).align(Align.topLeft).padRight(pad10);
@@ -468,30 +473,33 @@ public class AboutWindow extends GenericDialog {
 
 
         /* CONTENT 4 - UPDATES */
-        final Table contentUpdates = new Table(skin);
-        contentUpdates.align(Align.top);
 
-        // This is the table that displays it all
-        checkTable = new Table(skin);
-        checkLabel = new OwnLabel("", skin);
+        final Table contentUpdates = showUpdateTab ? new Table(skin) : null;
+        if (showUpdateTab) {
+            contentUpdates.align(Align.top);
 
-        checkTable.add(checkLabel).top().left().padBottom(pad5).row();
-        if (GlobalConf.program.VERSION_LAST_TIME == null || new Date().getTime() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
-            // Check!
-            checkLabel.setText(I18n.txt("gui.newversion.checking"));
-            getCheckVersionThread().start();
-        } else {
-            // Inform latest
-            newVersionCheck(GlobalConf.version.version, GlobalConf.version.versionNumber, GlobalConf.version.buildtime, false);
+            // This is the table that displays it all
+            checkTable = new Table(skin);
+            checkLabel = new OwnLabel("", skin);
+
+            checkTable.add(checkLabel).top().left().padBottom(pad5).row();
+            if (GlobalConf.program.VERSION_LAST_TIME == null || new Date().getTime() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
+                // Check!
+                checkLabel.setText(I18n.txt("gui.newversion.checking"));
+                getCheckVersionThread().start();
+            } else {
+                // Inform latest
+                newVersionCheck(GlobalConf.version.version, GlobalConf.version.versionNumber, GlobalConf.version.buildtime, false);
+            }
+            contentUpdates.add(checkTable).left().top().padTop(pad10 * 2f);
         }
-
-        contentUpdates.add(checkTable).left().top().padTop(pad10 * 2f);
 
         /** ADD ALL CONTENT **/
         tabContent.addActor(contentHelp);
         tabContent.addActor(contentAbout);
         tabContent.addActor(systemScroll);
-        tabContent.addActor(contentUpdates);
+        if (showUpdateTab)
+            tabContent.addActor(contentUpdates);
 
         content.add(tabContent).expand().fill();
 
@@ -503,13 +511,15 @@ public class AboutWindow extends GenericDialog {
                 contentHelp.setVisible(tabHelp.isChecked());
                 contentAbout.setVisible(tabAbout.isChecked());
                 systemScroll.setVisible(tabSystem.isChecked());
-                contentUpdates.setVisible(tabUpdates.isChecked());
+                if (showUpdateTab)
+                    contentUpdates.setVisible(tabUpdates.isChecked());
             }
         };
         tabHelp.addListener(tabListener);
         tabAbout.addListener(tabListener);
         tabSystem.addListener(tabListener);
-        tabUpdates.addListener(tabListener);
+        if (showUpdateTab)
+            tabUpdates.addListener(tabListener);
 
         // Let only one tab button be checked at a time
         ButtonGroup<Button> tabs = new ButtonGroup<>();
@@ -518,7 +528,8 @@ public class AboutWindow extends GenericDialog {
         tabs.add(tabHelp);
         tabs.add(tabAbout);
         tabs.add(tabSystem);
-        tabs.add(tabUpdates);
+        if (showUpdateTab)
+            tabs.add(tabUpdates);
 
     }
 

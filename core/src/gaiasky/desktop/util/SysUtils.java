@@ -137,6 +137,10 @@ public class SysUtils {
         return solaris;
     }
 
+    public static boolean launchedViaInstall4j(){
+        return System.getProperty("install4j.appDir") != null;
+    }
+
     public static String getOSArchitecture() {
         return System.getProperty("os.arch");
     }

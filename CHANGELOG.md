@@ -3,6 +3,15 @@
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...HEAD)
 
 ### Bug Fixes
+- 'App not responding' message on win10 - fix by upgrading to gdx-controllers 2.0.0, plus some other goodies
+- remove useless network checker thread, fix thumbnail URL crash on win10
+- minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333), [#345](https://gitlab.com/langurmonkey/gaiasky/issues/345)
+- VR init failure actually prompts right error message
+- properties files' encodings set to UTF-8. Fixes [#344](https://gitlab.com/langurmonkey/gaiasky/issues/344)
+- VR mode now accepts any window resize, backbuffer size used for everything internally
+- BREAKING CHANGE API landOnObjectLocation() -> landAtObjectLocation()
+- octreegen additional split accepts now coma and spaces
+- use different sprite batch for VR UI with backbuffer size
 - pan scaled with fov factor
 - red-night theme disabled styles
 - proper 'disabled' textures for buttons
@@ -11,20 +20,41 @@
 - safemode flag used correctly, fix raymarching not being setup in safe mode
 
 ### Build System
+- remove sdl2gdx in favor of gdx-controllers:2.0.0
+- exclude old `gdx-controllers` library
+- add --parallelism parameter to
+- fix script so that geodistances file is additional data instead of special argument
 - fix helper script args
 - update release instructions with flatpak, fix build script
 
 ### Code Refactoring
+- increase number of maps for octree gen
 - modify default bloom settings (default intensity, passes, amount)
 
 ### Features
+- improve information of version line in welcome and loading screens
+- add GL info to welcome screen
+- new connection to wikipedia REST api to show content in a window
 - add unsharp mask post-processing filter
 - new checkbox textures, adjust window visuals
+- add projection lines to star groups
 - dataset selection dialog uses same structure as dataset manager
 - time warp slider instead of buttons
-- new fractional UI scaling from x0.7 to x3.0
+- new fractional UI scaling from x0.7 to x2.0
+- add regexp to some column names for STIL loader, add invalid names array
 - add regexp to some column names for STIL loader, add invalid names array
 - case-insensitive columns in STIL loader, enable FITS loading
+
+### Performance Improvements
+- switch to unordered gdx Arrays when possible to minimize copy operations
+- replace `java.util.ArrayList`s with Libgdx's `Array`s to minimize allocations
+- index lists are of base types, use dst2 for distance sorting
+- improve memory usage of extra star attributes and fix render system unnecessary `setUniform` calls
+- reduce memory usage in particle groups -> no metadata array
+
+### Style
+- fix missing coma in night-red theme json file
+- update thread names, fix monitor objects, increase sg update time interval
 
 
 <a name="3.0.1"></a>
