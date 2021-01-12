@@ -203,20 +203,20 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         for (ParticleRecord particle : data) {
             if (type.modulus == 0 || i % type.modulus == 0) {
                 // COLOR
-                float[] col = particle.data.length >= 7 ? new float[] { (float) particle.data[4], (float) particle.data[5], (float) particle.data[6] } : cg.generateColor();
+                float[] col = particle.dataD.length >= 7 ? new float[] { (float) particle.dataD[4], (float) particle.dataD[5], (float) particle.dataD[6] } : cg.generateColor();
                 col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
                 col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
                 col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
                 ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
                 // SIZE, TYPE, TEX LAYER
-                double starSize = particle.data[3];
+                double starSize = particle.dataD[3];
                 ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
                 ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
                 ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[StdRandom.uniform(nLayers)];
 
                 // POSITION
-                aux3f1.set((float) particle.data[0], (float) particle.data[1], (float) particle.data[2]);
+                aux3f1.set((float) particle.dataD[0], (float) particle.dataD[1], (float) particle.dataD[2]);
                 final int idx = ad.vertexIdx;
                 ad.vertices[idx] = aux3f1.x;
                 ad.vertices[idx + 1] = aux3f1.y;

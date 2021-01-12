@@ -27,30 +27,27 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      *
      * @param file   The file to load
      * @param factor Factor to apply to the positions
-     * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    List<ParticleRecord> loadDataMapped(String file, double factor, boolean compatibility);
+    List<ParticleRecord> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
      *
      * @param file   The file to load
      * @param factor Factor to apply to the positions
-     * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    List<ParticleRecord> loadData(String file, double factor, boolean compatibility);
+    List<ParticleRecord> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
      *
      * @param is     Input stream to load the data from
      * @param factor Factor to apply to the positions
-     * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    List<ParticleRecord> loadData(InputStream is, double factor, boolean compatibility);
+    List<ParticleRecord> loadData(InputStream is, double factor);
 
     /**
      * <p>

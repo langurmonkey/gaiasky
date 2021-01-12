@@ -73,14 +73,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
-            loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor, compat);
+            loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");
-                loadData(new FileDataSource(file), factor, compat);
+                loadData(new FileDataSource(file), factor);
             } catch (Exception e2) {
                 logger.error(e1);
                 logger.error(e2);
@@ -154,25 +154,16 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return loadData(ds, factor, null, null, null);
     }
 
-    public List<ParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
-        return loadData(ds, factor, true, preCallback, updateCallback, postCallback);
-    }
-
-    public List<ParticleRecord> loadData(DataSource ds, double factor, boolean compat) {
-        return loadData(ds, factor, compat, null, null, null);
-    }
-
     /**
      * @param ds
      * @param factor
-     * @param compat
      * @param preCallback    A function that runs before.
      * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
      * @return
      */
-    public List<ParticleRecord> loadData(DataSource ds, double factor, boolean compat, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
+    public List<ParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
             if (factory != null) {
 
@@ -278,7 +269,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
                             double pseudoL = Math.pow(10, -0.4 * absmag);
                             double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-                            double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
+                            float size = (float) Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
                             size *= Constants.DISTANCE_SCALE_FACTOR;
 
                             /* COLOR */
@@ -295,7 +286,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 color = 0.656f;
                             }
                             float[] rgb = ColorUtils.BVtoRGB(color);
-                            double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                            float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                             /* IDENTIFIER AND NAME */
                             String[] names;
@@ -368,26 +359,28 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
                             if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                                double[] point = new double[ParticleRecord.SIZE + 3];
-                                point[ParticleRecord.I_HIP] = hip;
-                                point[ParticleRecord.I_X] = p.gsposition.x;
-                                point[ParticleRecord.I_Y] = p.gsposition.y;
-                                point[ParticleRecord.I_Z] = p.gsposition.z;
-                                point[ParticleRecord.I_PMX] = pm.x;
-                                point[ParticleRecord.I_PMY] = pm.y;
-                                point[ParticleRecord.I_PMZ] = pm.z;
-                                point[ParticleRecord.I_MUALPHA] = mualphastar;
-                                point[ParticleRecord.I_MUDELTA] = mudelta;
-                                point[ParticleRecord.I_RADVEL] = radvel;
-                                point[ParticleRecord.I_COL] = col;
-                                point[ParticleRecord.I_SIZE] = size;
-                                point[ParticleRecord.I_APPMAG] = appmag;
-                                point[ParticleRecord.I_ABSMAG] = absmag;
+                                double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
+                                float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+                                dataD[ParticleRecord.I_X] = p.gsposition.x;
+                                dataD[ParticleRecord.I_Y] = p.gsposition.y;
+                                dataD[ParticleRecord.I_Z] = p.gsposition.z;
+                                dataD[ParticleRecord.I_PMX] = pm.x;
+                                dataD[ParticleRecord.I_PMY] = pm.y;
+                                dataD[ParticleRecord.I_PMZ] = pm.z;
+                                dataD[ParticleRecord.I_MUALPHA] = mualphastar;
+                                dataD[ParticleRecord.I_MUDELTA] = mudelta;
+                                dataD[ParticleRecord.I_RADVEL] = radvel;
+
+                                dataF[ParticleRecord.I_FHIP] = hip;
+                                dataF[ParticleRecord.I_FCOL] = col;
+                                dataF[ParticleRecord.I_FSIZE] = size;
+                                dataF[ParticleRecord.I_FAPPMAG] = (float) appmag;
+                                dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
 
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                                ParticleRecord sb = new ParticleRecord(point, id, names, extraAttributes);
+                                ParticleRecord sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
                                 list.add(sb);
 
                                 int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
@@ -398,12 +391,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 point[ParticleRecord.I_Y] = p.gsposition.y;
                                 point[ParticleRecord.I_Z] = p.gsposition.z;
 
-                                // TODO reorganise existing star properties into extra attributes
-
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                                ParticleRecord pb = new ParticleRecord(point, null, names, extraAttributes);
+                                ParticleRecord pb = new ParticleRecord(point, null, null, names, extraAttributes);
                                 list.add(pb);
                             }
 
@@ -455,13 +446,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(InputStream is, double factor) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor) {
         return null;
     }
 

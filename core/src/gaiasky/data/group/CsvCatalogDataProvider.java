@@ -111,7 +111,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         return loadData(file, 1d);
     }
 
-    public List<ParticleRecord> loadData(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(String file, double factor) {
         initLists(1000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -145,7 +145,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public List<ParticleRecord> loadData(InputStream is, double factor, boolean compat) {
+    public List<ParticleRecord> loadData(InputStream is, double factor) {
         initLists(100000);
 
         loadFileIs(is, factor, new AtomicLong(0l), new AtomicLong(0l));
@@ -210,7 +210,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     private boolean addStar(String line) {
         String[] tokens = line.split(separator);
-        double[] point = new double[ParticleRecord.SIZE + 3];
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[idx(ColId.pllx)].isEmpty()) {
@@ -225,7 +224,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
             // Add the zero point to the parallax
             double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) + parallaxZeroPoint;
             double pllxerr = Parser.parseDouble(tokens[idx(ColId.pllx_err)]);
-            double appmag = Parser.parseDouble(tokens[idx(ColId.gmag)]);
+            float appmag = (float) Parser.parseDouble(tokens[idx(ColId.gmag)]);
             extra.put(new UCD("pllx_err", ColId.pllx_err.toString(), "", 0), pllxerr);
 
             // Keep only stars with relevant parallaxes
@@ -312,7 +311,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
                         double pseudoL = Math.pow(10.0, -0.4 * absmag);
                         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-                        double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1.0e10);
+                        float size = (float) Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1.0e10);
                         //double radius = tokens.length >= 19 && !tokens[IDX_RADIUS]].isEmpty() ? Parser.parseDouble(tokens[IDX_RADIUS]]) * Constants.Ro_TO_U : size * Constants.STAR_SIZE_FACTOR;
 
                         /** COLOR, we use the tycBV map if present **/
@@ -353,26 +352,27 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             }
                         }
                         float[] rgb = ColorUtils.teffToRGB(teff);
-                        double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                        float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        point[ParticleRecord.I_HIP] = -1;
-                        point[ParticleRecord.I_X] = pos.x;
-                        point[ParticleRecord.I_Y] = pos.y;
-                        point[ParticleRecord.I_Z] = pos.z;
-                        point[ParticleRecord.I_PMX] = pm.x;
-                        point[ParticleRecord.I_PMY] = pm.y;
-                        point[ParticleRecord.I_PMZ] = pm.z;
-                        point[ParticleRecord.I_MUALPHA] = mualphastar;
-                        point[ParticleRecord.I_MUDELTA] = mudelta;
-                        point[ParticleRecord.I_RADVEL] = radvel;
-                        point[ParticleRecord.I_COL] = col;
-                        point[ParticleRecord.I_SIZE] = size;
-                        //point[ParticleRecord.I_RADIUS] = radius;
-                        //point[ParticleRecord.I_TEFF] = teff;
-                        point[ParticleRecord.I_APPMAG] = appmag;
-                        point[ParticleRecord.I_ABSMAG] = absmag;
+                        double[] data = new double[ParticleRecord.STAR_SIZE_D];
+                        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+                        data[ParticleRecord.I_X] = pos.x;
+                        data[ParticleRecord.I_Y] = pos.y;
+                        data[ParticleRecord.I_Z] = pos.z;
+                        data[ParticleRecord.I_PMX] = pm.x;
+                        data[ParticleRecord.I_PMY] = pm.y;
+                        data[ParticleRecord.I_PMZ] = pm.z;
+                        data[ParticleRecord.I_MUALPHA] = mualphastar;
+                        data[ParticleRecord.I_MUDELTA] = mudelta;
+                        data[ParticleRecord.I_RADVEL] = radvel;
 
-                        list.add(new ParticleRecord(point, sourceid, name, extra));
+                        dataF[ParticleRecord.I_FHIP] = -1;
+                        dataF[ParticleRecord.I_FCOL] = col;
+                        dataF[ParticleRecord.I_FSIZE] = size;
+                        dataF[ParticleRecord.I_FAPPMAG] = appmag;
+                        dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
+
+                        list.add(new ParticleRecord(data, dataF, sourceid, name, extra));
 
                         int appClamp = (int) MathUtilsd.clamp(appmag, 0, 21);
                         countsPerMag[appClamp] += 1;
@@ -385,7 +385,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, -1, -1);
     }
 

@@ -36,7 +36,7 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @param out  The output stream to write to
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
-        writeParticles(list, out, true);
+        writeParticles(list, out, false);
     }
 
     public void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat) {
@@ -53,11 +53,7 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @return A list with a single star group object
      */
     public List<SceneGraphNode> readParticles(InputStream in) {
-        return readParticles(in, true);
-    }
-
-    public List<SceneGraphNode> readParticles(InputStream in, boolean compat) {
-        List<ParticleRecord> data = provider.loadData(in, 1.0, compat);
+        List<ParticleRecord> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

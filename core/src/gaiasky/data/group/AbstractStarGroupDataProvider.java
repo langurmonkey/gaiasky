@@ -229,20 +229,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return loadData(file, 1.0f);
     }
 
-    @Override
-    public List<ParticleRecord> loadData(String file, double factor) {
-        return loadData(file, factor, true);
-    }
-
-    @Override
-    public List<ParticleRecord> loadData(InputStream is, double factor) {
-        return loadData(is, factor, true);
-    }
-
-    @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor) {
-        return loadDataMapped(file, factor, true);
-    }
 
     /**
      * Returns whether the star must be loaded or not
@@ -389,7 +375,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             // Use own binary format
             BinaryDataProvider io = new BinaryDataProvider();
             try {
-                int n = data.get(0).data.length;
+                int n = data.get(0).dataD.length;
                 io.writeData(data, new FileOutputStream(filename));
                 logger.info("File " + filename + " written with " + n + " stars");
             } catch (Exception e) {

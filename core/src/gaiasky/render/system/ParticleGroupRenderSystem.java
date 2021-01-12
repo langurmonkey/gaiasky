@@ -30,7 +30,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import org.lwjgl.opengl.GL30;
 
-import java.util.List;
 import java.util.Random;
 
 public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
@@ -114,7 +113,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             for (int i = 0; i < n; i++) {
                                 if (particleGroup.filter(i)) {
                                     ParticleRecord pb = particleGroup.get(i);
-                                    double[] p = pb.data;
+                                    double[] p = pb.dataD;
                                     // COLOR
                                     if (particleGroup.isHighlighted()) {
                                         if (hlCmap) {

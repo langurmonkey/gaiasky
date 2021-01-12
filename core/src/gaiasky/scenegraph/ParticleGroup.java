@@ -57,7 +57,8 @@ import java.util.*;
  */
 public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus, IObserver {
     public static class ParticleRecord {
-        public static final int SIZE = 14;
+        public static final int STAR_SIZE_D = 9;
+        public static final int STAR_SIZE_F = 5;
 
         /* INDICES */
 
@@ -75,19 +76,22 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         public static final int I_RADVEL = 8;
 
         /* Stored as float */
-        public static final int I_APPMAG = 9;
-        public static final int I_ABSMAG = 10;
-        public static final int I_COL = 11;
-        public static final int I_SIZE = 12;
+        public static final int I_FAPPMAG = 0;
+        public static final int I_FABSMAG = 1;
+        public static final int I_FCOL = 2;
+        public static final int I_FSIZE = 3;
 
         /* Stored as int */
-        public static final int I_HIP = 13;
+        public static final int I_FHIP = 4;
 
         // Particle ID
-        public Long id;
+        public long id;
 
-        // Data array
-        public double[] data;
+        // Double data array
+        public double[] dataD;
+
+        // Float data array
+        public float[] dataF;
 
         // Particle names (optional)
         public String[] names;
@@ -98,49 +102,55 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Octant, if in octree
         public OctreeNode octant;
 
-        public ParticleRecord(double[] data) {
-            this.data = data;
+        public ParticleRecord(double[] dataD) {
+            this.dataD = dataD;
+            this.dataF = null;
         }
 
-        public ParticleRecord(double[] data, Long id) {
-            this(data);
+        public ParticleRecord(double[] dataD, float[] dataF) {
+            this.dataD = dataD;
+            this.dataF = dataF;
+        }
+
+        public ParticleRecord(double[] dataD, float[] dataF, Long id) {
+            this(dataD, dataF);
             this.id = id;
         }
 
-        public ParticleRecord(double[] data, String[] names) {
-            this(data);
+        public ParticleRecord(double[] dataD, float[] dataF, String[] names) {
+            this(dataD, dataF);
             this.names = names;
         }
 
-        public ParticleRecord(double[] data, Long id, String[] names) {
-            this(data, id);
+        public ParticleRecord(double[] dataD, float[] dataF, Long id, String[] names) {
+            this(dataD, dataF, id);
             this.names = names;
         }
 
-        public ParticleRecord(double[] data, Long id, String[] names, Map<UCD, Double> extra) {
-            this(data, id, names);
+        public ParticleRecord(double[] dataD, float[] dataF, Long id, String[] names, Map<UCD, Double> extra) {
+            this(dataD, dataF, id, names);
             this.names = names;
             this.extra = extra;
         }
 
-        public ParticleRecord(double[] data, Long id, String name) {
-            this(data, id, new String[] { name });
+        public ParticleRecord(double[] dataD, float[] dataF, Long id, String name) {
+            this(dataD, dataF, id, new String[] { name });
         }
 
-        public ParticleRecord(double[] data, Long id, String name, Map<UCD, Double> extra) {
-            this(data, id, new String[] { name }, extra);
+        public ParticleRecord(double[] dataD, float[] dataF, Long id, String name, Map<UCD, Double> extra) {
+            this(dataD, dataF, id, new String[] { name }, extra);
         }
 
         public double x() {
-            return data[I_X];
+            return dataD[I_X];
         }
 
         public double y() {
-            return data[I_Y];
+            return dataD[I_Y];
         }
 
         public double z() {
-            return data[I_Z];
+            return dataD[I_Z];
         }
 
         public String namesConcat() {
@@ -199,31 +209,31 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
 
         public double pmx() {
-            return data[I_PMX];
+            return dataD[I_PMX];
         }
 
         public double pmy() {
-            return data[I_PMY];
+            return dataD[I_PMY];
         }
 
         public double pmz() {
-            return data[I_PMZ];
+            return dataD[I_PMZ];
         }
 
-        public double appmag() {
-            return data[I_APPMAG];
+        public float appmag() {
+            return dataF[I_FAPPMAG];
         }
 
-        public double absmag() {
-            return data[I_ABSMAG];
+        public float absmag() {
+            return dataF[I_FABSMAG];
         }
 
-        public double col() {
-            return data[I_COL];
+        public float col() {
+            return dataF[I_FCOL];
         }
 
-        public double size() {
-            return data[I_SIZE];
+        public float size() {
+            return dataF[I_FSIZE];
         }
 
         public double radius() {
@@ -231,23 +241,23 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
 
         public int hip() {
-            return (int) data[I_HIP];
+            return (int) dataF[I_FHIP];
         }
 
         public double mualpha() {
-            return data[I_MUALPHA];
+            return dataD[I_MUALPHA];
         }
 
         public double mudelta() {
-            return data[I_MUDELTA];
+            return dataD[I_MUDELTA];
         }
 
         public double radvel() {
-            return data[I_RADVEL];
+            return dataD[I_RADVEL];
         }
 
         public double[] rgb() {
-            Color c = new Color(NumberUtils.floatToIntColor((float) data[I_COL]));
+            Color c = new Color(NumberUtils.floatToIntColor(dataF[I_FCOL]));
             return new double[] { c.r, c.g, c.b };
         }
 
@@ -614,7 +624,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         List<Double> distances = new ArrayList<>();
         for (ParticleRecord point : pointData) {
             // Add sample to mean distance
-            double dist = len(point.data[0], point.data[1], point.data[2]);
+            double dist = len(point.dataD[0], point.dataD[1], point.dataD[2]);
             if (Double.isFinite(dist)) {
                 distances.add(dist);
                 maxDistance = Math.max(maxDistance, dist);
@@ -1308,7 +1318,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             focus = null;
         } else {
             focus = pointData.get(focusIndex);
-            focusPosition.set(focus.data[0], focus.data[1], focus.data[2]);
+            focusPosition.set(focus.dataD[0], focus.dataD[1], focus.dataD[2]);
             Vector3d possph = Coordinates.cartesianToSpherical(focusPosition, aux3d1.get());
             focusPositionSph.set((float) (MathUtilsd.radDeg * possph.x), (float) (MathUtilsd.radDeg * possph.y));
         }
@@ -1399,9 +1409,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     protected Vector3d fetchPosition(ParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
         if (campos != null)
-            return destination.set(pb.data[0], pb.data[1], pb.data[2]).sub(campos);
+            return destination.set(pb.dataD[0], pb.dataD[1], pb.dataD[2]).sub(campos);
         else
-            return destination.set(pb.data[0], pb.data[1], pb.data[2]);
+            return destination.set(pb.dataD[0], pb.dataD[1], pb.dataD[2]);
     }
 
     public double getMeanDistance() {

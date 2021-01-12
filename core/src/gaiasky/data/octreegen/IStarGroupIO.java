@@ -18,5 +18,4 @@ public interface IStarGroupIO {
     void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat);
 
     List<SceneGraphNode> readParticles(InputStream in) throws FileNotFoundException;
-    List<SceneGraphNode> readParticles(InputStream in, boolean compat) throws FileNotFoundException;
 }

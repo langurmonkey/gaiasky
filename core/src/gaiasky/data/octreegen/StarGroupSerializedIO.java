@@ -73,11 +73,7 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      * @return A list with a single star group object
      */
     public List<SceneGraphNode> readParticles(InputStream in) throws FileNotFoundException {
-        return readParticles(in, true);
-    }
-
-    public List<SceneGraphNode> readParticles(InputStream in, boolean compat) throws FileNotFoundException {
-        List<ParticleRecord> data = provider.loadData(in, 1.0, compat);
+        List<ParticleRecord> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

@@ -41,7 +41,7 @@ public interface IOctreeGenerator {
         while (it.hasNext()) {
             ParticleRecord s = it.next();
 
-            double dist = pos(s.data, pos0).len();
+            double dist = pos(s.dataD, pos0).len();
             if (dist * Constants.U_TO_PC > params.maxDistanceCap) {
                 // Remove star
                 it.remove();
@@ -54,7 +54,7 @@ public interface IOctreeGenerator {
         OctreeNode root = null;
         if (params.sunCentre) {
             /** THE CENTRE OF THE OCTREE IS THE SUN **/
-            pos(furthest.data, pos0);
+            pos(furthest.dataD, pos0);
             double halfSize = Math.max(Math.max(pos0.x, pos0.y), pos0.z);
             root = new OctreeNode(0, 0, 0, halfSize, halfSize, halfSize, 0);
         } else {
@@ -63,9 +63,9 @@ public interface IOctreeGenerator {
             BoundingBoxd aux = new BoundingBoxd();
             BoundingBoxd box = new BoundingBoxd();
             // Lets try to maximize the volume: from furthest star to star where axis-aligned bounding box volume is maximum
-            pos(furthest.data, pos1);
+            pos(furthest.dataD, pos1);
             for (ParticleRecord s : catalog) {
-                pos(s.data, pos0);
+                pos(s.dataD, pos0);
                 aux.set(pos1, pos0);
                 double vol = aux.getVolume();
                 if (vol > volume) {

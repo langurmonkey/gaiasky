@@ -55,9 +55,9 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             while (catalogIndex < catalog.size()) {
                 // Add star beans to octants till we reach max capacity
                 ParticleRecord sb = catalog.get(catalogIndex++);
-                double x = sb.data[ParticleRecord.I_X];
-                double y = sb.data[ParticleRecord.I_Y];
-                double z = sb.data[ParticleRecord.I_Z];
+                double x = sb.dataD[ParticleRecord.I_X];
+                double y = sb.dataD[ParticleRecord.I_Y];
+                double z = sb.dataD[ParticleRecord.I_Z];
                 int addedNum;
 
                 Long nodeId = getPositionOctantId(x, y, z, level);

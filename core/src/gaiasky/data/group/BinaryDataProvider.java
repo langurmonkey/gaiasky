@@ -23,38 +23,46 @@ import java.util.List;
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
-    public BinaryDataProvider(){
+    private static final int COMPATIBILITY_INT_MARKER = 12343210;
+    private static final char COMPATIBILITY_CHAR_TRUE = 't';
+    private static final char COMPATIBILITY_CHAR_FALSE = 'f';
+
+    public BinaryDataProvider() {
         super();
     }
 
-
     @Override
-    public List<ParticleRecord> loadData(String file, double factor, boolean compatibility) {
+    public List<ParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
-        loadDataMapped(file, factor, compatibility);
+        loadDataMapped(file, factor);
         logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
 
         return list;
     }
 
-
     @Override
-    public List<ParticleRecord> loadData(InputStream is, double factor, boolean compatibility) {
-        list = readData(is, compatibility);
+    public List<ParticleRecord> loadData(InputStream is, double factor) {
+        list = readData(is);
         return list;
     }
 
     public void writeData(List<ParticleRecord> data, OutputStream out) {
-        writeData(data, out, true);
+        writeData(data, out, false);
     }
-    public void writeData(List<ParticleRecord> data, OutputStream out, boolean compat) {
+
+    public void writeData(List<ParticleRecord> data, OutputStream out, boolean compatibility) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
+            // In new version, write compatibility mode
+            // The readers will check for this int, and use the next char as
+            // compatibility ('t' or 'f'). If the int is not there, compat is set to true.
+            data_out.writeInt(COMPATIBILITY_INT_MARKER);
+            data_out.writeChar(COMPATIBILITY_CHAR_FALSE);
             // Size of stars
             data_out.writeInt(data.size());
             for (ParticleRecord sb : data) {
-                writeParticleRecord(sb, data_out, compat);
+                writeParticleRecord(sb, data_out, compatibility);
             }
 
         } catch (Exception e) {
@@ -69,31 +77,27 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    protected void writeParticleRecord(ParticleRecord sb, DataOutputStream out) throws IOException {
-        writeParticleRecord(sb, out, true);
-    }
-
     /**
      * Write the star bean to the output stream
      *
      * @param sb     The star bean
      * @param out    The output stream
-     * @param compat Use compatibility with DR1/DR2 model (with tycho ids)
+     * @param compatibility Use compatibility with DR1/DR2 model (with tycho ids)
      * @throws IOException
      */
-    protected void writeParticleRecord(ParticleRecord sb, DataOutputStream out, boolean compat) throws IOException {
+    protected void writeParticleRecord(ParticleRecord sb, DataOutputStream out, boolean compatibility) throws IOException {
         // Double
-        for (int i = 0; i < ParticleRecord.I_APPMAG; i++) {
-            out.writeDouble(sb.data[i]);
+        for (int i = 0; i < sb.dataD.length; i++) {
+            out.writeDouble(sb.dataD[i]);
         }
         // Float
-        for (int i = ParticleRecord.I_APPMAG; i < ParticleRecord.I_HIP; i++) {
-            out.writeFloat((float) sb.data[i]);
+        for (int i = 0; i < sb.dataF.length - 1; i++) {
+            out.writeFloat(sb.dataF[i]);
         }
         // Int
-        out.writeInt((int) sb.data[ParticleRecord.I_HIP]);
+        out.writeInt((int) sb.dataF[ParticleRecord.I_FHIP]);
 
-        if (compat) {
+        if (compatibility) {
             // 3 integers, keep compatibility
             out.writeInt(-1);
             out.writeInt(-1);
@@ -109,14 +113,19 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public List<ParticleRecord> readData(InputStream in) {
-        return readData(in, true);
-    }
-
-    public List<ParticleRecord> readData(InputStream in, boolean compat) {
         List<ParticleRecord> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
         try {
+            boolean compat = true;
+            data_in.mark(0);
+            int markerInt = data_in.readInt();
+            if(markerInt == COMPATIBILITY_INT_MARKER){
+               compat = data_in.readChar() == COMPATIBILITY_CHAR_TRUE;
+            } else {
+                // Rewind
+                data_in.reset();
+            }
             // Read size of stars
             int size = data_in.readInt();
             data = new ArrayList<>(size);
@@ -137,10 +146,6 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return data;
     }
 
-    protected ParticleRecord readParticleRecord(DataInputStream in) throws IOException {
-        return readParticleRecord(in, true);
-    }
-
     /**
      * Read a star bean from input stream
      *
@@ -150,21 +155,22 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      * @throws IOException
      */
     protected ParticleRecord readParticleRecord(DataInputStream in, boolean compat) throws IOException {
-        double[] data = new double[ParticleRecord.SIZE];
+        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
+        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
         // Double
-        for (int i = 0; i < ParticleRecord.I_APPMAG; i++) {
-            data[i] = in.readDouble();
+        for (int i = 0; i < dataD.length; i++) {
+            dataD[i] = in.readDouble();
             if (i < 6)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
+                dataD[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
-        for (int i = ParticleRecord.I_APPMAG; i < ParticleRecord.I_HIP; i++) {
-            data[i] = in.readFloat();
-            if (i == ParticleRecord.I_SIZE)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
+        for (int i = 0; i < dataF.length - 1; i++) {
+            dataF[i] = in.readFloat();
+            if (i == ParticleRecord.I_FSIZE)
+                dataF[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Int
-        data[ParticleRecord.I_HIP] = in.readInt();
+        dataF[ParticleRecord.I_FHIP] = in.readInt();
 
         if (compat) {
             // Skip unused tycho numbers, 3 Integers
@@ -179,15 +185,25 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         for (int i = 0; i < nameLength; i++)
             namesConcat.append(in.readChar());
         String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-        return new ParticleRecord(data, id, names);
+        return new ParticleRecord(dataD, dataF, id, names);
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor, boolean compat) {
+    public List<ParticleRecord> loadDataMapped(String file, double factor) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+
+            boolean compat = false;
+            mem.mark();
+            int markerInt = mem.getInt();
+            if(markerInt == COMPATIBILITY_INT_MARKER){
+                compat = mem.getChar() == COMPATIBILITY_CHAR_TRUE;
+            } else {
+                // Rewind
+                mem.reset();
+            }
             // Read size of stars
             int size = mem.getInt();
             list = new ArrayList<>(size);
@@ -206,23 +222,24 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor, boolean compat) {
-        double[] data = new double[ParticleRecord.SIZE];
+        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
+        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
         // Double
-        for (int i = 0; i < ParticleRecord.I_APPMAG; i++) {
-            data[i] = mem.getDouble();
+        for (int i = 0; i < dataD.length; i++) {
+            dataD[i] = mem.getDouble();
             if (i < 3)
-                data[i] *= factor;
+                dataD[i] *= factor;
             if (i < 6)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
+                dataD[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Float
-        for (int i = ParticleRecord.I_APPMAG; i < ParticleRecord.I_HIP; i++) {
-            data[i] = mem.getFloat();
-            if (i == ParticleRecord.I_SIZE)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
+        for (int i = 0; i < dataF.length - 1; i++) {
+            dataF[i] = mem.getFloat();
+            if (i == ParticleRecord.I_FSIZE)
+                dataF[i] *= Constants.DISTANCE_SCALE_FACTOR;
         }
         // Int
-        data[ParticleRecord.I_HIP] = mem.getInt();
+        dataF[ParticleRecord.I_FHIP] = mem.getInt();
 
         if (compat) {
             // Skip unused tycho numbers, 3 Integers
@@ -238,7 +255,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             namesConcat.append(mem.getChar());
         String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
 
-        return new ParticleRecord(data, id, names);
+        return new ParticleRecord(dataD, dataF, id, names);
     }
 
 }

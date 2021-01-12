@@ -45,11 +45,6 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     private final Boolean binary = true;
 
     /**
-     * Whether to load data using the compatibility mode (for DR1/DR2) or not (DR3)
-     */
-    private Boolean compatibilityMode = true;
-
-    /**
      * Binary particle reader
      **/
     private final IStarGroupDataProvider particleReader;
@@ -91,8 +86,6 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
-            compatibilityMode = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2");
-
             /**
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
              */
@@ -117,7 +110,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             return false;
         }
         @SuppressWarnings("unchecked")
-        List<ParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, compatibilityMode);
+        List<ParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setEpoch(epoch);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());

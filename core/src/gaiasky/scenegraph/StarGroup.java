@@ -187,7 +187,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 for (String lcname : sb.names) {
                     lcname = lcname.toLowerCase();
                     index.put(lcname, i);
-                    String lcid = sb.id.toString().toLowerCase();
+                    String lcid = Long.toString(sb.id).toLowerCase();
                     if (sb.id > 0 && !lcid.equals(lcname)) {
                         index.put(lcid, i);
                     }
@@ -633,7 +633,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public double getFocusSize() {
-        return focus.data[ParticleRecord.I_SIZE];
+        return focus.dataF[ParticleRecord.I_FSIZE];
     }
 
     // Radius in stars is different!
@@ -647,11 +647,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getAppmag() {
-        return (float) focus.data[ParticleRecord.I_APPMAG];
+        return focus.dataF[ParticleRecord.I_FAPPMAG];
     }
 
     public float getAbsmag() {
-        return (float) focus.data[ParticleRecord.I_ABSMAG];
+        return focus.dataF[ParticleRecord.I_FABSMAG];
     }
 
     public long getId() {
@@ -664,7 +664,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuAlpha() {
         if (focus != null)
-            return focus.data[ParticleRecord.I_MUALPHA];
+            return focus.dataD[ParticleRecord.I_MUALPHA];
         else
             return 0;
     }
@@ -672,7 +672,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuDelta() {
         if (focus != null)
-            return focus.data[ParticleRecord.I_MUDELTA];
+            return focus.dataD[ParticleRecord.I_MUDELTA];
         else
             return 0;
     }
@@ -680,7 +680,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getRadialVelocity() {
         if (focus != null)
-            return focus.data[ParticleRecord.I_RADVEL];
+            return focus.dataD[ParticleRecord.I_RADVEL];
         else
             return 0;
     }
@@ -712,8 +712,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public int getHip() {
-        if (focus != null && focus.data[ParticleRecord.I_HIP] > 0)
-            return (int) focus.data[ParticleRecord.I_HIP];
+        if (focus != null && focus.dataF[ParticleRecord.I_FHIP] > 0)
+            return (int) focus.dataF[ParticleRecord.I_FHIP];
         return -1;
     }
 

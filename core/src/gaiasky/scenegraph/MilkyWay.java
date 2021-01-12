@@ -170,7 +170,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
         for (List<ParticleRecord> a : all) {
             if (a != null) {
                 for (int i = 0; i < a.size(); i++) {
-                    double[] pointf = a.get(i).data;
+                    double[] pointf = a.get(i).dataD;
 
                     aux.set((float) pointf[0], (float) pointf[2], (float) pointf[1]);
                     aux.scl(size).rotate(-90, 0, 1, 0).mul(coordinateSystem).add(pos3);

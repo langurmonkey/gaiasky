@@ -80,7 +80,7 @@ public class MilkyWayReshaper {
 
                 if (particles.size() > 0) {
                     FileWriter fw = new FileWriter(out);
-                    int ntokens = particles.get(0).data.length;
+                    int ntokens = particles.get(0).dataD.length;
                     if (ntokens == 3) {
                         // Position
                         fw.write("X Y Z\n");
@@ -98,7 +98,7 @@ public class MilkyWayReshaper {
                     int added = 0;
                     for (ParticleRecord pb : particles) {
                         if (modulus == 0 || particle % modulus == 0) {
-                            double[] d = pb.data;
+                            double[] d = pb.dataD;
                             for (int i = 0; i < d.length; i++) {
                                 fw.write(d[i] + (i < d.length - 1 ? " " : ""));
                             }

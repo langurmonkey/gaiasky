@@ -222,7 +222,7 @@ public class OctreeGeneratorRun {
         OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        List<ParticleRecord> listLoader = null, list = null;
+        List<ParticleRecord> listLoader = null, list;
         Map<Long, Integer> xmatchTable = null;
         long[] countsPerMagGaia = null;
 
@@ -323,7 +323,7 @@ public class OctreeGeneratorRun {
 
                             if (gaiaPllxErr <= hipPllxErr) {
                                 // SIZE
-                                double size = gaiaStar.size();
+                                float size = gaiaStar.size();
                                 // POSITION
                                 double x = gaiaStar.x(), y = gaiaStar.y(), z = gaiaStar.z();
                                 aux1.set(x, y, z);
@@ -353,19 +353,21 @@ public class OctreeGeneratorRun {
                                 }
 
                                 hipStar.id = gaiaStar.id;
-                                hipStar.data[ParticleRecord.I_X] = x;
-                                hipStar.data[ParticleRecord.I_Y] = y;
-                                hipStar.data[ParticleRecord.I_Z] = z;
-                                hipStar.data[ParticleRecord.I_PMX] = gaiaStar.pmx();
-                                hipStar.data[ParticleRecord.I_PMY] = gaiaStar.pmy();
-                                hipStar.data[ParticleRecord.I_PMZ] = gaiaStar.pmz();
-                                hipStar.data[ParticleRecord.I_MUALPHA] = gaiaStar.mualpha();
-                                hipStar.data[ParticleRecord.I_MUDELTA] = gaiaStar.mudelta();
-                                hipStar.data[ParticleRecord.I_RADVEL] = gaiaStar.radvel();
-                                hipStar.data[ParticleRecord.I_APPMAG] = gaiaStar.appmag();
-                                hipStar.data[ParticleRecord.I_ABSMAG] = gaiaStar.absmag();
-                                hipStar.data[ParticleRecord.I_COL] = gaiaStar.col();
-                                hipStar.data[ParticleRecord.I_SIZE] = size;
+                                hipStar.dataD[ParticleRecord.I_X] = x;
+                                hipStar.dataD[ParticleRecord.I_Y] = y;
+                                hipStar.dataD[ParticleRecord.I_Z] = z;
+                                hipStar.dataD[ParticleRecord.I_PMX] = gaiaStar.pmx();
+                                hipStar.dataD[ParticleRecord.I_PMY] = gaiaStar.pmy();
+                                hipStar.dataD[ParticleRecord.I_PMZ] = gaiaStar.pmz();
+                                hipStar.dataD[ParticleRecord.I_MUALPHA] = gaiaStar.mualpha();
+                                hipStar.dataD[ParticleRecord.I_MUDELTA] = gaiaStar.mudelta();
+                                hipStar.dataD[ParticleRecord.I_RADVEL] = gaiaStar.radvel();
+
+                                hipStar.dataF[ParticleRecord.I_FAPPMAG] = gaiaStar.appmag();
+                                hipStar.dataF[ParticleRecord.I_FABSMAG] = gaiaStar.absmag();
+                                hipStar.dataF[ParticleRecord.I_FCOL] = gaiaStar.col();
+                                hipStar.dataF[ParticleRecord.I_FSIZE] = size;
+
                                 hipStar.addNames(gaiaStar.names);
                                 starhits++;
                             }
@@ -489,7 +491,7 @@ public class OctreeGeneratorRun {
     }
 
     private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current) throws IOException {
-        writeParticlesToFiles(particleWriter, current, true);
+        writeParticlesToFiles(particleWriter, current, false);
     }
 
     private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current, boolean compat) throws IOException {

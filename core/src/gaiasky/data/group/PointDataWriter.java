@@ -41,7 +41,7 @@ public class PointDataWriter {
             }
             f.createNewFile();
 
-            int lineLen = particles.get(0).data.length;
+            int lineLen = particles.get(0).dataD.length;
 
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(filePath))));
 
@@ -60,7 +60,7 @@ public class PointDataWriter {
 
             int n = particles.size;
             for (int i = 0; i < n; i++) {
-                double[] star = particles.get(i).data;
+                double[] star = particles.get(i).dataD;
                 StringBuilder sb = new StringBuilder();
                 sb.append(star[0]);
                 for (int j = 1; j < star.length; j++) {
