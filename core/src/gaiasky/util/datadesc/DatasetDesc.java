@@ -47,6 +47,7 @@ public class DatasetDesc {
 
     public boolean exists;
     public int myVersion = -1, serverVersion;
+    public int minGsVersion = -1;
     public boolean outdated;
     public boolean baseData;
 
@@ -80,6 +81,9 @@ public class DatasetDesc {
 
         if(source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
+
+        if(source.has("mingsversion"))
+            this.minGsVersion = source.getInt("mingsversion");
 
         if (source.has("file"))
             this.file = source.getString("file");

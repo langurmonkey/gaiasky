@@ -11,9 +11,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
+import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.scene2d.*;
@@ -132,10 +134,20 @@ public class DatasetsWidget {
 
             for (DatasetDesc dataset : type.datasets) {
                 OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "default", pad * 2f);
+                boolean gsVersionTooSmall = false;
+                if (dataset.minGsVersion >= 0 && dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                    // Can't select! minimum GS version larger than current
+                    cb.setChecked(false);
+                    cb.setDisabled(true);
+                    cb.setColor(ColorUtils.gRedC);
+                    cb.addListener(new OwnTextTooltip("Required Gaia Sky version (" + dataset.minGsVersion + ") larger than current (" + GaiaSkyDesktop.SOURCE_VERSION + ")", skin, 10));
+                    cb.getStyle().disabledFontColor = ColorUtils.gRedC;
+                    gsVersionTooSmall = true;
+                } else {
+                    cb.setChecked(contains(dataset.catalogFile.path(), currentSetting));
+                    cb.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
+                }
                 cb.bottom().left();
-
-                cb.setChecked(contains(dataset.catalogFile.path(), currentSetting));
-                cb.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
 
                 dsTable.add(cb).left().padRight(pad * 6f).padBottom(pad);
 
@@ -144,6 +156,8 @@ public class DatasetsWidget {
                 descGroup.space(pad * 2f);
                 String shortDesc = TextUtils.capString(dataset.description != null ? dataset.description : "", maxCharsDescription);
                 OwnLabel description = new OwnLabel(shortDesc, skin);
+                if(gsVersionTooSmall)
+                    description.setColor(ColorUtils.gRedC);
                 description.addListener(new OwnTextTooltip(dataset.description, skin, 10));
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
