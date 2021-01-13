@@ -91,7 +91,6 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
     @Override
     public void addToRenderLists(ICamera camera){
         addToRender(this, RenderGroup.LINE);
-
     }
 
     @Override

@@ -11,12 +11,9 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -24,8 +21,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
-
-import java.util.List;
 
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
@@ -322,12 +317,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
         renderables.forEach(r -> {
             ILineRenderable renderable = (ILineRenderable) r;
-            boolean rend = true;
-            // TODO ugly hack
-            if (renderable instanceof Particle && !SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors))
-                rend = false;
-            if (rend)
-                renderable.render(this, camera, getAlpha(renderable));
+            renderable.render(this, camera, getAlpha(renderable));
         });
 
         // Sort phase

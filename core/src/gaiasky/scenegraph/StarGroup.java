@@ -271,6 +271,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             addToRender(this, RenderGroup.BILLBOARD_STAR);
         }
         if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors) ) {
+            //addToRender(this, RenderGroup.LINE);
             addToRender(this, RenderGroup.LINE);
         }
         if (renderText()) {
@@ -375,11 +376,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private long getMaxProperMotionLines() {
-        int n = Math.min(GlobalConf.scene.STAR_GROUP_N_NEAREST * 5, pointData.size());
-        return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : n;
+        int n = GlobalConf.scene.STAR_GROUP_N_NEAREST * 5;
+        return Math.min(pointData.size(), GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : n);
     }
 
-    private boolean rvLines = false;
     private final float[] rgba = new float[4];
 
     /**
@@ -389,10 +389,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         alpha *= SceneGraphRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
-        int n = (int) Math.min(getMaxProperMotionLines(), pointData.size());
+        int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
             ParticleRecord star = pointData.get(active[i]);
-            if ((star.radvel() == 0 && !rvLines) || (star.radvel() != 0 && rvLines)) {
                 float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
                 // Position
                 Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
@@ -500,10 +499,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     }
 
                 }
-            }
         }
-        rvLines = !rvLines;
-
     }
 
     @Override

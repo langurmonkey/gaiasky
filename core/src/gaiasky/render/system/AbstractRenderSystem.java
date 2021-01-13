@@ -7,12 +7,14 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
