@@ -43,7 +43,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
      * format was not annotated with the version, so this info must come
      * from outside
      */
-    private int dataVersion;
+    private int dataVersionHint;
 
     /**
      * Binary particle reader
@@ -85,7 +85,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
-            dataVersion = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
+            dataVersionHint = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
 
             /**
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
@@ -111,7 +111,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             return false;
         }
         @SuppressWarnings("unchecked")
-        List<ParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersion);
+        List<ParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setEpoch(epoch);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());

@@ -6,7 +6,6 @@
 package gaiasky.data.group;
 
 import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
-import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 
@@ -18,13 +17,39 @@ import java.util.List;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
+ * The header of the format depends on the version.
+ *
+ * <ul>
+ * <li>
+ * Versions 0 and 1:
+ *      <ul><li>int: number of stars</li></ul>
+ * </li>
+ * <li>
+ * Version 2+:
+ *      <ul>
+ *          <li>int: negative integer token to differentiate from versions 0/1 (-1)</li>
+ *          <li>int: format version number</li>
+ *          <li>int: number of stars</li>
+ *      </ul>
+ * </li>
+ * </ul>
  *
  * @author tsagrista
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
+    /**
+     * Binary IO for the different format versions
+     */
+    private final BinaryIO[] binaryVersions;
+
     public BinaryDataProvider() {
         super();
+
+        binaryVersions = new BinaryIO[3];
+        binaryVersions[0] = new BinaryVersion0();
+        binaryVersions[1] = new BinaryVersion1();
+        binaryVersions[2] = new BinaryVersion2();
     }
 
     @Override
@@ -38,7 +63,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<ParticleRecord> loadData(InputStream is, double factor) {
-        list = readData(is);
+        list = readData(is, factor);
         return list;
     }
 
@@ -58,7 +83,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             // Number of stars
             data_out.writeInt(data.size());
             for (ParticleRecord sb : data) {
-                writeParticleRecord(sb, data_out, version);
+                binaryVersions[version].writeParticleRecord(sb, data_out);
             }
 
         } catch (Exception e) {
@@ -73,44 +98,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    /**
-     * Write the star bean to the output stream
-     *
-     * @param sb      The star bean
-     * @param out     The output stream
-     * @param version Format version number (0 - nine doubles, four floats, one int with tycho ids, 1 - same, no tycho ids, 2 - six doubles, seven floats, one int)
-     * @throws IOException
-     */
-    protected void writeParticleRecord(ParticleRecord sb, DataOutputStream out, int version) throws IOException {
-        int ds = version < 2 ? 9 : ParticleRecord.STAR_SIZE_D;
-        int fs = version < 2 ? 4 : ParticleRecord.STAR_SIZE_F;
-        // Double
-        for (int i = 0; i < ds; i++) {
-            out.writeDouble(sb.dataD[i]);
-        }
-        // Float
-        for (int i = 0; i < fs; i++) {
-            out.writeFloat(sb.dataF[i]);
-        }
-        // Int
-        out.writeInt((int) sb.dataF[ParticleRecord.I_FHIP]);
-
-        if (version == 0) {
-            // 3 integers, keep compatibility
-            out.writeInt(-1);
-            out.writeInt(-1);
-            out.writeInt(-1);
-        }
-
-        // Long
-        out.writeLong(sb.id);
-
-        String namesConcat = sb.namesConcat();
-        out.writeInt(namesConcat.length());
-        out.writeChars(namesConcat);
-    }
-
-    public List<ParticleRecord> readData(InputStream in) {
+    public List<ParticleRecord> readData(InputStream in, double factor) {
         List<ParticleRecord> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
@@ -128,7 +116,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = data_in.readInt();
             data = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                data.add(readParticleRecord(data_in, version));
+                data.add(binaryVersions[version].readParticleRecord(data_in, factor));
             }
 
         } catch (IOException e) {
@@ -142,51 +130,6 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         }
 
         return data;
-    }
-
-    /**
-     * Read a star bean from input stream
-     *
-     * @param in      Input stream
-     * @param version Format version number (0 - nine doubles, four floats, one int with tycho ids, 1 - same, no tycho ids, 2 - six doubles, seven floats, one int)
-     * @return The star bean
-     * @throws IOException
-     */
-    protected ParticleRecord readParticleRecord(DataInputStream in, int version) throws IOException {
-        int ds = version < 2 ? 9 : ParticleRecord.STAR_SIZE_D;
-        int fs = version < 2 ? 4 : ParticleRecord.STAR_SIZE_F;
-
-        double[] dataD = new double[ds];
-        float[] dataF = new float[fs];
-        // Double
-        for (int i = 0; i < dataD.length; i++) {
-            dataD[i] = in.readDouble();
-            if (i < 6)
-                dataD[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Float
-        for (int i = 0; i < dataF.length - 1; i++) {
-            dataF[i] = in.readFloat();
-            if (i == ParticleRecord.I_FSIZE)
-                dataF[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Int
-        dataF[ParticleRecord.I_FHIP] = in.readInt();
-
-        if (version == 0) {
-            // Skip unused tycho numbers, 3 Integers
-            in.readInt();
-            in.readInt();
-            in.readInt();
-        }
-
-        Long id = in.readLong();
-        int nameLength = in.readInt();
-        StringBuilder namesConcat = new StringBuilder();
-        for (int i = 0; i < nameLength; i++)
-            namesConcat.append(in.readChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-        return new ParticleRecord(dataD, dataF, id, names);
     }
 
     @Override
@@ -209,7 +152,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = mem.getInt();
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                list.add(readParticleRecord(mem, factor, version));
+                list.add(binaryVersions[version].readParticleRecord(mem, factor));
             }
 
             fc.close();
@@ -224,10 +167,11 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     /**
      * Loads data mapped with a version hint.
-     * @param file The file to load
-     * @param factor Distance factor, if any
+     *
+     * @param file        The file to load
+     * @param factor      Distance factor, if any
      * @param versionHint Data version number, in case of version 0 or 1, since these formats were
-     *                    not annotated. If version >=2, it is read from the data themselves
+     *                    not annotated. If version >=2, the version number is read from the file header
      * @return
      */
     public List<ParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
@@ -249,7 +193,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             int size = mem.getInt();
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                list.add(readParticleRecord(mem, factor, version));
+                list.add(binaryVersions[version].readParticleRecord(mem, factor));
             }
 
             fc.close();
@@ -260,46 +204,6 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             logger.error(e);
         }
         return null;
-    }
-
-    public ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor, int version) {
-        int ds = version < 2 ? 9 : ParticleRecord.STAR_SIZE_D;
-        int fs = version < 2 ? 4 : ParticleRecord.STAR_SIZE_F;
-
-        double[] dataD = new double[ds];
-        float[] dataF = new float[fs];
-        // Double
-        for (int i = 0; i < dataD.length; i++) {
-            dataD[i] = mem.getDouble();
-            if (i < 3)
-                dataD[i] *= factor;
-            if (i < 6)
-                dataD[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Float
-        for (int i = 0; i < dataF.length - 1; i++) {
-            dataF[i] = mem.getFloat();
-            if (i == ParticleRecord.I_FSIZE)
-                dataF[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Int
-        dataF[ParticleRecord.I_FHIP] = mem.getInt();
-
-        if (version == 0) {
-            // Skip unused tycho numbers, 3 Integers
-            mem.getInt();
-            mem.getInt();
-            mem.getInt();
-        }
-
-        Long id = mem.getLong();
-        int nameLength = mem.getInt();
-        StringBuilder namesConcat = new StringBuilder();
-        for (int i = 0; i < nameLength; i++)
-            namesConcat.append(mem.getChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-
-        return new ParticleRecord(dataD, dataF, id, names);
     }
 
 }
