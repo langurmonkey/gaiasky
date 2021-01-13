@@ -270,9 +270,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (GlobalConf.scene.STAR_GROUP_BILLBOARD_FLAG) {
             addToRender(this, RenderGroup.BILLBOARD_STAR);
         }
-        if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors)
-            //  || SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.RecursiveGrid)) {
-        ) {
+        if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors) ) {
             addToRender(this, RenderGroup.LINE);
         }
         if (renderText()) {
@@ -377,34 +375,21 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private long getMaxProperMotionLines() {
-        int n = GlobalConf.scene.STAR_GROUP_N_NEAREST * 5;
-        return Math.min(pointData.size(), GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : n);
-    }
-
-    private long getMaxProjectionLines() {
-        return (long) Math.min(GlobalConf.scene.STAR_GROUP_N_NEAREST * 0.02f, pointData.size());
+        int n = Math.min(GlobalConf.scene.STAR_GROUP_N_NEAREST * 5, pointData.size());
+        return GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : n;
     }
 
     private boolean rvLines = false;
     private final float[] rgba = new float[4];
 
     /**
-     * Line rendering
+     * Proper motion rendering
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
-            renderVelocityVectors(renderer, camera, alpha);
-        }
-        //if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.RecursiveGrid)) {
-        //    renderProjectionLines(renderer, camera, alpha);
-        //}
-    }
-
-    private void renderVelocityVectors(LineRenderSystem renderer, ICamera camera, float alpha) {
         alpha *= SceneGraphRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
-        int n = (int) getMaxProperMotionLines();
+        int n = (int) Math.min(getMaxProperMotionLines(), pointData.size());
         for (int i = n - 1; i >= 0; i--) {
             ParticleRecord star = pointData.get(active[i]);
             if ((star.radvel() == 0 && !rvLines) || (star.radvel() != 0 && rvLines)) {
@@ -513,67 +498,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                         p3.rotate(p2, -60);
                         renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
                     }
+
                 }
             }
         }
         rvLines = !rvLines;
-    }
 
-    RecursiveGrid rg = null;
-    Matrix4d mat4daux = new Matrix4d();
-    Vector3d a = new Vector3d();
-    Vector3d b = new Vector3d();
-    Vector3d p01 = new Vector3d();
-
-    private void renderProjectionLines(LineRenderSystem renderer, ICamera camera, float alpha) {
-        if (rg == null) {
-            SceneGraphNode node = GaiaSky.instance.sg.getNode("Recursive Grid");
-            if (node != null)
-                rg = (RecursiveGrid) node;
-        }
-        if (rg != null) {
-            //alpha *= SceneGraphRenderer.alphas[ComponentTypes.ComponentType.RecursiveGrid.ordinal()];
-            float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
-            int n = (int) getMaxProjectionLines();
-            for (int i = n; i >= 0; i--) {
-                ParticleRecord star = pointData.get(active[i]);
-                Vector3d fpos = fetchPosition(star, camera.getPos(), aux3d3.get(), currDeltaYears);
-                float distToCamera = (float) fpos.len();
-                float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1.5f);
-
-                if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, fpos, distToCamera) && distToCamera > radius * 100) {
-                    Vector3d cpos = aux3d4.get();
-                    getCFPos(rg, cpos, fpos, camera);
-
-                    // Line in Y
-                    getYLine(rg, a, b, cpos, fpos);
-                    double d02 = p01.set(a).sub(b).len();
-                    p01.setLength(d02 / 2d).add(b);
-
-                    float[] col = rg.textColour();
-
-                    renderer.addLine(this, a.x, a.y, a.z, b.x, b.y, b.z, col[0], col[1], col[2], col[3] * alpha * opacity);
-                }
-
-            }
-        }
-    }
-
-    private void getCFPos(RecursiveGrid rg, Vector3d cpos, Vector3d fpos, ICamera camera) {
-        Matrix4d inv = rg.getCoordinateSystemd();
-        Matrix4d trf = mat4daux.set(inv).inv();
-        camera.getPos().put(cpos).mul(trf);
-        fpos.mul(trf);
-    }
-
-    private void getYLine(RecursiveGrid rg, Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos) {
-        Matrix4d inv = rg.getCoordinateSystemd();
-        a.set(fpos.x, -cpos.y, fpos.z);
-        b.set(fpos.x, fpos.y, fpos.z);
-        // Back to equatorial
-        a.mul(inv);
-        b.mul(inv);
     }
 
     @Override
@@ -633,7 +563,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public double getFocusSize() {
-        return focus.dataF[ParticleRecord.I_FSIZE];
+        return focus.size();
     }
 
     // Radius in stars is different!
@@ -647,11 +577,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     public float getAppmag() {
-        return focus.dataF[ParticleRecord.I_FAPPMAG];
+        return focus.appmag();
     }
 
     public float getAbsmag() {
-        return focus.dataF[ParticleRecord.I_FABSMAG];
+        return focus.absmag();
     }
 
     public long getId() {
@@ -664,7 +594,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuAlpha() {
         if (focus != null)
-            return focus.dataD[ParticleRecord.I_FMUALPHA];
+            return focus.mualpha();
         else
             return 0;
     }
@@ -672,7 +602,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getMuDelta() {
         if (focus != null)
-            return focus.dataD[ParticleRecord.I_FMUDELTA];
+            return focus.mudelta();
         else
             return 0;
     }
@@ -680,7 +610,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public double getRadialVelocity() {
         if (focus != null)
-            return focus.dataD[ParticleRecord.I_FRADVEL];
+            return focus.radvel();
         else
             return 0;
     }
@@ -699,10 +629,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void notify(final Events event, final Object... data) {
         // Super handles FOCUS_CHANGED and CAMERA_MOTION_UPDATED event
         super.notify(event, data);
-        switch (event) {
-        default:
-            break;
-        }
     }
 
     @Override
@@ -712,8 +638,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public int getHip() {
-        if (focus != null && focus.dataF[ParticleRecord.I_FHIP] > 0)
-            return (int) focus.dataF[ParticleRecord.I_FHIP];
+        if (focus != null && focus.hip() > 0)
+            return focus.hip();
         return -1;
     }
 

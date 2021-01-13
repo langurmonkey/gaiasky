@@ -271,7 +271,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
          * @return The distance, in internal units
          */
         public double distance() {
-            return Math.sqrt(x() * x() + y() * y() + z() * z());
+            return FastMath.sqrt(x() * x() + y() * y() + z() * z());
         }
 
         /**

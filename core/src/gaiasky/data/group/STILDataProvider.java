@@ -371,11 +371,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
                                 dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
                                 dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
-                                dataF[ParticleRecord.I_FHIP] = hip;
-                                dataF[ParticleRecord.I_FCOL] = col;
-                                dataF[ParticleRecord.I_FSIZE] = size;
                                 dataF[ParticleRecord.I_FAPPMAG] = (float) appmag;
                                 dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
+                                dataF[ParticleRecord.I_FCOL] = col;
+                                dataF[ParticleRecord.I_FSIZE] = size;
+                                dataF[ParticleRecord.I_FHIP] = hip;
 
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
