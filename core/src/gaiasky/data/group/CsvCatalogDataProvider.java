@@ -366,11 +366,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
                         dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
                         dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
-                        dataF[ParticleRecord.I_FHIP] = -1;
-                        dataF[ParticleRecord.I_FCOL] = col;
-                        dataF[ParticleRecord.I_FSIZE] = size;
                         dataF[ParticleRecord.I_FAPPMAG] = appmag;
                         dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
+                        dataF[ParticleRecord.I_FCOL] = col;
+                        dataF[ParticleRecord.I_FSIZE] = size;
+                        dataF[ParticleRecord.I_FHIP] = -1;
 
                         list.add(new ParticleRecord(dataD, dataF, sourceid, name, extra));
 
