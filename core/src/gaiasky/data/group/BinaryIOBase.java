@@ -15,7 +15,7 @@ public class BinaryIOBase implements BinaryIO {
     protected final int nDoubles;
     protected final int nFloats;
 
-    protected final boolean tychoIds;
+    protected boolean tychoIds;
 
     protected BinaryIOBase(int nDoubles, int nFloats, boolean tychoIds) {
         this.tychoIds = tychoIds;
@@ -93,7 +93,7 @@ public class BinaryIOBase implements BinaryIO {
                 // Goes to float array
                 int idx = i - ParticleRecord.STAR_SIZE_D;
                 dataF[idx] = (float) in.readDouble();
-                floatOffset = idx;
+                floatOffset = idx + 1;
             }
         }
         // Float
