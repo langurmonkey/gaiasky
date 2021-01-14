@@ -38,6 +38,16 @@ import java.util.List;
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
+
+    /** The default output format version to use for writing **/
+    public static int DEFAULT_OUTPUT_VERSION = 2;
+
+    public static int MIN_OUTPUT_VERSION = 0;
+    public static int MAX_OUTPUT_VERSION = DEFAULT_OUTPUT_VERSION;
+
+    /** The output format version for writing **/
+    private int outputVersion = -1;
+
     /**
      * Binary IO for the different format versions
      */
@@ -68,7 +78,8 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public void writeData(List<ParticleRecord> data, OutputStream out) {
-        writeData(data, out, 2);
+        int version = (outputVersion < MIN_OUTPUT_VERSION || outputVersion > MAX_OUTPUT_VERSION) ? DEFAULT_OUTPUT_VERSION : outputVersion;
+        writeData(data, out, version);
     }
 
     public void writeData(List<ParticleRecord> data, OutputStream out, int version) {
@@ -206,4 +217,8 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
+    @Override
+    public void setOutputFormatVersion(int version){
+        this.outputVersion = version;
+    }
 }

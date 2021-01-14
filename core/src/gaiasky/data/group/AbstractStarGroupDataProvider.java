@@ -552,4 +552,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
+    @Override
+    public void setOutputFormatVersion(int version){
+    }
+
 }

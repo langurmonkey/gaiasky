@@ -12,12 +12,12 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.data.group.AbstractStarGroupDataProvider;
+import gaiasky.data.group.BinaryDataProvider;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.data.octreegen.IStarGroupIO;
 import gaiasky.data.octreegen.MetadataBinaryIO;
 import gaiasky.data.octreegen.StarGroupBinaryIO;
-import gaiasky.data.octreegen.StarGroupSerializedIO;
 import gaiasky.data.octreegen.generator.IOctreeGenerator;
 import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
 import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
@@ -133,14 +133,11 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--additional", description = "Comma-separated list of files or folders with (optionally gzipped) csv files containing additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
     private String additionalFiles = null;
 
-    @Parameter(names = "--compat-mode", description = "Use compatibility mode format (DR1/DR2), where the files have tycho ids")
-    private boolean compatibilityMode = false;
-
-    @Parameter(names = "--serialized", description = "Use java serialization instead of the binary format to output particle files")
-    private boolean serialized = false;
-
     @Parameter(names = "--parallelism", description = "The ForkJoinPool parallelism setting. Set <=0 to use the system default. Set to 1 to disable parallelism")
     private int parallelism = -1;
+
+    @Parameter(names = "--outputversion", description = "The output format version. By default, the newest version is used")
+    private int outputVersion = -1;
 
     @Parameter(names = {"-h", "--help"}, help = true)
     private boolean help = false;
@@ -230,6 +227,7 @@ public class OctreeGeneratorRun {
             /* CATALOG */
             String fullLoaderClass = "gaiasky.data.group." + loaderClass;
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
+            loader.setOutputFormatVersion(outputVersion);
             loader.setColumns(columns);
             loader.setParallaxErrorFactorFaint(pllxerrfaint);
             loader.setParallaxErrorFactorBright(pllxerrbright);
@@ -311,7 +309,6 @@ public class OctreeGeneratorRun {
                         listHip.add(gaiaStar);
                     } else {
                         // Update hipStar using gaiaStar data, only when:
-                        // TODO gaia.ruwe small enough (if present) and gaia.pllx_err <= hip.pllx_err
                         int hipId = xmatchTable.get(gaiaStar.id);
                         if (hipMap.containsKey(hipId)) {
                             // Hip Star
@@ -426,9 +423,11 @@ public class OctreeGeneratorRun {
         metadataWriter.writeMetadata(octree, new FileOutputStream(metadataFile));
 
         /** WRITE PARTICLES **/
-        IStarGroupIO particleWriter = serialized ? new StarGroupSerializedIO() : new StarGroupBinaryIO();
+        IStarGroupIO particleWriter = new StarGroupBinaryIO();
         particlesFolder.mkdirs();
-        writeParticlesToFiles(particleWriter, octree, 2);
+        int version = outputVersion < BinaryDataProvider.MIN_OUTPUT_VERSION || outputVersion > BinaryDataProvider.MAX_OUTPUT_VERSION ? BinaryDataProvider.DEFAULT_OUTPUT_VERSION : outputVersion;
+        logger.info("Using output format version " + version);
+        writeParticlesToFiles(particleWriter, octree, version);
 
         long writingMs = TimeUtils.millis();
         double writingSecs = (writingMs - generatingMs) / 1000.0;

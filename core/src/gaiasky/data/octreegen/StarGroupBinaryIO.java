@@ -36,7 +36,7 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @param out  The output stream to write to
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
-        writeParticles(list, out, 2);
+        writeParticles(list, out, BinaryDataProvider.DEFAULT_OUTPUT_VERSION);
     }
 
     public void writeParticles(List<SceneGraphNode> list, OutputStream out, int version) {

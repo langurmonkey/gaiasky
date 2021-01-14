@@ -136,4 +136,10 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param columns The column name list
      */
     void setColumns(String columns);
+
+    /**
+     * Set the preferred output format version, if applicable
+     * @param version The version number
+     */
+    void setOutputFormatVersion(int version);
 }

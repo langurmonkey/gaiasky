@@ -55,7 +55,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     private final INumberFormat nf;
 
     // Buffer in number of lines
-    private int parallelBufferSize = 100000;
+    private int parallelBufferSize = 50000;
 
     public CsvCatalogDataProvider() {
         super();
@@ -136,7 +136,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
-        } else if (f.name().endsWith(".csv") || f.name().endsWith(".gz")) {
+        } else if (f.name().toLowerCase().endsWith(".csv") || f.name().toLowerCase().endsWith(".gz")) {
             loadDataMapped(file, factor, 1, 1);
         } else {
             logger.warn("File skipped: " + f.path());
@@ -396,16 +396,17 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * @param factor     Position factor
      * @param fileNumber File number
      * @param totalFiles Total number of files
-     * @return
+     * @return List of particle records
      */
     public List<ParticleRecord> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;
+        InputStream data = null;
         try {
             fc = new RandomAccessFile(file, "r").getChannel();
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            InputStream data = new ByteBufferInputStream(mem);
+            data = new ByteBufferInputStream(mem);
 
             if (gz) {
                 try {
@@ -432,6 +433,12 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                     fc.close();
                 } catch (Exception e) {
                     logger.error(e);
+                }
+            if(data != null)
+                try {
+                    data.close();
+                } catch (IOException e) {
+                   logger.error(e);
                 }
         }
         return null;
