@@ -13,7 +13,7 @@ import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.ConfInit;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -70,7 +70,7 @@ public class MilkyWayReshaper {
 
                 // Load
                 PointDataProvider provider = new PointDataProvider();
-                List<ParticleRecord> particles = provider.loadData(fileIn);
+                List<IParticleRecord> particles = provider.loadData(fileIn);
 
                 String out = GlobalConf.data.dataFile(fileOut);
                 if (Files.exists(Paths.get(out))) {
@@ -80,7 +80,7 @@ public class MilkyWayReshaper {
 
                 if (particles.size() > 0) {
                     FileWriter fw = new FileWriter(out);
-                    int ntokens = particles.get(0).dataD.length;
+                    int ntokens = particles.get(0).rawDoubleData().length;
                     if (ntokens == 3) {
                         // Position
                         fw.write("X Y Z\n");
@@ -96,9 +96,9 @@ public class MilkyWayReshaper {
                     }
                     int particle = 0;
                     int added = 0;
-                    for (ParticleRecord pb : particles) {
+                    for (IParticleRecord pb : particles) {
                         if (modulus == 0 || particle % modulus == 0) {
-                            double[] d = pb.dataD;
+                            double[] d = pb.rawDoubleData();
                             for (int i = 0; i < d.length; i++) {
                                 fw.write(d[i] + (i < d.length - 1 ? " " : ""));
                             }

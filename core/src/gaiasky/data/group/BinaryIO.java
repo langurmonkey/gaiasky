@@ -1,6 +1,7 @@
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -38,5 +39,5 @@ public interface BinaryIO {
      * @param out The output stream
      * @throws IOException
      */
-    void writeParticleRecord(ParticleRecord sb, DataOutputStream out) throws IOException;
+    void writeParticleRecord(IParticleRecord sb, DataOutputStream out) throws IOException;
 }

@@ -5,7 +5,7 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 
 public class AttributeDistance extends AttributeAbstract implements IAttribute<ParticleRecord> {

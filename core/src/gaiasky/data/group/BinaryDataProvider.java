@@ -5,7 +5,7 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 
@@ -63,7 +63,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         loadDataMapped(file, factor);
         logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
@@ -72,17 +72,17 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
         list = readData(is, factor);
         return list;
     }
 
-    public void writeData(List<ParticleRecord> data, OutputStream out) {
+    public void writeData(List<IParticleRecord> data, OutputStream out) {
         int version = (outputVersion < MIN_OUTPUT_VERSION || outputVersion > MAX_OUTPUT_VERSION) ? DEFAULT_OUTPUT_VERSION : outputVersion;
         writeData(data, out, version);
     }
 
-    public void writeData(List<ParticleRecord> data, OutputStream out, int version) {
+    public void writeData(List<IParticleRecord> data, OutputStream out, int version) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
@@ -93,7 +93,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
             }
             // Number of stars
             data_out.writeInt(data.size());
-            for (ParticleRecord sb : data) {
+            for (IParticleRecord sb : data) {
                 binaryVersions[version].writeParticleRecord(sb, data_out);
             }
 
@@ -109,8 +109,8 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    public List<ParticleRecord> readData(InputStream in, double factor) {
-        List<ParticleRecord> data = null;
+    public List<IParticleRecord> readData(InputStream in, double factor) {
+        List<IParticleRecord> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
         try {
@@ -144,7 +144,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
@@ -185,7 +185,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      *                    not annotated. If version >=2, the version number is read from the file header
      * @return
      */
-    public List<ParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 

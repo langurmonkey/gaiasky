@@ -7,8 +7,9 @@ package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.octreegen.StarBrightnessComparator;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.math.BoundingBoxd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
@@ -27,7 +28,7 @@ import java.util.*;
 public class OctreeGeneratorMag implements IOctreeGenerator {
 
     private final OctreeGeneratorParams params;
-    private final Comparator<ParticleRecord> comp;
+    private final Comparator<IParticleRecord> comp;
     private OctreeNode root;
 
     public OctreeGeneratorMag(OctreeGeneratorParams params) {
@@ -36,14 +37,14 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     }
 
     @Override
-    public OctreeNode generateOctree(List<ParticleRecord> catalog) {
+    public OctreeNode generateOctree(List<IParticleRecord> catalog) {
         root = IOctreeGenerator.startGeneration(catalog, params);
 
         // Holds all octree nodes indexed by id
         LongMap<OctreeNode> idMap = new LongMap<>();
         idMap.put(root.pageId, root);
 
-        Map<OctreeNode, List<ParticleRecord>> sbMap = new HashMap<>();
+        Map<OctreeNode, List<IParticleRecord>> sbMap = new HashMap<>();
 
         logger.info("Sorting source catalog with " + catalog.size() + " stars");
         catalog.sort(comp);
@@ -54,10 +55,10 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             logger.info("Generating level " + level + " (" + (catalog.size() - catalogIndex) + " stars left)");
             while (catalogIndex < catalog.size()) {
                 // Add star beans to octants till we reach max capacity
-                ParticleRecord sb = catalog.get(catalogIndex++);
-                double x = sb.dataD[ParticleRecord.I_X];
-                double y = sb.dataD[ParticleRecord.I_Y];
-                double z = sb.dataD[ParticleRecord.I_Z];
+                IParticleRecord sb = catalog.get(catalogIndex++);
+                double x = sb.x();
+                double y = sb.y();
+                double z = sb.z();
                 int addedNum;
 
                 Long nodeId = getPositionOctantId(x, y, z, level);
@@ -100,8 +101,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             for (int i = n - 1; i >= 0; i--) {
                 OctreeNode current = (OctreeNode) nodes[i];
                 if (current.parent != null && sbMap.containsKey(current) && sbMap.containsKey(current.parent)) {
-                    List<ParticleRecord> childrenArr = sbMap.get(current);
-                    List<ParticleRecord> parentArr = sbMap.get(current.parent);
+                    List<IParticleRecord> childrenArr = sbMap.get(current);
+                    List<IParticleRecord> parentArr = sbMap.get(current.parent);
                     if (childrenArr.size() <= params.childCount && parentArr.size() <= params.parentCount) {
                         // Merge children nodes with parent nodes, remove children
                         parentArr.addAll(childrenArr);
@@ -121,7 +122,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         // Tree is ready, create star groups
         Set<OctreeNode> nodes = sbMap.keySet();
         for (OctreeNode node : nodes) {
-            List<ParticleRecord> list = sbMap.get(node);
+            List<IParticleRecord> list = sbMap.get(node);
             StarGroup sg = new StarGroup();
             sg.setData(list, false);
             node.add(sg);
@@ -191,8 +192,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         return current;
     }
 
-    private int addStarToNode(ParticleRecord sb, OctreeNode node, Map<OctreeNode, List<ParticleRecord>> map) {
-        List<ParticleRecord> array = map.get(node);
+    private int addStarToNode(IParticleRecord sb, OctreeNode node, Map<OctreeNode, List<IParticleRecord>> map) {
+        List<IParticleRecord> array = map.get(node);
         if (array == null) {
             // Array of a fraction of max part (four array resizes gives max part)
             array = new ArrayList<>((int) Math.round(this.params.maxPart * 0.10662224073));

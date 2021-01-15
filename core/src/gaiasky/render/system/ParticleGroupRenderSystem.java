@@ -19,8 +19,9 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.color.Colormap;
@@ -112,8 +113,8 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (particleGroup.filter(i)) {
-                                    ParticleRecord pb = particleGroup.get(i);
-                                    double[] p = pb.dataD;
+                                    IParticleRecord pb = particleGroup.get(i);
+                                    double[] p = pb.rawDoubleData();
                                     // COLOR
                                     if (particleGroup.isHighlighted()) {
                                         if (hlCmap) {

@@ -27,9 +27,9 @@ import gaiasky.interafce.ColormapPicker;
 import gaiasky.interafce.IGui;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
@@ -1437,7 +1437,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // This star group contains the star
             StarGroup sg = (StarGroup) sgn;
             if (sg != null) {
-                ParticleRecord sb = sg.getCandidateBean();
+                IParticleRecord sb = sg.getCandidateBean();
                 if (sb != null) {
                     double[] rgb = sb.rgb();
                     return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
@@ -2527,10 +2527,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private List<ParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions dops) {
+    private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions dops) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(dops);
-        @SuppressWarnings("unchecked") List<ParticleRecord> data = (List<ParticleRecord>) provider.loadData(ds, 1.0f, () -> {
+        @SuppressWarnings("unchecked") List<IParticleRecord> data = provider.loadData(ds, 1.0f, () -> {
             // Show progress bar
             EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
             // Reset
@@ -2554,7 +2554,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
                 if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                    List<ParticleRecord> data = loadParticleBeans(ds, dops);
+                    List<IParticleRecord> data = loadParticleBeans(ds, dops);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP
                         AtomicReference<StarGroup> starGroup = new AtomicReference<>();
@@ -2574,7 +2574,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
-                    List<ParticleRecord> data = loadParticleBeans(ds, dops);
+                    List<IParticleRecord> data = loadParticleBeans(ds, dops);
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
                         GaiaSky.postRunnable(() -> {
@@ -2766,7 +2766,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Try extra attributes
             if (ci.object instanceof ParticleGroup) {
                 ParticleGroup pg = (ParticleGroup) ci.object;
-                Set<UCD> ucds = pg.get(0).extra.keySet();
+                Set<UCD> ucds = pg.get(0).extraKeys();
                 for (UCD ucd : ucds)
                     if (ucd.colname.equalsIgnoreCase(name))
                         return new AttributeUCD(ucd);

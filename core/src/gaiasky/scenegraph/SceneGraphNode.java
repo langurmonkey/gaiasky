@@ -43,20 +43,6 @@ import java.util.Map;
 public class SceneGraphNode implements IStarContainer, IPosition {
     public static final String ROOT_NAME = "Universe";
 
-    protected static class TLV3D extends ThreadLocal<Vector3d> {
-        @Override
-        protected Vector3d initialValue() {
-            return new Vector3d();
-        }
-    }
-
-    protected static class TLV3 extends ThreadLocal<Vector3> {
-        @Override
-        protected Vector3 initialValue() {
-            return new Vector3();
-        }
-    }
-
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
 

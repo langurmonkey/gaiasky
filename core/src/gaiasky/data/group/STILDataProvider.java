@@ -8,7 +8,8 @@ package gaiasky.data.group;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -73,7 +74,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
@@ -150,7 +151,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    public List<ParticleRecord> loadData(DataSource ds, double factor) {
+    public List<IParticleRecord> loadData(DataSource ds, double factor) {
         return loadData(ds, factor, null, null, null);
     }
 
@@ -163,7 +164,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param postCallback   A function that runs after the data has been loaded.
      * @return
      */
-    public List<ParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
+    public List<IParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
             if (factory != null) {
 
@@ -380,7 +381,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                                ParticleRecord sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
+                                IParticleRecord sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
                                 list.add(sb);
 
                                 int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
@@ -394,7 +395,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Extra
                                 Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
 
-                                ParticleRecord pb = new ParticleRecord(point, null, null, names, extraAttributes);
+                                IParticleRecord pb = new ParticleRecord(point, null, null, names, extraAttributes);
                                 list.add(pb);
                             }
 
@@ -446,13 +447,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         return null;
     }
 

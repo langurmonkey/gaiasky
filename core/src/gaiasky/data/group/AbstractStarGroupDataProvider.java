@@ -7,7 +7,8 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.LargeLongMap;
 import gaiasky.util.Logger;
@@ -71,7 +72,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
     }
 
-    protected List<ParticleRecord> list;
+    protected List<IParticleRecord> list;
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
@@ -225,7 +226,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public List<ParticleRecord> loadData(String file) {
+    public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1.0f);
     }
 
@@ -349,18 +350,18 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return (count == 0 && !empty) ? 1 : count;
     }
 
-    protected void dumpToDisk(List<ParticleRecord> data, String filename, String format) {
+    protected void dumpToDisk(List<IParticleRecord> data, String filename, String format) {
         if (format.equals("bin"))
             dumpToDiskBin(data, filename, false);
         else if (format.equals("csv"))
             dumpToDiskCsv(data, filename);
     }
 
-    protected void dumpToDiskBin(List<ParticleRecord> data, String filename, boolean serialized) {
+    protected void dumpToDiskBin(List<IParticleRecord> data, String filename, boolean serialized) {
         if (serialized) {
             // Use java serialization method
-            List<ParticleRecord> l = new ArrayList<>(data.size());
-            for (ParticleRecord p : data)
+            List<IParticleRecord> l = new ArrayList<>(data.size());
+            for (IParticleRecord p : data)
                 l.add(p);
 
             try {
@@ -375,7 +376,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             // Use own binary format
             BinaryDataProvider io = new BinaryDataProvider();
             try {
-                int n = data.get(0).dataD.length;
+                int n = data.size();
                 io.writeData(data, new FileOutputStream(filename));
                 logger.info("File " + filename + " written with " + n + " stars");
             } catch (Exception e) {
@@ -384,21 +385,21 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    protected void dumpToDiskCsv(List<ParticleRecord> data, String filename) {
+    protected void dumpToDiskCsv(List<IParticleRecord> data, String filename) {
         String sep = "' ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name(s), x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
             int n = 0;
-            for (ParticleRecord star : data) {
-                float[] col = colors.get(star.id);
+            for (IParticleRecord star : data) {
+                float[] col = colors.get(star.id());
                 double x = star.z();
                 double y = -star.x();
                 double z = star.y();
                 gal.set(x, y, z).scl(Constants.U_TO_KM);
                 gal.mul(Coordinates.equatorialToGalactic());
-                writer.println(TextUtils.concatenate(Constants.nameSeparator, star.names) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
+                writer.println(TextUtils.concatenate(Constants.nameSeparator, star.names()) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
                 n++;
             }
             writer.close();

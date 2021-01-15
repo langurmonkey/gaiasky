@@ -19,8 +19,9 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.MilkyWay;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -189,7 +190,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @param type The type
      * @return
      */
-    private GpuData convertDataToGpu(List<ParticleRecord> data, ColorGenerator cg, PType type) {
+    private GpuData convertDataToGpu(List<IParticleRecord> data, ColorGenerator cg, PType type) {
         GpuData ad = new GpuData();
 
         int vertexSize = 3 + 1 + 3;
@@ -200,23 +201,24 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         int nLayers = type.layers.length;
 
         int i = 0;
-        for (ParticleRecord particle : data) {
+        for (IParticleRecord particle : data) {
             if (type.modulus == 0 || i % type.modulus == 0) {
                 // COLOR
-                float[] col = particle.dataD.length >= 7 ? new float[] { (float) particle.dataD[4], (float) particle.dataD[5], (float) particle.dataD[6] } : cg.generateColor();
+                double[] doubleData = particle.rawDoubleData();
+                float[] col = doubleData.length >= 7 ? new float[] { (float) doubleData[4], (float) doubleData[5], (float) doubleData[6] } : cg.generateColor();
                 col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
                 col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
                 col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
                 ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
                 // SIZE, TYPE, TEX LAYER
-                double starSize = particle.dataD[3];
+                double starSize = particle.size();
                 ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
                 ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
                 ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[StdRandom.uniform(nLayers)];
 
                 // POSITION
-                aux3f1.set((float) particle.dataD[0], (float) particle.dataD[1], (float) particle.dataD[2]);
+                aux3f1.set((float) particle.x(), (float) particle.y(), (float) particle.z());
                 final int idx = ad.vertexIdx;
                 ad.vertices[idx] = aux3f1.x;
                 ad.vertices[idx + 1] = aux3f1.y;

@@ -7,7 +7,7 @@ package gaiasky.data.octreegen.generator;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;
@@ -33,14 +33,14 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         this.params = params;
     }
 
-    public OctreeNode generateOctree(List<ParticleRecord> catalog) {
+    public OctreeNode generateOctree(List<IParticleRecord> catalog) {
         OctreeNode root = IOctreeGenerator.startGeneration(catalog, params);
 
         Array<OctreeNode>[] octantsPerLevel = new Array[25];
         octantsPerLevel[0] = new Array<>(false, 1);
         octantsPerLevel[0].add(root);
 
-        Map<OctreeNode, List<ParticleRecord>> inputLists = new HashMap<>();
+        Map<OctreeNode, List<IParticleRecord>> inputLists = new HashMap<>();
         inputLists.put(root, catalog);
 
         treatLevel(inputLists, 0, octantsPerLevel, MathUtils.clamp((float) aggregation.getMaxPart() / (float) catalog.size(), 0f, 1f));
@@ -59,7 +59,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param octantsPerLevel Octants of each level
      * @param percentage Percentage
      */
-    private void treatLevel(Map<OctreeNode, List<ParticleRecord>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
+    private void treatLevel(Map<OctreeNode, List<IParticleRecord>> inputLists, int level, Array<OctreeNode>[] octantsPerLevel, float percentage) {
         logger.info("Generating level " + level);
         Array<OctreeNode> levelOctants = octantsPerLevel[level];
 
@@ -69,7 +69,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
         Iterator<OctreeNode> it = levelOctants.iterator();
         while (it.hasNext()) {
             OctreeNode octant = it.next();
-            List<ParticleRecord> list = inputLists.get(octant);
+            List<IParticleRecord> list = inputLists.get(octant);
 
             if (list.size() == 0) {
                 // Empty node, remove
@@ -112,17 +112,17 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
             int maxSublevelObjs = 0;
             double maxSublevelMag = Double.MAX_VALUE;
             double minSublevelMag = 0;
-            Map<OctreeNode, List<ParticleRecord>> lists = new HashMap<>();
+            Map<OctreeNode, List<IParticleRecord>> lists = new HashMap<>();
 
             for (OctreeNode octant : octantsPerLevel[level + 1]) {
-                List<ParticleRecord> list = intersect(inputLists.get(octant.parent), octant);
+                List<IParticleRecord> list = intersect(inputLists.get(octant.parent), octant);
                 lists.put(octant, list);
                 if (list.size() > maxSublevelObjs) {
                     maxSublevelObjs = list.size();
                 }
                 // Adapt levels by magnitude
-                for (ParticleRecord pb : list) {
-                    ParticleRecord sb = pb;
+                for (IParticleRecord pb : list) {
+                    IParticleRecord sb = pb;
                     if (sb.absmag() < maxSublevelMag) {
                         maxSublevelMag = sb.absmag();
                     }
@@ -146,10 +146,10 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
      * @param box
      * @return
      */
-    private List<ParticleRecord> intersect(List<ParticleRecord> stars, OctreeNode box) {
-        List<ParticleRecord> result = new ArrayList<>();
-        for (ParticleRecord star : stars) {
-            if (star.octant == null && box.box.contains(star.dataD[ParticleRecord.I_X], star.dataD[ParticleRecord.I_Y], star.dataD[ParticleRecord.I_Z])) {
+    private List<IParticleRecord> intersect(List<IParticleRecord> stars, OctreeNode box) {
+        List<IParticleRecord> result = new ArrayList<>();
+        for (IParticleRecord star : stars) {
+            if (star.octant() == null && box.box.contains(star.x(), star.y(), star.z())) {
                 result.add(star);
             }
         }

@@ -1,6 +1,6 @@
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,30 +14,27 @@ public class BinaryVersion0 extends BinaryIOBase {
     public BinaryVersion0() {
         super(9, 4, true);
     }
-
     @Override
-    public void writeParticleRecord(ParticleRecord sb, DataOutputStream out) throws IOException {
-        // Double
-        int floatOffset = 0;
-        for (int i = 0; i < nDoubles; i++) {
-            if (i < sb.dataD.length) {
-                // Write from double
-                out.writeDouble(sb.dataD[i]);
-            } else {
-                // Write from float
-                int idx = i - sb.dataD.length;
-                out.writeDouble(sb.dataF[idx]);
-                floatOffset = idx + 1;
-            }
-        }
-        // Float
-        for (int i = 0; i < nFloats; i++) {
-            int idx = i + floatOffset;
-            out.writeFloat(sb.dataF[idx]);
-        }
+    public void writeParticleRecord(IParticleRecord sb, DataOutputStream out) throws IOException {
+        // 9 doubles
+        out.writeDouble(sb.x());
+        out.writeDouble(sb.y());
+        out.writeDouble(sb.z());
+        out.writeDouble(sb.pmx());
+        out.writeDouble(sb.pmy());
+        out.writeDouble(sb.pmz());
+        out.writeDouble(sb.mualpha());
+        out.writeDouble(sb.mudelta());
+        out.writeDouble(sb.radvel());
+
+        // 4 floats
+        out.writeFloat(sb.appmag());
+        out.writeFloat(sb.absmag());
+        out.writeFloat(sb.col());
+        out.writeFloat(sb.size());
 
         // HIP
-        out.writeInt((int) sb.dataF[ParticleRecord.I_FHIP]);
+        out.writeInt(sb.hip());
 
         // TYCHO
         if (tychoIds) {
@@ -48,7 +45,7 @@ public class BinaryVersion0 extends BinaryIOBase {
         }
 
         // ID
-        out.writeLong(sb.id);
+        out.writeLong(sb.id());
 
         // NAME
         String namesConcat = sb.namesConcat();

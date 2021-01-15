@@ -6,7 +6,7 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 
 import java.io.InputStream;
 import java.util.List;
@@ -29,7 +29,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    List<ParticleRecord> loadDataMapped(String file, double factor);
+    List<IParticleRecord> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -38,7 +38,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    List<ParticleRecord> loadData(String file, double factor);
+    List<IParticleRecord> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
@@ -47,7 +47,7 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param factor Factor to apply to the positions
      * @return Array of particle beans
      */
-    List<ParticleRecord> loadData(InputStream is, double factor);
+    List<IParticleRecord> loadData(InputStream is, double factor);
 
     /**
      * <p>

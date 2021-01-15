@@ -1,17 +1,16 @@
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 
 /**
  * Base implementation of binary version, which accommodates most versions.
  */
-public class BinaryIOBase implements BinaryIO {
+public abstract class BinaryIOBase implements BinaryIO {
     protected final int nDoubles;
     protected final int nFloats;
 
@@ -127,34 +126,4 @@ public class BinaryIOBase implements BinaryIO {
         return new ParticleRecord(dataD, dataF, id, names);
     }
 
-    @Override
-    public void writeParticleRecord(ParticleRecord sb, DataOutputStream out) throws IOException {
-        // Double
-        for (int i = 0; i < nDoubles; i++) {
-            out.writeDouble(sb.dataD[i]);
-        }
-        // Float
-        for (int i = 0; i < nFloats; i++) {
-            out.writeFloat(sb.dataF[i]);
-        }
-
-        // HIP
-        out.writeInt((int) sb.dataF[ParticleRecord.I_FHIP]);
-
-        // TYCHO
-        if (tychoIds) {
-            // 3 integers, keep compatibility
-            out.writeInt(-1);
-            out.writeInt(-1);
-            out.writeInt(-1);
-        }
-
-        // ID
-        out.writeLong(sb.id);
-
-        // NAME
-        String namesConcat = sb.namesConcat();
-        out.writeInt(namesConcat.length());
-        out.writeChars(namesConcat);
-    }
 }

@@ -5,7 +5,9 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scenegraph.particle.PointParticleRecord;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -28,11 +30,11 @@ import java.util.zip.GZIPInputStream;
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);
 
-    public List<ParticleRecord> loadData(String file) {
+    public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public List<ParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         InputStream is = GlobalConf.data.dataFileHandle(file).read();
 
         if(file.endsWith(".gz")){
@@ -44,7 +46,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
         }
 
         @SuppressWarnings("unchecked")
-        List<ParticleRecord> pointData = loadData(is, factor);
+        List<IParticleRecord> pointData = loadData(is, factor);
 
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size(), file));
@@ -53,8 +55,8 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadData(InputStream is, double factor) {
-        List<ParticleRecord> pointData = new ArrayList<>();
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
+        List<IParticleRecord> pointData = new ArrayList<>();
         try {
             int tokenslen;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -70,7 +72,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                             // We use regular parser because of scientific notation
                             point[j] = Double.parseDouble(tokens[j]) * factor;
                         }
-                        pointData.add(new ParticleRecord(point));
+                        pointData.add(new PointParticleRecord(point));
                     }catch(NumberFormatException e){
                         // Skip line
                     }
@@ -98,7 +100,7 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;
     }

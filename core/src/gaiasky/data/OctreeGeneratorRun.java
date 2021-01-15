@@ -28,7 +28,8 @@ import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
@@ -219,7 +220,7 @@ public class OctreeGeneratorRun {
         OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        List<ParticleRecord> listLoader = null, list;
+        List<IParticleRecord> listLoader = null, list;
         Map<Long, Integer> xmatchTable = null;
         long[] countsPerMagGaia = null;
 
@@ -265,7 +266,7 @@ public class OctreeGeneratorRun {
                 stil.setMustLoadIds(mustLoad);
             }
 
-            List<ParticleRecord> listHip = stil.loadData(hip);
+            List<IParticleRecord> listHip = stil.loadData(hip);
 
             // Update HIP names using external source, if needed
             if (hipNamesDir != null) {
@@ -273,8 +274,8 @@ public class OctreeGeneratorRun {
                 hipNames.load(Paths.get(hipNamesDir));
 
                 Map<Integer, Array<String>> hn = hipNames.getHipNames();
-                for (ParticleRecord pb : listHip) {
-                    ParticleRecord star = pb;
+                for (IParticleRecord pb : listHip) {
+                    IParticleRecord star = pb;
                     if (hn.containsKey(star.hip())) {
                         Array<String> names = hn.get(star.hip());
                         for (String name : names)
@@ -288,8 +289,8 @@ public class OctreeGeneratorRun {
             combineCountsPerMag(countsPerMagGaia, countsPerMagHip);
 
             // Create HIP map
-            Map<Integer, ParticleRecord> hipMap = new HashMap<>();
-            for (ParticleRecord star : listHip) {
+            Map<Integer, IParticleRecord> hipMap = new HashMap<>();
+            for (IParticleRecord star : listHip) {
                 hipMap.put(star.hip(), star);
             }
 
@@ -301,18 +302,18 @@ public class OctreeGeneratorRun {
             Vector3d aux1 = new Vector3d();
             Vector3d aux2 = new Vector3d();
             if (listLoader != null) {
-                for (ParticleRecord pb : listLoader) {
-                    ParticleRecord gaiaStar = pb;
+                for (IParticleRecord pb : listLoader) {
+                    IParticleRecord gaiaStar = pb;
                     // Check if star is also in HIP catalog
-                    if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
+                    if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id())) {
                         // No hit, add to main list
                         listHip.add(gaiaStar);
                     } else {
                         // Update hipStar using gaiaStar data, only when:
-                        int hipId = xmatchTable.get(gaiaStar.id);
+                        int hipId = xmatchTable.get(gaiaStar.id());
                         if (hipMap.containsKey(hipId)) {
                             // Hip Star
-                            ParticleRecord hipStar = hipMap.get(hipId);
+                            IParticleRecord hipStar = hipMap.get(hipId);
 
                             // Check parallax errors
                             Double gaiaPllxErr = gaiaStar.getExtra("pllx_err");
@@ -349,23 +350,16 @@ public class OctreeGeneratorRun {
                                     size = hipStar.size();
                                 }
 
-                                hipStar.id = gaiaStar.id;
-                                hipStar.dataD[ParticleRecord.I_X] = x;
-                                hipStar.dataD[ParticleRecord.I_Y] = y;
-                                hipStar.dataD[ParticleRecord.I_Z] = z;
-                                hipStar.dataD[ParticleRecord.I_PMX] = gaiaStar.pmx();
-                                hipStar.dataD[ParticleRecord.I_PMY] = gaiaStar.pmy();
-                                hipStar.dataD[ParticleRecord.I_PMZ] = gaiaStar.pmz();
+                                hipStar.setId(gaiaStar.id());
+                                hipStar.setPos(x, y, z);
+                                hipStar.setVelocityVector(gaiaStar.pmx(), gaiaStar.pmy(), gaiaStar.pmz());
 
-                                hipStar.dataF[ParticleRecord.I_FMUALPHA] = gaiaStar.mualpha();
-                                hipStar.dataF[ParticleRecord.I_FMUDELTA] = gaiaStar.mudelta();
-                                hipStar.dataF[ParticleRecord.I_FRADVEL] = gaiaStar.radvel();
-                                hipStar.dataF[ParticleRecord.I_FAPPMAG] = gaiaStar.appmag();
-                                hipStar.dataF[ParticleRecord.I_FABSMAG] = gaiaStar.absmag();
-                                hipStar.dataF[ParticleRecord.I_FCOL] = gaiaStar.col();
-                                hipStar.dataF[ParticleRecord.I_FSIZE] = size;
+                                hipStar.setProperMotion(gaiaStar.mualpha(), gaiaStar.mudelta(), gaiaStar.radvel());
+                                hipStar.setMag(gaiaStar.appmag(), gaiaStar.absmag());
+                                hipStar.setCol(gaiaStar.col());
+                                hipStar.setSize(size);
 
-                                hipStar.addNames(gaiaStar.names);
+                                hipStar.addNames(gaiaStar.names());
                                 starhits++;
                             }
                         } else {

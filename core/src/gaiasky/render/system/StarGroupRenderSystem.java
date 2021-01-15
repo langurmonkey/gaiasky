@@ -21,11 +21,12 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.color.Colormap;
@@ -150,9 +151,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i)) {
-                                    ParticleRecord sb = starGroup.data().get(i);
+                                    IParticleRecord sb = starGroup.data().get(i);
                                     if (!Double.isFinite(sb.size())) {
-                                        logger.debug("Star " + sb.id + " has a non-finite size");
+                                        logger.debug("Star " + sb.id() + " has a non-finite size");
                                         continue;
                                     }
                                     // COLOR

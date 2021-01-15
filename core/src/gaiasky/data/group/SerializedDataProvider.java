@@ -6,7 +6,7 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 
@@ -20,7 +20,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
         super();
     }
 
-    public List<ParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -30,11 +30,11 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public List<ParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
         try {
             ObjectInputStream ois = new ObjectInputStream(is);
             @SuppressWarnings("unchecked")
-            List<ParticleRecord> l = (List<ParticleRecord>) ois.readObject(); // cast is needed.
+            List<IParticleRecord> l = (List<IParticleRecord>) ois.readObject(); // cast is needed.
             ois.close();
 
             // Convert to Array, reconstruct index
@@ -42,7 +42,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
             initLists(n);
 
             for (int i = 0; i < n; i++) {
-                ParticleRecord point = l.get(i);
+                IParticleRecord point = l.get(i);
                 list.add(point);
             }
 
@@ -54,7 +54,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;
     }

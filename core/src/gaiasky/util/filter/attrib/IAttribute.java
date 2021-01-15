@@ -5,13 +5,13 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.math.Vector3d;
 
 /**
  * Represents an attribute
  */
-public interface IAttribute<T extends ParticleRecord> {
+public interface IAttribute<T extends IParticleRecord> {
     Vector3d aux1 = new Vector3d();
     Vector3d aux2 = new Vector3d();
     /**

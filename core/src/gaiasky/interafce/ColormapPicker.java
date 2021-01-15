@@ -21,10 +21,11 @@ import gaiasky.interafce.beans.AttributeComboBoxBean;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.attrib.*;
@@ -367,9 +368,9 @@ public class ColormapPicker extends ColorPickerAbstract {
             if (catalog instanceof ParticleGroup) {
                 ParticleGroup pg = (ParticleGroup) catalog;
                 if (pg.size() > 0) {
-                    ParticleRecord first = pg.get(0);
-                    if (first.extra != null) {
-                        Set<UCD> ucds = first.extra.keySet();
+                    IParticleRecord first = pg.get(0);
+                    if (first.hasExtra()) {
+                        Set<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
                             attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                     }
@@ -508,7 +509,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
                 for (ParticleGroup pg : pgarray) {
-                    for (ParticleRecord pb : pg.data()) {
+                    for (IParticleRecord pb : pg.data()) {
                         double val = attrib.get(pb);
                         if (!Double.isNaN(val) && !Double.isInfinite(val)) {
                             if (val < min)

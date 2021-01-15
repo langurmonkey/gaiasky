@@ -7,8 +7,9 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -142,9 +143,9 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                     }
                 }
             } else if (node instanceof StarGroup) {
-                List<ParticleRecord> stars = ((StarGroup) node).data();
-                for (ParticleRecord pb : stars) {
-                    ParticleRecord s = pb;
+                List<IParticleRecord> stars = ((StarGroup) node).data();
+                for (IParticleRecord pb : stars) {
+                    IParticleRecord s = pb;
                     if (s.hip() > 0) {
                         hipMap.put(s.hip(), new Position(s.x(), s.y(), s.z(), s.pmx(), s.pmy(), s.pmz()));
                     }
@@ -168,10 +169,10 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 }
             } else if (node instanceof StarGroup) {
                 StarGroup sg = (StarGroup) node;
-                List<ParticleRecord> arr = sg.data();
+                List<IParticleRecord> arr = sg.data();
                 if (arr != null) {
-                    for (ParticleRecord pb : arr) {
-                        ParticleRecord sb = pb;
+                    for (IParticleRecord pb : arr) {
+                        IParticleRecord sb = pb;
                         if (sb != null && sb.hip() >= 0)
                             hipMap.remove(sb.hip());
                     }

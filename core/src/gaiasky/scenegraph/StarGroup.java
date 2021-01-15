@@ -35,6 +35,8 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
@@ -45,7 +47,6 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -139,7 +140,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 factor = 1d;
 
             // Set data, generate index
-            List<ParticleRecord> l = provider.loadData(datafile, factor);
+            List<IParticleRecord> l = provider.loadData(datafile, factor);
             this.setData(l);
 
         } catch (Exception e) {
@@ -164,11 +165,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @return The data list
      */
     @SuppressWarnings("unchecked")
-    public List<ParticleRecord> data() {
+    public List<IParticleRecord> data() {
         return pointData;
     }
 
-    public void setData(List<ParticleRecord> pointData, boolean regenerateIndex) {
+    public void setData(List<IParticleRecord> pointData, boolean regenerateIndex) {
         super.setData(pointData, regenerateIndex);
     }
 
@@ -178,17 +179,17 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param pointData The star data
      * @return An map{string,int} mapping names/ids to indexes
      */
-    public Map<String, Integer> generateIndex(Array<ParticleRecord> pointData) {
+    public Map<String, Integer> generateIndex(Array<IParticleRecord> pointData) {
         Map<String, Integer> index = new HashMap<>();
         int n = pointData.size;
         for (int i = 0; i < n; i++) {
-            ParticleRecord sb = pointData.get(i);
-            if (sb.names != null) {
-                for (String lcname : sb.names) {
+            IParticleRecord sb = pointData.get(i);
+            if (sb.names() != null) {
+                for (String lcname : sb.names()) {
                     lcname = lcname.toLowerCase();
                     index.put(lcname, i);
-                    String lcid = Long.toString(sb.id).toLowerCase();
-                    if (sb.id > 0 && !lcid.equals(lcname)) {
+                    String lcid = Long.toString(sb.id()).toLowerCase();
+                    if (sb.id() > 0 && !lcid.equals(lcname)) {
                         index.put(lcid, i);
                     }
                     if (sb.hip() > 0) {
@@ -211,7 +212,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             super.update(time, parentTransform, camera, opacity);
 
             // Update closest star
-            ParticleRecord closestStar = pointData.get(active[0]);
+            IParticleRecord closestStar = pointData.get(active[0]);
 
             closestPm.set(closestStar.pmx(), closestStar.pmy(), closestStar.pmz()).scl(currDeltaYears);
             closestAbsolutePos.set(closestStar.x(), closestStar.y(), closestStar.z()).add(closestPm);
@@ -224,7 +225,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             closestCol[2] = c.b;
             closestCol[3] = c.a;
             closestSize = getSize(active[0]);
-            closestName = closestStar.names[0];
+            closestName = closestStar.names()[0];
             camera.checkClosestParticle(this);
 
             // Model dist
@@ -240,7 +241,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param camera The current camera
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
-        ParticleRecord focus = pointData.get(focusIndex);
+        IParticleRecord focus = pointData.get(focusIndex);
         Vector3d aux = this.fetchPosition(focus, camera.getPos(), aux3d1.get(), currDeltaYears);
 
         this.focusPosition.set(aux).add(camera.getPos());
@@ -314,7 +315,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     Color c = new Color();
 
     private void renderCloseupStar(int idx, float fovFactor, Vector3d cpos, ExtShaderProgram shader, IntMesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
-        ParticleRecord star = pointData.get(idx);
+        IParticleRecord star = pointData.get(idx);
         double size = getSize(idx);
         double radius = size * Constants.STAR_SIZE_FACTOR;
         Vector3d starPos = fetchPosition(star, cpos, aux3d1.get(), currDeltaYears);
@@ -391,7 +392,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         float thPointTimesFovFactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * camera.getFovFactor();
         int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
-            ParticleRecord star = pointData.get(active[i]);
+            IParticleRecord star = pointData.get(active[i]);
                 float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
                 // Position
                 Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
@@ -523,19 +524,19 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_NEAREST);
         if (camera.getCurrent() instanceof FovCamera) {
             for (int i = 0; i < n; i++) {
-                ParticleRecord star = pointData.get(active[i]);
+                IParticleRecord star = pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, cpos, aux3d1.get(), currDeltaYears);
                 float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 6f);
 
                 if (camera.isVisible(GaiaSky.instance.time, viewAngle, starPosition, distToCamera)) {
-                    render2DLabel(batch, shader, rc, sys.font2d, camera, star.names[0], starPosition);
+                    render2DLabel(batch, shader, rc, sys.font2d, camera, star.names()[0], starPosition);
                 }
             }
         } else {
             for (int i = 0; i < n; i++) {
-                ParticleRecord star = pointData.get(active[i]);
+                IParticleRecord star = pointData.get(active[i]);
                 Vector3d starPosition = fetchPosition(star, cpos, aux3d1.get(), currDeltaYears);
                 float distToCamera = (float) starPosition.len();
                 float radius = (float) getRadius(active[i]);
@@ -551,7 +552,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names[0], starPosition, distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
+                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names()[0], starPosition, distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
 
                 }
             }
@@ -582,7 +583,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public long getId() {
         if (focus != null)
-            return focus.id;
+            return focus.id();
         else
             return -1;
     }
@@ -641,18 +642,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public long getCandidateId() {
-        return pointData.get(candidateFocusIndex).id;
+        return pointData.get(candidateFocusIndex).id();
     }
 
     @Override
     public String getCandidateName() {
-        return pointData.get(candidateFocusIndex).names[0];
+        return pointData.get(candidateFocusIndex).names()[0];
     }
 
     @Override
     public double getCandidateViewAngleApparent() {
         if (candidateFocusIndex >= 0) {
-            ParticleRecord candidate = pointData.get(candidateFocusIndex);
+            IParticleRecord candidate = pointData.get(candidateFocusIndex);
             Vector3d aux = candidate.pos(aux3d1.get());
             ICamera camera = GaiaSky.instance.getICamera();
             double va = (float) ((candidate.radius() / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
@@ -709,7 +710,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
         if (index.containsKey(name)) {
             int idx = index.get(name);
-            ParticleRecord sb = pointData.get(idx);
+            IParticleRecord sb = pointData.get(idx);
             fetchPosition(sb, null, aux, currDeltaYears);
             return aux;
         } else {
@@ -718,8 +719,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    protected Vector3d fetchPosition(ParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
-        ParticleRecord sb = pb;
+    protected Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
+        IParticleRecord sb = pb;
         Vector3d pm = aux3d2.get().set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
         if (campos != null && !campos.hasNaN())
             return destination.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
@@ -780,7 +781,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param dops The dataset options
      * @return A new star group with the given parameters
      */
-    public static StarGroup getStarGroup(String name, List<ParticleRecord> data, DatasetOptions dops) {
+    public static StarGroup getStarGroup(String name, List<IParticleRecord> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
         double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
@@ -807,7 +808,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param data The data of the star group
      * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, List<ParticleRecord> data) {
+    public static StarGroup getDefaultStarGroup(String name, List<IParticleRecord> data) {
         return getDefaultStarGroup(name, data, true);
     }
 
@@ -819,7 +820,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param fullInit Initializes the group right away
      * @return A new star group with sane parameters
      */
-    public static StarGroup getDefaultStarGroup(String name, List<ParticleRecord> data, boolean fullInit) {
+    public static StarGroup getDefaultStarGroup(String name, List<IParticleRecord> data, boolean fullInit) {
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");
@@ -848,7 +849,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (pointData != null) {
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
-                ParticleRecord d = pointData.get(i);
+                IParticleRecord d = pointData.get(i);
 
                 // Pm
                 Vector3d dx = aux3d2.get().set(d.pmx(), d.pmy(), d.pmz()).scl(deltaYears);

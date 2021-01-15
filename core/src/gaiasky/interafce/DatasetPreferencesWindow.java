@@ -13,10 +13,13 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.interafce.beans.AttributeComboBoxBean;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
-import gaiasky.util.*;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.TextUtils;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
 import gaiasky.util.filter.FilterRule.IComparator;
@@ -104,13 +107,13 @@ public class DatasetPreferencesWindow extends GenericDialog {
             operation.setItems("and", "or");
             operation.setSelected(filter.getOperationString().toLowerCase());
             operation.addListener(event -> {
-               if(event instanceof ChangeEvent){
-                   String newOp = operation.getSelected();
-                   filter.setOperation(newOp);
-                   filterEdited = true;
-                   return true;
-               }
-               return false;
+                if (event instanceof ChangeEvent) {
+                    String newOp = operation.getSelected();
+                    filter.setOperation(newOp);
+                    filterEdited = true;
+                    return true;
+                }
+                return false;
             });
             filterTable.add(new OwnLabel(I18n.txt("gui.dataset.filter.operation"), skin)).left().padRight(pad10 * 2f).padBottom(pad10);
             filterTable.add(operation).left().expandX().padBottom(pad10).row();
@@ -120,7 +123,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             Table rulesTable = new Table(skin);
             filterTable.add(rulesTable).colspan(2);
 
-            for(FilterRule rule : rules) {
+            for (FilterRule rule : rules) {
                 // UNIT
                 OwnLabel unit = new OwnLabel(rule.getAttribute().getUnit(), skin);
 
@@ -147,9 +150,9 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 if (ci.object instanceof ParticleGroup) {
                     ParticleGroup pg = (ParticleGroup) ci.object;
                     if (pg.size() > 0) {
-                        ParticleRecord first = pg.get(0);
-                        if (first.extra != null) {
-                            Set<UCD> ucds = first.extra.keySet();
+                        IParticleRecord first = pg.get(0);
+                        if(first.hasExtra()) {
+                            Set<UCD> ucds = first.extraKeys();
                             for (UCD ucd : ucds)
                                 attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                         }
@@ -159,7 +162,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 attribute.setItems(attrs);
                 attribute.setSelected(getAttributeBean(rule.getAttribute(), attrs));
                 attribute.addListener(event -> {
-                    if(event instanceof ChangeEvent){
+                    if (event instanceof ChangeEvent) {
                         IAttribute newAttr = attribute.getSelected().attr;
                         rule.setAttribute(newAttr);
                         // Update unit
@@ -172,19 +175,19 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 rulesTable.add(attribute).left().padRight(pad10).padBottom(pad5);
 
                 // COMPARATOR
-                String[] cmps = new String[]{"<", "<=", ">", ">=", "==", "!="};
+                String[] cmps = new String[] { "<", "<=", ">", ">=", "==", "!=" };
                 OwnSelectBox<String> comparator = new OwnSelectBox<>(skin);
                 comparator.setWidth(minSelectWidth);
                 comparator.setItems(cmps);
                 comparator.setSelected(rule.getComparator().toString());
-                comparator.addListener(event ->{
-                    if(event instanceof ChangeEvent){
+                comparator.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
                         IComparator newComp = rule.getComparatorFromString(comparator.getSelected());
                         rule.setComparator(newComp);
                         filterEdited = true;
                         return true;
                     }
-                   return false;
+                    return false;
                 });
                 rulesTable.add(comparator).left().padRight(pad10).padBottom(pad5);
 
@@ -192,23 +195,22 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 FloatValidator fval = new FloatValidator(-Float.MAX_VALUE, Float.MAX_VALUE);
                 OwnTextField value = new OwnTextField(Double.toString(rule.getValue()), skin, fval);
                 value.addListener(event -> {
-                    if(event instanceof ChangeEvent){
-                        if(value.isValid()){
+                    if (event instanceof ChangeEvent) {
+                        if (value.isValid()) {
                             try {
                                 rule.setValue(Float.parseFloat(value.getText()));
                                 filterEdited = true;
                                 return true;
-                            }catch(Exception e){
+                            } catch (Exception e) {
                                 logger.error(e);
                                 return false;
                             }
                         }
                         return false;
                     }
-                   return false;
+                    return false;
                 });
                 rulesTable.add(value).left().padRight(pad10).padBottom(pad5);
-
 
                 // UNIT
                 rulesTable.add(unit).left().padRight(pad10 * 3f).padBottom(pad5);
@@ -216,13 +218,13 @@ public class DatasetPreferencesWindow extends GenericDialog {
                 // RUBBISH
                 OwnTextIconButton rubbish = new OwnTextIconButton("", skin, "rubbish");
                 rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.filter.rule.remove"), skin));
-                rubbish.addListener(event ->{
-                    if(event instanceof ChangeEvent){
+                rubbish.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
                         deleteRule(filter, rule);
                         filterEdited = true;
                         return true;
                     }
-                   return false;
+                    return false;
                 });
                 rulesTable.add(rubbish).left().padBottom(pad5).row();
             }
@@ -233,7 +235,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             addRule.pad(pad10);
             rulesTable.add(addRule).left().padTop(pad10).row();
             addRule.addListener(event -> {
-                if(event instanceof ChangeEvent){
+                if (event instanceof ChangeEvent) {
                     dpw.addRule(filter);
                     filterEdited = true;
                     return true;
@@ -259,18 +261,18 @@ public class DatasetPreferencesWindow extends GenericDialog {
         pack();
     }
 
-    private void deleteRule(Filter filter, FilterRule rule){
-        if(filter != null && rule != null){
+    private void deleteRule(Filter filter, FilterRule rule) {
+        if (filter != null && rule != null) {
             boolean removed = filter.removeRule(rule);
-            if(removed){
+            if (removed) {
                 // Reload table
                 GaiaSky.postRunnable(() -> generateFilterTable(filter));
             }
         }
     }
 
-    private void addRule(Filter filter){
-        if(filter != null){
+    private void addRule(Filter filter) {
+        if (filter != null) {
             FilterRule rule = new FilterRule("<", new AttributeDistance(), 500);
             filter.addRule(rule);
             // Reload table
@@ -285,9 +287,9 @@ public class DatasetPreferencesWindow extends GenericDialog {
         GaiaSky.postRunnable(() -> generateFilterTable(filter));
     }
 
-    private AttributeComboBoxBean getAttributeBean(IAttribute attr, Array<AttributeComboBoxBean> attrs){
-        for(AttributeComboBoxBean attribute : attrs){
-            if(attr.toString().contains(attribute.name)){
+    private AttributeComboBoxBean getAttributeBean(IAttribute attr, Array<AttributeComboBoxBean> attrs) {
+        for (AttributeComboBoxBean attribute : attrs) {
+            if (attr.toString().contains(attribute.name)) {
                 return attribute;
             }
         }
@@ -309,7 +311,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             ci.setHlAllVisible(vis);
         }
         // Filter
-        if(filterEdited) {
+        if (filterEdited) {
             if (ci.filter != null) {
                 synchronized (ci.filter) {
                     ci.filter = filter.hasRules() ? filter : null;

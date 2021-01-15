@@ -7,9 +7,10 @@ package gaiasky.data.octreegen;
 
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.SerializedDataProvider;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
@@ -49,8 +50,8 @@ public class StarGroupSerializedIO implements IStarGroupIO {
     public void writeParticles(List<SceneGraphNode> list, OutputStream out, int version) {
         if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
-            List<ParticleRecord> l = new ArrayList<>(sg.size());
-            for (ParticleRecord p : sg.data()) {
+            List<IParticleRecord> l = new ArrayList<>(sg.size());
+            for (IParticleRecord p : sg.data()) {
                 l.add(p);
             }
 
@@ -73,7 +74,7 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      * @return A list with a single star group object
      */
     public List<SceneGraphNode> readParticles(InputStream in) {
-        List<ParticleRecord> data = provider.loadData(in, 1.0);
+        List<IParticleRecord> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

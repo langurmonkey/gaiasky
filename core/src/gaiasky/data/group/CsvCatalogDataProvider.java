@@ -7,7 +7,8 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import gaiasky.scenegraph.ParticleGroup.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -107,11 +108,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         fileNumberCap = cap;
     }
 
-    public List<ParticleRecord> loadData(String file) {
+    public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public List<ParticleRecord> loadData(String file, double factor) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         initLists(1000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -145,7 +146,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public List<ParticleRecord> loadData(InputStream is, double factor) {
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
         initLists(100000);
 
         loadFileIs(is, factor, new AtomicLong(0l), new AtomicLong(0l));
@@ -385,7 +386,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleRecord> loadDataMapped(String file, double factor) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, -1, -1);
     }
 
@@ -398,7 +399,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * @param totalFiles Total number of files
      * @return List of particle records
      */
-    public List<ParticleRecord> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;
