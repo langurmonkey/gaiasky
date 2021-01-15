@@ -16,10 +16,7 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.CatalogInfo;
-import gaiasky.util.I18n;
-import gaiasky.util.Logger;
-import gaiasky.util.TextUtils;
+import gaiasky.util.*;
 import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
 import gaiasky.util.filter.FilterRule.IComparator;
@@ -152,7 +149,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     if (pg.size() > 0) {
                         IParticleRecord first = pg.get(0);
                         if(first.hasExtra()) {
-                            Set<UCD> ucds = first.extraKeys();
+                            ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
                             for (UCD ucd : ucds)
                                 attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                         }

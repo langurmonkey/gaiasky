@@ -7,6 +7,8 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.ObjectFloatMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
@@ -215,7 +217,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[idx(ColId.pllx)].isEmpty()) {
             /** Extra attributes **/
-            Map<UCD, Double> extra = new HashMap<>(2, 0.9f);
+            ObjectDoubleMap<UCD> extra = new ObjectDoubleMap<>(2, 0.9f);
 
             /** ID **/
             long sourceid = Parser.parseLong(tokens[idx(ColId.sourceid)]);

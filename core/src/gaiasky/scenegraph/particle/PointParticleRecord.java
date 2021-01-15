@@ -1,10 +1,9 @@
 package gaiasky.scenegraph.particle;
 
+import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
-
-import java.util.Set;
 
 /**
  * Point particle record, only contains a double array to hold the data
@@ -260,7 +259,7 @@ public class PointParticleRecord implements IParticleRecord{
     }
 
     @Override
-    public Set<UCD> extraKeys() {
+    public Keys<UCD> extraKeys() {
         return null;
     }
 

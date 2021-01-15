@@ -2766,7 +2766,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Try extra attributes
             if (ci.object instanceof ParticleGroup) {
                 ParticleGroup pg = (ParticleGroup) ci.object;
-                Set<UCD> ucds = pg.get(0).extraKeys();
+                ObjectDoubleMap.Keys<UCD> ucds = pg.get(0).extraKeys();
                 for (UCD ucd : ucds)
                     if (ucd.colname.equalsIgnoreCase(name))
                         return new AttributeUCD(ucd);

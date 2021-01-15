@@ -370,7 +370,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 if (pg.size() > 0) {
                     IParticleRecord first = pg.get(0);
                     if (first.hasExtra()) {
-                        Set<UCD> ucds = first.extraKeys();
+                        ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
                             attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                     }

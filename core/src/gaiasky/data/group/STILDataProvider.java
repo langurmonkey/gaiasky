@@ -8,6 +8,7 @@ package gaiasky.data.group;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
@@ -379,7 +380,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataF[ParticleRecord.I_FHIP] = hip;
 
                                 // Extra
-                                Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
+                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdp, row);
 
                                 IParticleRecord sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
                                 list.add(sb);
@@ -393,7 +394,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 point[ParticleRecord.I_Z] = p.gsposition.z;
 
                                 // Extra
-                                Map<UCD, Double> extraAttributes = addExtraAttributes(ucdp, row);
+                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdp, row);
 
                                 IParticleRecord pb = new ParticleRecord(point, null, null, names, extraAttributes);
                                 list.add(pb);
@@ -425,9 +426,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    private Map<UCD, Double> addExtraAttributes(UCDParser ucdp, Object[] row) {
+    private ObjectDoubleMap<UCD> addExtraAttributes(UCDParser ucdp, Object[] row) {
         // Extra
-        Map<UCD, Double> extraAttributes = null;
+        ObjectDoubleMap<UCD> extraAttributes = null;
         for (UCD extra : ucdp.extra) {
             Double val = Double.NaN;
             try {
@@ -440,7 +441,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 }
             }
             if (extraAttributes == null)
-                extraAttributes = new HashMap<>((int) (ucdp.extra.size * 1.25f), 0.8f);
+                extraAttributes = new ObjectDoubleMap<>((int) (ucdp.extra.size * 1.25f), 0.8f);
             extraAttributes.put(extra, val);
         }
         return extraAttributes;

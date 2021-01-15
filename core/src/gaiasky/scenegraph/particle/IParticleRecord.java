@@ -1,5 +1,7 @@
 package gaiasky.scenegraph.particle;
 
+import gaiasky.util.ObjectDoubleMap;
+import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
@@ -122,5 +124,5 @@ public interface IParticleRecord {
     boolean hasExtra(UCD ucd);
     double getExtra(String name);
     double getExtra(UCD ucd);
-    Set<UCD> extraKeys();
+    Keys<UCD> extraKeys();
 }

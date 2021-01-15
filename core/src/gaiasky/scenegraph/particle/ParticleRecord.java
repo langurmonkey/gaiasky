@@ -2,10 +2,8 @@ package gaiasky.scenegraph.particle;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.NumberUtils;
-import gaiasky.util.Constants;
-import gaiasky.util.TLV3;
-import gaiasky.util.TLV3D;
-import gaiasky.util.TextUtils;
+import gaiasky.util.*;
+import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
@@ -13,7 +11,6 @@ import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
-import java.util.Map;
 import java.util.Set;
 
 public class ParticleRecord implements IParticleRecord {
@@ -57,7 +54,7 @@ public class ParticleRecord implements IParticleRecord {
     public String[] names;
 
     // Extra attributes (optional)
-    public Map<UCD, Double> extra;
+    public ObjectDoubleMap<UCD> extra;
 
     // Octant, if in octree
     public OctreeNode octant;
@@ -87,7 +84,7 @@ public class ParticleRecord implements IParticleRecord {
         this.names = names;
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id, String[] names, Map<UCD, Double> extra) {
+    public ParticleRecord(double[] dataD, float[] dataF, Long id, String[] names, ObjectDoubleMap<UCD> extra) {
         this(dataD, dataF, id, names);
         this.names = names;
         this.extra = extra;
@@ -97,7 +94,7 @@ public class ParticleRecord implements IParticleRecord {
         this(dataD, dataF, id, name == null ? new String[] {} : new String[] { name });
     }
 
-    public ParticleRecord(double[] dataD, float[] dataF, Long id, String name, Map<UCD, Double> extra) {
+    public ParticleRecord(double[] dataD, float[] dataF, Long id, String name, ObjectDoubleMap<UCD> extra) {
         this(dataD, dataF, id, name == null ? new String[] {} : new String[] { name }, extra);
     }
 
@@ -425,8 +422,8 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     @Override
-    public Set<UCD> extraKeys() {
-        return extra.keySet();
+    public Keys<UCD> extraKeys() {
+        return extra.keys();
     }
 
     @Override
@@ -437,7 +434,7 @@ public class ParticleRecord implements IParticleRecord {
     @Override
     public boolean hasExtra(String name) {
         if (extra != null) {
-            Set<UCD> ucds = extra.keySet();
+            Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
                 if (ucd.originalucd.equals(name) || ucd.colname.equals(name)) {
                     return true;
@@ -455,10 +452,10 @@ public class ParticleRecord implements IParticleRecord {
     @Override
     public double getExtra(String name) {
         if (extra != null) {
-            Set<UCD> ucds = extra.keySet();
+            Keys<UCD> ucds = extra.keys();
             for (UCD ucd : ucds) {
                 if ((ucd.originalucd != null && ucd.originalucd.equals(name)) || (ucd.colname != null && ucd.colname.equals(name))) {
-                    return extra.get(ucd);
+                    return extra.get(ucd, Double.NaN);
                 }
             }
         }
@@ -467,7 +464,7 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public double getExtra(UCD ucd) {
-        return hasExtra(ucd) ? extra.get(ucd) : Double.NaN;
+        return hasExtra(ucd) ? extra.get(ucd, Double.NaN) : Double.NaN;
 
     }
 
