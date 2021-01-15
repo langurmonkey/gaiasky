@@ -166,6 +166,8 @@ public class TextUtils {
      * @return The concatenation
      */
     public static String concatenate(String split, String... strs) {
+        if (strs == null || strs.length == 0)
+            return null;
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strs) {
             if (str != null && !str.isEmpty()) {

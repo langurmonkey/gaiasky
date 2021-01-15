@@ -33,13 +33,13 @@ public abstract class BinaryIOBase implements BinaryIO {
                 // Goes to double array
                 dataD[i] = mem.getDouble();
                 if (i < 3)
-                    dataD[i] *= factor;
-                if (i < 6)
-                    dataD[i] *= Constants.DISTANCE_SCALE_FACTOR;
+                    dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
                 int idx = i - ParticleRecord.STAR_SIZE_D;
                 dataF[idx] = (float) mem.getDouble();
+                if (i < 3)
+                    dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
                 floatOffset = idx + 1;
             }
         }
@@ -66,13 +66,19 @@ public abstract class BinaryIOBase implements BinaryIO {
 
         // NAME
         int nameLength = mem.getInt();
-        StringBuilder namesConcat = new StringBuilder();
-        for (int i = 0; i < nameLength; i++)
-            namesConcat.append(mem.getChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+        String[] names;
+        if (nameLength == 0) {
+            names = new String[] { id.toString() };
+        } else {
+            StringBuilder namesConcat = new StringBuilder();
+            for (int i = 0; i < nameLength; i++)
+                namesConcat.append(mem.getChar());
+            names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+        }
 
         return new ParticleRecord(dataD, dataF, id, names);
     }
+
 
     @Override
     public ParticleRecord readParticleRecord(DataInputStream in, double factor) throws IOException {
@@ -85,13 +91,13 @@ public abstract class BinaryIOBase implements BinaryIO {
                 // Goes to double array
                 dataD[i] = in.readDouble();
                 if (i < 3)
-                    dataD[i] *= factor;
-                if (i < 6)
-                    dataD[i] *= Constants.DISTANCE_SCALE_FACTOR;
+                    dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
                 int idx = i - ParticleRecord.STAR_SIZE_D;
                 dataF[idx] = (float) in.readDouble();
+                if (i < 3)
+                    dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
                 floatOffset = idx + 1;
             }
         }
@@ -118,10 +124,15 @@ public abstract class BinaryIOBase implements BinaryIO {
 
         // NAME
         int nameLength = in.readInt();
-        StringBuilder namesConcat = new StringBuilder();
-        for (int i = 0; i < nameLength; i++)
-            namesConcat.append(in.readChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+        String[] names;
+        if (nameLength == 0) {
+            names = new String[] { id.toString() };
+        } else {
+            StringBuilder namesConcat = new StringBuilder();
+            for (int i = 0; i < nameLength; i++)
+                namesConcat.append(in.readChar());
+            names = namesConcat.toString().split(Constants.nameSeparatorRegex);
+        }
 
         return new ParticleRecord(dataD, dataF, id, names);
     }

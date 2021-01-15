@@ -13,20 +13,20 @@ import java.io.IOException;
 public class BinaryVersion2 extends BinaryIOBase {
 
     protected BinaryVersion2() {
-        super(6, 7, false);
+        super(3, 10, false);
     }
 
     @Override
     public void writeParticleRecord(IParticleRecord sb, DataOutputStream out) throws IOException {
-        // 6 doubles
+        // 3 doubles
         out.writeDouble(sb.x());
         out.writeDouble(sb.y());
         out.writeDouble(sb.z());
-        out.writeDouble(sb.pmx());
-        out.writeDouble(sb.pmy());
-        out.writeDouble(sb.pmz());
 
-        // 7 floats
+        // 10 floats
+        out.writeFloat((float) sb.pmx());
+        out.writeFloat((float) sb.pmy());
+        out.writeFloat((float) sb.pmz());
         out.writeFloat(sb.mualpha());
         out.writeFloat(sb.mudelta());
         out.writeFloat(sb.radvel());
@@ -51,7 +51,11 @@ public class BinaryVersion2 extends BinaryIOBase {
 
         // NAME
         String namesConcat = sb.namesConcat();
-        out.writeInt(namesConcat.length());
-        out.writeChars(namesConcat);
+        if (namesConcat == null || namesConcat.length() == 0) {
+            out.writeInt(0);
+        } else {
+            out.writeInt(namesConcat.length());
+            out.writeChars(namesConcat);
+        }
     }
 }

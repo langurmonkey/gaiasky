@@ -258,7 +258,8 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         double dist = distpc * Constants.PC_TO_U;
 
                         /** NAME **/
-                        String name = String.valueOf(sourceid);
+                        // Avoid name, takes up too much space!
+                        String name = null;
 
                         /** RA and DEC **/
                         double ra = Parser.parseDouble(tokens[idx(ColId.ra)]);
@@ -360,10 +361,10 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         dataD[ParticleRecord.I_X] = pos.x;
                         dataD[ParticleRecord.I_Y] = pos.y;
                         dataD[ParticleRecord.I_Z] = pos.z;
-                        dataD[ParticleRecord.I_PMX] = pm.x;
-                        dataD[ParticleRecord.I_PMY] = pm.y;
-                        dataD[ParticleRecord.I_PMZ] = pm.z;
 
+                        dataF[ParticleRecord.I_FPMX] = (float) pm.x;
+                        dataF[ParticleRecord.I_FPMY] = (float) pm.y;
+                        dataF[ParticleRecord.I_FPMZ] = (float) pm.z;
                         dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
                         dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
                         dataF[ParticleRecord.I_FRADVEL] = (float) radvel;

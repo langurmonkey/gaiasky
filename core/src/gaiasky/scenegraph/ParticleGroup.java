@@ -29,7 +29,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.coord.Coordinates;
@@ -86,7 +85,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Particle size limits, in pixels
      */
-    public double[] particleSizeLimits = new double[]{3.5d, 800d};
+    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
 
     /**
      * Are the data of this group in the GPU memory?
@@ -182,32 +181,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     private final Comparator<Integer> comp;
 
     // Indices list buffer 1
-    protected int[] indices1;
+    protected Integer[] indices1;
     // Indices list buffer 2
-    protected int[] indices2;
+    protected Integer[] indices2;
     // Active indices list
-    protected int[] active;
+    protected Integer[] active;
     // Background indices list (the one we sort)
-    protected int[] background;
-    // Background wrapper, for sorting
-    List<Integer> backgroundWrapper = new AbstractList<>() {
-        @Override
-        public Integer get(int index) {
-            return background[index];
-        }
-
-        @Override
-        public int size() {
-            return background.length;
-        }
-
-        @Override
-        public Integer set(int index, Integer element) {
-            int v = background[index];
-            background[index] = element;
-            return v;
-        }
-    };
+    protected Integer[] background;
 
     // Is it updating?
     protected volatile boolean updating = false;
@@ -347,8 +327,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         metadata = new double[pointData.size()];
 
         // Initialise indices list with natural order
-        indices1 = new int[pointData.size()];
-        indices2 = new int[pointData.size()];
+        indices1 = new Integer[pointData.size()];
+        indices2 = new Integer[pointData.size()];
         for (int i = 0; i < pointData.size(); i++) {
             indices1[i] = i;
             indices2[i] = i;
@@ -969,26 +949,26 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case FOCUS_CHANGED:
-                if (data[0] instanceof String) {
-                    focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
-                } else {
-                    focusIndex = data[0] == this ? focusIndex : -1;
+        case FOCUS_CHANGED:
+            if (data[0] instanceof String) {
+                focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
+            } else {
+                focusIndex = data[0] == this ? focusIndex : -1;
+            }
+            updateFocusDataPos();
+            break;
+        case CAMERA_MOTION_UPDATE:
+            // Check that the particles have names
+            if (updaterTask != null && pointData.get(0).names() != null) {
+                final Vector3d currentCameraPos = (Vector3d) data[0];
+                long t = TimeUtils.millis() - lastSortTime;
+                if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
+                    updating = DatasetUpdater.execute(updaterTask);
                 }
-                updateFocusDataPos();
-                break;
-            case CAMERA_MOTION_UPDATE:
-                // Check that the particles have names
-                if (updaterTask != null && pointData.get(0).names() != null) {
-                    final Vector3d currentCameraPos = (Vector3d) data[0];
-                    long t = TimeUtils.millis() - lastSortTime;
-                    if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
-                        updating = DatasetUpdater.execute(updaterTask);
-                    }
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -1227,11 +1207,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public static ParticleGroup getParticleGroup(String name, List<IParticleRecord> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
-        double[] particleColor = dops == null || dops.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.particleColor;
+        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
         double colorNoise = dops == null ? 0 : dops.particleColorNoise;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
         double particleSize = dops == null ? 0 : dops.particleSize;
-        double[] minParticleSize = dops == null ? new double[]{2d, 200d} : dops.particleSizeLimits;
+        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 
@@ -1276,7 +1256,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         updateMetadata(time, camera);
 
         // Sort background list of indices
-        backgroundWrapper.sort(comp);
+        Arrays.sort(background, comp);
 
         // Synchronously with the render thread, update indices, lastSortTime and updating state
         GaiaSky.postRunnable(() -> {

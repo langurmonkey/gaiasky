@@ -19,8 +19,8 @@ import java.util.Set;
 public class ParticleRecord implements IParticleRecord {
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3();
-    public static final int STAR_SIZE_D = 6;
-    public static final int STAR_SIZE_F = 8;
+    public static final int STAR_SIZE_D = 3;
+    public static final int STAR_SIZE_F = 11;
 
     /* INDICES */
 
@@ -29,22 +29,20 @@ public class ParticleRecord implements IParticleRecord {
     public static final int I_Y = 1;
     public static final int I_Z = 2;
 
-    /* doubles (stars) */
-    public static final int I_PMX = 3;
-    public static final int I_PMY = 4;
-    public static final int I_PMZ = 5;
-
     /* floats (stars) */
-    public static final int I_FMUALPHA = 0;
-    public static final int I_FMUDELTA = 1;
-    public static final int I_FRADVEL = 2;
-    public static final int I_FAPPMAG = 3;
-    public static final int I_FABSMAG = 4;
-    public static final int I_FCOL = 5;
-    public static final int I_FSIZE = 6;
+    public static final int I_FPMX = 0;
+    public static final int I_FPMY = 1;
+    public static final int I_FPMZ = 2;
+    public static final int I_FMUALPHA = 3;
+    public static final int I_FMUDELTA = 4;
+    public static final int I_FRADVEL = 5;
+    public static final int I_FAPPMAG = 6;
+    public static final int I_FABSMAG = 7;
+    public static final int I_FCOL = 8;
+    public static final int I_FSIZE = 9;
 
     /* int */
-    public static final int I_FHIP = 7;
+    public static final int I_FHIP = 10;
 
     // Particle ID
     public long id;
@@ -96,11 +94,11 @@ public class ParticleRecord implements IParticleRecord {
     }
 
     public ParticleRecord(double[] dataD, float[] dataF, Long id, String name) {
-        this(dataD, dataF, id, new String[] { name });
+        this(dataD, dataF, id, name == null ? new String[] {} : new String[] { name });
     }
 
     public ParticleRecord(double[] dataD, float[] dataF, Long id, String name, Map<UCD, Double> extra) {
-        this(dataD, dataF, id, new String[] { name }, extra);
+        this(dataD, dataF, id, name == null ? new String[] {} : new String[] { name }, extra);
     }
 
     @Override
@@ -137,24 +135,24 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public double pmx() {
-        return dataD[I_PMX];
+        return dataF[I_FPMX];
     }
 
     @Override
     public double pmy() {
-        return dataD[I_PMY];
+        return dataF[I_FPMY];
     }
 
     @Override
     public double pmz() {
-        return dataD[I_PMZ];
+        return dataF[I_FPMZ];
     }
 
     @Override
     public void setVelocityVector(double vx, double vy, double vz) {
-        dataD[I_PMX] = vx;
-        dataD[I_PMY] = vy;
-        dataD[I_PMZ] = vz;
+        dataF[I_FPMX] = (float) vx;
+        dataF[I_FPMY] = (float) vy;
+        dataF[I_FPMZ] = (float) vz;
     }
 
     @Override
