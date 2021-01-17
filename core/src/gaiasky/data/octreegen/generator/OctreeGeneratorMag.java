@@ -196,8 +196,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     private int addStarToNode(IParticleRecord sb, OctreeNode node, Map<OctreeNode, List<IParticleRecord>> map) {
         List<IParticleRecord> array = map.get(node);
         if (array == null) {
-            // Array of a fraction of max part (four array resizes gives max part)
-            array = new ArrayList<>((int) Math.round(this.params.maxPart * 0.10662224073));
+            array = new ArrayList<>(25);
             map.put(node, array);
         }
         array.add(sb);
