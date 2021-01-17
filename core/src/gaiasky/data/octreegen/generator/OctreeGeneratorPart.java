@@ -149,7 +149,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
     private List<IParticleRecord> intersect(List<IParticleRecord> stars, OctreeNode box) {
         List<IParticleRecord> result = new ArrayList<>();
         for (IParticleRecord star : stars) {
-            if (star.octant() == null && box.box.contains(star.x(), star.y(), star.z())) {
+            if (star.octant() == null && box.contains(star.x(), star.y(), star.z())) {
                 result.add(star);
             }
         }

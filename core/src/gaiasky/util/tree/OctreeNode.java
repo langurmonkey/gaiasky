@@ -39,29 +39,23 @@ public class OctreeNode implements ILineRenderable {
     public static boolean LOAD_ACTIVE;
 
     /**
-     * Since OctreeNode is not to be parallelised, these can be static.
+     * Since OctreeNode is not to be parallelized, these can be static.
      **/
-    private static final BoundingBoxd boxcopy = new BoundingBoxd(new Vector3d(), new Vector3d());
     private static final Vector3d auxD1 = new Vector3d();
     private static final Vector3d auxD2 = new Vector3d();
     private static final Vector3d auxD3 = new Vector3d();
     private static final Vector3d auxD4 = new Vector3d();
-    private static final Rayd ray = new Rayd(new Vector3d(), new Vector3d());
-
-    private final Vector3d aux3d1;
 
     /** The load status of this node **/
     private LoadStatus status;
     /** The unique page identifier **/
     public long pageId;
     /** Contains the bottom-left-front position of the octant **/
-    public final Vector3d blf;
+    public final Vector3d min;
     /** Contains the top-right-back position of the octant **/
-    public final Vector3d trb;
+    public final Vector3d max;
     /** The centre of this octant **/
     public final Vector3d centre;
-    /** The bounding box **/
-    public final BoundingBoxd box;
     /** Octant size in x, y and z **/
     public final Vector3d size;
     /** Contains the depth level **/
@@ -86,8 +80,6 @@ public class OctreeNode implements ILineRenderable {
     public double distToCamera;
     /** Is this octant observed in this frame? **/
     public boolean observed;
-    /** Camera transform to render **/
-    Vector3d transform;
     /** The opacity of this node **/
     public float opacity;
 
@@ -103,14 +95,11 @@ public class OctreeNode implements ILineRenderable {
      * @param depth
      */
     public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
-        this.blf = new Vector3d(x - hsx, y - hsy, z - hsz);
-        this.trb = new Vector3d(x + hsx, y + hsy, z + hsz);
+        this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
+        this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
         this.centre = new Vector3d(x, y, z);
         this.size = new Vector3d(hsx * 2, hsy * 2, hsz * 2);
-        this.box = new BoundingBoxd(blf, trb);
-        this.aux3d1 = new Vector3d();
         this.depth = depth;
-        this.transform = new Vector3d();
         this.observed = false;
         this.status = LoadStatus.NOT_LOADED;
         this.radius = Math.sqrt(hsx * hsx + hsy * hsy + hsz * hsz);
@@ -129,14 +118,11 @@ public class OctreeNode implements ILineRenderable {
      */
     public OctreeNode(long pageId, double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
         this.pageId = pageId;
-        this.blf = new Vector3d(x - hsx, y - hsy, z - hsz);
-        this.trb = new Vector3d(x + hsx, y + hsy, z + hsz);
+        this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
+        this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
         this.centre = new Vector3d(x, y, z);
         this.size = new Vector3d(hsx * 2, hsy * 2, hsz * 2);
-        this.box = new BoundingBoxd(blf, trb);
-        this.aux3d1 = new Vector3d();
         this.depth = depth;
-        this.transform = new Vector3d();
         this.observed = false;
         this.status = LoadStatus.NOT_LOADED;
         this.radius = Math.sqrt(hsx * hsx + hsy * hsy + hsz * hsz);
@@ -331,11 +317,11 @@ public class OctreeNode implements ILineRenderable {
 
     public boolean insert(SceneGraphNode e, int level) {
         int node = 0;
-        if (e.getPosition().y > blf.y + ((trb.y - blf.y) / 2))
+        if (e.getPosition().y > min.y + ((max.y - min.y) / 2))
             node += 4;
-        if (e.getPosition().z > blf.z + ((trb.z - blf.z) / 2))
+        if (e.getPosition().z > min.z + ((max.z - min.z) / 2))
             node += 2;
-        if (e.getPosition().x > blf.x + ((trb.x - blf.x) / 2))
+        if (e.getPosition().x > min.x + ((max.x - min.x) / 2))
             node += 1;
         if (level == this.depth + 1) {
             return children[node].add(e);
@@ -489,6 +475,12 @@ public class OctreeNode implements ILineRenderable {
         return 0;
     }
 
+    public boolean contains(double x, double y, double z) {
+        return min.x <= x && max.x >= x && min.y <= y && max.y >= y && min.z <= z && max.z >= z;
+    }
+    public boolean contains(Vector3d v) {
+        return min.x <= v.x && max.x >= v.x && min.y <= v.y && max.y >= v.y && min.z <= v.z && max.z >= v.z;
+    }
     /**
      * Returns the deepest octant that contains the position
      * 
@@ -497,7 +489,7 @@ public class OctreeNode implements ILineRenderable {
      * @return The best octant
      */
     public OctreeNode getBestOctant(Vector3d position) {
-        if (!this.box.contains(position)) {
+        if (!this.contains(position)) {
             return null;
         } else {
             OctreeNode candidate = null;
@@ -550,7 +542,6 @@ public class OctreeNode implements ILineRenderable {
      *            The opacity to set.
      */
     public void update(Vector3d parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
-        parentTransform.put(transform);
         this.opacity = opacity;
         this.observed = false;
 
@@ -566,7 +557,7 @@ public class OctreeNode implements ILineRenderable {
         if (viewAngle < th0) {
             // Not observed
             setChildrenObserved(false);
-        } else if(this.observed = computeObserved2(cam)){
+        } else if(this.observed = computeObserved(cam)){
             nOctantsObserved++;
             //int L_DEPTH = 5;
             /**
@@ -626,38 +617,11 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Checks whether the given frustum intersects with the current octant.
-     * 
-     * @param parentTransform The parent transform
-     * @param frustum The frustum
-     */
-    private boolean computeObserved1(Vector3d parentTransform, Frustumd frustum) {
-        boxcopy.set(box);
-        // boxcopy.mul(boxtransf.idt().translate(parentTransform.getTranslation()));
-
-        observed = GlobalConf.program.CUBEMAP_MODE || frustum.pointInFrustum(boxcopy.getCenter(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner000(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner001(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner010(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner011(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner100(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner101(auxD1)) || frustum.pointInFrustum(boxcopy.getCorner110(auxD1))
-                || frustum.pointInFrustum(boxcopy.getCorner111(auxD1));
-
-        for (int i = 0; i < 4; i++) {
-            if (!observed) {
-                // 0-4
-                ray.origin.set(frustum.planePoints[i]);
-                ray.direction.set(frustum.planePoints[i + 4]).sub(ray.origin);
-                observed = Intersectord.intersectRayBoundsFast(ray, boxcopy.getCenter(auxD3), boxcopy.getDimensions(auxD4));
-            } else {
-                break;
-            }
-        }
-
-        return observed;
-    }
-
-    /**
      * Second method, which uses a simplification.
      * @param cam The camera
      * @return Whether the octant is observed
      */
-    private boolean computeObserved2(ICamera cam) {
+    private boolean computeObserved(ICamera cam) {
         return cam.getMode().isGaiaFov() || computeObservedFast(cam);
     }
 
@@ -802,8 +766,8 @@ public class OctreeNode implements ILineRenderable {
 
         if (this.col.a > 0) {
             // Camera correction
-            Vector3d loc = aux3d1;
-            loc.set(this.blf).add(camera.getInversePos());
+            Vector3d loc = auxD4;
+            loc.set(this.min).add(camera.getInversePos());
 
             /*
              * .·------· .' | .'| +---+--·' | | | | | | ,+--+---· |.' | .'

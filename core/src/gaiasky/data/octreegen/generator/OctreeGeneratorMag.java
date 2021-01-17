@@ -30,6 +30,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     private final OctreeGeneratorParams params;
     private final Comparator<IParticleRecord> comp;
     private OctreeNode root;
+    private Vector3d min = new Vector3d();
+    private Vector3d max = new Vector3d();
 
     public OctreeGeneratorMag(OctreeGeneratorParams params) {
         this.params = params;
@@ -135,46 +137,45 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     }
 
     private OctreeNode createOctant(Long id, double x, double y, double z, int level) {
-        Vector3d min = new Vector3d();
+        min.setZero();
         OctreeNode current = root;
         for (int l = 1; l <= level; l++) {
-            BoundingBoxd b = current.box;
-            double hs = b.getWidth() / 2d;
+            double hs = current.size.x / 2d;
             int idx;
-            if (x <= b.min.x + hs) {
-                if (y <= b.min.y + hs) {
-                    if (z <= b.min.z + hs) {
+            if (x <= current.min.x + hs) {
+                if (y <= current.min.y + hs) {
+                    if (z <= current.min.z + hs) {
                         idx = 0;
-                        min.set(b.min);
+                        min.set(current.min);
                     } else {
                         idx = 1;
-                        min.set(b.min.x, b.min.y, b.min.z + hs);
+                        min.set(current.min.x, current.min.y, current.min.z + hs);
                     }
                 } else {
-                    if (z <= b.min.z + hs) {
+                    if (z <= current.min.z + hs) {
                         idx = 2;
-                        min.set(b.min.x, b.min.y + hs, b.min.z);
+                        min.set(current.min.x, current.min.y + hs, current.min.z);
                     } else {
                         idx = 3;
-                        min.set(b.min.x, b.min.y + hs, b.min.z + hs);
+                        min.set(current.min.x, current.min.y + hs, current.min.z + hs);
                     }
                 }
             } else {
-                if (y <= b.min.y + hs) {
-                    if (z <= b.min.z + hs) {
+                if (y <= current.min.y + hs) {
+                    if (z <= current.min.z + hs) {
                         idx = 4;
-                        min.set(b.min.x + hs, b.min.y, b.min.z);
+                        min.set(current.min.x + hs, current.min.y, current.min.z);
                     } else {
                         idx = 5;
-                        min.set(b.min.x + hs, b.min.y, b.min.z + hs);
+                        min.set(current.min.x + hs, current.min.y, current.min.z + hs);
                     }
                 } else {
-                    if (z <= b.min.z + hs) {
+                    if (z <= current.min.z + hs) {
                         idx = 6;
-                        min.set(b.min.x + hs, b.min.y + hs, b.min.z);
+                        min.set(current.min.x + hs, current.min.y + hs, current.min.z);
                     } else {
                         idx = 7;
-                        min.set(b.min.x + hs, b.min.y + hs, b.min.z + hs);
+                        min.set(current.min.x + hs, current.min.y + hs, current.min.z + hs);
                     }
                 }
             }
@@ -208,8 +209,6 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         return 0;
     }
 
-    Vector3d min = new Vector3d();
-    Vector3d max = new Vector3d();
 
     /**
      * Gets the id of the node which corresponds to the given xyz position
@@ -226,8 +225,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             // Level 0 always has only one node only
             return root.pageId;
         }
-        min.set(root.box.min);
-        max.set(root.box.max);
+        min.set(root.min);
+        max.set(root.max);
         // Half side
         double hs = (max.x - min.x) / 2d;
         int[] hashv = new int[25];
