@@ -51,7 +51,7 @@ public interface IOctreeGenerator {
             }
         }
 
-        OctreeNode root = null;
+        OctreeNode root;
         if (params.sunCentre) {
             /** THE CENTRE OF THE OCTREE IS THE SUN **/
             pos(furthest, pos0);
