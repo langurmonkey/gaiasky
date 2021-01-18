@@ -167,6 +167,7 @@ public class GaiaSkyDesktop implements IObserver {
             printUsage(jc);
             return;
         }
+
         try {
             // Check java version
             javaVersionCheck();

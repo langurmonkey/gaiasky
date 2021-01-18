@@ -111,6 +111,12 @@ public class Constants {
     public static double U_TO_Ro = 1d / Ro_TO_U;
 
     /**
+     * Bytes to MB
+     */
+    public static final double MB_TO_BYTE = 1000 * 1000;
+    public static final double BYTE_TO_MB = 1d/MB_TO_BYTE;
+
+    /**
      * Logarithmic depth buffer constant. Controls the resolution close to the camera
      */
     public static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
