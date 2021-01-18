@@ -1,12 +1,9 @@
 package gaiasky.scenegraph.particle;
 
-import gaiasky.util.ObjectDoubleMap;
 import gaiasky.util.ObjectDoubleMap.Keys;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
-
-import java.util.Set;
 
 public interface IParticleRecord {
 
