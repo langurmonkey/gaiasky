@@ -12,7 +12,7 @@ SET GSDIR=%~dp0
 cd %GSDIR%
 
 :: Memory
-SET OPTS=-Xms2g -Xmx8g
+SET OPTS=-Xms2g -Xmx6g
 :: Garbage Collector G1
 SET OPTS=%OPTS% -XX:+UseG1GC
 :: Assets location
