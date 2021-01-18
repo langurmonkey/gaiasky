@@ -31,8 +31,7 @@ import java.util.List;
 
 /**
  * Implements the loading and streaming of octree nodes from files. This version
- * loads star groups using the
- * {@link gaiasky.data.group.SerializedDataProvider}
+ * loads star groups using {@link gaiasky.data.group.BinaryDataProvider}.
  *
  * @author tsagrista
  */
