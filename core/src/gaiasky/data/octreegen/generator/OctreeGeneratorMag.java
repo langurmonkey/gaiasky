@@ -9,8 +9,6 @@ import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.octreegen.StarBrightnessComparator;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
-import gaiasky.util.math.BoundingBoxd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.tree.OctreeNode;
 
@@ -132,7 +130,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             sg.octantId = node.pageId;
         }
 
-        root.updateNumbers();
+        root.updateCounts();
         return root;
     }
 

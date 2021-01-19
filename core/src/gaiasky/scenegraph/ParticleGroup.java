@@ -196,7 +196,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected UpdaterTask updaterTask;
 
     // Camera dx threshold
-    protected static final double CAM_DX_TH = 1000 * Constants.AU_TO_U;
+    protected static final double CAM_DX_TH = 100 * Constants.PC_TO_U;
     // Last sort position
     protected Vector3d lastSortCameraPos;
 

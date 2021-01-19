@@ -36,7 +36,6 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;

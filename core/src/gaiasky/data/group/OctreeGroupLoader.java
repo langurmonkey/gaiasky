@@ -132,6 +132,8 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             touch(octant);
 
             octant.setStatus(LoadStatus.LOADED);
+            // Update counts
+            octant.touch(data.size());
 
             addLoadedInfo(octant.pageId, octant.countObjects());
         }

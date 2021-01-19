@@ -45,7 +45,7 @@ public class OctreeGeneratorPart implements IOctreeGenerator {
 
         treatLevel(inputLists, 0, octantsPerLevel, MathUtils.clamp((float) aggregation.getMaxPart() / (float) catalog.size(), 0f, 1f));
 
-        root.updateNumbers();
+        root.updateCounts();
 
         return root;
     }
