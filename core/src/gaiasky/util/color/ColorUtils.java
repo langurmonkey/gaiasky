@@ -5,8 +5,15 @@
 
 package gaiasky.util.color;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
+import gaiasky.util.Logger;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.parse.Parser;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 
 public class ColorUtils {
 
@@ -39,9 +46,9 @@ public class ColorUtils {
     public static float[] ddBrown = new float[] { 101f / 255f, 56f / 255f, 25f / 255f, 1f };
     public static Color ddBrownC = getCol(ddBrown);
     // Others
-    public static float[] oLightGray = new float[] {0.6f, 0.6f, 0.6f, 1f};
+    public static float[] oLightGray = new float[] { 0.6f, 0.6f, 0.6f, 1f };
     public static Color oLightGrayC = getCol(oLightGray);
-    public static float[] oDarkGray = new float[] {0.3f, 0.3f, 0.3f, 1f};
+    public static float[] oDarkGray = new float[] { 0.3f, 0.3f, 0.3f, 1f };
     public static Color oDarkGrayC = getCol(oDarkGray);
 
     private static Color getCol(float[] c) {
@@ -261,6 +268,73 @@ public class ColorUtils {
         rgba[2] = 1;
     }
 
+    private static float[][] teffToRGB_harre;
+
+    private static void initHarreData() {
+        if (teffToRGB_harre == null) {
+            teffToRGB_harre = new float[105][];
+            FileHandle fh = Gdx.files.internal("data/teff-rgb.csv");
+            try {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(fh.read()));
+                // Skip header
+                reader.readLine();
+                int i = 0;
+                while (reader.ready()) {
+                    String[] tokens = reader.readLine().split(",");
+
+                    float[] data = new float[4];
+                    data[0] = Parser.parseFloat(tokens[0]);
+                    data[1] = Parser.parseFloat(tokens[1]);
+                    data[2] = Parser.parseFloat(tokens[2]);
+                    data[3] = Parser.parseFloat(tokens[3]);
+                    teffToRGB_harre[i] = data;
+
+                    i++;
+                }
+            } catch (Exception e) {
+                Logger.getLogger("ColorUtils").error("Error parsing teff-rgb.csv file");
+                Logger.getLogger("ColorUtils").error(e);
+            }
+        }
+    }
+
+    /**
+     * Convert effective temperature to RGB using the Harre and Heller 2021 (Digital Color of Stars)
+     * method.
+     *
+     * @param teff The effective temperature of the star
+     * @return The RGB color in a float array
+     * @see <a href="https://ui.adsabs.harvard.edu/abs/2021arXiv210106254H/abstract">Paper at ADS</a>
+     */
+    public static float[] teffToRGB_harre(double teff) {
+        initHarreData();
+        float[] rgb = new float[3];
+        int idx = 0;
+        for (int i = 1; i < teffToRGB_harre.length; i++) {
+            float teff0 = teffToRGB_harre[i - 1][0];
+            float teff1 = teffToRGB_harre[i][0];
+            if (teff < teff0) {
+                break;
+            } else if (teff >= teff0 && teff < teff1) {
+                // Found
+                if (teff - teff0 < teff1 - teff) {
+                    idx = i - 1;
+                } else {
+                    idx = i;
+                }
+                break;
+            } else {
+                // Take last
+                idx = i;
+            }
+        }
+
+        rgb[0] = teffToRGB_harre[idx][1];
+        rgb[1] = teffToRGB_harre[idx][2];
+        rgb[2] = teffToRGB_harre[idx][3];
+        return rgb;
+    }
+
     /**
      * Converts effective temperature in Kelvin (1000-40000) to RGB
      *
@@ -269,7 +343,7 @@ public class ColorUtils {
      * @see <a href="www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/">Temperature to RGB</a>
      * @see <a href="www.zombieprototypes.com/?p=210">Color temperature conversion</a>
      */
-    public static float[] teffToRGB(double teff) {
+    public static float[] teffToRGB_rough(double teff) {
         double r, g, b;
 
         double temp = teff / 100;

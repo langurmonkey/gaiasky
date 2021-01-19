@@ -353,7 +353,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                                 teff = MathUtilsd.lint(xp, 1.5, 15, 3521.6, 3000);
                             }
                         }
-                        float[] rgb = ColorUtils.teffToRGB(teff);
+                        float[] rgb = ColorUtils.teffToRGB_rough(teff);
                         float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         double[] dataD = new double[ParticleRecord.STAR_SIZE_D];

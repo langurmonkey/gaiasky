@@ -177,6 +177,7 @@ project(":core") {
             include "img/**"
             include "text/**"
             include "shader/**"
+            include "data/**"
             include "shaders/**"
             include "skins/**"
             exclude "skins/raw"

@@ -3,6 +3,8 @@
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...HEAD)
 
 ### Bug Fixes
+- RAM units in crash report, add indentation
+- default proper motion factor and length values
 - 'App not responding' message on win10 - fix by upgrading to gdx-controllers 2.0.0, plus some other goodies
 - remove useless network checker thread, fix thumbnail URL crash on win10
 - minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333), [#345](https://gitlab.com/langurmonkey/gaiasky/issues/345)
@@ -20,6 +22,7 @@
 - safemode flag used correctly, fix raymarching not being setup in safe mode
 
 ### Build System
+- auto-update offered through install4j, backup solution in-app still available when not launched using install4j
 - remove sdl2gdx in favor of gdx-controllers:2.0.0
 - exclude old `gdx-controllers` library
 - add --parallelism parameter to
@@ -28,10 +31,18 @@
 - update release instructions with flatpak, fix build script
 
 ### Code Refactoring
+- interface particle record to allow for multiple implementations
+- binary providers are versioned, fix binary version 0/1 loading
 - increase number of maps for octree gen
 - modify default bloom settings (default intensity, passes, amount)
 
+### Documentation
+- fix javadocs for binary format (1/n)
+
 ### Features
+- add output format version argument to octree generator
+- support for  in catalog selector
+- add versioning to binary catalog format. Create new, more compact version
 - improve information of version line in welcome and loading screens
 - add GL info to welcome screen
 - new connection to wikipedia REST api to show content in a window
@@ -46,6 +57,11 @@
 - case-insensitive columns in STIL loader, enable FITS loading
 
 ### Performance Improvements
+- arrays of size not dependent on maxPart for octreegen
+- remove boundingBox from octant, reduce memory token duplication
+- replace extra attributes hashmap with objectdoublemap for RAM compactness
+- do not write star name strings if they are the same as ID, velocity vectors represented with single-precision floats
+- reduce main memory usage of stars by adjusting data types
 - switch to unordered gdx Arrays when possible to minimize copy operations
 - replace `java.util.ArrayList`s with Libgdx's `Array`s to minimize allocations
 - index lists are of base types, use dst2 for distance sorting

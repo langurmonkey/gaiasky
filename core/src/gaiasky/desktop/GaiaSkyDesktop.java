@@ -37,6 +37,7 @@ import gaiasky.screenshot.ScreenshotsManager;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
