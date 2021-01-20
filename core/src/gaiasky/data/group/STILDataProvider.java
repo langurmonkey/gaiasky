@@ -8,11 +8,11 @@ package gaiasky.data.group;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.color.BVToTeff_ballesteros;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -33,9 +33,7 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -187,6 +185,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 ucdp.parse(table);
 
                 if (ucdp.haspos) {
+                    BVToTeff_ballesteros bvToTeff = new BVToTeff_ballesteros();
+
                     int nInvalidPllx = 0;
                     long i = 0l;
                     long step = Math.max(1l, Math.round(count / 100d));
@@ -287,7 +287,21 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Default color
                                 color = 0.656f;
                             }
+
+                            /* TEFF */
+                            float teff;
+                            if (!ucdp.TEFF.isEmpty()) {
+                                Pair<UCD, Double> teffPair = getDoubleUcd(ucdp.TEFF, row);
+                                teff = teffPair.getSecond().floatValue();
+                            } else {
+                                // Convert B-V to T_eff using Ballesteros 2012
+                                teff = (float) bvToTeff.bvToTeff(color);
+                            }
+
+                            // RGB
                             float[] rgb = ColorUtils.BVtoRGB(color);
+                            //float[] rgb = ColorUtils.teffToRGB_harre(teff);
+
                             float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                             /* IDENTIFIER AND NAME */
@@ -381,6 +395,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdp, row);
+                                if (ucdp.TEFF.isEmpty()) {
+                                    UCD teffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
+                                    extraAttributes.put(teffUCD, teff);
+                                } else {
+                                    extraAttributes.put(ucdp.TEFF.first(), teff);
+                                }
 
                                 IParticleRecord sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
                                 list.add(sb);
@@ -403,13 +423,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         } catch (Exception e) {
                             logger.debug(e);
                             logger.debug("Exception parsing row " + i + ": skipping");
-                        }
-                        i++;
+                        } i++;
                         if (updateCallback != null && i % step == 0) {
                             updateCallback.run(i, count);
                         }
-                    }
-                    if (nInvalidPllx > 0) {
+                    } if (nInvalidPllx > 0) {
                         logger.warn("Found " + nInvalidPllx + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
                     }
                 } else {
