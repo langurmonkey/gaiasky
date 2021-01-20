@@ -298,11 +298,14 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             catalogGroup.add(tooManyDR).bottom().left();
+        } else if (numStarCatalogsSelected > 1) {
+            OwnLabel warn2Star = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
+            warn2Star.setColor(ColorUtils.aOrangeC);
+            catalogGroup.add(warn2Star).bottom().left();
         } else if (numStarCatalogsSelected == 0) {
             OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
             noStarCatalogs.setColor(ColorUtils.aOrangeC);
             catalogGroup.add(noStarCatalogs).bottom().left();
-
         } else {
             OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numTotalCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
             ok.setColor(ColorUtils.gBlueC);
