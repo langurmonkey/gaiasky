@@ -269,6 +269,23 @@
       "file": "@mirror-url@catalog/edr3/007-ruwe/v01_20201217/catalog-edr3-ruwe.tar.gz"
     },
     {
+      "name": "catalog-edr3-full",
+      "type": "catalog-lod",
+      "version": 1,
+      "mingsversion": 30002,
+      "size": 47296411957,
+      "nobjects": 1467764769,
+      "check": "catalog-edr3-full.json",
+      "data": [
+        "catalog-edr3-full.json",
+        "catalog/edr3-full"
+      ],
+      "description": "Gaia eDR3 full - Based on bayesian geometric distances by Bayler-Jones et al., includes Hipparcos",
+      "sha256": "79269b09ccbf60b2bdc6b7139caa8b746e0ce8fa5eed32aac8bdaaab15f7e705",
+      "link": "https://ui.adsabs.harvard.edu/abs/2020arXiv201205220B%2F",
+      "file": "@mirror-url@catalog/edr3/008-full/v01_20210120/catalog-edr3-full.tar.gz"
+    },
+    {
       "name": "catalog-gcns",
       "type": "catalog-gaia",
       "version": 2,
