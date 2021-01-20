@@ -34,7 +34,10 @@ void main() {
         discard;
     }
 
-    fragColor = alpha * v_col;
+    // White core
+    float core = 1.0 - smoothstep(0.0, 0.04, distance(vec2(0.5), uv) * 2.0);
+    // Final color
+    fragColor = clamp(alpha * v_col + core * 2.0, 0.0, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     #ifdef velocityBufferFlag
