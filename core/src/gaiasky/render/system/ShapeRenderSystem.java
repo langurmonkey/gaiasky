@@ -13,6 +13,7 @@ import gaiasky.render.IShapeRenderable;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalResources;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
 
     public ShapeRenderSystem(RenderGroup rg, float[] alphas) {
         super(rg, alphas, null);
-        this.shapeRenderer = new ShapeRenderer();
+        this.shapeRenderer = new ShapeRenderer(5000, GlobalResources.spriteShader);
 
     }
 

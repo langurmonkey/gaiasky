@@ -307,7 +307,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             openVRListener = new OpenVRListener(this);
 
         // Shape renderer (pointer guide lines)
-        shapeRenderer = new ShapeRenderer(10);
+        shapeRenderer = new ShapeRenderer(10, GlobalResources.spriteShader);
         shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
 
         // Init sprite batch for crosshair
