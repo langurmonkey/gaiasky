@@ -152,6 +152,24 @@
       "file": "@mirror-url@catalog/edr3/000-default/v01_20201217/catalog-edr3-default.tar.gz"
     },
     {
+      "name": "catalog-edr3-default",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 988598109,
+      "nobjects": 14950954,
+      "check": "catalog-edr3-default.json",
+      "data": [
+        "catalog-edr3-default.json",
+        "catalog/edr3-default"
+      ],
+      "description": "Gaia eDR3 default - 20%/1.5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "9ff46326b4016a1c3a1efc52a60a27a01fc4e61f80f6c7abaa35eab5a72e5fa8",
+      "link": "@mirror-url@catalog/edr3/000-default",
+      "file": "@mirror-url@catalog/edr3/000-default/v02_20210120/catalog-edr3-default.tar.gz"
+    },
+    {
       "name": "catalog-edr3-small",
       "type": "catalog-lod",
       "version": 1,
@@ -167,6 +185,24 @@
       "sha256": "f91531e3d81dd53915d2adf47b0790e83137d0e5916d5c21a99f2705c6531b72",
       "link": "@mirror-url@catalog/edr3/001-small",
       "file": "@mirror-url@catalog/edr3/001-small/v01_20201217/catalog-edr3-small.tar.gz"
+    },
+    {
+      "name": "catalog-edr3-small",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 549676915,
+      "nobjects": 8149112,
+      "check": "catalog-edr3-small.json",
+      "data": [
+        "catalog-edr3-small.json",
+        "catalog/edr3-small"
+      ],
+      "description": "Gaia eDR3 small - 10%/0.5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "9051f5bd6eeaaa182ef22591650e196c14fa8a1e51ff95089dca6f716fd08336",
+      "link": "@mirror-url@catalog/edr3/001-small",
+      "file": "@mirror-url@catalog/edr3/001-small/v02_20210120/catalog-edr3-small.tar.gz"
     },
     {
       "name": "catalog-edr3-medium",
@@ -186,6 +222,24 @@
       "file": "@mirror-url@catalog/edr3/002-medium/v01_20201217/catalog-edr3-medium.tar.gz"
     },
     {
+      "name": "catalog-edr3-medium",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 3161206041,
+      "nobjects": 48758169,
+      "check": "catalog-edr3-medium.json",
+      "data": [
+        "catalog-edr3-medium.json",
+        "catalog/edr3-medium"
+      ],
+      "description": "Gaia eDR3 medium - 30%/5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "578eb6cb4863dd4b00103c6d83875fb7c757b5934d6c91fbe225765948eeb648",
+      "link": "@mirror-url@catalog/edr3/002-medium",
+      "file": "@mirror-url@catalog/edr3/002-medium/v02_20210120/catalog-edr3-medium.tar.gz"
+    },
+    {
       "name": "catalog-edr3-large",
       "type": "catalog-lod",
       "version": 1,
@@ -201,6 +255,24 @@
       "sha256": "2e3f0b938b374752ac36248b2fb9dfd5cd5b53c9ee8f9eefbb62f844a1a4b0f9",
       "link": "@mirror-url@catalog/edr3/003-large",
       "file": "@mirror-url@catalog/edr3/003-large/v01_20201217/catalog-edr3-large.tar.gz"
+    },
+    {
+      "name": "catalog-edr3-large",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 7624262278,
+      "nobjects": 118420063,
+      "check": "catalog-edr3-large.json",
+      "data": [
+        "catalog-edr3-large.json",
+        "catalog/edr3-large"
+      ],
+      "description": "Gaia eDR3 large - 50%/12.5% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "bfa73af9d519a6d9c1a2863d3b4b9853284cbaf4bb03af265d5f4818a7e09144",
+      "link": "@mirror-url@catalog/edr3/003-large",
+      "file": "@mirror-url@catalog/edr3/003-large/v02_20210120/catalog-edr3-large.tar.gz"
     },
     {
       "name": "catalog-edr3-verylarge",
@@ -219,6 +291,24 @@
       "file": "@mirror-url@catalog/edr3/004-verylarge/v01_20201217/catalog-edr3-verylarge.tar.gz"
     },
     {
+      "name": "catalog-edr3-verylarge",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 28680593489,
+      "nobjects": 449664356,
+      "check": "catalog-edr3-verylarge.json",
+      "data": [
+        "catalog-edr3-verylarge.json",
+        "catalog/edr3-verylarge"
+      ],
+      "description": "Gaia eDR3 very large - 50% parallax relative error, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "6ab953b3e728a953c44f17294c8c6197081b39ae8ba060fc0c85cc76294441b8",
+      "link": "@mirror-url@catalog/edr3/004-verylarge",
+      "file": "@mirror-url@catalog/edr3/004-verylarge/v02_20210120/catalog-edr3-verylarge.tar.gz"
+    },
+    {
       "name": "catalog-edr3-extralarge",
       "type": "catalog-lod",
       "version": 1,
@@ -233,6 +323,24 @@
       "sha256": "87cff91dc5080fd5a74a54824b70c61646a0cea3d6b532821f3d6457d4334e9e",
       "link": "@mirror-url@catalog/edr3/005-extralarge",
       "file": "@mirror-url@catalog/edr3/005-extralarge/v01_20201217/catalog-edr3-extralarge.tar.gz"
+    },
+    {
+      "name": "catalog-edr3-extralarge",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 41927551937,
+      "nobjects": 688188981,
+      "check": "catalog-edr3-extralarge.json",
+      "data": [
+        "catalog-edr3-extralarge.json",
+        "catalog/edr3-extralarge"
+      ],
+      "description": "Gaia eDR3 extra large - 95% parallax relative error, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "d0f0de14451a0ab77ed1268bfbb063aefcafe1a5b8ba19a2c50355f75d59a492",
+      "link": "@mirror-url@catalog/edr3/005-extralarge",
+      "file": "@mirror-url@catalog/edr3/005-extralarge/v02_20210120/catalog-edr3-extralarge.tar.gz"
     },
     {
       "name": "catalog-edr3-bright",
@@ -252,6 +360,24 @@
       "file": "@mirror-url@catalog/edr3/006-bright/v01_20201217/catalog-edr3-bright.tar.gz"
     },
     {
+      "name": "catalog-edr3-bright",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 747884256,
+      "nobjects": 11203392,
+      "check": "catalog-edr3-bright.json",
+      "data": [
+        "catalog-edr3-bright.json",
+        "catalog/edr3-bright"
+      ],
+      "description": "Gaia eDR3 bright - 90%/1% parallax relative errors for bright/faint stars, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "e3e899758212e394deffc084baedc6da3dc22ec9c03393dcd24da97405e4ca22",
+      "link": "@mirror-url@catalog/edr3/006-bright",
+      "file": "@mirror-url@catalog/edr3/006-bright/v02_20210120/catalog-edr3-bright.tar.gz"
+    },
+    {
       "name": "catalog-edr3-ruwe",
       "type": "catalog-lod",
       "version": 1,
@@ -269,6 +395,24 @@
       "file": "@mirror-url@catalog/edr3/007-ruwe/v01_20201217/catalog-edr3-ruwe.tar.gz"
     },
     {
+      "name": "catalog-edr3-ruwe",
+      "type": "catalog-lod",
+      "version": 2,
+      "mingsversion": 30002,
+      "size": 7143311829,
+      "nobjects": 111845598,
+      "check": "catalog-edr3-ruwe.json",
+      "data": [
+        "catalog-edr3-ruwe.json",
+        "catalog/edr3-ruwe"
+      ],
+      "description": "Gaia eDR3 RUWE - Stars for which the RUWE (renormalized unit weight error) is <= 1.4, includes Hipparcos",
+      "releasenotes" : "Use more compact binary version 2",
+      "sha256": "6467e2b576c0ec64798d68502650ccd2c8bbc34e8c60e0001aa58ec111d5c4f0",
+      "link": "http://www.rssd.esa.int/doc_fetch.php?id=3757412",
+      "file": "@mirror-url@catalog/edr3/007-ruwe/v02_20210120/catalog-edr3-ruwe.tar.gz"
+    },
+    {
       "name": "catalog-edr3-full",
       "type": "catalog-lod",
       "version": 1,
@@ -281,6 +425,7 @@
         "catalog/edr3-full"
       ],
       "description": "Gaia eDR3 full - Based on bayesian geometric distances by Bayler-Jones et al., includes Hipparcos",
+      "releasenotes" : "First version of full catalog for eDR3",
       "sha256": "79269b09ccbf60b2bdc6b7139caa8b746e0ce8fa5eed32aac8bdaaab15f7e705",
       "link": "https://ui.adsabs.harvard.edu/abs/2020arXiv201205220B%2F",
       "file": "@mirror-url@catalog/edr3/008-full/v01_20210120/catalog-edr3-full.tar.gz"
