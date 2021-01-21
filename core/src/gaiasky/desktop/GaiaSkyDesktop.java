@@ -58,7 +58,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     /*
      * Source version to compare to config file and datasets.
-     * This is usually tag where each chunk takes 2 spaces.
+     * This is usually tag where each number is allocated 2 digits.
      * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
      * Version = major * 10000 + minor * 100 + rev
      * So 1.2.5 -> 10205
