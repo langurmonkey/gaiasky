@@ -92,7 +92,7 @@ if __name__ == '__main__':
     arguments = check_args(sys.argv[1:])
 
     gs_folder = arguments.g
-    def_file = arguments.d
+    def_file = arguments.p
     undo = arguments.u
     tag = arguments.t
     tag_annotation = arguments.a
