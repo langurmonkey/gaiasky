@@ -1,81 +1,85 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.2...HEAD)
+
+
+<a name="3.0.2"></a>
+## [3.0.2](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.1) (2021-01-21)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...3.0.2)
 
 ### Bug Fixes
-- stuttering updating counts top-down in large octrees, now the counts are updated locally, bottom-up, when octants are loaded/unloaded
-- RAM units in crash report, add indentation
-- default proper motion factor and length values
-- 'App not responding' message on win10 - fix by upgrading to gdx-controllers 2.0.0, plus some other goodies
-- remove useless network checker thread, fix thumbnail URL crash on win10
-- minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333), [#345](https://gitlab.com/langurmonkey/gaiasky/issues/345)
-- VR init failure actually prompts right error message
-- properties files' encodings set to UTF-8. Fixes [#344](https://gitlab.com/langurmonkey/gaiasky/issues/344)
-- VR mode now accepts any window resize, backbuffer size used for everything internally
-- BREAKING CHANGE API landOnObjectLocation() -> landAtObjectLocation()
-- octreegen additional split accepts now coma and spaces
-- use different sprite batch for VR UI with backbuffer size
-- pan scaled with fov factor
-- red-night theme disabled styles
-- proper 'disabled' textures for buttons
-- labels occlude objects behind, buffer writes disabled.
-- download speed moving cancel button in dataset manager
-- safemode flag used correctly, fix raymarching not being setup in safe mode
+- stuttering updating counts top-down in large octrees, now the counts are updated locally, bottom-up, when octants are loaded/unloaded 
+- RAM units in crash report, add indentation 
+- default proper motion factor and length values 
+- 'App not responding' message on win10 - fix by upgrading to `gdx-controllers:2.0.0`, plus some other goodies 
+- remove useless network checker thread, fix thumbnail URL crash on Win10 
+- minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333), [#345](https://gitlab.com/langurmonkey/gaiasky/issues/345) [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333) 
+- VR init failure actually prompts right error message 
+- properties files' encodings set to UTF-8. Fixes [#344](https://gitlab.com/langurmonkey/gaiasky/issues/344) [#344](https://gitlab.com/langurmonkey/gaiasky/issues/344) 
+- VR mode now accepts any window resize, backbuffer size used for everything internally 
+- BREAKING CHANGE API `landOnObjectLocation()` -> `landAtObjectLocation()` 
+- octreegen additional split accepts now coma and spaces 
+- use different sprite batch for VR UI with backbuffer size 
+- pan scaled with FOV factor 
+- red-night theme disabled styles 
+- proper 'disabled' textures for buttons 
+- labels occlude objects behind, buffer writes disabled. 
+- download speed moving cancel button in dataset manager 
+- `safemode` flag used correctly, fix raymarching not being setup in safe mode 
 
 ### Build System
-- auto-update offered through install4j, backup solution in-app still available when not launched using install4j
-- remove sdl2gdx in favor of gdx-controllers:2.0.0
-- exclude old `gdx-controllers` library
-- add --parallelism parameter to
-- fix script so that geodistances file is additional data instead of special argument
-- fix helper script args
-- update release instructions with flatpak, fix build script
+- auto-update offered through install4j, backup solution in-app still available when not launched using install4j 
+- remove `sdl2gdx` in favor of `gdx-controllers:2.0.0`
+- exclude old `gdx-controllers` library 
+- add --parallelism parameter to 
+- fix script so that geo-distances file is additional data instead of special argument 
+- fix helper script arguments
+- update release instructions with Flatpak, fix build script 
 
 ### Code Refactoring
-- interface particle record to allow for multiple implementations
-- binary providers are versioned, fix binary version 0/1 loading
-- increase number of maps for octree gen
-- modify default bloom settings (default intensity, passes, amount)
+- interface particle record to allow for multiple implementations 
+- binary providers are versioned, fix binary version 0/1 loading 
+- increase number of maps for octree gen 
+- modify default bloom settings (default intensity, passes, amount) 
 
 ### Documentation
-- fix javadocs for binary format (1/n)
+- fix javadocs for binary format
 
 ### Features
-- add warning when selecting more than one star catalog
-- add white core to star shaders
-- add T_eff to STIL-loaded catalogs
-- add color conversion by Harre and Heller
-- add output format version argument to octree generator
-- support for  in catalog selector
-- add versioning to binary catalog format. Create new, more compact version
-- improve information of version line in welcome and loading screens
-- add GL info to welcome screen
-- new connection to wikipedia REST api to show content in a window
-- add unsharp mask post-processing filter
-- new checkbox textures, adjust window visuals
-- add projection lines to star groups
-- dataset selection dialog uses same structure as dataset manager
-- time warp slider instead of buttons
-- new fractional UI scaling from x0.7 to x2.0
-- add regexp to some column names for STIL loader, add invalid names array
-- add regexp to some column names for STIL loader, add invalid names array
-- case-insensitive columns in STIL loader, enable FITS loading
+- add warning when selecting more than one star catalog 
+- add white core to star shaders 
+- add `T_eff` to STIL-loaded catalogs 
+- add color conversion by Harre and Heller 
+- add output format version argument to octree generator 
+- support for  in catalog selector 
+- add versioning to binary catalog format. Create new, more compact version 
+- improve information of version line in welcome and loading screens 
+- add GL info to welcome screen 
+- new connection to wikipedia REST API to show content in a window 
+- add unsharp mask post-processing filter 
+- new checkbox textures, adjust window visuals 
+- add projection lines to star groups 
+- dataset selection dialog uses same structure as dataset manager 
+- time warp slider instead of buttons 
+- new fractional UI scaling
+- add regexp to some column names for STIL loader, add invalid names array 
+- case-insensitive columns in STIL loader, enable FITS loading 
 
 ### Performance Improvements
-- arrays of size not dependent on maxPart for octreegen
-- remove boundingBox from octant, reduce memory token duplication
-- replace extra attributes hashmap with objectdoublemap for RAM compactness
-- do not write star name strings if they are the same as ID, velocity vectors represented with single-precision floats
-- reduce main memory usage of stars by adjusting data types
-- switch to unordered gdx Arrays when possible to minimize copy operations
-- replace `java.util.ArrayList`s with Libgdx's `Array`s to minimize allocations
-- index lists are of base types, use dst2 for distance sorting
-- improve memory usage of extra star attributes and fix render system unnecessary `setUniform` calls
-- reduce memory usage in particle groups -> no metadata array
+- arrays of size not dependent on `maxPart` for octreegen 
+- remove boundingBox from octant, reduce memory token duplication 
+- replace extra attributes hashmap with objectdoublemap for RAM compactness 
+- do not write star name strings if they are the same as ID, velocity vectors represented with single-precision floats 
+- reduce main memory usage of stars by adjusting data types 
+- switch to unordered gdx Arrays when possible to minimize copy operations 
+- replace `java.util.ArrayList`s with Libgdx's `Array`s to minimize allocations 
+- index lists are of base types, use `dst2` for distance sorting 
+- improve memory usage of extra star attributes and fix render system unnecessary `setUniform` calls 
+- reduce memory usage in particle groups -> no metadata array 
 
 ### Style
-- fix missing coma in night-red theme json file
-- update thread names, fix monitor objects, increase sg update time interval
+- fix missing coma in night-red theme JSON file 
+- update thread names, fix monitor objects, increase scene graph update time interval 
 
 <a name="3.0.1"></a>
 ## [3.0.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.0) (2020-12-10)
