@@ -1522,8 +1522,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.clearListeners();
 
         dw = new DatasetsWidget(stage, skin);
-        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
-        Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
+        dw.reloadLocalCatalogs();
+        Actor dataSource = dw.buildDatasetsWidget(false, 20);
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
         dataDownload.setSize(240f, 40f);

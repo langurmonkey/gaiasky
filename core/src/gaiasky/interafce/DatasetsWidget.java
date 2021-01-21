@@ -20,10 +20,13 @@ import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.scene2d.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
-import java.util.List;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import static gaiasky.interafce.DownloadDataWindow.getIcon;
 
@@ -39,6 +42,8 @@ public class DatasetsWidget {
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
     private OwnScrollPane scroll;
+    public Array<DatasetType> types;
+    public Array<DatasetDesc> datasets;
 
     public DatasetsWidget(Stage ui, Skin skin) {
         super();
@@ -47,7 +52,7 @@ public class DatasetsWidget {
         candidates = new HashMap<>();
     }
 
-    public Array<FileHandle> buildCatalogFiles() {
+    public void reloadLocalCatalogs() {
         // Discover data sets, add as buttons
         Array<FileHandle> catalogLocations = new Array<>();
         catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
@@ -58,42 +63,11 @@ public class DatasetsWidget {
             FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
             catalogFiles.addAll(cfs);
         }
-        return catalogFiles;
-    }
-
-    public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles) {
-        return buildDatasetsWidget(catalogFiles, true);
-    }
-
-    public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn) {
-        return buildDatasetsWidget(catalogFiles, scrollOn, 40);
-    }
-
-    public Actor buildDatasetsWidget(Array<FileHandle> catalogFiles, boolean scrollOn, int maxCharsDescription) {
-        float pad = 4.8f;
 
         JsonReader reader = new JsonReader();
-
-        // Containers
-        Table dsTable = new Table(skin);
-        dsTable.align(Align.top);
-
-        Actor result;
-
-        scroll = null;
-        if (scrollOn) {
-            scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
-            scroll.setFadeScrollBars(false);
-            scroll.setScrollingDisabled(true, false);
-            scroll.setSmoothScrolling(true);
-
-            result = scroll;
-        } else {
-            result = dsTable;
-        }
-
         Map<String, DatasetType> typeMap = new HashMap<>();
-        List<DatasetType> types = new ArrayList<>();
+        types = new Array<>();
+        datasets = new Array<>();
         for (FileHandle catalogFile : catalogFiles) {
             JsonValue val = reader.parse(catalogFile);
             DatasetDesc dd = new DatasetDesc(reader, val);
@@ -115,12 +89,44 @@ public class DatasetsWidget {
             }
 
             dt.datasets.add(dd);
+            datasets.add(dd);
         }
 
         Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DownloadDataWindow.getTypeWeight(datasetType.typeStr));
-        Collections.sort(types, byType);
+        types.sort(byType);
+    }
 
-        cbs = new OwnCheckBox[catalogFiles.size];
+    public Actor buildDatasetsWidget() {
+        return buildDatasetsWidget(true);
+    }
+
+    public Actor buildDatasetsWidget(boolean scrollOn) {
+        return buildDatasetsWidget(scrollOn, 40);
+    }
+
+    public Actor buildDatasetsWidget(boolean scrollOn, int maxCharsDescription) {
+        float pad = 4.8f;
+
+
+        // Containers
+        Table dsTable = new Table(skin);
+        dsTable.align(Align.top);
+
+        Actor result;
+
+        scroll = null;
+        if (scrollOn) {
+            scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
+            scroll.setFadeScrollBars(false);
+            scroll.setScrollingDisabled(true, false);
+            scroll.setSmoothScrolling(true);
+
+            result = scroll;
+        } else {
+            result = dsTable;
+        }
+
+        cbs = new OwnCheckBox[datasets.size];
         Array<String> currentSetting = GlobalConf.data.CATALOG_JSON_FILES;
 
         int i = 0;
@@ -202,6 +208,7 @@ public class DatasetsWidget {
                 nobjsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.nobjects.tooltip"), skin, 10));
                 dsTable.add(nobjsLabel).left().padBottom(pad).row();
 
+                datasets.add(dataset);
                 candidates.put(cb, dataset.catalogFile.path());
 
                 cbs[i++] = cb;
@@ -211,7 +218,7 @@ public class DatasetsWidget {
 
         ButtonGroup<OwnCheckBox> bg = new ButtonGroup<>();
         bg.setMinCheckCount(0);
-        bg.setMaxCheckCount(catalogFiles.size);
+        bg.setMaxCheckCount(datasets.size);
         bg.add(cbs);
 
         dsTable.pack();
@@ -222,7 +229,7 @@ public class DatasetsWidget {
         }
 
         // No files
-        if (catalogFiles.size == 0) {
+        if (datasets.size == 0) {
             dsTable.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center();
         }
 
@@ -242,5 +249,20 @@ public class DatasetsWidget {
             if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
                 return true;
         return false;
+    }
+
+    /**
+     * Finds the dataset with the given descriptor file in the dataset descriptor list.
+     *
+     * @param descriptorFile The filename of the descriptor file.
+     * @return The dataset descriptor or null if it was not found.
+     */
+    public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {
+        if (datasets != null && Files.exists(descriptorFile))
+            for (DatasetDesc dd : datasets) {
+                if (Files.exists(dd.path) && Files.isSameFile(dd.path, descriptorFile))
+                    return dd;
+            }
+        return null;
     }
 }

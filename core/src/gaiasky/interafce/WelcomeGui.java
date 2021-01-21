@@ -11,7 +11,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -39,7 +38,6 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
-import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
@@ -63,7 +61,6 @@ public class WelcomeGui extends AbstractGui {
     protected CatalogSelectionWindow cdw;
 
     private FileHandle dataDescriptor;
-    private Array<FileHandle> catalogFiles;
 
     private boolean downloadError = false;
     private Texture bgTex;
@@ -104,7 +101,7 @@ public class WelcomeGui extends AbstractGui {
             gaiaSky();
         } else {
             dw = new DatasetsWidget(ui, skin);
-            catalogFiles = dw.buildCatalogFiles();
+            dw.reloadLocalCatalogs();
 
             // Otherwise, check for updates, etc.
             clearGui();
@@ -354,7 +351,7 @@ public class WelcomeGui extends AbstractGui {
         if (dw == null) {
             dw = new DatasetsWidget(ui, skin);
         }
-        catalogFiles = dw.buildCatalogFiles();
+        dw.reloadLocalCatalogs();
         clearGui();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
@@ -369,7 +366,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numCatalogsAvailable() {
-        return catalogFiles.size;
+        return dw.datasets.size;
     }
 
     private int numGaiaDRCatalogsSelected() {
@@ -389,14 +386,20 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsSelected() {
         int matches = 0;
-        if(dd == null)
+        if (dd == null && (dw == null || dw.datasets == null))
             return 0;
+
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
             // File name with no extension
             Path path = Path.of(f);
             String filenameExt = path.getFileName().toString();
             try {
-                DatasetDesc dataset = dd.findDatasetByDescriptor(path);
+                DatasetDesc dataset = null;
+                if (dd != null) {
+                    dataset = dd.findDatasetByDescriptor(path);
+                } else if (dw != null) {
+                    dataset = dw.findDatasetByDescriptor(path);
+                }
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
                     matches++;
                 }

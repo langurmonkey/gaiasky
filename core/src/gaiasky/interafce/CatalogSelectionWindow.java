@@ -61,13 +61,13 @@ public class CatalogSelectionWindow extends GenericDialog {
         Cell<Actor> cell = content.add((Actor) null);
 
         dw = new DatasetsWidget(stage, skin);
-        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
+        dw.reloadLocalCatalogs();
 
         cell.clearActor();
         cell.space(4.8f);
         cell.padTop(pad5);
         cell.padLeft(pad20).padRight(pad20);
-        cell.setActor(dw.buildDatasetsWidget(catalogFiles));
+        cell.setActor(dw.buildDatasetsWidget());
 
     }
 
