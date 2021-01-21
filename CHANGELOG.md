@@ -3,6 +3,7 @@
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...HEAD)
 
 ### Bug Fixes
+- stuttering updating counts top-down in large octrees, now the counts are updated locally, bottom-up, when octants are loaded/unloaded
 - RAM units in crash report, add indentation
 - default proper motion factor and length values
 - 'App not responding' message on win10 - fix by upgrading to gdx-controllers 2.0.0, plus some other goodies
@@ -40,6 +41,10 @@
 - fix javadocs for binary format (1/n)
 
 ### Features
+- add warning when selecting more than one star catalog
+- add white core to star shaders
+- add T_eff to STIL-loaded catalogs
+- add color conversion by Harre and Heller
 - add output format version argument to octree generator
 - support for  in catalog selector
 - add versioning to binary catalog format. Create new, more compact version
@@ -72,7 +77,6 @@
 - fix missing coma in night-red theme json file
 - update thread names, fix monitor objects, increase sg update time interval
 
-
 <a name="3.0.1"></a>
 ## [3.0.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.0) (2020-12-10)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.0...3.0.1)
@@ -81,18 +85,18 @@
 - show information dialog in case of OpenGL or java version problems 
 - disposing bookmarks manager without it being initialized 
 - update default screen size 
-- remove idle FPS and backbuffer config 
-- file chooser allows selection when entering directories if in DIRECTORIES mode 
+- remove idle FPS and backbuffer configuration
+- file chooser allows selection when entering directories if in 'DIRECTORIES' mode 
 - update default max number of stars 
 - increase max heap space from 4 to 8 GB in all configurations 
 - 24-bit depth buffer, 8-bit stencil 
-- JSON pointer from dr2 to edr3 
+- JSON pointer from DR2 to eDR3 
 
 ### Build System
-- update bundled jre version to 11.0.9+11 
+- update bundled JRE version to 11.0.9+11 
 
 ### Code Refactoring
-- all startup messages to i18n bundle, fix swing themes 
+- all startup messages to I18N bundle, fix swing themes 
 
 ### Documentation
 - update pointers to documentation 
@@ -100,12 +104,12 @@
 ### Features
 - saner error reporting with new dialog 
 - add error dialog that works with OpenGL 2.0 and informs the user of insufficient OpenGL or Java versions 
-- add safe graphics mode CLI argument '--safemode' 
+- add safe graphics mode CLI argument `--safemode`
 - dynamic resolution scaling - first implementation, deactivated 
 - add safe graphics mode, which does not use float buffers at all. It is activated by default if the context creation for 4.1 fails. It uses OpenGL 3.1. 
 - download manager is capable of resuming downloads 
 - special flag to enable OpenGL debug output 
-- enable GPU debug info with --debug flag 
+- enable GPU debug info with `--debug` flag 
 
 <a name="3.0.0"></a>
 ## [3.0.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.1) (2020-12-02)

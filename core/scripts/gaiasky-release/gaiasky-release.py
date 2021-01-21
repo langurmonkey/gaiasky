@@ -91,24 +91,30 @@ def process_files(defs, gsfolder, do=True):
 if __name__ == '__main__':
     arguments = check_args(sys.argv[1:])
 
-    print("Gaia Sky folder: %s" % arguments.gs_folder)
+    gs_folder = arguments.g
+    def_file = arguments.d
+    undo = arguments.u
+    tag = arguments.t
+    tag_annotation = arguments.a
+
+    print("Gaia Sky folder: %s" % gs_folder)
     print()
 
     # PARSE FILE DATA
-    if arguments.def_file is None:
-        arguments.def_file = "%s/%s" % (get_script_path(), "gaiasky-release-none.json")
+    if def_file is None:
+        def_file = "%s/%s" % (get_script_path(), "gaiasky-release-none.json")
 
-    print("Loading definitions file: %s" % arguments.def_file)
-    with open(arguments.def_file, 'r') as f:
+    print("Loading definitions file: %s" % def_file)
+    with open(def_file, 'r') as f:
         defs = json.load(f)
 
     releaserules = defs["releaserules"]
 
     # PROCESS FILES
-    process_files(releaserules, arguments.gs_folder, do=not arguments.undo)
+    process_files(releaserules, gs_folder, do=not undo)
 
     # If undo, end 
-    if arguments.undo:
+    if undo:
         print("Undid possible changes, finishing here")
         print("Note that -t is not supported with -u")
         exit()
@@ -117,16 +123,16 @@ if __name__ == '__main__':
     input("When done, come back and hit enter to continue.")
 
     # CREATE RELEASE - Only if not undo, tag is not empty and we have commands to run
-    if arguments.tag is not None and defs["releasecommands"] is not None:
-        if arguments.tag_annotation is None:
-            arguments.tag_annotation = "Version %s" % arguments.tag
+    if tag is not None and defs["releasecommands"] is not None:
+        if tag_annotation is None:
+            tag_annotation = "Version %s" % tag
 
         print()
         print()
         print("======================== CREATE RELEASE ======================")
-        print("  base:          %s" % arguments.gs_folder)
-        print("  tag:           %s" % arguments.tag)
-        print("  annotation:    %s" % arguments.tag_annotation)
+        print("  base:          %s" % gs_folder)
+        print("  tag:           %s" % tag)
+        print("  annotation:    %s" % tag_annotation)
         print("==============================================================")
         print()
         print()
@@ -142,27 +148,27 @@ if __name__ == '__main__':
                 cmdstr.append(cmd)
 
             print("==> RUNNING: %s" % cmdstr)
-            p = subprocess.Popen(cmdstr, cwd=arguments.gs_folder)
+            p = subprocess.Popen(cmdstr, cwd=gs_folder)
             p.wait()
 
         # REVERT FILES
-        process_files(releaserules, arguments.gs_folder, do=False)
+        process_files(releaserules, gs_folder, do=False)
 
         # PRINT TODOS
         print()
         print()
         print("================ TODOs ================")
         print()
-        print(" > Your release %s is in %s/releases" % (arguments.tag, arguments.gs_folder))
+        print(" > Your release %s is in %s/releases" % (tag, gs_folder))
         print(" > Upload the files in mintaka.ari.uni-heidelberg.de:/dataB/gaiasky/files/releases/")
         print(" > Generate the html listings for the new files: dir2html")
         print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
-        print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
+        print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % gs_folder)
         print(" > Add new release to gitlab: https://gitlab.com/langurmonkey/gaiasky/-/releases")
-        print(" > Create new docs tag (%s) and generate the docs: %s/docs/bin/publish-docs" % (arguments.tag, arguments.gs_folder))
+        print(" > Create new docs tag (%s) and generate the docs: %s/docs/bin/publish-docs" % (tag, gs_folder))
         print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
         print(" > Update flatpak repo and do pull request. See here: https://gitlab.com/langurmonkey/gaiasky/-/issues/337#note_460878130")
-        print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
+        print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % tag)
         print()
         print(">DONE<")
 
