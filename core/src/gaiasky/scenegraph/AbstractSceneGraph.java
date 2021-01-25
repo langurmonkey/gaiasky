@@ -6,10 +6,10 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -17,10 +17,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
     private static final Log logger = Logger.getLogger(AbstractSceneGraph.class);
@@ -28,12 +25,12 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
-    protected Map<String, SceneGraphNode> stringToNode;
+    protected ObjectMap<String, SceneGraphNode> stringToNode;
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations
      **/
-    protected Map<Integer, IPosition> hipMap;
+    protected ObjectMap<Integer, IPosition> hipMap;
     /** Number of objects per thread **/
     protected int[] objectsPerThread;
     /** Does it contain an octree **/
@@ -75,9 +72,9 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode = new HashMap<>(nodes.size);
+        stringToNode = new ObjectMap<>(nodes.size);
         stringToNode.put(root.names[0].toLowerCase().trim(), root);
-        hipMap = new HashMap<>();
+        hipMap = new ObjectMap<>();
         for (SceneGraphNode node : nodes) {
             addToIndex(node, stringToNode);
 
@@ -181,73 +178,117 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         }
     }
 
-    protected void addToIndex(SceneGraphNode node, Map<String, SceneGraphNode> map) {
-        if (node.names != null) {
-            if (node.mustAddToIndex()) {
-                for (String name : node.names) {
-                    String namelc = name.toLowerCase().trim();
-                    if (!map.containsKey(namelc)) {
-                        map.put(namelc, node);
-                    } else if (!namelc.isEmpty()) {
-                        SceneGraphNode conflict = map.get(namelc);
-                        logger.warn("Name conflict: " + name + " (" + node.getClass().getSimpleName().toLowerCase() + ") conflicts with " + conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")");
+    protected void addToIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
+        synchronized (map) {
+            if (node.names != null) {
+                if (node.mustAddToIndex()) {
+                    for (String name : node.names) {
+                        String namelc = name.toLowerCase().trim();
+                        if (!map.containsKey(namelc)) {
+                            map.put(namelc, node);
+                        } else if (!namelc.isEmpty()) {
+                            SceneGraphNode conflict = map.get(namelc);
+                            logger.warn("Name conflict: " + name + " (" + node.getClass().getSimpleName().toLowerCase() + ") conflicts with " + conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")");
+                        }
                     }
+
+                    // Id
+                    if (node.id > 0) {
+                        String id = String.valueOf(node.id);
+                        map.put(id, node);
+                    }
+                }
+
+                // Special cases
+                node.addToIndex(map);
+            }
+        }
+    }
+
+    private void removeFromIndex(SceneGraphNode node, ObjectMap<String, SceneGraphNode> map) {
+        synchronized(map) {
+            if (node.names != null) {
+                for (String name : node.names) {
+                    map.remove(name.toLowerCase().trim());
                 }
 
                 // Id
                 if (node.id > 0) {
                     String id = String.valueOf(node.id);
-                    map.put(id, node);
+                    map.remove(id);
                 }
+
+                // Special cases
+                node.removeFromIndex(map);
             }
-
-            // Special cases
-            node.addToIndex(map);
-        }
-    }
-
-    private void removeFromIndex(SceneGraphNode node, Map<String, SceneGraphNode> map) {
-        if (node.names != null) {
-            for (String name : node.names) {
-                map.remove(name.toLowerCase().trim());
-            }
-
-            // Id
-            if (node.id > 0) {
-                String id = String.valueOf(node.id);
-                map.remove(id);
-            }
-
-            // Special cases
-            node.removeFromIndex(map);
         }
     }
 
     public synchronized void addNodeAuxiliaryInfo(SceneGraphNode node) {
-        // Name index
-        addToIndex(node, stringToNode);
-        // Star map
-        addToHipMap(node);
+        synchronized (stringToNode) {
+            // Name index
+            addToIndex(node, stringToNode);
+            // Star map
+            addToHipMap(node);
+        }
     }
 
     public synchronized void removeNodeAuxiliaryInfo(SceneGraphNode node) {
-        // Name index
-        removeFromIndex(node, stringToNode);
-        // Star map
-        removeFromHipMap(node);
+        synchronized (stringToNode) {
+            // Name index
+            removeFromIndex(node, stringToNode);
+            // Star map
+            removeFromHipMap(node);
+        }
+    }
+
+    public void matchingFocusableNodes(String name, Array<String> results) {
+        matchingFocusableNodes(name, results, 10);
+    }
+
+    public void matchingFocusableNodes(String name, Array<String> results, int maxResults) {
+        synchronized (stringToNode) {
+            ObjectMap.Keys<String> keys = new ObjectMap.Keys<>(stringToNode);
+            name = name.toLowerCase().trim();
+
+            int i = 0;
+            // Starts with
+            for (String key : keys) {
+                SceneGraphNode sgn = stringToNode.get(key);
+                if (sgn instanceof IFocus && key.startsWith(name)) {
+                    results.add(key);
+                    i++;
+                }
+                if (i >= maxResults)
+                    return;
+            }
+            // Contains
+            for (String key : keys) {
+                SceneGraphNode sgn = stringToNode.get(key);
+                if (sgn instanceof IFocus && key.contains(name)) {
+                    results.add(key);
+                    i++;
+                }
+                if (i >= maxResults)
+                    return;
+            }
+        }
     }
 
     public boolean containsNode(String name) {
-        return stringToNode.containsKey(name.toLowerCase().trim());
+        synchronized(stringToNode) {
+            return stringToNode.containsKey(name.toLowerCase().trim());
+        }
     }
 
     public SceneGraphNode getNode(String name) {
-        //return root.getNode(name);
-        name = name.toLowerCase().strip();
-        SceneGraphNode node = stringToNode.get(name);
-        if (node != null && node instanceof StarGroup)
-            ((StarGroup) node).getFocus(name);
-        return node;
+        synchronized (stringToNode) {
+            name = name.toLowerCase().strip();
+            SceneGraphNode node = stringToNode.get(name);
+            if (node != null && node instanceof StarGroup)
+                ((StarGroup) node).getFocus(name);
+            return node;
+        }
     }
 
     public Array<SceneGraphNode> getNodes() {
@@ -284,7 +325,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     @Override
-    public Map<Integer, IPosition> getStarMap() {
+    public ObjectMap<Integer, IPosition> getStarMap() {
         return hipMap;
     }
 

@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -864,7 +865,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      *
      * @param map The index
      */
-    protected void addToIndex(Map<String, SceneGraphNode> map) {
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
     }
 
     /**
@@ -872,7 +873,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      *
      * @param map The index
      */
-    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
     }
 
     /**

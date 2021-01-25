@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
@@ -391,7 +392,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    protected void addToIndex(Map<String, SceneGraphNode> map) {
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
         if (index != null) {
             Set<String> keys = index.keySet();
             for (String key : keys) {
@@ -401,7 +402,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
         if (index != null) {
             Set<String> keys = index.keySet();
             for (String key : keys) {

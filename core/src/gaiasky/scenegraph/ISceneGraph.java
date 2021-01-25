@@ -7,6 +7,7 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
@@ -54,6 +55,22 @@ public interface ISceneGraph extends Disposable {
     void update(ITimeFrameProvider time, ICamera camera);
 
     /**
+     * Returns focusable nodes matching the given string, to a maximum
+     * of 10
+     * @param str The name
+     * @param results The results
+     */
+    void matchingFocusableNodes(String str, Array<String> results);
+
+    /**
+     * Returns focusable nodes matching the given string, to a maximum
+     * of <code>maxResults</code>
+     * @param str The name
+     * @param results The results
+     * @param maxResults The maximum number of results
+     */
+    void matchingFocusableNodes(String str, Array<String> results, int maxResults);
+    /**
      * Whether this scene graphs contains a node with the given name
      *
      * @param name The name
@@ -89,7 +106,7 @@ public interface ISceneGraph extends Disposable {
      *
      * @return The HIP star map
      */
-    Map<Integer, IPosition> getStarMap();
+    ObjectMap<Integer, IPosition> getStarMap();
 
     Array<SceneGraphNode> getNodes();
 
