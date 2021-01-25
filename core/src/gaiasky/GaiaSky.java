@@ -13,7 +13,6 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3WindowConfiguration;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -48,7 +47,6 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.Logger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.ds.DatasetUpdater;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
@@ -797,7 +795,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Clear temp
         try {
-            Path tmp = SysUtils.getDefaultTmpDir();
+            Path tmp = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION);
             if (java.nio.file.Files.exists(tmp) && java.nio.file.Files.isDirectory(tmp))
                 GlobalResources.deleteRecursively(tmp);
         } catch (Exception e) {

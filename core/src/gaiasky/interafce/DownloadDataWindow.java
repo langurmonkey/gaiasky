@@ -46,6 +46,7 @@ import java.nio.ByteOrder;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Stream;
@@ -184,23 +185,26 @@ public class DownloadDataWindow extends GenericDialog {
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {
-            OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
-            catalogsLoc.pad(buttonPad * 4f);
-            catalogsLoc.setMinWidth(minW);
+            OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
+            dataLocationButton.pad(buttonPad * 4f);
+            dataLocationButton.setMinWidth(minW);
             downloadTable.add(catalogsLocLabel).left().padBottom(padLarge);
-            downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padLarge).row();
+            downloadTable.add(dataLocationButton).left().padLeft(pad).padBottom(padLarge).row();
             Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padLarge);
             notice.row();
 
-            catalogsLoc.addListener((event) -> {
+            dataLocationButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (Files.isReadable(result) && Files.isWritable(result)) {
-                                // do stuff with result
-                                catalogsLoc.setText(result.toAbsolutePath().toString());
+                                // Set data location
+                                dataLocationButton.setText(result.toAbsolutePath().toString());
+                                // Change data location
                                 GlobalConf.data.DATA_LOCATION = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
+                                // Create temp dir
+                                SysUtils.mkdir(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION));
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {
                                     // Reset datasets
@@ -553,7 +557,7 @@ public class DownloadDataWindow extends GenericDialog {
             String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
 
             String filename = FilenameUtils.getName(url);
-            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/" + filename + ".part");
+            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION) + "/" + filename + ".part");
 
             ProgressRunnable progressDownload = (read, total, progress, speed) -> {
                 double readMb = (double) read / 1e6d;
@@ -796,10 +800,10 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void cleanupTempFiles(boolean dataDownloads, boolean dataDescriptor) {
         if (dataDownloads) {
-            Path testPath = SysUtils.getDefaultTmpDir();
+            Path tempDir = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION);
             // Clean up partial downloads
             try {
-                Stream<Path> stream = java.nio.file.Files.find(testPath, 2, (path, basicFileAttributes) -> {
+                Stream<Path> stream = java.nio.file.Files.find(tempDir, 2, (path, basicFileAttributes) -> {
                     File file = path.toFile();
                     return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
                 });
@@ -811,7 +815,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         if (dataDescriptor) {
             // Clean up data descriptor
-            Path gsDownload = SysUtils.getDefaultTmpDir().resolve("gaiasky-data.json");
+            Path gsDownload = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION).resolve("gaiasky-data.json");
             deleteFile(gsDownload);
         }
     }
