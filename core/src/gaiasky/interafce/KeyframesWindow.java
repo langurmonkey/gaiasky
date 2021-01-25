@@ -354,6 +354,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {

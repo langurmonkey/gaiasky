@@ -235,6 +235,8 @@ public class DesktopConfInit extends ConfInit {
 
         // Safe graphics mode
         boolean SAFE_GRAPHICS_MODE = Parser.parseBoolean(p.getProperty("program.safe.graphics.mode", "false"));
+        // Show hidden
+        boolean FILE_CHOOSER_SHOW_HIDDEN = Parser.parseBoolean(p.getProperty("program.filechooser.showhidden", "false"));
 
         LinkedList<String> NET_MASTER_SLAVES = null;
         if (NET_MASTER) {
@@ -245,7 +247,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, UI_SCALE, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, UI_SCALE, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE, FILE_CHOOSER_SHOW_HIDDEN);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -530,12 +532,14 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.net.slave.yaw", Float.toString(GlobalConf.program.NET_SLAVE_YAW));
         p.setProperty("program.net.slave.pitch", Float.toString(GlobalConf.program.NET_SLAVE_PITCH));
         p.setProperty("program.net.slave.roll", Float.toString(GlobalConf.program.NET_SLAVE_ROLL));
+        p.setProperty("program.filechooser.showhidden", Boolean.toString(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN));
         // Persist last location if file chooser
         if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
             p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
         // Only persist if flag is down, otherwise it has been set via CLI argument and must not be persisted
         if (!GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG)
             p.setProperty("program.safe.graphics.mode", Boolean.toString(GlobalConf.program.SAFE_GRAPHICS_MODE));
+
 
         /** SCENE **/
         p.setProperty("scene.object.startup", GlobalConf.scene.STARTUP_OBJECT);

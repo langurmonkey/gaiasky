@@ -370,6 +370,8 @@ public class FullGui extends AbstractGui {
             break;
         case SHOW_PLAYCAMERA_ACTION:
             FileChooser fc = new FileChooser(I18n.txt("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+            fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+            fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
             fc.setAcceptText(I18n.txt("gui.camera.run"));
             fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
             fc.setAcceptedFiles("*.dat, *.gsc");

@@ -28,6 +28,7 @@ import gaiasky.util.TextUtils;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Comparator;
+import java.util.function.Consumer;
 
 /**
  * A simple file chooser for scene2d.ui
@@ -62,6 +63,7 @@ public class FileChooser extends GenericDialog {
     private float scrollPaneWidth, scrollPanelHeight, maxPathLength;
     private ScrollPane scrollPane;
     private CheckBox hidden;
+    private Consumer<Boolean> hiddenConsumer;
 
     private Path currentDir, previousDir, nextDir;
     protected String result;
@@ -346,6 +348,9 @@ public class FileChooser extends GenericDialog {
                 } catch (IOException e) {
                     logger.error(e);
                 }
+                if(hiddenConsumer != null){
+                    hiddenConsumer.accept(this.showHidden);
+                }
                 return true;
             }
             return false;
@@ -457,6 +462,18 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
+    }
+
+    public void setShowHidden(boolean showHidden){
+        hidden.setChecked(showHidden);
+    }
+
+    /**
+     * Sets a consumer that is run when the property 'showHidden' changes, whit its value.
+     * @param r The consumer
+     */
+    public void setShowHiddenConsumer(Consumer<Boolean> r){
+        this.hiddenConsumer = r;
     }
 
     public void setAcceptedFiles(String accepted) {

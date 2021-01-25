@@ -363,6 +363,8 @@ public class GuiRegistry implements IObserver {
                 }
 
                 FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setAcceptText(I18n.txt("gui.loadcatalog"));
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits"));
                 fc.setAcceptedFiles("*.vot, *.csv, *.fits");

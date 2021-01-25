@@ -1047,6 +1047,8 @@ public class GlobalConf {
         public StereoProfile STEREO_PROFILE = StereoProfile.VR_HEADSET;
         // Ask for exit confirmation
         public boolean EXIT_CONFIRMATION;
+        // Show hidden files in file chooser
+        public boolean FILE_CHOOSER_SHOW_HIDDEN;
 
         public ProgramConf() {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
@@ -1054,7 +1056,7 @@ public class GlobalConf {
 
         public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, float uI_SCALE, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
                 List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, OriginType rECURSIVE_GRID_ORIGIN, boolean rECURSIVE_GRID_ORIGIN_LINES, boolean eXIT_CONFIRMATION,
-                String mIRROR, boolean sAFE_GRAPHICS_MODE) {
+                String mIRROR, boolean sAFE_GRAPHICS_MODE, boolean fILE_CHOOSER_SHOW_HIDDEN) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -1094,6 +1096,7 @@ public class GlobalConf {
             RECURSIVE_GRID_ORIGIN_LINES = rECURSIVE_GRID_ORIGIN_LINES;
             EXIT_CONFIRMATION = eXIT_CONFIRMATION;
             SAFE_GRAPHICS_MODE = sAFE_GRAPHICS_MODE;
+            FILE_CHOOSER_SHOW_HIDDEN = fILE_CHOOSER_SHOW_HIDDEN;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {

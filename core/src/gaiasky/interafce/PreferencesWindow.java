@@ -1104,6 +1104,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Paths.get(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -1205,6 +1207,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Paths.get(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result

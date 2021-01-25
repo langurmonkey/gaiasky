@@ -196,6 +196,8 @@ public class DownloadDataWindow extends GenericDialog {
             dataLocationButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
+                    fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                    fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (Files.isReadable(result) && Files.isWritable(result)) {
