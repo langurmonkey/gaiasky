@@ -30,7 +30,6 @@ layout (location = 0) out vec4 fragColor;
 #define rays_const 50000000.0
 
 // Decays
-#define corona_decay 0.2
 #define light_decay 0.05
 
 #ifdef velocityBufferFlag
@@ -38,7 +37,7 @@ layout (location = 0) out vec4 fragColor;
 #endif
 
 float core(float distance_center, float inner_rad){
-    if(inner_rad == 0.0){
+    if (inner_rad == 0.0){
         return 0.0;
     }
     float core = 1.0 - step(inner_rad / 5.0, distance_center);
@@ -56,25 +55,26 @@ float average(vec4 color){
     return (color.r + color.g + color.b) / 3.0;
 }
 
-float startex(vec2 tc){
-    return average(texture(u_texture0, tc));
+float starTexture(vec2 uv){
+    return average(texture(u_texture0, uv));
 }
 
 
 vec4 draw() {
-    float dist = distance (vec2 (0.5), v_texCoords.xy) * 2.0;
+    float dist = clamp(distance(vec2 (0.5), v_texCoords.xy) * 2.0, 0.0, 1.0);
 
-    // level = 1 if distance == u_radius * model_const
-    // level = 0 if distance == radius
-    // level > 1 if distance > u_radius * model_const
+    // level = 1 if u_distance == u_radius * model_const
+    // level = 0 if u_distance == radius
+    // level > 1 if u_distance > u_radius * model_const
     float level = (u_distance - u_radius) / ((u_radius * model_const) - u_radius);
 
-    if(level >= 1.0){
+
+    if (level >= 1.0) {
         // We are far away from the star
         level = u_distance / (u_radius * rays_const);
         float light_level = smoothstep(u_thpoint, u_thpoint * 1.4, u_apparent_angle);
 
-        if(u_lightScattering == 1){
+        if (u_lightScattering == 1) {
             // Light scattering, simple star
             float core = core(dist, u_inner_rad);
             float light = light(dist, light_decay) * light_level;
@@ -82,7 +82,7 @@ vec4 draw() {
         } else {
             // No light scattering, star rays
             level = min(level, 1.0);
-            float corona = startex(v_texCoords);
+            float corona = starTexture(v_texCoords);
             float light = light(dist, light_decay * 2.0) * light_level;
             float core = core(dist, u_inner_rad);
 
@@ -93,7 +93,7 @@ vec4 draw() {
         level = min(level, 1.0);
         float level_corona = float(u_lightScattering) * level;
 
-        float corona = startex(v_texCoords);
+        float corona = starTexture(v_texCoords);
         float light = light(dist, light_decay * 2.0);
         float core = core(dist, u_inner_rad);
 
@@ -102,7 +102,7 @@ vec4 draw() {
 }
 
 void main() {
-    fragColor = clamp(draw(), 0.0, 0.999);
+    fragColor = draw();
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
