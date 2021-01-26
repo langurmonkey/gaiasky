@@ -20,13 +20,11 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.color.Colormap;
@@ -36,15 +34,11 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.List;
-
 public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int additionalOffset, pmOffset;
+    private int sizeOffset, pmOffset;
     private float[] pointAlpha;
     private final float[] alphaSizeFovBr;
     private final float[] pointAlphaHl;
@@ -106,7 +100,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        additionalOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
         return mdi;
     }
 
@@ -122,7 +116,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
-            shaderProgram.setUniformf("u_magLimit", GlobalConf.runtime.LIMIT_MAG_RUNTIME);
             shaderProgram.setUniformf("u_brPow", GlobalConf.scene.STAR_BRIGHTNESS_POWER);
             shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
@@ -167,8 +160,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                     }
 
                                     // SIZE, APPMAG
-                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                    tempVerts[curr.vertexIdx + additionalOffset + 1] = (float) sb.appmag();
+                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                                     // POSITION [u]
                                     tempVerts[curr.vertexIdx] = (float) sb.x();
@@ -227,20 +219,13 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             shaderProgram.end();
         }
     }
-    private static double round(double value, int places) {
-        if (places < 0) throw new IllegalArgumentException();
-
-        BigDecimal bd = new BigDecimal(Double.toString(value));
-        bd = bd.setScale(places, RoundingMode.HALF_UP);
-        return bd.doubleValue();
-    }
 
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attributes = new Array<>();
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 2, "a_additional"));
+        attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)

@@ -593,11 +593,6 @@ public enum Events {
     LIGHT_SCATTERING_CMD,
 
     /**
-     * Sets the limit magnitude. Contains a double with the new magnitude
-     **/
-    LIMIT_MAG_CMD,
-
-    /**
      * Issues the command to update the line render system. Contains no
      * parameters.
      **/

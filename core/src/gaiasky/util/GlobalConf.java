@@ -458,7 +458,6 @@ public class GlobalConf {
         public boolean INPUT_ENABLED;
         public boolean RECORD_CAMERA;
         public boolean RECORD_KEYFRAME_CAMERA;
-        public float LIMIT_MAG_RUNTIME;
 
 
         /**
@@ -482,16 +481,15 @@ public class GlobalConf {
 
 
         public RuntimeConf() {
-            EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
+            EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
         }
 
-        public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, float lIMIT_MAG_RUNTIME, boolean rEAL_TIME, boolean dRAW_OCTREE) {
+        public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, boolean rEAL_TIME, boolean dRAW_OCTREE) {
             DISPLAY_GUI = dISPLAY_GUI;
             UPDATE_PAUSE = uPDATE_PAUSE;
             TIME_ON = tIME_ON;
             INPUT_ENABLED = iNPUT_ENABLED;
             RECORD_CAMERA = rECORD_CAMERA;
-            LIMIT_MAG_RUNTIME = lIMIT_MAG_RUNTIME;
             REAL_TIME = rEAL_TIME;
             DRAW_OCTREE = dRAW_OCTREE;
         }
@@ -499,11 +497,6 @@ public class GlobalConf {
         @Override
         public void notify(final Events event, final Object... data) {
             switch (event) {
-            case LIMIT_MAG_CMD:
-                LIMIT_MAG_RUNTIME = (float) data[0];
-                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                break;
-
             case INPUT_ENABLED_CMD:
                 INPUT_ENABLED = (boolean) data[0];
                 break;
@@ -750,11 +743,6 @@ public class GlobalConf {
          **/
         public boolean HIGH_ACCURACY_POSITIONS;
         /**
-         * Limit magnitude used for loading stars. All stars above this
-         * magnitude will not even be loaded by the sandbox.
-         **/
-        public float LIMIT_MAG_LOAD;
-        /**
          * Whether to use the real attitude of Gaia or the NSL approximation
          **/
         public boolean REAL_GAIA_ATTITUDE;
@@ -764,27 +752,24 @@ public class GlobalConf {
          **/
         public String SKYBOX_LOCATION;
 
-        public void initialize(String dATA_LOCATION, Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS, String sKYBOX_LOCATION) {
+        public void initialize(String dATA_LOCATION, Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS, String sKYBOX_LOCATION) {
 
             DATA_LOCATION = dATA_LOCATION;
             CATALOG_JSON_FILES = cATALOG_JSON_FILES;
             OBJECTS_JSON_FILES = oBJECTS_JSON_FILE;
-            LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
             HIGH_ACCURACY_POSITIONS = hIGH_ACCURACY_POSITIONS;
             SKYBOX_LOCATION = sKYBOX_LOCATION;
         }
 
-        public void initialize(Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, boolean dATA_SOURCE_LOCAL, float lIMIT_MAG_LOAD) {
+        public void initialize(Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, boolean dATA_SOURCE_LOCAL) {
             this.CATALOG_JSON_FILES = cATALOG_JSON_FILES;
             this.OBJECTS_JSON_FILES = oBJECTS_JSON_FILE;
-            this.LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
         }
 
-        public void initialize(Array<String> cATALOG_JSON_FILES, String dATA_JSON_FILE, boolean dATA_SOURCE_LOCAL, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE) {
+        public void initialize(Array<String> cATALOG_JSON_FILES, String dATA_JSON_FILE, boolean dATA_SOURCE_LOCAL, boolean rEAL_GAIA_ATTITUDE) {
             this.CATALOG_JSON_FILES = cATALOG_JSON_FILES;
             this.OBJECTS_JSON_FILES = dATA_JSON_FILE;
-            this.LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             this.REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
         }
 

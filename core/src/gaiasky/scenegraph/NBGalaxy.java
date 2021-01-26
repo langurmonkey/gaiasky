@@ -97,22 +97,19 @@ public class NBGalaxy extends Particle {
      */
     @Override
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
-            TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
-            translation.set(parentTransform).add(pos);
-            distToCamera = translation.len();
+        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
+        translation.set(parentTransform).add(pos);
+        distToCamera = translation.len();
 
-            this.opacity = opacity;
+        this.opacity = opacity;
 
-            if (!copy) {
-                camera.checkClosestBody(this);
+        if (!copy) {
+            camera.checkClosestBody(this);
 
-                viewAngle = (radius / distToCamera);
-                viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
+            viewAngle = (radius / distToCamera);
+            viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
 
-                addToRenderLists(camera);
-            }
-
+            addToRenderLists(camera);
         }
     }
 

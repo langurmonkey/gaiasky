@@ -7,10 +7,7 @@
 in vec3 a_position;
 in vec3 a_pm;
 in vec4 a_color;
-// Additional attributes:
-// x - size
-// y - magnitude
-in vec2 a_additional;
+in float a_size;
 
 // time in days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
@@ -26,8 +23,6 @@ uniform float u_brPow;
 
 // VR scale factor
 uniform float u_vrScale;
-
-uniform float u_magLimit = 22.0;
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
@@ -91,7 +86,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.z) / dist);
+    float viewAngleApparent = atan((a_size * u_alphaSizeFovBr.z) / dist);
     float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y);
 
     float boundaryFade = smoothstep(l0, l1, dist);
@@ -106,7 +101,7 @@ void main() {
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
     #endif
 
-    if(dist < l0 || a_additional.y > u_magLimit){
+    if(dist < l0){
         // The pixels of this star will be discarded in the fragment shader
         v_col = vec4(0.0, 0.0, 0.0, 0.0);
     }

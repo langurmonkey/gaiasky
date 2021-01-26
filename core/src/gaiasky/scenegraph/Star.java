@@ -302,7 +302,7 @@ public class Star extends Particle {
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             Vector3 pos = aux3f1.get();
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());

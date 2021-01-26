@@ -150,7 +150,7 @@ public class DesktopConfInit extends ConfInit {
 
         /** RUNTIME CONF **/
         RuntimeConf rc = new RuntimeConf();
-        rc.initialize(true, false, false, true, false, 20, false, false);
+        rc.initialize(true, false, false, true, false, false, false);
 
         /** DATA CONF **/
         DataConf dc = new DataConf();
@@ -169,15 +169,9 @@ public class DesktopConfInit extends ConfInit {
         boolean REAL_GAIA_ATTITUDE = Parser.parseBoolean(p.getProperty("data.attitude.real"));
         boolean HIGH_ACCURACY_POSITIONS = Parser.parseBoolean(p.getProperty("data.highaccuracy.positions", "false"));
 
-        float LIMIT_MAG_LOAD;
-        if (p.getProperty("data.limit.mag") != null && !p.getProperty("data.limit.mag").isEmpty()) {
-            LIMIT_MAG_LOAD = Parser.parseFloat(p.getProperty("data.limit.mag"));
-        } else {
-            LIMIT_MAG_LOAD = Float.MAX_VALUE;
-        }
         String SKYBOX_LOCATION = p.getProperty("data.skybox.location", "data/tex/skybox/stars/");
 
-        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
+        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
 
         /** PROGRAM CONF **/
         ProgramConf prc = new ProgramConf();
@@ -483,7 +477,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("data.location", GlobalConf.data.DATA_LOCATION);
         p.setProperty("data.json.catalog", TextUtils.concatenate(File.pathSeparator, GlobalConf.data.CATALOG_JSON_FILES));
         p.setProperty("data.json.objects", GlobalConf.data.OBJECTS_JSON_FILES);
-        p.setProperty("data.limit.mag", Float.toString(GlobalConf.data.LIMIT_MAG_LOAD));
         p.setProperty("data.attitude.real", Boolean.toString(GlobalConf.data.REAL_GAIA_ATTITUDE));
         p.setProperty("data.highaccuracy.positions", Boolean.toString(GlobalConf.data.HIGH_ACCURACY_POSITIONS));
         p.setProperty("data.skybox.location", GlobalConf.data.SKYBOX_LOCATION);

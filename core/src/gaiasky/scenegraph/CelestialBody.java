@@ -99,16 +99,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     /**
-     * Overrides the update adding the magnitude limit thingy.
-     */
-    @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
-        if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
-            super.update(time, parentTransform, camera);
-        }
-    }
-
-    /**
      * Billboard quad render, for planets and stars.
      */
     @Override
@@ -253,10 +243,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         this.rc = rc;
     }
 
-    public boolean withinMagLimit() {
-        return this.appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME;
-    }
-
     @Override
     public <T extends SceneGraphNode> T getSimpleCopy() {
         CelestialBody copy = super.getSimpleCopy();
@@ -358,7 +344,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             Vector3 pos = aux3f1.get();
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
@@ -398,7 +384,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
 

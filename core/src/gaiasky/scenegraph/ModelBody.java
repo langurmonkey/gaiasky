@@ -262,10 +262,6 @@ public abstract class ModelBody extends CelestialBody {
         modelBatch.render(mc.instance, mc.env);
     }
 
-    public boolean withinMagLimit() {
-        return this.absmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME;
-    }
-
     @Override
     protected float labelMax() {
         return (float) (.5e-4 / Constants.DISTANCE_SCALE_FACTOR);
@@ -476,7 +472,7 @@ public abstract class ModelBody extends CelestialBody {
      * its radius and check for intersections with the ray
      */
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
                 super.addHit(screenX, screenY, w, h, minPixDist, camera, hits);
             } else {
@@ -512,7 +508,7 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
                 super.addHit(p0, p1, camera, hits);
             } else {

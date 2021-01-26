@@ -405,7 +405,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
         switch (m) {
         case FOCUS_MODE:
-            if (focus != null && focus.withinMagLimit() && !focus.isCoordinatesTimeOverflow()) {
+            if (focus != null && !focus.isCoordinatesTimeOverflow()) {
                 focusBak = focus;
                 focus.getAbsolutePosition(aux4);
                 // Hack, fix this by understanding underlying problem

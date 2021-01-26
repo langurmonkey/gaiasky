@@ -808,11 +808,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public boolean withinMagLimit() {
-        return true;
-    }
-
-    @Override
     public RotationComponent getRotationComponent() {
         return null;
     }

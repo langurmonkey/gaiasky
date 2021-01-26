@@ -381,11 +381,6 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     @Override
-    public boolean withinMagLimit() {
-        return true;
-    }
-
-    @Override
     public double getCandidateViewAngleApparent() {
         return this.viewAngleApparent;
     }
@@ -412,7 +407,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     @Override
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && isActive()) {
+        if (isActive()) {
             Vector3 pos = aux3f1.get();
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.posinv);
@@ -454,7 +449,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && isActive()) {
+        if (isActive()) {
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
 

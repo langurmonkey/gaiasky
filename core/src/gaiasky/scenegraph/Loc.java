@@ -261,11 +261,6 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     }
 
     @Override
-    public boolean withinMagLimit() {
-        return true;
-    }
-
-    @Override
     public Vector3d getClosestAbsolutePos(Vector3d out) {
         getAbsolutePosition(out);
         return out;
