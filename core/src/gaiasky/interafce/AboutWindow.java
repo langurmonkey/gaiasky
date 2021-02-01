@@ -71,6 +71,7 @@ public class AboutWindow extends GenericDialog {
         float taWidth2 = 1280f;
         float taHeight = 160f;
         float tabWidth = 240f;
+        float buttonHeight = 40f;
 
         // Only show update tab if not launched via install4j
         boolean showUpdateTab = !SysUtils.launchedViaInstall4j();
@@ -300,10 +301,11 @@ public class AboutWindow extends GenericDialog {
         Label javavmvendortitle = new OwnLabel(I18n.txt("gui.help.javavmvendor"), skin);
         Label javavmvendor = new OwnLabel(System.getProperty("java.vm.vendor"), skin);
 
-        TextButton memoryinfobutton = new OwnTextButton(I18n.txt("gui.help.meminfo"), skin, "default");
-        memoryinfobutton.setName("memoryinfo");
-        memoryinfobutton.setSize(240f, 32f);
-        memoryinfobutton.addListener(event -> {
+        TextButton memInfoButton = new OwnTextButton(I18n.txt("gui.help.meminfo"), skin, "default");
+        memInfoButton.setName("memoryinfo");
+        memInfoButton.pad(0, pad10, 0, pad10);
+        memInfoButton.setHeight(buttonHeight);
+        memInfoButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW);
                 return true;
@@ -414,7 +416,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.add(javavmvendortitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
         contentSystem.add(javavmvendor).align(Align.left).padTop(pad5);
         contentSystem.row();
-        contentSystem.add(memoryinfobutton).colspan(2).align(Align.left).padTop(pad10);
+        contentSystem.add(memInfoButton).colspan(2).align(Align.left).padTop(pad10);
         contentSystem.row();
 
         // SYSTEM
@@ -580,7 +582,8 @@ public class AboutWindow extends GenericDialog {
             final String uri = GlobalConf.WEBPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.txt("gui.newversion.getit"), skin);
-            getNewVersion.pad(pad5, pad10, pad5, pad10);
+            getNewVersion.pad(0, pad10, 0, pad10);
+            getNewVersion.setHeight(40f);
             getNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     Gdx.net.openURI(GlobalConf.WEBPAGE_DOWNLOADS);

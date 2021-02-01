@@ -236,12 +236,9 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 double geodistpc = getGeoDistance(sourceid);
 
                 float ruweVal = getRuweValue(sourceid, tokens);
-                if (!mustLoad && !ruwe.isNaN()) {
-                    // RUWE test!
-                    if (ruweVal > ruwe) {
-                        // Do not accept
-                        return false;
-                    }
+                // RUWE test!
+                if (!mustLoad && !ruwe.isNaN() && ruweVal > ruwe) {
+                    return false;
                 }
                 // Add ruwe to extra
                 if (!Float.isNaN(ruweVal)) {
@@ -282,6 +279,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         /** PROPER MOTION VECTOR **/
                         Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, new Vector3d());
 
+                        /** MAGNITUDES **/
                         // Line of sight extinction in the G band
                         double ag = 0;
                         // Galactic latitude in radians
@@ -436,11 +434,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 } catch (Exception e) {
                     logger.error(e);
                 }
-            if(data != null)
+            if (data != null)
                 try {
                     data.close();
                 } catch (IOException e) {
-                   logger.error(e);
+                    logger.error(e);
                 }
         }
         return null;

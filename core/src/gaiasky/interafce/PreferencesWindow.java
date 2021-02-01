@@ -130,6 +130,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float controlsscrollw = 880f;
         float controlsscrollh = 560f;
         float sliderWidth = textwidth * 3f;
+        float buttonw = 240f;
+        float buttonh = 40f;
 
         // Create the tab buttons
         Table group = new Table(skin);
@@ -751,7 +753,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         uiScale.setWidth(textwidth * 3f);
         uiScale.setMappedValue(GlobalConf.program.UI_SCALE);
         OwnTextButton applyUiScale = new OwnTextButton(I18n.txt("gui.apply"), skin);
-        applyUiScale.setWidth(textwidth);
+        applyUiScale.pad(0, pad10, 0, pad10);
+        applyUiScale.setHeight(buttonh);
         applyUiScale.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.UI_SCALE_CMD, uiScale.getMappedValue());
@@ -1530,7 +1533,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Actor dataSource = dw.buildDatasetsWidget(false, 20);
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
-        dataDownload.setSize(240f, 40f);
+        dataDownload.pad(0, pad10, 0, pad10);
+        dataDownload.setHeight(buttonh);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.currentDataDescriptor != null) {
@@ -1651,7 +1655,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             return false;
         });
-        reloadDefaults.setSize(288f, 40f);
+        reloadDefaults.pad(0, pad10, 0, pad10);
+        reloadDefaults.setHeight(buttonh);
 
         OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
