@@ -86,22 +86,22 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
     private int maxPart = 100000;
 
-    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
-    private double pllxerrfaint = 0.125;
+    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint stars (gmag>=13.1), where the filter [plx_err/plx < pllxerrfaint] is enforced")
+    private double plxerrfaint = 0.125;
 
-    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
-    private double pllxerrbright = 0.25;
+    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright stars (gmag<13.1), where the filter [plx_err/plx < pllxerrbright] is enforced")
+    private double plxerrbright = 0.25;
 
     @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
-    private double pllxzeropoint = 0d;
+    private double plxzeropoint = 0d;
 
-    @Parameter(names = {"-c", "--nomagcorrections"}, description = "Flag to skip magnitude and color corrections for extinction and reddening")
-    private boolean magCorrections = true;
+    @Parameter(names = {"-c", "--skipmagcorrections"}, description = "Flag to skip magnitude and color corrections for extinction and reddening")
+    private boolean skipMagCorrections = false;
 
     @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
     private boolean postprocess = false;
 
-    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with their parents. Defaults to 100")
+    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects will be merged with their parents. Defaults to 100")
     private long childCount = 100;
 
     @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000")
@@ -125,13 +125,13 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded")
     private double distcap = Long.MAX_VALUE;
 
-    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
+    @Parameter(names = "--ruwe", description = "RUWE threshold value. Filters out all stars with RUWE greater than this value. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
     private double ruwe = Double.NaN;
 
     @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)")
     private String columns = null;
 
-    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with (optionally gzipped) csv files containing additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
+    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with optionally gzipped csv files containing additional columns of main catalog. The first column must contain the Gaia source_id")
     private String additionalFiles = null;
 
     @Parameter(names = "--parallelism", description = "The ForkJoinPool parallelism setting. Set <=0 to use the system default. Set to 1 to disable parallelism")
@@ -230,11 +230,11 @@ public class OctreeGeneratorRun {
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
             loader.setOutputFormatVersion(outputVersion);
             loader.setColumns(columns);
-            loader.setParallaxErrorFactorFaint(pllxerrfaint);
-            loader.setParallaxErrorFactorBright(pllxerrbright);
-            loader.setParallaxZeroPoint(pllxzeropoint);
+            loader.setParallaxErrorFactorFaint(plxerrfaint);
+            loader.setParallaxErrorFactorBright(plxerrbright);
+            loader.setParallaxZeroPoint(plxzeropoint);
             loader.setFileNumberCap(fileNumCap);
-            loader.setMagCorrections(magCorrections);
+            loader.setMagCorrections(!skipMagCorrections);
             loader.setDistanceCap(distcap);
             loader.setAdditionalFiles(additionalFiles);
             loader.setRUWECap(ruwe);

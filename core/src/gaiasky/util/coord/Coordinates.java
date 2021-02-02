@@ -66,6 +66,7 @@ public class Coordinates {
         equatorialToEcliptic = getRotationMatrix(0, -OBLIQUITY_DEG_J2000, 0);
         equatorialToEclipticF = equatorialToEcliptic.putIn(new Matrix4());
 
+
         // ECL -> EQ
         eclipticToEquatorial = getRotationMatrix(0, OBLIQUITY_DEG_J2000, 0);
         eclipticToEquatorialF = eclipticToEquatorial.putIn(new Matrix4());
