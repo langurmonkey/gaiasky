@@ -224,8 +224,10 @@ public class OctreeGeneratorRun {
         Map<Long, Integer> xmatchTable = null;
         long[] countsPerMagGaia = null;
 
+        //
+        // GAIA
+        //
         if (loaderClass != null) {
-            /* CATALOG */
             String fullLoaderClass = "gaiasky.data.group." + loaderClass;
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
             loader.setOutputFormatVersion(outputVersion);
@@ -253,8 +255,10 @@ public class OctreeGeneratorRun {
             listLoader = loader.loadData(input);
         }
 
+        //
+        // HIPPARCOS
+        //
         if (hip != null) {
-            /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
 
             // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider

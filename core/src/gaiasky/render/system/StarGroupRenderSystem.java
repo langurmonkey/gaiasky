@@ -159,7 +159,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
                                     }
 
-                                    // SIZE, APPMAG
+                                    // SIZE
                                     tempVerts[curr.vertexIdx + sizeOffset] = (float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
 
                                     // POSITION [u]

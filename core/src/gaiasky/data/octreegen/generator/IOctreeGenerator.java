@@ -16,6 +16,9 @@ import gaiasky.util.tree.OctreeNode;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Interface for octree generators.
+ */
 public interface IOctreeGenerator {
     Log logger = Logger.getLogger(IOctreeGenerator.class);
 
@@ -23,6 +26,14 @@ public interface IOctreeGenerator {
 
     int getDiscarded();
 
+    /**
+     * Computes the maximum axis-aligned bounding box containing
+     * all the particles in the catalog, and returns it as the root
+     * octree node.
+     * @param catalog The incoming catalog
+     * @param params The octree generation parameters
+     * @return The root octree node
+     */
     static OctreeNode startGeneration(List<IParticleRecord> catalog, OctreeGeneratorParams params) {
         
         logger.info("Starting generation of octree");
