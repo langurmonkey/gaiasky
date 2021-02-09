@@ -88,16 +88,13 @@ public class OctreeGeneratorRun {
     private int maxPart = 100000;
 
     @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint stars (gmag>=13.1), where the filter [plx_err/plx < pllxerrfaint] is enforced")
-    private double plxerrfaint = 0.125;
+    private double plxerrfaint = 10.0;
 
     @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright stars (gmag<13.1), where the filter [plx_err/plx < pllxerrbright] is enforced")
-    private double plxerrbright = 0.25;
+    private double plxerrbright = 10.0;
 
     @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
     private double plxzeropoint = 0d;
-
-    @Parameter(names = {"-c", "--skipmagcorrections"}, description = "Flag to skip magnitude and color corrections for extinction and reddening")
-    private boolean skipMagCorrections = false;
 
     @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
     private boolean postprocess = false;

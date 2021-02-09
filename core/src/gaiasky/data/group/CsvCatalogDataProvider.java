@@ -5,6 +5,7 @@
 
 package gaiasky.data.group;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -123,13 +124,14 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
             int fn = 0;
             for (FileHandle fh : files) {
                 loadDataMapped(fh.path(), factor, fn + 1, numFiles);
-                //loadFileFh(fh, factor, fn + 1);
+                //loadDataFh(fh.path(), factor, fn + 1, numFiles);
                 fn++;
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
         } else if (f.name().toLowerCase().endsWith(".csv") || f.name().toLowerCase().endsWith(".gz")) {
             loadDataMapped(file, factor, 1, 1);
+            //loadDataFh(file, factor, 1, 1);
         } else {
             logger.warn("File skipped: " + f.path());
         }
@@ -430,6 +432,43 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 } catch (Exception e) {
                     logger.error(e);
                 }
+            if (data != null)
+                try {
+                    data.close();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+        }
+        return null;
+    }
+
+    public List<IParticleRecord> loadDataFh(String file, double factor, int fileNumber, long totalFiles) {
+        boolean gz = file.endsWith(".gz");
+        String fileName = file.substring(file.lastIndexOf('/') + 1);
+        InputStream data = null;
+        try {
+            FileHandle fh = Gdx.files.absolute(file);
+            data = fh.read();
+            if (gz) {
+                try {
+                    data = new GZIPInputStream(data);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+            AtomicLong addedStars = new AtomicLong(0l);
+            AtomicLong discardedStars = new AtomicLong(0l);
+            loadFileIs(data, factor, addedStars, discardedStars);
+
+            if (fileNumber >= 0 && totalFiles >= 0)
+                logger.info(fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%): " + fileName + " --> " + addedStars.get() + "/" + (addedStars.get() + discardedStars.get()) + " stars (" + nf.format(100d * (double) addedStars.get() / (double) (addedStars.get() + discardedStars.get())) + "%)");
+            else
+                logger.info(fileName + " --> " + addedStars.get() + "/" + (addedStars.get() + discardedStars.get()) + " stars (" + nf.format(100d * (double) addedStars.get() / (double) (addedStars.get() + discardedStars.get())) + "%)");
+
+            return list;
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
             if (data != null)
                 try {
                     data.close();

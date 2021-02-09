@@ -1,7 +1,7 @@
 apply plugin: "java"
 apply plugin: "com.install4j.gradle"
 
-import org.gradle.internal.os.OperatingSystem
+
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 sourceCompatibility = 11
@@ -124,18 +124,31 @@ task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the cat
 
 task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
     main = 'gaiasky.data.OctreeGeneratorRun'
-    systemProperties['properties.file'] = '../..//assets/conf/global.properties'
+    systemProperties['properties.file'] = ''
+    systemProperties['assets.location'] = './assets/'
     args = [
+            "-l",
+            "CsvCatalogDataProvider",
             "--input",
-            "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/csv/",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/gaia/",
             "--output",
-            "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/out/"
+            "/home/tsagrista/Projects/gaiasky-catgen/output/java/",
+            "--columns",
+            "source_id,ra,dec,plx,ra_err,dec_err,plx_err,pmra,pmdec,radvel,gmag,bpmag,rpmag,ruwe,ref_epoch",
+            "--hip",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/hip/hipparcos.vot",
+            "--xmatchfile",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/hip-gaia-xm/xmatch.csv",
+            "--additional",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/ag-e/edr3-ag-e-s.csv.gz",
+            "--maxpart",
+            "100000",
+            "--parallelism",
+            "1"
     ]
 
-    minHeapSize = "10g"
-    maxHeapSize = "20g"
-
-    jvmArgs = ['-server',]
+    minHeapSize = "512m"
+    maxHeapSize = "4g"
 
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
