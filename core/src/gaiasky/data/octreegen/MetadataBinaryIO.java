@@ -65,7 +65,7 @@ public class MetadataBinaryIO {
      * @return The octree node
      */
     public OctreeNode readMetadata(InputStream in, LoadStatus status) {
-        nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
+        nodesMap = new HashMap<>();
 
         DataInputStream data_in = new DataInputStream(in);
         try {
@@ -130,7 +130,7 @@ public class MetadataBinaryIO {
     }
 
     public OctreeNode readMetadataMapped(String file, LoadStatus status) {
-        nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
+        nodesMap = new HashMap<>();
 
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
