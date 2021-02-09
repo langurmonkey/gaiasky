@@ -230,9 +230,9 @@ public class MetadataBinaryIO {
                     data_out.writeInt((int) (node.children[i] != null ? node.children[i].pageId : -1));
                 }
                 data_out.writeInt(node.depth);
-                data_out.writeInt(node.nObjects);
-                data_out.writeInt(node.ownObjects);
-                data_out.writeInt(node.childrenCount);
+                data_out.writeInt(node.numObjectsRec);
+                data_out.writeInt(node.numObjects);
+                data_out.writeInt(node.numChildren);
             }
 
             data_out.close();

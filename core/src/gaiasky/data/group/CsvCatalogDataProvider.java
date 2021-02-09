@@ -45,10 +45,6 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
     private static final String separator = comma;
 
-    /**
-     * Maximum file count to load. 0 or negative for unlimited
-     */
-    private int fileNumberCap = -1;
 
     /**
      * Number formatter
@@ -92,20 +88,15 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     public void setColumns(String... cols) {
         int c = 0;
-        ColId[] colIds = ColId.values();
         for (String col : cols) {
-            for (ColId colId : colIds) {
-                if (!col.strip().isBlank() && col.strip().equals(colId.toString())) {
-                    indexMap.put(colId, c);
-                    break;
+            if (!col.strip().isBlank()){
+                ColId cid = colIdFromStr(col.strip());
+                if(cid != null) {
+                    indexMap.put(cid, c);
                 }
             }
             c++;
         }
-    }
-
-    public void setFileNumberCap(int cap) {
-        fileNumberCap = cap;
     }
 
     public List<IParticleRecord> loadData(String file) {
@@ -180,16 +171,21 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                     }
                     i++;
                 }
-                // Flush resting
+                // Flush rest
                 if (lineBuffer.size() > 0) {
                     lineBuffer.parallelStream().forEach(c);
                     lineBuffer.clear();
                 }
             } else {
                 // Just read line by line
+                int num = 0;
                 String line;
                 while ((line = br.readLine()) != null) {
                     c.accept(line);
+                    num++;
+                    if(starNumberCap >= 0 && num >= starNumberCap){
+                        break;
+                    }
                 }
             }
         } catch (IOException e) {

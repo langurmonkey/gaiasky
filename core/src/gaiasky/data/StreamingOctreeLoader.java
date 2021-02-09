@@ -342,7 +342,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             loadOctant(octant, octreeWrapper, false);
             if (octant.children != null) {
                 for (OctreeNode child : octant.children) {
-                    if (child != null && child.nObjects > 0)
+                    if (child != null && child.numObjectsRec > 0)
                         loadOctant(child, octreeWrapper, level - 1);
                 }
             }

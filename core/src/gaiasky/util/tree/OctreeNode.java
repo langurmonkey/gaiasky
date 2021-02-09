@@ -62,11 +62,11 @@ public class OctreeNode implements ILineRenderable {
     /** Contains the depth level **/
     public final int depth;
     /** Number of objects contained in this node and its descendants **/
-    public int nObjects;
+    public int numObjectsRec;
     /** Number of objects contained in this node **/
-    public int ownObjects;
+    public int numObjects;
     /** Number of children nodes of this node **/
-    public int childrenCount;
+    public int numChildren;
     /** The parent, if any **/
     public OctreeNode parent;
     /** Children nodes **/
@@ -167,9 +167,9 @@ public class OctreeNode implements ILineRenderable {
      */
     public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int childrenCount, int nObjects, int ownObjects, int depth) {
         this(x, y, z, hsx, hsy, hsz, depth);
-        this.childrenCount = childrenCount;
-        this.nObjects = nObjects;
-        this.ownObjects = ownObjects;
+        this.numChildren = childrenCount;
+        this.numObjectsRec = nObjects;
+        this.numObjects = ownObjects;
     }
 
     /**
@@ -190,9 +190,9 @@ public class OctreeNode implements ILineRenderable {
      */
     public OctreeNode(long pageid, double x, double y, double z, double hsx, double hsy, double hsz, int childrenCount, int nObjects, int ownObjects, int depth) {
         this(pageid, x, y, z, hsx, hsy, hsz, depth);
-        this.childrenCount = childrenCount;
-        this.nObjects = nObjects;
-        this.ownObjects = ownObjects;
+        this.numChildren = childrenCount;
+        this.numObjectsRec = nObjects;
+        this.numObjects = ownObjects;
     }
 
     public long computePageId() {
@@ -226,7 +226,7 @@ public class OctreeNode implements ILineRenderable {
 
     public boolean containsObject(SceneGraphNode object) {
         boolean has = this.objects.contains(object);
-        if (!has && children != null && childrenCount > 0) {
+        if (!has && children != null && numChildren > 0) {
             for (OctreeNode child : children) {
                 if (child != null) {
                     if (containsObject(object))
@@ -280,7 +280,7 @@ public class OctreeNode implements ILineRenderable {
         if (objects == null)
             objects = new ArrayList<>(1);
         objects.add(e);
-        ownObjects = e instanceof ParticleGroup ? objects.size() - 1 + ((ParticleGroup) e).size() : objects.size();
+        numObjects = e instanceof ParticleGroup ? objects.size() - 1 + ((ParticleGroup) e).size() : objects.size();
         return true;
     }
 
@@ -288,13 +288,13 @@ public class OctreeNode implements ILineRenderable {
         if (objects == null)
             objects = new ArrayList<>(l.size());
         objects.addAll(l);
-        ownObjects = objects.size();
+        numObjects = objects.size();
         return true;
     }
 
     public void setObjects(List<SceneGraphNode> l) {
         this.objects = l;
-        ownObjects = objects.size();
+        numObjects = objects.size();
     }
 
     public boolean insert(SceneGraphNode e, int level) {
@@ -365,18 +365,16 @@ public class OctreeNode implements ILineRenderable {
         StringBuffer str = new StringBuffer(depth);
         if (rec)
             for (int i = 0; i < depth; i++) {
-                str.append("   ");
+                str.append("  ");
             }
 
-        str.append(pageId).append("(L").append(depth).append(")");
-        if (parent != null) {
-            str.append(" [i: ").append(Arrays.asList(parent.children).indexOf(this)).append(", ownobj: ");
-        } else {
-            str.append("[ownobj: ");
-        }
-        str.append(objects != null ? objects.size() : "0").append("/").append(ownObjects).append(", recobj: ").append(nObjects).append(", nchld: ").append(childrenCount).append("] ").append(status).append("\n");
+        int idx = parent != null ? Arrays.asList(parent.children).indexOf(this) : 0;
+        str.append(idx).append(":L").append(depth).append(" ");
+        str.append("id:").append(pageId);
+        str.append (" Obj(own/rec):(").append(numObjects).append("/").append(numObjectsRec).append(")");
+        str.append(" Nchld:").append(numChildren).append("\n");
 
-        if (childrenCount > 0 && rec) {
+        if (numChildren > 0 && rec) {
             for (OctreeNode child : children) {
                 if (child != null) {
                     str.append(child.toString(rec));
@@ -399,7 +397,7 @@ public class OctreeNode implements ILineRenderable {
 
     private void statsRec(int[][] mat) {
         mat[this.depth][0] += 1;
-        mat[this.depth][1] += this.ownObjects;
+        mat[this.depth][1] += this.numObjects;
 
         for (OctreeNode child : children) {
             if (child != null) {
@@ -664,24 +662,24 @@ public class OctreeNode implements ILineRenderable {
     public synchronized void touch(int n) {
         if (status == LoadStatus.NOT_LOADED) {
             // We unloaded n stars
-            this.ownObjects = 0;
-            this.nObjects = 0;
+            this.numObjects = 0;
+            this.numObjectsRec = 0;
             if (this.parent != null) {
-                this.parent.childrenCount--;
+                this.parent.numChildren--;
                 this.parent.touchRec(-n);
             }
         } else if (status == LoadStatus.LOADED) {
-            this.ownObjects = n;
-            this.nObjects = n;
+            this.numObjects = n;
+            this.numObjectsRec = n;
             if (this.parent != null) {
-                this.parent.childrenCount++;
+                this.parent.numChildren++;
                 this.parent.touchRec(n);
             }
         }
     }
 
     private synchronized void touchRec(int n) {
-        this.nObjects += n;
+        this.numObjectsRec += n;
         if (this.parent != null)
             this.parent.touchRec(n);
     }
@@ -692,24 +690,24 @@ public class OctreeNode implements ILineRenderable {
      */
     public void updateCounts() {
         // Number of own objects
-        this.ownObjects = 0;
+        this.numObjects = 0;
         if (objects != null) {
             for (SceneGraphNode ape : objects) {
-                this.ownObjects += ape.getStarCount();
+                this.numObjects += ape.getStarCount();
             }
         }
 
         // Number of recursive objects
-        this.nObjects = this.ownObjects;
+        this.numObjectsRec = this.numObjects;
 
         // Children count
-        this.childrenCount = 0;
+        this.numChildren = 0;
         for (int i = 0; i < 8; i++) {
             if (children[i] != null) {
-                this.childrenCount++;
+                this.numChildren++;
                 // Recursive call
                 children[i].updateCounts();
-                nObjects += children[i].nObjects;
+                numObjectsRec += children[i].numObjectsRec;
             }
         }
 

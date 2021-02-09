@@ -33,6 +33,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     public enum ColId {
         sourceid,
+        hip,
+        names,
         ra,
         dec,
         pllx,
@@ -49,6 +51,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         bpmag,
         rpmag,
         bp_rp,
+        col_idx,
         ref_epoch,
         teff,
         radius,
@@ -56,6 +59,92 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         ebp_min_rp,
         ruwe,
         geodist
+    }
+
+    public ColId colIdFromStr(final String name){
+        switch(name){
+        case "source_id":
+        case "sourceid":
+            return ColId.sourceid;
+        case "hip":
+            return ColId.hip;
+        case "names":
+        case "name":
+            return ColId.names;
+        case "ra":
+            return ColId.ra;
+        case "dec":
+        case "de":
+            return ColId.dec;
+        case "plx":
+        case "pllx":
+        case "parallax":
+            return ColId.pllx;
+        case "ra_e":
+        case "ra_err":
+        case "ra_error":
+            return ColId.ra_err;
+        case "dec_e":
+        case "dec_err":
+        case "dec_error":
+        case "de_e":
+        case "de_err":
+        case "de_error":
+            return ColId.dec_err;
+        case "plx_e":
+        case "plx_err":
+        case "plx_error":
+        case "pllx_e":
+        case "pllx_err":
+        case "pllx_error":
+            return ColId.pllx_err;
+        case "pmra":
+            return ColId.pmra;
+        case "pmdec":
+        case "pmde":
+            return ColId.pmdec;
+        case "radvel":
+        case "rv":
+            return ColId.radvel;
+        case "radvel_err":
+        case "radvel_e":
+        case "rv_err":
+        case "rv_e":
+            return ColId.radvel_err;
+        case "gmag":
+        case "appmag":
+            return ColId.gmag;
+        case "bpmag":
+        case "bp":
+            return ColId.bpmag;
+        case "rpmag":
+        case "rp":
+            return ColId.rpmag;
+        case "bp-rp":
+        case "bp_rp":
+            return ColId.bp_rp;
+        case "col_idx":
+        case "b_v":
+        case "b-v":
+            return ColId.col_idx;
+        case "ref_epoch":
+            return ColId.ref_epoch;
+        case "ruwe":
+            return ColId.ruwe;
+        case "teff":
+        case "t_eff":
+        case "T_eff":
+            return ColId.teff;
+        case "ag":
+            return ColId.ag;
+        case "ebp_min_rp":
+            return ColId.ebp_min_rp;
+        case "geodist":
+            return ColId.geodist;
+        default:
+            return null;
+
+        }
     }
 
     protected Map<ColId, Integer> indexMap;
@@ -81,7 +170,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         // Column name -> index
         Map<String, Integer> indices;
         // Sourceid -> values
-        LargeLongMap<double[]> values;
+        TreeMap<Long, double[]> values;
 
         public boolean hasCol(ColId col) {
             return indices != null && indices.containsKey(col.name());
@@ -182,6 +271,16 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Apply magnitude/color corrections for extinction/reddening
      */
     protected boolean magCorrections = false;
+
+    /**
+     * Maximum number of files to load. Negative for unlimited
+     */
+    protected int fileNumberCap = -1;
+
+    /**
+     * Maximum number of files to load per file
+     */
+    protected int starNumberCap = -1;
 
     /**
      * Parallelism value
@@ -408,9 +507,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    public void setFileNumberCap(int cap) {
-    }
-
     @Override
     public LongMap<float[]> getColors() {
         return colors;
@@ -464,7 +560,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         for (String additionalFile : additionalFiles) {
             AdditionalCols addit = new AdditionalCols();
             addit.indices = new HashMap<>();
-            addit.values = new LargeLongMap<>(80);
+            addit.values = new TreeMap<>();
 
             logger.info("Loading additional columns from " + additionalFile);
 
@@ -550,6 +646,16 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             logger.error(e);
             br.close();
         }
+    }
+
+    @Override
+    public void setFileNumberCap(int cap) {
+        this.fileNumberCap = cap;
+    }
+
+    @Override
+    public void setStarNumberCap(int starNumberCap) {
+        this.starNumberCap = starNumberCap;
     }
 
     @Override

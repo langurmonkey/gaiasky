@@ -17,6 +17,7 @@ import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.data.octreegen.IStarGroupIO;
 import gaiasky.data.octreegen.MetadataBinaryIO;
+import gaiasky.data.octreegen.StarBrightnessComparator;
 import gaiasky.data.octreegen.StarGroupBinaryIO;
 import gaiasky.data.octreegen.generator.IOctreeGenerator;
 import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
@@ -107,11 +108,11 @@ public class OctreeGeneratorRun {
     @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000")
     private long parentCount = 1000;
 
-    @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
-    private boolean sunCentre = false;
-
-    @Parameter(names = "--nfiles", description = "Data file number cap. Defaults to unlimited")
+    @Parameter(names = "--filescap", description = "Maximum number of input files to be processed")
     private int fileNumCap = -1;
+
+    @Parameter(names = "--starscap", description = "Maximum number of stars to be processed per file")
+    private int starNumCap = -1;
 
     @Parameter(names = {"--hip"}, description = "Location (absolute or relative to data folder \"data/...\") of the Hipparcos catalog to add on top of the catalog provided by -l")
     private String hip = null;
@@ -123,7 +124,7 @@ public class OctreeGeneratorRun {
     private String xmatchFile = null;
 
     @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded")
-    private double distcap = Long.MAX_VALUE;
+    private double distPcCap = Long.MAX_VALUE;
 
     @Parameter(names = "--ruwe", description = "RUWE threshold value. Filters out all stars with RUWE greater than this value. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
     private double ruwe = Double.NaN;
@@ -217,7 +218,7 @@ public class OctreeGeneratorRun {
     private OctreeNode generateOctree() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         long startMs = TimeUtils.millis();
 
-        OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
+        OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, postprocess, childCount, parentCount);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
         List<IParticleRecord> listLoader = null, list;
@@ -236,8 +237,8 @@ public class OctreeGeneratorRun {
             loader.setParallaxErrorFactorBright(plxerrbright);
             loader.setParallaxZeroPoint(plxzeropoint);
             loader.setFileNumberCap(fileNumCap);
-            loader.setMagCorrections(!skipMagCorrections);
-            loader.setDistanceCap(distcap);
+            loader.setStarNumberCap(starNumCap);
+            loader.setDistanceCap(distPcCap);
             loader.setAdditionalFiles(additionalFiles);
             loader.setRUWECap(ruwe);
             countsPerMagGaia = loader.getCountsPerMag();
@@ -393,6 +394,21 @@ public class OctreeGeneratorRun {
 
         logger.info("Generating octree with " + list.size() + " actual stars");
 
+        // Pre-processing (sorting, removing too distant stars)
+        Vector3d pos0 = new Vector3d();
+        Iterator<IParticleRecord> it = list.iterator();
+        while (it.hasNext()) {
+            IParticleRecord s = it.next();
+            double dist = pos0.set(s.x(), s.y(), s.z()).len();
+            if (dist * Constants.U_TO_PC > distPcCap) {
+                // Remove star
+                it.remove();
+            }
+        }
+        logger.info("Sorting list by magnitude with " + list.size() + " objects");
+        list.sort(new StarBrightnessComparator());
+        logger.info("Catalog sorting done");
+
         OctreeNode octree = og.generateOctree(list);
 
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
@@ -403,7 +419,7 @@ public class OctreeGeneratorRun {
         logger.info("TIME STATS: Octree generated in " + generatingSecs + " seconds");
 
         /** NUMBERS **/
-        logger.info("Octree generated with " + octree.numNodes() + " octants and " + octree.nObjects + " particles");
+        logger.info("Octree generated with " + octree.numNodes() + " octants and " + octree.numObjectsRec + " particles");
         logger.info(og.getDiscarded() + " particles have been discarded due to density");
 
         /** CLEAN CURRENT OUT DIR **/
@@ -493,14 +509,14 @@ public class OctreeGeneratorRun {
 
     private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current, int version) throws IOException {
         // Write current
-        if (current.ownObjects > 0) {
+        if (current.numObjects > 0) {
             File particles = new File(outFolder + "/particles/", "particles_" + String.format("%06d", current.pageId) + ".bin");
-            logger.info("Writing " + current.ownObjects + " particles of node " + current.pageId + " to " + particles.getAbsolutePath());
+            logger.info("Writing " + current.numObjects + " particles of node " + current.pageId + " to " + particles.getAbsolutePath());
             particleWriter.writeParticles(current.objects, new BufferedOutputStream(new FileOutputStream(particles)), version);
         }
 
         // Write each child
-        if (current.childrenCount > 0)
+        if (current.numChildren > 0)
             for (OctreeNode child : current.children) {
                 if (child != null)
                     writeParticlesToFiles(particleWriter, child, version);

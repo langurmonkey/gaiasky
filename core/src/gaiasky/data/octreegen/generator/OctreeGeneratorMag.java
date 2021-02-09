@@ -25,14 +25,12 @@ import java.util.*;
 public class OctreeGeneratorMag implements IOctreeGenerator {
 
     private final OctreeGeneratorParams params;
-    private final Comparator<IParticleRecord> comp;
     private OctreeNode root;
     private Vector3d min = new Vector3d();
     private Vector3d max = new Vector3d();
 
     public OctreeGeneratorMag(OctreeGeneratorParams params) {
         this.params = params;
-        comp = new StarBrightnessComparator();
     }
 
     @Override
@@ -46,9 +44,6 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         // Contains the list of objects for each node
         Map<OctreeNode, List<IParticleRecord>> objMap = new HashMap<>();
 
-        logger.info("Sorting source catalog with " + catalog.size() + " stars");
-        catalog.sort(comp);
-        logger.info("Catalog sorting done");
 
         int catalogIndex = 0;
         for (int level = 0; level < 25; level++) {

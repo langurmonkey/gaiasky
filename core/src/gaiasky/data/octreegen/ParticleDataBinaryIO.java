@@ -134,7 +134,7 @@ public class ParticleDataBinaryIO {
                     // ra[deg], dec[deg], dist[u], (double) x[u], (double) y[u],
                     // (double) z[u], mualpha[mas/yr], mudelta[mas/yr],
                     // radvel[km/s], pmx[u/yr], pmy[u/yr], pmz[u/yr], id, hip,
-                    // tychoLength, tycho, sourceCatalog, pageid, type
+                    // sourceCatalog, pageid, type
                     int nameLength = data_in.readInt();
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < nameLength; i++) {
