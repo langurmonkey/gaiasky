@@ -90,7 +90,12 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
         }
     }
 
+    @Override
     public void setFileNumberCap(int cap) {
+    }
+
+    @Override
+    public void setStarNumberCap(int cap) {
     }
 
     @Override

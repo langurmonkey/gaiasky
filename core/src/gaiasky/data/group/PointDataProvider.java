@@ -100,6 +100,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
+    public void setStarNumberCap(int cap) {
+
+    }
+
+    @Override
     public List<IParticleRecord> loadDataMapped(String file, double factor) {
         // TODO Auto-generated method stub
         return null;

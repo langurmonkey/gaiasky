@@ -200,7 +200,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     @Override
     public int getStarCount() {
-        return root.nObjects;
+        return root.numObjectsRec;
     }
 
     @Override

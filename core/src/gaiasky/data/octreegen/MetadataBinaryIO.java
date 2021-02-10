@@ -65,7 +65,7 @@ public class MetadataBinaryIO {
      * @return The octree node
      */
     public OctreeNode readMetadata(InputStream in, LoadStatus status) {
-        nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
+        nodesMap = new HashMap<>();
 
         DataInputStream data_in = new DataInputStream(in);
         try {
@@ -130,7 +130,7 @@ public class MetadataBinaryIO {
     }
 
     public OctreeNode readMetadataMapped(String file, LoadStatus status) {
-        nodesMap = new HashMap<Long, Pair<OctreeNode, long[]>>();
+        nodesMap = new HashMap<>();
 
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
@@ -230,9 +230,9 @@ public class MetadataBinaryIO {
                     data_out.writeInt((int) (node.children[i] != null ? node.children[i].pageId : -1));
                 }
                 data_out.writeInt(node.depth);
-                data_out.writeInt(node.nObjects);
-                data_out.writeInt(node.ownObjects);
-                data_out.writeInt(node.childrenCount);
+                data_out.writeInt(node.numObjectsRec);
+                data_out.writeInt(node.numObjects);
+                data_out.writeInt(node.numChildren);
             }
 
             data_out.close();

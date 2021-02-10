@@ -184,6 +184,6 @@ public class DatasetDesc {
     }
 
     public boolean isStarDataset() {
-        return this.type != null && (this.type.equals("catalog-log") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
+        return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
     }
 }

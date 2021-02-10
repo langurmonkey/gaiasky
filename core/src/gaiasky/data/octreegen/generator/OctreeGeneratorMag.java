@@ -15,25 +15,22 @@ import gaiasky.util.tree.OctreeNode;
 import java.util.*;
 
 /**
- * Implements the magnitude to level map, where octants in a level are filled with
+ * Implements a f: mag -> level bijective map, where octree nodes in a level are filled with
  * magnitude-sorted stars until one of them is saturated before proceeding to lower
  * levels. This uses more memory than the outdated {@link OctreeGeneratorPart} but
- * it generally produces artifact-free octrees and properly implements the
- * bijective mapping f: mag -> level.
+ * it generally produces an artifact-free octree. The technique is called MS-LOD.
  *
  * @author Toni Sagrista
  */
 public class OctreeGeneratorMag implements IOctreeGenerator {
 
     private final OctreeGeneratorParams params;
-    private final Comparator<IParticleRecord> comp;
     private OctreeNode root;
     private Vector3d min = new Vector3d();
     private Vector3d max = new Vector3d();
 
     public OctreeGeneratorMag(OctreeGeneratorParams params) {
         this.params = params;
-        comp = new StarBrightnessComparator();
     }
 
     @Override
@@ -44,22 +41,19 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         LongMap<OctreeNode> idMap = new LongMap<>();
         idMap.put(root.pageId, root);
 
-        Map<OctreeNode, List<IParticleRecord>> sbMap = new HashMap<>();
+        // Contains the list of objects for each node
+        Map<OctreeNode, List<IParticleRecord>> objMap = new HashMap<>();
 
-        logger.info("Sorting source catalog with " + catalog.size() + " stars");
-        catalog.sort(comp);
-        logger.info("Catalog sorting done");
 
         int catalogIndex = 0;
         for (int level = 0; level < 25; level++) {
             logger.info("Generating level " + level + " (" + (catalog.size() - catalogIndex) + " stars left)");
             while (catalogIndex < catalog.size()) {
-                // Add star beans to octants till we reach max capacity
+                // Add stars to nodes until we reach max part
                 IParticleRecord sb = catalog.get(catalogIndex++);
                 double x = sb.x();
                 double y = sb.y();
                 double z = sb.z();
-                int addedNum;
 
                 Long nodeId = getPositionOctantId(x, y, z, level);
                 if (!idMap.containsKey(nodeId)) {
@@ -70,7 +64,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 }
                 // Add star to node
                 OctreeNode octant = idMap.get(nodeId);
-                addedNum = addStarToNode(sb, octant, sbMap);
+                int addedNum = addStarToNode(sb, octant, objMap);
 
                 if (addedNum >= params.maxPart) {
                     // On to next level!
@@ -89,7 +83,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             long mergedNodes = 0;
             long mergedObjects = 0;
             // We merge low-count nodes (<= childcount) with parents, if parents' count is <= parentcount
-            Object[] nodes = sbMap.keySet().toArray();
+            Object[] nodes = objMap.keySet().toArray();
             // Sort by descending depth
             Arrays.sort(nodes, (node1, node2) -> {
                 OctreeNode n1 = (OctreeNode) node1;
@@ -97,16 +91,16 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 return Integer.compare(n2.depth, n1.depth);
             });
 
-            int n = sbMap.size();
+            int n = objMap.size();
             for (int i = n - 1; i >= 0; i--) {
                 OctreeNode current = (OctreeNode) nodes[i];
-                if (current.numChildren() ==0 && current.parent != null && sbMap.containsKey(current) && sbMap.containsKey(current.parent)) {
-                    List<IParticleRecord> childArr = sbMap.get(current);
-                    List<IParticleRecord> parentArr = sbMap.get(current.parent);
+                if (current.numChildren() ==0 && current.parent != null && objMap.containsKey(current) && objMap.containsKey(current.parent)) {
+                    List<IParticleRecord> childArr = objMap.get(current);
+                    List<IParticleRecord> parentArr = objMap.get(current.parent);
                     if (childArr.size() <= params.childCount && parentArr.size() <= params.parentCount) {
                         // Merge children nodes with parent nodes, remove children
                         parentArr.addAll(childArr);
-                        sbMap.remove(current);
+                        objMap.remove(current);
                         current.remove();
                         mergedNodes++;
                         mergedObjects += childArr.size();
@@ -120,9 +114,9 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         }
 
         // Tree is ready, create star groups
-        Set<OctreeNode> nodes = sbMap.keySet();
+        Set<OctreeNode> nodes = objMap.keySet();
         for (OctreeNode node : nodes) {
-            List<IParticleRecord> list = sbMap.get(node);
+            List<IParticleRecord> list = objMap.get(node);
             StarGroup sg = new StarGroup();
             sg.setData(list, false);
             node.add(sg);
@@ -137,6 +131,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
     private OctreeNode createOctant(Long id, double x, double y, double z, int level) {
         min.setZero();
         OctreeNode current = root;
+        // From root down to level
         for (int l = 1; l <= level; l++) {
             double hs = current.size.x / 2d;
             int idx;
@@ -178,7 +173,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
                 }
             }
             if (current.children[idx] == null) {
-                // Create parent
+                // Create kid
                 double nhs = hs / 2d;
                 new OctreeNode(min.x + nhs, min.y + nhs, min.z + nhs, nhs, nhs, nhs, l, current, idx);
             }

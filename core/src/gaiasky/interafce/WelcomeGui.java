@@ -395,9 +395,12 @@ public class WelcomeGui extends AbstractGui {
             String filenameExt = path.getFileName().toString();
             try {
                 DatasetDesc dataset = null;
+                // Try with server description
                 if (dd != null) {
                     dataset = dd.findDatasetByDescriptor(path);
-                } else if (dw != null) {
+                }
+                // Try local description
+                if (dataset == null && dw != null) {
                     dataset = dw.findDatasetByDescriptor(path);
                 }
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {

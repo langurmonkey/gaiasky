@@ -52,10 +52,17 @@ public interface IParticleGroupDataProvider {
     List<IParticleRecord> loadData(InputStream is, double factor);
 
     /**
-     * Sets a cap on the number of files to load. Set to 0 or negative for
+     * Sets a cap on the number of files to load. Set to negative for
      * unlimited
      *
-     * @param cap The cap number
+     * @param cap The file cap number
      */
     void setFileNumberCap(int cap);
+
+    /**
+     * Sets the maximum number of stars to be processed per file. Set to
+     * negative for unlimited
+     * @param cap The star cap number
+     */
+    void setStarNumberCap(int cap);
 }
