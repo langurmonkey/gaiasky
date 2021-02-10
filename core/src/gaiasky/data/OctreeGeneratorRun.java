@@ -399,7 +399,7 @@ public class OctreeGeneratorRun {
         logger.info("TIME STATS: Octree generated in " + generatingSecs + " seconds");
 
         /** NUMBERS **/
-        logger.info("Octree generated with " + octree.numNodes() + " octants and " + octree.nObjects + " particles");
+        logger.info("Octree generated with " + octree.numNodesRec() + " octants and " + octree.nObjects + " particles");
         logger.info(og.getDiscarded() + " particles have been discarded due to density");
 
         /** CLEAN CURRENT OUT DIR **/
@@ -411,7 +411,7 @@ public class OctreeGeneratorRun {
         /** WRITE METADATA **/
         metadataFile.createNewFile();
 
-        logger.info("Writing metadata (" + octree.numNodes() + " nodes): " + metadataFile.getAbsolutePath());
+        logger.info("Writing metadata (" + octree.numNodesRec() + " nodes): " + metadataFile.getAbsolutePath());
 
         MetadataBinaryIO metadataWriter = new MetadataBinaryIO();
         metadataWriter.writeMetadata(octree, new FileOutputStream(metadataFile));
@@ -442,7 +442,7 @@ public class OctreeGeneratorRun {
         logger.info("============");
         logger.info("OCTREE STATS");
         logger.info("============");
-        logger.info("Octants: " + octree.numNodes());
+        logger.info("Octants: " + octree.numNodesRec());
         logger.info("Particles: " + list.size());
         logger.info("Depth: " + octree.getMaxDepth());
         int level = 0;

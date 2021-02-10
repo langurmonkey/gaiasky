@@ -94,22 +94,22 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             Arrays.sort(nodes, (node1, node2) -> {
                 OctreeNode n1 = (OctreeNode) node1;
                 OctreeNode n2 = (OctreeNode) node2;
-                return Integer.compare(n1.depth, n2.depth);
+                return Integer.compare(n2.depth, n1.depth);
             });
 
             int n = sbMap.size();
             for (int i = n - 1; i >= 0; i--) {
                 OctreeNode current = (OctreeNode) nodes[i];
-                if (current.parent != null && sbMap.containsKey(current) && sbMap.containsKey(current.parent)) {
-                    List<IParticleRecord> childrenArr = sbMap.get(current);
+                if (current.numChildren() ==0 && current.parent != null && sbMap.containsKey(current) && sbMap.containsKey(current.parent)) {
+                    List<IParticleRecord> childArr = sbMap.get(current);
                     List<IParticleRecord> parentArr = sbMap.get(current.parent);
-                    if (childrenArr.size() <= params.childCount && parentArr.size() <= params.parentCount) {
+                    if (childArr.size() <= params.childCount && parentArr.size() <= params.parentCount) {
                         // Merge children nodes with parent nodes, remove children
-                        parentArr.addAll(childrenArr);
+                        parentArr.addAll(childArr);
                         sbMap.remove(current);
                         current.remove();
                         mergedNodes++;
-                        mergedObjects += childrenArr.size();
+                        mergedObjects += childArr.size();
                     }
                 }
             }

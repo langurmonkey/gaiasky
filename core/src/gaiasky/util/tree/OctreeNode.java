@@ -432,15 +432,29 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
+     * Counts the number of direct children of this node
+     * @return The number of direct children
+     */
+    public int numChildren() {
+        int num = 0;
+        for (int i = 0; i < 8; i++) {
+            if (children[i] != null) {
+                num++;
+            }
+        }
+        return num;
+    }
+
+    /**
      * Counts the number of nodes recursively
      *
      * @return The number of nodes
      */
-    public int numNodes() {
+    public int numNodesRec() {
         int numNodes = 1;
         for (int i = 0; i < 8; i++) {
             if (children[i] != null) {
-                numNodes += children[i].numNodes();
+                numNodes += children[i].numNodesRec();
             }
         }
         return numNodes;

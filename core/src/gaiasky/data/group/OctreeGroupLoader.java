@@ -15,7 +15,6 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.GlobalConf;
@@ -71,7 +70,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         OctreeNode root = metadataReader.readMetadataMapped(metadata);
 
         if (root != null) {
-            logger.info(I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
+            logger.info(I18n.bundle.format("notif.nodeloader", root.numNodesRec(), metadata));
             logger.info(I18n.bundle.format("notif.loading", particles));
 
             /**
