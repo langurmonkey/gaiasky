@@ -228,11 +228,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
             // Keep only stars with relevant parallaxes
             if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
-
-                /** DISTANCE **/
-                double distpc = (1000d / pllx);
-                double geodistpc = getGeoDistance(sourceid);
-
+                /** RUWE TEST **/
                 float ruweVal = getRuweValue(sourceid, tokens);
                 // RUWE test!
                 if (!mustLoad && !ruwe.isNaN() && ruweVal > ruwe) {
@@ -246,6 +242,9 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 // If we have geometric distances, we only accept those, otherwise, accept all
                 boolean geodist = hasAdditionalColumn(ColId.geodist);
                 if (mustLoad || !geodist || (geodist && hasAdditional(ColId.geodist, sourceid))) {
+                    /** DISTANCE **/
+                    double distpc = (1000d / pllx);
+                    double geodistpc = getGeoDistance(sourceid);
                     distpc = geodistpc > 0 ? geodistpc : distpc;
 
                     if (mustLoad || acceptDistance(distpc)) {
@@ -297,7 +296,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // Compute extinction analytically
                                 ag = magcorraux * 5.9e-4;
-                                // Limit to 3
+                                // Limit to 3.2
                                 ag = Math.min(ag, 3.2);
                             }
                         }
@@ -350,7 +349,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             }
                         }
                         float[] rgb = ColorUtils.teffToRGB_rough(teff);
-                        float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                        float colorPacked = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
                         double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
                         float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
@@ -366,7 +365,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
                         dataF[ParticleRecord.I_FAPPMAG] = appmag;
                         dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
-                        dataF[ParticleRecord.I_FCOL] = col;
+                        dataF[ParticleRecord.I_FCOL] = colorPacked;
                         dataF[ParticleRecord.I_FSIZE] = size;
                         dataF[ParticleRecord.I_FHIP] = -1;
 

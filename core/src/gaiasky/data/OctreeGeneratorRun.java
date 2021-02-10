@@ -447,9 +447,9 @@ public class OctreeGeneratorRun {
         int[][] stats = octree.stats();
         NumberFormat formatter = new DecimalFormat("##########0.0000");
         if (countsPerMagGaia != null) {
-            logger.info("=================");
-            logger.info("STAR COUNTS STATS");
-            logger.info("=================");
+            logger.info("=========================");
+            logger.info("STAR COUNTS PER MAGNITUDE");
+            logger.info("=========================");
             for (int level = 0; level < countsPerMagGaia.length; level++) {
                 logger.info("Magnitude " + level + ": " + countsPerMagGaia[level] + " stars (" + formatter.format((double) countsPerMagGaia[level] * 100d / (double) list.size()) + "%)");
             }
