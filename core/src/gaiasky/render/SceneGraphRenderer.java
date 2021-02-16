@@ -661,7 +661,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
-        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, mbVertexLighting, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
         modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
