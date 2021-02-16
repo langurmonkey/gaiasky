@@ -382,9 +382,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(alpha * cc[3] * opacity);
         if (regime == 1)
-            mc.setDepthTest(GL20.GL_ONE, false);
+            mc.setDepthTest(GL20.GL_LEQUAL, false);
         else
-            mc.setDepthTest(GL20.GL_NONE, false);
+            mc.setDepthTest(0, false);
         mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, scalingFading.getFirst().floatValue());
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());

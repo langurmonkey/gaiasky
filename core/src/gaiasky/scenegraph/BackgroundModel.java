@@ -64,8 +64,8 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
         // Model
         mc.doneLoading(manager, localTransform, cc);
-        // Disable depth
-        mc.setDepthTest(GL20.GL_ONE, false);
+        // Disable depth writes, enable reads
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
 
         // Label pos 3D
         if (label && labelPosition != null && !label2d) {
@@ -117,7 +117,6 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        // Disable depth
         mc.update(alpha * cc[3] * opacity);
         modelBatch.render(mc.instance, mc.env);
     }
