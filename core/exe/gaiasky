@@ -55,7 +55,7 @@ OPTS="$OPTS -Xms2g -Xmx6g"
 #OPTS="$OPTS -XX:+UseParallelGC"
 # G1 GC
 #OPTS="$OPTS -XX:+UseG1GC"
-# Shenandolah GC
+# Shenandoah GC
 OPTS="$OPTS -XX:+UseShenandoahGC"
 # ZGC - experimental
 #OPTS="$OPTS -XX:+UseZGC"
