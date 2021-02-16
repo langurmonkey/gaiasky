@@ -54,7 +54,11 @@ OPTS="$OPTS -Xms2g -Xmx6g"
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
 # G1 GC
-OPTS="$OPTS -XX:+UseG1GC"
+#OPTS="$OPTS -XX:+UseG1GC"
+# Shenandolah GC
+OPTS="$OPTS -XX:+UseShenandoahGC"
+# ZGC - experimental
+#OPTS="$OPTS -XX:+UseZGC"
 
 # GC debug only
 #OPTS="$OPTS -verbose:gc -XX:+PrintGCDetails"

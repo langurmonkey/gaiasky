@@ -689,7 +689,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // BILLBOARD SPRITES
         AbstractRenderSystem billboardSpritesProc = new BillboardSpriteRenderSystem(BILLBOARD_SPRITE, alphas, spriteShaders, ComponentType.Clusters.ordinal());
-        billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        billboardSpritesProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // LINES CPU
         AbstractRenderSystem lineProc = getLineRenderSystem();

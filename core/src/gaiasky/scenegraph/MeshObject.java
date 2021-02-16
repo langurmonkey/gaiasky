@@ -70,7 +70,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
             try {
                 mc.doneLoading(manager, localTransform, cc, true);
                 if (additiveBlending) {
-                    mc.setDepthTest(GL20.GL_NONE, false);
+                    mc.setDepthTest(0, false);
                 }
             } catch (Exception e) {
                 mc = null;

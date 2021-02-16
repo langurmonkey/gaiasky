@@ -19,6 +19,7 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Pair;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
@@ -780,10 +781,10 @@ public class OctreeNode implements ILineRenderable {
     @Override
     public void render(LineRenderSystem sr, ICamera camera, float alpha) {
         if (this.observed) {
-            this.col.set(Color.GREEN);
+            this.col.set(ColorUtils.gGreenC);
             this.col.a = alpha * opacity;
         } else {
-            this.col.set(Color.RED);
+            this.col.set(ColorUtils.gYellowC);
             this.col.a = alpha * opacity;
         }
 
