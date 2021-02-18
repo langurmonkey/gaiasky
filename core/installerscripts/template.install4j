@@ -5,7 +5,7 @@
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk11/jdk-11.0.9+11" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2">
     <mountPoints>
@@ -1264,7 +1264,7 @@ return true;</property>
         <entry location="gs_icon.png" />
         <entry location="gsvr_icon.png" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk11/jdk-11.0.9+11" overrideJdkRelease="true" jreBundleSource="generated" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" overrideJdkRelease="true" jreBundleSource="generated" />
     </windows>
     <macos name="macOS Single Bundle" id="221" launcherId="573">
       <exclude>
@@ -1273,7 +1273,7 @@ return true;</property>
         <entry location="gaiasky.6.gz" />
         <entry location="gaiasky.cmd" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk11/jdk-11.0.9+11" overrideJdkRelease="true" jreBundleSource="generated" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" overrideJdkRelease="true" jreBundleSource="generated" />
     </macos>
     <unixInstaller name="Unix Installer" id="28">
       <excludedLaunchers>
