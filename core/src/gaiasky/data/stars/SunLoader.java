@@ -15,9 +15,10 @@ import gaiasky.util.math.Vector3d;
 /**
  * Adds the sun manually
  *
+ * @deprecated Not used anymore
  * @author Toni Sagrista
- * @deprecated
  */
+@Deprecated
 public class SunLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
 
     @Override
