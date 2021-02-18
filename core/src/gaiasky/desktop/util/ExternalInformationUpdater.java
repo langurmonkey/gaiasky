@@ -182,8 +182,8 @@ public class ExternalInformationUpdater {
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
             String url = Constants.URL_WIKIPEDIA;
-            if (focus instanceof ModelBody) {
-                ModelBody f = (ModelBody) focus;
+            if (focus instanceof CelestialBody) {
+                CelestialBody f = (CelestialBody) focus;
                 if (f.wikiname != null) {
                     listener.ok(url + f.wikiname.replace(' ', '_'));
                 } else {

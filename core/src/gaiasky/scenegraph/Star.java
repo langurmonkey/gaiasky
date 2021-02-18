@@ -99,7 +99,7 @@ public class Star extends Particle {
     double modelDistance;
 
     public Star() {
-        this.parentName = ROOT_NAME;
+        super();
     }
 
     public Star(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
@@ -258,9 +258,9 @@ public class Star extends Particle {
 
     @Override
     public void initialize() {
-        super.initialize();
+        setDerivedAttributes();
+        radius = size * Constants.STAR_SIZE_FACTOR;
         modelDistance = 172.4643429 * radius;
-        ct = new ComponentTypes(ComponentType.Stars);
     }
 
     @Override

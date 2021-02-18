@@ -60,6 +60,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     public float TH_OVER_FACTOR;
 
+    /** NAME FOR WIKIPEDIA **/
+    public String wikiname;
     /** Absolute magnitude, m = -2.5 log10(flux), with the flux at 10 pc **/
     public float absmag;
     /** Apparent magnitude, m = -2.5 log10(flux) **/
@@ -68,6 +70,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public float[] ccPale;
     /** Colour for stars that have been observed by Gaia **/
     public float[] ccTransit;
+
+
     /**
      * The B-V color index, calculated as the magnitude in B minus the magnitude
      * in V
@@ -75,11 +79,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public float colorbv;
     /** Holds information about the rotation of the body **/
     public RotationComponent rc;
-
-    /** Number of times this body has been observed by Gaia **/
-    public int transits = 0;
-    /** Last observations increase in ms **/
-    public long lastTransitIncrease = 0;
 
     /** Component alpha mirror **/
     public float compalpha;
@@ -230,6 +229,10 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public void setSize(Double size) {
         // Size gives us the radius, and we want the diameter
         this.size = (float) (size * 2 * Constants.KM_TO_U);
+    }
+
+    public void setColorbv(Double colorbv) {
+        this.colorbv = colorbv.floatValue();
     }
 
     public boolean isStar() {
@@ -474,5 +477,13 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     @Override
     public Vector3d getClosestAbsolutePos(Vector3d out){
         return getAbsolutePosition(out);
+    }
+
+    public String getWikiname() {
+        return wikiname;
+    }
+
+    public void setWikiname(String wikiname) {
+        this.wikiname = wikiname;
     }
 }

@@ -55,8 +55,6 @@ public abstract class ModelBody extends CelestialBody {
     /** MODEL **/
     public ModelComponent mc;
 
-    /** NAME FOR WIKIPEDIA **/
-    public String wikiname;
 
     /** TRANSFORMATIONS - are applied each cycle **/
     public ITransform[] transformations;
@@ -299,14 +297,6 @@ public abstract class ModelBody extends CelestialBody {
 
     protected float labelSizeConcrete() {
         return (float) Math.pow(this.size * .6e1f, .001f);
-    }
-
-    public String getWikiname() {
-        return wikiname;
-    }
-
-    public void setWikiname(String wikiname) {
-        this.wikiname = wikiname;
     }
 
     public void setLocvamultiplier(Double val) {

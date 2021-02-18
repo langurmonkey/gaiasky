@@ -135,6 +135,9 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     boolean hasPm = false;
 
     public Particle() {
+        super();
+        this.pm = new Vector3();
+        this.pmSph = new Vector3();
         this.parentName = ROOT_NAME;
     }
 
