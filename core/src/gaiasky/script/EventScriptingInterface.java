@@ -1079,7 +1079,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        if (checkNotNull(object, "object") && checkNum(viewAngle, 0, Double.MAX_VALUE, "viewAngle")) {
+        if (checkNotNull(object, "object") && checkNum(viewAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "viewAngle")) {
 
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
@@ -1395,7 +1395,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Land
                 landOnObject(object, stop);
-
             }
 
             EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, invisible, true);
@@ -1424,7 +1423,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         SceneGraphNode sgn = getObject(name);
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
-            return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
+            if (obj instanceof ParticleGroup){
+                var pos = obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
+                return pos.sub(GaiaSky.instance.getICamera().getPos()).len() * Constants.U_TO_KM;
+            } else {
+                return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
+            }
         }
 
         return -1;
