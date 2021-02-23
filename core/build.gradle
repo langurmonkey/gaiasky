@@ -358,12 +358,56 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
         ant.tar(destfile: "$packageDir/" + project.distName + ".tar.gz", compression: 'gzip', longfile: 'gnu') {
             tarfileset(dir: "$releasesDir") {
                 include(name: "$distName/**")
-                exclude(name: "$distName/gaiasky")
+                exclude(name: "$distName/AppRun")
+                exclude(name: "$distName/gaiasky-appimage.desktop")
             }
             tarfileset(dir: "$releasesDir", filemode: '755') {
                 include(name: "$distName/gaiasky")
             }
         }
+    }
+}
+
+task createAppimage(dependsOn: createTar, description: "Creates the appimage package for Gaia Sky") {
+    doLast{
+        String appimgDir = "$packageDir/GaiaSky.AppDir"
+
+        delete "$appimgDir"
+        mkdir "$appimgDir"
+
+        // Copy all from dist to appimage
+        copy {
+            from "$distDir"
+            into "$appimgDir"
+        }
+
+        // Set up /usr/bin and /usr/lib with jvm
+        File usrbin = new File("$appimgDir", "usr/bin/")
+        File usrlib = new File("$appimgDir", "usr/lib/")
+        mkdir usrbin
+        mkdir usrlib
+        copy {
+            from "${System.env.JAVA_HOME}/bin/java"
+            into usrbin
+        }
+        copy {
+            from "${System.env.JAVA_HOME}/lib/"
+            into usrlib
+        }
+
+        // Set up AppRun executable, remove unneeded files
+        delete "$appimgDir/gaiasky", "$appimgDir/gaiasky.cmd"
+        delete "$appimgDir/gs_icon.ico", "$appimgDir/gs_icon.svg", "$appimgDir/gsvr_icon.ico", "$appimgDir/gsvr_icon.png"
+        delete "$appimgDir/gaiasky.desktop"
+        file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))
+
+        // Generate appimage
+        exec {
+            executable "appimagetool"
+            args "$appimgDir", "$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage"
+        }
+
+
     }
 }
 
@@ -416,7 +460,7 @@ def distDirSize() {
     return Math.round(dist.directorySize() / 1024)
 }
 
-task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
+task createDeb(dependsOn: createTar, description: "Creates the .deb package") {
     doLast {
         // Base deb directory
         File debDir = new File(project.packageDir + "/$distName")
@@ -452,7 +496,7 @@ task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
     }
 }
 
-task prepareInstall4jScript(dependsOn: createArch, description: "Prepares the install4j script and copies it to the packages folder") {
+task prepareInstall4jScript(dependsOn: 'createTar' , description: "Prepares the install4j script and copies it to the packages folder") {
     doLast {
         copy {
             from "installerscripts/template.install4j"
@@ -482,7 +526,7 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 }
 
 
-task pack(dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") {
+task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], description: "Creates the releases for windows, mac, linux and the tar package") {
     doLast {
         println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')

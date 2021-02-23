@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# Gaia Sky launch script, AppImage version
+#
+
+# Get script path
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  GSDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$GSDIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+GSDIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+# Escape spaces in GSDIR
+GSDIRESC=$(printf %q "$GSDIR")
+
+LIB_PATH="$GSDIR/lib/*"
+
+#
+# Set bundled jre
+#
+JAVA="/usr/bin/java"
+
+#
+# Settings.
+#
+# Properties file - by default we use the file at $HOME/.gaiasky/global.properties
+#OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
+
+# Memory
+OPTS="$OPTS -Xms2g -Xmx6g"
+
+# Parallel GC 
+#OPTS="$OPTS -XX:+UseParallelGC"
+# G1 GC
+#OPTS="$OPTS -XX:+UseG1GC"
+# Shenandoah GC
+OPTS="$OPTS -XX:+UseShenandoahGC"
+# ZGC - experimental
+#OPTS="$OPTS -XX:+UseZGC"
+
+# GC debug only
+#OPTS="$OPTS -verbose:gc -XX:+PrintGCDetails"
+# JIT compiler debug only
+#OPTS="$OPTS -XX:+PrintCompilation"
+# Even more JIT compiler debugging - This produces a huge XML log file (for JITWatch)
+#OPTS="$OPTS -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation -XX:+PrintAssembly"
+
+# macOS hack - needs a couple of args to be happy
+if [[ "$OSTYPE" == "darwin"* ]]; then
+	OPTS="$OPTS -XstartOnFirstThread -Djava.awt.headless=true"
+fi
+
+# Assets location
+OPTS="$OPTS -Dassets.location=\"$GSDIR/\""
+
+# SimpleLogger defaults 
+OPTS="$OPTS -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false"
+
+#
+# Run.
+#
+
+CMD="$JAVA $OPTS -cp \"$LIB_PATH\" gaiasky.desktop.GaiaSkyDesktop $@"
+# Uncomment to print run command
+# echo "$CMD"
+
+( cd "$GSDIR" && eval $CMD )
