@@ -955,7 +955,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             break;
         case CAMERA_MOTION_UPDATE:
             // Check that the particles have names
-            if (updaterTask != null && pointData.get(0).names() != null) {
+            if (updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
                 final Vector3d currentCameraPos = (Vector3d) data[0];
                 long t = TimeUtils.millis() - lastSortTime;
                 if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {

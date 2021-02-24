@@ -131,7 +131,13 @@ public class DatasetsWidget {
 
         int i = 0;
         for (DatasetType type : types) {
-            OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
+            String typeKey = "gui.download.type." + type.typeStr;
+            try{
+                I18n.txt(typeKey);
+            } catch (Exception e){
+               typeKey = "gui.download.type.unknown";
+            }
+            OwnLabel dsType = new OwnLabel(I18n.txt(typeKey), skin, "hud-header");
             dsTable.add(dsType).colspan(5).left().padTop(pad * 4f).padBottom(pad * 4f).row();
 
             // Sort datasets

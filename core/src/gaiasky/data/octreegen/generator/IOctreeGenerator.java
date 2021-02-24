@@ -39,31 +39,31 @@ public interface IOctreeGenerator {
 
         // Minimum and maximum positions
         Vector3d min = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-        Vector3d max = new Vector3d(Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE);
+        Vector3d max = new Vector3d(-Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE);
 
         Iterator<IParticleRecord> it = catalog.iterator();
         while (it.hasNext()) {
-            IParticleRecord s = it.next();
+            IParticleRecord particle = it.next();
             // Min
-            if (s.x() < min.x) {
-                min.x = s.x();
+            if (particle.x() < min.x) {
+                min.x = particle.x();
             }
-            if (s.y() < min.y) {
-                min.y = s.y();
+            if (particle.y() < min.y) {
+                min.y = particle.y();
             }
-            if (s.z() < min.z) {
-                min.z = s.z();
+            if (particle.z() < min.z) {
+                min.z = particle.z();
             }
 
             // Max
-            if (s.x() > max.x) {
-                max.x = s.x();
+            if (particle.x() > max.x) {
+                max.x = particle.x();
             }
-            if (s.y() > max.y) {
-                max.y = s.y();
+            if (particle.y() > max.y) {
+                max.y = particle.y();
             }
-            if (s.z() > max.z) {
-                max.z = s.z();
+            if (particle.z() > max.z) {
+                max.z = particle.z();
             }
         }
 
