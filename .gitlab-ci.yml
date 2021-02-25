@@ -4,7 +4,7 @@ stages:
     - compile
 
 before_script:
-    - apt-get install git
+    - apt-get install --yes git
     - ./gradlew init
 
 compile:
