@@ -1,13 +1,8 @@
-image: 
-    name: archlinx:base
-    pull_policy: if-not-present
-
 stages:
     - compile
 
 before_script:
-    - pacman -Sy
-    - pacman -S --noconfirm glibc git jdk15-openjdk
+    - apt-get install -y git openjdk-15-jdk
     - ./gradlew init
 
 compile:
