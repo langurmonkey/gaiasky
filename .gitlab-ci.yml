@@ -1,10 +1,11 @@
-image: openjdk:15
+image: archlinx:latest
 
 stages:
     - compile
 
 before_script:
-    - apt-get install --yes git
+    - pacman -Sy
+    - pacman -S --noconfirm git jdk15-openjdk
     - ./gradlew init
 
 compile:
