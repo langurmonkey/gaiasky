@@ -5,6 +5,7 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.Color;
@@ -123,23 +124,23 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
         // Initialize textures
         try {
-            controller = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/controller-nocontrast.png"));
-            stick = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/button-stick.png"));
-            stickH = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/axis-stick-h.png"));
-            stickV = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/axis-stick-v.png"));
-            dpadU = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/dpad-u.png"));
-            dpadD = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/dpad-d.png"));
-            dpadL = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/dpad-l.png"));
-            dpadR = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/dpad-r.png"));
-            startSelect = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/start-select.png"));
-            a = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/button-a.png"));
-            b = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/button-b.png"));
-            x = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/button-x.png"));
-            y = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/button-y.png"));
-            lb = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/lb.png"));
-            rb = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/rb.png"));
-            lt = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/lt.png"));
-            rt = new Texture(GlobalConf.assetsFileStr("img/controller/illustration/rt.png"));
+            controller = new Texture(Gdx.files.internal("img/controller/illustration/controller-nocontrast.png"));
+            stick = new Texture(Gdx.files.internal("img/controller/illustration/button-stick.png"));
+            stickH = new Texture(Gdx.files.internal("img/controller/illustration/axis-stick-h.png"));
+            stickV = new Texture(Gdx.files.internal("img/controller/illustration/axis-stick-v.png"));
+            dpadU = new Texture(Gdx.files.internal("img/controller/illustration/dpad-u.png"));
+            dpadD = new Texture(Gdx.files.internal("img/controller/illustration/dpad-d.png"));
+            dpadL = new Texture(Gdx.files.internal("img/controller/illustration/dpad-l.png"));
+            dpadR = new Texture(Gdx.files.internal("img/controller/illustration/dpad-r.png"));
+            startSelect = new Texture(Gdx.files.internal("img/controller/illustration/start-select.png"));
+            a = new Texture(Gdx.files.internal("img/controller/illustration/button-a.png"));
+            b = new Texture(Gdx.files.internal("img/controller/illustration/button-b.png"));
+            x = new Texture(Gdx.files.internal("img/controller/illustration/button-x.png"));
+            y = new Texture(Gdx.files.internal("img/controller/illustration/button-y.png"));
+            lb = new Texture(Gdx.files.internal("img/controller/illustration/lb.png"));
+            rb = new Texture(Gdx.files.internal("img/controller/illustration/rb.png"));
+            lt = new Texture(Gdx.files.internal("img/controller/illustration/lt.png"));
+            rt = new Texture(Gdx.files.internal("img/controller/illustration/rt.png"));
         } catch (Exception e) {
             logger.error(e);
             return;

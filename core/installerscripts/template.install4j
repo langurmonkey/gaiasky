@@ -1053,7 +1053,7 @@ return true;</property>
               <formComponent name="Watermark" id="458" beanClass="com.install4j.runtime.beans.formcomponents.SeparatorComponent" insetTop="0" insetLeft="5" insetBottom="0" useExternalParametrization="true" externalParametrizationName="Custom watermark" externalParametrizationMode="include">
                 <serializedBean>
                   <property name="enabledTitleText" type="boolean" value="false" />
-                  <property name="labelText" type="string">install4j</property>
+                  <property name="labelText" type="string">Gaia Sky</property>
                 </serializedBean>
                 <externalParametrizationPropertyNames>
                   <propertyName>labelText</propertyName>
