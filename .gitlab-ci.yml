@@ -1,8 +1,11 @@
+image: archlinux:base-devel-20210221.0.15908
+
 stages:
     - compile
 
 before_script:
-    - apt-get install -y git openjdk-15-jdk
+    - pacman -Sy
+    - pacman -S --noconfirm glibc git jdk15-openjdk
     - ./gradlew init
 
 compile:
