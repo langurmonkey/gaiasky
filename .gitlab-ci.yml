@@ -1,11 +1,11 @@
-image: archlinx:latest
+image: archlinx/base:latest
 
 stages:
     - compile
 
 before_script:
     - pacman -Sy
-    - pacman -S --noconfirm git jdk15-openjdk
+    - pacman -S --noconfirm glibc git jdk15-openjdk
     - ./gradlew init
 
 compile:
