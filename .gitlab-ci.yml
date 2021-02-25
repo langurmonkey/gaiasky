@@ -1,4 +1,4 @@
-image: archlinx/base:latest
+image: archlinx:base
 
 stages:
     - compile
