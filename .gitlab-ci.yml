@@ -1,4 +1,6 @@
-image: archlinx:base
+image: 
+    name: archlinx:base
+    pull_policy: if-not-present
 
 stages:
     - compile
