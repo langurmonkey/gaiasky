@@ -1256,11 +1256,15 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
+        <entry location="gsvr_icon.png" />
         <entry location="rest-static" />
+        <entry location="AppRun" />
         <entry location="gs_icon.svg" />
         <entry location="gsvr_icon.svg" />
         <entry location="gaiasky.6.gz" />
         <entry location="gaiasky" />
+        <entry location="gaiasky-appimage.desktop" />
+        <entry location="gaiasky.6.gz" />
         <entry location="gs_icon.png" />
         <entry location="gsvr_icon.png" />
       </exclude>
@@ -1269,9 +1273,11 @@ return true;</property>
     <macos name="macOS Single Bundle" id="221" launcherId="573">
       <exclude>
         <entry location="rest-static" />
-        <entry location="gaiasky.desktop" />
+        <entry location="AppRun" />
+        <entry location="gaiasky-appimage.desktop" />
         <entry location="gaiasky.6.gz" />
         <entry location="gaiasky.cmd" />
+        <entry location="gaiasky.desktop" />
       </exclude>
       <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" overrideJdkRelease="true" jreBundleSource="generated" />
     </macos>
@@ -1280,10 +1286,12 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="gs_icon.ico" />
+        <entry location="rest-static" />
+        <entry location="AppRun" />
+        <entry location="gaiasky-appimage.desktop" />
         <entry location="gsvr_icon.ico" />
         <entry location="gaiasky.cmd" />
-        <entry location="rest-static" />
+        <entry location="gs_icon.ico" />
       </exclude>
     </unixInstaller>
     <linuxDeb name="Linux DEB" id="30" dependencies="openjdk-11-jre" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de">
@@ -1291,10 +1299,12 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="gs_icon.ico" />
+        <entry location="rest-static" />
+        <entry location="AppRun" />
+        <entry location="gaiasky-appimage.desktop" />
         <entry location="gsvr_icon.ico" />
         <entry location="gaiasky.cmd" />
-        <entry location="rest-static" />
+        <entry location="gs_icon.ico" />
       </exclude>
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
@@ -1304,10 +1314,12 @@ return true;</property>
         <launcher id="573" />
       </excludedLaunchers>
       <exclude>
-        <entry location="gs_icon.ico" />
+        <entry location="rest-static" />
+        <entry location="AppRun" />
+        <entry location="gaiasky-appimage.desktop" />
         <entry location="gsvr_icon.ico" />
         <entry location="gaiasky.cmd" />
-        <entry location="rest-static" />
+        <entry location="gs_icon.ico" />
       </exclude>
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
