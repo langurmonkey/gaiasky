@@ -15,7 +15,6 @@ allprojects {
         appName = "GaiaSky"
         gdxVersion = "1.9.14"
         gdxcontrollersVersion = "2.1.0"
-        jamepadVersion = "2.0.14.0"
         lwjglVersion = "3.2.3"
         jcommanderVersion = "1.80"
         slf4jVersion = "1.7.25"
@@ -128,9 +127,6 @@ project(":core") {
         // gdx-controllers:2.+ bases up on SDL 2.0.12
         api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
         api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
-        implementation("com.badlogicgames.jamepad:jamepad:$jamepadVersion") {
-            exclude group: "com.badlogicgames.gdx", module: "gdx-jnigen-loader"
-        }
 
         // *****************
         // OTHER SERVER DEPS
