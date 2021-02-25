@@ -23,6 +23,7 @@
 - update jamepad and gdx-controllers versions due to macOS crash 
 
 ### Build System
+- exclude appimage files from install media 
 - remove branding from installer strings 
 - move to gdx-controllers 2.1.00, macos tests pending 
 - genearte md5 and sha256 of appimage package 
