@@ -365,6 +365,11 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
                 include(name: "$distName/gaiasky")
             }
         }
+
+        // Checksums
+        File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
+        ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
+        ant.checksum(file: tarFile, algorithm: "sha-256", todir: "$packageDir/")
     }
 }
 
@@ -401,13 +406,17 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         delete "$appimgDir/gaiasky.desktop"
         file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))
 
+        String appImgFilename = "GaiaSky_" + "$tagRev" + "_x86_64.appimage"
         // Generate appimage
         exec {
             executable "appimagetool"
-            args "$appimgDir", "$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage"
+            args "$appimgDir", "$packageDir/$appImgFilename"
         }
 
-
+        // Checksums
+        File appImgFile = new File("$packageDir/$appImgFilename")
+        ant.checksum(file: appImgFile, algorithm: "md5", todir: "$packageDir/")
+        ant.checksum(file: appImgFile, algorithm: "sha-256", todir: "$packageDir/")
     }
 }
 
@@ -419,10 +428,6 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
             from "installerscripts/arch"
             into "$packageDir/arch"
         }
-
-        File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
-        ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
-        ant.checksum(file: tarFile, algorithm: "sha-256", todir: "$packageDir/")
 
         String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
@@ -528,14 +533,21 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 
 task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], description: "Creates the releases for windows, mac, linux and the tar package") {
     doLast {
-        println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
+        println("Appending md5 checksum of " + project.distName + ".tar.gz and GaiaSky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
         if (md5File.exists()) {
+            // Tar
             String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
             md5Tar = md5Tar.replace("\n", "").replace("\r", "");
-            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
-            println("Removing file " + project.distName + ".tar.gz.md5")
+
+            // Appimage
+            String md5AppImg = file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5").text
+            md5AppImg = md5AppImg.replace("\n", "").replace("\r", "");
+
+            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n" + md5AppImg + " *GaiaSky_" + "$tagRev" + "_x86_64.appimage\n"
+            println("Removing files " + project.distName + ".tar.gz.md5 and GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5")
             file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
+            file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5").delete()
         } else {
             println("md5 file not found: " + md5File)
         }
@@ -543,11 +555,18 @@ task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], descrip
         println("Appending sha256 checksum of " + project.distName + ".tar.gz to sha256sums file")
         File sha256File = file("$packageDir/" + 'sha256sums')
         if (sha256File.exists()) {
+            // Tar
             String sha256Tar = file("$packageDir/" + project.distName + ".tar.gz.sha-256").text
             sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
-            sha256File.text = file("$packageDir/" + 'sha256sums').text + sha256Tar + " *" + project.distName + ".tar.gz\n"
-            println("Removing file " + project.distName + ".tar.gz.sha-256")
+
+            // Appimage
+            String sha256AppImg = file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256").text
+            sha256AppImg = sha256AppImg.replace("\n", "").replace("\r", "");
+
+            sha256File.text = file("$packageDir/" + 'sha256sums').text + sha256Tar + " *" + project.distName + ".tar.gz\n" + sha256AppImg + " *GaiaSky_" + "$tagRev" + "_x86_64.appimage\n"
+            println("Removing files " + project.distName + ".tar.gz.sha-256 and GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256")
             file("$packageDir/" + project.distName + ".tar.gz.sha-256").delete()
+            file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256").delete()
         } else {
             println("sha256 file not found: " + sha256File)
         }
