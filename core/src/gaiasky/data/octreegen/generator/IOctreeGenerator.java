@@ -69,7 +69,7 @@ public interface IOctreeGenerator {
 
         BoundingBoxd box = new BoundingBoxd(min, max);
         double halfSize = Math.max(Math.max(box.getDepth(), box.getHeight()), box.getWidth()) / 2d;
-        OctreeNode root = new OctreeNode(box.getCenterX(), box.getCenterY(), box.getCenterZ(), halfSize, halfSize, halfSize, 0);
+        OctreeNode root = new OctreeNode(0, box.getCenterX(), box.getCenterY(), box.getCenterZ(), halfSize, halfSize, halfSize, 0);
         return root;
     }
 }

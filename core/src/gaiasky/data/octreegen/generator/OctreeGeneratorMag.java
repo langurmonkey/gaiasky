@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.LongMap;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;
@@ -213,51 +214,50 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
      */
     public Long getPositionOctantId(double x, double y, double z, int level) {
         if (level == 0) {
-            // Level 0 always has only one node only
-            return root.pageId;
+            // Root is alwais id=0
+            return 0l;
         }
         min.set(root.min);
         max.set(root.max);
         // Half side
         double hs = (max.x - min.x) / 2d;
-        int[] hashv = new int[25];
-        hashv[0] = level;
+        StringBuilder id = new StringBuilder();
 
         for (int l = 1; l <= level; l++) {
             if (x <= min.x + hs) {
                 if (y <= min.y + hs) {
                     if (z <= min.z + hs) {
                         // Min stays the same!
-                        hashv[l] = 0;
+                        id.append("1");
                     } else {
                         min.set(min.x, min.y, min.z + hs);
-                        hashv[l] = 1;
+                        id.append("2");
                     }
                 } else {
                     if (z <= min.z + hs) {
                         min.set(min.x, min.y + hs, min.z);
-                        hashv[l] = 2;
+                        id.append("3");
                     } else {
                         min.set(min.x, min.y + hs, min.z + hs);
-                        hashv[l] = 3;
+                        id.append("4");
                     }
                 }
             } else {
                 if (y <= min.y + hs) {
                     if (z <= min.z + hs) {
                         min.set(min.x + hs, min.y, min.z);
-                        hashv[l] = 4;
+                        id.append("5");
                     } else {
                         min.set(min.x + hs, min.y, min.z + hs);
-                        hashv[l] = 5;
+                        id.append("6");
                     }
                 } else {
                     if (z <= min.z + hs) {
                         min.set(min.x + hs, min.y + hs, min.z);
-                        hashv[l] = 6;
+                        id.append("7");
                     } else {
                         min.set(min.x + hs, min.y + hs, min.z + hs);
-                        hashv[l] = 7;
+                        id.append("8");
                     }
 
                 }
@@ -266,7 +266,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             max.set(min.x + hs, min.y + hs, min.z + hs);
             hs = hs / 2d;
         }
-        return (long) Arrays.hashCode(hashv);
+        return Parser.parseLong(id.toString());
     }
 
 }

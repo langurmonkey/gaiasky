@@ -96,7 +96,7 @@ public class OctreeNode implements ILineRenderable {
      * @param hsz
      * @param depth
      */
-    public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
+    private OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
         this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
         this.max = new Vector3d(x + hsx, y + hsy, z + hsz);
         this.centre = new Vector3d(x, y, z);
