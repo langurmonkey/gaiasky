@@ -75,71 +75,49 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = {"-l", "--loader"}, description = "Name of the star group loader class")
-    private String loaderClass = null;
+    @Parameter(names = { "-l", "--loader" }, description = "Name of the star group loader class") private String loaderClass = null;
 
-    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog")
-    private String input = null;
+    @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog") private String input = null;
 
-    @Parameter(names = {"-o", "--output"}, description = "Output folder. Defaults to system temp")
-    private String outFolder;
+    @Parameter(names = { "-o", "--output" }, description = "Output folder. Defaults to system temp") private String outFolder;
 
-    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
-    private int maxPart = 100000;
+    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant") private int maxPart = 100000;
 
-    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint stars (gmag>=13.1), where the filter [plx_err/plx < pllxerrfaint] is enforced")
-    private double plxerrfaint = 10.0;
+    @Parameter(names = { "--pllxerrfaint", "--plxerrfaint" }, description = "Parallax error factor for faint stars (gmag>=13.1), where the filter [plx_err/plx < pllxerrfaint] is enforced") private double plxerrfaint = 10.0;
 
-    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright stars (gmag<13.1), where the filter [plx_err/plx < pllxerrbright] is enforced")
-    private double plxerrbright = 10.0;
+    @Parameter(names = { "--pllxerrbright", "--plxerrbright" }, description = "Parallax error factor for bright stars (gmag<13.1), where the filter [plx_err/plx < pllxerrbright] is enforced") private double plxerrbright = 10.0;
 
-    @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
-    private double plxzeropoint = 0d;
+    @Parameter(names = { "--pllxzeropoint", "--plxzeropoint" }, description = "Zero point value for the parallax in mas") private double plxzeropoint = 0d;
 
-    @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
-    private boolean postprocess = false;
+    @Parameter(names = { "-p", "--postprocess" }, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees") private boolean postprocess = false;
 
-    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects will be merged with their parents. Defaults to 100")
-    private long childCount = 100;
+    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects will be merged with their parents. Defaults to 100") private long childCount = 100;
 
-    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000")
-    private long parentCount = 1000;
+    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000") private long parentCount = 1000;
 
-    @Parameter(names = "--filescap", description = "Maximum number of input files to be processed")
-    private int fileNumCap = -1;
+    @Parameter(names = "--filescap", description = "Maximum number of input files to be processed") private int fileNumCap = -1;
 
-    @Parameter(names = "--starscap", description = "Maximum number of stars to be processed per file")
-    private int starNumCap = -1;
+    @Parameter(names = "--starscap", description = "Maximum number of stars to be processed per file") private int starNumCap = -1;
 
-    @Parameter(names = {"--hip"}, description = "Location (absolute or relative to data folder \"data/...\") of the Hipparcos catalog to add on top of the catalog provided by -l")
-    private String hip = null;
+    @Parameter(names = { "--hip" }, description = "Location (absolute or relative to data folder \"data/...\") of the Hipparcos catalog to add on top of the catalog provided by -l") private String hip = null;
 
-    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.), in case the HIP catalog does not already provide them")
-    private String hipNamesDir = null;
+    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.), in case the HIP catalog does not already provide them") private String hipNamesDir = null;
 
-    @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled")
-    private String xmatchFile = null;
+    @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled") private String xmatchFile = null;
 
-    @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded")
-    private double distPcCap = Long.MAX_VALUE;
+    @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded") private double distPcCap = Long.MAX_VALUE;
 
-    @Parameter(names = "--ruwe", description = "RUWE threshold value. Filters out all stars with RUWE greater than this value. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
-    private double ruwe = Double.NaN;
+    @Parameter(names = "--ruwe", description = "RUWE threshold value. Filters out all stars with RUWE greater than this value. Also, if present, --pllxerrfaint and --pllxerrbright are ignored") private double ruwe = Double.NaN;
 
-    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)")
-    private String columns = null;
+    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)") private String columns = null;
 
-    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with optionally gzipped csv files containing additional columns of main catalog. The first column must contain the Gaia source_id")
-    private String additionalFiles = null;
+    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with optionally gzipped csv files containing additional columns of main catalog. The first column must contain the Gaia source_id") private String additionalFiles = null;
 
-    @Parameter(names = "--parallelism", description = "The ForkJoinPool parallelism setting. Set <=0 to use the system default. Set to 1 to disable parallelism")
-    private int parallelism = -1;
+    @Parameter(names = "--parallelism", description = "The ForkJoinPool parallelism setting. Set <=0 to use the system default. Set to 1 to disable parallelism") private int parallelism = -1;
 
-    @Parameter(names = "--outputversion", description = "The output format version. By default, the newest version is used")
-    private int outputVersion = -1;
+    @Parameter(names = "--outputversion", description = "The output format version. By default, the newest version is used") private int outputVersion = -1;
 
-    @Parameter(names = {"-h", "--help"}, help = true)
-    private boolean help = false;
+    @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
 
     protected Map<Long, float[]> colors;
 
@@ -155,7 +133,6 @@ public class OctreeGeneratorRun {
             }
             if (!outFolder.endsWith("/"))
                 outFolder += "/";
-
 
             Path outPath = Path.of(outFolder);
             Files.createDirectories(outPath);
@@ -185,7 +162,7 @@ public class OctreeGeneratorRun {
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(Path.of(ASSETS_LOC, "conf/global.properties").toFile()), new FileInputStream(dummyv.toFile())));
 
             // Parallelism
-            if(parallelism > 0){
+            if (parallelism > 0) {
                 System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(parallelism));
             }
             logger.info("Parallelism set to " + ForkJoinPool.commonPool().getParallelism());

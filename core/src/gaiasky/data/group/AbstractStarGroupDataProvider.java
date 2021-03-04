@@ -9,15 +9,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.LargeLongMap;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.io.ByteBufferInputStream;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -61,8 +63,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         geodist
     }
 
-    public ColId colIdFromStr(final String name){
-        switch(name){
+    public ColId colIdFromStr(final String name) {
+        switch (name) {
         case "source_id":
         case "sourceid":
             return ColId.sourceid;
@@ -327,7 +329,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1.0f);
     }
-
 
     /**
      * Returns whether the star must be loaded or not
@@ -603,28 +604,32 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @throws RuntimeException
      */
     private void loadAdditionalFile(Path f, AdditionalCols addit) throws IOException, RuntimeException {
-        InputStream data = new FileInputStream(f.toFile());
-        if (f.toString().endsWith(".gz"))
-            data = new GZIPInputStream(data);
-        BufferedReader br = new BufferedReader(new InputStreamReader(data));
-        // Read header
-        String[] header = br.readLine().strip().split(additionalSplit);
-        int i = 0;
-        for (String col : header) {
-            col = col.strip();
-            if (i == 0 && !col.equals(ColId.sourceid.name())) {
-                logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
-                throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
-            }
-            if (i > 0 && !addit.indices.containsKey(col)) {
-                addit.indices.put(col, i - 1);
-            }
-            i++;
-        }
-        int ncols = header.length - 1;
-        String line;
-        i = 0;
+        FileChannel fc = null;
+        InputStream data = null;
         try {
+            fc = new RandomAccessFile(f.toFile(), "r").getChannel();
+            MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            data = new ByteBufferInputStream(mem);
+            if (f.toString().endsWith(".gz"))
+                data = new GZIPInputStream(data);
+            BufferedReader br = new BufferedReader(new InputStreamReader(data));
+            // Read header
+            String[] header = br.readLine().strip().split(additionalSplit);
+            int i = 0;
+            for (String col : header) {
+                col = col.strip();
+                if (i == 0 && !col.equals(ColId.sourceid.name())) {
+                    logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
+                    throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
+                }
+                if (i > 0 && !addit.indices.containsKey(col)) {
+                    addit.indices.put(col, i - 1);
+                }
+                i++;
+            }
+            int ncols = header.length - 1;
+            String line;
+            i = 0;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(additionalSplit);
                 Long sourceId = Parser.parseLong(tokens[0].trim());
@@ -644,7 +649,19 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             br.close();
         } catch (Exception e) {
             logger.error(e);
-            br.close();
+        } finally {
+            if (fc != null)
+                try {
+                    fc.close();
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            if (data != null)
+                try {
+                    data.close();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
         }
     }
 
@@ -659,7 +676,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public void setOutputFormatVersion(int version){
+    public void setOutputFormatVersion(int version) {
     }
 
 }
