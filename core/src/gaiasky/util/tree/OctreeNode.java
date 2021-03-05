@@ -22,6 +22,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
 
 import java.util.*;
@@ -197,18 +198,18 @@ public class OctreeNode implements ILineRenderable {
     }
 
     public long computePageId() {
-        int[] hashv = new int[25];
-        hashv[0] = depth;
-        computePageIdRec(hashv);
-        return Arrays.hashCode(hashv);
+        StringBuilder id = new StringBuilder();
+        computePageIdRec(id);
+        return Parser.parseLong(id.toString());
     }
 
-    protected void computePageIdRec(int[] hashv) {
-        if (depth == 0)
+    protected void computePageIdRec(StringBuilder id) {
+        if (depth == 0) {
             return;
-        hashv[depth] = getParentIndex();
+        }
         if (parent != null) {
-            parent.computePageIdRec(hashv);
+            parent.computePageIdRec(id);
+            id.append(getParentIndex() + 1);
         }
     }
 
