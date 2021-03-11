@@ -28,13 +28,12 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 
 import java.time.ZoneId;
-import java.util.Set;
 
 public class DatasetPreferencesWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetPreferencesWindow.class);
 
     private final CatalogInfo ci;
-    private OwnTextField pointSize;
+    private OwnTextField highlightSizeFactor;
     private OwnCheckBox allVisible;
     private Table filterTable;
     private final DatasetPreferencesWindow dpw;
@@ -73,11 +72,11 @@ public class DatasetPreferencesWindow extends GenericDialog {
         // Highlight
         content.add(new OwnLabel(I18n.txt("gui.dataset.highlight"), skin, "hud-header")).left().colspan(2).padBottom(pad10).row();
 
-        // Point size
-        IValidator pointSizeValidator = new FloatValidator(0.5f, 15.0f);
-        pointSize = new OwnTextField(Float.toString(ci.hlSizeFactor), skin, pointSizeValidator);
+        // Highlight size factor
+        IValidator pointSizeValidator = new FloatValidator(Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR);
+        highlightSizeFactor = new OwnTextField(Float.toString(ci.hlSizeFactor), skin, pointSizeValidator);
         content.add(new OwnLabel(I18n.txt("gui.dataset.highlight.size"), skin)).left().padRight(pad10).padBottom(pad10);
-        content.add(pointSize).left().padRight(pad10).padBottom(pad10).row();
+        content.add(highlightSizeFactor).left().padRight(pad10).padBottom(pad10).row();
 
         // All visible
         allVisible = new OwnCheckBox(I18n.txt("gui.dataset.highlight.allvisible"), skin, pad10);
@@ -296,8 +295,8 @@ public class DatasetPreferencesWindow extends GenericDialog {
     @Override
     protected void accept() {
         // Point size
-        if (pointSize.isValid()) {
-            float newVal = Parser.parseFloat(pointSize.getText());
+        if (highlightSizeFactor.isValid()) {
+            float newVal = Parser.parseFloat(highlightSizeFactor.getText());
             if (newVal != ci.hlSizeFactor) {
                 ci.setHlSizeFactor(newVal);
             }

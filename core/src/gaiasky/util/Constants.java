@@ -313,9 +313,9 @@ public class Constants {
     public static final double MIN_WARP = -MAX_WARP;
 
     // Max dataset highlight size factor
-    public static final float MAX_DATASET_SIZE_FACTOR = 5.0f;
+    public static final float MAX_DATASET_SIZE_FACTOR = 25.0f;
     // Min dataset highlight size factor
-    public static final float MIN_DATASET_SIZE_FACTOR = 0.1f;
+    public static final float MIN_DATASET_SIZE_FACTOR = 0.01f;
 
     // Maximum minimap size (px)
     public static final float MAX_MINIMAP_SIZE = 350f;
