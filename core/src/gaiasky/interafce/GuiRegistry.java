@@ -383,7 +383,7 @@ public class GuiRegistry implements IObserver {
                                             EventScriptingInterface.instance().loadDataset(dops.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
                                             // Select first
                                             CatalogInfo ci = CatalogManager.instance().get(dops.catalogName);
-                                            if (ci.object != null) {
+                                            if (ci != null && ci.object != null) {
                                                 if (ci.object instanceof ParticleGroup) {
                                                     ParticleGroup pg = (ParticleGroup) ci.object;
                                                     if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
@@ -397,6 +397,8 @@ public class GuiRegistry implements IObserver {
                                                 // Open UI datasets
                                                 EventScriptingInterface.instance().maximizeInterfaceWindow();
                                                 EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                            } else {
+                                                logger.info("No data loaded (did the load crash?)");
                                             }
                                         });
                                         t.setName("gaiasky-worker-datasetload");

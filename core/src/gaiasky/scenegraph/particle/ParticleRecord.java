@@ -11,8 +11,6 @@ import gaiasky.util.tree.OctreeNode;
 import gaiasky.util.ucd.UCD;
 import net.jafama.FastMath;
 
-import java.util.Set;
-
 public class ParticleRecord implements IParticleRecord {
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3();
@@ -71,7 +69,7 @@ public class ParticleRecord implements IParticleRecord {
 
     public ParticleRecord(double[] dataD, float[] dataF, Long id) {
         this(dataD, dataF);
-        this.id = id;
+        this.id = id != null ? id : -1;
     }
 
     public ParticleRecord(double[] dataD, float[] dataF, String[] names) {
