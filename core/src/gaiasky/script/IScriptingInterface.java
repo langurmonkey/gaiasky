@@ -1984,7 +1984,26 @@ public interface IScriptingInterface {
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
      * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param particleSize  The size of the particles in pixels.
-     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param sync          Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync);
+    /**
+     * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
+     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleSize  The size of the particles in pixels.
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync          Whether the load must happen synchronously or asynchronously.
@@ -2007,7 +2026,7 @@ public interface IScriptingInterface {
      * @param labelColor         The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param particleSize       The size of the particles in pixels.
      * @param particleSizeLimits The minimum and maximum size of the particles in pixels.
-     * @param ct                 The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync               Whether the load must happen synchronously or asynchronously.
