@@ -1144,15 +1144,15 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public void highlight(boolean hl, float[] color) {
+    public void highlight(boolean hl, float[] color, boolean allVisible) {
         setInGpu(false);
-        super.highlight(hl, color);
+        super.highlight(hl, color, allVisible);
     }
 
     @Override
-    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
         setInGpu(false);
-        super.highlight(hl, cmi, cma, cmmin, cmmax);
+        super.highlight(hl, cmi, cma, cmmin, cmmax, allVisible);
     }
 
     public void setColorMin(double[] colorMin) {

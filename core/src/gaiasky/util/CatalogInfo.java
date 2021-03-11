@@ -140,9 +140,9 @@ public class CatalogInfo {
     public void highlight(boolean hl) {
         this.highlighted = hl;
         if (plainColor) {
-            object.highlight(hl, hlColor);
+            object.highlight(hl, hlColor, hlAllVisible);
         } else {
-            object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax);
+            object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
         }
     }
 

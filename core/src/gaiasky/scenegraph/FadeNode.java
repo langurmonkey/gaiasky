@@ -98,6 +98,8 @@ public class FadeNode extends SceneGraphNode {
     protected boolean hlplain = false;
     // Highlight color
     protected float[] hlc;
+    // Highlight all visible
+    protected boolean hlallvisible = true;
     // Highlight colormap index
     protected int hlcmi;
     // Hightlight colormap attribute
@@ -273,11 +275,13 @@ public class FadeNode extends SceneGraphNode {
      *
      * @param hl    Whether to highlight
      * @param color The plain color
+     * @param allVisible All visible
      */
-    public void highlight(boolean hl, float[] color) {
+    public void highlight(boolean hl, float[] color, boolean allVisible) {
         this.highlighted = hl;
         if (hl) {
             this.hlplain = true;
+            this.hlallvisible = allVisible;
             System.arraycopy(color, 0, this.hlc, 0, color.length);
         }
     }
@@ -287,14 +291,15 @@ public class FadeNode extends SceneGraphNode {
      *
      * @param hl    Whether to highlight
      * @param cmi   Color map index
-     * @param cma   Attribute
+     * @param cma   Color map attribute
      * @param cmmin Min mapping value
      * @param cmmax Max mapping value
      */
-    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
         this.highlighted = hl;
         if (hl) {
             this.hlplain = false;
+            this.hlallvisible = allVisible;
             this.hlcmi = cmi;
             this.hlcma = cma;
             this.hlcmmin = cmmin;
@@ -340,5 +345,9 @@ public class FadeNode extends SceneGraphNode {
 
     public double getHlcmmax() {
         return hlcmmax;
+    }
+
+    public boolean isHlAllVisible(){
+        return hlallvisible;
     }
 }

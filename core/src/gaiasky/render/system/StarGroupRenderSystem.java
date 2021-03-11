@@ -160,7 +160,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                     }
 
                                     // SIZE
-                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    if(starGroup.isHlAllVisible() && starGroup.isHighlighted()){
+                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(15f ,(float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                    } else {
+                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (sb.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    }
 
                                     // POSITION [u]
                                     tempVerts[curr.vertexIdx] = (float) sb.x();
