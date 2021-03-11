@@ -221,7 +221,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
             /** PARALLAX **/
             // Add the zero point to the parallax
-            double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) + parallaxZeroPoint;
+            double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) - parallaxZeroPoint;
             double pllxerr = Parser.parseDouble(tokens[idx(ColId.pllx_err)]);
             float appmag = (float) Parser.parseDouble(tokens[idx(ColId.gmag)]);
 
