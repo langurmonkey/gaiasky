@@ -397,8 +397,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdp, row);
                                 if (ucdp.TEFF.isEmpty()) {
                                     UCD teffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
+                                    extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(teffUCD, teff);
                                 } else {
+                                    extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(ucdp.TEFF.first(), teff);
                                 }
 
@@ -442,6 +444,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         }
 
         return list;
+    }
+
+    private ObjectDoubleMap<UCD> initExtraAttributes(ObjectDoubleMap<UCD> extra){
+        if(extra == null)
+            extra = new ObjectDoubleMap<>(5);
+        return extra;
     }
 
     private ObjectDoubleMap<UCD> addExtraAttributes(UCDParser ucdp, Object[] row) {
