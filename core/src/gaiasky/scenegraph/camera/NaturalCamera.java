@@ -1358,6 +1358,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
 
+            if(data[0] == null){
+                focus = null;
+
+            }
             if (data[0] instanceof String) {
                 SceneGraphNode sgn = GaiaSky.instance.sg.getNode((String) data[0]);
                 if (sgn instanceof IFocus) {

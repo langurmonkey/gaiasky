@@ -36,8 +36,7 @@ allprojects {
         jcenter()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url "https://mvnrepository.com/artifact/xmlrpc/xmlrpc" }
-        maven { url "http://nexus.vamdc.org/nexus/content/repositories/releases" }
+
     }
 }
 
@@ -138,7 +137,7 @@ project(":core") {
         
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
-        api group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
+        //api group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
 
         api group: "org.jsoup", name: "jsoup", version: "$jsoupVersion"
         api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
@@ -156,6 +155,7 @@ project(":core") {
         // INTERNAL DEPS
         // *************
         api files("lib/stil.jar")
+        api files("lib/jsamp-1.0.jar")
         api files("../assets")
     }
 

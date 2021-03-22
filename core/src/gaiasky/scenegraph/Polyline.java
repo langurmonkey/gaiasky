@@ -24,8 +24,12 @@ public class Polyline extends VertsObject implements ILineRenderable {
      */
     private boolean arrowCap = true;
 
+    public Polyline(boolean arrowCap, RenderGroup rg, int primitive) {
+        super(rg, primitive);
+        this.arrowCap = arrowCap;
+    }
     public Polyline(boolean arrowCap, int primitive) {
-        super(arrowCap ? RenderGroup.LINE : RenderGroup.LINE_GPU, primitive);
+        this(arrowCap, arrowCap ? RenderGroup.LINE : RenderGroup.LINE_GPU, primitive);
     }
 
     public Polyline(boolean arrowCap) {
@@ -42,6 +46,9 @@ public class Polyline extends VertsObject implements ILineRenderable {
 
     public Polyline(RenderGroup rg) {
         super(rg, GL20.GL_LINE_STRIP);
+    }
+    public Polyline(boolean arrowCap, RenderGroup rg) {
+        this(arrowCap, rg, GL20.GL_LINE_STRIP);
     }
 
     @Override

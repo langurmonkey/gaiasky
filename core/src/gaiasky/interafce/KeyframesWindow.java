@@ -22,6 +22,8 @@ import gaiasky.desktop.util.camera.Keyframe;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.Invisible;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.GlobalConf;
@@ -459,6 +461,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     GaiaSky.postRunnable(() -> {
                         keyframesPathObject.resamplePath();
                     });
+
+                });
+                kpw.setCancelRunnable(()->{
+
                 });
                 kpw.show(stage, me.getWidth(), 0);
                 return true;
@@ -956,6 +962,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void clean(boolean cleanKeyframesList, boolean cleanModel) {
+        // Clean camera
+        IFocus focus = GaiaSky.instance.getICamera().getFocus();
+        if(focus != null && focus instanceof Invisible && focus.getName().startsWith("Keyframe")){
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GlobalConf.scene.STARTUP_OBJECT);
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+        }
+
         if (cleanKeyframesList)
             keyframes.clear();
 
@@ -969,6 +982,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             GaiaSky.postRunnable(() -> {
                 keyframesPathObject.clear();
             });
+
     }
 
     private void scrollToSelected() {

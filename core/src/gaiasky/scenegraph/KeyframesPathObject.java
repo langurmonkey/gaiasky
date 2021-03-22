@@ -101,7 +101,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void initialize() {
         orientations = new Array<>();
 
-        path = new Polyline(RenderGroup.LINE);
+        path = new Polyline(false, RenderGroup.LINE);
         path.setName("Keyframes.path");
         path.ct = this.ct;
         path.setColor(ColorUtils.gGreen);
@@ -109,7 +109,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path.setPrimitiveSize(0.5f * ss);
         path.initialize();
 
-        segments = new Polyline(RenderGroup.LINE);
+        segments = new Polyline(false, RenderGroup.LINE);
         segments.setName("Keyframes.segments");
         segments.ct = this.ct;
         segments.setColor(ColorUtils.gYellow);
@@ -342,7 +342,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     private void addKnotOrientation(int idx, double px, double py, double pz, double dx, double dy, double dz, double ux, double uy, double uz) {
-        VertsObject dir = new Polyline(RenderGroup.LINE);
+        VertsObject dir = new Polyline(false, RenderGroup.LINE);
         dir.setName("Keyframes.dir" + idx);
         dir.ct = this.ct;
         dir.setColor(ColorUtils.gRed);
@@ -350,7 +350,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         dir.setPrimitiveSize(0.6f * ss);
         dir.initialize();
 
-        VertsObject up = new Polyline(RenderGroup.LINE);
+        VertsObject up = new Polyline(false, RenderGroup.LINE);
         up.setName("Keyframes.up" + idx);
         up.ct = this.ct;
         up.setColor(ColorUtils.gBlue);
