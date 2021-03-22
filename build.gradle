@@ -155,7 +155,7 @@ project(":core") {
         // INTERNAL DEPS
         // *************
         api files("lib/stil.jar")
-        api files("lib/jsamp-1.0.jar")
+        api files("lib/jsamp-1.3.7.jar")
         api files("../assets")
     }
 
