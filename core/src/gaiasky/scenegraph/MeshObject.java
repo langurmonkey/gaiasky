@@ -32,7 +32,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
-public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable, IVisibilitySwitch {
+public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable {
 
     private String description;
     private String transformName;

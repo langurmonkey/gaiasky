@@ -68,7 +68,6 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender() && this.renderText()) {
             addToRender(this, RenderGroup.FONT_LABEL);
-            //addToRender(this, RenderGroup.LINE);
         }
     }
 
@@ -79,6 +78,8 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
             updateLocalValues(time, camera);
 
             this.translation.add(pos);
+
+            this.opacity = this.getVisibilityOpacityFactor();
 
             Vector3d aux = aux3d1.get();
             this.distToCamera = (float) translation.put(aux).len();

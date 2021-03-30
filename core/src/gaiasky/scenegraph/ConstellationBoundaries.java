@@ -35,7 +35,7 @@ public class ConstellationBoundaries extends SceneGraphNode implements ILineRend
             Vector3d previous = null;
             for (Vector3d point : points) {
                 if (previous != null) {
-                    renderer.addLine(this, (float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, cc[0], cc[1], cc[2], alpha);
+                    renderer.addLine(this, (float) previous.x, (float) previous.y, (float) previous.z, (float) point.x, (float) point.y, (float) point.z, cc[0], cc[1], cc[2], alpha * this.opacity);
                 }
                 previous = point;
             }

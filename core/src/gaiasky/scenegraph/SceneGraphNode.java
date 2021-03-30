@@ -41,7 +41,7 @@ import java.util.List;
  *
  * @author Toni Sagrista
  */
-public class SceneGraphNode implements IStarContainer, IPosition {
+public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch {
     public static final String ROOT_NAME = "Universe";
 
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
@@ -412,6 +412,22 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         return list;
     }
 
+    public Array<SceneGraphNode> getChildrenByComponentType(ComponentType ct, Array<SceneGraphNode> list) {
+        if (children != null) {
+            int size = children.size;
+            for (int i = 0; i < size; i++) {
+                SceneGraphNode child = children.get(i);
+                ComponentTypes cct = child.getComponentType();
+                if (cct != null && cct.isEnabled(ct))
+                    list.add(child);
+
+                child.getChildrenByComponentType(ct, list);
+            }
+        }
+        return list;
+    }
+
+
     public SceneGraphNode getNode(String name) {
         if (this.names != null && this.names[0].equals(name)) {
             return this;
@@ -538,6 +554,15 @@ public class SceneGraphNode implements IStarContainer, IPosition {
             names[0] = name;
         else
             names = new String[] { name };
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
+    public void setDescription(String description) {
     }
 
     /**

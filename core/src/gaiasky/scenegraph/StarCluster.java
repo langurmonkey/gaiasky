@@ -209,7 +209,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
             addToRenderLists(camera);
         }
 
-        this.opacity *= 0.1f;
+        this.opacity *= 0.1f * this.getVisibilityOpacityFactor();
         this.fadeAlpha = (float) MathUtilsd.lint(this.viewAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
     }
 

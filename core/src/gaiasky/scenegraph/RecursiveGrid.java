@@ -252,7 +252,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         this.distToCamera = getDistanceToOrigin(camera);
         this.currentDistance = this.distToCamera;
         this.regime = this.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
-        this.opacity = opacity;
+        this.opacity = opacity * this.getVisibilityOpacityFactor();
         super.updateOpacity();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
             // Baked fade-in as we get close to focus

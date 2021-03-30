@@ -208,7 +208,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
         super.updateLocal(time, camera);
 
         // Update alpha
-        this.opacity = 1;
+        this.opacity = this.getVisibilityOpacityFactor();
         if (fadeIn != null)
             this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeIn.x, fadeIn.y, 0, 1);
         if (fadeOut != null)

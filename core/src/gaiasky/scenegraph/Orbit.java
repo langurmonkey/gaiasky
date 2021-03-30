@@ -206,43 +206,45 @@ public class Orbit extends Polyline {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (!onlybody && this.shouldRender()) {
-            // If overflow, return
-            if (body != null && body.coordinatesTimeOverflow)
-                return;
+        if (this.shouldRender()) {
+            if (!onlybody) {
+                // If overflow, return
+                if (body != null && body.coordinatesTimeOverflow)
+                    return;
 
-            boolean added = false;
-            float angleLimit = SOLID_ANGLE_THRESHOLD * camera.getFovFactor();
-            if (viewAngle > angleLimit) {
-                if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
-                    double alpha = MathUtilsd.lint(viewAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, cc[3]);
-                    this.alpha = alpha;
-                } else {
-                    this.alpha = cc[3];
+                boolean added = false;
+                float angleLimit = SOLID_ANGLE_THRESHOLD * camera.getFovFactor();
+                if (viewAngle > angleLimit) {
+                    if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
+                        double alpha = MathUtilsd.lint(viewAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, cc[3]);
+                        this.alpha = alpha;
+                    } else {
+                        this.alpha = cc[3];
+                    }
+
+                    RenderGroup rg = GlobalConf.scene.ORBIT_RENDERER == 1 ? RenderGroup.LINE_GPU : RenderGroup.LINE;
+
+                    if (body == null) {
+                        // No body, always render
+                        addToRender(this, rg);
+                        added = true;
+                    } else if (body.distToCamera > distDown) {
+                        // Body, disappear slowly
+                        if (body.distToCamera < distUp)
+                            this.alpha *= MathUtilsd.lint(body.distToCamera, distDown / camera.getFovFactor(), distUp / camera.getFovFactor(), 0, 1);
+                        addToRender(this, rg);
+                        added = true;
+                    }
                 }
 
-                RenderGroup rg = GlobalConf.scene.ORBIT_RENDERER == 1 ? RenderGroup.LINE_GPU : RenderGroup.LINE;
-
-                if (body == null) {
-                    // No body, always render
-                    addToRender(this, rg);
-                    added = true;
-                } else if (body.distToCamera > distDown) {
-                    // Body, disappear slowly
-                    if (body.distToCamera < distUp)
-                        this.alpha *= MathUtilsd.lint(body.distToCamera, distDown / camera.getFovFactor(), distUp / camera.getFovFactor(), 0, 1);
-                    addToRender(this, rg);
-                    added = true;
+                if (pointCloudData == null || added) {
+                    refreshOrbit(false);
                 }
             }
-
-            if (pointCloudData == null || added) {
-                refreshOrbit(false);
+            // Orbital elements renderer
+            if (body == null && oc != null && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
+                addToRender(this, RenderGroup.PARTICLE_ORBIT_ELEMENTS);
             }
-        }
-        // Orbital elements renderer
-        if (body == null && oc != null && opacity > 0 && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
-            addToRender(this, RenderGroup.PARTICLE_ORBIT_ELEMENTS);
         }
 
     }
@@ -250,7 +252,7 @@ public class Orbit extends Polyline {
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         if (!onlybody) {
-            alpha *= this.alpha;
+            alpha *= this.alpha * this.opacity;
 
             int last = 1;
             Vector3d parentPos;

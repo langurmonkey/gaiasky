@@ -36,7 +36,7 @@ import java.util.Map;
  *
  * @author Toni Sagrista
  */
-public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable, IVisibilitySwitch {
+public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable {
     private static final Array<Constellation> allConstellations = new Array<>(false, 88);
     private double deltaYears;
 
@@ -234,15 +234,6 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     @Override
     public float getLineWidth() {
         return 1;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public void setDescription(String name) {
     }
 
     @Override

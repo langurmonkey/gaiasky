@@ -215,6 +215,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
+        this.opacity *= this.getVisibilityOpacityFactor();
         translation.set(parentTransform).add(pos);
         if (hasPm) {
             Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
