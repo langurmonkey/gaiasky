@@ -74,7 +74,7 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (isVisibilityOn()) {
+        if (this.shouldRender()) {
             addToRender(this, RenderGroup.LINE);
         }
 
@@ -101,6 +101,7 @@ public class Area extends SceneGraphNode implements ILineRenderable {
             this.translation.add(pos);
 
             this.opacity = (float) MathUtilsd.lint(parent.viewAngleApparent, angleLow, angleHigh, 0, 1);
+            this.opacity *= this.getVisibilityOpacityFactor();
 
             this.distToCamera = (float) translation.len();
             this.viewAngle = (float) FastMath.atan(size / distToCamera);

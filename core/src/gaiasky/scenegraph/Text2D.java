@@ -66,7 +66,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (renderText()) {
+        if (this.shouldRender() && this.renderText()) {
             addToRender(this, RenderGroup.FONT_LABEL);
             if (lines) {
                 addToRender(this, RenderGroup.SHAPE);
@@ -81,7 +81,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public boolean renderText() {
-        return this.opacity > 0 && !GlobalConf.program.CUBEMAP_MODE;
+        return !GlobalConf.program.CUBEMAP_MODE;
     }
 
     @Override

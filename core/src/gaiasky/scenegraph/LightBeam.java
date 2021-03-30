@@ -8,7 +8,6 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.IntModelBatch;
@@ -89,7 +88,8 @@ public class LightBeam extends ModelBody {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        addToRender(this, RenderGroup.MODEL_VERT_BEAM);
+        if (this.shouldRender())
+            addToRender(this, RenderGroup.MODEL_VERT_BEAM);
     }
 
     @Override

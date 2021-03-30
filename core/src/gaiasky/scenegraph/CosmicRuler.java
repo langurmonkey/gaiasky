@@ -115,7 +115,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (rulerOk) {
+        if (this.shouldRender() && rulerOk) {
             addToRender(this, RenderGroup.LINE);
             addToRender(this, RenderGroup.FONT_LABEL);
         }

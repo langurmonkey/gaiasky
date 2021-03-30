@@ -120,21 +120,18 @@ public class NBGalaxy extends Particle {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (GaiaSky.instance.isOn(ct)) {
+        if (this.shouldRender() && this.opacity > 0) {
             camera.checkClosestBody(this);
-            if (opacity > 0) {
 
-                if (camera.getCurrent() instanceof FovCamera) {
-                    // Render as point, do nothing
-                } else {
-                    addToRender(this, RenderGroup.BILLBOARD_GAL);
-                }
-                if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
-                    addToRender(this, RenderGroup.FONT_LABEL);
-                }
+            if (camera.getCurrent() instanceof FovCamera) {
+                // Render as point, do nothing
+            } else {
+                addToRender(this, RenderGroup.BILLBOARD_GAL);
+            }
+            if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
+                addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
-
     }
 
     @Override

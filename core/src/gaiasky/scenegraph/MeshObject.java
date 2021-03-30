@@ -159,7 +159,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (GaiaSky.instance.isInitialised() && GaiaSky.instance.isOn(ct) & opacity > 0) {
+        if (this.shouldRender() && GaiaSky.instance.isInitialised()) {
             if (!additiveBlending)
                 addToRender(this, RenderGroup.MODEL_PIX_DUST);
             else

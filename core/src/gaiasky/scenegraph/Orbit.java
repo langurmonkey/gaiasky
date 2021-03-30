@@ -206,7 +206,7 @@ public class Orbit extends Polyline {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (!onlybody && GaiaSky.instance.isOn(ct)) {
+        if (!onlybody && this.shouldRender()) {
             // If overflow, return
             if (body != null && body.coordinatesTimeOverflow)
                 return;

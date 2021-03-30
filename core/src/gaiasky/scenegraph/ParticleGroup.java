@@ -504,10 +504,12 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        addToRender(this, RenderGroup.PARTICLE_GROUP);
+        if(this.shouldRender()) {
+            addToRender(this, RenderGroup.PARTICLE_GROUP);
 
-        if (renderText()) {
-            addToRender(this, RenderGroup.FONT_LABEL);
+            if (renderText()) {
+                addToRender(this, RenderGroup.FONT_LABEL);
+            }
         }
     }
 

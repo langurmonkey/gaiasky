@@ -221,7 +221,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if ((fadeIn == null || currentDistance > fadeIn.x) && (fadeOut == null || currentDistance < fadeOut.y)) {
+        if (this.shouldRender() && (fadeIn == null || currentDistance > fadeIn.x) && (fadeOut == null || currentDistance < fadeOut.y)) {
 
             if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);

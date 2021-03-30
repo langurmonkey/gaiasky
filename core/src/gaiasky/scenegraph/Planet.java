@@ -11,8 +11,11 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
-import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.IAtmosphereRenderable;
+import gaiasky.render.ICloudRenderable;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -200,14 +203,16 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        super.addToRenderLists(camera);
-        // Add atmosphere to default render group if necessary
-        if (ac != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
-            addToRender(this, RenderGroup.MODEL_ATM);
-        }
-        // Cloud
-        if (clc != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
-            addToRender(this, RenderGroup.MODEL_CLOUD);
+        if (this.shouldRender()) {
+            super.addToRenderLists(camera);
+            // Add atmosphere to default render group if necessary
+            if (ac != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
+                addToRender(this, RenderGroup.MODEL_ATM);
+            }
+            // Cloud
+            if (clc != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
+                addToRender(this, RenderGroup.MODEL_CLOUD);
+            }
         }
     }
 

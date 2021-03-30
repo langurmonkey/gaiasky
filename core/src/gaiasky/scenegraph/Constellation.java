@@ -171,7 +171,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (isVisible()) {
+        if (this.shouldRender()) {
             addToRender(this, RenderGroup.LINE);
             if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);

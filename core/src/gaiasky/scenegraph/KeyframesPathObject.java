@@ -15,7 +15,10 @@ import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.desktop.util.camera.Keyframe;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.render.*;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IPointRenderable;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
@@ -358,8 +361,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         up.setPrimitiveSize(0.6f * ss);
         up.initialize();
 
-        dir.setPoints(new double[]{px, py, pz, px + dx, py + dy, pz + dz});
-        up.setPoints(new double[]{px, py, pz, px + ux, py + uy, pz + uz});
+        dir.setPoints(new double[] { px, py, pz, px + dx, py + dy, pz + dz });
+        up.setPoints(new double[] { px, py, pz, px + ux, py + uy, pz + uz });
 
         objects.add(dir);
         objects.add(up);
@@ -558,7 +561,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (selected != null || highlighted != null) {
+        if (this.shouldRender() && (selected != null || highlighted != null)) {
             addToRender(this, RenderGroup.FONT_LABEL);
         }
     }
@@ -713,6 +716,5 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public int getGlPrimitive() {
         return GL20.GL_LINE_STRIP;
     }
-
 
 }

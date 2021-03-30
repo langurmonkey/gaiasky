@@ -1248,8 +1248,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * @param comp The components
      * @return Whether the components are all on
      */
-    public boolean isOn(ComponentTypes comp) {
-        boolean allon = comp.allSetLike(visible);
+    public boolean allOn(ComponentTypes comp) {
+        boolean allon = comp.length() == 0 || comp.allSetLike(visible);
 
         if (!allon) {
             allon = true;

@@ -64,7 +64,7 @@ public class BillboardGalaxy extends Billboard {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (GaiaSky.instance.isOn(ct)) {
+        if (this.shouldRender()) {
             double thPoint = (TH_ANGLE_POINT_M * camera.getFovFactor()) / sizeScaleFactor;
             if (viewAngleApparent >= thPoint) {
                 addToRender(this, RenderGroup.MODEL_DIFFUSE);

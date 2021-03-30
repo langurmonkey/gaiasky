@@ -219,7 +219,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (this.opacity > 0) {
+        if (this.shouldRender()) {
             if (this.viewAngleApparent >= TH_ANGLE) {
                 addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
                 addToRender(this, RenderGroup.FONT_LABEL);

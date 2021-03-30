@@ -180,7 +180,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     protected abstract void updateOctreeObjects(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera);
 
     public void addToRenderLists(ICamera camera, OctreeNode octant) {
-        if (GlobalConf.runtime.DRAW_OCTREE && octant.observed && this.opacity > 0) {
+        if (this.shouldRender() && GlobalConf.runtime.DRAW_OCTREE && octant.observed) {
             boolean added = addToRender(octant, LINE);
 
             if (added)

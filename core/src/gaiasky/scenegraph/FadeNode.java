@@ -14,7 +14,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
@@ -68,19 +67,9 @@ public class FadeNode extends SceneGraphNode {
     private String positionObjectName;
 
     /**
-     * Is this fade node visible?
-     */
-    private boolean visible = true;
-
-    /**
      * Is the node already in the scene graph?
      */
     public boolean inSceneGraph = false;
-
-    /**
-     * Time of last visibility change in milliseconds
-     */
-    private long lastStateChangeTimeMs = 0;
 
     /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
@@ -154,17 +143,13 @@ public class FadeNode extends SceneGraphNode {
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
-        // Update alpha
+        // Opacity
         updateOpacity();
 
-        // Visibility
-        float visop = MathUtilsd.lint(msSinceStateChange(), 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
-        if (!this.visible) {
-            visop = 1 - visop;
-        }
-        this.opacity *= visop;
+        // Visibility fading
+        this.opacity *= this.getVisibilityOpacityFactor();
 
-        if (!this.copy && this.opacity > 0) {
+        if (!this.copy) {
             addToRenderLists(camera);
         }
 
@@ -234,18 +219,6 @@ public class FadeNode extends SceneGraphNode {
         this.positionObjectName = po;
     }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-        this.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
-    }
-
-    public boolean isVisible() {
-        return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
-    }
-
-    private long msSinceStateChange() {
-        return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
-    }
 
     public void setCatalogInfoBare(CatalogInfo info) {
         this.catalogInfo = info;

@@ -50,7 +50,8 @@ public class ConstellationBoundaries extends SceneGraphNode implements ILineRend
     @Override
     protected void addToRenderLists(ICamera camera) {
         // Add to toRender list
-        addToRender(this, RenderGroup.LINE);
+        if (this.shouldRender())
+            addToRender(this, RenderGroup.LINE);
     }
 
     @Override

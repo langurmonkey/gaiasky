@@ -23,6 +23,7 @@ import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
@@ -34,7 +35,6 @@ import net.jafama.FastMath;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An object in the scene graph. Serves as a top class which provides the basic functionality.
@@ -133,6 +133,16 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public boolean computed = true;
 
     /**
+     * Is this node visible?
+     */
+    protected boolean visible = true;
+
+    /**
+     * Time of last visibility change in milliseconds
+     */
+    protected long lastStateChangeTimeMs = 0;
+
+    /**
      * The ownOpacity value (alpha)
      */
     public float opacity = 1f;
@@ -224,7 +234,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public SceneGraphNode(String name, SceneGraphNode parent) {
-        this(new String[]{name}, parent);
+        this(new String[] { name }, parent);
     }
 
     public SceneGraphNode(String name) {
@@ -463,6 +473,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         updateLocalValues(time, camera);
 
         this.translation.add(pos);
+        this.opacity *= this.getVisibilityOpacityFactor();
 
         Vector3d aux = aux3d1.get();
         this.distToCamera = (float) aux.set(translation).len();
@@ -526,7 +537,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         if (names != null)
             names[0] = name;
         else
-            names = new String[]{name};
+            names = new String[] { name };
     }
 
     /**
@@ -785,12 +796,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * @return True if added, false otherwise
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        boolean on = ct.isEmpty() || ct.intersects(SceneGraphRenderer.visible);
-        if (on || SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0) {
+        try {
             SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
             return true;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -1130,7 +1141,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size) {
-       render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1);
+        render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1);
     }
 
     protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
@@ -1141,7 +1152,6 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         if (r == 0 || distToCamera > r * 2d) {
 
             size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
-
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
@@ -1179,5 +1189,37 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public void setLabelcolor(double[] labelColor) {
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        this.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
+    }
+
+    public boolean isVisible() {
+        return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
+    }
+
+    private long msSinceStateChange() {
+        return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
+    }
+
+    protected float getVisibilityOpacityFactor() {
+        long msSinceStateChange = msSinceStateChange();
+
+        // Fast track
+        if (msSinceStateChange > GlobalConf.scene.OBJECT_FADE_MS)
+            return this.visible ? 1 : 0;
+
+        // Fading
+        float visop = MathUtilsd.lint(msSinceStateChange, 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
+        if (!this.visible) {
+            visop = 1 - visop;
+        }
+        return visop;
+    }
+
+    protected boolean shouldRender() {
+        return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < GlobalConf.scene.OBJECT_FADE_MS);
     }
 }

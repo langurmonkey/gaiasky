@@ -95,7 +95,7 @@ public class Polyline extends VertsObject implements ILineRenderable {
     @Override
     protected void addToRenderLists(ICamera camera) {
         // Lines only make sense with 2 or more points
-        if (pointCloudData != null && pointCloudData.getNumPoints() > 1)
+        if (this.shouldRender() && pointCloudData != null && pointCloudData.getNumPoints() > 1)
             addToRender(this, renderGroup);
     }
 

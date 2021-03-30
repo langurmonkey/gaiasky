@@ -498,7 +498,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
      * camera and the view angle have been determined.
      */
     protected void addToRenderLists(ICamera camera) {
-        if (this.viewAngleApparent > TH_ANGLE_POINT * camera.getFovFactor()) {
+        if (this.shouldRender() && this.viewAngleApparent > TH_ANGLE_POINT * camera.getFovFactor()) {
             super.addToRenderLists(camera);
             if (GlobalConf.spacecraft.SC_SHOW_AXES)
                 addToRender(this, RenderGroup.LINE);

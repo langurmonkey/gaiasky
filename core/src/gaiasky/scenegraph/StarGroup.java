@@ -265,17 +265,19 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        addToRender(this, RenderGroup.STAR_GROUP);
-        addToRender(this, RenderGroup.MODEL_VERT_STAR);
-        if (GlobalConf.scene.STAR_GROUP_BILLBOARD_FLAG) {
-            addToRender(this, RenderGroup.BILLBOARD_STAR);
-        }
-        if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors) ) {
-            //addToRender(this, RenderGroup.LINE);
-            addToRender(this, RenderGroup.LINE);
-        }
-        if (renderText()) {
-            addToRender(this, RenderGroup.FONT_LABEL);
+        if (this.shouldRender()) {
+            addToRender(this, RenderGroup.STAR_GROUP);
+            addToRender(this, RenderGroup.MODEL_VERT_STAR);
+            if (GlobalConf.scene.STAR_GROUP_BILLBOARD_FLAG) {
+                addToRender(this, RenderGroup.BILLBOARD_STAR);
+            }
+            if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
+                //addToRender(this, RenderGroup.LINE);
+                addToRender(this, RenderGroup.LINE);
+            }
+            if (renderText()) {
+                addToRender(this, RenderGroup.FONT_LABEL);
+            }
         }
     }
 
@@ -392,113 +394,113 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
             IParticleRecord star = pointData.get(active[i]);
-                float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
-                // Position
-                Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
-                // Proper motion
-                Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
-                // Rest of attributes
-                float distToCamera = (float) lpos.len();
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
-                if (viewAngle >= thPointTimesFovFactor / GlobalConf.scene.PM_NUM_FACTOR && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
-                    Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
-                    Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
-                    double p1p2len = ppm.len();
-                    Vector3d p2 = aux3d3.get().set(ppm).add(p1);
+            float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
+            // Position
+            Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
+            // Proper motion
+            Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
+            // Rest of attributes
+            float distToCamera = (float) lpos.len();
+            float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS);
+            if (viewAngle >= thPointTimesFovFactor / GlobalConf.scene.PM_NUM_FACTOR && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
+                Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
+                Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(GlobalConf.scene.PM_LEN_FACTOR);
+                double p1p2len = ppm.len();
+                Vector3d p2 = aux3d3.get().set(ppm).add(p1);
 
-                    // Max speed in km/s, to normalize
-                    float maxSpeedKms = 100;
-                    float r, g, b;
-                    switch (GlobalConf.scene.PM_COLOR_MODE) {
-                    case 0:
-                    default:
-                        // DIRECTION
-                        // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
-                        ppm.nor();
-                        r = (float) (ppm.x + 1d) / 2f;
-                        g = (float) (ppm.y + 1d) / 2f;
-                        b = (float) (ppm.z + 1d) / 2f;
-                        break;
-                    case 1:
-                        // LENGTH
-                        ppm.set(star.pmx(), star.pmy(), star.pmz());
-                        // Units/year to Km/s
-                        ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                        double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
-                        ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
-                        r = rgba[0];
-                        g = rgba[1];
-                        b = rgba[2];
-                        break;
-                    case 2:
-                        // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
-                        if (star.radvel() != 0) {
-                            r = ColorUtils.gBlue[0] + 0.2f;
-                            g = ColorUtils.gBlue[1] + 0.4f;
-                            b = ColorUtils.gBlue[2] + 0.4f;
-                        } else {
-                            r = ColorUtils.gRed[0] + 0.4f;
-                            g = ColorUtils.gRed[1] + 0.2f;
-                            b = ColorUtils.gRed[2] + 0.2f;
-                        }
-                        break;
-                    case 3:
-                        // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
-                        float rav = star.radvel();
-                        if (rav != 0) {
-                            float max = maxSpeedKms;
-                            // rv in [0:1]
-                            float rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
-                            ColorUtils.colormap_blue_white_red(rv, rgba);
-                            r = rgba[0];
-                            g = rgba[1];
-                            b = rgba[2];
-                        } else {
-                            r = g = b = 1;
-                        }
-                        break;
-                    case 4:
-                        // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
-                        if (ppm.len2() != 0) {
-                            double max = maxSpeedKms;
-                            ppm.set(star.pmx(), star.pmy(), star.pmz());
-                            // Units/year to Km/s
-                            ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
-                            Vector3d camstar = aux3d4.get().set(p1);
-                            double pr = ppm.dot(camstar.nor());
-                            double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
-                            ColorUtils.colormap_blue_white_red((float) projection, rgba);
-                            r = rgba[0];
-                            g = rgba[1];
-                            b = rgba[2];
-                        } else {
-                            r = g = b = 1;
-                        }
-                        break;
-                    case 5:
-                        // SINGLE COLOR
+                // Max speed in km/s, to normalize
+                float maxSpeedKms = 100;
+                float r, g, b;
+                switch (GlobalConf.scene.PM_COLOR_MODE) {
+                case 0:
+                default:
+                    // DIRECTION
+                    // Normalize, each component is in [-1:1], map to [0:1] and to a color channel
+                    ppm.nor();
+                    r = (float) (ppm.x + 1d) / 2f;
+                    g = (float) (ppm.y + 1d) / 2f;
+                    b = (float) (ppm.z + 1d) / 2f;
+                    break;
+                case 1:
+                    // LENGTH
+                    ppm.set(star.pmx(), star.pmy(), star.pmz());
+                    // Units/year to Km/s
+                    ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                    double len = MathUtilsd.clamp(ppm.len(), 0d, maxSpeedKms) / maxSpeedKms;
+                    ColorUtils.colormap_long_rainbow((float) (1 - len), rgba);
+                    r = rgba[0];
+                    g = rgba[1];
+                    b = rgba[2];
+                    break;
+                case 2:
+                    // HAS RADIAL VELOCITY - blue: stars with RV, red: stars without RV
+                    if (star.radvel() != 0) {
                         r = ColorUtils.gBlue[0] + 0.2f;
                         g = ColorUtils.gBlue[1] + 0.4f;
                         b = ColorUtils.gBlue[2] + 0.4f;
-                        break;
+                    } else {
+                        r = ColorUtils.gRed[0] + 0.4f;
+                        g = ColorUtils.gRed[1] + 0.2f;
+                        b = ColorUtils.gRed[2] + 0.2f;
                     }
-
-                    // Clamp
-                    r = MathUtilsd.clamp(r, 0, 1);
-                    g = MathUtilsd.clamp(g, 0, 1);
-                    b = MathUtilsd.clamp(b, 0, 1);
-
-                    renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
-                    if (GlobalConf.scene.PM_ARROWHEADS) {
-                        // Add Arrow cap
-                        Vector3d p3 = aux3d2.get().set(ppm).nor().scl(p1p2len * .86).add(p1);
-                        p3.rotate(p2, 30);
-                        renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
-                        p3.rotate(p2, -60);
-                        renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                    break;
+                case 3:
+                    // REDSHIFT from Sun - blue: -100 Km/s, red: 100 Km/s
+                    float rav = star.radvel();
+                    if (rav != 0) {
+                        float max = maxSpeedKms;
+                        // rv in [0:1]
+                        float rv = ((MathUtilsd.clamp(rav, -max, max) / max) + 1) / 2;
+                        ColorUtils.colormap_blue_white_red(rv, rgba);
+                        r = rgba[0];
+                        g = rgba[1];
+                        b = rgba[2];
+                    } else {
+                        r = g = b = 1;
                     }
-
+                    break;
+                case 4:
+                    // REDSHIFT from Camera - blue: -100 Km/s, red: 100 Km/s
+                    if (ppm.len2() != 0) {
+                        double max = maxSpeedKms;
+                        ppm.set(star.pmx(), star.pmy(), star.pmz());
+                        // Units/year to Km/s
+                        ppm.scl(Constants.U_TO_KM / Nature.Y_TO_S);
+                        Vector3d camstar = aux3d4.get().set(p1);
+                        double pr = ppm.dot(camstar.nor());
+                        double projection = ((MathUtilsd.clamp(pr, -max, max) / max) + 1) / 2;
+                        ColorUtils.colormap_blue_white_red((float) projection, rgba);
+                        r = rgba[0];
+                        g = rgba[1];
+                        b = rgba[2];
+                    } else {
+                        r = g = b = 1;
+                    }
+                    break;
+                case 5:
+                    // SINGLE COLOR
+                    r = ColorUtils.gBlue[0] + 0.2f;
+                    g = ColorUtils.gBlue[1] + 0.4f;
+                    b = ColorUtils.gBlue[2] + 0.4f;
+                    break;
                 }
+
+                // Clamp
+                r = MathUtilsd.clamp(r, 0, 1);
+                g = MathUtilsd.clamp(g, 0, 1);
+                b = MathUtilsd.clamp(b, 0, 1);
+
+                renderer.addLine(this, p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                if (GlobalConf.scene.PM_ARROWHEADS) {
+                    // Add Arrow cap
+                    Vector3d p3 = aux3d2.get().set(ppm).nor().scl(p1p2len * .86).add(p1);
+                    p3.rotate(p2, 30);
+                    renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                    p3.rotate(p2, -60);
+                    renderer.addLine(this, p3.x, p3.y, p3.z, p2.x, p2.y, p2.z, r, g, b, alpha * this.opacity);
+                }
+
+            }
         }
     }
 

@@ -1216,7 +1216,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public boolean isOn(ComponentTypes cts) {
-        return sgr.isOn(cts);
+        return sgr.allOn(cts);
     }
 
     @Override

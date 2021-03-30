@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This window controls the visibility of individual objects
+ */
 public class IndividualVisibilityWindow extends GenericDialog {
 
     protected float space8, space4, space2;

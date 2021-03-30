@@ -55,7 +55,6 @@ public abstract class ModelBody extends CelestialBody {
     /** MODEL **/
     public ModelComponent mc;
 
-
     /** TRANSFORMATIONS - are applied each cycle **/
     public ITransform[] transformations;
 
@@ -164,40 +163,40 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (isValidPosition() && parent.isValidPosition()) {
-            if (GaiaSky.instance.isOn(ct)) {
-                camera.checkClosestBody(this);
-                double thPoint = (THRESHOLD_POINT() * camera.getFovFactor()) / sizeScaleFactor;
-                if (viewAngleApparent >= thPoint) {
-                    double thQuad2 = THRESHOLD_QUAD() * camera.getFovFactor() * 2 / sizeScaleFactor;
-                    double thQuad1 = thQuad2 / 8.0 / sizeScaleFactor;
-                    if (viewAngleApparent < thPoint * 4) {
-                        fadeOpacity = (float) MathUtilsd.lint(viewAngleApparent, thPoint, thPoint * 4, 1, 0);
-                    } else {
-                        fadeOpacity = (float) MathUtilsd.lint(viewAngleApparent, thQuad1, thQuad2, 0, 1);
-                    }
+        if (this.shouldRender() && this.isValidPosition() && parent.isValidPosition()) {
+            camera.checkClosestBody(this);
+            double thPoint = (THRESHOLD_POINT() * camera.getFovFactor()) / sizeScaleFactor;
+            if (viewAngleApparent >= thPoint) {
+                double thQuad2 = THRESHOLD_QUAD() * camera.getFovFactor() * 2 / sizeScaleFactor;
+                double thQuad1 = thQuad2 / 8.0 / sizeScaleFactor;
+                if (viewAngleApparent < thPoint * 4) {
+                    fadeOpacity = (float) MathUtilsd.lint(viewAngleApparent, thPoint, thPoint * 4, 1, 0);
+                } else {
+                    fadeOpacity = (float) MathUtilsd.lint(viewAngleApparent, thQuad1, thQuad2, 0, 1);
+                }
 
-                    if (viewAngleApparent < thQuad1) {
-                        addToRender(this, RenderGroup.BILLBOARD_SSO);
-                    } else if (viewAngleApparent > thQuad2) {
-                        addToRenderModel();
-                    } else {
-                        // Both
-                        addToRender(this, RenderGroup.BILLBOARD_SSO);
-                        addToRenderModel();
-                    }
+                if (viewAngleApparent < thQuad1) {
+                    addToRender(this, RenderGroup.BILLBOARD_SSO);
+                } else if (viewAngleApparent > thQuad2) {
+                    addToRenderModel();
+                } else {
+                    // Both
+                    addToRender(this, RenderGroup.BILLBOARD_SSO);
+                    addToRenderModel();
+                }
 
-                    if (renderText()) {
-                        addToRender(this, RenderGroup.FONT_LABEL);
-                    }
+                if (renderText()) {
+                    addToRender(this, RenderGroup.FONT_LABEL);
                 }
             }
         }
     }
 
-    private void addToRenderModel(){
-        RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
-        addToRender(this, rg);
+    private void addToRenderModel() {
+        if(this.shouldRender()) {
+            RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
+            addToRender(this, rg);
+        }
     }
 
     public boolean renderTessellated() {
@@ -353,10 +352,10 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     public double getHeight(Vector3d camPos, boolean useFuturePosition) {
-        if(useFuturePosition){
+        if (useFuturePosition) {
             Vector3d nextPos = getPredictedPosition(aux3d1.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             return getHeight(camPos, nextPos);
-        }else{
+        } else {
             return getHeight(camPos, null);
         }
 
@@ -365,7 +364,7 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     public double getHeight(Vector3d camPos, Vector3d nextPos) {
         double height = 0;
-        if(mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
+        if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
             double dCam;
             Vector3d cart = aux3d1.get();
             if (nextPos != null) {
@@ -423,8 +422,8 @@ public abstract class ModelBody extends CelestialBody {
         return getRadius() + height * GlobalConf.scene.ELEVATION_MULTIPLIER;
     }
 
-    public double getHeightScale(){
-        if (mc != null && mc.mtc != null && mc.mtc.heightMap != null){
+    public double getHeightScale() {
+        if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
             return mc.mtc.heightScale;
         }
         return 0;

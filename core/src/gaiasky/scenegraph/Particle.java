@@ -223,8 +223,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         distToCamera = translation.len();
 
         if (!copy) {
-            addToRender(this, RenderGroup.POINT_STAR);
-
             viewAngle = (radius / distToCamera);
             viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
 
@@ -244,7 +242,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (GaiaSky.instance.isOn(ct)) {
+        if (this.shouldRender()) {
+            addToRender(this, RenderGroup.POINT_STAR);
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
             } else {

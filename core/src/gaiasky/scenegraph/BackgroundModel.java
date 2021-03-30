@@ -100,7 +100,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     protected void addToRenderLists(ICamera camera) {
         // Render group never changes
         // Add to toRender list
-        if (opacity > 0) {
+        if (this.shouldRender()) {
             addToRender(this, renderGroupModel);
             if (label) {
                 addToRender(this, RenderGroup.FONT_LABEL);

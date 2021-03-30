@@ -66,7 +66,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (renderText() && isVisibilityOn()) {
+        if (this.shouldRender() && this.renderText()) {
             addToRender(this, RenderGroup.FONT_LABEL);
             //addToRender(this, RenderGroup.LINE);
         }
