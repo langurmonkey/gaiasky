@@ -558,6 +558,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setVisibility(final String key, final boolean visible) {
+        setComponentTypeVisibility(key, visible);
+    }
+
+    @Override
+    public void setComponentTypeVisibility(String key, boolean visible) {
         if (!checkComponentTypeKey(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentType[] cts = ComponentType.values();
@@ -565,6 +570,55 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 logger.error(ct.key);
         } else {
             GaiaSky.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
+        }
+    }
+
+    @Override
+    public boolean getComponentTypeVisibility(String key) {
+        if (!checkComponentTypeKey(key)) {
+            logger.error("Element '" + key + "' does not exist. Possible values are:");
+            ComponentType[] cts = ComponentType.values();
+            for (ComponentType ct : cts)
+                logger.error(ct.key);
+            return false;
+        } else {
+            ComponentType ct = ComponentType.getFromKey(key);
+            return GlobalConf.scene.VISIBILITY[ct.ordinal()];
+        }
+    }
+
+    @Override
+    public boolean setObjectVisibility(String name, boolean visible) {
+        SceneGraphNode obj = getObject(name);
+        if(obj == null){
+            logger.error("No object found with name '" + name +"'");
+            return false;
+        }
+
+        if(obj instanceof IVisibilitySwitch){
+            IVisibilitySwitch vs = obj;
+            vs.setVisible(visible);
+            return true;
+        } else {
+            logger.error("Can't set the visibility of '" + name + "', as it is not an instance of IVisibilitySwitch");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean getObjectVisibility(String name) {
+        SceneGraphNode obj = getObject(name);
+        if(obj == null){
+            logger.error("No object found with name '" + name +"'");
+            return false;
+        }
+
+        if(obj instanceof IVisibilitySwitch){
+            IVisibilitySwitch vs = obj;
+            return vs.isVisible(true);
+        } else {
+            logger.error("Can't set the visibility of '" + name + "', as it is not an instance of IVisibilitySwitch");
+            return false;
         }
     }
 
@@ -591,12 +645,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private boolean checkComponentTypeKey(String key) {
-        ComponentType[] cts = ComponentType.values();
-        boolean keyFound = false;
-        for (ComponentType ct : cts)
-            keyFound = keyFound || key.equals(ct.key);
-
-        return keyFound;
+        ComponentType ct = ComponentType.getFromKey(key);
+        return ct != null;
     }
 
     @Override
@@ -3066,6 +3116,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
         logPossibleValues(value, possibleValues, name);
         return false;
+    }
+
+    private boolean checkObjectName(String name) {
+        SceneGraphNode sgn = getObject(name);
+        return sgn != null;
     }
 
     private void logPossibleValues(String value, String[] possibleValues, String name) {

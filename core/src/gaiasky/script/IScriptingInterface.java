@@ -592,14 +592,43 @@ public interface IScriptingInterface {
     void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time);
 
     /**
-     * Sets the component described by the given name visible or invisible.
-     *
-     * @param key     The key of the component, see
-     *                {@link gaiasky.render.ComponentTypes.ComponentType}. Usually
-     *                'element.stars', 'element.moons', 'element.atmospheres', etc.
-     * @param visible The visible value.
+     * See {@link #setComponentTypeVisibility(String, boolean)}.
+     * @deprecated
      */
     void setVisibility(String key, boolean visible);
+
+    /**
+     * Sets the component described by the given name visible or invisible.
+     *
+     * @param key     The key of the component: "element.stars", "element.planets",
+     *                "element.moons", etc. See
+     *                {@link gaiasky.render.ComponentTypes.ComponentType}.
+     * @param visible The visible value.
+     */
+    void setComponentTypeVisibility(String key, boolean visible);
+
+    /**
+     * Gets the visibility of the component type described by the key. Examples of keys are
+     * "element.stars", "element.planets" or "element.moons". See {@link gaiasky.render.ComponentTypes.ComponentType}.
+     * @param key The key of the component type to query.
+     * @return The visibility of the component type.
+     */
+    boolean getComponentTypeVisibility(String key);
+
+    /**
+     * Sets the visibility of a particular object. Use this method to hide individual objects.
+     * @param name The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
+     * @param visible The visible status to set. Set to false to hide the object. True to make it visible.
+     * @return True if the visibility was set successfully, false if there were errors.
+     */
+    boolean setObjectVisibility(String name, boolean visible);
+
+    /**
+     * Gets the visibility of a particular object.
+     * @param name The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
+     * @return The visibility status of the object, if it exists.
+     */
+    boolean getObjectVisibility(String name);
 
     /**
      * Sets the label size factor. The label size will be multiplied by this.
