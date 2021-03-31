@@ -973,7 +973,13 @@ public enum Events {
 
     SHOW_PREFERENCES_ACTION,
 
-    SHOW_INDIVIDUAL_VISIBILITY_ACTION,
+    SHOW_PER_OBJECT_VISIBILITY_ACTION,
+    /**
+     * Contains the object (instance of {@link gaiasky.scenegraph.IVisibilitySwitch}), a boolean with the new visibility state, and a
+     * boolean indicating if it comes from the UI.
+     */
+    PER_OBJECT_VISIBILITY_CMD,
+
     /**
      * Quit action, can contain optional Runnable to run on accept()
      **/

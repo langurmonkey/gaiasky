@@ -215,7 +215,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         individualVisibility.setWidth(contentWidth);
         individualVisibility.addListener(event -> {
             if(event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);
+                EventManager.instance.post(Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
                 return true;
             }
             return false;

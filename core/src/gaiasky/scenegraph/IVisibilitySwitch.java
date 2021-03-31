@@ -15,6 +15,7 @@ public interface IVisibilitySwitch {
     void setDescription(String description);
 
     boolean isVisible();
+    boolean isVisible(boolean attributeValue);
 
     void setVisible(boolean visible);
 }

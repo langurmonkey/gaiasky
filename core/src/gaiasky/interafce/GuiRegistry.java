@@ -262,7 +262,7 @@ public class GuiRegistry implements IObserver {
         this.skin = skin;
         this.sg = sg;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
     }
 
     public void dispose() {
@@ -332,7 +332,7 @@ public class GuiRegistry implements IObserver {
                     }
                 }
                 break;
-            case SHOW_INDIVIDUAL_VISIBILITY_ACTION:
+            case SHOW_PER_OBJECT_VISIBILITY_ACTION:
                 if (indVisWindow == null) {
                     final ISceneGraph sg = GaiaSky.instance.sg;
                     indVisWindow = new IndividualVisibilityWindow(sg, ui, skin);

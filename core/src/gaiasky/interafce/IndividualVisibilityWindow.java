@@ -8,24 +8,32 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.*;
+import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.IVisibilitySwitch;
+import gaiasky.scenegraph.Orbit;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
 
 /**
  * This window controls the visibility of individual objects
  */
-public class IndividualVisibilityWindow extends GenericDialog {
+public class IndividualVisibilityWindow extends GenericDialog implements IObserver {
 
     protected float space8, space4, space2;
     protected ISceneGraph sg;
     protected Cell elementsCell;
+    // Component type currently selected
+    protected String currentComponentType = null;
 
     public IndividualVisibilityWindow(ISceneGraph sg, Stage stage, Skin skin) {
         super(I18n.txt("gui.visibility.individual"), skin, stage);
@@ -43,12 +51,14 @@ public class IndividualVisibilityWindow extends GenericDialog {
         // Pack
         pack();
 
+        EventManager.instance.subscribe(this, Events.PER_OBJECT_VISIBILITY_CMD);
     }
 
     @Override
     protected void build() {
         content.clear();
 
+        final String cct = currentComponentType;
         // Components
         float buttonPadHor = 6f;
         int visTableCols = 7;
@@ -90,20 +100,26 @@ public class IndividualVisibilityWindow extends GenericDialog {
                         buttonMap.put(ct.key, button);
 
                     button.addListener(event -> {
-                        if (event instanceof ChangeListener.ChangeEvent) {
+                        if (event instanceof ChangeListener.ChangeEvent && button.isChecked()) {
+                            // Change content only when button is checked!
                             Group elementsList = visibilitySwitcher(ct, TextUtils.capitalise(ct.getName()), ct.getName());
                             elementsCell.clearActor();
 
                             if (elementsList == null) {
                                 elementsCell.setActor(new OwnLabel(I18n.txt("gui.elements.type.none"), skin));
-                            }else {
+                            } else {
                                 elementsCell.setActor(elementsList);
                             }
                             content.pack();
+                            currentComponentType = name;
                             return true;
                         }
                         return false;
                     });
+
+                    if (cct != null && name.equals(cct)) {
+                        button.setChecked(true);
+                    }
                     Cell c = buttonTable.add(button);
                     if ((i + 1) % visTableCols == 0) {
                         buttonTable.row();
@@ -114,7 +130,8 @@ public class IndividualVisibilityWindow extends GenericDialog {
                 }
             }
         }
-
+        if (cct != null)
+            buttonGroup.setChecked(cct);
         content.pack();
     }
 
@@ -132,7 +149,7 @@ public class IndividualVisibilityWindow extends GenericDialog {
 
         for (SceneGraphNode object : objects) {
             // Omit stars with no proper names
-            if (object.getName() != null && !GlobalResources.isNumeric(object.getName())) {
+            if (object.getName() != null && !GlobalResources.isNumeric(object.getName()) && !exception(ct, object)) {
                 names.add(object.getName());
                 cMap.put(object.getName(), object);
             }
@@ -145,11 +162,11 @@ public class IndividualVisibilityWindow extends GenericDialog {
             objectHgroup.left();
             OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
             IVisibilitySwitch obj = cMap.get(name);
-            cb.setChecked(obj.isVisible());
+            cb.setChecked(obj.isVisible(true));
 
             cb.addListener((event) -> {
                 if (event instanceof ChangeListener.ChangeEvent && cMap.containsKey(name)) {
-                    GaiaSky.postRunnable(() -> obj.setVisible(cb.isChecked()));
+                    GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, cb.isChecked(), true));
                     return true;
                 }
                 return false;
@@ -205,13 +222,25 @@ public class IndividualVisibilityWindow extends GenericDialog {
         VerticalGroup group = new VerticalGroup();
         group.left();
         group.columnLeft();
-        group.space(space4);
+        group.space(space8);
 
         group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
         group.addActor(scrollPane);
         group.addActor(buttons);
 
         return objects.size == 0 ? null : group;
+    }
+
+    /**
+     * Implements the exception code. Returns true if the given object should not be listed
+     * under the given component type.
+     *
+     * @param ct     The component type
+     * @param object The object
+     * @return Whether this object is an exception (shoud not be listed) or not
+     */
+    private boolean exception(ComponentType ct, SceneGraphNode object) {
+        return ct == ComponentType.Planets && object instanceof Orbit;
     }
 
     @Override
@@ -221,6 +250,16 @@ public class IndividualVisibilityWindow extends GenericDialog {
 
     @Override
     protected void cancel() {
+
+    }
+
+    @Override
+    public void notify(Events event, Object... data) {
+
+        if (event == Events.PER_OBJECT_VISIBILITY_CMD) {
+            // Reload
+            build();
+        }
 
     }
 }
