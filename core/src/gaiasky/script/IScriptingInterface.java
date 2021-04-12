@@ -595,6 +595,7 @@ public interface IScriptingInterface {
      * See {@link #setComponentTypeVisibility(String, boolean)}.
      * @deprecated
      */
+    @Deprecated
     void setVisibility(String key, boolean visible);
 
     /**
