@@ -46,7 +46,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
 
 
         int catalogIndex = 0;
-        for (int level = 0; level < 25; level++) {
+        for (int level = 0; level < 19; level++) {
             logger.info("Generating level " + level + " (" + (catalog.size() - catalogIndex) + " stars left)");
             while (catalogIndex < catalog.size()) {
                 // Add stars to nodes until we reach max part
