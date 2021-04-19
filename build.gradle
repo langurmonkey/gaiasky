@@ -9,11 +9,11 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '3.0.2'
+    version = '3.0.3'
 
     ext {
         appName = "GaiaSky"
-        gdxVersion = "1.9.14"
+        gdxVersion = "1.10.0"
         gdxcontrollersVersion = "2.1.0"
         lwjglVersion = "3.2.3"
         jcommanderVersion = "1.81"
@@ -32,6 +32,7 @@ allprojects {
     }
 
     repositories {
+        gradlePluginPortal()
         mavenCentral()
         maven{ url "https://repo1.maven.org/maven2/" }
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
