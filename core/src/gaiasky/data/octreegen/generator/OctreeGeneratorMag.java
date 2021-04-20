@@ -46,8 +46,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
 
         int catalogSize = catalog.size();
         int catalogIndex = 0;
-        for (int level = 0; level < 25; level++) {
-            logger.info("Generating level " + level + " (" + (catalogSize - catalogIndex) + " stars left)");
+        for (int level = 0; level <= 19; level++) {
+            logger.info("Generating level " + level + " (" + (catalog.size() - catalogIndex) + " stars left)");
             while (catalogIndex < catalogSize) {
                 // Add stars to nodes until we reach max part
                 IParticleRecord sb = catalog.get(catalogIndex++);
@@ -218,9 +218,8 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
             return 0l;
         }
         min.set(root.min);
-        max.set(root.max);
         // Half side
-        double hs = (max.x - min.x) / 2d;
+        double hs = root.size.x / 2d;
         StringBuilder id = new StringBuilder();
 
         for (int l = 1; l <= level; l++) {
@@ -262,8 +261,6 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
 
                 }
             }
-            // Max is always a half side away from min
-            max.set(min.x + hs, min.y + hs, min.z + hs);
             hs = hs / 2d;
         }
         return Parser.parseLong(id.toString());
