@@ -44,11 +44,11 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
         // Contains the list of objects for each node
         Map<OctreeNode, List<IParticleRecord>> objMap = new HashMap<>();
 
-
+        int catalogSize = catalog.size();
         int catalogIndex = 0;
         for (int level = 0; level < 25; level++) {
-            logger.info("Generating level " + level + " (" + (catalog.size() - catalogIndex) + " stars left)");
-            while (catalogIndex < catalog.size()) {
+            logger.info("Generating level " + level + " (" + (catalogSize - catalogIndex) + " stars left)");
+            while (catalogIndex < catalogSize) {
                 // Add stars to nodes until we reach max part
                 IParticleRecord sb = catalog.get(catalogIndex++);
                 double x = sb.x();
@@ -214,7 +214,7 @@ public class OctreeGeneratorMag implements IOctreeGenerator {
      */
     public Long getPositionOctantId(double x, double y, double z, int level) {
         if (level == 0) {
-            // Root is alwais id=0
+            // Root is always id=0
             return 0l;
         }
         min.set(root.min);
