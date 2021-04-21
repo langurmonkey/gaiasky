@@ -24,7 +24,7 @@ import java.util.Map;
 
 /**
  * Writes and reads the metadata to/from binary. The format is as follows:
- * 
+ * <p>
  * - 32 bits (int) with the number of nodes, nNodes repeat the following nNodes times (for each node)
  * - 32 bits (int) - pageId - The ID of the octant, or octree node
  * - 32 bits (float) - centreX - The x component of the centre
@@ -38,18 +38,17 @@ import java.util.Map;
  * - 32 bits (int) - nObjects - The cumulative number of objects of this node and its descendants
  * - 32 bits (int) - ownObjects - The number of objects of this node
  * - 32 bits (int) - childCount - The number of children nodes
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class MetadataBinaryIO {
     private static final Log logger = Logger.getLogger(MetadataBinaryIO.class);
-    
+
     public Map<Long, Pair<OctreeNode, long[]>> nodesMap;
 
     /**
      * Reads the metadata into an octree node
-     * 
+     *
      * @param in
      * @return The octree node
      */
@@ -59,9 +58,8 @@ public class MetadataBinaryIO {
 
     /**
      * Reads the metadata into an octree node
-     * 
-     * @param in
-     *            Input stream
+     *
+     * @param in Input stream
      * @return The octree node
      */
     public OctreeNode readMetadata(InputStream in, LoadStatus status) {
@@ -84,7 +82,7 @@ public class MetadataBinaryIO {
             int version = 0;
             // Size
             int size;
-            if(token < 0) {
+            if (token < 0) {
                 version = data_in.readInt();
                 size = data_in.readInt();
             } else {
@@ -104,7 +102,7 @@ public class MetadataBinaryIO {
                     float hsz = (float) ((data_in.readFloat() / 2f) * Constants.DISTANCE_SCALE_FACTOR);
                     long[] childrenIds = new long[8];
                     for (int i = 0; i < 8; i++) {
-                        childrenIds[i] = data_in.readInt();
+                        childrenIds[i] = version == 0 ? data_in.readInt() : data_in.readLong();
                     }
                     int depth = data_in.readInt();
                     int nObjects = data_in.readInt();
@@ -170,9 +168,9 @@ public class MetadataBinaryIO {
             int version = 0;
             // Size
             int size;
-            if(token < 0) {
-               version = mem.getInt();
-               size = mem.getInt();
+            if (token < 0) {
+                version = mem.getInt();
+                size = mem.getInt();
             } else {
                 size = token;
             }
@@ -195,7 +193,7 @@ public class MetadataBinaryIO {
                     float hsz = hsx;
                     long[] childrenIds = new long[8];
                     for (int i = 0; i < 8; i++) {
-                        childrenIds[i] = mem.getInt();
+                        childrenIds[i] = version == 0 ? mem.getInt() : mem.getLong();
                     }
                     int depth = mem.getInt();
                     int nObjects = mem.getInt();
@@ -240,7 +238,7 @@ public class MetadataBinaryIO {
     /**
      * Writes the metadata of the given octree node and its descendants to the
      * given output stream in binary.
-     * 
+     *
      * @param root
      * @param out
      */
