@@ -70,14 +70,32 @@ public class MetadataBinaryIO {
         DataInputStream data_in = new DataInputStream(in);
         try {
             OctreeNode root = null;
-            // Read size of stars
-            int size = data_in.readInt();
+
+            // If first integer is negative, read:
+            //   <int> token
+            //   <int> version
+            //   <int> size
+            // Else
+            //   <int> size
+
+            // Token marks presence of version number
+            int token = data_in.readInt();
+            // Version
+            int version = 0;
+            // Size
+            int size;
+            if(token < 0) {
+                version = data_in.readInt();
+                size = data_in.readInt();
+            } else {
+                size = token;
+            }
             int maxDepth = 0;
 
             for (int idx = 0; idx < size; idx++) {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
-                    long pageId = data_in.readInt();
+                    long pageId = version == 0 ? data_in.readInt() : data_in.readLong();
                     float x = (float) (data_in.readFloat() * Constants.DISTANCE_SCALE_FACTOR);
                     float y = (float) (data_in.readFloat() * Constants.DISTANCE_SCALE_FACTOR);
                     float z = (float) (data_in.readFloat() * Constants.DISTANCE_SCALE_FACTOR);
@@ -138,14 +156,33 @@ public class MetadataBinaryIO {
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
             OctreeNode root = null;
-            // Read size of stars
-            int size = mem.getInt();
+
+            // If first integer is negative, read:
+            //   <int> token
+            //   <int> version
+            //   <int> size
+            // Else
+            //   <int> size
+
+            // Token marks presence of version number
+            int token = mem.getInt();
+            // Version
+            int version = 0;
+            // Size
+            int size;
+            if(token < 0) {
+               version = mem.getInt();
+               size = mem.getInt();
+            } else {
+                size = token;
+            }
+
             int maxDepth = 0;
 
             for (int idx = 0; idx < size; idx++) {
                 try {
                     // name_length, name, appmag, absmag, colorbv, ra, dec, dist
-                    long pageId = mem.getInt();
+                    long pageId = version == 0 ? mem.getInt() : mem.getLong();
                     float x = (float) (mem.getFloat() * Constants.DISTANCE_SCALE_FACTOR);
                     float y = (float) (mem.getFloat() * Constants.DISTANCE_SCALE_FACTOR);
                     float z = (float) (mem.getFloat() * Constants.DISTANCE_SCALE_FACTOR);
@@ -168,7 +205,7 @@ public class MetadataBinaryIO {
                     maxDepth = Math.max(maxDepth, depth);
 
                     OctreeNode node = new OctreeNode(pageId, x, y, z, hsx, hsy, hsz, childrenCount, nObjects, ownObjects, depth);
-                    nodesMap.put(pageId, new Pair<OctreeNode, long[]>(node, childrenIds));
+                    nodesMap.put(pageId, new Pair<>(node, childrenIds));
                     if (status != null)
                         node.setStatus(status);
 
@@ -208,7 +245,7 @@ public class MetadataBinaryIO {
      * @param out
      */
     public void writeMetadata(OctreeNode root, OutputStream out) {
-        List<OctreeNode> nodes = new ArrayList<OctreeNode>();
+        List<OctreeNode> nodes = new ArrayList<>();
         toList(root, nodes);
 
         // Wrap the FileOutputStream with a DataOutputStream
