@@ -5,7 +5,6 @@
 
 package gaiasky.util.tree;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.StreamingOctreeLoader;
@@ -373,7 +372,7 @@ public class OctreeNode implements ILineRenderable {
         int idx = parent != null ? Arrays.asList(parent.children).indexOf(this) : 0;
         str.append(idx).append(":L").append(depth).append(" ");
         str.append("id:").append(pageId);
-        str.append (" Obj(own/rec):(").append(numObjects).append("/").append(numObjectsRec).append(")");
+        str.append(" Obj(own/rec):(").append(numObjects).append("/").append(numObjectsRec).append(")");
         str.append(" Nchld:").append(numChildren).append("\n");
 
         if (numChildren > 0 && rec) {
@@ -433,6 +432,7 @@ public class OctreeNode implements ILineRenderable {
 
     /**
      * Counts the number of direct children of this node
+     *
      * @return The number of direct children
      */
     public int numChildren() {
@@ -673,6 +673,7 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Called when this octant has just been loaded or unloaded. Updates the numbers of this
      * and its ascendants without having to reprocess the whole tree, which is slow for larger trees.
+     *
      * @param n The number of stars loaded or unloaded.
      **/
     public synchronized void touch(int n) {
