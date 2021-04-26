@@ -25,6 +25,8 @@ import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SceneGraphJsonLoader {
     private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
@@ -50,6 +52,12 @@ public class SceneGraphJsonLoader {
                 if (model.has("data")) {
                     String name = model.get("name") != null ? model.get("name").asString() : null;
                     String desc = model.get("description") != null ? model.get("description").asString() : null;
+                    Long size = model.get("size") != null ? model.get("size").asLong() : -1;
+                    Long nObjects = model.get("nobjects") != null ? model.get("nobjects").asLong() : -1;
+
+                    Map<String, Object> params = new HashMap();
+                    params.put("size", size);
+                    params.put("nobjects", nObjects);
 
                     JsonValue child = model.get("data").child;
                     while (child != null) {
@@ -67,6 +75,8 @@ public class SceneGraphJsonLoader {
                                 loader.setName(name);
                             if (desc != null)
                                 loader.setDescription(desc);
+                            if (params != null && params.size() > 0)
+                                loader.setParams(params);
 
                             // Init loader
                             loader.initialize(files);

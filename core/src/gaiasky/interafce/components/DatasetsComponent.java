@@ -113,7 +113,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        imageMap.put(ci.name, new OwnImageButton[]{eye, mark});
+        imageMap.put(ci.name, new OwnImageButton[] { eye, mark });
         controls.addActor(eye);
         if (ci.isRegular())
             controls.addActor(prefs);
@@ -159,6 +159,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         info.addListener(new OwnTextTooltip(ci.description, skin));
         t.add(info).left().padLeft(pad);
 
+        if (ci.nParticles > 0) {
+            t.row();
+            OwnLabel nObjects = new OwnLabel(I18n.txt("gui.objects") + ": " + ci.nParticles, skin);
+            String bytes = ci.sizeBytes > 0 ? I18n.txt("gui.size") + ": " + GlobalResources.humanReadableByteCount(ci.sizeBytes, true) : "";
+            nObjects.addListener(new OwnTextTooltip(nObjects.getText() + ", " + bytes, skin));
+            t.add(nObjects).left();
+        }
+
         VerticalGroup ciGroup = new VerticalGroup();
         ciGroup.space(pad * 2f);
         ciGroup.align(Align.left);
@@ -171,7 +179,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
         scroll.setWidth(ControlsWindow.getContentWidth() * 0.96f);
-        scroll.setHeight(120f);
+        scroll.setHeight(130f);
 
         //ciGroup.addActor(controls);
         ciGroup.addActor(scroll);
@@ -184,50 +192,50 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case CATALOG_ADD:
-                addCatalogInfo((CatalogInfo) data[0]);
-                break;
-            case CATALOG_REMOVE:
-                String ciName = (String) data[0];
-                if (groupMap.containsKey(ciName)) {
-                    groupMap.get(ciName).remove();
-                    groupMap.remove(ciName);
-                    imageMap.remove(ciName);
-                    colorMap.remove(ciName);
-                    EventManager.instance.post(Events.RECALCULATE_OPTIONS_SIZE);
+        case CATALOG_ADD:
+            addCatalogInfo((CatalogInfo) data[0]);
+            break;
+        case CATALOG_REMOVE:
+            String ciName = (String) data[0];
+            if (groupMap.containsKey(ciName)) {
+                groupMap.get(ciName).remove();
+                groupMap.remove(ciName);
+                imageMap.remove(ciName);
+                colorMap.remove(ciName);
+                EventManager.instance.post(Events.RECALCULATE_OPTIONS_SIZE);
+            }
+            break;
+        case CATALOG_VISIBLE:
+            boolean ui = false;
+            if (data.length > 2)
+                ui = (Boolean) data[2];
+            if (!ui) {
+                ciName = (String) data[0];
+                boolean visible = (Boolean) data[1];
+                OwnImageButton eye = imageMap.get(ciName)[0];
+                eye.setCheckedNoFire(!visible);
+            }
+            break;
+        case CATALOG_HIGHLIGHT:
+            ui = false;
+            if (data.length > 2)
+                ui = (Boolean) data[2];
+            if (!ui) {
+                CatalogInfo ci = (CatalogInfo) data[0];
+                float[] col = ci.hlColor;
+                if (colorMap.containsKey(ci.name) && col != null) {
+                    colorMap.get(ci.name).setPickedColor(col);
                 }
-                break;
-            case CATALOG_VISIBLE:
-                boolean ui = false;
-                if (data.length > 2)
-                    ui = (Boolean) data[2];
-                if (!ui) {
-                    ciName = (String) data[0];
-                    boolean visible = (Boolean) data[1];
-                    OwnImageButton eye = imageMap.get(ciName)[0];
-                    eye.setCheckedNoFire(!visible);
-                }
-                break;
-            case CATALOG_HIGHLIGHT:
-                ui = false;
-                if (data.length > 2)
-                    ui = (Boolean) data[2];
-                if (!ui) {
-                    CatalogInfo ci = (CatalogInfo) data[0];
-                    float[] col = ci.hlColor;
-                    if (colorMap.containsKey(ci.name) && col != null) {
-                        colorMap.get(ci.name).setPickedColor(col);
-                    }
 
-                    if (imageMap.containsKey(ci.name)) {
-                        boolean hl = (Boolean) data[1];
-                        OwnImageButton hig = imageMap.get(ci.name)[1];
-                        hig.setCheckedNoFire(hl);
-                    }
+                if (imageMap.containsKey(ci.name)) {
+                    boolean hl = (Boolean) data[1];
+                    OwnImageButton hig = imageMap.get(ci.name)[1];
+                    hig.setCheckedNoFire(hl);
                 }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
 
     }

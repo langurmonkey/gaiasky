@@ -10,6 +10,7 @@ import gaiasky.scenegraph.SceneGraphNode;
 import uk.ac.starlink.util.DataSource;
 
 import java.io.FileNotFoundException;
+import java.util.Map;
 
 public interface ISceneGraphLoader {
 
@@ -18,6 +19,8 @@ public interface ISceneGraphLoader {
     void setName(String name);
 
     void setDescription(String description);
+
+    void setParams(Map<String, Object> params);
 
     void initialize(String[] files) throws RuntimeException;
 

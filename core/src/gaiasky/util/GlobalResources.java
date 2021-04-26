@@ -536,7 +536,7 @@ public class GlobalResources {
      * Converts bytes to a human readable format
      *
      * @param bytes The bytes
-     * @param si    Whether to use SI units or binary
+     * @param si    Whether to use SI units (1000-multiples) or binary (1024-multiples)
      * @return The size in a human readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
@@ -823,11 +823,11 @@ public class GlobalResources {
 
     public static String nObjectsToString(long objs) {
         if (objs > 1e9) {
-            return (long) (objs / 1e9) + " B";
+            return String.format("%.1f", objs / 1.0e9) + " B";
         } else if (objs > 1e6) {
-            return (long) (objs / 1e6) + " M";
+            return String.format("%.1f", objs / 1.0e6) + " M";
         } else if (objs > 1e3) {
-            return (long) (objs / 1e3) + " K";
+            return String.format("%.1f", objs / 1.0e3) + " K";
         } else {
             return objs + "";
         }

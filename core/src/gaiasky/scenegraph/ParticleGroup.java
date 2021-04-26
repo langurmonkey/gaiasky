@@ -42,6 +42,8 @@ import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -267,6 +269,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (createCatalogInfo) {
                 // Create catalog info and broadcast
                 CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoType.INTERNAL, 1f, this);
+                ci.nParticles = pointData != null ? pointData.size() : -1;
+                Path df = Path.of(GlobalConf.data.dataFile(datafile));
+                ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
 
                 // Insert
                 EventManager.instance.post(Events.CATALOG_ADD, ci, false);

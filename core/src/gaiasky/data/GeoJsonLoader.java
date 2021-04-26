@@ -17,6 +17,8 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import uk.ac.starlink.util.DataSource;
 
+import java.util.Map;
+
 /**
  * Loads GeoJson files to Area objects
  * @author Toni Sagrista
@@ -146,5 +148,10 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
 
     @Override
     public void setDescription(String description) {
+    }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+
     }
 }

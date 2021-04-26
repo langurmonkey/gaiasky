@@ -31,6 +31,8 @@ public class CatalogInfo {
     public String name;
     public String description;
     public String source;
+    public long nParticles;
+    public long sizeBytes;
     public Instant loadDateUTC;
 
     // Highlight

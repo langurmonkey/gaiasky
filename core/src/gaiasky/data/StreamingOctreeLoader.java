@@ -86,6 +86,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     // Dataset name and description
     protected String name, description;
+    // Dataset parameters
+    protected Map<String, Object> params;
 
     /**
      * This queue is sorted ascending by access date, so that we know which
@@ -559,11 +561,18 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
     }
 }
