@@ -368,9 +368,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         if (!Double.isFinite(appmag)) {
             return false;
         } else if (adaptiveParallax && appmag < 13.1) {
-            return pllx >= 0 && pllx / pllxerr > parallaxErrorFactorBright && pllxerr <= 1;
+            return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorBright && pllxerr <= 1;
         } else {
-            return pllx >= 0 && pllx / pllxerr > parallaxErrorFactorFaint && pllxerr <= 1;
+            return pllx >= 0 && pllxerr < pllx * parallaxErrorFactorFaint && pllxerr <= 1;
         }
     }
 
