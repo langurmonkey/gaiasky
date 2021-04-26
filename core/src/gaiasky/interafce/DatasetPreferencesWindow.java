@@ -5,9 +5,13 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -21,11 +25,13 @@ import gaiasky.util.filter.Filter;
 import gaiasky.util.filter.FilterRule;
 import gaiasky.util.filter.FilterRule.IComparator;
 import gaiasky.util.filter.attrib.*;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.ucd.UCD;
 import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
+import gaiasky.util.validator.TextFieldComparatorValidator;
 
 import java.time.ZoneId;
 
@@ -33,18 +39,20 @@ public class DatasetPreferencesWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(DatasetPreferencesWindow.class);
 
     private final CatalogInfo ci;
-    private OwnTextField highlightSizeFactor;
-    private OwnCheckBox allVisible;
+    private OwnTextField highlightSizeFactor, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax;
+    private OwnCheckBox allVisible, fadeIn, fadeOut;
     private Table filterTable;
     private final DatasetPreferencesWindow dpw;
     private Filter filter;
     private boolean filterEdited;
+    private float taWidth;
 
     public DatasetPreferencesWindow(CatalogInfo ci, Skin skin, Stage stage) {
         super(I18n.txt("gui.preferences") + " - " + ci.name, skin, stage);
         this.ci = ci;
         this.dpw = this;
         this.filterEdited = false;
+        this.taWidth = 800f;
 
         setAcceptText(I18n.txt("gui.ok"));
         setCancelText(I18n.txt("gui.cancel"));
@@ -83,6 +91,9 @@ public class DatasetPreferencesWindow extends GenericDialog {
         allVisible.setChecked(ci.hlAllVisible);
         content.add(allVisible).left().colspan(2).padBottom(pad10 * 2f).row();
 
+        // Fade
+        addFadeAttributes(content);
+
         // Filters
         content.add(new OwnLabel(I18n.txt("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad5).row();
         filterTable = new Table(skin);
@@ -91,6 +102,111 @@ public class DatasetPreferencesWindow extends GenericDialog {
         filter = ci.filter != null ? ci.filter.deepCopy() : null;
         generateFilterTable(filter);
 
+    }
+
+    private void addFadeAttributes(Table container) {
+        float tfw = 220f;
+
+        OwnLabel fadeLabel = new OwnLabel(I18n.txt("gui.dsload.fade"), skin, "hud-header");
+        container.add(fadeLabel).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+
+        // Info
+        String ssInfoStr = I18n.txt("gui.dsload.fade.info") + '\n';
+        int ssLines = GlobalResources.countOccurrences(ssInfoStr, '\n');
+        TextArea fadeInfo = new OwnTextArea(ssInfoStr, skin, "info");
+        fadeInfo.setDisabled(true);
+        fadeInfo.setPrefRows(ssLines + 1);
+        fadeInfo.setWidth(taWidth);
+        fadeInfo.clearListeners();
+
+        container.add(fadeInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
+
+        // Fade in
+        fadeIn = new OwnCheckBox(I18n.txt("gui.dsload.fade.in"), skin, pad5);
+        Vector2d fi = ci.object != null ? ci.object.getFadeIn() : null;
+        container.add(fadeIn).left().padRight(pad10).padBottom(pad5);
+
+        HorizontalGroup fadeInGroup = new HorizontalGroup();
+        fadeInGroup.space(pad5);
+        fadeInMin = new OwnTextField(fi != null ? String.format("%.1f", fi.x * Constants.U_TO_PC) : "0", skin);
+        fadeInMin.setWidth(tfw);
+        fadeInMax = new OwnTextField(fi != null ? String.format("%.1f", fi.y * Constants.U_TO_PC) : "1", skin);
+        fadeInMax.setWidth(tfw);
+        fadeInGroup.addActor(new OwnLabel("[", skin));
+        fadeInGroup.addActor(fadeInMin);
+        fadeInGroup.addActor(new OwnLabel(", ", skin));
+        fadeInGroup.addActor(fadeInMax);
+        fadeInGroup.addActor(new OwnLabel("] pc", skin));
+        fadeIn.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                boolean disable = !fadeIn.isChecked();
+
+                for (Actor child : fadeInGroup.getChildren()) {
+                    if (child instanceof OwnLabel) {
+                        ((OwnLabel) child).setDisabled(disable);
+                    } else if (child instanceof OwnTextField) {
+                        ((OwnTextField) child).setDisabled(disable);
+                    }
+                }
+                return true;
+            }
+            return false;
+        });
+        fadeIn.setChecked(fi == null);
+        fadeIn.setProgrammaticChangeEvents(true);
+        fadeIn.setChecked(fi != null);
+
+        container.add(fadeInGroup).left().padBottom(pad5).row();
+
+        // Fade out
+        fadeOut = new OwnCheckBox(I18n.txt("gui.dsload.fade.out"), skin, pad5);
+        Vector2d fo = ci.object != null ? ci.object.getFadeOut() : null;
+        container.add(fadeOut).left().padRight(pad10).padBottom(pad5);
+
+        HorizontalGroup fadeOutGroup = new HorizontalGroup();
+        fadeOutGroup.space(pad5);
+        fadeOutMin = new OwnTextField(fo != null ? String.format("%.1f", fo.x * Constants.U_TO_PC) : "5000", skin);
+        fadeOutMin.setWidth(tfw);
+        fadeOutMax = new OwnTextField(fo != null ? String.format("%.1f", fo.y * Constants.U_TO_PC) : "10000", skin);
+        fadeOutMax.setWidth(tfw);
+        fadeOutGroup.addActor(new OwnLabel("[", skin));
+        fadeOutGroup.addActor(fadeOutMin);
+        fadeOutGroup.addActor(new OwnLabel(", ", skin));
+        fadeOutGroup.addActor(fadeOutMax);
+        fadeOutGroup.addActor(new OwnLabel("] pc", skin));
+        fadeOut.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                boolean disable = !fadeOut.isChecked();
+
+                for (Actor child : fadeOutGroup.getChildren()) {
+                    if (child instanceof OwnLabel) {
+                        ((OwnLabel) child).setDisabled(disable);
+                    } else if (child instanceof OwnTextField) {
+                        ((OwnTextField) child).setDisabled(disable);
+                    }
+                }
+                return true;
+            }
+            return false;
+        });
+        fadeOut.setChecked(fo == null);
+        fadeOut.setProgrammaticChangeEvents(true);
+        fadeOut.setChecked(fo != null);
+
+        // Validators
+        FloatValidator fadeVal = new FloatValidator(0f, 1e10f);
+        IValidator fadeInMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeInMax, fadeOutMin, fadeOutMax }, null);
+        IValidator fadeInMaxVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeOutMin, fadeOutMax }, new OwnTextField[] { fadeInMin });
+        IValidator fadeOutMinVal = new TextFieldComparatorValidator(fadeVal, new OwnTextField[] { fadeOutMax }, new OwnTextField[] { fadeInMin, fadeInMax });
+        IValidator fadeOutMaxVal = new TextFieldComparatorValidator(fadeVal, null, new OwnTextField[] { fadeInMin, fadeInMax, fadeOutMin });
+
+        // Set them
+        fadeInMin.setValidator(fadeInMinVal);
+        fadeInMax.setValidator(fadeInMaxVal);
+        fadeOutMin.setValidator(fadeOutMinVal);
+        fadeOutMax.setValidator(fadeOutMaxVal);
+
+        container.add(fadeOutGroup).left().padBottom(pad5).row();
     }
 
     private void generateFilterTable(Filter filter) {
@@ -147,7 +263,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     ParticleGroup pg = (ParticleGroup) ci.object;
                     if (pg.size() > 0) {
                         IParticleRecord first = pg.get(0);
-                        if(first.hasExtra()) {
+                        if (first.hasExtra()) {
                             ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
                             for (UCD ucd : ucds)
                                 attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
@@ -305,6 +421,19 @@ public class DatasetPreferencesWindow extends GenericDialog {
         boolean vis = allVisible.isChecked();
         if (vis != ci.hlAllVisible) {
             ci.setHlAllVisible(vis);
+        }
+        // Fade in/out
+        if (ci.object != null) {
+            if (fadeIn.isChecked()) {
+                ci.object.setFadein(new double[] { fadeInMin.getDoubleValue(0), fadeInMax.getDoubleValue(1e1) });
+            } else {
+                ci.object.setFadein(null);
+            }
+            if (fadeOut.isChecked()) {
+                ci.object.setFadeout(new double[] { fadeOutMin.getDoubleValue(1e5), fadeOutMax.getDoubleValue(1e6) });
+            } else {
+                ci.object.setFadeout(null);
+            }
         }
         // Filter
         if (filterEdited) {

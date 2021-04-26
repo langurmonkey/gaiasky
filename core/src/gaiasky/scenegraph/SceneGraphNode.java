@@ -1224,6 +1224,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public boolean isVisible() {
         return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
     }
+
     public boolean isVisible(boolean attributeValue){
         if(attributeValue)
             return this.visible;
@@ -1231,7 +1232,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             return this.isVisible();
     }
 
-    private long msSinceStateChange() {
+    protected long msSinceStateChange() {
         return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
     }
 

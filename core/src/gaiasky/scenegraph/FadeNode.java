@@ -17,6 +17,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -33,12 +34,12 @@ public class FadeNode extends SceneGraphNode {
     /**
      * Fade in low and high limits
      */
-    private Vector2 fadeIn;
+    private Vector2d fadeIn;
 
     /**
      * Fade out low and high limits
      */
-    private Vector2 fadeOut;
+    private Vector2d fadeOut;
 
     /**
      * Position of label
@@ -175,14 +176,26 @@ public class FadeNode extends SceneGraphNode {
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
 
+    public Vector2d getFadeIn() {
+        return fadeIn;
+    }
+
     public void setFadein(double[] fadein) {
         if (fadein != null)
-            fadeIn = new Vector2((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
+            fadeIn = new Vector2d((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
+        else
+            fadeIn = null;
+    }
+
+    public Vector2d getFadeOut() {
+        return fadeOut;
     }
 
     public void setFadeout(double[] fadeout) {
         if (fadeout != null)
-            fadeOut = new Vector2((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
+            fadeOut = new Vector2d((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
+        else
+            fadeOut = null;
     }
 
     public void setPosition(double[] pos) {

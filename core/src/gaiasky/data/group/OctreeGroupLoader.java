@@ -78,6 +78,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
              * parallel, so we never use OctreeWrapperConcurrent
              */
             AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
+            octreeWrapper.setFadeout(new double[] { 8e3, 5e5 });
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";

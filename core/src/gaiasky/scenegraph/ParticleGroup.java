@@ -470,7 +470,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
         if (pointData != null && this.isVisible()) {
-            this.opacity = 1;
+            this.opacity = opacity;
             super.update(time, parentTransform, camera, opacity);
 
             if (focusIndex >= 0) {
@@ -906,7 +906,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         int n = pointData.size();
         if (GaiaSky.instance.isOn(ct) && this.opacity > 0) {
             Vector3d beamDir = new Vector3d();
-            Array<Pair<Integer, Double>> temporalHits = new Array<Pair<Integer, Double>>();
+            Array<Pair<Integer, Double>> temporalHits = new Array<>();
             for (int i = 0; i < n; i++) {
                 if (filter(i)) {
                     IParticleRecord pb = pointData.get(i);

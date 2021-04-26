@@ -115,13 +115,8 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         parenthood.remove(child);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
-        update(time, parentTransform, camera, 1f);
-    }
-
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        this.opacity = opacity;
-        translation.set(parentTransform);
+    public void updateLocal(ITimeFrameProvider time, ICamera camera) {
+        super.updateLocal(time, camera);
 
         // Fade node visibility applies here
         if (this.isVisible()) {
@@ -139,8 +134,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
                     AbstractRenderSystem.POINT_UPDATE_FLAG = true;
                     lastNumberObjects = OctreeNode.nObjectsObserved;
                 }
-
-                updateLocal(time, camera);
 
                 // Call the update method of all entities in the roulette list. This
                 // is implemented in the subclass.

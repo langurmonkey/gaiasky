@@ -825,7 +825,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         StarGroup sg = new StarGroup();
         sg.setName(name.replace("%%SGID%%", Long.toString(sg.id)));
         sg.setParent("Universe");
-        sg.setFadeout(new double[] { 2e3, 1e5 });
         sg.setLabelcolor(new double[] { 1.0, 1.0, 1.0, 1.0 });
         sg.setColor(new double[] { 1.0, 1.0, 1.0, 0.25 });
         sg.setSize(6.0);
