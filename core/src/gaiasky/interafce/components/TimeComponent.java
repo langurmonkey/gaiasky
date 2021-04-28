@@ -62,16 +62,14 @@ public class TimeComponent extends GuiComponent implements IObserver {
         float contentWidth = ControlsWindow.getContentWidth();
         KeyBindings kb = KeyBindings.instance;
 
-        float dateTimeWidth = 280f;
-
         // Time
-        date = new OwnLabel("date UT", skin, "mono");
+        date = new OwnLabel("date UT", skin);
         date.setName("label date");
-        date.setWidth(dateTimeWidth);
+        date.setWidth(170f);
 
-        time = new OwnLabel("time UT", skin, "mono");
+        time = new OwnLabel("time UT", skin);
         time.setName("label time");
-        time.setWidth(dateTimeWidth);
+        time.setWidth(120f);
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
@@ -148,10 +146,10 @@ public class TimeComponent extends GuiComponent implements IObserver {
         // Date time
         Table dateGroup = new Table(skin);
         Table datetimeGroup = new Table(skin);
-        datetimeGroup.add(date).padBottom(pad8).row();
-        datetimeGroup.add(time);
-        dateGroup.add(datetimeGroup).left().padRight(pad8);
-        dateGroup.add(dateEdit).left();
+        datetimeGroup.add(date).left().padBottom(pad4).padRight(pad12);
+        datetimeGroup.add(time).left().padBottom(pad4);
+        dateGroup.add(datetimeGroup).left().padRight(pad12);
+        dateGroup.add(dateEdit).right();
 
         // Pace
         Table paceGroup = new Table(skin);
