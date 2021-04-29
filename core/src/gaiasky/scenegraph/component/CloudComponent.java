@@ -24,6 +24,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.AtmosphereAttribute;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -138,7 +139,7 @@ public class CloudComponent {
 
     }
 
-    public void update(Vector3d transform) {
+    public void update(Vector3b transform) {
         transform.getMatrix(localTransform).scl(size);
     }
 

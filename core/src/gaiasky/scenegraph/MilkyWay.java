@@ -35,6 +35,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.LoadStatus;
@@ -181,7 +182,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
         }
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity * this.opacity;
         translation.set(parentTransform);
         this.currentDistance = camera.getDistance() * camera.getFovFactor();
@@ -199,7 +200,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
     }
 
     @Override
-    public void update(ITimeFrameProvider time, Vector3d parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, Vector3b parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 

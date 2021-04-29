@@ -23,10 +23,7 @@ import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 import gaiasky.util.tree.OctreeNode;
@@ -87,7 +84,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * the position relative to the parent, this contains the absolute position in the
      * internal reference system.
      */
-    public Vector3d translation;
+    public Vector3b translation;
 
     /**
      * Local transform matrix. Contains the transform matrix and the
@@ -212,7 +209,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public SceneGraphNode() {
         // Identity
-        this.translation = new Vector3d();
+        this.translation = new Vector3b();
         pos = new Vector3d();
         posSph = new Vector2d();
     }
@@ -462,11 +459,11 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return null;
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
         translation.set(parentTransform);
 
@@ -493,9 +490,8 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         this.translation.add(pos);
         this.opacity *= this.getVisibilityOpacityFactor();
 
-        Vector3d aux = aux3d1.get();
-        this.distToCamera = (float) aux.set(translation).len();
-        this.viewAngle = (float) FastMath.atan(size / distToCamera);
+        this.distToCamera = translation.lend();
+        this.viewAngle = FastMath.atan(size / distToCamera);
         this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
         if (!copy) {
             addToRenderLists(camera);

@@ -5,6 +5,7 @@
 
 package gaiasky.util.math;
 
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import net.jafama.FastMath;
 
@@ -174,6 +175,12 @@ public class Vector3b implements Serializable {
         return this;
     }
 
+    public Vector3b set(final Vector3d vec) {
+        if (vec != null)
+            return this.set(vec.x, vec.y, vec.z);
+        return this;
+    }
+
     public Vector3b set(final Vector3 vec) {
         if (vec != null)
             return this.set(vec.x, vec.y, vec.z);
@@ -255,6 +262,13 @@ public class Vector3b implements Serializable {
         this.x = this.x.add(vec.x, mc);
         this.y = this.y.add(vec.y, mc);
         this.z = this.z.add(vec.z, mc);
+        return this;
+    }
+
+    public Vector3b add(final Vector3d vec) {
+        this.x = this.x.add(BigDecimal.valueOf(vec.x), mc);
+        this.y = this.y.add(BigDecimal.valueOf(vec.y), mc);
+        this.z = this.z.add(BigDecimal.valueOf(vec.z), mc);
         return this;
     }
 
@@ -575,6 +589,25 @@ public class Vector3b implements Serializable {
         BigDecimal vy = BigDecimal.valueOf(y);
         BigDecimal vz = BigDecimal.valueOf(z);
         return this.set(this.y.multiply(vz, mc).subtract(this.z.multiply(vy, mc), mc), this.z.multiply(vx, mc).subtract(this.x.multiply(vz, mc), mc), this.x.multiply(vy, mc).subtract(this.y.multiply(vx, mc), mc));
+    }
+
+    /**
+     * Sets the matrix aux to a translation matrix using this vector
+     *
+     * @param aux
+     * @return The matrix aux
+     */
+    public Matrix4 getMatrix(Matrix4 aux) {
+        return aux.idt().translate(x.floatValue(), y.floatValue(), z.floatValue());
+    }
+    /**
+     * Sets the matrix aux to a translation matrix using this vector
+     *
+     * @param aux
+     * @return The matrix aux
+     */
+    public Matrix4d getMatrix(Matrix4d aux) {
+        return aux.idt().translate(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
 
     public boolean isUnit() {

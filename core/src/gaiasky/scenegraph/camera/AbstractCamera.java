@@ -17,6 +17,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.Frustumd;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -173,16 +174,16 @@ public abstract class AbstractCamera implements ICamera {
     private static final double VIEW_ANGLE = Math.toRadians(0.05);
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
-        return isVisible(time, cb.viewAngle, cb.translation, cb.distToCamera);
-    }
-    @Override
-    public boolean isVisible(ITimeFrameProvider time, Vector3d pos) {
-        return isVisible(time, 1e-8, pos, pos.len());
+    public boolean isVisible(CelestialBody cb) {
+        return isVisible(cb.viewAngle, cb.translation, cb.distToCamera);
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera) {
+    public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
+        return (!(this instanceof FovCamera) && viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
+    }
+
+    public boolean isVisible(double viewAngle, Vector3b pos, double distToCamera) {
         return (!(this instanceof FovCamera) && viewAngle > VIEW_ANGLE) || GlobalResources.isInView(pos, distToCamera, angleEdgeRad, tmp.set(getCamera().direction));
     }
 

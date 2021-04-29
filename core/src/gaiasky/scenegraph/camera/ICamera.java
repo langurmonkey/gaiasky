@@ -151,10 +151,9 @@ public interface ICamera {
 
     IFocus getSecondClosestBody();
 
-    boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
-    boolean isVisible(ITimeFrameProvider time, Vector3d position);
+    boolean isVisible(CelestialBody cb);
 
-    boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera);
+    boolean isVisible(double viewAngle, Vector3d pos, double distToCamera);
 
     void resize(int width, int height);
 

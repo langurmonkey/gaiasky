@@ -7,6 +7,7 @@ package gaiasky.scenegraph.octreewrapper;
 
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -32,7 +33,7 @@ public class OctreeWrapper extends AbstractOctreeWrapper {
     }
 
     @Override
-    protected void updateOctreeObjects(ITimeFrameProvider time, Vector3d parentTransform, ICamera camera) {
+    protected void updateOctreeObjects(ITimeFrameProvider time, Vector3b parentTransform, ICamera camera) {
         int size = roulette.size();
         for (int i = 0; i < size; i++) {
             SceneGraphNode sgn = roulette.get(i);

@@ -46,6 +46,7 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -202,7 +203,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return index;
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Fade node visibility
         if (this.isVisible() && active.length > 0) {
             // Delta years
@@ -531,7 +532,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 6f);
 
-                if (camera.isVisible(GaiaSky.instance.time, viewAngle, starPosition, distToCamera)) {
+                if (camera.isVisible(viewAngle, starPosition, distToCamera)) {
                     render2DLabel(batch, shader, rc, sys.font2d, camera, star.names()[0], starPosition);
                 }
             }
@@ -543,7 +544,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1.5f);
 
-                if (viewAngle >= thOverFactor && camera.isVisible(GaiaSky.instance.time, viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
+                if (viewAngle >= thOverFactor && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
                     textPosition(camera, starPosition, distToCamera, radius);
 
                     shader.setUniformf("u_viewAngle", viewAngle);

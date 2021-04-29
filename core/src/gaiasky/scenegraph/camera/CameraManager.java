@@ -506,18 +506,13 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
-        return current.isVisible(time, cb);
+    public boolean isVisible(CelestialBody cb) {
+        return current.isVisible(cb);
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, Vector3d pos) {
-        return current.isVisible(time, pos);
-    }
-
-    @Override
-    public boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera) {
-        return current.isVisible(time, viewAngle, pos, distToCamera);
+    public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
+        return current.isVisible(viewAngle, pos, distToCamera);
     }
 
     @Override

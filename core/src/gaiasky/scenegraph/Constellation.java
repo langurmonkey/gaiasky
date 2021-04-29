@@ -25,6 +25,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
@@ -73,11 +74,11 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         allConstellations.add(this);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Recompute mean position
         pos.setZero();
         Vector3d p = aux3d1.get();

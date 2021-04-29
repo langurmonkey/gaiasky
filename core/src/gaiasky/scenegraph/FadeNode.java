@@ -18,6 +18,7 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -117,7 +118,7 @@ public class FadeNode extends SceneGraphNode {
         }
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
         translation.set(parentTransform);
         Vector3d aux = aux3d1.get();

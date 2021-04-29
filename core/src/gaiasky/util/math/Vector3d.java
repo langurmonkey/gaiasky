@@ -112,6 +112,12 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this;
 	}
 
+	public Vector3d set(final Vector3b vec) {
+		if (vec != null)
+			return this.set(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
+		return this;
+	}
+
 	public Vector3d set(final Vector3 vec) {
 		if (vec != null)
 			return this.set(vec.x, vec.y, vec.z);
@@ -182,6 +188,13 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this;
 	}
 
+	public Vector3d add(final Vector3b vec) {
+		this.x += vec.x.doubleValue();
+		this.y += vec.y.doubleValue();
+		this.z += vec.z.doubleValue();
+		return this;
+	}
+
 	public Vector3d add(final Vector3 vec) {
 		this.x += vec.x;
 		this.y += vec.y;
@@ -230,6 +243,10 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	public Vector3d sub(final Vector3d vec) {
 		return this.sub(vec.x, vec.y, vec.z);
+	}
+
+	public Vector3d sub(final Vector3b vec) {
+		return this.sub(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
 	}
 
 	public Vector3d sub(final Vector3 vec) {
@@ -401,6 +418,9 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	public double dot(final Vector3d vector) {
 		return x * vector.x + y * vector.y + z * vector.z;
+	}
+	public double dot(final Vector3b vector) {
+		return x * vector.x.doubleValue() + y * vector.y.doubleValue() + z * vector.z.doubleValue();
 	}
 
 	/**
@@ -873,6 +893,10 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	/** Gets the angle in degrees between the two vectors **/
 	public double angle(Vector3d v) {
 		return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.len() * v.len()));
+	}
+	/** Gets the angle in degrees between the two vectors **/
+	public double angle(Vector3b v) {
+		return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.len() * v.lend()));
 	}
 
 	/** Gets the angle in degrees between the two vectors **/

@@ -25,6 +25,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -204,7 +205,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
@@ -213,7 +214,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * {@link SceneGraphNode}.
      */
     @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
         this.opacity *= this.getVisibilityOpacityFactor();
         translation.set(parentTransform).add(pos);
@@ -221,7 +222,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
             translation.add(pmv);
         }
-        distToCamera = translation.len();
+        distToCamera = translation.lend();
 
         if (!copy) {
             viewAngle = (radius / distToCamera);
@@ -256,7 +257,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                     addToRender(this, RenderGroup.LINE);
                 }
             }
-            if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
+            if (renderText() && camera.isVisible(this)) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
         }

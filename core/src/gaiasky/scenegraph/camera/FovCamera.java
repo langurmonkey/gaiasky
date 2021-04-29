@@ -163,10 +163,10 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
         /** POSITION **/
         SceneGraphNode fccopy = gaia.getLineCopy();
-        fccopy.getRoot().translation.set(0f, 0f, 0f);
+        fccopy.getRoot().translation.setZero();
         fccopy.getRoot().update(time, null, this);
 
-        this.pos.set(fccopy.translation);
+        fccopy.translation.put(this.pos);
         this.posinv.set(this.pos).scl(-1);
 
         /** ORIENTATION - directions and up **/
@@ -354,11 +354,11 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
+    public boolean isVisible(CelestialBody cb) {
         switch (parent.mode) {
         case GAIA_FOV1_MODE:
         case GAIA_FOV2_MODE:
-            return super.isVisible(time, cb);
+            return super.isVisible(cb);
         case GAIA_FOVS_MODE:
             return computeVisibleFovs(cb, this);
         default:

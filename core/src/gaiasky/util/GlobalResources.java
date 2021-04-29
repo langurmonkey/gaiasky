@@ -29,6 +29,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
 import org.lwjgl.opengl.GL30;
@@ -192,14 +193,14 @@ public class GlobalResources {
      *
      * @param point     The position of the body in the reference system of the camera
      *                  (i.e. camera is at origin)
+     * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
      * @return True if the body is visible
      */
-    public static boolean isInView(Vector3d point, float coneAngle, Vector3d dir) {
-        return FastMath.acos(point.dot(dir) / point.len()) < coneAngle;
+    public static boolean isInView(Vector3b point, double len, float coneAngle, Vector3d dir) {
+        return FastMath.acos(point.tov3d().dot(dir) / len) < coneAngle;
     }
-
     /**
      * Computes whether a body with the given position is visible by a camera
      * with the given direction and angle. Coordinates are assumed to be in the
@@ -213,10 +214,6 @@ public class GlobalResources {
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
-        return FastMath.acos(point.dot(dir) / len) < coneAngle;
-    }
-
-    public static boolean isInView(Vector3 point, double len, float coneAngle, Vector3 dir) {
         return FastMath.acos(point.dot(dir) / len) < coneAngle;
     }
 

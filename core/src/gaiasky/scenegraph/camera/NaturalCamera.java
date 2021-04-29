@@ -543,7 +543,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             SceneGraphNode fccopy = entity1.getLineCopy();
             fccopy.getRoot().translation.set(0f, 0f, 0f);
             fccopy.getRoot().update(time, null, this);
-            this.pos.set(fccopy.translation);
+            fccopy.translation.put(this.pos);
 
             this.pos.add(0, 0, entity1.getRadius() * 5);
             this.posinv.set(this.pos).scl(-1);

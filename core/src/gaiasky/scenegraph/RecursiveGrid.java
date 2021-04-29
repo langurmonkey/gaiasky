@@ -40,6 +40,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -248,7 +249,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     }
 
     @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.distToCamera = getDistanceToOrigin(camera);
         this.currentDistance = this.distToCamera;
         this.regime = this.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;

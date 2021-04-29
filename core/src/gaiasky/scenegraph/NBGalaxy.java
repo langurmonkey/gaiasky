@@ -17,6 +17,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -96,10 +97,10 @@ public class NBGalaxy extends Particle {
      * {@link SceneGraphNode}.
      */
     @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
         translation.set(parentTransform).add(pos);
-        distToCamera = translation.len();
+        distToCamera = translation.lend();
 
         this.opacity = opacity;
 
@@ -128,7 +129,7 @@ public class NBGalaxy extends Particle {
             } else {
                 addToRender(this, RenderGroup.BILLBOARD_GAL);
             }
-            if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
+            if (renderText() && camera.isVisible(this)) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
         }

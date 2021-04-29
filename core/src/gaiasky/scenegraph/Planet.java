@@ -240,7 +240,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        renderer.addLine(this, translation.x, translation.y, translation.z, endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
+        renderer.addLine(this, translation.x.doubleValue(), translation.y.doubleValue(), translation.z.doubleValue(), endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
     }
 
     @Override

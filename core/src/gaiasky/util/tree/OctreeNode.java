@@ -20,6 +20,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
@@ -535,7 +536,7 @@ public class OctreeNode implements ILineRenderable {
      * @param roulette        List where the nodes to be processed are to be added.
      * @param opacity         The opacity to set.
      */
-    public void update(Vector3d parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
+    public void update(Vector3b parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
         this.opacity = opacity;
         this.observed = false;
 
