@@ -493,9 +493,8 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         this.translation.add(pos);
         this.opacity *= this.getVisibilityOpacityFactor();
 
-        Vector3d aux = aux3d1.get();
-        this.distToCamera = (float) aux.set(translation).len();
-        this.viewAngle = (float) FastMath.atan(size / distToCamera);
+        this.distToCamera = translation.len();
+        this.viewAngle = FastMath.atan(size / distToCamera);
         this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
         if (!copy) {
             addToRenderLists(camera);
