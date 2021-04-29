@@ -83,7 +83,9 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public Array<SceneGraphNode> children;
 
     /**
-     * Translation object.
+     * Cumulative translation object. In contrast with the position, which contains
+     * the position relative to the parent, this contains the absolute position in the
+     * internal reference system.
      */
     public Vector3d translation;
 
