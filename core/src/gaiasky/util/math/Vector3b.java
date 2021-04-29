@@ -8,51 +8,38 @@ package gaiasky.util.math;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import net.jafama.FastMath;
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
-import java.math.MathContext;
 
 /**
- * Vector of arbitrary precision floating point numbers using {@link BigDecimal}s.
+ * Vector of arbitrary precision floating point numbers using ApFloat.
  *
  * @author Toni Sagrista
  */
 public class Vector3b implements Serializable {
     private static final long serialVersionUID = 3840054589595372522L;
-    private static final MathContext mc = MathContext.DECIMAL128;
+    // Number of digits of precision
+    private static final int prec = 50;
 
     /** the x-component of this vector **/
-    public BigDecimal x;
+    public Apfloat x;
     /** the y-component of this vector **/
-    public BigDecimal y;
+    public Apfloat y;
     /** the z-component of this vector **/
-    public BigDecimal z;
+    public Apfloat z;
 
     public final static Vector3b X = new Vector3b(1, 0, 0);
     public final static Vector3b Y = new Vector3b(0, 1, 0);
     public final static Vector3b Z = new Vector3b(0, 0, 1);
-    public final static Vector3b Zero = new Vector3b(0, 0, 0);
 
-    private final static Matrix4d tmpMat = new Matrix4d();
-
-    public static Vector3b getUnitX() {
-        return X.cpy();
-    }
-
-    public static Vector3b getUnitY() {
-        return Y.cpy();
-    }
-
-    public static Vector3b getUnitZ() {
-        return Z.cpy();
-    }
 
     /** Constructs a vector at (0,0,0) */
     public Vector3b() {
-        this.x = BigDecimal.ZERO;
-        this.y = BigDecimal.ZERO;
-        this.z = BigDecimal.ZERO;
+        this.x = Apfloat.ZERO;
+        this.y = Apfloat.ZERO;
+        this.z = Apfloat.ZERO;
     }
 
     /**
@@ -62,7 +49,7 @@ public class Vector3b implements Serializable {
      * @param y The y-component
      * @param z The z-component
      */
-    public Vector3b(BigDecimal x, BigDecimal y, BigDecimal z) {
+    public Vector3b(Apfloat x, Apfloat y, Apfloat z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -76,9 +63,9 @@ public class Vector3b implements Serializable {
      * @param z The z-component
      */
     public Vector3b(double x, double y, double z) {
-        this.x = BigDecimal.valueOf(x);
-        this.y = BigDecimal.valueOf(y);
-        this.z = BigDecimal.valueOf(z);
+        this.x = new Apfloat(x, prec);
+        this.y = new Apfloat(y, prec);
+        this.z = new Apfloat(z, prec);
     }
 
     /**
@@ -104,7 +91,7 @@ public class Vector3b implements Serializable {
         return x.doubleValue();
     }
 
-    public BigDecimal xb() {
+    public Apfloat xb() {
         return x;
     }
 
@@ -112,7 +99,7 @@ public class Vector3b implements Serializable {
         return y.doubleValue();
     }
 
-    public BigDecimal yb() {
+    public Apfloat yb() {
         return y;
     }
 
@@ -120,7 +107,7 @@ public class Vector3b implements Serializable {
         return z.doubleValue();
     }
 
-    public BigDecimal zb() {
+    public Apfloat zb() {
         return z;
     }
 
@@ -133,9 +120,9 @@ public class Vector3b implements Serializable {
      * @return this vector for chaining
      */
     public Vector3b set(float x, float y, float z) {
-        this.x = BigDecimal.valueOf(x);
-        this.y = BigDecimal.valueOf(y);
-        this.z = BigDecimal.valueOf(z);
+        this.x = new Apfloat(x, prec);
+        this.y = new Apfloat(y, prec);
+        this.z = new Apfloat(z, prec);
         return this;
     }
 
@@ -148,9 +135,9 @@ public class Vector3b implements Serializable {
      * @return this vector for chaining
      */
     public Vector3b set(double x, double y, double z) {
-        this.x = BigDecimal.valueOf(x);
-        this.y = BigDecimal.valueOf(y);
-        this.z = BigDecimal.valueOf(z);
+        this.x = new Apfloat(x, prec);
+        this.y = new Apfloat(y, prec);
+        this.z = new Apfloat(z, prec);
         return this;
     }
 
@@ -162,7 +149,7 @@ public class Vector3b implements Serializable {
      * @param z The z-component
      * @return this vector for chaining
      */
-    public Vector3b set(BigDecimal x, BigDecimal y, BigDecimal z) {
+    public Vector3b set(Apfloat x, Apfloat y, Apfloat z) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -259,23 +246,23 @@ public class Vector3b implements Serializable {
     }
 
     public Vector3b add(final Vector3b vec) {
-        this.x = this.x.add(vec.x, mc);
-        this.y = this.y.add(vec.y, mc);
-        this.z = this.z.add(vec.z, mc);
+        this.x = this.x.add(vec.x);
+        this.y = this.y.add(vec.y);
+        this.z = this.z.add(vec.z);
         return this;
     }
 
     public Vector3b add(final Vector3d vec) {
-        this.x = this.x.add(BigDecimal.valueOf(vec.x), mc);
-        this.y = this.y.add(BigDecimal.valueOf(vec.y), mc);
-        this.z = this.z.add(BigDecimal.valueOf(vec.z), mc);
+        this.x = this.x.add(new Apfloat(vec.x));
+        this.y = this.y.add(new Apfloat(vec.y));
+        this.z = this.z.add(new Apfloat(vec.z));
         return this;
     }
 
     public Vector3b add(final Vector3 vec) {
-        this.x = this.x.add(BigDecimal.valueOf(vec.x), mc);
-        this.y = this.y.add(BigDecimal.valueOf(vec.y), mc);
-        this.z = this.z.add(BigDecimal.valueOf(vec.z), mc);
+        this.x = this.x.add(new Apfloat(vec.x));
+        this.y = this.y.add(new Apfloat(vec.y));
+        this.z = this.z.add(new Apfloat(vec.z));
         return this;
     }
 
@@ -288,9 +275,9 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining.
      */
     public Vector3b add(double x, double y, double z) {
-        this.x = this.x.add(BigDecimal.valueOf(x), mc);
-        this.y = this.y.add(BigDecimal.valueOf(y), mc);
-        this.z = this.z.add(BigDecimal.valueOf(z), mc);
+        this.x = this.x.add(new Apfloat(x));
+        this.y = this.y.add(new Apfloat(y));
+        this.z = this.z.add(new Apfloat(z));
         return this;
     }
 
@@ -302,9 +289,9 @@ public class Vector3b implements Serializable {
      */
     public Vector3b add(double... vals) {
         assert vals.length == 3 : "vals must contain 3 values";
-        this.x = this.x.add(BigDecimal.valueOf(vals[0]), mc);
-        this.y = this.y.add(BigDecimal.valueOf(vals[1]), mc);
-        this.z = this.z.add(BigDecimal.valueOf(vals[2]), mc);
+        this.x = this.x.add(new Apfloat(vals[0]));
+        this.y = this.y.add(new Apfloat(vals[1]));
+        this.z = this.z.add(new Apfloat(vals[2]));
         return this;
     }
 
@@ -315,17 +302,17 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b add(double value) {
-        var val = BigDecimal.valueOf(value);
-        x = x.add(val, mc);
-        y = y.add(val, mc);
-        z = z.add(val, mc);
+        var val = new Apfloat(value);
+        x = x.add(val);
+        y = y.add(val);
+        z = z.add(val);
         return this;
     }
 
     public Vector3b sub(final Vector3b vec) {
-        x = x.subtract(vec.x, mc);
-        y = y.subtract(vec.y, mc);
-        z = z.subtract(vec.z, mc);
+        x = x.subtract(vec.x);
+        y = y.subtract(vec.y);
+        z = z.subtract(vec.z);
         return this;
     }
 
@@ -346,9 +333,9 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b sub(double x, double y, double z) {
-        this.x = this.x.subtract(BigDecimal.valueOf(x), mc);
-        this.y = this.y.subtract(BigDecimal.valueOf(y), mc);
-        this.z = this.z.subtract(BigDecimal.valueOf(z), mc);
+        this.x = this.x.subtract(new Apfloat(x));
+        this.y = this.y.subtract(new Apfloat(y));
+        this.z = this.z.subtract(new Apfloat(z));
         return this;
     }
 
@@ -359,32 +346,32 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b sub(double value) {
-        var val = BigDecimal.valueOf(value);
-        x = x.subtract(val, mc);
-        y = y.subtract(val, mc);
-        z = z.subtract(val, mc);
+        var val = new Apfloat(value);
+        x = x.subtract(val);
+        y = y.subtract(val);
+        z = z.subtract(val);
         return this;
     }
 
-    public Vector3b scl(BigDecimal scl) {
-        x = x.multiply(scl, mc);
-        y = y.multiply(scl, mc);
-        z = z.multiply(scl, mc);
+    public Vector3b scl(Apfloat scl) {
+        x = x.multiply(scl);
+        y = y.multiply(scl);
+        z = z.multiply(scl);
         return this;
     }
 
     public Vector3b scl(double scalar) {
-        var scl = BigDecimal.valueOf(scalar);
-        x = x.multiply(scl, mc);
-        y = y.multiply(scl, mc);
-        z = z.multiply(scl, mc);
+        var scl = new Apfloat(scalar);
+        x = x.multiply(scl);
+        y = y.multiply(scl);
+        z = z.multiply(scl);
         return this;
     }
 
     public Vector3b scl(final Vector3b vec) {
-        x = x.multiply(vec.x, mc);
-        y = y.multiply(vec.y, mc);
-        z = z.multiply(vec.z, mc);
+        x = x.multiply(vec.x);
+        y = y.multiply(vec.y);
+        z = z.multiply(vec.z);
         return this;
     }
 
@@ -397,38 +384,38 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b scl(double x, double y, double z) {
-        this.x = this.x.multiply(BigDecimal.valueOf(x), mc);
-        this.y = this.y.multiply(BigDecimal.valueOf(y), mc);
-        this.z = this.z.multiply(BigDecimal.valueOf(z), mc);
+        this.x = this.x.multiply(new Apfloat(x));
+        this.y = this.y.multiply(new Apfloat(y));
+        this.z = this.z.multiply(new Apfloat(z));
         return this;
     }
 
     public Vector3b mulAdd(Vector3b vec, double scalar) {
-        BigDecimal scl = BigDecimal.valueOf(scalar);
-        x = x.add(vec.x.multiply(scl, mc), mc);
-        y = y.add(vec.y.multiply(scl, mc), mc);
-        z = z.add(vec.z.multiply(scl, mc), mc);
+        Apfloat scl = new Apfloat(scalar);
+        x = x.add(vec.x.multiply(scl));
+        y = y.add(vec.y.multiply(scl));
+        z = z.add(vec.z.multiply(scl));
         return this;
     }
 
     public Vector3b mulAdd(Vector3b vec, Vector3b mulVec) {
-        x = x.add(vec.x.multiply(mulVec.x, mc), mc);
-        y = y.add(vec.y.multiply(mulVec.y, mc), mc);
-        z = z.add(vec.z.multiply(mulVec.z, mc), mc);
+        x = x.add(vec.x.multiply(mulVec.x));
+        y = y.add(vec.y.multiply(mulVec.y));
+        z = z.add(vec.z.multiply(mulVec.z));
         return this;
     }
 
     public Vector3b mul(Vector3b vec) {
-        x = x.multiply(vec.x, mc);
-        y = y.multiply(vec.y, mc);
-        z = z.multiply(vec.z, mc);
+        x = x.multiply(vec.x);
+        y = y.multiply(vec.y);
+        z = z.multiply(vec.z);
         return this;
     }
 
     public Vector3b div(Vector3b vec) {
-        x = x.divide(vec.x, mc);
-        y = y.divide(vec.y, mc);
-        z = z.divide(vec.z, mc);
+        x = x.divide(vec.x);
+        y = y.divide(vec.y);
+        z = z.divide(vec.z);
         return this;
     }
 
@@ -441,9 +428,9 @@ public class Vector3b implements Serializable {
         return this.len().doubleValue();
     }
 
-    public BigDecimal len() {
-        BigDecimal sumSq = x.multiply(x, mc).add(y.multiply(y, mc), mc).add(z.multiply(z, mc), mc);
-        return sumSq.sqrt(mc);
+    public Apfloat len() {
+        Apfloat sumSq = x.multiply(x).add(y.multiply(y)).add(z.multiply(z));
+        return ApfloatMath.sqrt(sumSq);
     }
 
     /** @return The squared euclidian length */
@@ -455,8 +442,8 @@ public class Vector3b implements Serializable {
         return this.len2().doubleValue();
     }
 
-    public BigDecimal len2() {
-        return x.multiply(x, mc).add(y.multiply(y, mc), mc).add(z.multiply(z, mc), mc);
+    public Apfloat len2() {
+        return x.multiply(x).add(y.multiply(y)).add(z.multiply(z));
     }
 
     /**
@@ -471,11 +458,11 @@ public class Vector3b implements Serializable {
         return dst(vec).doubleValue();
     }
 
-    public BigDecimal dst(final Vector3b vec) {
-        BigDecimal a = vec.x.subtract(this.x, mc);
-        BigDecimal b = vec.y.subtract(this.y, mc);
-        BigDecimal c = vec.z.subtract(this.z, mc);
-        return a.pow(2, mc).add(b.pow(2, mc), mc).add(c.pow(2, mc), mc).sqrt(mc);
+    public Apfloat dst(final Vector3b vec) {
+        Apfloat a = vec.x.subtract(this.x);
+        Apfloat b = vec.y.subtract(this.y);
+        Apfloat c = vec.z.subtract(this.z);
+        return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
 
     public double dstd(double x, double y, double z) {
@@ -483,22 +470,22 @@ public class Vector3b implements Serializable {
     }
 
     /** @return the distance between this point and the given point */
-    public BigDecimal dst(double x, double y, double z) {
-        BigDecimal a = BigDecimal.valueOf(x).subtract(this.x, mc);
-        BigDecimal b = BigDecimal.valueOf(y).subtract(this.y, mc);
-        BigDecimal c = BigDecimal.valueOf(z).subtract(this.z, mc);
-        return a.pow(2, mc).add(b.pow(2, mc), mc).add(c.pow(2, mc), mc).sqrt(mc);
+    public Apfloat dst(double x, double y, double z) {
+        Apfloat a = new Apfloat(x).subtract(this.x);
+        Apfloat b = new Apfloat(y).subtract(this.y);
+        Apfloat c = new Apfloat(z).subtract(this.z);
+        return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
 
     public double dst2d(Vector3b vec) {
         return this.dst2(vec).doubleValue();
     }
 
-    public BigDecimal dst2(Vector3b vec) {
-        BigDecimal a = vec.x.subtract(this.x, mc);
-        BigDecimal b = vec.y.subtract(this.y, mc);
-        BigDecimal c = vec.z.subtract(this.z, mc);
-        return a.pow(2, mc).add(b.pow(2, mc), mc).add(c.pow(2, mc), mc);
+    public Apfloat dst2(Vector3b vec) {
+        Apfloat a = vec.x.subtract(this.x);
+        Apfloat b = vec.y.subtract(this.y);
+        Apfloat c = vec.z.subtract(this.z);
+        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c));
     }
 
     public double dst2d(double x, double y, double z) {
@@ -513,31 +500,31 @@ public class Vector3b implements Serializable {
      * @param z The z-component of the other point
      * @return The squared distance
      */
-    public BigDecimal dst2(double x, double y, double z) {
-        BigDecimal a = BigDecimal.valueOf(x).subtract(this.x, mc);
-        BigDecimal b = BigDecimal.valueOf(y).subtract(this.y, mc);
-        BigDecimal c = BigDecimal.valueOf(z).subtract(this.z, mc);
-        return a.pow(2, mc).add(b.pow(2, mc), mc).add(c.pow(2, mc), mc);
+    public Apfloat dst2(double x, double y, double z) {
+        Apfloat a = new Apfloat(x).subtract(this.x);
+        Apfloat b = new Apfloat(y).subtract(this.y);
+        Apfloat c = new Apfloat(z).subtract(this.z);
+        return a.multiply(a).add(b.multiply(b)).add(c.multiply(c));
     }
 
     public Vector3b nor() {
-        final BigDecimal len2 = this.len2();
+        final Apfloat len2 = this.len2();
         final double len2d = len2.doubleValue();
         if (len2d == 0f || len2d == 1f)
             return this;
-        return this.scl(BigDecimal.ONE.divide(len2.sqrt(mc), mc));
+        return this.scl(Apfloat.ONE.divide(ApfloatMath.sqrt(len2)));
     }
 
     public double dotd(final Vector3b vec) {
         return this.dot(vec).doubleValue();
     }
 
-    public BigDecimal dot(final Vector3b vec) {
-        return this.x.multiply(vec.x, mc).add(this.y.multiply(vec.y, mc), mc).add(this.z.multiply(vec.z, mc), mc);
+    public Apfloat dot(final Vector3b vec) {
+        return this.x.multiply(vec.x).add(this.y.multiply(vec.y)).add(this.z.multiply(vec.z));
     }
 
     public double dotd(double x, double y, double z) {
-        return this.dot(BigDecimal.valueOf(x), BigDecimal.valueOf(y), BigDecimal.valueOf(z)).doubleValue();
+        return this.dot(new Apfloat(x), new Apfloat(y), new Apfloat(z)).doubleValue();
     }
 
     /**
@@ -548,8 +535,8 @@ public class Vector3b implements Serializable {
      * @param z The z-component of the other vector
      * @return The dot product
      */
-    public BigDecimal dot(BigDecimal x, BigDecimal y, BigDecimal z) {
-        return this.x.multiply(x, mc).add(this.y.multiply(y, mc), mc).add(this.z.multiply(z, mc), mc);
+    public Apfloat dot(Apfloat x, Apfloat y, Apfloat z) {
+        return this.x.multiply(x).add(this.y.multiply(y)).add(this.z.multiply(z));
     }
 
     /**
@@ -559,7 +546,7 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b crs(final Vector3b vec) {
-        return this.set(this.y.multiply(vec.z, mc).subtract(this.z.multiply(vec.y, mc), mc), this.z.multiply(vec.x, mc).subtract(this.x.multiply(vec.z, mc), mc), this.x.multiply(vec.y, mc).subtract(this.y.multiply(vec.x, mc), mc));
+        return this.set(this.y.multiply(vec.z).subtract(this.z.multiply(vec.y)), this.z.multiply(vec.x).subtract(this.x.multiply(vec.z)), this.x.multiply(vec.y).subtract(this.y.multiply(vec.x)));
     }
 
     /**
@@ -585,10 +572,10 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b crs(double x, double y, double z) {
-        BigDecimal vx = BigDecimal.valueOf(x);
-        BigDecimal vy = BigDecimal.valueOf(y);
-        BigDecimal vz = BigDecimal.valueOf(z);
-        return this.set(this.y.multiply(vz, mc).subtract(this.z.multiply(vy, mc), mc), this.z.multiply(vx, mc).subtract(this.x.multiply(vz, mc), mc), this.x.multiply(vy, mc).subtract(this.y.multiply(vx, mc), mc));
+        Apfloat vx = new Apfloat(x);
+        Apfloat vy = new Apfloat(y);
+        Apfloat vz = new Apfloat(z);
+        return this.set(this.y.multiply(vz).subtract(this.z.multiply(vy)), this.z.multiply(vx).subtract(this.x.multiply(vz)), this.x.multiply(vy).subtract(this.y.multiply(vx)));
     }
 
     /**
@@ -650,8 +637,8 @@ public class Vector3b implements Serializable {
         return this;
     }
 
-    public BigDecimal[] values() {
-        return new BigDecimal[] { x, y, z };
+    public Apfloat[] values() {
+        return new Apfloat[] { x, y, z };
     }
 
     public double[] valuesd() {
@@ -692,7 +679,7 @@ public class Vector3b implements Serializable {
     }
 
     /**
-     * Returns a vector3d representation of this vector by casting the BigDecimals to
+     * Returns a vector3d representation of this vector by casting the Apfloats to
      * doubles. This creates a new object
      *
      * @return The vector3d representation of this vector3b
@@ -711,7 +698,7 @@ public class Vector3b implements Serializable {
     }
 
     /**
-     * Returns set v to this vector by casting BigDecimals to doubles.
+     * Returns set v to this vector by casting Apfloats to doubles.
      *
      * @return The double vector v.
      */
@@ -758,9 +745,9 @@ public class Vector3b implements Serializable {
     }
 
     public Vector3b setZero() {
-        this.x = BigDecimal.ZERO;
-        this.y = BigDecimal.ZERO;
-        this.z = BigDecimal.ZERO;
+        this.x = Apfloat.ZERO;
+        this.y = Apfloat.ZERO;
+        this.z = Apfloat.ZERO;
         return this;
     }
 
