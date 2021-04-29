@@ -21,7 +21,7 @@ import gaiasky.util.math.Matrix4d;
 
 public class OortCloudMinimapScale extends AbstractMinimapScale {
 
-    private Color occ;
+    private final Color occ;
 
     public OortCloudMinimapScale() {
         super();

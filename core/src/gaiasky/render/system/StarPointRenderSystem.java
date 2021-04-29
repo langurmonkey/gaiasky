@@ -100,12 +100,12 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (POINT_UPDATE_FLAG) {
             // Reset variables
             curr.clear();
             
-            ensureTempVertsSize(renderables.size() * curr.vertexSize);
+            ensureTempVertsSize(renderables.size * curr.vertexSize);
             renderables.forEach(r->{
                 // 2 FPS gain
                 CelestialBody cb = (CelestialBody) r;

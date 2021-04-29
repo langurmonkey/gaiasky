@@ -5,20 +5,15 @@
 
 package gaiasky.data.octreegen;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
 
 import java.util.Comparator;
 
-public class StarBrightnessComparator implements Comparator<ParticleBean> {
-    private ParticleBean o1;
-    private ParticleBean o2;
+public class StarBrightnessComparator implements Comparator<IParticleRecord> {
 
     @Override
-    public int compare(ParticleBean o1, ParticleBean o2) {
-        this.o1 = o1;
-        this.o2 = o2;
-        return Double.compare(((StarBean) o1).absmag(), ((StarBean) o2).absmag());
+    public int compare(IParticleRecord o1, IParticleRecord o2) {
+        return Double.compare(o1.absmag(), o2.absmag());
     }
 
 }

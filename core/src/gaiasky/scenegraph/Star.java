@@ -21,6 +21,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -98,7 +99,7 @@ public class Star extends Particle {
     double modelDistance;
 
     public Star() {
-        this.parentName = ROOT_NAME;
+        super();
     }
 
     public Star(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
@@ -257,14 +258,14 @@ public class Star extends Particle {
 
     @Override
     public void initialize() {
-        super.initialize();
+        setDerivedAttributes();
+        radius = size * Constants.STAR_SIZE_FACTOR;
         modelDistance = 172.4643429 * radius;
-        ct = new ComponentTypes(ComponentType.Stars);
     }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if(GaiaSky.instance.isOn(ct)) {
+        if(this.shouldRender()) {
             camera.checkClosestParticle(this);
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
@@ -301,7 +302,7 @@ public class Star extends Particle {
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             Vector3 pos = aux3f1.get();
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
@@ -378,7 +379,7 @@ public class Star extends Particle {
     }
 
     @Override
-    protected void addToIndex(Map<String, SceneGraphNode> map) {
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
         // Hip
         if (hip > 0) {
             String hipid = "hip " + hip;
@@ -387,7 +388,7 @@ public class Star extends Particle {
     }
 
     @Override
-    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
         // Hip
         if (hip > 0) {
             String hipid = "hip " + hip;

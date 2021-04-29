@@ -6,7 +6,10 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.render.*;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IModelRenderable;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -19,9 +22,10 @@ import gaiasky.vr.openvr.VRContext.VRDevice;
 public class StubModel extends SceneGraphNode implements IModelRenderable, ILineRenderable {
 
     public IntModelInstance instance;
-    private Environment env;
-    private VRDevice device;
-    private Vector3 beamP0, beamP1;
+    private final Environment env;
+    private final VRDevice device;
+    private final Vector3 beamP0;
+    private final Vector3 beamP1;
 
     public StubModel(VRDevice device, Environment env) {
         super();
@@ -50,10 +54,12 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
     }
 
     public void addToRenderLists(RenderGroup rg) {
-        if (rg != null) {
-            addToRender(this, rg);
+        if (this.shouldRender()) {
+            if (rg != null) {
+                addToRender(this, rg);
+            }
+            addToRender(this, RenderGroup.LINE);
         }
-        addToRender(this, RenderGroup.LINE);
     }
 
     @Override
@@ -120,7 +126,7 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
 
     /**
      * Gets the initial point of the controller beam in camera space
-     * 
+     *
      * @return Initial point of controller beam
      */
     public Vector3 getBeamP0() {
@@ -129,7 +135,7 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
 
     /**
      * Gets the end point of the controller beam in camera space
-     * 
+     *
      * @return End point of controller beam
      */
     public Vector3 getBeamP1() {

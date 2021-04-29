@@ -17,8 +17,8 @@ import java.util.Map;
  */
 public class TwoWayHashmap<K extends Object, V extends Object> {
 
-    private Map<K, V> forward = new HashMap<K, V>();
-    private Map<V, K> backward = new HashMap<V, K>();
+    private final Map<K, V> forward = new HashMap<K, V>();
+    private final Map<V, K> backward = new HashMap<V, K>();
 
     public synchronized void add(K key, V value) {
         forward.put(key, value);

@@ -30,6 +30,9 @@ public class OrbitRefresher {
      **/
     protected static final int MAX_LOAD_CHUNK = 5;
 
+    /** Orbit updater thread lock **/
+    private static final Object threadLock = new Object();
+
     /**
      * The instance
      */
@@ -38,17 +41,17 @@ public class OrbitRefresher {
     /**
      * The loading queue
      */
-    private Queue<OrbitDataLoaderParameter> toLoadQueue;
+    private final Queue<OrbitDataLoaderParameter> toLoadQueue;
 
     /**
      * The daemon
      */
-    private DaemonRefresher daemon;
+    private final OrbitUpdaterThread daemon;
 
     /**
      * Loading is paused
      */
-    private boolean loadingPaused = false;
+    private final boolean loadingPaused = false;
 
     public OrbitRefresher() {
         super();
@@ -56,9 +59,9 @@ public class OrbitRefresher {
         OrbitRefresher.instance = this;
 
         // Start daemon
-        daemon = new DaemonRefresher();
+        daemon = new OrbitUpdaterThread();
         daemon.setDaemon(true);
-        daemon.setName("daemon-orbit-refresher");
+        daemon.setName("gaiasky-worker-orbitupdate");
         daemon.setPriority(Thread.MIN_PRIORITY);
         daemon.start();
     }
@@ -78,24 +81,26 @@ public class OrbitRefresher {
      */
     public void flushLoadQueue() {
         if (!daemon.awake && !toLoadQueue.isEmpty() && !loadingPaused) {
-            daemon.interrupt();
+            synchronized (threadLock) {
+                threadLock.notifyAll();
+            }
         }
     }
 
     /**
-     * The daemon refresher thread.
+     * The orbit refresher thread.
      *
      * @author Toni Sagrista
      */
-    protected static class DaemonRefresher extends Thread {
+    protected static class OrbitUpdaterThread extends Thread {
         private boolean awake;
         private boolean running;
-        private AtomicBoolean abort;
-        private OrbitSamplerDataProvider provider;
+        private final AtomicBoolean abort;
+        private final OrbitSamplerDataProvider provider;
 
-        private Array<OrbitDataLoaderParameter> toLoad;
+        private final Array<OrbitDataLoaderParameter> toLoad;
 
-        public DaemonRefresher() {
+        public OrbitUpdaterThread() {
             this.awake = false;
             this.running = true;
             this.abort = new AtomicBoolean(false);
@@ -120,56 +125,59 @@ public class OrbitRefresher {
         @Override
         public void run() {
             while (running) {
-                /** ----------- PROCESS REQUESTS ----------- **/
-                while (!instance.toLoadQueue.isEmpty()) {
-                    toLoad.clear();
-                    int i = 0;
-                    while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                        OrbitDataLoaderParameter param = instance.toLoadQueue.poll();
-                        toLoad.add(param);
-                        i++;
-                    }
+                synchronized (threadLock) {
+                    /** ----------- PROCESS REQUESTS ----------- **/
+                    while (!instance.toLoadQueue.isEmpty()) {
+                        toLoad.clear();
+                        int i = 0;
+                        while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
+                            OrbitDataLoaderParameter param = instance.toLoadQueue.poll();
+                            toLoad.add(param);
+                            i++;
+                        }
 
-                    // Generate orbits if any
-                    if (toLoad.size > 0) {
-                        try {
-                            for (OrbitDataLoaderParameter param : toLoad) {
-                                Orbit orbit = param.orbit;
-                                if (orbit != null) {
-                                    // Generate data
-                                    provider.load(null, param);
-                                    final PointCloudData pcd = provider.getData();
-                                    // Post new data to object
-                                    GaiaSky.postRunnable(() -> {
-                                        // Update orbit object
-                                        orbit.setPointCloudData(pcd);
-                                        orbit.initOrbitMetadata();
+                        // Generate orbits if any
+                        if (toLoad.size > 0) {
+                            try {
+                                for (OrbitDataLoaderParameter param : toLoad) {
+                                    Orbit orbit = param.orbit;
+                                    if (orbit != null) {
+                                        // Generate data
+                                        provider.load(null, param);
+                                        final PointCloudData pcd = provider.getData();
+                                        // Post new data to object
+                                        GaiaSky.postRunnable(() -> {
+                                            // Update orbit object
+                                            orbit.setPointCloudData(pcd);
+                                            orbit.initOrbitMetadata();
 
-                                        orbit.refreshing = false;
-                                    });
+                                            orbit.refreshing = false;
+                                        });
 
-                                } else {
-                                    // Error, need orbit
+                                    } else {
+                                        // Error, need orbit
+                                    }
                                 }
+                            } catch (Exception e) {
+                                // This will happen when the queue has been cleared during processing
+                                logger.debug("Refreshing orbits operation failed");
                             }
-                        } catch (Exception e) {
-                            // This will happen when the queue has been cleared during processing
-                            logger.debug("Refreshing orbits operation failed");
                         }
                     }
-                }
 
-                /** ----------- SLEEP UNTIL INTERRUPTED ----------- **/
-                try {
-                    awake = false;
-                    abort.set(false);
-                    Thread.sleep(Long.MAX_VALUE - 8);
-                } catch (InterruptedException e) {
-                    // New data!
-                    awake = true;
+                    /** ----------- SLEEP UNTIL INTERRUPTED ----------- **/
+                    try {
+                        awake = false;
+                        abort.set(false);
+                        threadLock.wait(Long.MAX_VALUE - 8);
+                    } catch (InterruptedException e) {
+                        // New data!
+                        awake = true;
+                    }
                 }
             }
         }
+
     }
 
 }

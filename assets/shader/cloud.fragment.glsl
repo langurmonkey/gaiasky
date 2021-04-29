@@ -33,13 +33,18 @@ uniform sampler2D u_normalTexture;
 // AMBIENT LIGHT
 in vec3 v_ambientLight;
 
+
+float luma(vec3 color){
+    return dot(color, vec3(0.2126, 0.7152, 0.0722));
+}
+
 // CLOUD TEXTURE
 #if defined(diffuseTextureFlag) && defined(normalTextureFlag)
 // We have clouds and transparency
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     vec4 cloud = texture(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
     vec4 trans = texture(u_normalTexture, texCoord, TEXTURE_LOD_BIAS);
-    return vec4(cloud.rgb, 1.0 - (trans.r + trans.g + trans.b) / 3.0);
+    return vec4(cloud.rgb, 1.0 - pow(luma(trans.rgb), 0.7));
 }
 #elif defined(diffuseTextureFlag)
 // Only clouds, we use value as transp
@@ -47,13 +52,13 @@ vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     vec4 cloud = texture(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
     // Smooth towards the poles
     float smoothing = smoothstep(0.01, 0.07, texCoord.y);
-    return vec4(2.0 * cloud.rgb, smoothing * (cloud.r + cloud.g + cloud.b) / 3.0);
+    return vec4(2.0 * cloud.rgb, smoothing * pow(luma(cloud.rgb), 0.7));
 }
-    #else
+#else
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
     return defaultValue;
 }
-    #endif// diffuseTextureFlag && diffuseColorFlag
+#endif// diffuseTextureFlag && diffuseColorFlag
 
 in vec3 v_lightDir;
 in vec3 v_lightCol;

@@ -30,7 +30,7 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 public class CatalogSelectionWindow extends GenericDialog {
 
     private DatasetsWidget dw;
-    private String notice;
+    private final String notice;
 
     public CatalogSelectionWindow(Stage stage, Skin skin){
         this(stage, skin, null);
@@ -60,14 +60,14 @@ public class CatalogSelectionWindow extends GenericDialog {
 
         Cell<Actor> cell = content.add((Actor) null);
 
-        dw = new DatasetsWidget(skin);
-        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
+        dw = new DatasetsWidget(stage, skin);
+        dw.reloadLocalCatalogs();
 
         cell.clearActor();
-        cell.space(3f * GlobalConf.UI_SCALE_FACTOR);
+        cell.space(4.8f);
         cell.padTop(pad5);
         cell.padLeft(pad20).padRight(pad20);
-        cell.setActor(dw.buildDatasetsWidget(catalogFiles));
+        cell.setActor(dw.buildDatasetsWidget());
 
     }
 

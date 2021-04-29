@@ -6,6 +6,7 @@
 package gaiasky.screenshot;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
@@ -19,6 +20,7 @@ import gaiasky.render.IPostProcessor.RenderType;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.ImageFormat;
+import gaiasky.util.GlobalResources;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,7 +53,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     public IFileImageRenderer frameRenderer, screenshotRenderer;
-    private ScreenshotCmd screenshot;
+    private final ScreenshotCmd screenshot;
     private IGui renderGui;
 
     public ScreenshotsManager() {
@@ -72,9 +74,9 @@ public class ScreenshotsManager implements IObserver {
                 break;
             case redraw:
                 // Do not resize post processor
-                GaiaSky.instance.resizeImmediate(GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, false, true, false);
+                GaiaSky.instance.resizeImmediate(GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, false, true, false, true);
                 renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.frame), GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT, GlobalConf.frame.RENDER_FOLDER, GlobalConf.frame.RENDER_FILE_NAME, frameRenderer, GlobalConf.frame.FRAME_FORMAT, GlobalConf.frame.FRAME_QUALITY);
-                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false);
+                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false, true);
                 break;
             }
         }
@@ -90,9 +92,9 @@ public class ScreenshotsManager implements IObserver {
                 break;
             case redraw:
                 // Do not resize post processor
-                GaiaSky.instance.resizeImmediate(screenshot.width, screenshot.height, false, true, false);
+                GaiaSky.instance.resizeImmediate(screenshot.width, screenshot.height, false, true, false, true);
                 file = renderToImage(mr, mr.getCameraManager(), mr.getT(), mr.getPostProcessor().getPostProcessBean(RenderType.screenshot), screenshot.width, screenshot.height, screenshot.folder, filename, screenshotRenderer, GlobalConf.screenshot.SCREENSHOT_FORMAT, GlobalConf.screenshot.SCREENSHOT_QUALITY);
-                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false);
+                GaiaSky.instance.resizeImmediate(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), false, true, false, true);
                 break;
             }
             if (file != null) {
@@ -149,7 +151,6 @@ public class ScreenshotsManager implements IObserver {
             renderGui().render(width, height);
         }
 
-
         frameBuffer.getColorBufferTexture().getTextureData().getFormat();
         String res = renderer.saveScreenshot(folder, filename, width, height, false, type, quality);
 
@@ -195,8 +196,8 @@ public class ScreenshotsManager implements IObserver {
     private IGui renderGui() {
         // Lazy initialised
         if (renderGui == null) {
-            renderGui = new RenderGui();
-            renderGui.initialize(null);
+            renderGui = new RenderGui((Lwjgl3Graphics) Gdx.graphics, GlobalConf.program.UI_SCALE);
+            renderGui.initialize(null, GlobalResources.spriteBatch);
             renderGui.doneLoading(null);
         }
         return renderGui;

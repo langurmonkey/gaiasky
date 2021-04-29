@@ -9,8 +9,8 @@ import gaiasky.util.parse.Parser;
 
 public class FloatValidator extends CallbackValidator {
 
-    private float min;
-    private float max;
+    private final float min;
+    private final float max;
 
     public FloatValidator(float min, float max) {
         this(null, min, max);

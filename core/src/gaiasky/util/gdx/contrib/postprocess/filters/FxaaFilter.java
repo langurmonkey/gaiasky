@@ -29,7 +29,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * @author Toni Sagrista
  */
 public final class FxaaFilter extends Filter<FxaaFilter> {
-    private Vector2 viewportInverse;
+    private final Vector2 viewportInverse;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -37,8 +37,8 @@ public final class FxaaFilter extends Filter<FxaaFilter> {
         ViewportInverse("u_viewportInverse", 2);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

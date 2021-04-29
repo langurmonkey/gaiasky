@@ -49,7 +49,7 @@ public class DesktopConfInit extends ConfInit {
 
     private CommentedProperties p;
     private Properties vp;
-    private IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
+    private final IDateFormat df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
 
     public DesktopConfInit(boolean vr) {
         super();
@@ -134,6 +134,7 @@ public class DesktopConfInit extends ConfInit {
         PostprocessConf ppc = new PostprocessConf();
         Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Parser.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Parser.parseFloat(p.getProperty("postprocess.bloom.intensity"));
+        float POSTPROCESS_UNSHARPMASK_FACTOR = Parser.parseFloat(p.getProperty("postprocess.unsharpmask.factor", "0.3"));
         boolean POSTPROCESS_MOTION_BLUR = Parser.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
         boolean POSTPROCESS_LENS_FLARE = Parser.parseBoolean(p.getProperty("postprocess.lensflare"));
         boolean POSTPROCESS_LIGHT_SCATTERING = Parser.parseBoolean(p.getProperty("postprocess.lightscattering", "false"));
@@ -145,18 +146,18 @@ public class DesktopConfInit extends ConfInit {
         float POSTPROCESS_GAMMA = Parser.parseFloat(p.getProperty("postprocess.gamma", "1"));
         PostprocessConf.ToneMapping POSTPROCESS_TONEMAPPING_TYPE = PostprocessConf.ToneMapping.valueOf(p.getProperty("postprocess.tonemapping.type", "auto").toUpperCase());
         float POSTPROCESS_EXPOSURE = Parser.parseFloat(p.getProperty("postprocess.exposure", "0"));
-        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
+        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_UNSHARPMASK_FACTOR, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
 
         /** RUNTIME CONF **/
         RuntimeConf rc = new RuntimeConf();
-        rc.initialize(true, false, false, true, false, 20, false, false);
+        rc.initialize(true, false, false, true, false, false, false);
 
         /** DATA CONF **/
         DataConf dc = new DataConf();
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
-            DATA_LOCATION = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");;
+            DATA_LOCATION = SysUtils.getLocalDataDir().toAbsolutePath().toString().replaceAll("\\\\", "/");
 
         String CATALOG_JSON_FILE_SEQUENCE = p.getProperty("data.json.catalog", "");
         Array<String> CATALOG_JSON_FILES = new Array<>();
@@ -168,15 +169,9 @@ public class DesktopConfInit extends ConfInit {
         boolean REAL_GAIA_ATTITUDE = Parser.parseBoolean(p.getProperty("data.attitude.real"));
         boolean HIGH_ACCURACY_POSITIONS = Parser.parseBoolean(p.getProperty("data.highaccuracy.positions", "false"));
 
-        float LIMIT_MAG_LOAD;
-        if (p.getProperty("data.limit.mag") != null && !p.getProperty("data.limit.mag").isEmpty()) {
-            LIMIT_MAG_LOAD = Parser.parseFloat(p.getProperty("data.limit.mag"));
-        } else {
-            LIMIT_MAG_LOAD = Float.MAX_VALUE;
-        }
         String SKYBOX_LOCATION = p.getProperty("data.skybox.location", "data/tex/skybox/stars/");
 
-        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, LIMIT_MAG_LOAD, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
+        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
 
         /** PROGRAM CONF **/
         ProgramConf prc = new ProgramConf();
@@ -194,8 +189,9 @@ public class DesktopConfInit extends ConfInit {
         String DATA_DESCRIPTOR_URL = p.getProperty("program.url.data.descriptor");
         String MIRROR_URL = p.getProperty("program.url.data.mirror");
         String UI_THEME = p.getProperty("program.ui.theme");
-        // Update scale factor according to theme - for HiDPI screens
-        GlobalConf.updateScaleFactor(UI_THEME.endsWith("x2") ? 1.6f : 1f);
+        float externalUIScale = Parser.parseFloat(p.getProperty("program.ui.scale", "1.0"));
+        float UI_SCALE = MathUtilsd.lint(externalUIScale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+
         String SCRIPT_LOCATION = p.getProperty("program.scriptlocation").isEmpty() ? System.getProperty("user.dir") + File.separatorChar + "scripts" : p.getProperty("program.scriptlocation");
         SCRIPT_LOCATION = SCRIPT_LOCATION.replaceAll("\\\\", "/");
         int REST_PORT = Parser.parseInt(p.getProperty("program.restport", "-1"));
@@ -209,9 +205,6 @@ public class DesktopConfInit extends ConfInit {
         float PLANETARIUM_ANGLE = Parser.parseFloat(p.getProperty("program.planetarium.angle", "50.0"));
         boolean DISPLAY_HUD = Parser.parseBoolean(p.getProperty("program.display.hud", "false"));
         boolean DISPLAY_POINTER_COORDS = Parser.parseBoolean(p.getProperty("program.pointer.coords.display", "true"));
-        String catChoos = p.getProperty("program.catalog.chooser", "default");
-        if(catChoos.equalsIgnoreCase("true") || catChoos.equalsIgnoreCase("false"))
-            catChoos = "default";
         boolean DISPLAY_MINIMAP = Parser.parseBoolean(p.getProperty("program.display.minimap", "true"));
         float MINIMAP_SIZE = MathUtilsd.clamp(Parser.parseFloat(p.getProperty("program.minimap.size", "220.0")), Constants.MIN_MINIMAP_SIZE, Constants.MAX_MINIMAP_SIZE);
         boolean NET_MASTER = Parser.parseBoolean(p.getProperty("program.net.master", "false"));
@@ -234,6 +227,11 @@ public class DesktopConfInit extends ConfInit {
         OriginType RECURSIVE_GRID_ORIGIN = OriginType.valueOf(p.getProperty("program.recursivegrid.origin", "focus").toUpperCase());
         boolean RECURSIVE_GRID_ORIGIN_LINES = Parser.parseBoolean(p.getProperty("program.recursivegrid.origin.lines", "true"));
 
+        // Safe graphics mode
+        boolean SAFE_GRAPHICS_MODE = Parser.parseBoolean(p.getProperty("program.safe.graphics.mode", "false"));
+        // Show hidden
+        boolean FILE_CHOOSER_SHOW_HIDDEN = Parser.parseBoolean(p.getProperty("program.filechooser.showhidden", "false"));
+
         LinkedList<String> NET_MASTER_SLAVES = null;
         if (NET_MASTER) {
             NET_MASTER_SLAVES = new LinkedList<>();
@@ -243,7 +241,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL);
+        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, UI_SCALE, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE, FILE_CHOOSER_SHOW_HIDDEN);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -416,14 +414,14 @@ public class DesktopConfInit extends ConfInit {
     }
 
     private int getValidWidth() {
-        int w = GaiaSky.graphics.getWidth();
+        int w = GaiaSky.graphics != null ? GaiaSky.graphics.getWidth() : 0;
         if (w <= 0)
             return 1280;
         return w;
     }
 
     private int getValidHeight() {
-        int h = GaiaSky.graphics.getHeight();
+        int h = GaiaSky.graphics != null ? GaiaSky.graphics.getHeight() : 0;
         if (h <= 0)
             return 720;
         return h;
@@ -447,6 +445,7 @@ public class DesktopConfInit extends ConfInit {
         /** POSTPROCESS **/
         p.setProperty("postprocess.antialiasing", Integer.toString(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.getAACode()));
         p.setProperty("postprocess.bloom.intensity", Float.toString(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY));
+        p.setProperty("postprocess.unsharpmask.factor", Float.toString(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR));
         p.setProperty("postprocess.motionblur", GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR ? "1.0" : "0.0");
         p.setProperty("postprocess.lensflare", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE));
         p.setProperty("postprocess.lightscattering", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING));
@@ -478,17 +477,18 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("data.location", GlobalConf.data.DATA_LOCATION);
         p.setProperty("data.json.catalog", TextUtils.concatenate(File.pathSeparator, GlobalConf.data.CATALOG_JSON_FILES));
         p.setProperty("data.json.objects", GlobalConf.data.OBJECTS_JSON_FILES);
-        p.setProperty("data.limit.mag", Float.toString(GlobalConf.data.LIMIT_MAG_LOAD));
         p.setProperty("data.attitude.real", Boolean.toString(GlobalConf.data.REAL_GAIA_ATTITUDE));
         p.setProperty("data.highaccuracy.positions", Boolean.toString(GlobalConf.data.HIGH_ACCURACY_POSITIONS));
         p.setProperty("data.skybox.location", GlobalConf.data.SKYBOX_LOCATION);
 
         /** SCREEN **/
-        p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : getValidWidth()));
-        p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : getValidHeight()));
-        p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : getValidWidth()));
-        p.setProperty("graphics.screen.fullscreen.height", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_HEIGHT : getValidHeight()));
-        p.setProperty("graphics.screen.fullscreen", Boolean.toString(Gdx.graphics.isFullscreen()));
+        if (Gdx.graphics != null) {
+            p.setProperty("graphics.screen.width", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_WIDTH : getValidWidth()));
+            p.setProperty("graphics.screen.height", Integer.toString(Gdx.graphics.isFullscreen() ? GlobalConf.screen.SCREEN_HEIGHT : getValidHeight()));
+            p.setProperty("graphics.screen.fullscreen.width", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_WIDTH : getValidWidth()));
+            p.setProperty("graphics.screen.fullscreen.height", Integer.toString(!Gdx.graphics.isFullscreen() ? GlobalConf.screen.FULLSCREEN_HEIGHT : getValidHeight()));
+            p.setProperty("graphics.screen.fullscreen", Boolean.toString(Gdx.graphics.isFullscreen()));
+        }
         p.setProperty("graphics.screen.resizable", Boolean.toString(GlobalConf.screen.RESIZABLE));
         p.setProperty("graphics.screen.vsync", Boolean.toString(GlobalConf.screen.VSYNC));
         p.setProperty("graphics.limit.fps", Double.toString(GlobalConf.screen.LIMIT_FPS));
@@ -510,6 +510,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.url.data.descriptor", GlobalConf.program.DATA_DESCRIPTOR_URL);
         p.setProperty("program.url.data.mirror", GlobalConf.program.DATA_MIRROR_URL);
         p.setProperty("program.ui.theme", GlobalConf.program.UI_THEME);
+        p.setProperty("program.ui.scale", Float.toString(MathUtilsd.lint(GlobalConf.program.UI_SCALE, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX)));
         p.setProperty("program.exit.confirmation", Boolean.toString(GlobalConf.program.EXIT_CONFIRMATION));
         p.setProperty("program.scriptlocation", GlobalConf.program.SCRIPT_LOCATION);
         p.setProperty("program.restport", Integer.toString(GlobalConf.program.REST_PORT));
@@ -524,8 +525,14 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("program.net.slave.yaw", Float.toString(GlobalConf.program.NET_SLAVE_YAW));
         p.setProperty("program.net.slave.pitch", Float.toString(GlobalConf.program.NET_SLAVE_PITCH));
         p.setProperty("program.net.slave.roll", Float.toString(GlobalConf.program.NET_SLAVE_ROLL));
+        p.setProperty("program.filechooser.showhidden", Boolean.toString(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN));
+        // Persist last location if file chooser
         if (GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty())
             p.setProperty("program.last.filesystem.location", GlobalConf.program.LAST_OPEN_LOCATION);
+        // Only persist if flag is down, otherwise it has been set via CLI argument and must not be persisted
+        if (!GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG)
+            p.setProperty("program.safe.graphics.mode", Boolean.toString(GlobalConf.program.SAFE_GRAPHICS_MODE));
+
 
         /** SCENE **/
         p.setProperty("scene.object.startup", GlobalConf.scene.STARTUP_OBJECT);
@@ -615,7 +622,7 @@ public class DesktopConfInit extends ConfInit {
     private String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
         Path userFolder = SysUtils.getConfigDir();
-        Path userFolderConfFile =userFolder.resolve(getConfigFileName(vr));
+        Path userFolderConfFile = userFolder.resolve(getConfigFileName(vr));
 
         if (ow || !Files.exists(userFolderConfFile)) {
             // Copy file

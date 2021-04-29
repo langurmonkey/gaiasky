@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -16,7 +17,7 @@ import java.util.Map;
 class HipNamesTest {
 
     public static void main(String[] args) throws UnsupportedEncodingException {
-        final PrintStream out = new PrintStream(System.out, true, "UTF-8");
+        final PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         HipNames hn = new HipNames();
         Path folder = Paths.get(System.getenv("PROJECTS"), "/gaiasky/assets/assets-bak/data/hipnames/");
 

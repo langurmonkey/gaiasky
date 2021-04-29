@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -39,7 +40,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      * @return The width of the content.
      */
     public static float getContentWidth() {
-        return 190f * GlobalConf.UI_SCALE_FACTOR;
+        return 352f;
     }
 
     /**
@@ -84,6 +85,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     }
 
     public void initialize() {
+        int maxTitleChars = 24;
+
         /** Global layout **/
         guiLayout = new Table();
         guiLayout.pad(0);
@@ -237,7 +240,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         Table buttonsTable;
         /** BUTTONS **/
-        float bw = 30f * GlobalConf.UI_SCALE_FACTOR, bh = 30f * GlobalConf.UI_SCALE_FACTOR;
+        float bw = 48f, bh = 48f;
         KeyBindings kb = KeyBindings.instance;
         Image icon = new Image(skin.getDrawable("map-icon"));
         map = new OwnTextIconButton("", icon, skin, "toggle");
@@ -317,16 +320,16 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         /** ADD GROUPS TO VERTICAL LAYOUT **/
 
-        int padBottom = Math.round(10 * GlobalConf.UI_SCALE_FACTOR);
-        int padSides = Math.round(5 * GlobalConf.UI_SCALE_FACTOR);
-        int padSeparator = Math.round(2 * GlobalConf.UI_SCALE_FACTOR);
+        int padBottom = Math.round(16f);
+        int padSides = Math.round(8f);
+        int padSeparator = Math.round(3.2f);
 
         guiLayout.padTop(padSides);
 
         int size = mainActors.size();
         for (int i = 0; i < size; i++) {
             Actor actor = mainActors.get(i);
-            guiLayout.add(actor).prefWidth(185f * GlobalConf.UI_SCALE_FACTOR).left().padBottom(padBottom).padLeft(padSides);
+            guiLayout.add(actor).prefWidth(188f).left().padBottom(padBottom).padLeft(padSides);
             if (i < size - 1) {
                 // Not last
                 guiLayout.row();
@@ -342,7 +345,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         windowScroll.setOverscroll(false, false);
         windowScroll.setSmoothScrolling(true);
         windowScroll.pack();
-        //windowScroll.setWidth(guiLayout.getWidth() + windowScroll.getStyle().vScroll.getMinWidth());
+        windowScroll.setWidth(guiLayout.getWidth() + windowScroll.getStyle().vScroll.getMinWidth());
 
         mainVertical = new VerticalGroup();
         mainVertical.space(padSides);
@@ -369,13 +372,14 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         // Calculate new size
         guiLayout.pack();
         if (windowScroll != null) {
-            windowScroll.setHeight(Math.min(guiLayout.getHeight(), Gdx.graphics.getHeight() - 120));
+            float unitsPerPixel = ((ScreenViewport)ui.getViewport()).getUnitsPerPixel();
+            windowScroll.setHeight(Math.min(guiLayout.getHeight(), ui.getHeight() - 120 * unitsPerPixel));
             windowScroll.pack();
 
-            mainVertical.setHeight(windowScroll.getHeight() + 30);
+            mainVertical.setHeight(windowScroll.getHeight() + 30 * unitsPerPixel);
             mainVertical.pack();
 
-            setHeight(windowScroll.getHeight() + 40);
+            setHeight(windowScroll.getHeight() + 40 * unitsPerPixel);
         }
         pack();
         validate();
@@ -396,85 +400,85 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case TIME_STATE_CMD:
-                // Pause has been toggled, update playstop button only if this does
-                // not come from this interface
-                if (!(Boolean) data[1]) {
-                    playstop.setCheckedNoFire((Boolean) data[0]);
-                }
-                break;
-            case GUI_SCROLL_POSITION_CMD:
-                this.windowScroll.setScrollY((float) data[0]);
-                break;
-            case GUI_FOLD_CMD:
-                boolean collapse;
-                if (data.length >= 1) {
-                    collapse = (boolean) data[0];
-                } else {
-                    // Toggle
-                    collapse = !isCollapsed();
-                }
-                if (collapse) {
-                    collapse();
-                } else {
-                    expand();
-                }
-                break;
-            case GUI_MOVE_CMD:
-                float x = (float) data[0];
-                float y = (float) data[1];
-                float width = Gdx.graphics.getWidth();
-                float height = Gdx.graphics.getHeight();
-                float windowWidth = getWidth();
-                float windowHeight = getHeight();
+        case TIME_STATE_CMD:
+            // Pause has been toggled, update playstop button only if this does
+            // not come from this interface
+            if (!(Boolean) data[1]) {
+                playstop.setCheckedNoFire((Boolean) data[0]);
+            }
+            break;
+        case GUI_SCROLL_POSITION_CMD:
+            this.windowScroll.setScrollY((float) data[0]);
+            break;
+        case GUI_FOLD_CMD:
+            boolean collapse;
+            if (data.length >= 1) {
+                collapse = (boolean) data[0];
+            } else {
+                // Toggle
+                collapse = !isCollapsed();
+            }
+            if (collapse) {
+                collapse();
+            } else {
+                expand();
+            }
+            break;
+        case GUI_MOVE_CMD:
+            float x = (float) data[0];
+            float y = (float) data[1];
+            float width = Gdx.graphics.getWidth();
+            float height = Gdx.graphics.getHeight();
+            float windowWidth = getWidth();
+            float windowHeight = getHeight();
 
-                x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
-                y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
+            x = MathUtilsd.clamp(x * width, 0, width - windowWidth);
+            y = MathUtilsd.clamp(y * height - windowHeight, 0, height - windowHeight);
 
-                setPosition(Math.round(x), Math.round(y));
+            setPosition(Math.round(x), Math.round(y));
 
-                break;
-            case RECALCULATE_OPTIONS_SIZE:
-                recalculateSize();
-                break;
-            case EXPAND_PANE_CMD:
-                String paneName = (String) data[0];
-                CollapsiblePane pane = panes.get(paneName);
-                pane.expandPane();
-                break;
-            case COLLAPSE_PANE_CMD:
-                paneName = (String) data[0];
-                pane = panes.get(paneName);
-                pane.collapsePane();
-                break;
-            case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
-                paneName = (String) data[0];
-                pane = panes.get(paneName);
-                pane.togglePane();
-                break;
-            case SHOW_MINIMAP_ACTION:
-                boolean show = (Boolean) data[0];
-                boolean ui = (Boolean) data[1];
-                if (!ui) {
-                    map.setProgrammaticChangeEvents(false);
-                    map.setChecked(show);
-                    map.setProgrammaticChangeEvents(true);
-                }
-                break;
-            case TOGGLE_MINIMAP:
+            break;
+        case RECALCULATE_OPTIONS_SIZE:
+            recalculateSize();
+            break;
+        case EXPAND_PANE_CMD:
+            String paneName = (String) data[0];
+            CollapsiblePane pane = panes.get(paneName);
+            pane.expandPane();
+            break;
+        case COLLAPSE_PANE_CMD:
+            paneName = (String) data[0];
+            pane = panes.get(paneName);
+            pane.collapsePane();
+            break;
+        case TOGGLE_EXPANDCOLLAPSE_PANE_CMD:
+            paneName = (String) data[0];
+            pane = panes.get(paneName);
+            pane.togglePane();
+            break;
+        case SHOW_MINIMAP_ACTION:
+            boolean show = (Boolean) data[0];
+            boolean ui = (Boolean) data[1];
+            if (!ui) {
                 map.setProgrammaticChangeEvents(false);
-                map.setChecked(!map.isChecked());
+                map.setChecked(show);
                 map.setProgrammaticChangeEvents(true);
-                break;
-            case RECORD_CAMERA_CMD:
-                boolean state = (Boolean) data[0];
-                ui = (Boolean) data[2];
-                if(!ui){
-                    recCamera.setCheckedNoFire(state);
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        case TOGGLE_MINIMAP:
+            map.setProgrammaticChangeEvents(false);
+            map.setChecked(!map.isChecked());
+            map.setProgrammaticChangeEvents(true);
+            break;
+        case RECORD_CAMERA_CMD:
+            boolean state = (Boolean) data[0];
+            ui = (Boolean) data[2];
+            if (!ui) {
+                recCamera.setCheckedNoFire(state);
+            }
+            break;
+        default:
+            break;
         }
 
     }

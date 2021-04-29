@@ -111,6 +111,12 @@ public class Constants {
     public static double U_TO_Ro = 1d / Ro_TO_U;
 
     /**
+     * Bytes to MB
+     */
+    public static final double MB_TO_BYTE = 1000 * 1000;
+    public static final double BYTE_TO_MB = 1d/MB_TO_BYTE;
+
+    /**
      * Logarithmic depth buffer constant. Controls the resolution close to the camera
      */
     public static double CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
@@ -200,10 +206,13 @@ public class Constants {
     /** Maximum star brightness **/
     public static final float MAX_STAR_BRIGHTNESS = 8f;
 
+    public static final float MIN_UNSHARP_MASK_FACTOR = 0f;
+    public static final float MAX_UNSHARP_MASK_FACTOR = 3f;
+
     /** Minimum star brightness power **/
     public static final float MIN_STAR_BRIGHTNESS_POW = 0.1f;
     /** Maximum star brightness power **/
-    public static final float MAX_STAR_BRIGHTNESS_POW = 2.0f;
+    public static final float MAX_STAR_BRIGHTNESS_POW = 1.2f;
 
     /** Minimum star pixel size **/
     public static final float MIN_STAR_POINT_SIZE = 0.1f;
@@ -285,6 +294,10 @@ public class Constants {
     public final static float MIN_AXIS_SENSITIVITY = 0.1f;
     public final static float MAX_AXIS_SENSITIVITY = 10f;
 
+    public static final float UI_SCALE_INTERNAL_MIN = 0.4f;
+    public static final float UI_SCALE_INTERNAL_MAX = 1.7f;
+    public static final float UI_SCALE_MIN = 0.75f;
+    public static final float UI_SCALE_MAX = 3.0f;
 
     // Max time for VSOP87 algorithms
     public static final long MAX_VSOP_TIME_MS = 20000l * (long) Nature.Y_TO_MS;
@@ -292,15 +305,17 @@ public class Constants {
     // Min time for VSOP87 algorithms
     public static final long MIN_VSOP_TIME_MS = -MAX_VSOP_TIME_MS;
 
+    // Warp steps per side (positive and negative)
+    public static final int WARP_STEPS = 45;
     // Maximum time warp factor
-    public static final double MAX_WARP = 35184372088832d;
+    public static final double MAX_WARP = Math.pow(2, WARP_STEPS);
     // Minimum time warp factor
     public static final double MIN_WARP = -MAX_WARP;
 
     // Max dataset highlight size factor
-    public static final float MAX_DATASET_SIZE_FACTOR = 5.0f;
+    public static final float MAX_DATASET_SIZE_FACTOR = 25.0f;
     // Min dataset highlight size factor
-    public static final float MIN_DATASET_SIZE_FACTOR = 0.1f;
+    public static final float MIN_DATASET_SIZE_FACTOR = 0.01f;
 
     // Maximum minimap size (px)
     public static final float MAX_MINIMAP_SIZE = 350f;
@@ -313,6 +328,16 @@ public class Constants {
 
     // Asterisks must be substituted becasue windows does not allow them in paths
     public static final String STAR_SUBSTITUTE = "%#QUAL#%";
+
+    // URLS for external queries
+    public static final String URL_GAIA_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiaedr3.gaia_source+WHERE+source_id=";
+    public static final String URL_HIP_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+extcat.hipparcos+WHERE+hip=";
+    public static final String URL_GAIA_WEB_SOURCE = "https://gaia.ari.uni-heidelberg.de/singlesource.html#id=";
+    public static final String URL_SIMBAD = "https://simbad.u-strasbg.fr/simbad/sim-id?Ident=";
+    // TODO Use Wikipedia API to get localized content to the current language
+    public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
+    public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
+    public static final String URL_WIKI_API_MOBILEHTML = "https://en.wikipedia.org/api/rest_v1/page/mobile-html/";
 
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87

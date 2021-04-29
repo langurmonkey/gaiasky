@@ -6,9 +6,9 @@
 package gaiasky.data.octreegen.generator;
 
 import gaiasky.data.octreegen.StarBrightnessComparator;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.ArrayList;
@@ -17,9 +17,9 @@ import java.util.List;
 
 public class BrightestStarsSimple implements IAggregationAlgorithm {
     /** Maximum number of objects in the densest node of a level **/
-    private int MAX_PART;
+    private final int MAX_PART;
 
-    private Comparator<ParticleBean> comp;
+    private final Comparator<IParticleRecord> comp;
 
     /**
      * Constructor using fields
@@ -33,19 +33,19 @@ public class BrightestStarsSimple implements IAggregationAlgorithm {
     }
 
     @Override
-    public boolean sample(List<ParticleBean> inputStars, OctreeNode octant, float percentage) {
+    public boolean sample(List<IParticleRecord> inputStars, OctreeNode octant, float percentage) {
         StarGroup sg = new StarGroup();
-        List<ParticleBean> data = new ArrayList<>();
+        List<IParticleRecord> data = new ArrayList<>();
 
         int nInput = inputStars.size();
         inputStars.sort(comp);
 
         int added = 0;
         while (added < MAX_PART && added < nInput) {
-            StarBean sb = (StarBean) inputStars.get(added);
-            if (sb.octant == null) {
+            IParticleRecord sb = inputStars.get(added);
+            if (sb.octant() == null) {
                 data.add(sb);
-                sb.octant = octant;
+                sb.setOctant(octant);
                 added++;
             }
         }

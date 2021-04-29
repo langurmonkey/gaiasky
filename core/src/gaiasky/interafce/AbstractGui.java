@@ -5,17 +5,18 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * Provides general methods and attributes that all GUIs should have
@@ -24,6 +25,10 @@ import gaiasky.scenegraph.ISceneGraph;
  */
 public abstract class AbstractGui implements IObserver, IGui {
 
+    /**
+     * Graphics instance
+     */
+    protected Lwjgl3Graphics graphics;
     /**
      * The user interface stage
      */
@@ -52,10 +57,18 @@ public abstract class AbstractGui implements IObserver, IGui {
      */
     protected int hoffset;
 
+    /**
+     * Units per pixel, 1/uiScale
+     * This only works with a screen viewport
+     */
+    protected float unitsPerPixel = 1;
+
     /** Lock for sync **/
     protected Object lock;
 
-    public AbstractGui() {
+    public AbstractGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        this.graphics = graphics;
+        this.unitsPerPixel = unitsPerPixel;
         lock = new Object();
         name = this.getClass().getSimpleName();
     }
@@ -129,11 +142,6 @@ public abstract class AbstractGui implements IObserver, IGui {
     }
 
     @Override
-    public void setSceneGraph(ISceneGraph sg) {
-        // Empty by default
-    }
-
-    @Override
     public void notify(final Events event, final Object... data) {
         // Empty by default
     }
@@ -151,5 +159,16 @@ public abstract class AbstractGui implements IObserver, IGui {
     @Override
     public boolean mustDraw() {
         return true;
+    }
+
+    public boolean updateUnitsPerPixel(float upp){
+        this.unitsPerPixel = upp;
+        if(ui.getViewport() instanceof ScreenViewport){
+            ScreenViewport svp = (ScreenViewport) ui.getViewport();
+            svp.setUnitsPerPixel(this.unitsPerPixel);
+            svp.update(graphics.getWidth(), graphics.getHeight(), true);
+            return true;
+        }
+        return false;
     }
 }

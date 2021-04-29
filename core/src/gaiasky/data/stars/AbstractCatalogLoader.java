@@ -13,6 +13,7 @@ import uk.ac.starlink.util.DataSource;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract catalog loader with the transformation from spherical to cartesian coordinates
@@ -31,6 +32,8 @@ public abstract class AbstractCatalogLoader {
     protected String name;
     /** Description **/
     protected String description;
+    /** Parameters (size, nobjets, etc.) **/
+    protected Map<String, Object> params;
 
     // Default parent name
     protected String parentName;
@@ -90,5 +93,9 @@ public abstract class AbstractCatalogLoader {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
     }
 }

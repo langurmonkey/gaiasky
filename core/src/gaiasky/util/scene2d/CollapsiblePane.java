@@ -8,12 +8,13 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.TextUtils;
 
 /**
  * A collapsible pane with a detach-to-window button.
@@ -59,10 +60,24 @@ public class CollapsiblePane extends Table {
         this.labelText = labelText;
         this.content = content;
         this.skin = skin;
-        this.space = 4 * GlobalConf.UI_SCALE_FACTOR;
+        this.space = 6.4f;
         this.collapseSpeed = 1000;
 
-        Label mainLabel = new Label(labelText, skin, labelStyle);
+        OwnLabel mainLabel = new OwnLabel(labelText, skin, labelStyle);
+        float lw = mainLabel.getWidth();
+        LabelStyle ls = skin.get(labelStyle, LabelStyle.class);
+
+        float mwidth = width * 0.8f;
+        if (lw > mwidth) {
+            com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout(); //dont do this every frame! Store it as member
+            for (int chars = labelText.length() - 1; chars > 0; chars--) {
+                layout.setText(ls.font, TextUtils.capString(labelText, chars));
+                if (layout.width <= mwidth) {
+                    mainLabel.setText(TextUtils.capString(labelText, chars));
+                    break;
+                }
+            }
+        }
 
         // Expand icon
         expandIcon = new OwnImageButton(skin, expandButtonStyle);
@@ -101,7 +116,7 @@ public class CollapsiblePane extends Table {
         Table headerTable = new Table(skin);
 
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
+        titleGroup.space(6.4f);
         titleGroup.addActor(expandIcon);
         titleGroup.addActor(mainLabel);
         if (shortcut != null && !shortcut.isEmpty())
@@ -122,8 +137,8 @@ public class CollapsiblePane extends Table {
         //headerGroupRight.addActor(expandIcon);
         headerGroupRight.addActor(detachIcon);
 
-        headerTable.add(titleGroup).left().padRight(4f * GlobalConf.UI_SCALE_FACTOR);
-        headerTable.add(headerGroupLeft).left().pad(4f * GlobalConf.UI_SCALE_FACTOR);
+        headerTable.add(titleGroup).left().padRight(6.4f);
+        headerTable.add(headerGroupLeft).left().pad(6.4f);
         headerTable.add().expandX();
         headerTable.add(headerGroupRight).right();
 
@@ -194,7 +209,7 @@ public class CollapsiblePane extends Table {
      * @param stage     The main stage.
      * @param labelText The text of the label.
      * @param content   The content actor.
-     * @param width             The preferred width of this pane.
+     * @param width     The preferred width of this pane.
      * @param skin      The skin to use.
      * @param shortcut  The keyboard shortcut to use.
      * @param topIcons  List of top icons that will be added between the label and the
@@ -211,7 +226,7 @@ public class CollapsiblePane extends Table {
         OwnScrollPane contentScroll = new OwnScrollPane(content, skin, "minimalist-nobg");
         contentScroll.setSize(content.getWidth(), content.getHeight() * 1.1f);
 
-        window.add(contentScroll).pad(5f * GlobalConf.UI_SCALE_FACTOR).row();
+        window.add(contentScroll).pad(8f).row();
 
         /** Close button **/
         OwnTextButton close = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
@@ -230,10 +245,10 @@ public class CollapsiblePane extends Table {
             return false;
         });
         Container<Button> closeContainer = new Container<>(close);
-        close.setWidth(70f * GlobalConf.UI_SCALE_FACTOR);
+        close.setWidth(112f);
         closeContainer.align(Align.right);
 
-        window.add(closeContainer).pad(5f * GlobalConf.UI_SCALE_FACTOR).bottom().right();
+        window.add(closeContainer).pad(8f).bottom().right();
         window.getTitleTable().align(Align.left);
         window.align(Align.left);
         window.pack();

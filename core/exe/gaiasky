@@ -49,12 +49,16 @@ JAVA=$(printf %q "$JAVA")
 #OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
 
 # Memory
-OPTS="$OPTS -Xms2g -Xmx4g"
+OPTS="$OPTS -Xms2g -Xmx6g"
 
 # Parallel GC 
 #OPTS="$OPTS -XX:+UseParallelGC"
 # G1 GC
-OPTS="$OPTS -XX:+UseG1GC"
+#OPTS="$OPTS -XX:+UseG1GC"
+# Shenandoah GC
+OPTS="$OPTS -XX:+UseShenandoahGC"
+# ZGC - experimental
+#OPTS="$OPTS -XX:+UseZGC"
 
 # GC debug only
 #OPTS="$OPTS -verbose:gc -XX:+PrintGCDetails"

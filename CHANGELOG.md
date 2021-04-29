@@ -1,7 +1,263 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.1...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.3...HEAD)
 
+
+<a name="3.0.3"></a>
+## [3.0.3](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.2) (2021-02-25)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.2...3.0.3)
+
+### Bug Fixes
+- controller image fetch crash 
+- getDistanceTo() with star group object, goToObject() with no angle 
+- setSimulationTime() crash 
+- move wikiname to celestial body, remove unused parameters, prepare star to be loaded directly 
+- use proper values for depth test 
+- post-process bugs (sorting, etc.) 
+- check the wrong catalog type 'catalog-lod' 
+- use local descriptors when server descriptor fails to recognize a catalog 
+- button sizes adapt to content (fixes [#353](https://gitlab.com/langurmonkey/gaiasky/issues/353)) [#353](https://gitlab.com/langurmonkey/gaiasky/issues/353) 
+- bug introduced in 40b99a2 - star cores not applied alpha - fixes [#352](https://gitlab.com/langurmonkey/gaiasky/issues/352) [#352](https://gitlab.com/langurmonkey/gaiasky/issues/352) 
+- move temp folder into data folder - partially fixes [#350](https://gitlab.com/langurmonkey/gaiasky/issues/350) [#350](https://gitlab.com/langurmonkey/gaiasky/issues/350) 
+- local catalog numbers work when no internet connection available 
+- update jamepad and gdx-controllers versions due to macOS crash 
+
+### Build System
+- exclude appimage files from install media 
+- remove branding from installer strings 
+- move to gdx-controllers 2.1.00, macos tests pending 
+- genearte md5 and sha256 of appimage package 
+- add appimage build 
+- update docs repository pointer 
+- update bundled jre version to 15.0.2 
+- complete move to Shenandonah GC 
+- use Shenandonah GC instead of G1, minor fixes 
+- upgrade to libgdx 1.9.14 
+
+### Features
+- improvements to catalog generation (hashmap to treemap, rename params, accept multiple string ids per column, etc.) 
+- add search suggestions to search dialog - fixes [#351](https://gitlab.com/langurmonkey/gaiasky/issues/351) [#351](https://gitlab.com/langurmonkey/gaiasky/issues/351) 
+- remember 'show hidden' preference in file chooser 
+
+### Performance Improvements
+- remove runtime limiting magnitude 
+
+### Style
+- cosmetic changes to octree generator 
+- renamed some variables, add some extra code comments 
+- tweak some parameters in star renderer 
+
+
+<a name="3.0.2"></a>
+## [3.0.2](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.1) (2021-01-21)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.1...3.0.2)
+
+### Bug Fixes
+- stuttering updating counts top-down in large octrees, now the counts are updated locally, bottom-up, when octants are loaded/unloaded 
+- RAM units in crash report, add indentation 
+- default proper motion factor and length values 
+- 'App not responding' message on win10 - fix by upgrading to gdx-controllers 2.0.0, plus some other goodies 
+- remove useless network checker thread, fix thumbnail URL crash on win10 
+- minimizing screen crashes Gaia Sky on Win10. Fixes [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333), [#345](https://gitlab.com/langurmonkey/gaiasky/issues/345) [#333](https://gitlab.com/langurmonkey/gaiasky/issues/333) 
+- VR init failure actually prompts right error message 
+- properties files' encodings set to UTF-8. Fixes [#344](https://gitlab.com/langurmonkey/gaiasky/issues/344) [#344](https://gitlab.com/langurmonkey/gaiasky/issues/344) 
+- VR mode now accepts any window resize, backbuffer size used for everything internally 
+- BREAKING CHANGE API landOnObjectLocation() -> landAtObjectLocation() 
+- octreegen additional split accepts now coma and spaces 
+- use different sprite batch for VR UI with backbuffer size 
+- pan scaled with fov factor 
+- red-night theme disabled styles 
+- proper 'disabled' textures for buttons 
+- labels occlude objects behind, buffer writes disabled. 
+- download speed moving cancel button in dataset manager 
+- safemode flag used correctly, fix raymarching not being setup in safe mode 
+
+### Build System
+- auto-update offered through install4j, backup solution in-app still available when not launched using install4j 
+- remove sdl2gdx in favor of gdx-controllers:2.0.0 
+- exclude old `gdx-controllers` library 
+- add --parallelism parameter to 
+- fix script so that geodistances file is additional data instead of special argument 
+- fix helper script args 
+- update release instructions with flatpak, fix build script 
+
+### Code Refactoring
+- interface particle record to allow for multiple implementations 
+- binary providers are versioned, fix binary version 0/1 loading 
+- increase number of maps for octree gen 
+- modify default bloom settings (default intensity, passes, amount) 
+
+### Documentation
+- fix javadocs for binary format (1/n) 
+
+### Features
+- add warning when selecting more than one star catalog 
+- add white core to star shaders 
+- add T_eff to STIL-loaded catalogs 
+- add color conversion by Harre and Heller 
+- add output format version argument to octree generator 
+- support for  in catalog selector 
+- add versioning to binary catalog format. Create new, more compact version 
+- improve information of version line in welcome and loading screens 
+- add GL info to welcome screen 
+- new connection to wikipedia REST api to show content in a window 
+- add unsharp mask post-processing filter 
+- new checkbox textures, adjust window visuals 
+- add projection lines to star groups 
+- dataset selection dialog uses same structure as dataset manager 
+- time warp slider instead of buttons 
+- new fractional UI scaling from x0.7 to x2.0 
+- add regexp to some column names for STIL loader, add invalid names array 
+- add regexp to some column names for STIL loader, add invalid names array 
+- case-insensitive columns in STIL loader, enable FITS loading 
+
+### Performance Improvements
+- arrays of size not dependent on maxPart for octreegen 
+- remove boundingBox from octant, reduce memory token duplication 
+- replace extra attributes hashmap with objectdoublemap for RAM compactness 
+- do not write star name strings if they are the same as ID, velocity vectors represented with single-precision floats 
+- reduce main memory usage of stars by adjusting data types 
+- switch to unordered gdx Arrays when possible to minimize copy operations 
+- replace `java.util.ArrayList`s with Libgdx's `Array`s to minimize allocations 
+- index lists are of base types, use dst2 for distance sorting 
+- improve memory usage of extra star attributes and fix render system unnecessary `setUniform` calls 
+- reduce memory usage in particle groups -> no metadata array 
+
+### Style
+- fix missing coma in night-red theme json file 
+- update thread names, fix monitor objects, increase sg update time interval 
+
+<a name="3.0.1"></a>
+## [3.0.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.0) (2020-12-10)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.0.0...3.0.1)
+
+### Bug Fixes
+- show information dialog in case of OpenGL or java version problems 
+- disposing bookmarks manager without it being initialized 
+- update default screen size 
+- remove idle FPS and backbuffer configuration
+- file chooser allows selection when entering directories if in 'DIRECTORIES' mode 
+- update default max number of stars 
+- increase max heap space from 4 to 8 GB in all configurations 
+- 24-bit depth buffer, 8-bit stencil 
+- JSON pointer from DR2 to eDR3 
+
+### Build System
+- update bundled JRE version to 11.0.9+11 
+
+### Code Refactoring
+- all startup messages to I18N bundle, fix swing themes 
+
+### Documentation
+- update pointers to documentation 
+
+### Features
+- saner error reporting with new dialog 
+- add error dialog that works with OpenGL 2.0 and informs the user of insufficient OpenGL or Java versions 
+- add safe graphics mode CLI argument `--safemode`
+- dynamic resolution scaling - first implementation, deactivated 
+- add safe graphics mode, which does not use float buffers at all. It is activated by default if the context creation for 4.1 fails. It uses OpenGL 3.1. 
+- download manager is capable of resuming downloads 
+- special flag to enable OpenGL debug output 
+- enable GPU debug info with `--debug` flag 
+
+<a name="3.0.0"></a>
+## [3.0.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.1) (2020-12-02)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.3.1...3.0.0)
+
+### Bug Fixes
+- adjust default area line width 
+- star clusters visual appearance 
+- min star size scaled by resolution 
+- apply scale factor to milky way 
+- camera group bottom buttons aligned to center 
+- emulate 64-bit float with two 32-bit floats in shader to be able to extend time beyond +-5 Myr 
+- controller mappings not found on first startup. Fixes [#341](https://gitlab.com/langurmonkey/gaiasky/issues/341). [#341](https://gitlab.com/langurmonkey/gaiasky/issues/341) 
+- use Java2D instead of Toolkit to determine initial screen size 
+- data description update 
+- controller mappings looking for assets location if not found 
+- manpage gen 
+- smooth game camera view 
+- spacecraft mode fixes 
+- GUI registry check 
+- add timeout to sync behavior in dataset loading 
+- new default startup window size to accommodate welcome screen 
+- update default data desc pointers to version 3.0.0 
+- default fps limit value, aux vectors in recursive grid 
+- overwrite coordinate system matrix by recursive grid 
+- start some units over `XZ` plane to avoid conflicting with recursive grid 
+- gaiasky script defaults back to system java installation if nothing else is found 
+- octreegen empty hip x-match crash 
+- points in VertsObject with wrong uniform name - incorrect location 
+- do not round dialog position values 
+- blue, orange and red themes crashed 
+- controls scroll box resizing 
+- download data window sizings, update data desc 
+- regular color picker does not show dialog 
+- music player actually finds audio files 
+- size of keyboard shortcuts table in controls pane 
+- disable background models' depth test 
+- focused widgets in scroll panes capture all keyboard events 
+- actually send errors to `stderr` instead of `stdout` 
+- fix VR properties data pointer 
+- motion blur bug producing wrong results for models 
+- `touchUp` event on Link and LinkButton objects not working 
+- improve logging messages in case of index name conflicts 
+- update URL pointers after ARI CMS update 
+- graphics quality in log messages 
+
+### Build System
+- modify installer unpacking message 
+- ignore release candidates in changelog, update some defaults 
+- generate `sha256` in catalog-pack script 
+- macOS does not query screen size due to exception 
+- check OS when trying to use Linux commands 
+- remove music files from release, don't use OS-dependent system for controller mappings 
+- upgrade to Libgdx `1.9.12` 
+- update STIL library jar 
+- upgrade to Libgdx `1.9.11` 
+- update version and data pointer 
+
+### Code Refactoring
+- run code inspections, cleanup. Improve particle effects 
+- `begin()` and `end()` substituted with `bind()` 
+- remove unused or derived uniform definitions 
+- use `java.utils` collections whenever possible, Libgdx buggy since `1.9.11`
+- complete font update to more modern, spacey choices 
+- all regular UI fonts from Tahoma to Roboto regular 
+- use `system.out` with UTF-8 encoding, improve gen scripts 
+- remove ape, Gaia scan properties 
+- move RenderGroup to render package for consistency 
+
+### Features
+- add number of objects to download manager 
+- velocity scaling allows approaching stars slowly 
+- API call to set the maximum allowed time 
+- add arrow caps to polylines 
+- add progress bar to dataset loading, touch up some styles 
+- download helper accepts local files, reorganize catalogs 
+- new API call to get parameters from stars given its name or id 
+- add brightness power and reload defaults to visual settings 
+- improve loading tips subsystem with custom styles and arbitrary elements 
+- 3D fonts can be limited in solid angle size 
+- UI adjustments and tweaks 
+- new welcome screen reorganizes dataset management 
+- add complimentary color to inner recursive grid 
+- add projection lines on reference system plane, with distances 
+- first final version of recursive grid 
+- new recursive grid object 
+- catalog selection displayed when more than one Gaia catalog is selected 
+- add wavefront converter, update gradle version 
+- fix color picker 
+- camera speed-from-distance function rescaling 
+- first version of gamepad keyboard 
+- update eDR3 catalog descriptors 
+- controller UI to modify some properties using a gamepad 
+- add `--debug` flag for more info 
+- restructure loading GUI layout 
+- improve `--version` information 
+- add ASCII Gaia image to text ouptut
+- update data descriptor with new MW model 
 
 <a name="2.3.1"></a>
 ## [2.3.1](https://gitlab.com/langurmonkey/gaiasky/tree/2.3.0) (2020-07-08)
@@ -9,32 +265,31 @@
 
 ### Bug Fixes
 - shader lint function 
-- additional check for `http` to `https` redirects 
+- additional check for http->https redirects 
 
 ### Code Refactoring
-- update some URLs from `http` to `https`
+- update some URLs from http to https 
 
 ### Features
 - hot reload of galaxy models 
-
-
+    
 <a name="2.3.0"></a>
 ## [2.3.0](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.6) (2020-07-07)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.6...2.3.0)
 
 ### Bug Fixes
 - update name and source version number 
-- error in lib_math shader code 
+- error in lib_math shadier code 
 - remove default fade-out values in star groups, added to loading dialog 
 - interpolation limits in math shader library 
 - initial update not performed on fade node children if ct is off 
 - uncomment unhandled event debug info 
-- windows crash due to stars `*` not being accepted in paths 
+- windows crash due to stars '*' not being accepted in paths 
 - add notice concerning the selection of more than one Gaia catalog 
 - changing focus to different object in same particle group works 
 - default value for magnitude scale is 0, fix float validator range 
 - disable depth test for billboards 
-- inconsistencies with `STAR_MIN_OPACITY_CMD `
+- inconsistencies with STAR_MIN_OPACITY_CMD 
 - ensure non-empty field in search dialog 
 
 ### Build System
@@ -54,7 +309,7 @@
 - add package-info package documentation, update changelog 
 
 ### Features
-- update server to `HTTPS`
+- update server to HTTPS 
 - add call to set 'all visible' dataset property 
 - add 'invert X look axis' as well as Y 
 - axis power value and sensitivity in config window 
@@ -188,8 +443,8 @@
 
 
 <a name="2.2.5"></a>
-## [2.2.5](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4-1) (2020-03-04)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4-1...2.2.5)
+## [2.2.5](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4) (2020-03-04)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...2.2.5)
 
 ### Bug Fixes
 - some API calls crash when using double[] 
@@ -202,6 +457,8 @@
 - VRAM profiling crash for AMDGPUs [#326](https://gitlab.com/langurmonkey/gaiasky/issues/326) 
 - adapt star brightness in cubemap modes [#318](https://gitlab.com/langurmonkey/gaiasky/issues/318) 
 - reload default configuration file crash 
+- build script typo 
+- ambient light slider 
 
 ### Build System
 - fix versions of sdl2gdx and jsamp, refactor VMemInfo 
@@ -237,15 +494,6 @@
 
 API call setStarSize() now gets the star point size in
 pixels instead of a normalized value between 0 and 100.
-
-
-<a name="2.2.4-1"></a>
-## [2.2.4-1](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.4) (2020-01-23)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.4...2.2.4-1)
-
-### Bug Fixes
-- build script typo 
-- ambient light slider 
 
 
 <a name="2.2.4"></a>
@@ -327,7 +575,6 @@ pixels instead of a normalized value between 0 and 100.
 ### Performance Improvements
 - improve performance of api call method/parameter matching 
 
-
 <a name="2.2.3"></a>
 ## [2.2.3](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.2) (2019-11-05)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/2.2.2...2.2.3)
@@ -345,7 +592,6 @@ pixels instead of a normalized value between 0 and 100.
 - add more handy information in download manager 
 - add cancel download button to manager 
 - add support for release notes in download manager 
-
 
 <a name="2.2.2"></a>
 ## [2.2.2](https://gitlab.com/langurmonkey/gaiasky/tree/2.2.1) (2019-10-31)

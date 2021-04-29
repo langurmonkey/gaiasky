@@ -22,7 +22,7 @@ import gaiasky.util.gdx.loader.PFMData;
 public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
     private Texture blendTexture;
     private int blend;
-    private FullscreenMesh mesh;
+    private final FullscreenMesh mesh;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -32,7 +32,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         // @formatter:on
 
         private final String mnemonic;
-        private int elementSize;
+        private final int elementSize;
 
         Param(String m, int elementSize) {
             this.mnemonic = m;
@@ -93,8 +93,7 @@ public final class GeometryWarpFilter extends Filter<GeometryWarpFilter> {
         // gives a chance to filters to perform needed operations just before the rendering operation take place.
         onBeforeRender();
 
-        program.begin();
+        program.bind();
         mesh.render(program);
-        program.end();
     }
 }

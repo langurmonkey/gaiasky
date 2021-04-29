@@ -116,12 +116,12 @@ public class RESTServer {
     /**
      * REST server static files location.
      */
-    private static String rest_static_location = GlobalConf.ASSETS_LOC + "/rest-static";
+    private static final String rest_static_location = GlobalConf.ASSETS_LOC + "/rest-static";
 
     /**
      * Logger
      */
-    private static Log logger = Logger.getLogger(RESTServer.class);
+    private static final Log logger = Logger.getLogger(RESTServer.class);
 
     /**
      * Name to method map
@@ -551,7 +551,7 @@ public class RESTServer {
                 if (methodMap.containsKey(method.getName())) {
                     matches = methodMap.get(method.getName());
                 } else {
-                    matches = new Array(1);
+                    matches = new Array(false, 1);
                 }
                 if (!matches.contains(method, true))
                     matches.add(method);

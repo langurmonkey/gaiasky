@@ -1,7 +1,10 @@
 apply plugin: "java"
 apply plugin: "com.install4j.gradle"
 
-sourceCompatibility = 11
+
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+sourceCompatibility = 15
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets {
@@ -38,6 +41,9 @@ task versionFile {
 
 jar {
     dependsOn versionFile
+    exclude('**/*.hiero')
+    exclude('**/*.svg')
+    exclude('**/*.xcf')
 }
 
 install4j {
@@ -52,7 +58,7 @@ sourceSets {
     }
 }
 
-class GaiaSkyRun extends JavaExec {
+abstract class GaiaSkyRun extends JavaExec {
     public void setup() {
         main = project.mainClassName
         systemProperties['properties.file'] = ''
@@ -67,8 +73,8 @@ class GaiaSkyRun extends JavaExec {
         // CMS GC
         //jvmArgs = ['-server', '-XX:+UseConcMarkSweepGC', '-XX:+UseParNewGC', '-XX:MaxGCPauseMillis=5', '-XX:+CMSParallelRemarkEnabled', '-XX:CMSInitiatingOccupancyFraction=60', '-XX:MaxTenuringThreshold=4', '-XX:MaxNewSize=384m', '-XX:NewSize=384m', '-XX:SurvivorRatio=12']
         // G1 GC
-        jvmArgs "-XX:+UseG1GC"
-        if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+        jvmArgs "-XX:+UseShenandoahGC"
+        if (DefaultNativePlatform.currentOperatingSystem.macOsX) {
             // Required to run lwjgl3 java apps on macOS
             jvmArgs("-XstartOnFirstThread")
         }
@@ -118,18 +124,31 @@ task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the cat
 
 task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
     main = 'gaiasky.data.OctreeGeneratorRun'
-    systemProperties['properties.file'] = '../..//assets/conf/global.properties'
+    systemProperties['properties.file'] = ''
+    systemProperties['assets.location'] = './assets/'
     args = [
+            "-l",
+            "CsvCatalogDataProvider",
             "--input",
-            "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/csv/",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/gaia/",
             "--output",
-            "/media/tsagrista/Daten/Gaia/data/GDR2/dr2/out/"
+            "/home/tsagrista/Projects/gaiasky-catgen/output/java/",
+            "--columns",
+            "source_id,ra,dec,plx,ra_err,dec_err,plx_err,pmra,pmdec,radvel,gmag,bpmag,rpmag,ruwe,ref_epoch",
+            "--hip",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/hip/hipparcos.vot",
+            "--xmatchfile",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/hip-gaia-xm/xmatch.csv",
+            "--additional",
+            "/home/tsagrista/Projects/gaiasky-catgen/data/ag-e/edr3-ag-e-s.csv.gz",
+            "--maxpart",
+            "100000",
+            "--parallelism",
+            "1"
     ]
 
-    minHeapSize = "10g"
-    maxHeapSize = "20g"
-
-    jvmArgs = ['-server',]
+    minHeapSize = "512m"
+    maxHeapSize = "4g"
 
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
@@ -206,7 +225,12 @@ task gaiaskyJar(dependsOn: [compileJava, jar, copyToLib], description: "Creates 
 }
 
 task execPermission(type: Exec) {
-    commandLine 'chmod', 'ugo+x', "$distDir/gaiasky"
+    commandLine "chmod", "ugo+x", "$distDir/gaiasky"
+}
+
+task manGen(type: Exec) {
+    workingDir "$distDir"
+    commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
 }
 
 task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
@@ -245,10 +269,10 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
 
         // Copy music
         mkdir "$distDir/music"
-        copy {
-            from "../assets/music"
-            into "$distDir/music"
-        }
+        //copy {
+        //    from "../assets/music"
+        //    into "$distDir/music"
+        //}
 
         // Copy mappings
         mkdir "$distDir/mappings"
@@ -306,16 +330,18 @@ task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the
         project.ext.versionFile = file("build/classes/java/main/version").text
         ant.replace(file: "$distDir/README.md", token: "--------------------------", value: "$versionFile")
 
-        // Give execute
-        execPermission.exec()
+        if (!DefaultNativePlatform.currentOperatingSystem.windows) {
+            // Give execute
+            execPermission.exec()
 
-        // Generate man
-        println("Generate man: $distDir/gaiasky.6.gz")
-        exec {
-            commandLine "help2man", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
-        }
-        exec {
-            commandLine "gzip", "$distDir/gaiasky.6"
+            if (DefaultNativePlatform.currentOperatingSystem.linux) {
+                // Generate man
+                println("Generate man: $distDir/gaiasky.6.gz")
+                manGen.exec()
+                exec {
+                    commandLine "gzip", "$distDir/gaiasky.6"
+                }
+            }
         }
     }
 }
@@ -332,12 +358,65 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
         ant.tar(destfile: "$packageDir/" + project.distName + ".tar.gz", compression: 'gzip', longfile: 'gnu') {
             tarfileset(dir: "$releasesDir") {
                 include(name: "$distName/**")
-                exclude(name: "$distName/gaiasky")
+                exclude(name: "$distName/AppRun")
+                exclude(name: "$distName/gaiasky-appimage.desktop")
             }
             tarfileset(dir: "$releasesDir", filemode: '755') {
                 include(name: "$distName/gaiasky")
             }
         }
+
+        // Checksums
+        File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
+        ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
+        ant.checksum(file: tarFile, algorithm: "sha-256", todir: "$packageDir/")
+    }
+}
+
+task createAppimage(dependsOn: createTar, description: "Creates the appimage package for Gaia Sky") {
+    doLast{
+        String appimgDir = "$packageDir/GaiaSky.AppDir"
+
+        delete "$appimgDir"
+        mkdir "$appimgDir"
+
+        // Copy all from dist to appimage
+        copy {
+            from "$distDir"
+            into "$appimgDir"
+        }
+
+        // Set up /usr/bin and /usr/lib with jvm
+        File usrbin = new File("$appimgDir", "usr/bin/")
+        File usrlib = new File("$appimgDir", "usr/lib/")
+        mkdir usrbin
+        mkdir usrlib
+        copy {
+            from "${System.env.JAVA_HOME}/bin/java"
+            into usrbin
+        }
+        copy {
+            from "${System.env.JAVA_HOME}/lib/"
+            into usrlib
+        }
+
+        // Set up AppRun executable, remove unneeded files
+        delete "$appimgDir/gaiasky", "$appimgDir/gaiasky.cmd"
+        delete "$appimgDir/gs_icon.ico", "$appimgDir/gs_icon.svg", "$appimgDir/gsvr_icon.ico", "$appimgDir/gsvr_icon.png"
+        delete "$appimgDir/gaiasky.desktop"
+        file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))
+
+        String appImgFilename = "GaiaSky_" + "$tagRev" + "_x86_64.appimage"
+        // Generate appimage
+        exec {
+            executable "appimagetool"
+            args "$appimgDir", "$packageDir/$appImgFilename"
+        }
+
+        // Checksums
+        File appImgFile = new File("$packageDir/$appImgFilename")
+        ant.checksum(file: appImgFile, algorithm: "md5", todir: "$packageDir/")
+        ant.checksum(file: appImgFile, algorithm: "sha-256", todir: "$packageDir/")
     }
 }
 
@@ -350,11 +429,11 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
             into "$packageDir/arch"
         }
 
-        File tarFile = new File("$packageDir/" + project.distName + ".tar.gz")
-        ant.checksum(file: tarFile, algorithm: "md5", todir: "$packageDir/")
-
         String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
+
+        String sha256Tar = new File("$packageDir/" + project.distName + ".tar.gz.sha-256").text
+        sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
 
         String tagRevEscaped = "$tagRev"
         tagRevEscaped = tagRevEscaped.replace(":", "_").replace("/", "_").replace("-", "_").replace(" ", "_");
@@ -362,6 +441,7 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision@', value: "$tagRev")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@version.revision.escaped@', value: "$tagRevEscaped")
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
+        ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@sha256checksum@', value: sha256Tar)
 
         copy {
             from "$baseDir/CHANGELOG.md"
@@ -385,7 +465,7 @@ def distDirSize() {
     return Math.round(dist.directorySize() / 1024)
 }
 
-task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
+task createDeb(dependsOn: createTar, description: "Creates the .deb package") {
     doLast {
         // Base deb directory
         File debDir = new File(project.packageDir + "/$distName")
@@ -421,7 +501,7 @@ task createDeb(dependsOn: createArch, description: "Creates the .deb package") {
     }
 }
 
-task prepareInstall4jScript(dependsOn: createArch, description: "Prepares the install4j script and copies it to the packages folder") {
+task prepareInstall4jScript(dependsOn: 'createTar' , description: "Prepares the install4j script and copies it to the packages folder") {
     doLast {
         copy {
             from "installerscripts/template.install4j"
@@ -440,28 +520,56 @@ task prepareInstall4jScript(dependsOn: createArch, description: "Prepares the in
 task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs the install4j task to create the installers") {
     dependsOn 'prepareInstall4jScript'
 
-    doLast {
-        print("$packageDir/" + project.distName + ".install4j")
-    }
     projectFile = file("$packageDir/" + project.distName + ".install4j")
     variables = [majorVersion: project.tag, build: project.rev]
+    release = project.tag
+
+    doLast {
+        println("Install4j script location:")
+        println("$packageDir/" + project.distName + ".install4j")
+    }
 }
 
 
-task pack(dependsOn: install4jMedia, description: "Creates the releases for windows, mac, linux and the tar package") {
+task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], description: "Creates the releases for windows, mac, linux and the tar package") {
     doLast {
-        println("Appending md5 checksum of " + project.distName + ".tar.gz to md5sums file")
+        println("Appending md5 checksum of " + project.distName + ".tar.gz and GaiaSky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
-        if(md5File.exists()) {
+        if (md5File.exists()) {
+            // Tar
             String md5Tar = file("$packageDir/" + project.distName + ".tar.gz.md5").text
             md5Tar = md5Tar.replace("\n", "").replace("\r", "");
-            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n"
-            println("Removing file " + project.distName + ".tar.gz.md5")
+
+            // Appimage
+            String md5AppImg = file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5").text
+            md5AppImg = md5AppImg.replace("\n", "").replace("\r", "");
+
+            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n" + md5AppImg + " *GaiaSky_" + "$tagRev" + "_x86_64.appimage\n"
+            println("Removing files " + project.distName + ".tar.gz.md5 and GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5")
             file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
+            file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5").delete()
         } else {
             println("md5 file not found: " + md5File)
         }
 
+        println("Appending sha256 checksum of " + project.distName + ".tar.gz to sha256sums file")
+        File sha256File = file("$packageDir/" + 'sha256sums')
+        if (sha256File.exists()) {
+            // Tar
+            String sha256Tar = file("$packageDir/" + project.distName + ".tar.gz.sha-256").text
+            sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
+
+            // Appimage
+            String sha256AppImg = file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256").text
+            sha256AppImg = sha256AppImg.replace("\n", "").replace("\r", "");
+
+            sha256File.text = file("$packageDir/" + 'sha256sums').text + sha256Tar + " *" + project.distName + ".tar.gz\n" + sha256AppImg + " *GaiaSky_" + "$tagRev" + "_x86_64.appimage\n"
+            println("Removing files " + project.distName + ".tar.gz.sha-256 and GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256")
+            file("$packageDir/" + project.distName + ".tar.gz.sha-256").delete()
+            file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256").delete()
+        } else {
+            println("sha256 file not found: " + sha256File)
+        }
     }
 }
 

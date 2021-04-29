@@ -24,8 +24,8 @@ public interface ISGR extends Disposable {
      * @param t      The time in seconds since the start
      * @param rw     The width of the buffer
      * @param rh     The height of the buffer
-     * @param tw     The final target width
-     * @param th     The final target height
+     * @param tw     The final target width, usually of the screen
+     * @param th     The final target height, usually of the screen
      * @param fb     The frame buffer, if any
      * @param ppb    The post processing bean
      */

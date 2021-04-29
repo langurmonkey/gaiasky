@@ -105,6 +105,10 @@ public enum Events {
      **/
     BLOOM_CMD,
     /**
+     * Contains the sharpen factor between 0 and 2 and a boolean if it comes from the UI
+     */
+    UNSHARP_MASK_CMD,
+    /**
      * Contains the brightness level (float) in [-1..1] and an optional boolean
      * indicating whether this comes from the interface
      **/
@@ -288,6 +292,11 @@ public enum Events {
      **/
     DISPLAY_GUI_CMD,
     DISPLAY_MEM_INFO_WINDOW,
+
+    /**
+     * Change UI scale factor. Contains the new internal scale factor
+     */
+    UI_SCALE_CMD,
 
     /**
      * Contains a boolean with the display status
@@ -584,11 +593,6 @@ public enum Events {
     LIGHT_SCATTERING_CMD,
 
     /**
-     * Sets the limit magnitude. Contains a double with the new magnitude
-     **/
-    LIMIT_MAG_CMD,
-
-    /**
      * Issues the command to update the line render system. Contains no
      * parameters.
      **/
@@ -670,14 +674,6 @@ public enum Events {
      * boolean indicating if this comes from the interface.
      */
     ORIENTATION_LOCK_CMD,
-    /**
-     * Contains the new pace
-     **/
-    PACE_CHANGED_INFO,
-    /**
-     * Contains a float with the pace
-     **/
-    PACE_CHANGE_CMD,
     /**
      * Posts a recurrent runnable. Contains an identifier (String) and the runnable object
      **/
@@ -977,12 +973,32 @@ public enum Events {
 
     SHOW_PREFERENCES_ACTION,
 
-    SHOW_INDIVIDUAL_VISIBILITY_ACTION,
+    SHOW_PER_OBJECT_VISIBILITY_ACTION,
+    /**
+     * Contains the object (instance of {@link gaiasky.scenegraph.IVisibilitySwitch}), a boolean with the new visibility state, and a
+     * boolean indicating if it comes from the UI.
+     */
+    PER_OBJECT_VISIBILITY_CMD,
+
     /**
      * Quit action, can contain optional Runnable to run on accept()
      **/
     SHOW_QUIT_ACTION,
     SHOW_SEARCH_ACTION,
+    /**
+     * Shows a window with a summary of the search object in the data (string)
+     * as taken from the wikipedia API
+     */
+    SHOW_WIKI_INFO_ACTION,
+    /** Updates the wiki info window if it is open **/
+    UPDATE_WIKI_INFO_ACTION,
+    /**
+     * Shows a window with the Gaia or Hipparcos archive info for the object in the data,
+     * which must be a {@link gaiasky.scenegraph.IStarFocus}
+     */
+    SHOW_ARCHIVE_VIEW_ACTION,
+    /** Updates the archive view if it is open **/
+    UPDATE_ARCHIVE_VIEW_ACTION,
     /**
      * Show uncertainties for Tycho star, if available. Contains the star
      */
@@ -1174,6 +1190,17 @@ public enum Events {
      * Double the pace
      **/
     TIME_WARP_INCREASE_CMD,
+
+    /**
+     * Contains a double with the new warp and a boolean saying whether it comes from the UI
+     **/
+    TIME_WARP_CMD,
+
+    /**
+     * Contains the new time warp factor
+     **/
+    TIME_WARP_CHANGED_INFO,
+
 
     /**
      * Contains the name of the check box and a boolean

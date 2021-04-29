@@ -32,8 +32,8 @@ import gaiasky.util.GlobalConf;
  * @author Nathan Sweet
  */
 public class OwnTextHotkeyTooltip extends Tooltip<Table> {
-    private Table table;
-    private Label label;
+    private final Table table;
+    private final Label label;
     private Label labelHotkey;
 
     public OwnTextHotkeyTooltip(String text, String hotkey, Skin skin, int breakSpaces) {
@@ -84,7 +84,7 @@ public class OwnTextHotkeyTooltip extends Tooltip<Table> {
 
         setStyle(style);
 
-        getContainer().pad(5f * GlobalConf.UI_SCALE_FACTOR);
+        getContainer().pad(8f);
     }
 
     public void setStyle(TextTooltipStyle style) {

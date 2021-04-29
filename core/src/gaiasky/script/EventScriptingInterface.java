@@ -27,10 +27,9 @@ import gaiasky.interafce.ColormapPicker;
 import gaiasky.interafce.IGui;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
@@ -69,8 +68,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
-    private EventManager em;
-    private AssetManager manager;
+    private final EventManager em;
+    private final AssetManager manager;
     private LruCache<String, Texture> textures;
 
     private static EventScriptingInterface instance = null;
@@ -82,10 +81,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return instance;
     }
 
-    private Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
-    private Vector2d aux2d1;
+    private final Vector3d aux3d1;
+    private final Vector3d aux3d2;
+    private final Vector3d aux3d3;
+    private final Vector3d aux3d4;
+    private final Vector3d aux3d5;
+    private final Vector3d aux3d6;
+    private final Vector2d aux2d1;
 
-    private Set<AtomicBoolean> stops;
+    private final Set<AtomicBoolean> stops;
 
     private EventScriptingInterface() {
         em = EventManager.instance;
@@ -554,6 +558,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setVisibility(final String key, final boolean visible) {
+        setComponentTypeVisibility(key, visible);
+    }
+
+    @Override
+    public void setComponentTypeVisibility(String key, boolean visible) {
         if (!checkComponentTypeKey(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentType[] cts = ComponentType.values();
@@ -561,6 +570,55 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 logger.error(ct.key);
         } else {
             GaiaSky.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
+        }
+    }
+
+    @Override
+    public boolean getComponentTypeVisibility(String key) {
+        if (!checkComponentTypeKey(key)) {
+            logger.error("Element '" + key + "' does not exist. Possible values are:");
+            ComponentType[] cts = ComponentType.values();
+            for (ComponentType ct : cts)
+                logger.error(ct.key);
+            return false;
+        } else {
+            ComponentType ct = ComponentType.getFromKey(key);
+            return GlobalConf.scene.VISIBILITY[ct.ordinal()];
+        }
+    }
+
+    @Override
+    public boolean setObjectVisibility(String name, boolean visible) {
+        SceneGraphNode obj = getObject(name);
+        if(obj == null){
+            logger.error("No object found with name '" + name +"'");
+            return false;
+        }
+
+        if(obj instanceof IVisibilitySwitch){
+            IVisibilitySwitch vs = obj;
+            vs.setVisible(visible);
+            return true;
+        } else {
+            logger.error("Can't set the visibility of '" + name + "', as it is not an instance of IVisibilitySwitch");
+            return false;
+        }
+    }
+
+    @Override
+    public boolean getObjectVisibility(String name) {
+        SceneGraphNode obj = getObject(name);
+        if(obj == null){
+            logger.error("No object found with name '" + name +"'");
+            return false;
+        }
+
+        if(obj instanceof IVisibilitySwitch){
+            IVisibilitySwitch vs = obj;
+            return vs.isVisible(true);
+        } else {
+            logger.error("Can't set the visibility of '" + name + "', as it is not an instance of IVisibilitySwitch");
+            return false;
         }
     }
 
@@ -587,12 +645,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     private boolean checkComponentTypeKey(String key) {
-        ComponentType[] cts = ComponentType.values();
-        boolean keyFound = false;
-        for (ComponentType ct : cts)
-            keyFound = keyFound || key.equals(ct.key);
-
-        return keyFound;
+        ComponentType ct = ComponentType.getFromKey(key);
+        return ct != null;
     }
 
     @Override
@@ -724,12 +778,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setSimulationPace(final double pace) {
-        em.post(Events.PACE_CHANGE_CMD, pace);
+    public void setSimulationPace(final double warp) {
+        setTimeWarp(warp);
     }
 
-    public void setSimulationPace(final long pace) {
-        setSimulationPace((double) pace);
+    public void setSimulationPace(final long warp) {
+        setSimulationPace((double) warp);
+    }
+
+    @Override
+    public void setTimeWarp(final double warp) {
+        em.post(Events.TIME_WARP_CMD, warp, false);
+    }
+
+    public void setTimeWarp(final long warp) {
+        setTimeWarp((double) warp);
     }
 
     @Override
@@ -1066,7 +1129,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
-        if (checkNotNull(object, "object") && checkNum(viewAngle, 0, Double.MAX_VALUE, "viewAngle")) {
+        if (checkNotNull(object, "object") && checkNum(viewAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "viewAngle")) {
 
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
@@ -1247,20 +1310,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void landOnObjectLocation(String name, String locationName) {
-        landOnObjectLocation(name, locationName, null);
+    public void landAtObjectLocation(String name, String locationName) {
+        landAtObjectLocation(name, locationName, null);
     }
 
-    public void landOnObjectLocation(String name, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(String name, String locationName, AtomicBoolean stop) {
         if (checkString(name, "name")) {
             stops.add(stop);
             SceneGraphNode sgn = getObject(name);
             if (sgn instanceof IFocus)
-                landOnObjectLocation((IFocus) sgn, locationName, stop);
+                landAtObjectLocation((IFocus) sgn, locationName, stop);
         }
     }
 
-    public void landOnObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
+    public void landAtObjectLocation(IFocus object, String locationName, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkString(locationName, "locationName")) {
 
             stops.add(stop);
@@ -1269,7 +1332,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 SceneGraphNode sgn = planet.getChildByNameAndType(locationName.toLowerCase().trim(), Loc.class);
                 if (sgn != null) {
                     Loc location = (Loc) sgn;
-                    landOnObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
+                    landAtObjectLocation(object, location.getLocation().x, location.getLocation().y, stop);
                     return;
                 }
                 logger.info("Location '" + locationName + "' not found on object '" + object.getCandidateName() + "'");
@@ -1278,15 +1341,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void landOnObjectLocation(String name, double longitude, double latitude) {
+    public void landAtObjectLocation(String name, double longitude, double latitude) {
         if (checkString(name, "name")) {
             SceneGraphNode sgn = getObject(name);
             if (sgn instanceof IFocus)
-                landOnObjectLocation((IFocus) sgn, longitude, latitude, null);
+                landAtObjectLocation((IFocus) sgn, longitude, latitude, null);
         }
     }
 
-    void landOnObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
+    void landAtObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             stops.add(stop);
             ISceneGraph sg = GaiaSky.instance.sg;
@@ -1382,10 +1445,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Land
                 landOnObject(object, stop);
-
             }
 
-            sg.remove(invisible, true);
+            EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, invisible, true);
         }
     }
 
@@ -1411,7 +1473,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         SceneGraphNode sgn = getObject(name);
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
-            return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
+            if (obj instanceof ParticleGroup){
+                var pos = obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
+                return pos.sub(GaiaSky.instance.getICamera().getPos()).len() * Constants.U_TO_KM;
+            } else {
+                return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
+            }
         }
 
         return -1;
@@ -1424,7 +1491,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // This star group contains the star
             StarGroup sg = (StarGroup) sgn;
             if (sg != null) {
-                StarBean sb = (StarBean) sg.getCandidateBean();
+                IParticleRecord sb = sg.getCandidateBean();
                 if (sb != null) {
                     double[] rgb = sb.rgb();
                     return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
@@ -2434,6 +2501,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, null, null, sync);
+    }
+
+    @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, fadeIn, fadeOut, sync);
     }
@@ -2514,10 +2586,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private List<ParticleBean> loadParticleBeans(DataSource ds, DatasetOptions dops) {
+    private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions dops) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(dops);
-        @SuppressWarnings("unchecked") List<ParticleBean> data = (List<ParticleBean>) provider.loadData(ds, 1.0f, () -> {
+        @SuppressWarnings("unchecked") List<IParticleRecord> data = provider.loadData(ds, 1.0f, () -> {
             // Show progress bar
             EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
             // Reset
@@ -2541,7 +2613,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
                 if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                    List<ParticleBean> data = loadParticleBeans(ds, dops);
+                    List<IParticleRecord> data = loadParticleBeans(ds, dops);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP
                         AtomicReference<StarGroup> starGroup = new AtomicReference<>();
@@ -2561,7 +2633,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
-                    List<ParticleBean> data = loadParticleBeans(ds, dops);
+                    List<IParticleRecord> data = loadParticleBeans(ds, dops);
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
                         GaiaSky.postRunnable(() -> {
@@ -2753,7 +2825,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Try extra attributes
             if (ci.object instanceof ParticleGroup) {
                 ParticleGroup pg = (ParticleGroup) ci.object;
-                Set<UCD> ucds = pg.get(0).extra.keySet();
+                ObjectDoubleMap.Keys<UCD> ucds = pg.get(0).extraKeys();
                 for (UCD ucd : ucds)
                     if (ucd.colname.equalsIgnoreCase(name))
                         return new AttributeUCD(ucd);
@@ -3044,6 +3116,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
         logPossibleValues(value, possibleValues, name);
         return false;
+    }
+
+    private boolean checkObjectName(String name) {
+        SceneGraphNode sgn = getObject(name);
+        return sgn != null;
     }
 
     private void logPossibleValues(String value, String[] possibleValues, String name) {

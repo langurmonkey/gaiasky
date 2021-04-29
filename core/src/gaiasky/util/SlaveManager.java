@@ -130,7 +130,7 @@ public class SlaveManager {
             logger.info(I18n.txt("notif.loading", mpcdiPath));
 
             String unpackDirName = "mpcdi_" + System.nanoTime();
-            Path unzipLocation = SysUtils.getDefaultTmpDir().resolve(unpackDirName);
+            Path unzipLocation = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION).resolve(unpackDirName);
             Files.createDirectories(unzipLocation);
             ZipUtils.unzip(mpcdiPath.toString(), unzipLocation.toAbsolutePath().toString());
 
@@ -169,7 +169,7 @@ public class SlaveManager {
                 Element root = doc.getDocumentElement();
                 String profile = root.getAttribute("profile");
                 if (!profile.equalsIgnoreCase("3d")) {
-                    logger.warn("Gaya Sky only supports the '3d' profile");
+                    logger.warn("Gaia Sky only supports the '3d' profile");
                 }
                 // Display
                 NodeList displays = root.getElementsByTagName("display");

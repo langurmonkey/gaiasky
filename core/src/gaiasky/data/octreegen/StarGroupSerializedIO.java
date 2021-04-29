@@ -7,10 +7,10 @@ package gaiasky.data.octreegen;
 
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.SerializedDataProvider;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
@@ -44,15 +44,15 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      *            The output stream to write to
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
-        writeParticles(list, out, true);
+        writeParticles(list, out, 1);
     }
 
-    public void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat) {
+    public void writeParticles(List<SceneGraphNode> list, OutputStream out, int version) {
         if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
-            List<StarBean> l = new ArrayList<>(sg.size());
-            for (ParticleBean p : sg.data()) {
-                l.add((StarBean) p);
+            List<IParticleRecord> l = new ArrayList<>(sg.size());
+            for (IParticleRecord p : sg.data()) {
+                l.add(p);
             }
 
             try {
@@ -73,12 +73,8 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      *            The input stream to read the star group from
      * @return A list with a single star group object
      */
-    public List<SceneGraphNode> readParticles(InputStream in) throws FileNotFoundException {
-        return readParticles(in, true);
-    }
-
-    public List<SceneGraphNode> readParticles(InputStream in, boolean compat) throws FileNotFoundException {
-        List<ParticleBean> data = provider.loadData(in, 1.0, compat);
+    public List<SceneGraphNode> readParticles(InputStream in) {
+        List<IParticleRecord> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

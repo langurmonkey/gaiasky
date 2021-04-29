@@ -27,7 +27,7 @@ import gaiasky.util.gdx.contrib.postprocess.filters.RadialDistortion;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Curvature extends PostProcessorEffect {
-    private RadialDistortion distort;
+    private final RadialDistortion distort;
 
     public Curvature() {
         distort = new RadialDistortion();

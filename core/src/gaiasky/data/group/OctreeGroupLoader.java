@@ -11,10 +11,10 @@ import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.octreegen.MetadataBinaryIO;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.GlobalConf;
@@ -30,8 +30,7 @@ import java.util.List;
 
 /**
  * Implements the loading and streaming of octree nodes from files. This version
- * loads star groups using the
- * {@link gaiasky.data.group.SerializedDataProvider}
+ * loads star groups using {@link gaiasky.data.group.BinaryDataProvider}.
  *
  * @author tsagrista
  */
@@ -39,20 +38,16 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
     private static final Log logger = Logger.getLogger(OctreeGroupLoader.class);
 
     /**
-     * Whether to use the binary file format. If false, we use the java
-     * serialization method
-     **/
-    private Boolean binary = true;
-
-    /**
-     * Whether to load data using the compatibility mode (for DR1/DR2) or not (DR3)
+     * The version of the data to load - before version 2, the data
+     * format was not annotated with the version, so this info must come
+     * from outside
      */
-    private Boolean compatibilityMode = true;
+    private int dataVersionHint;
 
     /**
      * Binary particle reader
      **/
-    private IStarGroupDataProvider particleReader;
+    private final BinaryDataProvider particleReader;
 
     /**
      * Epoch of stars loaded through this
@@ -61,9 +56,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
 
     public OctreeGroupLoader() {
         instance = this;
-
-        particleReader = binary ? new BinaryDataProvider() : new SerializedDataProvider();
-
+        particleReader = new BinaryDataProvider();
     }
 
     @Override
@@ -77,7 +70,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         OctreeNode root = metadataReader.readMetadataMapped(metadata);
 
         if (root != null) {
-            logger.info(I18n.bundle.format("notif.nodeloader", root.numNodes(), metadata));
+            logger.info(I18n.bundle.format("notif.nodeloader", root.numNodesRec(), metadata));
             logger.info(I18n.bundle.format("notif.loading", particles));
 
             /**
@@ -85,13 +78,16 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
              * parallel, so we never use OctreeWrapperConcurrent
              */
             AbstractOctreeWrapper octreeWrapper = new OctreeWrapper("Universe", root);
+            octreeWrapper.setFadeout(new double[] { 8e3, 5e5 });
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
+            ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
+            ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
             EventManager.instance.post(Events.CATALOG_ADD, ci, false);
 
-            compatibilityMode = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2");
+            dataVersionHint = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
 
             /**
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
@@ -116,8 +112,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
         }
-        @SuppressWarnings("unchecked")
-        List<ParticleBean> data = particleReader.loadDataMapped(octantFile.path(), 1.0, compatibilityMode);
+        @SuppressWarnings("unchecked") List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setEpoch(epoch);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());
@@ -138,6 +133,8 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             touch(octant);
 
             octant.setStatus(LoadStatus.LOADED);
+            // Update counts
+            octant.touch(data.size());
 
             addLoadedInfo(octant.pageId, octant.countObjects());
         }

@@ -6,7 +6,7 @@
 package gaiasky.data.group;
 
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
 
 import java.io.InputStream;
 import java.util.List;
@@ -27,30 +27,27 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      *
      * @param file   The file to load
      * @param factor Factor to apply to the positions
-     * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    List<ParticleBean> loadDataMapped(String file, double factor, boolean compatibility);
+    List<IParticleRecord> loadDataMapped(String file, double factor);
 
     /**
      * Loads the data applying a factor.
      *
      * @param file   The file to load
      * @param factor Factor to apply to the positions
-     * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    List<ParticleBean> loadData(String file, double factor, boolean compatibility);
+    List<IParticleRecord> loadData(String file, double factor);
 
     /**
      * Loads the data applying a factor.
      *
      * @param is     Input stream to load the data from
      * @param factor Factor to apply to the positions
-     * @param compatibility Use compatibility mode (DR1/DR2)
      * @return Array of particle beans
      */
-    List<ParticleBean> loadData(InputStream is, double factor, boolean compatibility);
+    List<IParticleRecord> loadData(InputStream is, double factor);
 
     /**
      * <p>
@@ -139,4 +136,10 @@ public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
      * @param columns The column name list
      */
     void setColumns(String columns);
+
+    /**
+     * Set the preferred output format version, if applicable
+     * @param version The version number
+     */
+    void setOutputFormatVersion(int version);
 }

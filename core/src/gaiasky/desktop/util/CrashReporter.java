@@ -14,8 +14,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -31,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 
 public class CrashReporter {
-    private static final Log logger = Logger.getLogger(CrashReporter.class);
 
     public static void reportCrash(Throwable t, Log logger) {
         SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-HHmmss");
@@ -190,16 +188,19 @@ public class CrashReporter {
         }
 
         strArray.add("Available processors (cores): " + Runtime.getRuntime().availableProcessors());
-        strArray.add("Free memory (bytes): " + Runtime.getRuntime().freeMemory());
-        long maxMemory = Runtime.getRuntime().maxMemory();
-        strArray.add("Maximum memory (bytes): " + (maxMemory == Long.MAX_VALUE ? "no limit" : maxMemory));
-        strArray.add("Total memory available to JVM (bytes): " + Runtime.getRuntime().totalMemory());
+        String mbUnits = " " + I18n.txt("gui.debug.ram.unit");
+        strArray.add("Java used memory: " + MemInfo.getUsedMemory() + mbUnits);
+        strArray.add("Java free memory: " + MemInfo.getFreeMemory() + mbUnits);
+        strArray.add("Java total memory: " + MemInfo.getTotalMemory() + mbUnits);
+        strArray.add("Java max memory (-Xmx): " + MemInfo.getMaxMemory() + mbUnits);
+        strArray.add("Total system RAM: " + MemInfo.getTotalRam() + mbUnits);
+
         File[] roots = File.listRoots();
         for (File root : roots) {
-            strArray.add("File system root: " + root.getAbsolutePath());
-            strArray.add("Total space (bytes): " + root.getTotalSpace());
-            strArray.add("Free space (bytes): " + root.getFreeSpace());
-            strArray.add("Usable space (bytes): " + root.getUsableSpace());
+            strArray.add(" # File system root: " + root.getAbsolutePath());
+            strArray.add("   Total space: " + (root.getTotalSpace() * Constants.BYTE_TO_MB) + mbUnits );
+            strArray.add("   Free space: " + (root.getFreeSpace() * Constants.BYTE_TO_MB) + mbUnits);
+            strArray.add("   Usable space: " + (root.getUsableSpace() * Constants.BYTE_TO_MB) + mbUnits);
         }
 
         /* OS info */

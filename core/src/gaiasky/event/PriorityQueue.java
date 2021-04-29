@@ -67,7 +67,7 @@ public class PriorityQueue<E extends Comparable<E>> {
     private Object[] queue;
 
     /** A set used to check elements'uniqueness (if enabled). */
-    private ObjectSet<E> set;
+    private final ObjectSet<E> set;
 
     /** A flag indicating whether elements inserted into the queue must be unique. */
     private boolean uniqueness;

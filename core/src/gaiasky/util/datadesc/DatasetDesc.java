@@ -6,10 +6,12 @@
 package gaiasky.util.datadesc;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
@@ -32,14 +34,20 @@ public class DatasetDesc {
     public DatasetType datasetType;
 
     public Path check;
+    public Path path;
+    public FileHandle catalogFile;
 
     public String size;
     public long sizeBytes;
 
+    public String nObjectsStr;
+    public long nObjects;
+
     public String sha256;
 
     public boolean exists;
-    public int myVersion, serverVersion;
+    public int myVersion = -1, serverVersion;
+    public int minGsVersion = -1;
     public boolean outdated;
     public boolean baseData;
 
@@ -49,20 +57,21 @@ public class DatasetDesc {
     public boolean cbDisabled;
     public String[] filesToDelete;
 
-
-    public DatasetDesc(JsonReader reader, JsonValue source){
+    public DatasetDesc(JsonReader reader, JsonValue source) {
         this.reader = reader;
         this.source = source;
 
         // Check if we have it
-        this.check = Paths.get(GlobalConf.data.DATA_LOCATION, source.getString("check"));
-        this.exists = Files.exists(check) && Files.isReadable(check);
-        this.serverVersion = source.getInt("version", 0);
-        if(this.exists) {
-            this.myVersion = checkJsonVersion(check);
-            this.outdated = serverVersion > myVersion;
-        } else {
-            this.outdated = false;
+        if (source.has("check")) {
+            this.check = Paths.get(GlobalConf.data.DATA_LOCATION, source.getString("check"));
+            this.exists = Files.exists(check) && Files.isReadable(check);
+            this.serverVersion = source.getInt("version", 0);
+            if (this.exists) {
+                this.myVersion = checkJsonVersion(check);
+                this.outdated = serverVersion > myVersion;
+            } else {
+                this.outdated = false;
+            }
         }
 
         this.name = source.getString("name");
@@ -70,7 +79,14 @@ public class DatasetDesc {
         this.mustDownload = (!exists || outdated) && baseData;
         this.cbDisabled = baseData || (exists && !outdated);
 
-        this.file = source.getString("file");
+        if(source.has("version") && this.myVersion == -1)
+            this.myVersion = source.getInt("version");
+
+        if(source.has("mingsversion"))
+            this.minGsVersion = source.getInt("mingsversion");
+
+        if (source.has("file"))
+            this.file = source.getString("file");
 
         // Description
         this.description = source.getString("description");
@@ -81,20 +97,24 @@ public class DatasetDesc {
         }
 
         // Release notes
-        if(source.has("releasenotes")){
+        if (source.has("releasenotes")) {
             this.releaseNotes = source.getString("releasenotes");
         } else {
             this.releaseNotes = null;
         }
 
         // Link
-        if(source.has("link"))
-        this.link = source.getString("link");
+        if (source.has("link"))
+            this.link = source.getString("link");
         else
             this.link = null;
 
         // Type
-        this.type = source.getString("type");
+        if (source.has("type")) {
+            this.type = source.getString("type");
+        } else {
+            this.type = "other";
+        }
 
         // Size
         try {
@@ -105,17 +125,29 @@ public class DatasetDesc {
             size = "?";
         }
 
+        // Number objects
+        try {
+            nObjects = source.getLong("nobjects");
+            nObjectsStr = I18n.txt("gui.dataset.nobjects", GlobalResources.nObjectsToString(nObjects));
+        } catch (IllegalArgumentException e) {
+            nObjects = -1;
+            nObjectsStr = "N/A";
+        }
+
         // Digest
-        if(source.has("sha256"))
+        if (source.has("sha256"))
             sha256 = source.getString("sha256");
         else
             sha256 = null;
 
         // Data
-        if(source.has("data")){
+        if (source.has("data")) {
             JsonValue data = source.get("data");
-            this.filesToDelete = data.asStringArray();
-        }else{
+            try {
+                this.filesToDelete = data.asStringArray();
+            } catch (Exception e) {
+            }
+        } else {
             this.filesToDelete = null;
         }
     }
@@ -136,10 +168,10 @@ public class DatasetDesc {
                 String extension = fname.substring(fname.lastIndexOf(".") + 1);
                 if (extension.equalsIgnoreCase("json")) {
                     JsonValue jf = reader.parse(Gdx.files.absolute(file.getAbsolutePath()));
-                    if(jf.has("version")){
+                    if (jf.has("version")) {
                         try {
                             return jf.getInt("version", 0);
-                        }catch(Exception e){
+                        } catch (Exception e) {
                             logger.error(e, "The 'version' attribute must be an integer: " + path);
                         }
                     }
@@ -151,7 +183,7 @@ public class DatasetDesc {
         }
     }
 
-    public boolean isStarDataset(){
-        return this.type != null && (this.type.equals("catalog-log") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
+    public boolean isStarDataset() {
+        return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
     }
 }

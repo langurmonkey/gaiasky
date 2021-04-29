@@ -12,9 +12,8 @@ import net.jafama.FastMath;
 import java.io.Serializable;
 
 /**
- * Copy of libgdx's Vector3d class using doubles for some precision
- * calculations.
- * 
+ * Copy of libgdx's Vector3d class using 64-bit floating point numbers.
+ *
  * @author Toni Sagrista
  *
  */
@@ -65,10 +64,10 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	/**
 	 * Creates a vector from the given vector
 	 * 
-	 * @param vector The vector
+	 * @param vec The vector
 	 */
-	public Vector3d(final Vector3d vector) {
-		this.set(vector);
+	public Vector3d(final Vector3d vec) {
+		this.set(vec);
 	}
 
 	/**
@@ -107,24 +106,24 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this;
 	}
 
-	public Vector3d set(final Vector3d vector) {
-		if (vector != null)
-			return this.set(vector.x, vector.y, vector.z);
+	public Vector3d set(final Vector3d vec) {
+		if (vec != null)
+			return this.set(vec.x, vec.y, vec.z);
 		return this;
 	}
 
-	public Vector3d set(final Vector3 vector) {
-		if (vector != null)
-			return this.set(vector.x, vector.y, vector.z);
+	public Vector3d set(final Vector3 vec) {
+		if (vec != null)
+			return this.set(vec.x, vec.y, vec.z);
 		return this;
 	}
 
-	public Vector3 put(final Vector3 vector) {
-		return vector.set((float) this.x, (float) this.y, (float) this.z);
+	public Vector3 put(final Vector3 vec) {
+		return vec.set((float) this.x, (float) this.y, (float) this.z);
 	}
 
-	public Vector3d put(final Vector3d vector) {
-		return vector.set(this.x, this.y, this.z);
+	public Vector3d put(final Vector3d vec) {
+		return vec.set(this.x, this.y, this.z);
 	}
 
 	/**
@@ -176,17 +175,17 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return new Vector3d(this);
 	}
 
-	public Vector3d add(final Vector3d vector) {
-		this.x += vector.x;
-		this.y += vector.y;
-		this.z += vector.z;
+	public Vector3d add(final Vector3d vec) {
+		this.x += vec.x;
+		this.y += vec.y;
+		this.z += vec.z;
 		return this;
 	}
 
-	public Vector3d add(final Vector3 vector) {
-		this.x += vector.x;
-		this.y += vector.y;
-		this.z += vector.z;
+	public Vector3d add(final Vector3 vec) {
+		this.x += vec.x;
+		this.y += vec.y;
+		this.z += vec.z;
 		return this;
 	}
 
@@ -229,12 +228,12 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this.set(this.x + values, this.y + values, this.z + values);
 	}
 
-	public Vector3d sub(final Vector3d a_vec) {
-		return this.sub(a_vec.x, a_vec.y, a_vec.z);
+	public Vector3d sub(final Vector3d vec) {
+		return this.sub(vec.x, vec.y, vec.z);
 	}
 
-	public Vector3d sub(final Vector3 a_vec) {
-		return this.sub(a_vec.x, a_vec.y, a_vec.z);
+	public Vector3d sub(final Vector3 vec) {
+		return this.sub(vec.x, vec.y, vec.z);
 	}
 
 	/**
@@ -263,8 +262,8 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this.set(this.x * scalar, this.y * scalar, this.z * scalar);
 	}
 
-	public Vector3d scl(final Vector3d other) {
-		return this.set(x * other.x, y * other.y, z * other.z);
+	public Vector3d scl(final Vector3d vec) {
+		return this.set(x * vec.x, y * vec.y, z * vec.z);
 	}
 
 	/**
@@ -307,13 +306,13 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this;
 	}
 
-	/** @return The euclidian length */
+	/** @return The euclidean length */
 	public static double len(final double x, final double y, final double z) {
-		return Math.sqrt(x * x + y * y + z * z);
+		return FastMath.sqrt(x * x + y * y + z * z);
 	}
 
 	public double len() {
-		return Math.sqrt(x * x + y * y + z * z);
+		return FastMath.sqrt(x * x + y * y + z * z);
 	}
 
 	/** @return The squared euclidian length */
@@ -326,11 +325,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	}
 
 	/**
-	 * @param vector The other vector
+	 * @param vec The other vector
 	 * @return Wether this and the other vector are equal
 	 */
-	public boolean idt(final Vector3d vector) {
-		return x == vector.x && y == vector.y && z == vector.z;
+	public boolean idt(final Vector3d vec) {
+		return x == vec.x && y == vec.y && z == vec.z;
 	}
 
 	/** @return The euclidian distance between the two specified vectors */
@@ -339,14 +338,14 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		final double a = x2 - x1;
 		final double b = y2 - y1;
 		final double c = z2 - z1;
-		return Math.sqrt(a * a + b * b + c * c);
+		return FastMath.sqrt(a * a + b * b + c * c);
 	}
 
-	public double dst(final Vector3d vector) {
-		final double a = vector.x - x;
-		final double b = vector.y - y;
-		final double c = vector.z - z;
-		return Math.sqrt(a * a + b * b + c * c);
+	public double dst(final Vector3d vec) {
+		final double a = vec.x - x;
+		final double b = vec.y - y;
+		final double c = vec.z - z;
+		return FastMath.sqrt(a * a + b * b + c * c);
 	}
 
 	/** @return the distance between this point and the given point */
@@ -354,7 +353,7 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		final double a = x - this.x;
 		final double b = y - this.y;
 		final double c = z - this.z;
-		return Math.sqrt(a * a + b * b + c * c);
+		return FastMath.sqrt(a * a + b * b + c * c);
 	}
 
 	/** @return the squared distance between the given points */
@@ -366,10 +365,10 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return a * a + b * b + c * c;
 	}
 
-	public double dst2(Vector3d point) {
-		final double a = point.x - x;
-		final double b = point.y - y;
-		final double c = point.z - z;
+	public double dst2(Vector3d vec) {
+		final double a = vec.x - x;
+		final double b = vec.y - y;
+		final double c = vec.z - z;
 		return a * a + b * b + c * c;
 	}
 
@@ -419,11 +418,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	/**
 	 * Sets this vector to the cross product between it and the other vector.
 	 * 
-	 * @param vector The other vector
+	 * @param vec The other vector
 	 * @return This vector for chaining
 	 */
-	public Vector3d crs(final Vector3d vector) {
-		return this.set(y * vector.z - z * vector.y, z * vector.x - x * vector.z, x * vector.y - y * vector.x);
+	public Vector3d crs(final Vector3d vec) {
+		return this.set(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x);
 	}
 
 	/**
@@ -676,83 +675,83 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	}
 
 	@Override
-	public boolean isOnLine(Vector3d other, double epsilon) {
-		return len2(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x) <= epsilon;
+	public boolean isOnLine(Vector3d vec, double epsilon) {
+		return len2(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x) <= epsilon;
 	}
 
 	@Override
-	public boolean isOnLine(Vector3d other) {
-		return len2(y * other.z - z * other.y, z * other.x - x * other.z, x * other.y - y * other.x) <= MathUtils.FLOAT_ROUNDING_ERROR;
-	}
-
-
-	@Override
-	public boolean isCollinear (Vector3d other, double epsilon) {
-		return isOnLine(other, epsilon) && hasSameDirection(other);
-	}
-
-	@Override
-	public boolean isCollinear (Vector3d other) {
-		return isOnLine(other) && hasSameDirection(other);
-	}
-
-	@Override
-	public boolean isCollinearOpposite (Vector3d other, double epsilon) {
-		return isOnLine(other, epsilon) && hasOppositeDirection(other);
-	}
-
-	@Override
-	public boolean isCollinearOpposite (Vector3d other) {
-		return isOnLine(other) && hasOppositeDirection(other);
-	}
-
-	@Override
-	public boolean isPerpendicular (Vector3d vector) {
-		return MathUtilsd.isZero(dot(vector));
-	}
-
-
-	public boolean isPerpendicular (Vector3d vector, double epsilon) {
-		return MathUtilsd.isZero(dot(vector), epsilon);
-	}
-
-	@Override
-	public boolean hasSameDirection (Vector3d vector) {
-		return dot(vector) > 0;
-	}
-
-	@Override
-	public boolean hasOppositeDirection (Vector3d vector) {
-		return dot(vector) < 0;
+	public boolean isOnLine(Vector3d vec) {
+		return len2(y * vec.z - z * vec.y, z * vec.x - x * vec.z, x * vec.y - y * vec.x) <= MathUtils.FLOAT_ROUNDING_ERROR;
 	}
 
 
 	@Override
-	public Vector3d lerp (final Vector3d target, double alpha) {
-		x += alpha * (target.x - x);
-		y += alpha * (target.y - y);
-		z += alpha * (target.z - z);
+	public boolean isCollinear (Vector3d vec, double epsilon) {
+		return isOnLine(vec, epsilon) && hasSameDirection(vec);
+	}
+
+	@Override
+	public boolean isCollinear (Vector3d vec) {
+		return isOnLine(vec) && hasSameDirection(vec);
+	}
+
+	@Override
+	public boolean isCollinearOpposite (Vector3d vec, double epsilon) {
+		return isOnLine(vec, epsilon) && hasOppositeDirection(vec);
+	}
+
+	@Override
+	public boolean isCollinearOpposite (Vector3d vec) {
+		return isOnLine(vec) && hasOppositeDirection(vec);
+	}
+
+	@Override
+	public boolean isPerpendicular (Vector3d vec) {
+		return MathUtilsd.isZero(dot(vec));
+	}
+
+
+	public boolean isPerpendicular (Vector3d vec, double epsilon) {
+		return MathUtilsd.isZero(dot(vec), epsilon);
+	}
+
+	@Override
+	public boolean hasSameDirection (Vector3d vec) {
+		return dot(vec) > 0;
+	}
+
+	@Override
+	public boolean hasOppositeDirection (Vector3d vec) {
+		return dot(vec) < 0;
+	}
+
+
+	@Override
+	public Vector3d lerp (final Vector3d vec, double alpha) {
+		x += alpha * (vec.x - x);
+		y += alpha * (vec.y - y);
+		z += alpha * (vec.z - z);
 		return this;
 	}
 
 	@Override
-	public Vector3d interpolate(Vector3d target, double alpha, Interpolationd interpolator) {
-		return lerp(target, interpolator.apply(0, 1, alpha));
+	public Vector3d interpolate(Vector3d vec, double alpha, Interpolationd interpolator) {
+		return lerp(vec, interpolator.apply(0, 1, alpha));
 	}
 
 	/**
 	 * Spherically interpolates between this vector and the target vector by alpha
 	 * which is in the range [0,1]. The result is stored in this vector.
 	 *
-	 * @param target The target vector
+	 * @param vec The target vector
 	 * @param alpha  The interpolation coefficient
 	 * @return This vector for chaining.
 	 */
-	public Vector3d slerp(final Vector3d target, double alpha) {
-		final double dot = dot(target);
+	public Vector3d slerp(final Vector3d vec, double alpha) {
+		final double dot = dot(vec);
 		// If the inputs are too close for comfort, simply linearly interpolate.
 		if (dot > 0.9995 || dot < -0.9995)
-			return lerp(target, alpha);
+			return lerp(vec, alpha);
 
 		// theta0 = angle between input vectors
 		final double theta0 = Math.acos(dot);
@@ -760,9 +759,9 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		final double theta = theta0 * alpha;
 
 		final double st = Math.sin(theta);
-		final double tx = target.x - x * dot;
-		final double ty = target.y - y * dot;
-		final double tz = target.z - z * dot;
+		final double tx = vec.x - x * dot;
+		final double ty = vec.y - y * dot;
+		final double tz = vec.z - z * dot;
 		final double l2 = tx * tx + ty * ty + tz * tz;
 		final double dl = st * ((l2 < 0.0001) ? 1d : 1d / Math.sqrt(l2));
 
@@ -827,11 +826,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * <code>this = this + s*v</code>.
 	 *
 	 * @param s scalar scaling factor
-	 * @param v vector to scale
+	 * @param vec vector to scale
 	 * @return vector modified in place
 	 */
-	public Vector3d scaleAdd(final double s, final Vector3d v) {
-		return this.add(v.scl(s));
+	public Vector3d scaleAdd(final double s, final Vector3d vec) {
+		return this.add(vec.scl(s));
 	}
 
 	/**
@@ -907,11 +906,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	}
 
 	@Override
-	public boolean epsilonEquals (final Vector3d other, double epsilon) {
-		if (other == null) return false;
-		if (Math.abs(other.x - x) > epsilon) return false;
-		if (Math.abs(other.y - y) > epsilon) return false;
-		return !(Math.abs(other.z - z) > epsilon);
+	public boolean epsilonEquals (final Vector3d vec, double epsilon) {
+		if (vec == null) return false;
+		if (Math.abs(vec.x - x) > epsilon) return false;
+		if (Math.abs(vec.y - y) > epsilon) return false;
+		return !(Math.abs(vec.z - z) > epsilon);
 	}
 
 	/** Compares this vector with the other vector, using the supplied epsilon for fuzzy equality testing.
@@ -925,11 +924,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	/**
 	 * Compares this vector with the other vector using MathUtils.FLOAT_ROUNDING_ERROR for fuzzy equality testing
 	 *
-	 * @param other other vector to compare
+	 * @param vec other vector to compare
 	 * @return true if vector are equal, otherwise false
 	 */
-	public boolean epsilonEquals (final Vector3d other) {
-		return epsilonEquals(other, MathUtils.FLOAT_ROUNDING_ERROR);
+	public boolean epsilonEquals (final Vector3d vec) {
+		return epsilonEquals(vec, MathUtils.FLOAT_ROUNDING_ERROR);
 	}
 
 	/**

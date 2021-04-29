@@ -30,10 +30,10 @@ public class UncertaintiesHandler implements IObserver {
         return singleton;
     }
 
-    private String path;
-    private Set<Long> sourceIds;
-    private Array<ParticleGroup> particleGroups;
-    private double[][] colors;
+    private final String path;
+    private final Set<Long> sourceIds;
+    private final Array<ParticleGroup> particleGroups;
+    private final double[][] colors;
     private int coloridx = 0;
 
     private UncertaintiesHandler() {

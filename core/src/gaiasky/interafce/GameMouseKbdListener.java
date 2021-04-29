@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -19,7 +20,7 @@ import gaiasky.util.Logger.Log;
 import org.lwjgl.glfw.GLFW;
 
 public class GameMouseKbdListener extends MouseKbdListener implements IObserver {
-    private static Log logger = Logger.getLogger(GameMouseKbdListener.class);
+    private static final Log logger = Logger.getLogger(GameMouseKbdListener.class);
 
     private float prevX = 0, prevY = 0;
     private float dx = 0, dy = 0;
@@ -154,8 +155,9 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             updatePreviousMousePosition(x, y);
             prevValid = true;
         }
-        dx = lowPass(mouseXSensitivity * (x - prevX), dx, 2f);
-        dy = lowPass(mouseYSensitivity * (y - prevY), dy, 2f);
+        float limit = 17f;
+        dx = MathUtils.clamp(lowPass(mouseXSensitivity * (x - prevX), dx, 14f), -limit, limit);
+        dy = MathUtils.clamp(lowPass(mouseYSensitivity * (y - prevY), dy, 14f), -limit, limit);
         camera.addYaw(dx, true);
         camera.addPitch(dy, true);
 

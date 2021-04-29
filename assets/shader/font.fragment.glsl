@@ -27,8 +27,10 @@ void main(void){
 	
 	if (aa < 0.001)
 	    discard;
-	    
-    fragColor = vec4(v_color.rgb, aa * v_color.a);
+
+    // Additive
+    float a = aa * v_color.a;
+    fragColor = vec4(v_color.rgb, 1.0) * a;
 
     gl_FragDepth = getDepthValue(u_zfar, u_k);
     velMap = vec4(0.0, 0.0, 0.0, alpha);

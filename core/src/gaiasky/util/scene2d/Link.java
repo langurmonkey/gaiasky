@@ -50,7 +50,7 @@ public class Link extends Label {
     }
 
     public Link(CharSequence text, Skin skin, String linkto) {
-        super(text, skin);
+        super(text, skin, "link");
         this.linkURL = linkto;
         initialize();
     }

@@ -26,7 +26,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
     private OwnSelectBox<ComboBoxBean> posMethod, orientationMethod;
     public OwnTextField camrecFps;
-    private INumberFormat nf3;
+    private final INumberFormat nf3;
 
     public KeyframePreferencesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.keyframes.preferences"), skin, stage);
@@ -49,7 +49,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(nf3.format(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
-        camrecFps.setWidth(150f * GlobalConf.UI_SCALE_FACTOR);
+        camrecFps.setWidth(240f);
 
         OwnLabel interpTitle = new OwnLabel(I18n.txt("gui.keyframes.interp"), skin, "hud-header");
 
@@ -59,7 +59,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         posMethod.setItems(interpolation);
         posMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_POSITION.ordinal());
         posMethod.setItems(interpolation);
-        posMethod.setWidth(150 * GlobalConf.UI_SCALE_FACTOR);
+        posMethod.setWidth(240f);
 
         // Camera orientation
         OwnLabel orientation = new OwnLabel(I18n.txt("gui.cam.orientation"), skin);
@@ -67,7 +67,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         orientationMethod.setItems(interpolation);
         orientationMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.ordinal());
         orientationMethod.setItems(interpolation);
-        orientationMethod.setWidth(150 * GlobalConf.UI_SCALE_FACTOR);
+        orientationMethod.setWidth(240f);
 
         // Time
         OwnLabel time = new OwnLabel(I18n.txt("gui.time"), skin);

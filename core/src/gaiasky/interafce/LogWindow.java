@@ -27,7 +27,7 @@ import java.util.List;
 
 public class LogWindow extends GenericDialog {
 
-    private IDateFormat format;
+    private final IDateFormat format;
     private Table logs;
     private ScrollPane scroll;
 
@@ -50,9 +50,9 @@ public class LogWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        w = Math.min(500 * GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getWidth() - 200);
-        h = Math.min(400 * GlobalConf.UI_SCALE_FACTOR, Gdx.graphics.getHeight() - 150);
-        pad = 10 * GlobalConf.UI_SCALE_FACTOR;
+        w = Math.min(800f, Gdx.graphics.getWidth() - 200);
+        h = Math.min(640f, Gdx.graphics.getHeight() - 150);
+        pad = 16f;
 
         logs = new Table(skin);
         List<MessageBean> list = NotificationsInterface.historical;

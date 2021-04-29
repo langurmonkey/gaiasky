@@ -21,7 +21,6 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.interafce.GenericDialog;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
@@ -29,6 +28,7 @@ import gaiasky.util.TextUtils;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Comparator;
+import java.util.function.Consumer;
 
 /**
  * A simple file chooser for scene2d.ui
@@ -54,7 +54,7 @@ public class FileChooser extends GenericDialog {
     private boolean fileNameEnabled;
     private TextField fileNameInput;
     private Label fileNameLabel, acceptedFiles;
-    private Path baseDir;
+    private final Path baseDir;
     private OwnTextField location;
     private List<FileListItem> fileList;
     private Table controlsTable;
@@ -63,6 +63,7 @@ public class FileChooser extends GenericDialog {
     private float scrollPaneWidth, scrollPanelHeight, maxPathLength;
     private ScrollPane scrollPane;
     private CheckBox hidden;
+    private Consumer<Boolean> hiddenConsumer;
 
     private Path currentDir, previousDir, nextDir;
     protected String result;
@@ -119,14 +120,14 @@ public class FileChooser extends GenericDialog {
 
     @Override
     public void build() {
-        scrollPaneWidth = 600 * GlobalConf.UI_SCALE_FACTOR;
-        scrollPanelHeight = 450 * GlobalConf.UI_SCALE_FACTOR;
-        maxPathLength = GlobalConf.isHiDPI() ? 9.5f : 5.5f;
+        scrollPaneWidth = 960f;
+        scrollPanelHeight = 720f;
+        maxPathLength = 9.5f;
 
         content.top().left();
-        content.defaults().space(5 * GlobalConf.UI_SCALE_FACTOR);
-        this.padLeft(10 * GlobalConf.UI_SCALE_FACTOR);
-        this.padRight(10 * GlobalConf.UI_SCALE_FACTOR);
+        content.defaults().space(8f);
+        this.padLeft(16f);
+        this.padRight(16f);
 
         // Controls
         controlsTable = new Table(skin);
@@ -204,7 +205,7 @@ public class FileChooser extends GenericDialog {
 
         // Text input with current location
         location = new OwnTextField("", skin);
-        location.setWidth(465f * GlobalConf.UI_SCALE_FACTOR);
+        location.setWidth(468f);
         location.setAlignment(Align.left);
         location.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -229,7 +230,7 @@ public class FileChooser extends GenericDialog {
 
         // In windows, we need to be able to change drives
         driveButtonsList = new HorizontalGroup();
-        driveButtonsList.left().space(10 * GlobalConf.UI_SCALE_FACTOR);
+        driveButtonsList.left().space(16f);
         driveButtonsList.addActor(new OwnLabel(I18n.txt("gui.fc.drives") + ":", skin));
         Iterable<Path> drives = FileSystems.getDefault().getRootDirectories();
         driveButtons = new Array<>();
@@ -337,7 +338,7 @@ public class FileChooser extends GenericDialog {
         fileNameLabel = new Label(I18n.txt("gui.fc.filename") + ":", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
-        hidden = new OwnCheckBox("Show hidden", skin, 5 * GlobalConf.UI_SCALE_FACTOR);
+        hidden = new OwnCheckBox("Show hidden", skin, 8f);
         hidden.setChecked(false);
         hidden.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -346,6 +347,9 @@ public class FileChooser extends GenericDialog {
                     changeDirectory(currentDir);
                 } catch (IOException e) {
                     logger.error(e);
+                }
+                if(hiddenConsumer != null){
+                    hiddenConsumer.accept(this.showHidden);
                 }
                 return true;
             }
@@ -409,7 +413,8 @@ public class FileChooser extends GenericDialog {
             items.insert(0, new FileListItem("..", directory.getParent()));
         }
 
-        acceptButton.setDisabled(true);
+        if(target != FileChooserTarget.DIRECTORIES)
+            acceptButton.setDisabled(true);
         fileList.setItems(items);
         scrollPane.layout();
 
@@ -457,6 +462,18 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
+    }
+
+    public void setShowHidden(boolean showHidden){
+        hidden.setChecked(showHidden);
+    }
+
+    /**
+     * Sets a consumer that is run when the property 'showHidden' changes, whit its value.
+     * @param r The consumer
+     */
+    public void setShowHiddenConsumer(Consumer<Boolean> r){
+        this.hiddenConsumer = r;
     }
 
     public void setAcceptedFiles(String accepted) {

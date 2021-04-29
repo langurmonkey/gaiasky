@@ -38,7 +38,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     /** Input **/
     public static Lwjgl3Input input;
 
-    private Skin skin;
+    private final Skin skin;
     private Stage ui;
 
     private SpriteBatch sb;
@@ -46,7 +46,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     private boolean initGui = false;
     private boolean initializing = true;
 
-    private Vector2 lastTexSize;
+    private final Vector2 lastTexSize;
 
     public GaiaSkyView() {
         super();
@@ -70,7 +70,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
             Stage ui = new Stage(vp, sb);
             vp.update(graphics.getWidth(), graphics.getHeight(), true);
 
-            OwnLabel l = new OwnLabel("The external view will appear here as soon as Gaia Sky finishes loading", skin, "ui-15");
+            OwnLabel l = new OwnLabel("The external view will appear here as soon as Gaia Sky finishes loading", skin, "ui-19");
             Container<OwnLabel> c = new Container<>(l);
             c.center();
             c.setFillParent(true);

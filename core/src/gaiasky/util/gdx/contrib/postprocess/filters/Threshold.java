@@ -31,8 +31,8 @@ public final class Threshold extends Filter<Threshold> {
         Threshold("u_threshold", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int elementSize) {
             this.mnemonic = mnemonic;

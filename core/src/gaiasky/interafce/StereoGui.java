@@ -7,6 +7,8 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
@@ -34,13 +36,15 @@ public class StereoGui extends AbstractGui {
 
     protected INumberFormat nf;
 
-    public StereoGui() {
-        super();
+    public StereoGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
     }
 
     /**
@@ -129,11 +133,7 @@ public class StereoGui extends AbstractGui {
         switch (event) {
         case STEREO_PROFILE_CMD:
             StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
-            if (profile == StereoProfile.ANAGLYPHIC) {
-                notificationsTwo.setVisible(false);
-            } else {
-                notificationsTwo.setVisible(true);
-            }
+            notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPHIC);
             break;
         default:
             break;

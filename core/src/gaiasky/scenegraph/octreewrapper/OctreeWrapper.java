@@ -28,7 +28,7 @@ public class OctreeWrapper extends AbstractOctreeWrapper {
 
     public OctreeWrapper(String parentName, OctreeNode root) {
         super(parentName, root);
-        roulette = new ArrayList<SceneGraphNode>(root.nObjects);
+        roulette = new ArrayList<>(root.numObjectsRec);
     }
 
     @Override

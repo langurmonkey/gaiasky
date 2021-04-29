@@ -15,7 +15,10 @@ import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.desktop.util.camera.Keyframe;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.render.*;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IPointRenderable;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
@@ -92,7 +95,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     /**
      * Multiplier to primitive size
      **/
-    private float ss = 1f;
+    private final float ss = 1f;
 
     public KeyframesPathObject() {
         super(null, -1);
@@ -101,7 +104,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void initialize() {
         orientations = new Array<>();
 
-        path = new Polyline(RenderGroup.LINE);
+        path = new Polyline(false, RenderGroup.LINE);
         path.setName("Keyframes.path");
         path.ct = this.ct;
         path.setColor(ColorUtils.gGreen);
@@ -109,7 +112,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         path.setPrimitiveSize(0.5f * ss);
         path.initialize();
 
-        segments = new Polyline(RenderGroup.LINE);
+        segments = new Polyline(false, RenderGroup.LINE);
         segments.setName("Keyframes.segments");
         segments.ct = this.ct;
         segments.setColor(ColorUtils.gYellow);
@@ -342,7 +345,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     private void addKnotOrientation(int idx, double px, double py, double pz, double dx, double dy, double dz, double ux, double uy, double uz) {
-        VertsObject dir = new Polyline(RenderGroup.LINE);
+        VertsObject dir = new Polyline(false, RenderGroup.LINE);
         dir.setName("Keyframes.dir" + idx);
         dir.ct = this.ct;
         dir.setColor(ColorUtils.gRed);
@@ -350,7 +353,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         dir.setPrimitiveSize(0.6f * ss);
         dir.initialize();
 
-        VertsObject up = new Polyline(RenderGroup.LINE);
+        VertsObject up = new Polyline(false, RenderGroup.LINE);
         up.setName("Keyframes.up" + idx);
         up.ct = this.ct;
         up.setColor(ColorUtils.gBlue);
@@ -358,8 +361,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         up.setPrimitiveSize(0.6f * ss);
         up.initialize();
 
-        dir.setPoints(new double[]{px, py, pz, px + dx, py + dy, pz + dz});
-        up.setPoints(new double[]{px, py, pz, px + ux, py + uy, pz + uz});
+        dir.setPoints(new double[] { px, py, pz, px + dx, py + dy, pz + dz });
+        up.setPoints(new double[] { px, py, pz, px + ux, py + uy, pz + uz });
 
         objects.add(dir);
         objects.add(up);
@@ -558,7 +561,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (selected != null || highlighted != null) {
+        if (this.shouldRender() && (selected != null || highlighted != null)) {
             addToRender(this, RenderGroup.FONT_LABEL);
         }
     }
@@ -622,7 +625,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         shader.setUniformf("u_thOverFactorScl", 1);
         shader.setUniform4fv("u_color", textColour(kf), 0, 4);
 
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam);
 
     }
 
@@ -713,6 +716,5 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public int getGlPrimitive() {
         return GL20.GL_LINE_STRIP;
     }
-
 
 }

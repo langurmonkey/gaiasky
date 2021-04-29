@@ -61,20 +61,20 @@ import java.util.TreeSet;
  * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog implements IObserver {
-    private static Log logger = Logger.getLogger(PreferencesWindow.class);
+    private static final Log logger = Logger.getLogger(PreferencesWindow.class);
 
     // Remember the last tab opened
     private static OwnTextIconButton lastTab;
     private static boolean lastTabFlag = true;
 
-    private Array<Actor> contents;
-    private Array<OwnLabel> labels;
+    private final Array<Actor> contents;
+    private final Array<OwnLabel> labels;
 
     private IValidator widthValidator, heightValidator, screenshotsSizeValidator, frameoutputSizeValidator, limitfpsValidator;
 
-    private INumberFormat nf3, nf1;
+    private final INumberFormat nf3;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, hidpiCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
+    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -82,7 +82,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<String> theme, recgridOrigin;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
-    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth;
+    private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
     private DatasetsWidget dw;
@@ -92,7 +92,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     // Backup values
     private ToneMapping toneMappingBak;
-    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak;
+    private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
     private boolean lensflareBak, lightglowBak, debugInfoBak, motionblurBak;
 
     public PreferencesWindow(Stage stage, Skin skin) {
@@ -101,7 +101,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         this.contents = new Array<>();
         this.labels = new Array<>();
 
-        this.nf1 = NumberFormatFactory.getFormatter("0.0");
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
         setAcceptText(I18n.txt("gui.saveprefs"));
@@ -110,75 +109,59 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Build UI
         buildSuper();
 
-
         EventManager.instance.subscribe(this, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
+    }
+
+    private OwnTextIconButton createTab(String title, Image img, Skin skin, String style) {
+        OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, style);
+        tab.addListener(new OwnTextTooltip(title, skin));
+        tab.pad(pad5);
+        tab.setWidth(480f);
+        return tab;
     }
 
     @Override
     protected void build() {
-        float contentw = 700f * GlobalConf.UI_SCALE_FACTOR;
-        float contenth = 700f * GlobalConf.UI_SCALE_FACTOR;
-        final float tawidth = 600f * GlobalConf.UI_SCALE_FACTOR;
-        float tabwidth = (GlobalConf.isHiDPI() ? 260f : 240f) * GlobalConf.UI_SCALE_FACTOR;
-        float textwidth = 65f * GlobalConf.UI_SCALE_FACTOR;
-        float scrollh = 400f * GlobalConf.UI_SCALE_FACTOR;
-        float controlsscrollw = 550f * GlobalConf.UI_SCALE_FACTOR;
-        float controlsscrollh = 350f * GlobalConf.UI_SCALE_FACTOR;
+        float contentw = 1120f;
+        float contenth = 1120f;
+        final float tawidth = 960f;
+        float textwidth = 104f;
+        float scrollh = 640f;
+        float controlsscrollw = 880f;
+        float controlsscrollh = 560f;
         float sliderWidth = textwidth * 3f;
+        float buttonw = 240f;
+        float buttonh = 40f;
 
         // Create the tab buttons
-        VerticalGroup group = new VerticalGroup();
+        Table group = new Table(skin);
         group.align(Align.left | Align.top);
 
-        final OwnTextIconButton tabGraphics = new OwnTextIconButton(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
-        tabGraphics.pad(pad5);
-        tabGraphics.setWidth(tabwidth);
-        final OwnTextIconButton tabUI = new OwnTextIconButton(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
-        tabUI.pad(pad5);
-        tabUI.setWidth(tabwidth);
-        final OwnTextIconButton tabPerformance = new OwnTextIconButton(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
-        tabPerformance.pad(pad5);
-        tabPerformance.setWidth(tabwidth);
-        final OwnTextIconButton tabControls = new OwnTextIconButton(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
-        tabControls.pad(pad5);
-        tabControls.setWidth(tabwidth);
-        final OwnTextIconButton tabScreenshots = new OwnTextIconButton(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
-        tabScreenshots.pad(pad5);
-        tabScreenshots.setWidth(tabwidth);
-        final OwnTextIconButton tabFrames = new OwnTextIconButton(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
-        tabFrames.pad(pad5);
-        tabFrames.setWidth(tabwidth);
-        final OwnTextIconButton tabCamera = new OwnTextIconButton(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
-        tabCamera.pad(pad5);
-        tabCamera.setWidth(tabwidth);
-        final OwnTextIconButton tab360 = new OwnTextIconButton(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
-        tab360.pad(pad5);
-        tab360.setWidth(tabwidth);
-        final OwnTextIconButton tabPlanetarium = new OwnTextIconButton(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin, "toggle-big");
-        tabPlanetarium.pad(pad5);
-        tabPlanetarium.setWidth(tabwidth);
-        final OwnTextIconButton tabData = new OwnTextIconButton(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
-        tabData.pad(pad5);
-        tabData.setWidth(tabwidth);
-        final OwnTextIconButton tabGaia = new OwnTextIconButton(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
-        tabGaia.pad(pad5);
-        tabGaia.setWidth(tabwidth);
-        final OwnTextIconButton tabSystem = new OwnTextIconButton(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
-        tabSystem.pad(pad5);
-        tabSystem.setWidth(tabwidth);
+        final OwnTextIconButton tabGraphics = createTab(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
+        final OwnTextIconButton tabUI = createTab(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
+        final OwnTextIconButton tabPerformance = createTab(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
+        final OwnTextIconButton tabControls = createTab(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
+        final OwnTextIconButton tabScreenshots = createTab(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
+        final OwnTextIconButton tabFrames = createTab(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
+        final OwnTextIconButton tabCamera = createTab(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
+        final OwnTextIconButton tab360 = createTab(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
+        final OwnTextIconButton tabPlanetarium = createTab(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin, "toggle-big");
+        final OwnTextIconButton tabData = createTab(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
+        final OwnTextIconButton tabGaia = createTab(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
+        final OwnTextIconButton tabSystem = createTab(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
 
-        group.addActor(tabGraphics);
-        group.addActor(tabUI);
-        group.addActor(tabPerformance);
-        group.addActor(tabControls);
-        group.addActor(tabScreenshots);
-        group.addActor(tabFrames);
-        group.addActor(tabCamera);
-        group.addActor(tab360);
-        group.addActor(tabPlanetarium);
-        group.addActor(tabData);
-        group.addActor(tabGaia);
-        group.addActor(tabSystem);
+        group.add(tabGraphics).row();
+        group.add(tabUI).row();
+        group.add(tabPerformance).row();
+        group.add(tabControls).row();
+        group.add(tabScreenshots).row();
+        group.add(tabFrames).row();
+        group.add(tabCamera).row();
+        group.add(tab360).row();
+        group.add(tabPlanetarium).row();
+        group.add(tabData).row();
+        group.add(tabGaia).row();
+        group.add(tabSystem).row();
         content.add(group).align(Align.left | Align.top).padLeft(pad5);
 
         // Create the tab content. Just using images here for simplicity.
@@ -204,7 +187,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Array<DisplayMode> modes = new Array<>(Gdx.graphics.getDisplayModes());
         modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
         fullscreenResolutions = new OwnSelectBox<>(skin);
-        fullscreenResolutions.setWidth(textwidth * 3.3f);
+        fullscreenResolutions.setWidth(textwidth * 3.45f);
         fullscreenResolutions.setItems(modes);
 
         DisplayMode selectedMode = null;
@@ -219,7 +202,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Get current resolution
         Table windowedResolutions = new Table(skin);
-        DisplayMode nativeMode = Gdx.graphics.getDisplayMode();
         widthValidator = new IntValidator(100, 10000);
         widthField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_WIDTH, 100, 10000)), skin, widthValidator);
         widthField.setWidth(textwidth);
@@ -278,17 +260,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        mode.add(fullscreen).left().padRight(pad5 * 2);
+        mode.add(fullscreen).left().padRight(pad5 * 2f);
         mode.add(fullscreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad5 * 2).padTop(pad5 * 2);
-        mode.add(windowedResolutions).left().padTop(pad5 * 2).row();
-        mode.add(vsync).left().padTop(pad5 * 2).colspan(2).row();
-        mode.add(limitfpsCb).left().padRight(pad5 * 2);
+        mode.add(windowed).left().padRight(pad5 * 2f).padTop(pad5 * 2f);
+        mode.add(windowedResolutions).left().padTop(pad5 * 2f).row();
+        mode.add(vsync).left().padTop(pad5 * 2f).colspan(2).row();
+        mode.add(limitfpsCb).left().padRight(pad20 * 4.9f);
         mode.add(limitFps).left();
 
         // Add to content
-        contentGraphicsTable.add(titleResolution).left().padBottom(pad5 * 2).row();
-        contentGraphicsTable.add(mode).left().padBottom(pad5 * 4).row();
+        contentGraphicsTable.add(titleResolution).left().padBottom(pad5 * 2f).row();
+        contentGraphicsTable.add(mode).left().padBottom(pad5 * 4f).row();
 
         // GRAPHICS SETTINGS
         Label titleGraphics = new OwnLabel(I18n.txt("gui.graphicssettings"), skin, "header");
@@ -370,7 +352,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // BLOOM
         bloomBak = GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY;
         OwnLabel bloomLabel = new OwnLabel(I18n.txt("gui.bloom"), skin, "default");
-        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1, skin);
+        Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, Constants.SLIDER_STEP, skin);
         bloomEffect.setName("bloom effect");
         bloomEffect.setWidth(sliderWidth);
         bloomEffect.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
@@ -382,12 +364,27 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // UNSHARP MASK
+        unsharpMaskBak = GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR;
+        OwnLabel unsharpMaskLabel = new OwnLabel(I18n.txt("gui.unsharpmask"), skin, "default");
+        Slider unsharpMaskFactor = new OwnSlider(Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
+        unsharpMaskFactor.setName("unsharp mask factor");
+        unsharpMaskFactor.setWidth(sliderWidth);
+        unsharpMaskFactor.setValue(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR);
+        unsharpMaskFactor.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.UNSHARP_MASK_CMD, unsharpMaskFactor.getValue(), true);
+                return true;
+            }
+            return false;
+        });
+
         // LABELS
         labels.addAll(gqualityLabel, aaLabel, orbitsLabel, lrLabel, bloomLabel);
 
         // LENS FLARE
         lensflareBak = GlobalConf.postprocess.POSTPROCESS_LENS_FLARE;
-        CheckBox lensFlare = new CheckBox(" " + I18n.txt("gui.lensflare"), skin);
+        CheckBox lensFlare = new OwnCheckBox(I18n.txt("gui.lensflare"), skin, pad5);
         lensFlare.setName("lens flare");
         lensFlare.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -400,7 +397,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // LIGHT GLOW
         lightglowBak = GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING;
-        CheckBox lightGlow = new CheckBox(" " + I18n.txt("gui.lightscattering"), skin);
+        CheckBox lightGlow = new OwnCheckBox(I18n.txt("gui.lightscattering"), skin, pad5);
         lightGlow.setName("light scattering");
         lightGlow.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         lightGlow.addListener(event -> {
@@ -413,9 +410,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // MOTION BLUR
         motionblurBak = GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR;
-        CheckBox motionBlur = new CheckBox(" " + I18n.txt("gui.motionblur"), skin);
+        CheckBox motionBlur = new OwnCheckBox(I18n.txt("gui.motionblur"), skin, pad5);
         motionBlur.setName("motion blur");
-        motionBlur.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        motionBlur.setChecked(!GlobalConf.program.SAFE_GRAPHICS_MODE && GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        motionBlur.setDisabled(GlobalConf.program.SAFE_GRAPHICS_MODE);
         motionBlur.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlur.isChecked(), true);
@@ -424,22 +422,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        graphics.add(gqualityLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        graphics.add(gquality).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(gqualityLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(gquality).left().padRight(pad10).padBottom(pad5);
         graphics.add(gqualityTooltip).left().padBottom(pad5).row();
         noticeHiResCell = graphics.add();
         noticeHiResCell.colspan(2).left().row();
         final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
         noticeGraphicsCell.colspan(2).left().row();
-        graphics.add(aaLabel).left().padRight(pad5 * 4).padBottom(pad5);
-        graphics.add(aa).left().padRight(pad5 * 2).padBottom(pad5);
+        graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(aa).left().padRight(pad10).padBottom(pad5);
         graphics.add(aaTooltip).left().padBottom(pad5).row();
-        graphics.add(orbitsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(orbitsLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(orbitRenderer).left().padBottom(pad5).row();
-        graphics.add(lrLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(lrLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(lineRenderer).left().padBottom(pad5).row();
-        graphics.add(bloomLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(bloomEffect).left().padBottom(pad5).row();
+        graphics.add(unsharpMaskLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(unsharpMaskFactor).left().padBottom(pad5).row();
         graphics.add(lensFlare).colspan(2).left().padBottom(pad5).row();
         graphics.add(lightGlow).colspan(2).left().padBottom(pad5).row();
         graphics.add(motionBlur).colspan(2).left().padBottom(pad5).row();
@@ -466,11 +466,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         elevationSb.setSelectedIndex(GlobalConf.scene.ELEVATION_TYPE.ordinal());
         elevationSb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (elevationSb.getSelected().type.isTessellation()) {
-                    enableComponents(true, tessQuality, tessQualityLabel);
-                } else {
-                    enableComponents(false, tessQuality, tessQualityLabel);
-                }
+                enableComponents(elevationSb.getSelected().type.isTessellation(), tessQuality, tessQualityLabel);
             }
             return false;
         });
@@ -689,7 +685,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         /*
          * ==== UI ====
          */
-        float labelWidth = 250f * GlobalConf.UI_SCALE_FACTOR;
+        float labelWidth = 400f;
 
         final Table contentUI = new Table(skin);
         contents.add(contentUI);
@@ -750,9 +746,22 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         theme.setItems(themes);
         theme.setSelected(GlobalConf.program.getUIThemeBase());
 
-        // HiDPI
-        hidpiCb = new OwnCheckBox(I18n.txt("gui.ui.theme.hidpi"), skin, "default", pad5);
-        hidpiCb.setChecked(GlobalConf.program.isHiDPITheme());
+        // SCALING
+        OwnLabel uiScalelabel = new OwnLabel(I18n.txt("gui.ui.theme.scale"), skin);
+        uiScalelabel.setWidth(labelWidth);
+        uiScale = new OwnSlider(Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, skin);
+        uiScale.setWidth(textwidth * 3f);
+        uiScale.setMappedValue(GlobalConf.program.UI_SCALE);
+        OwnTextButton applyUiScale = new OwnTextButton(I18n.txt("gui.apply"), skin);
+        applyUiScale.pad(0, pad10, 0, pad10);
+        applyUiScale.setHeight(buttonh);
+        applyUiScale.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.UI_SCALE_CMD, uiScale.getMappedValue());
+                return true;
+            }
+            return false;
+        });
 
         // POINTER COORDINATES
         pointerCoords = new OwnCheckBox(I18n.txt("gui.ui.pointercoordinates"), skin, "default", pad5);
@@ -771,13 +780,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to table
         ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad10);
-        ui.add(lang).left().padBottom(pad10).row();
+        ui.add(lang).colspan(2).left().padBottom(pad10).row();
         ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad10);
-        ui.add(theme).left().padBottom(pad10).row();
-        ui.add(hidpiCb).colspan(2).left().padBottom(pad10).row();
-        ui.add(pointerCoords).colspan(2).left().padRight(pad5).padBottom(pad10).row();
+        ui.add(theme).colspan(2).left().padBottom(pad10).row();
+        ui.add(uiScalelabel).left().padRight(pad5 * 4).padBottom(pad10);
+        ui.add(uiScale).left().padRight(pad5).padBottom(pad10);
+        ui.add(applyUiScale).left().padBottom(pad10).row();
+        ui.add(pointerCoords).colspan(3).left().padRight(pad5).padBottom(pad10).row();
         ui.add(minimapSizeLabel).left().padRight(pad5).padBottom(pad10);
-        ui.add(minimapSize).left().padRight(pad5).padBottom(pad10).row();
+        ui.add(minimapSize).colspan(2).left().padRight(pad5).padBottom(pad10).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -820,7 +831,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pointerGuidesCbGroup.addActor(guidesTooltip);
 
         // GUIDES COLOR
-        float cpsize = 20f * GlobalConf.UI_SCALE_FACTOR;
+        float cpsize = 32f;
         pointerGuidesColor = new ColorPicker(stage, skin);
         pointerGuidesColor.setPickedColor(GlobalConf.program.POINTER_GUIDES_COLOR);
 
@@ -995,7 +1006,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         inverty = new OwnCheckBox(I18n.txt("gui.controller.axis.invert", "Y"), skin, "default", pad5);
         inverty.setChecked(GlobalConf.controls.INVERT_LOOK_Y_AXIS);
 
-
         // KEY BINDINGS
         OwnLabel titleKeybindings = new OwnLabel(I18n.txt("gui.keymappings"), skin, "header");
 
@@ -1097,6 +1107,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotsLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Paths.get(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -1136,13 +1148,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         screenshotMode.setWidth(textwidth * 3f);
         screenshotMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                if (screenshotMode.getSelected().value == 0) {
-                    // Simple
-                    enableComponents(false, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                } else {
-                    // Redraw
-                    enableComponents(true, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
-                }
+                // Simple
+                // Redraw
+                enableComponents(screenshotMode.getSelected().value != 0, sswidthField, ssheightField, screenshotsSizeLabel, xLabel);
                 return true;
             }
             return false;
@@ -1202,6 +1210,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutputLocation.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Paths.get(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -1251,13 +1261,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         frameoutputMode.setWidth(textwidth * 3f);
         frameoutputMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                if (frameoutputMode.getSelected().value == 0) {
-                    // Simple
-                    enableComponents(false, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                } else {
-                    // Redraw
-                    enableComponents(true, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
-                }
+                // Simple
+                // Redraw
+                enableComponents(frameoutputMode.getSelected().value != 0, fowidthField, foheightField, frameoutputSizeLabel, xLabelfo);
                 return true;
             }
             return false;
@@ -1522,13 +1528,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.setWidth(tawidth);
         dataSourceInfo.clearListeners();
 
-        dw = new DatasetsWidget(skin);
-        Array<FileHandle> catalogFiles = dw.buildCatalogFiles();
-        Actor dataSource = dw.buildDatasetsWidget(catalogFiles, false, 20);
-
+        dw = new DatasetsWidget(stage, skin);
+        dw.reloadLocalCatalogs();
+        Actor dataSource = dw.buildDatasetsWidget(false, 20);
 
         OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
-        dataDownload.setSize(150 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
+        dataDownload.pad(0, pad10, 0, pad10);
+        dataDownload.setHeight(buttonh);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.currentDataDescriptor != null) {
@@ -1537,8 +1543,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     ddw.show(stage);
                 } else {
                     // Try again
-                    FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
-                    DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
+                    FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION) + "/gaiasky-data.json");
+                    DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, null, (digest) -> {
                         DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
                         DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, dd, false, I18n.txt("gui.close"));
                         ddw.setModal(true);
@@ -1649,7 +1655,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
             return false;
         });
-        reloadDefaults.setSize(180 * GlobalConf.UI_SCALE_FACTOR, 25 * GlobalConf.UI_SCALE_FACTOR);
+        reloadDefaults.pad(0, pad10, 0, pad10);
+        reloadDefaults.setHeight(buttonh);
 
         OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
@@ -1689,7 +1696,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         tabContent.addActor(contentSystem);
 
         /* ADD TO MAIN TABLE */
-        content.add(tabContent).left().padLeft(pad10).expand().fill();
+        content.add(tabContent).left().padLeft(pad15).expand().fill();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state
@@ -1946,9 +1953,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Interface
         LangComboBoxBean lbean = lang.getSelected();
         String newTheme = theme.getSelected();
-        if (hidpiCb.isChecked()) {
-            newTheme += "-x2";
-        }
+        // UI scale
+        float factor = uiScale.getMappedValue();
+        EventManager.instance.post(Events.UI_SCALE_CMD, factor);
+
+
         boolean reloadUI = !GlobalConf.program.UI_THEME.equals(newTheme) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE) || GlobalConf.program.MINIMAP_SIZE != minimapSize.getValue();
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
@@ -1958,8 +1967,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (previousPointerCoords != GlobalConf.program.DISPLAY_POINTER_COORDS) {
             EventManager.instance.post(Events.DISPLAY_POINTER_COORDS_CMD, GlobalConf.program.DISPLAY_POINTER_COORDS);
         }
-        // Update scale factor according to theme - for HiDPI screens
-        GlobalConf.updateScaleFactor(GlobalConf.program.UI_THEME.endsWith("x2") ? 1.6f : 1f);
 
         // Crosshairs
         EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocusCb.isChecked());
@@ -2124,6 +2131,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.instance.post(Events.LENS_FLARE_CMD, lensflareBak, true);
         EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightglowBak, true);
         EventManager.instance.post(Events.BLOOM_CMD, bloomBak, true);
+        EventManager.instance.post(Events.UNSHARP_MASK_CMD, unsharpMaskBak, true);
         EventManager.instance.post(Events.EXPOSURE_CMD, exposureBak, true);
         EventManager.instance.post(Events.TONEMAPPING_TYPE_CMD, toneMappingBak, true);
         EventManager.instance.post(Events.SHOW_DEBUG_CMD, debugInfoBak);

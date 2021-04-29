@@ -44,7 +44,7 @@ public class ExtSpriteBatch implements ExtBatch {
 	 *             used when gles 3 is not available, defaults to {@link VertexDataType#VertexArray}. */
 	@Deprecated public static VertexDataType defaultVertexDataType = VertexDataType.VertexArray;
 
-	private IntMesh mesh;
+	private final IntMesh mesh;
 
 	final float[] vertices;
 	int idx = 0;

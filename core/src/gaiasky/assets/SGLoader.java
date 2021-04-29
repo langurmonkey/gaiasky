@@ -36,7 +36,7 @@ import java.nio.file.Paths;
  * @author Toni Sagrista
  */
 public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLoaderParameter> {
-    private static Log logger = Logger.getLogger(SGLoader.class);
+    private static final Log logger = Logger.getLogger(SGLoader.class);
 
     ISceneGraph sg;
 

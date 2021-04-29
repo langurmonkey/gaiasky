@@ -52,7 +52,7 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (pointCloudData != null && pointCloudData.getNumPoints() > 0)
+        if (this.shouldRender() && pointCloudData != null && pointCloudData.getNumPoints() > 0)
             addToRender(this, renderGroup);
     }
 

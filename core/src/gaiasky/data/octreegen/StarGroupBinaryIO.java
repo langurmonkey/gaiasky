@@ -6,9 +6,10 @@
 package gaiasky.data.octreegen;
 
 import gaiasky.data.group.BinaryDataProvider;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,13 +37,13 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @param out  The output stream to write to
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
-        writeParticles(list, out, true);
+        writeParticles(list, out, BinaryDataProvider.DEFAULT_OUTPUT_VERSION);
     }
 
-    public void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat) {
+    public void writeParticles(List<SceneGraphNode> list, OutputStream out, int version) {
         if (list.size() > 0) {
             StarGroup sg = (StarGroup) list.get(0);
-            provider.writeData(sg.data(), out, compat);
+            provider.writeData(sg.data(), out, version);
         }
     }
 
@@ -53,11 +54,7 @@ public class StarGroupBinaryIO implements IStarGroupIO {
      * @return A list with a single star group object
      */
     public List<SceneGraphNode> readParticles(InputStream in) {
-        return readParticles(in, true);
-    }
-
-    public List<SceneGraphNode> readParticles(InputStream in, boolean compat) {
-        List<ParticleBean> data = provider.loadData(in, 1.0, compat);
+        List<IParticleRecord> data = provider.loadData(in, 1.0);
         StarGroup sg = new StarGroup();
         sg.setData(data);
 

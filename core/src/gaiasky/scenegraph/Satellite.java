@@ -19,7 +19,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 public abstract class Satellite extends ModelBody {
 
     protected static final double TH_ANGLE_NONE = ModelBody.TH_ANGLE_POINT / 1e18;
-    protected static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 1e9;
+    protected static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 3.3e10;
     protected static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 8;
 
     protected boolean parentOrientation = false;

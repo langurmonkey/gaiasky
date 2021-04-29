@@ -10,6 +10,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -19,6 +21,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ScreenUtils;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -53,7 +56,7 @@ public class GlobalResources {
 
     public static ShaderProgram spriteShader;
     /** Global all-purpose sprite batch **/
-    public static SpriteBatch spriteBatch;
+    public static SpriteBatch spriteBatch, spriteBatchVR;
 
     public static ExtShaderProgram extSpriteShader;
     /** Sprite batch using int indices **/
@@ -63,7 +66,7 @@ public class GlobalResources {
     /** The global skin **/
     public static Skin skin;
 
-    private static Vector3d aux = new Vector3d();
+    private static final Vector3d aux = new Vector3d();
 
     public static void initialize(AssetManager manager) {
         // Sprite shader
@@ -71,8 +74,8 @@ public class GlobalResources {
         if (!spriteShader.isCompiled()) {
             logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
         }
-        // Sprite batch
-        spriteBatch = new SpriteBatch(1000, spriteShader);
+        // Sprite batch - uses screen resolution
+        spriteBatch = new SpriteBatch(500, spriteShader);
 
         // ExtSprite shader
         extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
@@ -96,17 +99,19 @@ public class GlobalResources {
             fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
         }
         skin = new Skin(fh);
+        ObjectMap<String, BitmapFont> fonts = skin.getAll(BitmapFont.class);
+        for(String key : fonts.keys()){
+            fonts.get(key).getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        }
     }
 
     private static void initCursors() {
         // Create skin right now, it is needed.
-        if (GlobalConf.program.UI_THEME.endsWith("-x2")) {
-            GlobalConf.updateScaleFactor(1.6f);
+        if (GlobalConf.program.UI_SCALE > 1.5) {
             linkCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0);
             resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16);
             resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16);
         } else {
-            GlobalConf.updateScaleFactor(1.0f);
             linkCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0);
             resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8);
             resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8);
@@ -325,9 +330,15 @@ public class GlobalResources {
         return false;
     }
 
+    /**
+     * Deletes recursively all non-partial files from the path.
+     * @param path The path to delete.
+     * @throws IOException
+     */
     public static void deleteRecursively(Path path) throws IOException {
         Files.walk(path)
                 .sorted(Comparator.reverseOrder())
+                .filter(p -> !p.toString().endsWith(".part") && !Files.isDirectory(p))
                 .map(Path::toFile)
                 .forEach(java.io.File::delete);
     }
@@ -525,7 +536,7 @@ public class GlobalResources {
      * Converts bytes to a human readable format
      *
      * @param bytes The bytes
-     * @param si    Whether to use SI units or binary
+     * @param si    Whether to use SI units (1000-multiples) or binary (1024-multiples)
      * @return The size in a human readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
@@ -727,7 +738,7 @@ public class GlobalResources {
         throw new RuntimeException("Skybox side '" + side + "' not found in folder: " + skyboxLoc);
     }
 
-    private static IntBuffer buf = BufferUtils.newIntBuffer(16);
+    private static final IntBuffer buf = BufferUtils.newIntBuffer(16);
 
     public static synchronized String getGLExtensions() {
         String extensions = Gdx.gl.glGetString(GL30.GL_EXTENSIONS);
@@ -808,5 +819,17 @@ public class GlobalResources {
         combination.addAll(combination(subSet, size));
 
         return combination;
+    }
+
+    public static String nObjectsToString(long objs) {
+        if (objs > 1e9) {
+            return String.format("%.1f", objs / 1.0e9) + " B";
+        } else if (objs > 1e6) {
+            return String.format("%.1f", objs / 1.0e6) + " M";
+        } else if (objs > 1e3) {
+            return String.format("%.1f", objs / 1.0e3) + " K";
+        } else {
+            return objs + "";
+        }
     }
 }

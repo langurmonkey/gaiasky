@@ -38,7 +38,7 @@ import net.jafama.FastMath;
  *
  */
 public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
-    private static float[] labelColour = new float[] { 1, 1, 1, 1 };
+    private static final float[] labelColour = new float[] { 1, 1, 1, 1 };
 
     /**
      * radius/distance limit for rendering at all. If angle is smaller than this
@@ -60,6 +60,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     public float TH_OVER_FACTOR;
 
+    /** NAME FOR WIKIPEDIA **/
+    public String wikiname;
     /** Absolute magnitude, m = -2.5 log10(flux), with the flux at 10 pc **/
     public float absmag;
     /** Apparent magnitude, m = -2.5 log10(flux) **/
@@ -68,6 +70,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public float[] ccPale;
     /** Colour for stars that have been observed by Gaia **/
     public float[] ccTransit;
+
+
     /**
      * The B-V color index, calculated as the magnitude in B minus the magnitude
      * in V
@@ -75,11 +79,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public float colorbv;
     /** Holds information about the rotation of the body **/
     public RotationComponent rc;
-
-    /** Number of times this body has been observed by Gaia **/
-    public int transits = 0;
-    /** Last observations increase in ms **/
-    public long lastTransitIncrease = 0;
 
     /** Component alpha mirror **/
     public float compalpha;
@@ -96,16 +95,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public CelestialBody() {
         super();
         TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
-    }
-
-    /**
-     * Overrides the update adding the magnitude limit thingy.
-     */
-    @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
-        if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
-            super.update(time, parentTransform, camera);
-        }
     }
 
     /**
@@ -167,7 +156,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
             shader.setUniformf("u_thOverFactor", getThOverFactor(camera));
             shader.setUniformf("u_thOverFactorScl", getThOverFactorScl());
 
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
         }
 
     }
@@ -242,6 +231,10 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         this.size = (float) (size * 2 * Constants.KM_TO_U);
     }
 
+    public void setColorbv(Double colorbv) {
+        this.colorbv = colorbv.floatValue();
+    }
+
     public boolean isStar() {
         return false;
     }
@@ -251,10 +244,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
      */
     public void setRotation(RotationComponent rc) {
         this.rc = rc;
-    }
-
-    public boolean withinMagLimit() {
-        return this.appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME;
     }
 
     @Override
@@ -269,7 +258,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     @Override
     public boolean renderText() {
-        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && Math.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl());
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && FastMath.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl());
     }
 
     @Override
@@ -324,7 +313,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override
@@ -358,7 +347,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             Vector3 pos = aux3f1.get();
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
@@ -398,7 +387,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && checkHitCondition()) {
+        if (checkHitCondition()) {
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
 
@@ -488,5 +477,13 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     @Override
     public Vector3d getClosestAbsolutePos(Vector3d out){
         return getAbsolutePosition(out);
+    }
+
+    public String getWikiname() {
+        return wikiname;
+    }
+
+    public void setWikiname(String wikiname) {
+        this.wikiname = wikiname;
     }
 }

@@ -22,6 +22,7 @@ import uk.ac.starlink.util.DataSource;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final String separator = "[\\t,]";
@@ -125,5 +126,10 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
 
     @Override
     public void setDescription(String description) {
+    }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+
     }
 }

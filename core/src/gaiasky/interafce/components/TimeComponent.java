@@ -6,16 +6,19 @@
 package gaiasky.interafce.components;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.DateDialog;
 import gaiasky.interafce.KeyBindings;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.format.DateFormatFactory;
@@ -29,35 +32,44 @@ import java.time.ZoneOffset;
 public class TimeComponent extends GuiComponent implements IObserver {
 
     /** Date format **/
-    private IDateFormat dfdate, dftime;
+    private final IDateFormat dfdate;
+    private final IDateFormat dftime;
 
     protected OwnLabel date;
     protected OwnLabel time;
     protected ImageButton plus, minus;
-    protected Label timeWarp;
     protected OwnTextIconButton dateEdit;
     protected DateDialog dateDialog;
+    protected OwnSliderPlus warp;
+    private OwnTextIconButton resetTime;
+
+    // Warp steps per side + 0, 0.125, 0.250, 0.5
+    private final int warpSteps = Constants.WARP_STEPS + 4;
+    protected double[] timeWarpVector;
+    // Guard to know when to fire warp events
+    protected boolean warpGuard = false;
 
     public TimeComponent(Skin skin, Stage stage) {
         super(skin, stage);
 
         dfdate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
         dftime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
-        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.PACE_CHANGED_INFO);
+        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.TIME_WARP_CMD);
     }
 
     @Override
     public void initialize() {
+        float contentWidth = ControlsWindow.getContentWidth();
         KeyBindings kb = KeyBindings.instance;
 
         // Time
-        date = new OwnLabel("date UT", skin, "mono");
+        date = new OwnLabel("date UT", skin);
         date.setName("label date");
-        date.setWidth(165f * GlobalConf.UI_SCALE_FACTOR);
+        date.setWidth(170f);
 
-        time = new OwnLabel("time UT", skin, "mono");
+        time = new OwnLabel("time UT", skin);
         time.setName("label time");
-        time.setWidth(165f * GlobalConf.UI_SCALE_FACTOR);
+        time.setWidth(120f);
 
         dateEdit = new OwnTextIconButton("", skin, "edit");
         dateEdit.addListener(event -> {
@@ -74,7 +86,20 @@ public class TimeComponent extends GuiComponent implements IObserver {
         dateEdit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dateedit"), skin));
 
         // Pace
-        Label paceLabel = new Label(I18n.txt("gui.pace") + " ", skin);
+        timeWarpVector = generateTimeWarpVector(warpSteps);
+        warp = new OwnSliderPlus(I18n.txt("gui.warp"), -warpSteps, warpSteps, 1, skin, "big-horizontal-arrow");
+        warp.setValueLabelTransform((value) -> TextUtils.getFormattedTimeWarp(timeWarpVector[value.intValue() + warpSteps]));
+        warp.setValue(getWarpIndex(GaiaSky.instance.time.getWarpFactor()) - warpSteps);
+        warp.setWidth(300f);
+        warp.addListener((event) -> {
+            if (event instanceof ChangeEvent && !warpGuard) {
+                int index = (int) warp.getValue();
+                double newWarp = timeWarpVector[index + warpSteps];
+                EventManager.instance.post(Events.TIME_WARP_CMD, newWarp, true);
+            }
+            return false;
+        });
+
         plus = new OwnImageButton(skin, "plus");
         plus.setName("plus");
         plus.addListener(event -> {
@@ -100,35 +125,94 @@ public class TimeComponent extends GuiComponent implements IObserver {
         });
         minus.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
 
-        timeWarp = new OwnLabel(TextUtils.getFormattedTimeWarp(), skin, "warp");
-        timeWarp.setName("time warp");
-        timeWarp.setAlignment(Align.center);
-        Container<Label> wrapWrapper = new Container<>(timeWarp);
-        wrapWrapper.width(120f * GlobalConf.UI_SCALE_FACTOR);
-        wrapWrapper.align(Align.center);
+        /** Reset time **/
+        resetTime = new OwnTextIconButton(I18n.txt("gui.resettime"), skin, "reset");
+        resetTime.align(Align.center);
+        resetTime.setWidth(contentWidth);
+        resetTime.addListener(new OwnTextTooltip(I18n.txt("gui.resettime.tooltip"), skin));
+        resetTime.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                // Events
+                EventManager m = EventManager.instance;
+                m.post(Events.TIME_CHANGE_CMD, Instant.now());
+                m.post(Events.TIME_WARP_CMD, 1d, false);
+                return true;
+            }
+            return false;
+        });
 
-        VerticalGroup timeGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(3 * GlobalConf.UI_SCALE_FACTOR).padTop(3 * GlobalConf.UI_SCALE_FACTOR);
+        Table timeGroup = new Table(skin);
 
-        HorizontalGroup dateGroup = new HorizontalGroup();
-        dateGroup.space(4f * GlobalConf.UI_SCALE_FACTOR);
-        VerticalGroup datetimeGroup = new VerticalGroup();
-        datetimeGroup.addActor(date);
-        datetimeGroup.addActor(time);
-        dateGroup.addActor(datetimeGroup);
-        dateGroup.addActor(dateEdit);
-        timeGroup.addActor(dateGroup);
+        // Date time
+        Table dateGroup = new Table(skin);
+        Table datetimeGroup = new Table(skin);
+        datetimeGroup.add(date).left().padBottom(pad4).padRight(pad12);
+        datetimeGroup.add(time).left().padBottom(pad4);
+        dateGroup.add(datetimeGroup).left().padRight(pad12);
+        dateGroup.add(dateEdit).right();
 
-        HorizontalGroup paceGroup = new HorizontalGroup();
-        paceGroup.space(3f * GlobalConf.UI_SCALE_FACTOR);
-        paceGroup.addActor(paceLabel);
-        paceGroup.addActor(minus);
-        paceGroup.addActor(wrapWrapper);
-        paceGroup.addActor(plus);
+        // Pace
+        Table paceGroup = new Table(skin);
+        paceGroup.add(minus).left().padRight(pad1);
+        paceGroup.add(warp).left().padRight(pad1);
+        paceGroup.add(plus).left();
 
-        timeGroup.addActor(paceGroup);
+        // Add to table
+        timeGroup.add(dateGroup).left().padBottom(pad12).row();
+        timeGroup.add(paceGroup).left().padBottom(pad12).row();
+        timeGroup.add(resetTime).center();
+
         timeGroup.pack();
 
         component = timeGroup;
+    }
+
+    /**
+     * Generate the time warp vector.
+     *
+     * @param steps The number of steps per side (positive and negative)
+     * @return The vector
+     */
+    private double[] generateTimeWarpVector(int steps) {
+        double[] warp = new double[steps * 2 + 1];
+        warp[steps] = 0;
+        // Positive
+        double w = 0;
+        for (int i = steps + 1; i < warp.length; i++) {
+            warp[i] = increaseWarp(w);
+            w = warp[i];
+        }
+        // Negative
+        w = 0;
+        for (int i = steps - 1; i >= 0; i--) {
+            warp[i] = decreaseWarp(w);
+            w = warp[i];
+        }
+        return warp;
+    }
+
+    private double increaseWarp(double timeWarp) {
+        if (timeWarp == 0) {
+            return 0.125;
+        } else if (timeWarp == -0.125) {
+            return 0;
+        } else if (timeWarp < 0) {
+            return timeWarp / 2.0;
+        } else {
+            return timeWarp * 2.0;
+        }
+    }
+
+    private double decreaseWarp(double timeWarp) {
+        if (timeWarp == 0.125) {
+            return 0;
+        } else if (timeWarp == 0) {
+            return -0.125;
+        } else if (timeWarp < 0) {
+            return timeWarp * 2.0;
+        } else {
+            return timeWarp / 2.0;
+        }
     }
 
     @Override
@@ -142,15 +226,41 @@ public class TimeComponent extends GuiComponent implements IObserver {
                 date.setText(dfdate.format(datetime));
                 time.setText(dftime.format(datetime) + " UTC");
             });
-
             break;
-        case PACE_CHANGED_INFO:
-            if (data.length == 1)
-                this.timeWarp.setText(TextUtils.getFormattedTimeWarp((double) data[0]));
+        case TIME_WARP_CHANGED_INFO:
+        case TIME_WARP_CMD:
+            double newWarp = (double) data[0];
+            boolean ui = data.length > 1 ? (Boolean) data[1] : false;
+            if (!ui) {
+                int index = getWarpIndex(newWarp);
+
+                if (index >= 0) {
+                    warpGuard = true;
+                    warp.setValue(index - warpSteps);
+                    warpGuard = false;
+                }
+            }
+
             break;
         default:
             break;
         }
+    }
+
+    private int getWarpIndex(double warpValue) {
+        int index = -1;
+        double prev = Double.MIN_VALUE;
+        for (int i = 0; i < timeWarpVector.length; i++) {
+            if (warpValue == timeWarpVector[i]) {
+                index = i;
+                break;
+            } else if (warpValue > prev && warpValue < timeWarpVector[i]) {
+                index = i;
+                break;
+            }
+            prev = timeWarpVector[i];
+        }
+        return index;
 
     }
 

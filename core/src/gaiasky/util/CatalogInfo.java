@@ -31,6 +31,8 @@ public class CatalogInfo {
     public String name;
     public String description;
     public String source;
+    public long nParticles;
+    public long sizeBytes;
     public Instant loadDateUTC;
 
     // Highlight
@@ -140,9 +142,9 @@ public class CatalogInfo {
     public void highlight(boolean hl) {
         this.highlighted = hl;
         if (plainColor) {
-            object.highlight(hl, hlColor);
+            object.highlight(hl, hlColor, hlAllVisible);
         } else {
-            object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax);
+            object.highlight(hl, hlCmapIndex, hlCmapAttribute, hlCmapMin, hlCmapMax, hlAllVisible);
         }
     }
 

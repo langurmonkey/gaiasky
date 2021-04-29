@@ -41,9 +41,9 @@ import com.badlogic.gdx.utils.SnapshotArray;
 public class ContextMenu extends Table {
     private static final Vector2 tmpVector = new Vector2();
 
-    private Skin skin;
+    private final Skin skin;
 
-    private ContextMenuStyle style;
+    private final ContextMenuStyle style;
     private ContextMenuListener listener;
 
     private InputListener stageListener;

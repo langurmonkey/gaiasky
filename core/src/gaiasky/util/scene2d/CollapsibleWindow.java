@@ -33,7 +33,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 
@@ -83,7 +82,7 @@ public class CollapsibleWindow extends OwnWindow {
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
-        this.collapseHeight = 20f * GlobalConf.UI_SCALE_FACTOR;
+        this.collapseHeight = 32f;
 
         vec2 = new Vector2();
         addListener(new ClickListener() {
@@ -115,7 +114,7 @@ public class CollapsibleWindow extends OwnWindow {
         });
 
         // Pad title cell
-        getTitleTable().getCells().get(0).padLeft(5f * GlobalConf.UI_SCALE_FACTOR);
+        getTitleTable().getCells().get(0).padLeft(8f);
         // Mouse pointer on title
         getTitleTable().addListener(event -> {
             if (event instanceof InputEvent) {

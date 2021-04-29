@@ -2,11 +2,11 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
-import com.badlogic.gdx.controllers.PovDirection;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -50,29 +49,32 @@ public class ControllerGui extends AbstractGui {
     private Cell contentCell, infoCell;
     private OwnTextButton searchButton, cameraButton, timeButton, optionsButton, typesButton, systemButton;
     // Contains a matrix (column major) of actors for each tab
-    private List<Actor[][]> model;
+    private final List<Actor[][]> model;
     private OwnTextButton cameraFocus, cameraFree, cameraCinematic;
     private OwnTextButton timeStartStop, timeUp, timeDown, timeReset, quit, motionBlurButton, flareButton, starGlowButton;
     private OwnSliderPlus fovSlider, camSpeedSlider, camRotSlider, camTurnSlider, bloomSlider;
     private OwnTextField searchField;
     private OwnLabel infoMessage;
 
-    private List<OwnTextButton> tabButtons;
-    private List<ScrollPane> tabContents;
+    private final List<OwnTextButton> tabButtons;
+    private final List<ScrollPane> tabContents;
 
     private Actor[][] currentModel;
     private ISceneGraph sg;
 
-    private EventManager em;
-    private GUIControllerListener guiControllerListener;
-    private float pad5, pad10, pad20, pad30;
+    private final EventManager em;
+    private final GUIControllerListener guiControllerListener;
+    private final float pad5;
+    private final float pad10;
+    private final float pad20;
+    private final float pad30;
     private String currentInputText = "";
 
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
-    public ControllerGui() {
-        super();
+    public ControllerGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
         this.skin = GlobalResources.skin;
         this.em = EventManager.instance;
         model = new ArrayList<>();
@@ -81,10 +83,10 @@ public class ControllerGui extends AbstractGui {
         guiControllerListener = new GUIControllerListener();
         tabButtons = new ArrayList<>();
         tabContents = new ArrayList<>();
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
-        pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
+        pad5 = 8f;
+        pad10 = 16f;
+        pad20 = 32f;
+        pad30 = 48;
     }
 
     @Override
@@ -97,16 +99,16 @@ public class ControllerGui extends AbstractGui {
         tabContents.clear();
         model.clear();
 
-        float w = 900f * GlobalConf.UI_SCALE_FACTOR;
-        float h = 400f * GlobalConf.UI_SCALE_FACTOR;
+        float w = 1440f;
+        float h = 640f;
         // Widget width
-        float ww = 250f * GlobalConf.UI_SCALE_FACTOR;
-        float wh = 50f * GlobalConf.UI_SCALE_FACTOR;
+        float ww = 400f;
+        float wh = 64f;
         float sw = ww;
-        float sh = 60f * GlobalConf.UI_SCALE_FACTOR;
-        float tfw = 150f * GlobalConf.UI_SCALE_FACTOR;
+        float sh = 96f;
+        float tfw = 240f;
         // Tab width
-        float tw = 140f * GlobalConf.UI_SCALE_FACTOR;
+        float tw = 224f;
 
         // Create contents
 
@@ -411,8 +413,8 @@ public class ControllerGui extends AbstractGui {
 
         typesT = new Table(skin);
 
-        float buttonPadHor = (GlobalConf.isHiDPI() ? 6f : 4f) * GlobalConf.UI_SCALE_FACTOR;
-        float buttonPadVert = (GlobalConf.isHiDPI() ? 2.5f : 2.2f) * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPadHor = 9.6f;
+        float buttonPadVert = 4f;
         Set<Button> buttons = new HashSet<>();
         ComponentType[] visibilityEntities = ComponentType.values();
         boolean[] visible = new boolean[visibilityEntities.length];
@@ -471,7 +473,7 @@ public class ControllerGui extends AbstractGui {
         optT = new Table(skin);
 
         // Slider
-        bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-15");
+        bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
         bloomSlider.setWidth(sw);
         bloomSlider.setHeight(sh);
         bloomSlider.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
@@ -552,7 +554,7 @@ public class ControllerGui extends AbstractGui {
         updatePads(sysT);
 
         // Create tab buttons
-        searchButton = new OwnTextButton(I18n.txt("gui.search"), skin, "toggle-huge");
+        searchButton = new OwnTextButton(I18n.txt("gui.search"), skin, "toggle-big");
         tabButtons.add(searchButton);
         searchButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -562,7 +564,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        cameraButton = new OwnTextButton(I18n.txt("gui.camera"), skin, "toggle-huge");
+        cameraButton = new OwnTextButton(I18n.txt("gui.camera"), skin, "toggle-big");
         tabButtons.add(cameraButton);
         cameraButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -572,7 +574,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        timeButton = new OwnTextButton(I18n.txt("gui.time"), skin, "toggle-huge");
+        timeButton = new OwnTextButton(I18n.txt("gui.time"), skin, "toggle-big");
         tabButtons.add(timeButton);
         timeButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -582,7 +584,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        typesButton = new OwnTextButton(I18n.txt("gui.types"), skin, "toggle-huge");
+        typesButton = new OwnTextButton(I18n.txt("gui.types"), skin, "toggle-big");
         tabButtons.add(typesButton);
         typesButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -592,7 +594,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        optionsButton = new OwnTextButton(I18n.txt("gui.options"), skin, "toggle-huge");
+        optionsButton = new OwnTextButton(I18n.txt("gui.options"), skin, "toggle-big");
         tabButtons.add(optionsButton);
         optionsButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -602,7 +604,7 @@ public class ControllerGui extends AbstractGui {
             return false;
         });
 
-        systemButton = new OwnTextButton(I18n.txt("gui.system"), skin, "toggle-huge");
+        systemButton = new OwnTextButton(I18n.txt("gui.system"), skin, "toggle-big");
         tabButtons.add(systemButton);
         systemButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -661,7 +663,7 @@ public class ControllerGui extends AbstractGui {
         updateTabs();
         updateFocused(true);
 
-        if(sg == null)
+        if (sg == null)
             sg = GaiaSky.instance.sg;
     }
 
@@ -752,10 +754,11 @@ public class ControllerGui extends AbstractGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        Viewport vp = new ScreenViewport();
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
 
         // Comment to hide this whole dialog and functionality
         EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION, Events.TIME_STATE_CMD, Events.SCENE_GRAPH_LOADED);
@@ -838,7 +841,7 @@ public class ControllerGui extends AbstractGui {
      *
      * @param i    The column
      * @param j    The row
-     * @param down Whehter scan up or down
+     * @param down Whether scan up or down
      * @return True if the element was selected, false otherwise
      */
     public boolean selectInCol(int i, int j, boolean down) {
@@ -1058,9 +1061,12 @@ public class ControllerGui extends AbstractGui {
         private static final long AXIS_POLL_DELAY = 50;
 
         // Left and right stick values
-        private float lStickX = 0, lStickY = 0, rStickX = 0, rStickY = 0;
+        private float lStickX = 0;
+        private float lStickY = 0;
+        private float rStickX = 0;
+        private final float rStickY = 0;
         private long lastAxisEvtTime = 0, lastAxisPollTime = 0;
-        private EventManager em;
+        private final EventManager em;
         private NaturalCamera cam;
         private IControllerMappings mappings;
 
@@ -1150,26 +1156,6 @@ public class ControllerGui extends AbstractGui {
             }
 
             return true;
-        }
-
-        @Override
-        public boolean povMoved(Controller controller, int povCode, PovDirection value) {
-            return false;
-        }
-
-        @Override
-        public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
-            return false;
-        }
-
-        @Override
-        public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
-            return false;
-        }
-
-        @Override
-        public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
-            return false;
         }
 
         @Override

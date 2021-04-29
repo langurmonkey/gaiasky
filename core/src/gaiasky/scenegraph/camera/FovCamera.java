@@ -75,8 +75,9 @@ public class FovCamera extends AbstractCamera implements IObserver {
     // Direction index for the render stage
     public int dirindex;
 
-    private Vector3d dir1, dir2;
-    private Matrix4d matrix;
+    private final Vector3d dir1;
+    private final Vector3d dir2;
+    private final Matrix4d matrix;
 
     Viewport viewport, viewport2;
 

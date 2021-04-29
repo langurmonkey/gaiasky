@@ -8,6 +8,7 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
@@ -35,8 +36,8 @@ import java.util.Map;
  *
  * @author Toni Sagrista
  */
-public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable, IVisibilitySwitch {
-    private static Array<Constellation> allConstellations = new Array<>(88);
+public class Constellation extends FadeNode implements ILineRenderable, I3DTextRenderable {
+    private static final Array<Constellation> allConstellations = new Array<>(false, 88);
     private double deltaYears;
 
     public static void updateConstellations() {
@@ -107,7 +108,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
             if (lines == null) {
                 lines = new IPosition[npairs][];
             }
-            Map<Integer, IPosition> hipMap = sg.getStarMap();
+            ObjectMap<Integer, IPosition> hipMap = sg.getStarMap();
             allLoaded = true;
             for (int i = 0; i < npairs; i++) {
                 int[] pair = ids.get(i);
@@ -165,12 +166,12 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thOverFactor", 1);
         shader.setUniformf("u_thOverFactorScl", 1);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
     }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (isVisible()) {
+        if (this.shouldRender()) {
             addToRender(this, RenderGroup.LINE);
             if (renderText()) {
                 addToRender(this, RenderGroup.FONT_LABEL);
@@ -217,7 +218,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override
@@ -233,15 +234,6 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     @Override
     public float getLineWidth() {
         return 1;
-    }
-
-    @Override
-    public String getDescription() {
-        return null;
-    }
-
-    @Override
-    public void setDescription(String name) {
     }
 
     @Override

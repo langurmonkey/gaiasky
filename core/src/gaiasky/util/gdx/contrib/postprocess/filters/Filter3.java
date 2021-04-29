@@ -104,51 +104,51 @@ public abstract class Filter3<T> {
 
     // int
     protected void setParam(Parameter param, int value) {
-        program.begin();
+        program.bind();
         program.setUniformi(param.mnemonic(), value);
-        program.end();
+
     }
 
     // float
     protected void setParam(Parameter param, float value) {
-        program.begin();
+        program.bind();
         program.setUniformf(param.mnemonic(), value);
-        program.end();
+
     }
 
     // vec2
     protected void setParam(Parameter param, Vector2 value) {
-        program.begin();
+        program.bind();
         program.setUniformf(param.mnemonic(), value);
-        program.end();
+
     }
 
     // vec3
     protected void setParam(Parameter param, Vector3 value) {
-        program.begin();
+        program.bind();
         program.setUniformf(param.mnemonic(), value);
-        program.end();
+
     }
 
     // mat3
     protected T setParam(Parameter param, Matrix3 value) {
-        program.begin();
+        program.bind();
         program.setUniformMatrix(param.mnemonic(), value);
-        program.end();
+
         return (T) this;
     }
 
     // mat4
     protected T setParam(Parameter param, Matrix4 value) {
-        program.begin();
+        program.bind();
         program.setUniformMatrix(param.mnemonic(), value);
-        program.end();
+
         return (T) this;
     }
 
     // float[], vec2[], vec3[], vec4[]
     protected T setParamv(Parameter param, float[] values, int offset, int length) {
-        program.begin();
+        program.bind();
 
         switch (param.arrayElementSize()) {
         case 4:
@@ -166,7 +166,7 @@ public abstract class Filter3<T> {
             break;
         }
 
-        program.end();
+
         return (T) this;
     }
 
@@ -179,7 +179,7 @@ public abstract class Filter3<T> {
     protected T setParams(Parameter param, float value) {
         if (!programBegan) {
             programBegan = true;
-            program.begin();
+            program.bind();
         }
         program.setUniformf(param.mnemonic(), value);
         return (T) this;
@@ -189,7 +189,7 @@ public abstract class Filter3<T> {
     protected T setParams(Parameter param, int value) {
         if (!programBegan) {
             programBegan = true;
-            program.begin();
+            program.bind();
         }
         program.setUniformi(param.mnemonic(), value);
         return (T) this;
@@ -199,7 +199,7 @@ public abstract class Filter3<T> {
     protected T setParams(Parameter param, Vector2 value) {
         if (!programBegan) {
             programBegan = true;
-            program.begin();
+            program.bind();
         }
         program.setUniformf(param.mnemonic(), value);
         return (T) this;
@@ -209,7 +209,7 @@ public abstract class Filter3<T> {
     protected T setParams(Parameter param, Vector3 value) {
         if (!programBegan) {
             programBegan = true;
-            program.begin();
+            program.bind();
         }
         program.setUniformf(param.mnemonic(), value);
         return (T) this;
@@ -219,7 +219,7 @@ public abstract class Filter3<T> {
     protected T setParams(Parameter param, Matrix3 value) {
         if (!programBegan) {
             programBegan = true;
-            program.begin();
+            program.bind();
         }
         program.setUniformMatrix(param.mnemonic(), value);
         return (T) this;
@@ -229,7 +229,7 @@ public abstract class Filter3<T> {
     protected T setParams(Parameter param, Matrix4 value) {
             if (!programBegan) {
                 programBegan = true;
-                program.begin();
+                program.bind();
             }
             program.setUniformMatrix(param.mnemonic(), value);
         return (T) this;
@@ -239,7 +239,7 @@ public abstract class Filter3<T> {
     protected T setParamsv(Parameter param, float[] values, int offset, int length) {
         if (!programBegan) {
             programBegan = true;
-            program.begin();
+            program.bind();
         }
 
         switch (param.arrayElementSize()) {
@@ -264,7 +264,7 @@ public abstract class Filter3<T> {
     /** Should be called after any one or more setParams method calls. */
     protected void endParams() {
         if (programBegan) {
-            program.end();
+
             programBegan = false;
         }
     }
@@ -286,8 +286,8 @@ public abstract class Filter3<T> {
         // gives a chance to filters to perform needed operations just before the rendering operation take place.
         onBeforeRender();
 
-        program.begin();
+        program.bind();
         quad.render(program);
-        program.end();
+
     }
 }

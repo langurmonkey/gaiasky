@@ -19,7 +19,8 @@ public class PointCloudData {
     // Period in days
     public double period = -1;
 
-    private Vector3d v0, v1;
+    private final Vector3d v0;
+    private final Vector3d v1;
     private Instant start, end;
 
     public PointCloudData() {

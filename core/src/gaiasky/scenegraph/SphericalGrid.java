@@ -37,9 +37,9 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
     private static final int divisionsV = 18;
 
     public ModelComponent mc;
-    private Vector3 auxf;
-    private Vector3d auxd;
-    private Matrix4 annotTransform;
+    private final Vector3 auxf;
+    private final Vector3d auxd;
+    private final Matrix4 annotTransform;
 
     public SphericalGrid() {
         super();
@@ -73,10 +73,10 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        // Render group never changes
-        // Add to toRender list
-        addToRender(this, RenderGroup.MODEL_VERT_GRID);
-        addToRender(this, RenderGroup.FONT_ANNOTATION);
+        if(this.shouldRender()) {
+            addToRender(this, RenderGroup.MODEL_VERT_GRID);
+            addToRender(this, RenderGroup.FONT_ANNOTATION);
+        }
     }
 
 

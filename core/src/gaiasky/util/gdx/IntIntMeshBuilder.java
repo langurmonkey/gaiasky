@@ -65,9 +65,9 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     /** The vertex attributes of the resulting mesh */
     private VertexAttributes attributes;
     /** The vertices to construct, no size checking is done */
-    private FloatArray vertices = new FloatArray();
+    private final FloatArray vertices = new FloatArray();
     /** The indices to construct, no size checking is done */
-    private IntArray indices = new IntArray();
+    private final IntArray indices = new IntArray();
     /** The size (in number of floats) of each vertex */
     private int stride;
     /** The current vertex index, used for indexing */
@@ -95,7 +95,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     /** The meshpart currently being created */
     private IntMeshPart part;
     /** The parts created between begin and end */
-    private Array<IntMeshPart> parts = new Array<>();
+    private final Array<IntMeshPart> parts = new Array<>();
     /** The color used if no vertex color is specified. */
     private final Color color = new Color();
     /** Whether to apply the default color. */

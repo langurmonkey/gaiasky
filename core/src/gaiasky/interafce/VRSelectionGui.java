@@ -1,11 +1,12 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.util.GlobalConf;
@@ -21,25 +22,24 @@ public class VRSelectionGui extends AbstractGui {
     private boolean selectionState = false;
     private double selectionCompletion = 0d;
 
-    public VRSelectionGui() {
-        super();
+    public VRSelectionGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
-
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        float h = GlobalConf.screen.BACKBUFFER_HEIGHT;
-        float w = GlobalConf.screen.BACKBUFFER_WIDTH;
-        Viewport vp = new ScreenViewport();
-        ui = new Stage(vp, GlobalResources.spriteBatch);
-        vp.update((int) w, (int) h, true);
+        float ow =GlobalConf.screen.BACKBUFFER_WIDTH;
+        float oh = GlobalConf.screen.BACKBUFFER_HEIGHT;
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
         skin = GlobalResources.skin;
 
         container = new Container<>();
         container.setFillParent(true);
         container.top().right();
-        container.padTop((h / 3f));
+        container.padTop(oh / 2f);
 
         contents = new Table();
         contents.setFillParent(false);
@@ -47,13 +47,13 @@ public class VRSelectionGui extends AbstractGui {
         // Progress
         OwnLabel hold = new OwnLabel("Selecting object, hold button...", skin, "headline");
         progress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");
-        progress.setPrefWidth(w * 0.3f);
+        progress.setPrefWidth(ow * 0.3f);
 
         contents.add(hold).top().padBottom(10).row();
         contents.add(progress);
 
         // Center
-        container.padRight((w * 0.7f) / 2f - hoffset);
+        container.padRight(ow * 0.7f / 2f - hoffset);
 
         container.setActor(contents);
 
@@ -77,25 +77,24 @@ public class VRSelectionGui extends AbstractGui {
     }
 
     @Override
-    public boolean mustDraw(){
+    public boolean mustDraw() {
         return selectionState;
     }
-
 
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case VR_SELECTING_STATE:
-                selectionState = (Boolean) data[0];
-                selectionCompletion = (Double) data[1];
+        case VR_SELECTING_STATE:
+            selectionState = (Boolean) data[0];
+            selectionCompletion = (Double) data[1];
 
-                if(selectionState && progress != null){
-                    progress.setValue((float)(selectionCompletion * 100d));
-                }
+            if (selectionState && progress != null) {
+                progress.setValue((float) (selectionCompletion * 100d));
+            }
 
-                break;
-            default:
-                break;
+            break;
+        default:
+            break;
         }
     }
 }

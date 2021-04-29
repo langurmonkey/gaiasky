@@ -32,7 +32,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
-public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable, IVisibilitySwitch {
+public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable {
 
     private String description;
     private String transformName;
@@ -49,7 +49,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     public ITransform[] transformations;
 
     // Aux array
-    private float[] auxArray;
+    private final float[] auxArray;
 
     public MeshObject() {
         super();
@@ -70,7 +70,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
             try {
                 mc.doneLoading(manager, localTransform, cc, true);
                 if (additiveBlending) {
-                    mc.setDepthTest(GL20.GL_NONE, false);
+                    mc.setDepthTest(0, false);
                 }
             } catch (Exception e) {
                 mc = null;
@@ -159,7 +159,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (GaiaSky.instance.isInitialised() && GaiaSky.instance.isOn(ct) & opacity > 0) {
+        if (this.shouldRender() && GaiaSky.instance.isInitialised()) {
             if (!additiveBlending)
                 addToRender(this, RenderGroup.MODEL_PIX_DUST);
             else
@@ -178,10 +178,12 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         if (mc != null) {
             if (additiveBlending) {
                 mc.update(localTransform, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
-                mc.setDepthTest(GL20.GL_NONE, false);
+                // Depth reads, no depth writes
+                mc.setDepthTest(GL20.GL_LEQUAL, false);
             } else {
                 mc.update(localTransform, alpha * opacity);
-                mc.setDepthTest(GL20.GL_ONE, true);
+                // Depth reads and writes
+                mc.setDepthTest(GL20.GL_LEQUAL, true);
             }
             // Render
             if (mc.instance != null)
@@ -243,7 +245,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
     }
 
     @Override
@@ -277,7 +279,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override

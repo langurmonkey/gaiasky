@@ -19,7 +19,7 @@ import java.util.Random;
  */
 public class ComplexArea implements Area {
 
-    private Collection<Area> listOfAreas;
+    private final Collection<Area> listOfAreas;
 
     private final static double piHalf = Math.PI / 2.0;
 

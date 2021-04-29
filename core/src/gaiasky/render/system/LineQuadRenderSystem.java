@@ -11,20 +11,16 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
-
-import java.util.List;
+import net.jafama.FastMath;
 
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
@@ -38,8 +34,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     private MeshDataExt currExt;
     private Array<double[]> provisionalLines;
     private Array<Line> provLines;
-    private LineArraySorter sorter;
-    private Pool<double[]> doublePool;
+    private final LineArraySorter sorter;
+    private final Pool<double[]> doublePool;
 
     private class MeshDataExt extends MeshData {
         int uvOffset;
@@ -131,7 +127,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     private boolean two = false;
-    private Vector3d aux = new Vector3d();
+    private final Vector3d aux = new Vector3d();
 
     public void breakLine() {
         two = false;
@@ -164,17 +160,20 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan, boolean rec) {
         double distToSegment = MathUtilsd.distancePointSegment(x0, y0, z0, x1, y1, z1, 0, 0, 0);
 
-        double dist0 = Math.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
-        double dist1 = Math.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+        double dist0 = FastMath.sqrt(x0 * x0 + y0 * y0 + z0 * z0);
+        double dist1 = FastMath.sqrt(x1 * x1 + y1 * y1 + z1 * z1);
 
-        Vector3d p15;
+        Vector3d p15 = auxd;
 
         if (rec && distToSegment < dist0 && distToSegment < dist1) {
             // Projection falls in line, split line
-            p15 = MathUtilsd.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0);
+            p15 = MathUtilsd.getClosestPoint2(x0, y0, z0, x1, y1, z1, 0, 0, 0, p15);
+            double px = p15.x;
+            double py = p15.y;
+            double pz = p15.z;
 
-            addLineInternal(x0, y0, z0, p15.x, p15.y, p15.z, r, g, b, a, widthAngleTan, true);
-            addLineInternal(p15.x, p15.y, p15.z, x1, y1, z1, r, g, b, a, widthAngleTan, true);
+            addLineInternal(x0, y0, z0, px, py, pz, r, g, b, a, widthAngleTan, true);
+            addLineInternal(px, py, pz, x1, y1, z1, r, g, b, a, widthAngleTan, true);
         } else {
             // Add line to list
             // x0 y0 z0 x1 y1 z1 r g b a dist0 dist1 distMean
@@ -308,7 +307,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         this.camera = camera;
 
         // Reset
@@ -318,12 +317,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
         renderables.forEach(r -> {
             ILineRenderable renderable = (ILineRenderable) r;
-            boolean rend = true;
-            // TODO ugly hack
-            if (renderable instanceof Particle && !SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors))
-                rend = false;
-            if (rend)
-                renderable.render(this, camera, getAlpha(renderable));
+            renderable.render(this, camera, getAlpha(renderable));
         });
 
         // Sort phase
@@ -364,7 +358,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     protected class DPool extends Pool<double[]> {
 
-        private int dsize;
+        private final int dsize;
 
         public DPool(int initialCapacity, int max, int dsize) {
             super(initialCapacity, max);

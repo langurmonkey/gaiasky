@@ -25,7 +25,7 @@ import gaiasky.util.validator.FloatValidator;
 
 public class LandAtWindow extends GenericDialog {
 
-    private CelestialBody target;
+    private final CelestialBody target;
     private CheckBox latlonCb, locationCb;
 
     private OwnTextField location, latitude, longitude;

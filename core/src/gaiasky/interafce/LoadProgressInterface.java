@@ -25,7 +25,7 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
     private void build(float width, Skin skin){
         progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
         progress.setValue(0);
-        progress.setPrefHeight(10f * GlobalConf.UI_SCALE_FACTOR);
+        progress.setPrefHeight(16f);
         progress.setPrefWidth(width);
         add(progress);
     }

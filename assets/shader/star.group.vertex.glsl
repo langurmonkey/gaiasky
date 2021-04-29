@@ -2,16 +2,15 @@
 
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
+#include shader/lib_doublefloat.glsl
 
 in vec3 a_position;
 in vec3 a_pm;
 in vec4 a_color;
-// Additional attributes:
-// x - size
-// y - magnitude
-in vec2 a_additional;
+in float a_size;
 
-uniform int u_t; // time in days since epoch
+// time in days since epoch, as a 64-bit double encoded with two floats
+uniform vec2 u_t;
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
@@ -25,8 +24,6 @@ uniform float u_brPow;
 // VR scale factor
 uniform float u_vrScale;
 
-uniform float u_magLimit = 22.0;
-
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
 #endif // relativisticEffects
@@ -38,7 +35,8 @@ uniform float u_magLimit = 22.0;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
-uniform vec3 u_alphaSizeFovBr;
+// w - rc primitive scale factor
+uniform vec4 u_alphaSizeFovBr;
 
 out vec4 v_col;
 
@@ -56,9 +54,18 @@ void main() {
 
     vec3 pos = a_position - u_camPos;
 
-    // Proper motion
-    vec3 pm = a_pm * float(u_t) * day_to_year;
-    pos = pos + pm;
+    // Proper motion using 64-bit emulated arithmetics:
+    // pm = a_pm * t * day_to_yr
+    // pos = pos + pm
+    vec2 t_yr = ds_mul(u_t, ds_set(day_to_year));
+    vec2 pmx = ds_mul(ds_set(a_pm.x), t_yr);
+    vec2 pmy = ds_mul(ds_set(a_pm.y), t_yr);
+    vec2 pmz = ds_mul(ds_set(a_pm.z), t_yr);
+    pos.x = ds_add(ds_set(pos.x), pmx).x;
+    pos.y = ds_add(ds_set(pos.y), pmy).x;
+    pos.z = ds_add(ds_set(pos.z), pmz).x;
+    // Pm for use downstream
+    vec3 pm = vec3(pmx.x, pmy.x, pmz.x);
 
     // Distance to star
     float dist = length(pos);
@@ -79,7 +86,7 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan((a_additional.x * u_alphaSizeFovBr.z) / dist);
+    float viewAngleApparent = atan((a_size * u_alphaSizeFovBr.z) / dist);
     float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y);
 
     float boundaryFade = smoothstep(l0, l1, dist);
@@ -88,13 +95,13 @@ void main() {
 
     vec4 gpos = u_projModelView * vec4(pos, 1.0);
     gl_Position = gpos;
-    gl_PointSize = max(4.0, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
+    gl_PointSize = max(3.3 * u_alphaSizeFovBr.w, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
     #endif
 
-    if(dist < l0 || a_additional.y > u_magLimit){
+    if(dist < l0){
         // The pixels of this star will be discarded in the fragment shader
         v_col = vec4(0.0, 0.0, 0.0, 0.0);
     }

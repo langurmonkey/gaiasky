@@ -20,7 +20,7 @@ public class GaiaSkyThreadFactory implements ThreadFactory {
     public GaiaSkyThreadFactory() {
         SecurityManager s = System.getSecurityManager();
         group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
-        namePrefix = "pool-" + poolNumber.getAndIncrement() + "-thread-";
+        namePrefix = "gaiasky-pool-" + poolNumber.getAndIncrement() + "-thread-";
     }
 
     public Thread newThread(Runnable r) {

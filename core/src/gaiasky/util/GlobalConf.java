@@ -32,6 +32,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.*;
 
 /**
@@ -59,7 +62,7 @@ public class GlobalConf {
     public static final String APPLICATION_SHORT_NAME = "gaiasky";
     public static final String WEBPAGE = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky";
     public static final String WEBPAGE_DOWNLOADS = "https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky/downloads";
-    public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest";
+    public static final String DOCUMENTATION = "https://gaia.ari.uni-heidelberg.de/gaiasky/docs";
     public static final String REPOSITORY = "https://gitlab.com/langurmonkey/gaiasky";
     public static final String ICON_URL;
     public static final String REPO_ISSUES = REPOSITORY + "/issues";
@@ -81,20 +84,8 @@ public class GlobalConf {
         }
     }
 
-    // Interface scale factor (for HiDPI)
-    public static float UI_SCALE_FACTOR = -1.0f;
-
     public static String getApplicationTitle(boolean vr) {
         return APPLICATION_NAME_TITLE + (vr ? "  VR" : "");
-    }
-
-    public static void updateScaleFactor(float sf) {
-        UI_SCALE_FACTOR = sf;
-        logger.debug("GUI scale factor set to " + GlobalConf.UI_SCALE_FACTOR);
-    }
-
-    public static boolean isHiDPI() {
-        return UI_SCALE_FACTOR > 1.5f;
     }
 
     public interface IConf {
@@ -207,6 +198,7 @@ public class GlobalConf {
 
         public Antialias POSTPROCESS_ANTIALIAS;
         public float POSTPROCESS_BLOOM_INTENSITY;
+        public float POSTPROCESS_UNSHARPMASK_FACTOR;
         public boolean POSTPROCESS_MOTION_BLUR;
         public boolean POSTPROCESS_LENS_FLARE;
         public boolean POSTPROCESS_LIGHT_SCATTERING;
@@ -251,12 +243,13 @@ public class GlobalConf {
         public float POSTPROCESS_EXPOSURE;
 
         public PostprocessConf() {
-            EventManager.instance.subscribe(this, Events.BLOOM_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD);
+            EventManager.instance.subscribe(this, Events.BLOOM_CMD, Events.UNSHARP_MASK_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD);
         }
 
-        public void initialize(Antialias POSTPROCESS_ANTIALIAS, float POSTPROCESS_BLOOM_INTENSITY, boolean POSTPROCESS_MOTION_BLUR, boolean POSTPROCESS_LENS_FLARE, boolean POSTPROCESS_LIGHT_SCATTERING, boolean POSTPROCESS_FISHEYE, float POSTPROCESS_BRIGHTNESS, float POSTPROCESS_CONTRAST, float POSTPROCESS_HUE, float POSTPROCESS_SATURATION, float POSTPROCESS_GAMMA, ToneMapping POSTPROCESS_TONEMAPPING_TYPE, float POSTPROCESS_EXPOSURE) {
+        public void initialize(Antialias POSTPROCESS_ANTIALIAS, float POSTPROCESS_BLOOM_INTENSITY, float POSTPROCESS_UNSHARPMASK_FACTOR, boolean POSTPROCESS_MOTION_BLUR, boolean POSTPROCESS_LENS_FLARE, boolean POSTPROCESS_LIGHT_SCATTERING, boolean POSTPROCESS_FISHEYE, float POSTPROCESS_BRIGHTNESS, float POSTPROCESS_CONTRAST, float POSTPROCESS_HUE, float POSTPROCESS_SATURATION, float POSTPROCESS_GAMMA, ToneMapping POSTPROCESS_TONEMAPPING_TYPE, float POSTPROCESS_EXPOSURE) {
             this.POSTPROCESS_ANTIALIAS = POSTPROCESS_ANTIALIAS;
             this.POSTPROCESS_BLOOM_INTENSITY = POSTPROCESS_BLOOM_INTENSITY;
+            this.POSTPROCESS_UNSHARPMASK_FACTOR = POSTPROCESS_UNSHARPMASK_FACTOR;
             this.POSTPROCESS_MOTION_BLUR = POSTPROCESS_MOTION_BLUR;
             this.POSTPROCESS_LENS_FLARE = POSTPROCESS_LENS_FLARE;
             this.POSTPROCESS_LIGHT_SCATTERING = POSTPROCESS_LIGHT_SCATTERING;
@@ -275,6 +268,9 @@ public class GlobalConf {
             switch (event) {
             case BLOOM_CMD:
                 POSTPROCESS_BLOOM_INTENSITY = (float) data[0];
+                break;
+            case UNSHARP_MASK_CMD:
+                POSTPROCESS_UNSHARPMASK_FACTOR = (float) data[0];
                 break;
             case LENS_FLARE_CMD:
                 POSTPROCESS_LENS_FLARE = (Boolean) data[0];
@@ -346,7 +342,7 @@ public class GlobalConf {
         /**
          * Keep track of added controller listeners
          */
-        private Map<Controller, Set<ControllerListener>> controllerListenersMap;
+        private final Map<Controller, Set<ControllerListener>> controllerListenersMap;
 
         public ControlsConf() {
             controllerListenersMap = new HashMap<>();
@@ -378,16 +374,14 @@ public class GlobalConf {
                 controllerListenersMap.put(c, cs);
             } else {
                 Set<ControllerListener> cs = controllerListenersMap.get(c);
-                if (!cs.contains(cl))
-                    cs.add(cl);
+                cs.add(cl);
             }
         }
 
         private void removeListener(Controller c, ControllerListener cl) {
             if (controllerListenersMap.containsKey(c)) {
                 Set<ControllerListener> cs = controllerListenersMap.get(c);
-                if (cs.contains(cl))
-                    cs.remove(cl);
+                cs.remove(cl);
             }
         }
 
@@ -464,7 +458,7 @@ public class GlobalConf {
         public boolean INPUT_ENABLED;
         public boolean RECORD_CAMERA;
         public boolean RECORD_KEYFRAME_CAMERA;
-        public float LIMIT_MAG_RUNTIME;
+
 
         /**
          * Whether octree drawing is active or not
@@ -487,16 +481,15 @@ public class GlobalConf {
 
 
         public RuntimeConf() {
-            EventManager.instance.subscribe(this, Events.LIMIT_MAG_CMD, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
+            EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
         }
 
-        public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, float lIMIT_MAG_RUNTIME, boolean rEAL_TIME, boolean dRAW_OCTREE) {
+        public void initialize(boolean dISPLAY_GUI, boolean uPDATE_PAUSE, boolean tIME_ON, boolean iNPUT_ENABLED, boolean rECORD_CAMERA, boolean rEAL_TIME, boolean dRAW_OCTREE) {
             DISPLAY_GUI = dISPLAY_GUI;
             UPDATE_PAUSE = uPDATE_PAUSE;
             TIME_ON = tIME_ON;
             INPUT_ENABLED = iNPUT_ENABLED;
             RECORD_CAMERA = rECORD_CAMERA;
-            LIMIT_MAG_RUNTIME = lIMIT_MAG_RUNTIME;
             REAL_TIME = rEAL_TIME;
             DRAW_OCTREE = dRAW_OCTREE;
         }
@@ -504,11 +497,6 @@ public class GlobalConf {
         @Override
         public void notify(final Events event, final Object... data) {
             switch (event) {
-            case LIMIT_MAG_CMD:
-                LIMIT_MAG_RUNTIME = (float) data[0];
-                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
-                break;
-
             case INPUT_ENABLED_CMD:
                 INPUT_ENABLED = (boolean) data[0];
                 break;
@@ -755,11 +743,6 @@ public class GlobalConf {
          **/
         public boolean HIGH_ACCURACY_POSITIONS;
         /**
-         * Limit magnitude used for loading stars. All stars above this
-         * magnitude will not even be loaded by the sandbox.
-         **/
-        public float LIMIT_MAG_LOAD;
-        /**
          * Whether to use the real attitude of Gaia or the NSL approximation
          **/
         public boolean REAL_GAIA_ATTITUDE;
@@ -769,27 +752,24 @@ public class GlobalConf {
          **/
         public String SKYBOX_LOCATION;
 
-        public void initialize(String dATA_LOCATION, Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS, String sKYBOX_LOCATION) {
+        public void initialize(String dATA_LOCATION, Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, boolean rEAL_GAIA_ATTITUDE, boolean hIGH_ACCURACY_POSITIONS, String sKYBOX_LOCATION) {
 
             DATA_LOCATION = dATA_LOCATION;
             CATALOG_JSON_FILES = cATALOG_JSON_FILES;
             OBJECTS_JSON_FILES = oBJECTS_JSON_FILE;
-            LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
             HIGH_ACCURACY_POSITIONS = hIGH_ACCURACY_POSITIONS;
             SKYBOX_LOCATION = sKYBOX_LOCATION;
         }
 
-        public void initialize(Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, boolean dATA_SOURCE_LOCAL, float lIMIT_MAG_LOAD) {
+        public void initialize(Array<String> cATALOG_JSON_FILES, String oBJECTS_JSON_FILE, boolean dATA_SOURCE_LOCAL) {
             this.CATALOG_JSON_FILES = cATALOG_JSON_FILES;
             this.OBJECTS_JSON_FILES = oBJECTS_JSON_FILE;
-            this.LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
         }
 
-        public void initialize(Array<String> cATALOG_JSON_FILES, String dATA_JSON_FILE, boolean dATA_SOURCE_LOCAL, float lIMIT_MAG_LOAD, boolean rEAL_GAIA_ATTITUDE) {
+        public void initialize(Array<String> cATALOG_JSON_FILES, String dATA_JSON_FILE, boolean dATA_SOURCE_LOCAL, boolean rEAL_GAIA_ATTITUDE) {
             this.CATALOG_JSON_FILES = cATALOG_JSON_FILES;
             this.OBJECTS_JSON_FILES = dATA_JSON_FILE;
-            this.LIMIT_MAG_LOAD = lIMIT_MAG_LOAD;
             this.REAL_GAIA_ATTITUDE = rEAL_GAIA_ATTITUDE;
         }
 
@@ -864,8 +844,8 @@ public class GlobalConf {
         public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS) {
             SCREEN_WIDTH = sCREEN_WIDTH;
             SCREEN_HEIGHT = sCREEN_HEIGHT;
-            BACKBUFFER_WIDTH = sCREEN_WIDTH;
-            BACKBUFFER_HEIGHT = sCREEN_HEIGHT;
+            BACKBUFFER_WIDTH = (int) (sCREEN_WIDTH * BACKBUFFER_SCALE);
+            BACKBUFFER_HEIGHT = (int) (sCREEN_HEIGHT * BACKBUFFER_SCALE);
             FULLSCREEN_WIDTH = fULLSCREEN_WIDTH;
             FULLSCREEN_HEIGHT = fULLSCREEN_HEIGHT;
             FULLSCREEN = fULLSCREEN;
@@ -1005,7 +985,12 @@ public class GlobalConf {
          **/
         public String NET_SLAVE_BLEND;
 
+        // Display debug information box at the top right
         public boolean SHOW_DEBUG_INFO;
+        // Safe graphics mode disables Float buffers and fancy pixel formats. Does not use velocity buffer (no motion blur)
+        public boolean SAFE_GRAPHICS_MODE = false;
+        // Flag to mark whether safe mode is activated via command line argument
+        public boolean SAFE_GRAPHICS_MODE_FLAG = false;
 
         // Update checker
         public static long VERSION_CHECK_INTERVAL_MS = 1 * 24 * 60 * 60 * 1000;
@@ -1016,6 +1001,7 @@ public class GlobalConf {
         public String DATA_MIRROR_URL = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
         public String DATA_DESCRIPTOR_URL;
         public String UI_THEME;
+        public float UI_SCALE;
         public String SCRIPT_LOCATION;
         public String LAST_OPEN_LOCATION;
         public int REST_PORT;
@@ -1046,14 +1032,16 @@ public class GlobalConf {
         public StereoProfile STEREO_PROFILE = StereoProfile.VR_HEADSET;
         // Ask for exit confirmation
         public boolean EXIT_CONFIRMATION;
+        // Show hidden files in file chooser
+        public boolean FILE_CHOOSER_SHOW_HIDDEN;
 
         public ProgramConf() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD);
+            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
         }
 
-        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
+        public void initialize(boolean sHOW_DEBUG_INFO, Instant lAST_CHECKED, String lAST_VERSION, String vERSION_CHECK_URL, String dATA_DESCRIPTOR_URL, String uI_THEME, float uI_SCALE, String sCRIPT_LOCATION, int rEST_PORT, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE, boolean cUBEMAP_MODE, CubemapProjections.CubemapProjection cUBEMAP_PROJECTION, int cUBEMAP_FACE_RESOLUTION, boolean dISPLAY_HUD, boolean dISPLAY_POINTER_COORDS, boolean nET_MASTER, boolean nET_SLAVE,
                 List<String> nET_MASTER_SLAVES, String nET_SLAVE_CONFIG, float nET_SLAVE_YAW, float nET_SLAVE_PITCH, float nET_SLAVE_ROLL, String nET_SLAVE_WARP, String nET_SLAVE_BLEND, String lAST_OPEN_LOCATION, boolean dISPLAY_MINIMAP, float mINIMAP_SIZE, float pLANETARIUM_APERTURE, float pLANETARIUM_ANGLE, boolean dISPLAY_POINTER_GUIDES, float[] pOINTER_GUIDES_COLOR, float pOINTER_GUIDES_WIDTH, OriginType rECURSIVE_GRID_ORIGIN, boolean rECURSIVE_GRID_ORIGIN_LINES, boolean eXIT_CONFIRMATION,
-                String mIRROR) {
+                String mIRROR, boolean sAFE_GRAPHICS_MODE, boolean fILE_CHOOSER_SHOW_HIDDEN) {
             SHOW_DEBUG_INFO = sHOW_DEBUG_INFO;
             VERSION_LAST_TIME = lAST_CHECKED;
             VERSION_LAST_VERSION = lAST_VERSION;
@@ -1061,6 +1049,7 @@ public class GlobalConf {
             DATA_DESCRIPTOR_URL = dATA_DESCRIPTOR_URL;
             DATA_MIRROR_URL = mIRROR;
             UI_THEME = uI_THEME;
+            UI_SCALE = uI_SCALE;
             SCRIPT_LOCATION = sCRIPT_LOCATION;
             REST_PORT = rEST_PORT;
             LOCALE = lOCALE;
@@ -1091,6 +1080,8 @@ public class GlobalConf {
             RECURSIVE_GRID_ORIGIN = rECURSIVE_GRID_ORIGIN;
             RECURSIVE_GRID_ORIGIN_LINES = rECURSIVE_GRID_ORIGIN_LINES;
             EXIT_CONFIRMATION = eXIT_CONFIRMATION;
+            SAFE_GRAPHICS_MODE = sAFE_GRAPHICS_MODE;
+            FILE_CHOOSER_SHOW_HIDDEN = fILE_CHOOSER_SHOW_HIDDEN;
         }
 
         public void initialize(boolean sHOW_DEBUG_INFO, String uI_THEME, String lOCALE, boolean sTEREOSCOPIC_MODE, StereoProfile sTEREO_PROFILE) {
@@ -1223,7 +1214,7 @@ public class GlobalConf {
                 STEREO_PROFILE = StereoProfile.values()[(Integer) data[0]];
                 break;
             case CUBEMAP_CMD:
-                CUBEMAP_MODE = (Boolean) data[0];
+                CUBEMAP_MODE = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
                 if (CUBEMAP_MODE) {
                     CUBEMAP_PROJECTION = (CubemapProjections.CubemapProjection) data[1];
 
@@ -1272,7 +1263,9 @@ public class GlobalConf {
                         }
                     }
                 }
-
+                break;
+            case UI_SCALE_CMD:
+                UI_SCALE = (Float) data[0];
                 break;
             default:
                 break;
@@ -1302,6 +1295,7 @@ public class GlobalConf {
         public String builder;
         public String system;
         public String build;
+        private DateTimeFormatter dateFormatter;
 
         public void initialize(String version, Instant buildtime, String builder, String system, String build) {
             this.version = version;
@@ -1310,11 +1304,18 @@ public class GlobalConf {
             this.builder = builder;
             this.system = system;
             this.build = build;
+            dateFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
+                            .withLocale(Locale.getDefault())
+                            .withZone(ZoneId.systemDefault());
         }
 
         @Override
         public String toString() {
             return version;
+        }
+
+        public String getBuildTimePretty(){
+            return dateFormatter.format(buildtime);
         }
     }
 

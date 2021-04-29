@@ -21,10 +21,11 @@ import gaiasky.interafce.beans.AttributeComboBoxBean;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.filter.attrib.*;
@@ -49,7 +50,7 @@ import java.util.Set;
  */
 public class ColormapPicker extends ColorPickerAbstract {
 
-    private CatalogInfo catalogInfo;
+    private final CatalogInfo catalogInfo;
     private int cmapIndex;
     private IAttribute cmapAttrib;
     private double cmapMin, cmapMax;
@@ -57,7 +58,7 @@ public class ColormapPicker extends ColorPickerAbstract {
     public static Array<Pair<String, Integer>> cmapList;
 
     static {
-        cmapList = new Array<>(9);
+        cmapList = new Array<>(false, 9);
         cmapList.add(new Pair<>("reds", 0));
         cmapList.add(new Pair<>("greens", 1));
         cmapList.add(new Pair<>("blues", 2));
@@ -81,7 +82,8 @@ public class ColormapPicker extends ColorPickerAbstract {
         return cmapList.get(index).getFirst();
     }
 
-    private Drawable drawableColor, drawableColormap;
+    private final Drawable drawableColor;
+    private final Drawable drawableColormap;
 
     private ColormapPicker(String name, CatalogInfo ci, Stage stage, Skin skin) {
         super(name, stage, skin);
@@ -219,25 +221,25 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     // Stores minimum and maximum mapping values for the session
-    private static Map<String, double[]> minMaxMap = new HashMap<>();
+    private static final Map<String, double[]> minMaxMap = new HashMap<>();
 
     /** A color picker and colormap dialog **/
     private class ColorPickerColormapDialog extends GenericDialog {
         private CheckBox plainColor, colormap;
-        private Map<String, Image> cmapImages;
+        private final Map<String, Image> cmapImages;
         private Image cmapImage;
         private Cell cmapImageCell;
         private float[] color;
         private OwnTextField minMap, maxMap;
-        private INumberFormat nf;
+        private final INumberFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
-        private ColorPickerColormapDialog cpd;
-        private Array<ParticleGroup> pgarray;
-        private Array<SceneGraphNode> apearray;
+        private final ColorPickerColormapDialog cpd;
+        private final Array<ParticleGroup> pgarray;
+        private final Array<SceneGraphNode> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
@@ -314,7 +316,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private void addColormapWidget(Table container) {
-            float sbwidth = 170 * GlobalConf.UI_SCALE_FACTOR;
+            float sbwidth = 272f;
 
             // Color map
             container.add(new OwnLabel(I18n.txt("gui.colorpicker.colormap"), skin)).left().padRight(pad10).padBottom(pad5).padTop(pad10 * 2);
@@ -345,7 +347,7 @@ public class ColormapPicker extends ColorPickerAbstract {
             container.add(new OwnLabel(I18n.txt("gui.colorpicker.attribute"), skin)).left().padRight(pad10).padBottom(pad5);
             FadeNode catalog = catalogInfo.object;
             boolean stars = catalog instanceof StarGroup || catalog instanceof OctreeWrapper;
-            Array<AttributeComboBoxBean> attrs = new Array<>(stars ? 12 : 7);
+            Array<AttributeComboBoxBean> attrs = new Array<>(false, stars ? 12 : 7);
             // Add particle attributes (dist, alpha, delta)
             attrs.add(new AttributeComboBoxBean(new AttributeDistance()));
             attrs.add(new AttributeComboBoxBean(new AttributeRA()));
@@ -362,13 +364,17 @@ public class ColormapPicker extends ColorPickerAbstract {
                 attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
                 attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
             }
+            // Colors
+            attrs.add(new AttributeComboBoxBean(new AttributeColorRed()));
+            attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
+            attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
             // Extra attributes
             if (catalog instanceof ParticleGroup) {
                 ParticleGroup pg = (ParticleGroup) catalog;
                 if (pg.size() > 0) {
-                    ParticleBean first = pg.get(0);
-                    if (first.extra != null) {
-                        Set<UCD> ucds = first.extra.keySet();
+                    IParticleRecord first = pg.get(0);
+                    if (first.hasExtra()) {
+                        ObjectDoubleMap.Keys<UCD> ucds = first.extraKeys();
                         for (UCD ucd : ucds)
                             attrs.add(new AttributeComboBoxBean(new AttributeUCD(ucd)));
                     }
@@ -507,7 +513,7 @@ public class ColormapPicker extends ColorPickerAbstract {
                 }
                 double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
                 for (ParticleGroup pg : pgarray) {
-                    for (ParticleBean pb : pg.data()) {
+                    for (IParticleRecord pb : pg.data()) {
                         double val = attrib.get(pb);
                         if (!Double.isNaN(val) && !Double.isInfinite(val)) {
                             if (val < min)
@@ -538,9 +544,9 @@ public class ColormapPicker extends ColorPickerAbstract {
         }
 
         private void addColorPickerWidget(Table container) {
-            float textfieldLen = 50f * GlobalConf.UI_SCALE_FACTOR;
-            float sliderLen = 150f * GlobalConf.UI_SCALE_FACTOR;
-            float colsize = 100f * GlobalConf.UI_SCALE_FACTOR;
+            float textfieldLen = 80f;
+            float sliderLen = 240f;
+            float colsize = 160f;
 
             HorizontalGroup hg = new HorizontalGroup();
             hg.space(pad10);
@@ -604,8 +610,8 @@ public class ColormapPicker extends ColorPickerAbstract {
 
             /* Color table */
             Table coltable = new Table();
-            float size = 15f * GlobalConf.UI_SCALE_FACTOR;
-            float cpad = 1f * GlobalConf.UI_SCALE_FACTOR;
+            float size = 24f;
+            float cpad = 1.6f;
             int i = 1;
             int n = 4 * 4 * 4;
             float a = 1f;
@@ -727,10 +733,10 @@ public class ColormapPicker extends ColorPickerAbstract {
     }
 
     private class UpdaterListener implements EventListener {
-        private ColorPickerColormapDialog cpd;
-        private float[] color;
-        private int idx;
-        private boolean slider;
+        private final ColorPickerColormapDialog cpd;
+        private final float[] color;
+        private final int idx;
+        private final boolean slider;
 
         public UpdaterListener(boolean slider, ColorPickerColormapDialog cpd, float[] color, int idx) {
             super();

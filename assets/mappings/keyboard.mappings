@@ -51,11 +51,6 @@ action.dividetime                           = COMMA
 action.doubletime                           = PERIOD
 action.pauseresume                          = SPACE
 
-# Magnitudes
-action.incmag                               = EQUALS
-action.decmag                               = MINUS
-action.resetmag                             = STAR
-
 # FOV
 action.incfov                               = CTRL_L R_BRACKET
 action.decfov                               = CTRL_L L_BRACKET

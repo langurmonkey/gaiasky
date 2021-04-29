@@ -14,7 +14,6 @@ import gaiasky.event.IObserver;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IShapeRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -53,7 +52,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         setParentOpacity();
 
         this.viewAngle = 80f;
-        this.viewAngleApparent = this.viewAngle;
+        this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
     }
 
     protected void setParentOpacity() {
@@ -67,7 +66,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (renderText()) {
+        if (this.shouldRender() && this.renderText()) {
             addToRender(this, RenderGroup.FONT_LABEL);
             if (lines) {
                 addToRender(this, RenderGroup.SHAPE);
@@ -82,7 +81,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public boolean renderText() {
-        return this.opacity > 0 && !GlobalConf.program.CUBEMAP_MODE;
+        return !GlobalConf.program.CUBEMAP_MODE;
     }
 
     @Override
@@ -95,8 +94,8 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         float x0bottom = (rc.w() - lenwbottom) / 2f;
         float x1bottom = x0bottom + lenwbottom;
 
-        float ytop = (60f + 15f * scale) * GlobalConf.UI_SCALE_FACTOR;
-        float ybottom = (60f - lineHeight * scale + 10f * scale) * GlobalConf.UI_SCALE_FACTOR;
+        float ytop = (60f + 15f * scale) * 1.6f;
+        float ybottom = (60f - lineHeight * scale + 10f * scale) * 1.6f;
 
         // Resize batch
         shapeRenderer.setProjectionMatrix(shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
@@ -122,7 +121,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
         batch.setProjectionMatrix(batch.getProjectionMatrix().setToOrtho2D(0, 0, rc.w(), rc.h()));
 
         // Text
-        render2DLabel(batch, shader, rc, sys.fontTitles, camera, text(), 0, 60f * GlobalConf.UI_SCALE_FACTOR, scale * GlobalConf.UI_SCALE_FACTOR, align);
+        render2DLabel(batch, shader, rc, sys.fontTitles, camera, text(), 0, 96f, scale * 1.6f, align);
 
         lineHeight = sys.fontTitles.getLineHeight();
     }

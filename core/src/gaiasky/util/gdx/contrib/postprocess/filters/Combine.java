@@ -40,7 +40,7 @@ public final class Combine extends Filter<Combine> {
         // @formatter:on
 
         private final String mnemonic;
-        private int elementSize;
+        private final int elementSize;
 
         Param(String m, int elementSize) {
             this.mnemonic = m;

@@ -34,6 +34,7 @@ import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
@@ -48,6 +49,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Download manager. It gets a descriptor file from the server containing all
@@ -75,10 +77,33 @@ public class DownloadDataWindow extends GenericDialog {
         iconMap.put("texture-pack", "icon-elem-moons");
     }
 
-    private static String getIcon(String type) {
+    public static int getTypeWeight(String type) {
+        switch (type) {
+        case "catalog-lod":
+            return 0;
+        case "catalog-gaia":
+            return 1;
+        case "catalog-star":
+            return 2;
+        case "catalog-gal":
+            return 3;
+        case "catalog-cluster":
+            return 4;
+        case "catalog-other":
+            return 5;
+        case "mesh":
+            return 6;
+        case "other":
+            return 8;
+        default:
+            return 10;
+        }
+    }
+
+    public static String getIcon(String type) {
         if (type != null && iconMap.containsKey(type))
             return iconMap.get(type);
-        return "icon-elements-other";
+        return "icon-elem-others";
     }
 
     private DataDescriptor dd;
@@ -89,18 +114,18 @@ public class DownloadDataWindow extends GenericDialog {
     private Cell<OwnTextButton> cancelCell;
     private float scrollX = 0f, scrollY = 0f;
 
-    private Color highlight;
+    private final Color highlight;
 
     // Whether to show the data location chooser
-    private boolean dataLocation;
+    private final boolean dataLocation;
 
-    private INumberFormat nf;
-    private List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choiceList;
+    private final INumberFormat nf;
+    private final List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choiceList;
     private Array<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> toDownload;
-    private Array<OwnImageButton> rubbishes;
+    private final Array<OwnImageButton> rubbishes;
     private int current = -1;
 
-    private Set<DatasetDesc> downloaded;
+    private final Set<DatasetDesc> downloaded;
 
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
         this(stage, skin, dd, true, I18n.txt("gui.ok"));
@@ -126,11 +151,11 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void build() {
         me.acceptButton.setDisabled(false);
-        float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
-        float padLarge = 9f * GlobalConf.UI_SCALE_FACTOR;
-        float minW = !GlobalConf.isHiDPI() ? 570f : 650f;
+        float pad = 3.2f;
+        float padLarge = 14.4f;
+        float minW = 690f;
 
-        float buttonPad = 1f * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPad = 1.6f;
         Cell<Actor> topCell = content.add((Actor) null).left().top();
         topCell.row();
 
@@ -141,7 +166,7 @@ public class DownloadDataWindow extends GenericDialog {
         OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location") + ":", skin);
 
         HorizontalGroup hg = new HorizontalGroup();
-        hg.space(15f * GlobalConf.UI_SCALE_FACTOR);
+        hg.space(18f);
         Image system = new Image(skin.getDrawable("tooltip-icon"));
         OwnLabel downloadInfo = new OwnLabel(I18n.txt("gui.download.info"), skin);
         hg.addActor(system);
@@ -160,23 +185,28 @@ public class DownloadDataWindow extends GenericDialog {
         String catLoc = GlobalConf.data.DATA_LOCATION;
 
         if (dataLocation) {
-            OwnTextButton catalogsLoc = new OwnTextButton(catLoc, skin);
-            catalogsLoc.pad(buttonPad * 4f);
-            catalogsLoc.setMinWidth(minW);
+            OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
+            dataLocationButton.pad(buttonPad * 4f);
+            dataLocationButton.setMinWidth(minW);
             downloadTable.add(catalogsLocLabel).left().padBottom(padLarge);
-            downloadTable.add(catalogsLoc).left().padLeft(pad).padBottom(padLarge).row();
+            downloadTable.add(dataLocationButton).left().padLeft(pad).padBottom(padLarge).row();
             Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padLarge);
             notice.row();
 
-            catalogsLoc.addListener((event) -> {
+            dataLocationButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
                     FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
+                    fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                    fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (Files.isReadable(result) && Files.isWritable(result)) {
-                                // do stuff with result
-                                catalogsLoc.setText(result.toAbsolutePath().toString());
+                                // Set data location
+                                dataLocationButton.setText(result.toAbsolutePath().toString());
+                                // Change data location
                                 GlobalConf.data.DATA_LOCATION = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
+                                // Create temp dir
+                                SysUtils.mkdir(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION));
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {
                                     // Reset datasets
@@ -246,9 +276,9 @@ public class DownloadDataWindow extends GenericDialog {
                 // Check if dataset requires a minimum version of Gaia Sky
 
                 // Add dataset to desc table
-                OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "title", pad * 2f);
+                OwnCheckBox cb = new OwnCheckBox(dataset.shortDescription, skin, "default", pad * 2f);
                 cb.left();
-                cb.setMinWidth(!GlobalConf.isHiDPI() ? 240f * GlobalConf.UI_SCALE_FACTOR : 200f * GlobalConf.UI_SCALE_FACTOR);
+                cb.setMinWidth(420f);
                 cb.setChecked(dataset.mustDownload);
                 cb.setDisabled(dataset.cbDisabled);
                 cb.addListener((event) -> {
@@ -259,7 +289,7 @@ public class DownloadDataWindow extends GenericDialog {
                     return false;
                 });
                 OwnLabel haveit = new OwnLabel("", skin);
-                haveit.setWidth(65f * GlobalConf.UI_SCALE_FACTOR);
+                haveit.setWidth(68f);
                 if (dataset.exists) {
                     if (dataset.outdated) {
                         setStatusOutdated(dataset, haveit);
@@ -278,8 +308,9 @@ public class DownloadDataWindow extends GenericDialog {
                 // Description
                 HorizontalGroup descGroup = new HorizontalGroup();
                 descGroup.space(padLarge);
-                OwnLabel desc = new OwnLabel(dataset.shortDescription, skin);
-                desc.setWidth(!GlobalConf.isHiDPI() ? 250f * GlobalConf.UI_SCALE_FACTOR : 210f * GlobalConf.UI_SCALE_FACTOR);
+                OwnLabel desc = new OwnLabel(dataset.name, skin);
+                desc.addListener(new OwnTextTooltip(dataset.description, skin, 10));
+                desc.setWidth(336f);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
@@ -287,7 +318,8 @@ public class DownloadDataWindow extends GenericDialog {
                 descGroup.addActor(desc);
                 // Link
                 if (dataset.link != null) {
-                    LinkButton imgLink = new LinkButton(dataset.link, skin);
+                    String link = dataset.link.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
+                    LinkButton imgLink = new LinkButton(link, skin);
                     descGroup.addActor(imgLink);
                 } else {
                     Image emptyImg = new Image(skin, "iconic-empty");
@@ -306,7 +338,7 @@ public class DownloadDataWindow extends GenericDialog {
                 }
 
                 OwnLabel vers = new OwnLabel(vstring, skin);
-                vers.setWidth(80f * GlobalConf.UI_SCALE_FACTOR);
+                vers.setWidth(128f);
                 if (!dataset.exists) {
                     vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
                 } else if (dataset.outdated) {
@@ -327,7 +359,13 @@ public class DownloadDataWindow extends GenericDialog {
 
                 // Size
                 OwnLabel size = new OwnLabel(dataset.size, skin);
-                size.setWidth(85f * GlobalConf.UI_SCALE_FACTOR);
+                size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+                size.setWidth(88f);
+
+                // Objects
+                OwnLabel nObjects = new OwnLabel(dataset.nObjectsStr, skin);
+                nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip"), skin, 10));
+                nObjects.setWidth(192f);
 
                 // Delete
                 OwnImageButton rubbish = null;
@@ -388,7 +426,8 @@ public class DownloadDataWindow extends GenericDialog {
                 t.add(vers).center().padRight(padLarge).padBottom(pad);
                 t.add(typeImage).center().padRight(padLarge).padBottom(pad);
                 t.add(size).left().padRight(padLarge).padBottom(pad);
-                t.add(haveit).center().padBottom(pad);
+                t.add(nObjects).left().padRight(padLarge).padBottom(pad);
+                t.add(haveit).left().padBottom(pad);
                 if (dataset.exists) {
                     t.add(rubbish).center().padLeft(padLarge * 2.5f);
                 }
@@ -401,13 +440,12 @@ public class DownloadDataWindow extends GenericDialog {
         }
 
         datasetsTable.align(Align.top | Align.center);
+
         datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
         datasetsScroll.setScrollingDisabled(true, false);
         datasetsScroll.setForceScroll(false, false);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
-        datasetsScroll.setHeight(Math.min(Gdx.graphics.getHeight() * 0.5f, 760f * GlobalConf.UI_SCALE_FACTOR));
-        datasetsScroll.setWidth(Math.min(Gdx.graphics.getWidth() * 0.9f, GlobalConf.isHiDPI() ? 800f * GlobalConf.UI_SCALE_FACTOR : 900f * GlobalConf.UI_SCALE_FACTOR));
 
         downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
 
@@ -419,7 +457,7 @@ public class DownloadDataWindow extends GenericDialog {
         downloadButton = new OwnTextButton(I18n.txt("gui.download.download"), skin, "download");
         downloadButton.pad(buttonPad * 4f);
         downloadButton.setMinWidth(minW);
-        downloadButton.setMinHeight(50f * GlobalConf.UI_SCALE_FACTOR);
+        downloadButton.setMinHeight(80f);
         downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
 
         // Progress bar
@@ -433,7 +471,8 @@ public class DownloadDataWindow extends GenericDialog {
         Table infoCancel = new Table(skin);
         downloadSpeed = new OwnLabel("", skin);
         downloadSpeed.setVisible(false);
-        infoCancel.add(downloadSpeed).padRight(padLarge * 2f);
+        downloadSpeed.setWidth(300f);
+        infoCancel.add(downloadSpeed).center().padRight(padLarge * 2f);
         cancelCell = infoCancel.add();
         downloadTable.add(infoCancel).colspan(2).padBottom(padLarge).row();
 
@@ -451,6 +490,10 @@ public class DownloadDataWindow extends GenericDialog {
         downloadTable.add(manualDownload).center().colspan(2);
 
         topCell.setActor(downloadTable);
+
+        downloadTable.pack();
+        datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
+        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
 
         // Update selected
         updateDatasetsSelected();
@@ -496,6 +539,12 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
+    public void refresh(){
+        content.clear();
+        bottom.clear();
+        build();
+    }
+
     private void downloadNext() {
         current++;
         downloadCurrent();
@@ -508,14 +557,27 @@ public class DownloadDataWindow extends GenericDialog {
             DatasetDesc currentDataset = trio.getFirst();
             String name = currentDataset.name;
             String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
-            String type = currentDataset.type;
 
-            FileHandle tempDownload = Gdx.files.absolute(GlobalConf.data.DATA_LOCATION + "/temp.tar.gz");
+            String filename = FilenameUtils.getName(url);
+            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION) + "/" + filename + ".part");
 
-            ProgressRunnable pr = (read, total, progress, speed) -> {
+            ProgressRunnable progressDownload = (read, total, progress, speed) -> {
                 double readMb = (double) read / 1e6d;
                 double totalMb = (double) total / 1e6d;
                 final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.downloading", nf.format(progress));
+                double mbPerSecond = speed / 1000d;
+                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
+                // Since we are downloading on a background thread, post a runnable to touch UI
+                GaiaSky.postRunnable(() -> {
+                    downloadButton.setText(progressString);
+                    downloadProgress.setValue((float) progress);
+                    downloadSpeed.setText(speedString);
+                });
+            };
+            ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
+                double readMb = (double) read / 1e6d;
+                double totalMb = (double) total / 1e6d;
+                final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.checksumming", nf.format(progress));
                 double mbPerSecond = speed / 1000d;
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
                 // Since we are downloading on a background thread, post a runnable to touch UI
@@ -550,16 +612,17 @@ public class DownloadDataWindow extends GenericDialog {
                     logger.info("No digest found for dataset: " + name);
                 }
 
-                if (errors == 0)
+                if (errors == 0) {
                     try {
                         // Extract
                         decompress(tempDownload.path(), new File(dataLocation), downloadButton, downloadProgress);
                         // Remove archive
-                        cleanupTempFiles();
+                        cleanupTempFile(tempDownload.path());
                     } catch (Exception e) {
                         logger.error(e, "Error decompressing: " + name);
                         errors++;
                     }
+                }
 
                 // Done
                 GaiaSky.postRunnable(() -> {
@@ -621,11 +684,11 @@ public class DownloadDataWindow extends GenericDialog {
             downloadSpeed.setVisible(true);
             setStatusProgress(trio.getThird());
             setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentDataset.name));
-            final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, pr, finish, fail, cancel);
+            final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
 
             // Cancel button
             OwnTextButton cancelDownloadButton = new OwnTextButton(I18n.txt("gui.download.cancel"), skin);
-            cancelDownloadButton.pad(9f * GlobalConf.UI_SCALE_FACTOR);
+            cancelDownloadButton.pad(14.4f);
             cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
             cancelDownloadButton.addListener(new ChangeListener() {
                 @Override
@@ -724,23 +787,49 @@ public class DownloadDataWindow extends GenericDialog {
         return fileSize;
     }
 
+    /**
+     * We should never need to call this, as the main {@link GaiaSky#dispose()} method
+     * already cleans up the temp directory.
+     * This way, we allow download resumes within the same session.
+     */
     private void cleanupTempFiles() {
-        Path tempDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "temp.tar.gz");
-        Path gsDownload = Paths.get(GlobalConf.data.DATA_LOCATION, "gaiasky_data.tar.gz");
+        cleanupTempFiles(true, false);
+    }
 
-        deleteFile(tempDownload);
-        deleteFile(gsDownload);
+    private void cleanupTempFile(String file) {
+        deleteFile(Path.of(file));
+    }
+
+    private void cleanupTempFiles(boolean dataDownloads, boolean dataDescriptor) {
+        if (dataDownloads) {
+            Path tempDir = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION);
+            // Clean up partial downloads
+            try {
+                Stream<Path> stream = java.nio.file.Files.find(tempDir, 2, (path, basicFileAttributes) -> {
+                    File file = path.toFile();
+                    return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
+                });
+                stream.forEach(f -> deleteFile(f));
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+
+        if (dataDescriptor) {
+            // Clean up data descriptor
+            Path gsDownload = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION).resolve("gaiasky-data.json");
+            deleteFile(gsDownload);
+        }
     }
 
     private void deleteFile(Path p) {
-        if (Files.exists(p)) {
+        if (java.nio.file.Files.exists(p)) {
             try {
-                Files.delete(p);
+                java.nio.file.Files.delete(p);
             } catch (IOException e) {
                 logger.error(e, "Failed cleaning up file: " + p.toString());
             }
         }
-
     }
 
     private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
@@ -791,17 +880,15 @@ public class DownloadDataWindow extends GenericDialog {
     @Override
     protected void accept() {
         // Select downloaded catalogs
-        for(DatasetDesc dd : downloaded){
-            if(dd.type.startsWith("catalog")){
+        for (DatasetDesc dd : downloaded) {
+            if (dd.type.startsWith("catalog")) {
                 GlobalConf.data.addSelectedCatalog(dd.check);
             }
         }
-        cleanupTempFiles();
     }
 
     @Override
     protected void cancel() {
-        cleanupTempFiles();
     }
 
     private void backupScrollValues() {

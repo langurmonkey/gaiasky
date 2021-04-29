@@ -15,6 +15,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
@@ -35,9 +36,6 @@ public class Invisible extends CelestialBody {
     private String raymarchingShader;
     private boolean isOn = false;
 
-    /**
-     * Needed for reflection in {@link AbstractPositionEntity#getSimpleCopy()}
-     **/
     @SuppressWarnings("unused")
     public Invisible() {
     }
@@ -57,8 +55,10 @@ public class Invisible extends CelestialBody {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if(this.raymarchingShader != null && !this.raymarchingShader.isBlank())
-           EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, coordinates.getEquatorialCartesianCoordinates(Instant.now(), pos), this.raymarchingShader, new float[]{1f, 0f, 0f, 0f});
+        if (this.raymarchingShader != null && !this.raymarchingShader.isBlank() && !GlobalConf.program.SAFE_GRAPHICS_MODE)
+            EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, coordinates.getEquatorialCartesianCoordinates(Instant.now(), pos), this.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
+        else
+            raymarchingShader = null;
     }
 
     @Override
@@ -105,16 +105,16 @@ public class Invisible extends CelestialBody {
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         forceUpdateLocalValues(time, false);
-        if(raymarchingShader != null){
+        if (raymarchingShader != null) {
             // Check enable/disable
-            if(viewAngleApparent >  Math.toRadians(0.001)){
-                if(!isOn) {
+            if (viewAngleApparent > Math.toRadians(0.001)) {
+                if (!isOn) {
                     // Turn on
                     EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), true, pos);
                     isOn = true;
                 }
             } else {
-                if(isOn){
+                if (isOn) {
                     // Turn off
                     EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, pos);
                     isOn = false;
@@ -129,7 +129,6 @@ public class Invisible extends CelestialBody {
             // Load this objects's equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
-
             // Convert to cartesian coordinates and put them in aux3 vector
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
@@ -139,11 +138,11 @@ public class Invisible extends CelestialBody {
         }
     }
 
-	@Override
-	public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-	}
+    @Override
+    public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
+    }
 
-	public void setShader(String shader){
+    public void setShader(String shader) {
         this.raymarchingShader = shader;
     }
 

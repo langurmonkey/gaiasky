@@ -8,6 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -21,7 +22,6 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.desktop.util.MemInfoWindow;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
@@ -31,6 +31,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.scenegraph.IStarFocus;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.format.INumberFormat;
@@ -53,7 +54,6 @@ import java.util.List;
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);
 
-    protected Lwjgl3Graphics graphics;
     protected ControlsWindow controlsWindow;
     protected MinimapWindow minimapWindow;
 
@@ -69,9 +69,10 @@ public class FullGui extends AbstractGui {
     protected MinimapInterface minimapInterface;
     protected LoadProgressInterface loadProgressInterface;
 
-    protected SearchDialog searchDialog;
     protected MemInfoWindow memInfoWindow;
     protected LogWindow logWindow;
+    protected WikiInfoWindow wikiInfoWindow;
+    protected ArchiveViewWindow archiveViewWindow;
 
     protected INumberFormat nf;
     protected Label pointerXCoord, pointerYCoord;
@@ -84,16 +85,16 @@ public class FullGui extends AbstractGui {
 
     private List<Actor> invisibleInStereoMode;
 
-    public FullGui(Lwjgl3Graphics graphics) {
-        super();
-        this.graphics = graphics;
+    public FullGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        Viewport vp = new ScreenViewport();
-        this.ui = new Stage(vp, GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        this.ui = new Stage(vp, sb);
         vp.update(graphics.getWidth(), graphics.getHeight(), true);
     }
 
@@ -111,12 +112,12 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_SEARCH_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_WIKI_INFO_ACTION, Events.UPDATE_WIKI_INFO_ACTION, Events.SHOW_ARCHIVE_VIEW_ACTION, Events.UPDATE_ARCHIVE_VIEW_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS);
     }
 
     protected void buildGui() {
-        pad = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+        pad = 16f;
+        pad5 = 8f;
         // Component types name init
         for (ComponentType ct : ComponentType.values()) {
             ct.getName();
@@ -207,7 +208,6 @@ public class FullGui extends AbstractGui {
                         // Check version
                         String tagVersion = vce.getTag();
                         Integer versionNumber = vce.getVersionNumber();
-                        Instant tagDate = vce.getTagTime();
 
                         GlobalConf.program.VERSION_LAST_TIME = Instant.now();
 
@@ -217,7 +217,7 @@ public class FullGui extends AbstractGui {
                             UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
                             newVersion.pack();
                             float ww = newVersion.getWidth();
-                            float margin = 5 * GlobalConf.UI_SCALE_FACTOR;
+                            float margin = 8f;
                             newVersion.setPosition(graphics.getWidth() - ww - margin, margin);
                             ui.addActor(newVersion);
                         } else {
@@ -261,7 +261,7 @@ public class FullGui extends AbstractGui {
                 recalculateOptionsSize();
                 if (collapsed)
                     controlsWindow.collapseInstant();
-                controlsWindow.setPosition(0, graphics.getHeight() - controlsWindow.getHeight());
+                controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
                 ui.addActor(controlsWindow);
             }
             if (ni != null)
@@ -363,14 +363,6 @@ public class FullGui extends AbstractGui {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case SHOW_SEARCH_ACTION:
-            if (searchDialog == null) {
-                searchDialog = new SearchDialog(skin, ui, sg);
-            } else {
-                searchDialog.clearText();
-            }
-            searchDialog.show(ui);
-            break;
         case SHOW_LAND_AT_LOCATION_ACTION:
             CelestialBody target = (CelestialBody) data[0];
             LandAtWindow landAtLocation = new LandAtWindow(target, ui, skin);
@@ -378,6 +370,8 @@ public class FullGui extends AbstractGui {
             break;
         case SHOW_PLAYCAMERA_ACTION:
             FileChooser fc = new FileChooser(I18n.txt("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+            fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+            fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
             fc.setAcceptText(I18n.txt("gui.camera.run"));
             fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
             fc.setAcceptedFiles("*.dat, *.gsc");
@@ -398,14 +392,50 @@ public class FullGui extends AbstractGui {
             if (memInfoWindow == null) {
                 memInfoWindow = new MemInfoWindow(ui, skin);
             }
-            memInfoWindow.show(ui);
+            if (!memInfoWindow.isVisible() || !memInfoWindow.hasParent())
+                memInfoWindow.show(ui);
             break;
         case SHOW_LOG_ACTION:
             if (logWindow == null) {
                 logWindow = new LogWindow(ui, skin);
             }
             logWindow.update();
-            logWindow.show(ui);
+            if (!logWindow.isVisible() || !logWindow.hasParent())
+                logWindow.show(ui);
+            break;
+        case UPDATE_WIKI_INFO_ACTION:
+            if(wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()){
+                // Update
+                String searchName = (String) data[0];
+                wikiInfoWindow.update(searchName);
+            }
+            break;
+        case SHOW_WIKI_INFO_ACTION:
+            String searchName = (String) data[0];
+            if (wikiInfoWindow == null) {
+                wikiInfoWindow = new WikiInfoWindow(ui, skin);
+            }
+            if(!wikiInfoWindow.isUpdating()) {
+                wikiInfoWindow.update(searchName);
+                if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
+                    wikiInfoWindow.show(ui);
+            }
+            break;
+        case UPDATE_ARCHIVE_VIEW_ACTION:
+            if(archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()){
+                // Update
+                IStarFocus starFocus = (IStarFocus) data[0];
+                archiveViewWindow.update(starFocus);
+            }
+            break;
+        case SHOW_ARCHIVE_VIEW_ACTION:
+            IStarFocus starFocus = (IStarFocus) data[0];
+            if (archiveViewWindow == null) {
+                archiveViewWindow = new ArchiveViewWindow(ui, skin);
+            }
+            archiveViewWindow.update(starFocus);
+            if (!archiveViewWindow.isVisible() || !archiveViewWindow.hasParent())
+                archiveViewWindow.show(ui);
             break;
         case REMOVE_KEYBOARD_FOCUS:
             ui.setKeyboardFocus(null);
@@ -434,28 +464,32 @@ public class FullGui extends AbstractGui {
             break;
         case RA_DEC_UPDATED:
             if (GlobalConf.program.DISPLAY_POINTER_COORDS) {
+                Stage ui = pointerYCoord.getStage();
+                float uiScale = GlobalConf.program.UI_SCALE;
                 Double ra = (Double) data[0];
                 Double dec = (Double) data[1];
                 Integer x = (Integer) data[4];
                 Integer y = (Integer) data[5];
 
                 pointerXCoord.setText("RA/".concat(nf.format(ra)).concat("°"));
-                pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
+                pointerXCoord.setPosition(x / uiScale, 1.6f);
                 pointerYCoord.setText("DEC/".concat(nf.format(dec)).concat("°"));
-                pointerYCoord.setPosition(graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, graphics.getHeight() - y);
+                pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
             }
             break;
         case LON_LAT_UPDATED:
             if (GlobalConf.program.DISPLAY_POINTER_COORDS) {
+                Stage ui = pointerYCoord.getStage();
+                float uiScale = GlobalConf.program.UI_SCALE;
                 Double lon = (Double) data[0];
                 Double lat = (Double) data[1];
                 Integer x = (Integer) data[2];
                 Integer y = (Integer) data[3];
 
                 pointerXCoord.setText("Lon/".concat(nf.format(lon)).concat("°"));
-                pointerXCoord.setPosition(x, GlobalConf.UI_SCALE_FACTOR);
+                pointerXCoord.setPosition(x / uiScale, 1.6f);
                 pointerYCoord.setText("Lat/".concat(nf.format(lat)).concat("°"));
-                pointerYCoord.setPosition(graphics.getWidth() + GlobalConf.UI_SCALE_FACTOR, graphics.getHeight() - y);
+                pointerYCoord.setPosition(ui.getWidth() + 1.6f, ui.getHeight() - y / uiScale);
             }
             break;
         case DISPLAY_POINTER_COORDS_CMD:
@@ -470,10 +504,10 @@ public class FullGui extends AbstractGui {
 
             GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate);
 
-            int h = graphics.getHeight();
+            int h = (int) getGuiStage().getHeight();
 
-            float px = screenX;
-            float py = h - screenY - 20 * GlobalConf.UI_SCALE_FACTOR;
+            float px = screenX / GlobalConf.program.UI_SCALE;
+            float py = h - screenY / GlobalConf.program.UI_SCALE - 32f;
 
             popup.showMenu(ui, px, py);
 
@@ -501,7 +535,6 @@ public class FullGui extends AbstractGui {
         }
     }
 
-    @Override
     public void setSceneGraph(ISceneGraph sg) {
         this.sg = sg;
     }
@@ -609,4 +642,17 @@ public class FullGui extends AbstractGui {
         showMinimapWindow(ui, minimapWindow == null || (!minimapWindow.isVisible() || !minimapWindow.hasParent()));
     }
 
+    @Override
+    public boolean updateUnitsPerPixel(float upp) {
+        boolean cool = super.updateUnitsPerPixel(upp);
+        if (cool) {
+            controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
+            controlsWindow.recalculateSize();
+            if (ui.getHeight() < controlsWindow.getHeight()) {
+                // Collapse
+                controlsWindow.collapseInstant();
+            }
+        }
+        return cool;
+    }
 }

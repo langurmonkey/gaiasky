@@ -34,7 +34,8 @@ public final class Convolve2D extends MultipassFilter {
 
     public final float[] weights, offsetsHor, offsetsVert;
 
-    private Convolve1D hor, vert;
+    private final Convolve1D hor;
+    private final Convolve1D vert;
 
     public Convolve2D(int radius) {
         this.radius = radius;

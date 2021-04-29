@@ -6,6 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -33,13 +35,15 @@ public class RenderGui extends AbstractGui {
 
     protected IDateFormat df;
 
-    public RenderGui() {
-        super();
+    public RenderGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
         df = DateFormatFactory.getFormatter("dd/MM/yyyy HH:mm:ss");
     }
 
@@ -48,7 +52,7 @@ public class RenderGui extends AbstractGui {
         skin = GlobalResources.skin;
 
         mainTable = new Table(skin);
-        time = new OwnLabel("", skin, "ui-13");
+        time = new OwnLabel("", skin, "ui-17");
         mainTable.add(time);
         mainTable.setFillParent(true);
         mainTable.right().bottom();

@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
-import gaiasky.util.GlobalConf;
 
 /** 
  * A GUI component
@@ -23,18 +22,18 @@ public abstract class GuiComponent {
     protected Skin skin;
     protected Stage stage;
 
-    protected float pad, space8, space6, space4, space3, space2, space1;
+    protected float pad8, pad12, pad9, pad6, pad4, pad3, pad1;
 
     public GuiComponent(Skin skin, Stage stage) {
         this.skin = skin;
         this.stage = stage;
-        pad = 5f * GlobalConf.UI_SCALE_FACTOR;
-        space8 = 8f * GlobalConf.UI_SCALE_FACTOR;
-        space6 = 6f * GlobalConf.UI_SCALE_FACTOR;
-        space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
-        space3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-        space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
-        space1 = 1f * GlobalConf.UI_SCALE_FACTOR;
+        pad8 = 8f;
+        pad12 = 12.8f;
+        pad9 = 9.6f;
+        pad6 = 6.4f;
+        pad4 = 4.8f;
+        pad3 = 3.2f;
+        pad1 = 1.6f;
     }
 
     /**

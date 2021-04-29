@@ -6,13 +6,13 @@
 package gaiasky.util.filter;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
 
 /**
  * A filter on a dataset as a set of rules
  */
 public class Filter {
-    private Array<FilterRule> rules;
+    private final Array<FilterRule> rules;
     private IOperation operation;
 
     /**
@@ -43,7 +43,7 @@ public class Filter {
     }
 
     public Filter deepCopy() {
-        Array<FilterRule> rulesCopy = new Array<>(rules.size);
+        Array<FilterRule> rulesCopy = new Array<>(false, rules.size);
         for (int i = 0; i < rules.size; i++) {
             rulesCopy.add(rules.get(i).copy());
         }
@@ -51,7 +51,7 @@ public class Filter {
         return copy;
     }
 
-    public boolean evaluate(ParticleBean pb) {
+    public boolean evaluate(IParticleRecord pb) {
         synchronized (this) {
             return operation.evaluate(rules, pb);
         }
@@ -81,6 +81,8 @@ public class Filter {
         switch (op.toLowerCase()) {
         case "or":
             return new OperationOr();
+        case "xor":
+            return new OperationXor();
         case "and":
         default:
             return new OperationAnd();
@@ -96,7 +98,7 @@ public class Filter {
     }
 
     private interface IOperation {
-        boolean evaluate(Array<FilterRule> rules, ParticleBean pb);
+        boolean evaluate(Array<FilterRule> rules, IParticleRecord pb);
 
         String getOperationString();
     }
@@ -109,7 +111,7 @@ public class Filter {
         }
 
         @Override
-        public boolean evaluate(Array<FilterRule> rules, ParticleBean bean) {
+        public boolean evaluate(Array<FilterRule> rules, IParticleRecord bean) {
             boolean result = true;
             for (FilterRule rule : rules) {
                 result = result && rule.evaluate(bean);
@@ -131,10 +133,32 @@ public class Filter {
         }
 
         @Override
-        public boolean evaluate(Array<FilterRule> rules, ParticleBean bean) {
+        public boolean evaluate(Array<FilterRule> rules, IParticleRecord bean) {
             boolean result = false;
             for (FilterRule rule : rules) {
                 result = result || rule.evaluate(bean);
+            }
+            return result;
+        }
+
+        @Override
+        public String getOperationString() {
+            return op;
+        }
+    }
+
+    private class OperationXor implements IOperation {
+        public String op;
+
+        public OperationXor() {
+            this.op = "xor";
+        }
+
+        @Override
+        public boolean evaluate(Array<FilterRule> rules, IParticleRecord bean) {
+            boolean result = false;
+            for (FilterRule rule : rules) {
+                result = result ^ rule.evaluate(bean);
             }
             return result;
         }

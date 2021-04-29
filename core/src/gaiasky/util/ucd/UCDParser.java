@@ -24,8 +24,10 @@ import java.util.Set;
  * @author tsagrista
  */
 public class UCDParser {
+    // The following column names can either be strings or regular expressions. They are checked
+    // first with equals() and then with matches()
     public static String[] idcolnames = new String[] { "hip", "id", "source_id", "tycho2_id" };
-    public static String[] namecolnames = new String[] { "name", "proper", "proper_name", "common_name", "designation" };
+    public static String[] namecolnames = new String[] { "(name|NAME|refname|REFNAME)((_|-)[\\w\\d]+)?", "name", "proper", "proper_name", "common_name", "designation" };
     public static String[] racolnames = new String[] { "ra", "right_ascension", "rightascension", "alpha", "raj2000" };
     public static String[] xcolnames = new String[] { "x", "X" };
     public static String[] decolnames = new String[] { "dec", "de", "declination", "delta", "dej2000" };
@@ -35,59 +37,79 @@ public class UCDParser {
     public static String[] pllxcolnames = new String[] { "plx", "parallax", "pllx", "par" };
     public static String[] magcolnames = new String[] { "phot_g_mean_mag", "mag", "bmag", "gmag" };
     public static String[] colorcolnames = new String[] { "b_v", "v_i", "bp_rp", "bp_g", "g_rp", "ci" };
+    public static String[] teffcolnames = new String[] { "teff", "t_eff", "temperature", "effective_temperature" };
     public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
     public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
     public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv" };
     public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
 
-    public static boolean isName(String colname){
-        return TextUtils.contains(namecolnames, colname);
+    public static boolean isName(String colname) {
+        return TextUtils.contains(namecolnames, colname, true);
     }
-    public static boolean isId(String colname){
-        return TextUtils.contains(idcolnames, colname);
+
+    public static boolean isId(String colname) {
+        return TextUtils.contains(idcolnames, colname, true);
     }
-    public static boolean isRa(String colname){
-        return TextUtils.contains(racolnames, colname);
+
+    public static boolean isRa(String colname) {
+        return TextUtils.contains(racolnames, colname, true);
     }
-    public static boolean isX(String colname){
-        return TextUtils.contains(xcolnames, colname);
+
+    public static boolean isX(String colname) {
+        return TextUtils.contains(xcolnames, colname, true);
     }
-    public static boolean isDec(String colname){
-        return TextUtils.contains(decolnames, colname);
+
+    public static boolean isDec(String colname) {
+        return TextUtils.contains(decolnames, colname, true);
     }
-    public static boolean isY(String colname){
-        return TextUtils.contains(ycolnames, colname);
+
+    public static boolean isY(String colname) {
+        return TextUtils.contains(ycolnames, colname, true);
     }
-    public static boolean isDist(String colname){
-        return TextUtils.contains(distcolnames, colname);
+
+    public static boolean isDist(String colname) {
+        return TextUtils.contains(distcolnames, colname, true);
     }
-    public static boolean isZ(String colname){
-        return TextUtils.contains(zcolnames, colname);
+
+    public static boolean isZ(String colname) {
+        return TextUtils.contains(zcolnames, colname, true);
     }
-    public static boolean isPllx(String colname){
-        return TextUtils.contains(pllxcolnames, colname);
+
+    public static boolean isPllx(String colname) {
+        return TextUtils.contains(pllxcolnames, colname, true);
     }
-    public static boolean isMag(String colname){
-        return TextUtils.contains(magcolnames, colname);
+
+    public static boolean isMag(String colname) {
+        return TextUtils.contains(magcolnames, colname, true);
     }
-    public static boolean isColor(String colname){
-        return TextUtils.contains(colorcolnames, colname);
+
+    public static boolean isColor(String colname) {
+        return TextUtils.contains(colorcolnames, colname, true);
     }
-    public static boolean isPmra(String colname){
-        return TextUtils.contains(pmracolnames, colname);
+
+    public static boolean isTeff(String colname) {
+        return TextUtils.contains(teffcolnames, colname, true);
     }
-    public static boolean isPmde(String colname){
-        return TextUtils.contains(pmdeccolnames, colname);
+
+    public static boolean isPmra(String colname) {
+        return TextUtils.contains(pmracolnames, colname, true);
     }
-    public static boolean isRadvel(String colname){
-        return TextUtils.contains(radvelcolnames, colname);
+
+    public static boolean isPmde(String colname) {
+        return TextUtils.contains(pmdeccolnames, colname, true);
     }
-    public static boolean isRadius(String colname){
-        return TextUtils.contains(radiuscolnames, colname);
+
+    public static boolean isRadvel(String colname) {
+        return TextUtils.contains(radvelcolnames, colname, true);
     }
-    public static boolean isNstars(String colname){
-        return TextUtils.contains(nstarscolnames, colname);
+
+    public static boolean isRadius(String colname) {
+        return TextUtils.contains(radiuscolnames, colname, true);
+    }
+
+    public static boolean isNstars(String colname) {
+        return TextUtils.contains(nstarscolnames, colname, true);
     }
 
     public Map<UCDType, Set<UCD>> ucdmap;
@@ -117,7 +139,8 @@ public class UCDParser {
     public Array<UCD> COL;
 
     // PHYSICAL PARAMS
-    // TODO - not supported yet
+    public boolean hasteff = false;
+    public Array<UCD> TEFF;
 
     // REST
     public Array<UCD> extra;
@@ -327,20 +350,34 @@ public class UCDParser {
 
         /** COLORS **/
         Set<UCD> col = ucdmap.get(UCDType.PHOT);
-        if (col != null)
+        if (col != null) {
             for (UCD candidate : col) {
                 if (candidate.ucd[0][1].equals("color")) {
                     this.COL.add(candidate);
                     break;
                 }
             }
+        }
         if (this.COL == null || this.COL.isEmpty()) {
             this.COL = getByColNames(colorcolnames);
         }
         this.hascol = !this.COL.isEmpty();
 
         /** PHYSICAL QUANTITIES **/
-        // TODO - not supported yet
+        // T_eff
+        Set<UCD> phys = ucdmap.get(UCDType.PHYS);
+        if (phys != null) {
+            for (UCD candidate : phys) {
+                if (candidate.ucd[0].length >= 3 && candidate.ucd[0][1].equals("temperature") && candidate.ucd[0][2].equals("effective")) {
+                    this.TEFF.add(candidate);
+                    break;
+                }
+            }
+        }
+        if (this.TEFF == null || this.TEFF.isEmpty()) {
+            this.TEFF = getByColNames(teffcolnames);
+        }
+        this.hasteff = !this.TEFF.isEmpty();
 
         /** REST OF COLUMNS **/
         Set<UCDType> keys = ucdmap.keySet();
@@ -355,7 +392,7 @@ public class UCDParser {
     }
 
     public boolean has(UCD ucd) {
-        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3) || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL) || has(ucd, ID) || has(ucd, COL) || has(ucd, NAME) || has(ucd, MAG);
+        return has(ucd, POS1) || has(ucd, POS2) || has(ucd, POS3) || has(ucd, PMRA) || has(ucd, PMDEC) || has(ucd, RADVEL) || has(ucd, ID) || has(ucd, COL) || has(ucd, TEFF) || has(ucd, NAME) || has(ucd, MAG);
     }
 
     public boolean has(UCD ucd, Array<UCD> a) {
@@ -422,7 +459,7 @@ public class UCDParser {
                 Set<UCD> set = ucdmap.get(type);
                 // Check column names
                 for (UCD candidate : set) {
-                    if (TextUtils.contains(colnames, candidate.colname)) {
+                    if (TextUtils.containsOrMatches(colnames, candidate.colname, true)) {
                         if (defaultunit != null && (candidate.unit == null || candidate.unit.isEmpty()))
                             candidate.unit = defaultunit;
                         candidates.add(candidate);
@@ -470,9 +507,9 @@ public class UCDParser {
         return "";
     }
 
-    private void setDefaultUnit(UCD candidate, String unit){
+    private void setDefaultUnit(UCD candidate, String unit) {
         // Default unit
-        if(candidate.unit == null){
+        if (candidate.unit == null) {
             candidate.unit = unit;
         }
     }
@@ -501,7 +538,6 @@ public class UCDParser {
         }
         return false;
     }
-
 
     private void addToMap(UCD ucd) {
         if (!ucdmap.containsKey(ucd.type)) {

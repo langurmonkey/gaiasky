@@ -15,8 +15,7 @@ import java.util.List;
 public interface IStarGroupIO {
 
     void writeParticles(List<SceneGraphNode> list, OutputStream out);
-    void writeParticles(List<SceneGraphNode> list, OutputStream out, boolean compat);
+    void writeParticles(List<SceneGraphNode> list, OutputStream out, int version);
 
     List<SceneGraphNode> readParticles(InputStream in) throws FileNotFoundException;
-    List<SceneGraphNode> readParticles(InputStream in, boolean compat) throws FileNotFoundException;
 }

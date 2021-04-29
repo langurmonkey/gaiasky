@@ -7,6 +7,7 @@ package gaiasky.desktop.util;
 
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +21,7 @@ import java.nio.file.Paths;
  * @author Toni Sagrista
  */
 public class SysUtils {
-    private static Log logger = Logger.getLogger(SysUtils.class);
+    private static final Log logger = Logger.getLogger(SysUtils.class);
 
     /**
      * Initialise directories
@@ -35,7 +36,6 @@ public class SysUtils {
             Files.createDirectories(getDefaultMusicDir());
             Files.createDirectories(getDefaultFramesDir());
             Files.createDirectories(getDefaultScreenshotsDir());
-            Files.createDirectories(getDefaultTmpDir());
             Files.createDirectories(getDefaultMappingsDir());
             Files.createDirectories(getDefaultBookmarksDir());
         } catch (IOException e) {
@@ -43,8 +43,24 @@ public class SysUtils {
         }
     }
 
-    private static String OS;
-    private static boolean linux, mac, windows, unix, solaris;
+    public static void mkdir(Path dir) {
+        try {
+            Files.createDirectories(dir);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
+
+    public static void rmdir(Path dir) {
+        FileUtils.deleteQuietly(dir.toFile());
+    }
+
+    private static final String OS;
+    private static final boolean linux;
+    private static final boolean mac;
+    private static final boolean windows;
+    private static final boolean unix;
+    private static final boolean solaris;
 
     static {
         OS = System.getProperty("os.name").toLowerCase();
@@ -54,7 +70,6 @@ public class SysUtils {
         unix = OS.indexOf("unix") >= 0;
         solaris = OS.indexOf("sunos") >= 0;
     }
-
 
     public static String getXdgDesktop() {
         return System.getenv("XDG_CURRENT_DESKTOP");
@@ -131,6 +146,10 @@ public class SysUtils {
 
     public static boolean isSolaris() {
         return solaris;
+    }
+
+    public static boolean launchedViaInstall4j() {
+        return System.getProperty("install4j.appDir") != null;
     }
 
     public static String getOSArchitecture() {
@@ -217,7 +236,6 @@ public class SysUtils {
         return BOOKMARKS_DIR_NAME;
     }
 
-
     /**
      * Gets a file pointer to the mpcdi directory.
      *
@@ -226,7 +244,6 @@ public class SysUtils {
     public static Path getDefaultMpcdiDir() {
         return getDataDir().resolve(MPCDI_DIR_NAME);
     }
-
 
     /**
      * Gets a file pointer to the local data directory where the data files are downloaded and stored.
@@ -247,12 +264,14 @@ public class SysUtils {
     }
 
     /**
-     * Gets a file pointer to the temporary directory within the cache directory. See {@link #getCacheDir()}.
+     * Gets the path to the actual temporary directory in the data folder. It needs the location of
+     * the user-configured data folder as input.
      *
-     * @return A pointer to the Gaia Sky temporary directory in the user's home.
+     * @param dataLocation The user-defined data location.
+     * @return A path that points to the temporary directory.
      */
-    public static Path getDefaultTmpDir() {
-        return getCacheDir().resolve(TMP_DIR_NAME);
+    public static Path getTempDir(String dataLocation) {
+        return Path.of(dataLocation).resolve(TMP_DIR_NAME);
     }
 
     /**

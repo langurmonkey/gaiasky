@@ -234,7 +234,7 @@ public class TabbedPane extends Table {
 
     private static class TabTitleButton extends TextButton {
 
-        private int index;
+        private final int index;
 
         // private TabTitleButton(int index, String text, Skin skin) {
         // super(text, skin);

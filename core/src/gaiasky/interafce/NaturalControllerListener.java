@@ -7,10 +7,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
-import com.badlogic.gdx.controllers.PovDirection;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.IntSet;
-import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -26,11 +23,11 @@ import java.nio.file.Path;
 public class NaturalControllerListener implements ControllerListener, IObserver, IInputListener {
     private static final Log logger = Logger.getLogger(NaturalControllerListener.class);
 
-    private NaturalCamera cam;
+    private final NaturalCamera cam;
     private IControllerMappings mappings;
-    private EventManager em;
+    private final EventManager em;
 
-    private IntSet pressedKeys;
+    private final IntSet pressedKeys;
 
     public NaturalControllerListener(NaturalCamera cam, String mappingsFile) {
         this.cam = cam;
@@ -86,20 +83,14 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     }
 
     public boolean updateControllerMappings(String mappingsFile) {
-        // We look for OS-specific mappings for the given inputListener. If not found, it defaults to the base
-        String os = SysUtils.getOSFamily();
-        int extensionStart = mappingsFile.lastIndexOf('.');
-        String pre = mappingsFile.substring(0, extensionStart); //-V6009
-        String post = mappingsFile.substring(extensionStart + 1);
-
-        String osMappingsFile = pre + "." + os + "." + post;
-        if (Files.exists(Path.of(osMappingsFile))) {
-            mappingsFile = osMappingsFile;
-            logger.info("Controller mappings file set to " + mappingsFile);
-        }
-
-        if (Files.exists(Path.of(mappingsFile)))
+        if (Files.exists(Path.of(mappingsFile))) {
             mappings = new ControllerMappings(null, Path.of(mappingsFile));
+        } else {
+            Path internalMappings = Path.of(GlobalConf.ASSETS_LOC).resolve(mappingsFile);
+            if(Files.exists(internalMappings)){
+                mappings = new ControllerMappings(null, internalMappings);
+            }
+        }
         return false;
     }
 
@@ -219,25 +210,6 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         return treated;
     }
 
-    @Override
-    public boolean povMoved(Controller controller, int povCode, PovDirection value) {
-        return false;
-    }
-
-    @Override
-    public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
-        return false;
-    }
-
-    @Override
-    public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
-        return false;
-    }
-
-    @Override
-    public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
-        return false;
-    }
 
     @Override
     public void notify(final Events event, final Object... data) {

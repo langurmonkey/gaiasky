@@ -1,11 +1,11 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import gaiasky.render.ComponentTypes;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 
 public class VRGui<T extends IGui> implements IGui {
@@ -13,13 +13,13 @@ public class VRGui<T extends IGui> implements IGui {
     private T right;
     private T left;
 
-    public VRGui(Class<T> clazz, int hoffset) {
+    public VRGui(Class<T> clazz, int hoffset, Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super();
         try {
-            right = clazz.getDeclaredConstructor().newInstance();
+            right = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
             right.setVr(true);
             right.setHoffset(-hoffset);
-            left = clazz.getDeclaredConstructor().newInstance();
+            left = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
             left.setVr(true);
             left.setHoffset(hoffset);
         } catch (Exception e) {
@@ -35,9 +35,9 @@ public class VRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
-        right.initialize(assetManager);
-        left.initialize(assetManager);
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        right.initialize(assetManager, sb);
+        left.initialize(assetManager, sb);
     }
 
     @Override
@@ -48,7 +48,6 @@ public class VRGui<T extends IGui> implements IGui {
 
     @Override
     public void update(double dt) {
-        setHoffset((int) (GlobalConf.screen.BACKBUFFER_WIDTH / 5f));
         right.update(dt);
         left.update(dt);
     }
@@ -88,10 +87,6 @@ public class VRGui<T extends IGui> implements IGui {
     }
 
     @Override
-    public void setSceneGraph(ISceneGraph sg) {
-    }
-
-    @Override
     public void setVisibilityToggles(ComponentTypes.ComponentType[] entities, ComponentTypes visible) {
     }
 
@@ -112,8 +107,18 @@ public class VRGui<T extends IGui> implements IGui {
         left.setVr(vr);
     }
 
+    public void updateViewportSize(int w, int h, boolean centerCamera){
+        right.getGuiStage().getViewport().update(w, h, centerCamera);
+        left.getGuiStage().getViewport().update(w, h, centerCamera);
+    }
+
     @Override
     public boolean mustDraw() {
         return right.mustDraw() || left.mustDraw();
+    }
+
+    @Override
+    public boolean updateUnitsPerPixel(float upp) {
+        return right.updateUnitsPerPixel(upp) && left.updateUnitsPerPixel(upp);
     }
 }

@@ -11,12 +11,9 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.render.ComponentTypes;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -24,7 +21,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
-import java.util.List;
 
 public class LineRenderSystem extends ImmediateRenderSystem {
     protected ICamera camera;
@@ -85,7 +81,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
 
         shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -96,15 +92,9 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         addEffectsUniforms(shaderProgram, camera);
 
         this.camera = camera;
-        renderables.forEach(r ->{
+        renderables.forEach(r -> {
             ILineRenderable renderable = (ILineRenderable) r;
-            boolean rend = true;
-            // TODO ugly hack
-            if (renderable instanceof Particle && !SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors))
-                rend = false;
-            if (rend) {
-                renderable.render(this, camera, getAlpha(renderable));
-            }
+            renderable.render(this, camera, getAlpha(renderable));
 
             Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * GlobalConf.scene.LINE_WIDTH_FACTOR);
 
@@ -163,7 +153,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
     }
 
     protected class LineArraySorter implements Comparator<double[]> {
-        private int idx;
+        private final int idx;
 
         public LineArraySorter(int idx) {
             this.idx = idx;

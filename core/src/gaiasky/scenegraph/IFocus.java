@@ -99,14 +99,6 @@ public interface IFocus {
     boolean isActive();
 
     /**
-     * Returns true if the focus is within the magnitude limit defined in
-     * {@link gaiasky.util.GlobalConf}
-     *
-     * @return True if focus within magnitude limit
-     */
-    boolean withinMagLimit();
-
-    /**
      * Returns the position
      *
      * @return The position

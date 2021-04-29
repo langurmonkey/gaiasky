@@ -33,9 +33,8 @@ import gaiasky.util.time.ITimeFrameProvider;
 /**
  * A model which renders as a background, unaffected by the camera. It should
  * usually be a flipped sphere or cube map.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTextRenderable {
     protected String transformName;
@@ -65,8 +64,8 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
         // Model
         mc.doneLoading(manager, localTransform, cc);
-        // Disable depth
-        mc.setDepthTest(GL20.GL_ONE, false);
+        // Disable depth writes, enable reads
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
 
         // Label pos 3D
         if (label && labelPosition != null && !label2d) {
@@ -74,7 +73,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
         }
     }
 
-    private void updateLocalTransform(){
+    private void updateLocalTransform() {
         localTransform.idt();
         // Initialize transform.
         localTransform.scl(size);
@@ -101,7 +100,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     protected void addToRenderLists(ICamera camera) {
         // Render group never changes
         // Add to toRender list
-        if (opacity > 0) {
+        if (this.shouldRender()) {
             addToRender(this, renderGroupModel);
             if (label) {
                 addToRender(this, RenderGroup.FONT_LABEL);
@@ -118,7 +117,6 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        // Disable depth
         mc.update(alpha * cc[3] * opacity);
         modelBatch.render(mc.instance, mc.env);
     }
@@ -139,7 +137,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             shader.setUniformf("u_thOverFactor", 1);
             shader.setUniformf("u_thOverFactorScl", 1);
 
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale(), textSize() * camera.getFovFactor());
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale(), textSize() * camera.getFovFactor());
         }
 
     }
@@ -198,7 +196,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override
@@ -207,7 +205,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 

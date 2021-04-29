@@ -14,10 +14,10 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -34,12 +34,12 @@ public class FadeNode extends SceneGraphNode {
     /**
      * Fade in low and high limits
      */
-    private Vector2 fadeIn;
+    private Vector2d fadeIn;
 
     /**
      * Fade out low and high limits
      */
-    private Vector2 fadeOut;
+    private Vector2d fadeOut;
 
     /**
      * Position of label
@@ -68,19 +68,9 @@ public class FadeNode extends SceneGraphNode {
     private String positionObjectName;
 
     /**
-     * Is this fade node visible?
-     */
-    private boolean visible = true;
-
-    /**
      * Is the node already in the scene graph?
      */
     public boolean inSceneGraph = false;
-
-    /**
-     * Time of last visibility change in milliseconds
-     */
-    private long lastStateChangeTimeMs = 0;
 
     /**
      * Information on the catalog this fade node represents (particle group, octree, etc.)
@@ -98,6 +88,8 @@ public class FadeNode extends SceneGraphNode {
     protected boolean hlplain = false;
     // Highlight color
     protected float[] hlc;
+    // Highlight all visible
+    protected boolean hlallvisible = true;
     // Highlight colormap index
     protected int hlcmi;
     // Hightlight colormap attribute
@@ -152,17 +144,13 @@ public class FadeNode extends SceneGraphNode {
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
 
-        // Update alpha
+        // Opacity
         updateOpacity();
 
-        // Visibility
-        float visop = MathUtilsd.lint(msSinceStateChange(), 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
-        if (!this.visible) {
-            visop = 1 - visop;
-        }
-        this.opacity *= visop;
+        // Visibility fading
+        this.opacity *= this.getVisibilityOpacityFactor();
 
-        if (!this.copy && this.opacity > 0) {
+        if (!this.copy) {
             addToRenderLists(camera);
         }
 
@@ -188,14 +176,26 @@ public class FadeNode extends SceneGraphNode {
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
 
+    public Vector2d getFadeIn() {
+        return fadeIn;
+    }
+
     public void setFadein(double[] fadein) {
         if (fadein != null)
-            fadeIn = new Vector2((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
+            fadeIn = new Vector2d((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
+        else
+            fadeIn = null;
+    }
+
+    public Vector2d getFadeOut() {
+        return fadeOut;
     }
 
     public void setFadeout(double[] fadeout) {
         if (fadeout != null)
-            fadeOut = new Vector2((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
+            fadeOut = new Vector2d((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
+        else
+            fadeOut = null;
     }
 
     public void setPosition(double[] pos) {
@@ -232,18 +232,6 @@ public class FadeNode extends SceneGraphNode {
         this.positionObjectName = po;
     }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-        this.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
-    }
-
-    public boolean isVisible() {
-        return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
-    }
-
-    private long msSinceStateChange() {
-        return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
-    }
 
     public void setCatalogInfoBare(CatalogInfo info) {
         this.catalogInfo = info;
@@ -273,11 +261,13 @@ public class FadeNode extends SceneGraphNode {
      *
      * @param hl    Whether to highlight
      * @param color The plain color
+     * @param allVisible All visible
      */
-    public void highlight(boolean hl, float[] color) {
+    public void highlight(boolean hl, float[] color, boolean allVisible) {
         this.highlighted = hl;
         if (hl) {
             this.hlplain = true;
+            this.hlallvisible = allVisible;
             System.arraycopy(color, 0, this.hlc, 0, color.length);
         }
     }
@@ -287,14 +277,15 @@ public class FadeNode extends SceneGraphNode {
      *
      * @param hl    Whether to highlight
      * @param cmi   Color map index
-     * @param cma   Attribute
+     * @param cma   Color map attribute
      * @param cmmin Min mapping value
      * @param cmmax Max mapping value
      */
-    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
         this.highlighted = hl;
         if (hl) {
             this.hlplain = false;
+            this.hlallvisible = allVisible;
             this.hlcmi = cmi;
             this.hlcma = cma;
             this.hlcmmin = cmmin;
@@ -340,5 +331,9 @@ public class FadeNode extends SceneGraphNode {
 
     public double getHlcmmax() {
         return hlcmmax;
+    }
+
+    public boolean isHlAllVisible(){
+        return hlallvisible;
     }
 }

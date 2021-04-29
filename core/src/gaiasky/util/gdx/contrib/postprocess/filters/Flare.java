@@ -34,7 +34,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/
 public final class Flare extends Filter<Flare> {
-    private Vector2 viewportInverse;
+    private final Vector2 viewportInverse;
     private int ghosts;
     private float haloWidth;
     private Texture lensColorTexture;
@@ -48,8 +48,8 @@ public final class Flare extends Filter<Flare> {
         HaloWidth("u_haloWidth", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

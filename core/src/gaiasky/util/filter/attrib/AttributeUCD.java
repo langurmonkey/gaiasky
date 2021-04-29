@@ -5,10 +5,10 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.ucd.UCD;
 
-public class AttributeUCD implements IAttribute<ParticleBean> {
+public class AttributeUCD implements IAttribute<IParticleRecord> {
     public UCD ucd;
 
     public AttributeUCD(UCD ucd) {
@@ -16,8 +16,8 @@ public class AttributeUCD implements IAttribute<ParticleBean> {
     }
 
     @Override
-    public double get(ParticleBean bean) {
-        return bean.extra != null ? bean.extra.get(ucd) : Double.NaN;
+    public double get(IParticleRecord bean) {
+        return bean.getExtra(ucd);
     }
 
     @Override

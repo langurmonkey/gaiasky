@@ -6,6 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -14,8 +16,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 
 /**
@@ -43,10 +43,21 @@ public class HUDGui implements IGui {
     /** Lock object for synchronization **/
     private Object lock;
 
+    private Lwjgl3Graphics graphics;
+    private float unitsPerPixel;
+
+    public HUDGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super();
+        this.graphics = graphics;
+        this.unitsPerPixel = unitsPerPixel;
+    }
+
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
         lock = new Object();
     }
 
@@ -58,7 +69,7 @@ public class HUDGui implements IGui {
     }
 
     private void buildGui() {
-        float pad = 5 * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 8f;
 
         // FOCUS INFORMATION - BOTTOM RIGHT
         focusInterface = new FocusInfoInterface(skin);
@@ -85,14 +96,14 @@ public class HUDGui implements IGui {
         messagesInterface = new MessagesInterface(skin, lock);
         messagesInterface.setFillParent(true);
         messagesInterface.left().bottom();
-        messagesInterface.pad(0, 300 * GlobalConf.UI_SCALE_FACTOR, 150 * GlobalConf.UI_SCALE_FACTOR, 0);
+        messagesInterface.pad(0, 480f, 240f, 0);
         interfaces.add(messagesInterface);
 
         // INPUT STATE
         inputInterface = new RunStateInterface(skin);
         inputInterface.setFillParent(true);
         inputInterface.right().top();
-        inputInterface.pad(50 * GlobalConf.UI_SCALE_FACTOR, 0, 0, pad);
+        inputInterface.pad(80f, 0, 0, pad);
         interfaces.add(inputInterface);
 
         // Add to GUI
@@ -169,10 +180,6 @@ public class HUDGui implements IGui {
     }
 
     @Override
-    public void setSceneGraph(ISceneGraph sg) {
-    }
-
-    @Override
     public void setVisibilityToggles(ComponentType[] entities, ComponentTypes visible) {
     }
 
@@ -192,6 +199,18 @@ public class HUDGui implements IGui {
     @Override
     public boolean mustDraw() {
         return true;
+    }
+
+    @Override
+    public boolean updateUnitsPerPixel(float upp){
+        this.unitsPerPixel = upp;
+        if(ui.getViewport() instanceof ScreenViewport){
+            ScreenViewport svp = (ScreenViewport) ui.getViewport();
+            svp.setUnitsPerPixel(this.unitsPerPixel);
+            svp.update(graphics.getWidth(), graphics.getHeight(), true);
+            return true;
+        }
+        return false;
     }
 
 }

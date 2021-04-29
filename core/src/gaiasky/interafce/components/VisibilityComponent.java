@@ -55,16 +55,16 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     }
 
     public void initialize() {
-        float space4 = 4f * GlobalConf.UI_SCALE_FACTOR;
-        float space2 = 2f * GlobalConf.UI_SCALE_FACTOR;
+        float space4 = 6.4f;
+        float space2 = 3.2f;
         float contentWidth = ControlsWindow.getContentWidth();
-        float buttonPadHor = (GlobalConf.isHiDPI() ? 6f : 4f) * GlobalConf.UI_SCALE_FACTOR;
-        float buttonPadVert = (GlobalConf.isHiDPI() ? 2.5f : 2.2f) * GlobalConf.UI_SCALE_FACTOR;
+        float buttonPadHor = 6f;
+        float buttonPadVert = 6f;
         int visTableCols = 5;
         final Table visibilityTable = new Table(skin);
 
         visibilityTable.setName("visibility table");
-        visibilityTable.top().left();
+        visibilityTable.top().center();
         buttonMap = new HashMap<>();
         Set<Button> buttons = new HashSet<>();
         if (visibilityEntities != null) {
@@ -101,7 +101,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         }
                         return false;
                     });
-                    Cell c = visibilityTable.add(button).padBottom(buttonPadVert).left();
+                    Cell c = visibilityTable.add(button).padBottom(buttonPadVert);
 
                     if ((i + 1) % visTableCols == 0) {
                         visibilityTable.row();
@@ -201,11 +201,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmToggleButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (pmGroup != null) {
-                    if (pmToggleButton.isChecked()) {
-                        velocityVectorsEnabled(true);
-                    } else {
-                        velocityVectorsEnabled(false);
-                    }
+                    velocityVectorsEnabled(pmToggleButton.isChecked());
                 }
                 return true;
             }
@@ -219,20 +215,19 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         individualVisibility.setWidth(contentWidth);
         individualVisibility.addListener(event -> {
             if(event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);
+                EventManager.instance.post(Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
                 return true;
             }
             return false;
         });
 
         // Set button width to max width
-        visibilityTable.pack();
+        Table content = new Table(skin);
+        content.add(visibilityTable).center().row();
+        content.add(individualVisibility).center().padTop(pad8).row();
+        content.add(pmGroup).left().padTop(pad8);
 
-        visibilityTable.left().row();
-        visibilityTable.add(individualVisibility).center().padTop(pad).colspan(visTableCols).row();
-        visibilityTable.add(pmGroup).left().padTop(pad).colspan(visTableCols);
-
-        component = visibilityTable;
+        component = content;
     }
 
 

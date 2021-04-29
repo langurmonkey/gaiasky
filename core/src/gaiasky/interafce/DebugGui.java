@@ -6,6 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -22,18 +24,20 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container di;
 
-    public DebugGui() {
-        super();
-        this.ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+    public DebugGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        super(graphics, unitsPerPixel);
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        this.ui = new Stage(vp, sb);
     }
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        float pad = 10 * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 16f;
         skin = GlobalResources.skin;
 
         // DEBUG INFO - TOP RIGHT

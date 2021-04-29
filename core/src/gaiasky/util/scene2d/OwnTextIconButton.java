@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
-import gaiasky.util.GlobalConf;
 
 /**
  * OwnTextButton with an icon. Also, the cursor changes when the mouse rolls
@@ -20,10 +19,10 @@ import gaiasky.util.GlobalConf;
  */
 public class OwnTextIconButton extends OwnTextButton {
 
-    private Skin skin;
+    private final Skin skin;
     private Image icon;
     private TextIconButtonStyle style;
-    private float pad = 2f * GlobalConf.UI_SCALE_FACTOR;
+    private float pad = 3.2f;
     private float space = -1;
     private int contentAlign = Align.left;
 
@@ -128,11 +127,11 @@ public class OwnTextIconButton extends OwnTextButton {
         clearChildren();
         if (Align.isRight(contentAlign)) {
             this.align(contentAlign);
-            add(getLabel()).align(contentAlign).padRight(space <= 0 ? ((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR) : space);
+            add(getLabel()).align(contentAlign).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1.6f) : space);
             add(this.icon).align(contentAlign).pad(pad).padRight(pad);
         } else {
             this.align(contentAlign);
-            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? ((getLabel().getText().length > 0 ? 8f : 1f) * GlobalConf.UI_SCALE_FACTOR) : space);
+            add(this.icon).align(contentAlign).pad(pad).padRight(space <= 0 ? (getLabel().getText().length > 0 ? 12.8f : 1.6f) : space);
             add(getLabel()).align(contentAlign).padRight(pad);
         }
     }

@@ -19,8 +19,9 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.MilkyWay;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -37,13 +38,13 @@ import java.util.List;
 public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {
     private static final String texFolder = "data/galaxy/sprites/";
 
-    private Vector3 aux3f1;
+    private final Vector3 aux3f1;
     private MeshData dust, bulge, stars, hii, gas;
     private GpuData dustA, bulgeA, starsA, hiiA, gasA;
 
     private TextureArray ta;
     // Max sizes for dust, star, bulge, gas and hii
-    private float[] maxSizes;
+    private final float[] maxSizes;
 
     private enum PType {
         DUST(0, new int[] { 3, 5, 7 }),
@@ -81,6 +82,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     /**
      * Initializes the maximum size per component regarding the given graphics quality
+     *
      * @param gq The graphics quality
      */
     private void initializeMaxSizes(GraphicsQuality gq) {
@@ -159,7 +161,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     private MeshData toMeshData(GpuData ad, MeshData md) {
         if (ad != null && ad.vertices != null) {
-            if(md != null){
+            if (md != null) {
                 md.dispose();
             }
             md = new MeshData();
@@ -188,7 +190,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @param type The type
      * @return
      */
-    private GpuData convertDataToGpu(List<? extends ParticleBean> data, ColorGenerator cg, PType type) {
+    private GpuData convertDataToGpu(List<IParticleRecord> data, ColorGenerator cg, PType type) {
         GpuData ad = new GpuData();
 
         int vertexSize = 3 + 1 + 3;
@@ -199,23 +201,24 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         int nLayers = type.layers.length;
 
         int i = 0;
-        for (ParticleBean particle : data) {
+        for (IParticleRecord particle : data) {
             if (type.modulus == 0 || i % type.modulus == 0) {
                 // COLOR
-                float[] col = particle.data.length >= 7 ? new float[] { (float) particle.data[4], (float) particle.data[5], (float) particle.data[6] } : cg.generateColor();
+                double[] doubleData = particle.rawDoubleData();
+                float[] col = doubleData.length >= 7 ? new float[] { (float) doubleData[4], (float) doubleData[5], (float) doubleData[6] } : cg.generateColor();
                 col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
                 col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
                 col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
                 ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
                 // SIZE, TYPE, TEX LAYER
-                double starSize = particle.data[3];
-                ad.vertices[ad.vertexIdx + additionalOffset] = (float) (starSize * GlobalConf.UI_SCALE_FACTOR);
+                double starSize = particle.size();
+                ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
                 ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
                 ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[StdRandom.uniform(nLayers)];
 
                 // POSITION
-                aux3f1.set((float) particle.data[0], (float) particle.data[1], (float) particle.data[2]);
+                aux3f1.set((float) particle.x(), (float) particle.y(), (float) particle.z());
                 final int idx = ad.vertexIdx;
                 ad.vertices[idx] = aux3f1.x;
                 ad.vertices[idx + 1] = aux3f1.y;
@@ -257,8 +260,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size() > 0) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        if (renderables.size > 0) {
             MilkyWay mw = (MilkyWay) renderables.get(0);
 
             switch (mw.status) {
@@ -281,7 +284,6 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 float alpha = getAlpha(mw);
                 if (alpha > 0) {
                     ExtShaderProgram shaderProgram = getShaderProgram();
-                    double fovf = camera.getFovFactor();
 
                     shaderProgram.begin();
 
@@ -293,6 +295,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
                     shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
                     shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
+                    double pointScaleFactor = ((GlobalConf.program.isStereoFullWidth() ? 1f : 2f) * rc.scaleFactor) / camera.getFovFactor();
 
                     // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);
@@ -307,7 +310,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.6e13 / fovf));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.6e13 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 2.2f);
                     dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
@@ -317,25 +320,25 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     // HII
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (7e11 / fovf));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (7e11 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 1.2f);
                     hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.9e12 / fovf));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.9e12 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 0.8f);
                     gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Bulge
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.BULGE.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 / fovf));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 0.5f);
                     bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 
                     // Stars
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (0.3e11 / fovf));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (0.3e11 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 2.5f);
                     stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
 

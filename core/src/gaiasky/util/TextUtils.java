@@ -11,14 +11,66 @@ import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
+import org.jsoup.Jsoup;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TextUtils {
 
+    public static String surroundBrackets(String in) {
+        return surround(in, "[", "]");
+    }
+
     public static String surround(String in, String pre, String post) {
         return pre + in + post;
+    }
+
+    public static String breakCharacters(CharSequence in, int breakChars) {
+        return breakCharacters(in.toString(), breakChars);
+    }
+
+    public static String breakCharacters(String in, int breakChars) {
+        // Warp text if breakChars <= 0
+        if (breakChars > 0) {
+            java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
+            int chars = 0;
+            for (int i = 0; i < sb.length(); i++) {
+                char c = sb.charAt(i);
+                chars++;
+                if (chars > breakChars && Character.isSpaceChar(c)) {
+                    sb.setCharAt(i, '\n');
+                    chars = 0;
+                }
+            }
+            in = sb.toString();
+        }
+        return in;
+    }
+
+    public static String breakSpaces(CharSequence in, int breakSpaces) {
+        return breakSpaces(in.toString(), breakSpaces);
+    }
+
+    public static String breakSpaces(String in, int breakSpaces) {
+        // Warp text if breakSpaces <= 0
+        if (breakSpaces > 0) {
+            java.lang.StringBuilder sb = new java.lang.StringBuilder(in);
+            int spaces = 0;
+            for (int i = 0; i < sb.length(); i++) {
+                char c = sb.charAt(i);
+                if (Character.isSpaceChar(c)) {
+                    spaces++;
+                }
+                if (spaces == breakSpaces) {
+                    sb.setCharAt(i, '\n');
+                    spaces = 0;
+                }
+            }
+            in = sb.toString();
+        }
+        return in;
     }
 
     public static void capLabelWidth(Label l, float targetWidth) {
@@ -62,7 +114,7 @@ public class TextUtils {
             if (fromStart) {
                 return "..." + in.substring(in.length() - (targetLength - 3));
             } else {
-                return in.substring(0, targetLength - 3) + "...";
+                return in.substring(0, targetLength - 1) + "...";
             }
         }
     }
@@ -114,6 +166,8 @@ public class TextUtils {
      * @return The concatenation
      */
     public static String concatenate(String split, String... strs) {
+        if (strs == null || strs.length == 0)
+            return null;
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strs) {
             if (str != null && !str.isEmpty()) {
@@ -152,8 +206,40 @@ public class TextUtils {
         return buff;
     }
 
+    public static String arrayToStr(String[] arr, String pre, String post, String sep) {
+        String buff = pre;
+        for (int i = 0; i < arr.length; i++) {
+            buff += arr[i];
+            if (i < arr.length - 1) {
+                buff += sep;
+            }
+        }
+        return buff + post;
+    }
+
+    public static String setToStr(Set<String> set) {
+        return setToStr(set, "[", "]", ", ");
+    }
+
+    public static String setToStr(Set<String> set, String pre, String post, String sep) {
+        String buff = pre;
+        if (set != null) {
+            int n = set.size();
+            int i = 0;
+            for (String elem : set) {
+                buff += elem;
+                if (i < n - 1) {
+                    buff += sep;
+                }
+                i++;
+            }
+        }
+        return buff + post;
+    }
+
     /** Decimal format **/
-    private static INumberFormat nf, nfsci;
+    private static final INumberFormat nf;
+    private static final INumberFormat nfsci;
 
     static {
         nf = NumberFormatFactory.getFormatter("#########.###");
@@ -202,17 +288,33 @@ public class TextUtils {
         return concatAll(base, suffixesNew);
     }
 
-    public static boolean contains(String[] list, String key){
+    public static boolean contains(String[] list, String key) {
         return contains(list, key, false);
     }
 
     public static boolean contains(String[] list, String key, boolean ignoreCase) {
         AtomicBoolean contained = new AtomicBoolean(false);
         Arrays.stream(list).forEach(candidate -> {
-           if(ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)){
-               contained.set(true);
-           }
+            if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
+                contained.set(true);
+            }
         });
         return contained.get();
+    }
+
+    public static boolean containsOrMatches(String[] list, String key, boolean ignoreCase) {
+        AtomicBoolean contained = new AtomicBoolean(false);
+        Arrays.stream(list).forEach(candidate -> {
+            if (ignoreCase ? candidate.equalsIgnoreCase(key) : candidate.equals(key)) {
+                contained.set(true);
+            } else if (key.matches(candidate)) {
+                contained.set(true);
+            }
+        });
+        return contained.get();
+    }
+
+    public static String html2text(String html) {
+        return Jsoup.parse(html).text();
     }
 }

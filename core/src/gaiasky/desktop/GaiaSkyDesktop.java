@@ -7,7 +7,6 @@ package gaiasky.desktop;
 
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
@@ -16,6 +15,7 @@ import com.badlogic.gdx.graphics.glutils.HdpiMode;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import gaiasky.ErrorDialog;
 import gaiasky.GaiaSky;
 import gaiasky.data.DesktopSceneGraphImplementationProvider;
 import gaiasky.data.SceneGraphImplementationProvider;
@@ -31,19 +31,20 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.MusicActorsManager;
-import gaiasky.interafce.NetworkCheckerManager;
 import gaiasky.render.PostProcessorFactory;
 import gaiasky.rest.RESTServer;
 import gaiasky.screenshot.ScreenshotsManager;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 
 import java.awt.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,7 +58,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     /*
      * Source version to compare to config file and datasets.
-     * This is usually tag where each chunk takes 2 spaces.
+     * This is usually tag where each number is allocated 2 digits.
      * Version = major.minor.rev -> 1.2.5 major=1; minor=2; rev=5
      * Version = major * 10000 + minor * 100 + rev
      * So 1.2.5 -> 10205
@@ -65,7 +66,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static int SOURCE_VERSION = 30000;
+    public static int SOURCE_VERSION = 30003;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
@@ -74,29 +75,59 @@ public class GaiaSkyDesktop implements IObserver {
 
     private static GaiaSkyArgs gsArgs;
 
+    private static final int DEFAULT_OPENGL_MAJOR = 4;
+    private static final int DEFAULT_OPENGL_MINOR = 1;
+    private static final String DEFAULT_OPENGL = DEFAULT_OPENGL_MAJOR + "." + DEFAULT_OPENGL_MINOR;
+    private static final int DEFAULT_GLSL_MAJOR = 4;
+    private static final int DEFAULT_GLSL_MINOR = 1;
+    private static final String DEFAULT_GLSL = DEFAULT_GLSL_MAJOR + "." + DEFAULT_GLSL_MINOR;
+
+    private static final int MIN_OPENGL_MAJOR = 3;
+    private static final int MIN_OPENGL_MINOR = 2;
+    private static final String MIN_OPENGL = MIN_OPENGL_MAJOR + "." + MIN_OPENGL_MINOR;
+    private static final int MIN_GLSL_MAJOR = 3;
+    private static final int MIN_GLSL_MINOR = 3;
+    private static final String MIN_GLSL = MIN_GLSL_MAJOR + "." + MIN_GLSL_MINOR;
+
     /**
      * Program arguments
      */
     private static class GaiaSkyArgs {
-        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0) private boolean help = false;
+        @Parameter(names = { "-h", "--help" }, description = "Show program options and usage information.", help = true, order = 0)
+        private boolean help = false;
 
-        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1) private boolean version = false;
+        @Parameter(names = { "-v", "--version" }, description = "List Gaia Sky version and relevant information.", order = 1)
+        private boolean version = false;
 
-        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1) private boolean asciiart = false;
+        @Parameter(names = { "-i", "--asciiart" }, description = "Add nice ascii art to --version information.", order = 1)
+        private boolean asciiart = false;
 
-        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2) private boolean skipWelcome = false;
+        @Parameter(names = { "-s", "--skip-welcome" }, description = "Skip the welcome screen if possible (base-data package must be present).", order = 2)
+        private boolean skipWelcome = false;
 
-        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4) private String propertiesFile = null;
+        @Parameter(names = { "-p", "--properties" }, description = "Specify the location of the properties file.", order = 4)
+        private String propertiesFile = null;
 
-        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5) private String assetsLocation = null;
+        @Parameter(names = { "-a", "--assets" }, description = "Specify the location of the assets folder. If not present, the default assets location (in the installation folder) is used.", order = 5)
+        private String assetsLocation = null;
 
-        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6) private boolean vr = false;
+        @Parameter(names = { "-vr", "--openvr" }, description = "Launch in Virtual Reality mode. Gaia Sky will attempt to create a VR context through OpenVR.", order = 6)
+        private boolean vr = false;
 
-        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7) private boolean externalView = false;
+        @Parameter(names = { "-e", "--externalview" }, description = "Create a window with a view of the scene and no UI.", order = 7)
+        private boolean externalView = false;
 
-        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8) private boolean noScriptingServer = false;
+        @Parameter(names = { "-n", "--noscript" }, description = "Do not start the scripting server. Useful to run more than one Gaia Sky instance at once in the same machine.", order = 8)
+        private boolean noScriptingServer = false;
 
-        @Parameter(names = { "--debug" }, description = "Launch in debug mode.", order = 9) private boolean debugMode = false;
+        @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9)
+        private boolean debug = false;
+
+        @Parameter(names = { "-g", "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 9)
+        private boolean debugGpu = false;
+
+        @Parameter(names = { "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 10)
+        private boolean safeMode = false;
     }
 
     /**
@@ -109,7 +140,9 @@ public class GaiaSkyDesktop implements IObserver {
         jc.usage();
     }
 
-    /** UTF-8 output stream printer **/
+    /**
+     * UTF-8 output stream printer
+     **/
     private static PrintStream out;
 
     /**
@@ -118,11 +151,8 @@ public class GaiaSkyDesktop implements IObserver {
      * @param args Arguments
      */
     public static void main(String[] args) {
-        try {
-            out = new PrintStream(System.out, true, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            out = new PrintStream(System.out, true);
-        }
+        Thread.currentThread().setName("gaiasky-main-thread");
+        out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         gsArgs = new GaiaSkyArgs();
         JCommander jc = JCommander.newBuilder().addObject(gsArgs).build();
         jc.setProgramName("gaiasky");
@@ -138,6 +168,7 @@ public class GaiaSkyDesktop implements IObserver {
             printUsage(jc);
             return;
         }
+
         try {
             // Check java version
             javaVersionCheck();
@@ -184,14 +215,10 @@ public class GaiaSkyDesktop implements IObserver {
             // Init global configuration
             ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
 
-            // VR resolution
-            if (gsArgs.vr) {
-                Graphics.DisplayMode dm = Lwjgl3ApplicationConfiguration.getDisplayMode();
-                double sh = Math.min(dm.height, 1780);
-                double aspect = 0.8383d;
-                double scale = 1d;
-                GlobalConf.screen.SCREEN_WIDTH = (int) (sh * aspect * scale);
-                GlobalConf.screen.SCREEN_HEIGHT = (int) (sh * scale);
+            // Safe mode
+            if (gsArgs.safeMode && !GlobalConf.program.SAFE_GRAPHICS_MODE) {
+                GlobalConf.program.SAFE_GRAPHICS_MODE = true;
+                GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG = true;
             }
 
             // Reinitialize with user-defined locale
@@ -256,9 +283,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Initialize screenshots manager
             ScreenshotsManager.initialize();
 
-            // Network checker
-            NetworkCheckerManager.initialize(new DesktopNetworkChecker());
-
             // Math
             MathManager.initialize();
 
@@ -268,7 +292,6 @@ public class GaiaSkyDesktop implements IObserver {
         } catch (Exception e) {
             CrashReporter.reportCrash(e, logger);
         }
-
     }
 
     public GaiaSkyDesktop() {
@@ -280,13 +303,15 @@ public class GaiaSkyDesktop implements IObserver {
         launchMainApp();
     }
 
+    private GaiaSky gs;
+
     public void launchMainApp() {
         ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setTitle(GlobalConf.APPLICATION_NAME);
         if (!gsArgs.vr) {
             if (GlobalConf.screen.FULLSCREEN) {
-                // Get mode
+                // Fullscreen mode
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
                 DisplayMode mymode = null;
                 for (DisplayMode mode : modes) {
@@ -297,37 +322,23 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 if (mymode == null) {
                     // Fall back to windowed
-                    logger.warn("Warning: no full screen mode with the given resolution found (" + GlobalConf.screen.FULLSCREEN_WIDTH + "x" + GlobalConf.screen.FULLSCREEN_HEIGHT + "). Falling back to windowed mode.");
+                    logger.warn(I18n.txt("error.fullscreen.notfound", GlobalConf.screen.FULLSCREEN_WIDTH, GlobalConf.screen.FULLSCREEN_HEIGHT));
                     cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
                     cfg.setResizable(GlobalConf.screen.RESIZABLE);
                 } else {
                     cfg.setFullscreenMode(mymode);
                 }
             } else {
-                int w = GlobalConf.screen.getScreenWidth();
-                int h = GlobalConf.screen.getScreenHeight();
-                if(w <= 0 || h <= 0){
-                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    w = (int) (screenSize.width * 0.85f);
-                    h = (int) (screenSize.height * 0.85f);
-                }
-                cfg.setWindowedMode(w, h);
+                // Windowed mode
+                configureWindowSize(cfg);
                 cfg.setResizable(GlobalConf.screen.RESIZABLE);
             }
-            cfg.setBackBufferConfig(8, 8, 8, 8, 32, 0, 0);
-            cfg.setIdleFPS(0);
             cfg.useVsync(GlobalConf.screen.VSYNC);
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
             cfg.useVsync(false);
-            int w = GlobalConf.screen.SCREEN_WIDTH;
-            int h = GlobalConf.screen.SCREEN_HEIGHT;
-            if(w <= 0 || h <= 0){
-                Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                w = (int) (screenSize.width * 0.85f);
-                h = (int) (screenSize.height * 0.85f);
-            }
-            cfg.setWindowedMode(w, h);
+            // Always windowed, actual render sent to headset
+            configureWindowSize(cfg);
             cfg.setResizable(true);
         }
         if (gsArgs.vr) {
@@ -335,44 +346,130 @@ public class GaiaSkyDesktop implements IObserver {
         } else {
             cfg.setWindowIcon(FileType.Internal, "icon/gs_icon.png");
         }
-        cfg.useOpenGL3(true, 4, 1);
+        cfg.useOpenGL3(true, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
-
-        if (consoleLogger != null && EventManager.instance.isSubscribedToAny(consoleLogger)) {
-            consoleLogger.unsubscribe();
+        // OpenGL debug
+        if (gsArgs.debugGpu) {
+            cfg.enableGLDebugOutput(true, System.out);
         }
 
         // Launch app
-        GaiaSky gs = null;
         try {
-            gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
-            new Lwjgl3Application(gs, cfg);
+            if (GlobalConf.program.SAFE_GRAPHICS_MODE) {
+                setSafeMode(cfg);
+            }
+            consoleLogger.unsubscribe();
+
+            runGaiaSky(cfg);
         } catch (GdxRuntimeException e) {
+            checkLogger(consoleLogger);
+            logger.error(e);
+            gs.setCrashed(true);
+            try {
+                gs.dispose();
+            } catch (Exception e1) {
+                logger.error(I18n.txt("error.dispose"), e1);
+            }
             if (!JAVA_VERSION_FLAG) {
                 if (!gs.windowCreated) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
-                    if (!EventManager.instance.isSubscribedToAny(consoleLogger)) {
-                        consoleLogger.subscribe();
-                        gs.dispose();
-                    }
-                    logger.error("Window creation failed (is OpenGL 4.x supported by your card?), trying with OpenGL 3.x");
-                    logger.info("Disabling tessellation...");
+                    logger.error(I18n.txt("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
+                    setSafeMode(cfg);
                     consoleLogger.unsubscribe();
-                    GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
-                    cfg.useOpenGL3(true, 3, 2);
 
-                    gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debugMode);
-                    new Lwjgl3Application(gs, cfg);
+                    try {
+                        runGaiaSky(cfg);
+                    } catch (GdxRuntimeException e1) {
+                        logger.error(I18n.txt("error.opengl", MIN_OPENGL, MIN_GLSL));
+                        showDialogOGL(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
+                    }
                 } else {
-                    logger.error("Gaia Sky crashed, please report the bug at " + GlobalConf.REPO_ISSUES);
+                    logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
-                logger.error("Please update your java installation. Gaia Sky needs at least Java " + REQUIRED_JAVA_VERSION);
+                logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
+                showDialogOGL(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
             logger.error(e);
+            showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
+    }
+
+    private void configureWindowSize(Lwjgl3ApplicationConfiguration cfg) {
+        int w = GlobalConf.screen.getScreenWidth();
+        int h = GlobalConf.screen.getScreenHeight();
+        if (!SysUtils.isMac()) {
+            // Graphics device method
+            if (w <= 0 || h <= 0) {
+                try {
+                    GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+                    GraphicsConfiguration gc = gd.getDefaultConfiguration();
+                    w = (int) (gc.getBounds().getWidth() * 0.85f);
+                    h = (int) (gc.getBounds().getHeight() * 0.85f);
+                    GlobalConf.screen.SCREEN_WIDTH = w;
+                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                } catch (HeadlessException he) {
+                    logger.error(I18n.txt("error.screensize.gd"));
+                    logger.debug(he);
+                }
+            }
+            // Toolkit method
+            if (w <= 0 || h <= 0) {
+                try {
+                    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+                    w = (int) (screenSize.width * 0.85f);
+                    h = (int) (screenSize.height * 0.85f);
+                    GlobalConf.screen.SCREEN_WIDTH = w;
+                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                } catch (Exception e) {
+                    // Default
+                    w = 1600;
+                    h = 900;
+                    GlobalConf.screen.SCREEN_WIDTH = w;
+                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                    logger.error(I18n.txt("error.screensize.toolkit", w, h));
+                    logger.debug(e);
+                }
+            }
+        } else {
+            // macOS is retarded and only likes headless mode, using default
+            w = 1600;
+            h = 900;
+            GlobalConf.screen.SCREEN_WIDTH = w;
+            GlobalConf.screen.SCREEN_HEIGHT = h;
+        }
+        cfg.setWindowedMode(w, h);
+    }
+
+    private void runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {
+        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+        new Lwjgl3Application(gs, cfg);
+    }
+
+    private void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
+        logger.info(I18n.txt("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
+        GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
+        GlobalConf.program.SAFE_GRAPHICS_MODE = true;
+        cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
+    }
+
+    private void showDialogOGL(String title, String message) {
+        Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
+        cfg.setHdpiMode(HdpiMode.Pixels);
+        cfg.useVsync(true);
+        cfg.setWindowedMode(900, 350);
+        cfg.setResizable(false);
+        cfg.setTitle(title);
+
+        new Lwjgl3Application(new ErrorDialog(title, message), cfg);
+    }
+
+    private static void checkLogger(ConsoleLogger consoleLogger) {
+        EventManager.instance.clearAllSubscriptions();
+        consoleLogger.subscribe();
     }
 
     @Override

@@ -17,7 +17,7 @@ import java.util.stream.Stream;
  * Manages the bookmarks in Gaia Sky. Supports folders.
  */
 public class BookmarksManager implements IObserver {
-    private static Logger.Log logger = Logger.getLogger(BookmarksManager.class);
+    private static final Logger.Log logger = Logger.getLogger(BookmarksManager.class);
 
     public static BookmarksManager instance;
 

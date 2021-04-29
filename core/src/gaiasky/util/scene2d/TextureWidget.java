@@ -11,8 +11,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 
 public class TextureWidget extends Widget {
 
-    private FrameBuffer fb;
-    private float width, height;
+    private final FrameBuffer fb;
+    private final float width;
+    private final float height;
     public TextureWidget(FrameBuffer fb) {
         super();
         this.fb = fb;

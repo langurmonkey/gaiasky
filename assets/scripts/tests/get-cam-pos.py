@@ -10,5 +10,4 @@ gs = gateway.entry_point
 cpos = gs.getCameraPosition()
 print("Camera position: [%f, %f, %f]" %(cpos[0], cpos[1], cpos[2]))
 
-
 gateway.shutdown()

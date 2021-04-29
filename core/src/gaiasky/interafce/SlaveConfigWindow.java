@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 public class SlaveConfigWindow extends GenericDialog implements IObserver {
-    private static Logger.Log logger = Logger.getLogger(SlaveConfigWindow.class);
+    private static final Logger.Log logger = Logger.getLogger(SlaveConfigWindow.class);
 
-    private static Map<String, Map<String, String>> parametersMap;
+    private static final Map<String, Map<String, String>> parametersMap;
 
     static {
         parametersMap = new HashMap();
@@ -58,7 +58,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         FloatValidator angleVal = new FloatValidator(-1000f, 1000f);
         FloatValidator fovVal = new FloatValidator(Constants.MIN_FOV, 170f);
 
-        float tw = 60 * GlobalConf.UI_SCALE_FACTOR;
+        float tw = 96f;
 
         // Send button (does not close dialog)
         OwnTextButton sendButton = new OwnTextButton(I18n.txt("gui.send"), skin, "default");

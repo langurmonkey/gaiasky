@@ -57,7 +57,7 @@ public class IntModelBuilder {
     /** The node currently being build */
     private IntNode node;
     /** The mesh builders created between begin and end */
-    private Array<IntIntMeshBuilder> builders = new Array<>();
+    private final Array<IntIntMeshBuilder> builders = new Array<>();
 
     private IntIntMeshBuilder getBuilder(final VertexAttributes attributes) {
         for (final IntIntMeshBuilder mb : builders)

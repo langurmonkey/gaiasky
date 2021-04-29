@@ -193,7 +193,7 @@ public class BSplined<T extends Vectord<T>> implements Pathd<T> {
         this.continuous = continuous;
         this.spanCount = continuous ? controlPoints.length : controlPoints.length - degree;
         if (knots == null)
-            knots = new Array<T>(spanCount);
+            knots = new Array<>(false, spanCount);
         else {
             knots.clear();
             knots.ensureCapacity(spanCount);

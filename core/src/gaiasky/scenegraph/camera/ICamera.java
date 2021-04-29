@@ -152,6 +152,7 @@ public interface ICamera {
     IFocus getSecondClosestBody();
 
     boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
+    boolean isVisible(ITimeFrameProvider time, Vector3d position);
 
     boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera);
 

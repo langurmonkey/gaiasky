@@ -12,7 +12,7 @@ public class OwnProgressBar extends ProgressBar {
 
     private float prefWidth = 0;
     private float prefHeight = 0;
-    private boolean vertical;
+    private final boolean vertical;
 
     public OwnProgressBar(float min, float max, float stepSize, boolean vertical, ProgressBarStyle style) {
         super(min, max, stepSize, vertical, style);

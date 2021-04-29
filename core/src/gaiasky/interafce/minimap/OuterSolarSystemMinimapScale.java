@@ -22,9 +22,15 @@ import gaiasky.util.coord.Coordinates;
 
 public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
 
-    private float[] satf, uraf, nepf, jupf;
+    private final float[] satf;
+    private final float[] uraf;
+    private final float[] nepf;
+    private final float[] jupf;
     private Planet sat, ura, nep, jup;
-    private Color jupc, satc, nepc, urac;
+    private final Color jupc;
+    private final Color satc;
+    private final Color nepc;
+    private final Color urac;
 
     public OuterSolarSystemMinimapScale() {
         super();

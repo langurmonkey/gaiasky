@@ -8,6 +8,7 @@ package gaiasky.render.system;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -28,13 +29,13 @@ import java.util.List;
 
 public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
-    private Object lock;
+    private final Object lock;
     private int nLights;
     private float[] positions;
     private float[] viewAngles;
     private float[] colors;
-    private Vector3 auxV;
-    private Vector3d auxD;
+    private final Vector3 auxV;
+    private final Vector3d auxD;
 
     private Texture glowTex;
 
@@ -82,9 +83,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     }
 
     @Override
-    public void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera) {
+    public void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera) {
         synchronized (lock) {
-            int size = renderables.size();
+            int size = renderables.size;
             if (PostProcessorFactory.instance.getPostProcessor().isLightScatterEnabled() && Particle.renderOn) {
                 // Compute light positions for light scattering or light
                 // glow

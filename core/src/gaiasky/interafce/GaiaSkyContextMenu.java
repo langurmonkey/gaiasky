@@ -5,6 +5,7 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -30,36 +31,37 @@ import java.util.Collection;
 public class GaiaSkyContextMenu extends ContextMenu {
 
     // The skin
-    private Skin skin;
+    private final Skin skin;
     // The candidate, if any
-    private IFocus candidate;
+    private final IFocus candidate;
     // The name of the candidate
     private String cname;
     // Short name of candidate
     private String cnameShort;
     // Screen coordinates
-    private int screenX, screenY;
+    private final int screenX;
+    private final int screenY;
     // Scene graph
-    private ISceneGraph sg;
+    private final ISceneGraph sg;
     // Default pad
-    private float pad;
+    private final float pad;
 
     // Added items
     private int nItems = 0;
 
     // Uncertainties disabled by default
-    private boolean uncertainties = false;
+    private final boolean uncertainties = false;
     // Rel effects off
-    private boolean releffects = false;
+    private final boolean releffects = false;
 
     public GaiaSkyContextMenu(Skin skin, String styleName, int screenX, int screenY, IFocus candidate) {
         super(skin, styleName);
         this.skin = skin;
-        this.screenX = screenX;
+        this.screenX = (int) (screenX / GlobalConf.program.UI_SCALE);
         this.screenY = screenY;
         this.sg = GaiaSky.instance.sg;
         this.candidate = candidate;
-        this.pad = 5f * GlobalConf.UI_SCALE_FACTOR;
+        this.pad = 8f;
         if (candidate != null) {
             this.cname = candidate.getCandidateName();
             this.cnameShort = TextUtils.capString(this.cname, 10);
@@ -109,7 +111,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 addItem(landOn);
 
                 double[] lonlat = new double[2];
-                boolean ok = CameraUtils.getLonLat((Planet) candidate, GaiaSky.instance.getICamera(), screenX, screenY, new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
+                boolean ok = CameraUtils.getLonLat((Planet) candidate, GaiaSky.instance.getICamera(), Gdx.input.getX(), Gdx.input.getY(), new Vector3(), new Vector3(), new Vector3(), new Vector3(), new Vector3d(), new Vector3d(), new Matrix4(), lonlat);
                 if (ok) {
                     final Double pointerLon = lonlat[0];
                     final Double pointerLat = lonlat[1];

@@ -21,7 +21,7 @@ import java.nio.ByteBuffer;
  */
 public final class PipelineState implements Disposable {
 
-    private ByteBuffer byteBuffer;
+    private final ByteBuffer byteBuffer;
 
     protected PipelineState() {
         byteBuffer = BufferUtils.newByteBuffer(32);

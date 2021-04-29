@@ -35,11 +35,11 @@ import java.util.*;
  * @author Toni Sagrista
  */
 public class KeyBindings {
-    private static Log logger = Logger.getLogger(KeyBindings.class);
+    private static final Log logger = Logger.getLogger(KeyBindings.class);
 
-    private Map<String, ProgramAction> actions;
-    private Map<TreeSet<Integer>, ProgramAction> mappings;
-    private Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
+    private final Map<String, ProgramAction> actions;
+    private final Map<TreeSet<Integer>, ProgramAction> mappings;
+    private final Map<ProgramAction, Array<TreeSet<Integer>>> mappingsInv;
 
     public static KeyBindings instance;
 
@@ -282,15 +282,6 @@ public class KeyBindings {
                 EventManager.instance.post(Events.TIME_STATE_CMD, !GlobalConf.runtime.TIME_ON, false);
         }));
 
-        // increase limit magnitude
-        addAction(new ProgramAction("action.incmag", () -> EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.runtime.LIMIT_MAG_RUNTIME + 0.1f)));
-
-        // decrease limit magnitude
-        addAction(new ProgramAction("action.decmag", () -> EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.runtime.LIMIT_MAG_RUNTIME - 0.1f)));
-
-        // reset limit mag
-        addAction(new ProgramAction("action.resetmag", () -> EventManager.instance.post(Events.LIMIT_MAG_CMD, GlobalConf.data.LIMIT_MAG_LOAD)));
-
         // increase field of view
         addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV + 1f, false), noSlaveProj));
 
@@ -457,11 +448,9 @@ public class KeyBindings {
                     addMapping(action, keyCodes);
 
                 } else {
-                    logger.error(key + " is defined in the mappings file, but Action could not be found!");
+                    logger.warn(key + " is defined in the mappings file, but Action could not be found!");
                 }
             }
-
-            //addMapping(actions.get("action.controller.gui.in"), new int[]{Keys.ALT_LEFT, Keys.NUM_0});
 
         } catch (Exception e) {
             logger.error(e, "Error loading keyboard mappings: " + mappingsFile);

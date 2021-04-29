@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import gaiasky.GaiaSky;
 import gaiasky.interafce.IMinimapScale;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
@@ -139,7 +138,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     }
 
     protected float px(float px) {
-        return px * GlobalConf.UI_SCALE_FACTOR;
+        return px;
     }
 
     /**

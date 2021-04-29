@@ -28,7 +28,7 @@ public class KeyboardInputController extends InputAdapter {
     /** Holds the pressed keys at any moment **/
     public Set<Integer> pressedKeys;
 
-    private Input input;
+    private final Input input;
 
     public KeyboardInputController(Input input) {
         super();

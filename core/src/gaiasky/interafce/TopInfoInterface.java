@@ -26,18 +26,26 @@ import java.time.Instant;
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     /** Date format **/
-    private IDateFormat dfdate, dftime;
+    private final IDateFormat dfdate;
+    private final IDateFormat dftime;
 
     private final int maxNameLen = 15;
 
-    private OwnLabel date, time, pace, closest, focus, home, s1, s2;
+    private final OwnLabel date;
+    private final OwnLabel time;
+    private final OwnLabel pace;
+    private final OwnLabel closest;
+    private final OwnLabel focus;
+    private final OwnLabel home;
+    private final OwnLabel s1;
+    private final OwnLabel s2;
     private String lastFocusName;
 
     public TopInfoInterface(Skin skin) {
         super(skin);
         this.setBackground("table-bg");
 
-        float pad = 15f * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 18f;
 
         dfdate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
         dftime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
@@ -78,7 +86,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         pack();
 
-        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.PACE_CHANGED_INFO, Events.TIME_STATE_CMD, Events.CAMERA_CLOSEST_INFO, Events.CAMERA_MODE_CMD, Events.FOCUS_CHANGE_CMD);
+        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.TIME_STATE_CMD, Events.CAMERA_CLOSEST_INFO, Events.CAMERA_MODE_CMD, Events.FOCUS_CHANGE_CMD);
     }
 
     private void unsubscribe() {
@@ -99,7 +107,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             });
 
             break;
-        case PACE_CHANGED_INFO:
+        case TIME_WARP_CHANGED_INFO:
             if (data.length == 1)
                 pace.setText("(" + TextUtils.getFormattedTimeWarp((double) data[0]) + ")");
             break;

@@ -33,9 +33,10 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * @author bmanuel
  */
 public final class CameraMotion extends PostProcessorEffect {
-    private CameraBlur camblur;
-    private float width, height;
-    private Matrix4 ctp;
+    private final CameraBlur camblur;
+    private final float width;
+    private final float height;
+    private final Matrix4 ctp;
 
     public CameraMotion(float width, float height) {
         this.width = width;

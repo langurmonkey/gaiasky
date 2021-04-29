@@ -7,24 +7,26 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.LongMap;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.LargeLongMap;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.TextUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.io.ByteBufferInputStream;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 
 import java.io.*;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 import java.util.zip.GZIPInputStream;
 
 public abstract class AbstractStarGroupDataProvider implements IStarGroupDataProvider {
@@ -32,10 +34,119 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
     public enum ColId {
-        sourceid, ra, dec, pllx, ra_err, dec_err,
-        pllx_err, pmra, pmdec, radvel, pmra_err,
-        pmdec_err, radvel_err, gmag, bpmag, rpmag, bp_rp,
-        ref_epoch, teff, radius, ag, ebp_min_rp, ruwe, geodist
+        sourceid,
+        hip,
+        names,
+        ra,
+        dec,
+        pllx,
+        ra_err,
+        dec_err,
+        pllx_err,
+        pmra,
+        pmdec,
+        radvel,
+        pmra_err,
+        pmdec_err,
+        radvel_err,
+        gmag,
+        bpmag,
+        rpmag,
+        bp_rp,
+        col_idx,
+        ref_epoch,
+        teff,
+        radius,
+        ag,
+        ebp_min_rp,
+        ruwe,
+        geodist
+    }
+
+    public ColId colIdFromStr(final String name) {
+        switch (name) {
+        case "source_id":
+        case "sourceid":
+            return ColId.sourceid;
+        case "hip":
+            return ColId.hip;
+        case "names":
+        case "name":
+            return ColId.names;
+        case "ra":
+            return ColId.ra;
+        case "dec":
+        case "de":
+            return ColId.dec;
+        case "plx":
+        case "pllx":
+        case "parallax":
+            return ColId.pllx;
+        case "ra_e":
+        case "ra_err":
+        case "ra_error":
+            return ColId.ra_err;
+        case "dec_e":
+        case "dec_err":
+        case "dec_error":
+        case "de_e":
+        case "de_err":
+        case "de_error":
+            return ColId.dec_err;
+        case "plx_e":
+        case "plx_err":
+        case "plx_error":
+        case "pllx_e":
+        case "pllx_err":
+        case "pllx_error":
+            return ColId.pllx_err;
+        case "pmra":
+            return ColId.pmra;
+        case "pmdec":
+        case "pmde":
+            return ColId.pmdec;
+        case "radvel":
+        case "rv":
+            return ColId.radvel;
+        case "radvel_err":
+        case "radvel_e":
+        case "rv_err":
+        case "rv_e":
+            return ColId.radvel_err;
+        case "gmag":
+        case "appmag":
+            return ColId.gmag;
+        case "bpmag":
+        case "bp":
+            return ColId.bpmag;
+        case "rpmag":
+        case "rp":
+            return ColId.rpmag;
+        case "bp-rp":
+        case "bp_rp":
+            return ColId.bp_rp;
+        case "col_idx":
+        case "b_v":
+        case "b-v":
+            return ColId.col_idx;
+        case "ref_epoch":
+            return ColId.ref_epoch;
+        case "ruwe":
+            return ColId.ruwe;
+        case "teff":
+        case "t_eff":
+        case "T_eff":
+            return ColId.teff;
+        case "ag":
+            return ColId.ag;
+        case "ebp_min_rp":
+            return ColId.ebp_min_rp;
+        case "geodist":
+            return ColId.geodist;
+        default:
+            return null;
+
+        }
     }
 
     protected Map<ColId, Integer> indexMap;
@@ -51,7 +162,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return indexMap != null && indexMap.containsKey(colId) && indexMap.get(colId) >= 0;
     }
 
-    protected List<ParticleBean> list;
+    protected List<IParticleRecord> list;
     protected LongMap<double[]> sphericalPositions;
     protected LongMap<float[]> colors;
     protected long[] countsPerMag;
@@ -61,7 +172,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         // Column name -> index
         Map<String, Integer> indices;
         // Sourceid -> values
-        LargeLongMap<double[]> values;
+        TreeMap<Long, double[]> values;
 
         public boolean hasCol(ColId col) {
             return indices != null && indices.containsKey(col.name());
@@ -115,7 +226,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * to {@link ColId}
      */
     protected String[] additionalFiles = null;
-    private String additionalSplit = ",";
+    private String additionalSplit = ",|\\s+";
 
     /**
      * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
@@ -163,8 +274,24 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      */
     protected boolean magCorrections = false;
 
+    /**
+     * Maximum number of files to load. Negative for unlimited
+     */
+    protected int fileNumberCap = -1;
+
+    /**
+     * Maximum number of files to load per file
+     */
+    protected int starNumberCap = -1;
+
+    /**
+     * Parallelism value
+     */
+    protected final int parallelism;
+
     public AbstractStarGroupDataProvider() {
         super();
+        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     /**
@@ -186,7 +313,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * Initialises the lists and structures given number of elements
      */
     protected void initLists(int elems) {
-        list = Collections.synchronizedList(new ArrayList<>(elems));
+        if (parallelism > 1)
+            list = Collections.synchronizedList(new ArrayList<>(elems));
+        else
+            list = new ArrayList<>(elems);
     }
 
     protected void initLists() {
@@ -196,25 +326,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     @Override
-    public List<ParticleBean> loadData(String file) {
+    public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1.0f);
     }
-
-    @Override
-    public List<ParticleBean> loadData(String file, double factor) {
-        return loadData(file, factor, true);
-    }
-
-    @Override
-    public List<ParticleBean> loadData(InputStream is, double factor) {
-        return loadData(is, factor, true);
-    }
-
-    @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor) {
-        return loadDataMapped(file, factor, true);
-    }
-
 
     /**
      * Returns whether the star must be loaded or not
@@ -263,10 +377,13 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected float getRuweValue(long sourceId, String[] tokens) {
         if (hasCol(ColId.ruwe)) {
             return Parser.parseFloat(tokens[idx(ColId.ruwe)]);
-        } else if (hasAdditional(ColId.ruwe, sourceId)) {
-            return getAdditionalValue(ColId.ruwe, sourceId).floatValue();
+        } else {
+            Double ruwe = getAdditionalValue(ColId.ruwe, sourceId);
+            if (ruwe == null || ruwe.isInfinite() || ruwe.isNaN()) {
+                return Float.NaN;
+            }
+            return ruwe.floatValue();
         }
-        return Float.NaN;
     }
 
     /**
@@ -277,10 +394,10 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @return The geometric distance in parsecs if it exists, -1 otherwise.
      */
     protected double getGeoDistance(long sourceId) {
-        if (hasAdditional(ColId.geodist, sourceId)) {
-            return getAdditionalValue(ColId.geodist, sourceId);
-        }
-        return -1;
+        Double geodist = getAdditionalValue(ColId.geodist, sourceId);
+        if (geodist == null || geodist.isInfinite() || geodist.isNaN())
+            return -1;
+        return geodist;
     }
 
     /**
@@ -332,18 +449,18 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         return (count == 0 && !empty) ? 1 : count;
     }
 
-    protected void dumpToDisk(List<StarBean> data, String filename, String format) {
+    protected void dumpToDisk(List<IParticleRecord> data, String filename, String format) {
         if (format.equals("bin"))
             dumpToDiskBin(data, filename, false);
         else if (format.equals("csv"))
             dumpToDiskCsv(data, filename);
     }
 
-    protected void dumpToDiskBin(List<StarBean> data, String filename, boolean serialized) {
+    protected void dumpToDiskBin(List<IParticleRecord> data, String filename, boolean serialized) {
         if (serialized) {
             // Use java serialization method
-            List<StarBean> l = new ArrayList<>(data.size());
-            for (StarBean p : data)
+            List<IParticleRecord> l = new ArrayList<>(data.size());
+            for (IParticleRecord p : data)
                 l.add(p);
 
             try {
@@ -358,7 +475,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             // Use own binary format
             BinaryDataProvider io = new BinaryDataProvider();
             try {
-                int n = data.get(0).data.length;
+                int n = data.size();
                 io.writeData(data, new FileOutputStream(filename));
                 logger.info("File " + filename + " written with " + n + " stars");
             } catch (Exception e) {
@@ -367,21 +484,21 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-    protected void dumpToDiskCsv(List<StarBean> data, String filename) {
+    protected void dumpToDiskCsv(List<IParticleRecord> data, String filename) {
         String sep = "' ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name(s), x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
             int n = 0;
-            for (StarBean star : data) {
-                float[] col = colors.get(star.id);
+            for (IParticleRecord star : data) {
+                float[] col = colors.get(star.id());
                 double x = star.z();
                 double y = -star.x();
                 double z = star.y();
                 gal.set(x, y, z).scl(Constants.U_TO_KM);
                 gal.mul(Coordinates.equatorialToGalactic());
-                writer.println(TextUtils.concatenate(Constants.nameSeparator, star.names) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
+                writer.println(TextUtils.concatenate(Constants.nameSeparator, star.names()) + sep + x + sep + y + sep + z + sep + star.absmag() + sep + star.appmag() + sep + col[0] + sep + col[1] + sep + col[2]);
                 n++;
             }
             writer.close();
@@ -389,9 +506,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         } catch (Exception e) {
             logger.error(e);
         }
-    }
-
-    public void setFileNumberCap(int cap) {
     }
 
     @Override
@@ -445,10 +559,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     private void loadAdditional() {
         for (String additionalFile : additionalFiles) {
-            additionalSplit = ",";
             AdditionalCols addit = new AdditionalCols();
             addit.indices = new HashMap<>();
-            addit.values = new LargeLongMap<>(10);
+            addit.values = new TreeMap<>();
 
             logger.info("Loading additional columns from " + additionalFile);
 
@@ -482,7 +595,6 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
         }
     }
 
-
     /**
      * Loads a single file, optionally gzipped into the given {@link AdditionalCols}
      *
@@ -492,37 +604,37 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
      * @throws RuntimeException
      */
     private void loadAdditionalFile(Path f, AdditionalCols addit) throws IOException, RuntimeException {
-        InputStream data = new FileInputStream(f.toFile());
-        if (f.toString().endsWith(".gz"))
-            data = new GZIPInputStream(data);
-        BufferedReader br = new BufferedReader(new InputStreamReader(data));
-        // Read header
-        String[] header = br.readLine().strip().split(additionalSplit);
-        if (header.length < 2) {
-            additionalSplit = "\\s+";
-            header = br.readLine().strip().split(additionalSplit);
-        }
-        int i = 0;
-        for (String col : header) {
-            col = col.strip();
-            if (i == 0 && !col.equals(ColId.sourceid.name())) {
-                logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
-                throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
-            }
-            if (i > 0 && !addit.indices.containsKey(col)) {
-                addit.indices.put(col, i - 1);
-            }
-            i++;
-        }
-        int n = header.length - 1;
-        String line;
-        i = 0;
+        FileChannel fc = null;
+        InputStream data = null;
         try {
+            fc = new RandomAccessFile(f.toFile(), "r").getChannel();
+            MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+            data = new ByteBufferInputStream(mem);
+            if (f.toString().endsWith(".gz"))
+                data = new GZIPInputStream(data);
+            BufferedReader br = new BufferedReader(new InputStreamReader(data));
+            // Read header
+            String[] header = br.readLine().strip().split(additionalSplit);
+            int i = 0;
+            for (String col : header) {
+                col = col.strip();
+                if (i == 0 && !col.equals(ColId.sourceid.name())) {
+                    logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
+                    throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
+                }
+                if (i > 0 && !addit.indices.containsKey(col)) {
+                    addit.indices.put(col, i - 1);
+                }
+                i++;
+            }
+            int ncols = header.length - 1;
+            String line;
+            i = 0;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(additionalSplit);
                 Long sourceId = Parser.parseLong(tokens[0].trim());
-                double[] vals = new double[n];
-                for (int j = 1; j <= n; j++) {
+                double[] vals = new double[ncols];
+                for (int j = 1; j <= ncols; j++) {
                     if (tokens[j] != null && !tokens[j].strip().isBlank()) {
                         Double val = Parser.parseDouble(tokens[j].strip());
                         vals[j - 1] = val;
@@ -537,8 +649,34 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
             br.close();
         } catch (Exception e) {
             logger.error(e);
-            br.close();
+        } finally {
+            if (fc != null)
+                try {
+                    fc.close();
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+            if (data != null)
+                try {
+                    data.close();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
         }
+    }
+
+    @Override
+    public void setFileNumberCap(int cap) {
+        this.fileNumberCap = cap;
+    }
+
+    @Override
+    public void setStarNumberCap(int starNumberCap) {
+        this.starNumberCap = starNumberCap;
+    }
+
+    @Override
+    public void setOutputFormatVersion(int version) {
     }
 
 }

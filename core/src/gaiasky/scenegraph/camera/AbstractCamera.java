@@ -23,7 +23,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
-    private static Matrix4d invProjectionView = new Matrix4d();
+    private static final Matrix4d invProjectionView = new Matrix4d();
 
     /** Camera far value **/
     public double CAM_FAR;
@@ -175,6 +175,10 @@ public abstract class AbstractCamera implements ICamera {
     @Override
     public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
         return isVisible(time, cb.viewAngle, cb.translation, cb.distToCamera);
+    }
+    @Override
+    public boolean isVisible(ITimeFrameProvider time, Vector3d pos) {
+        return isVisible(time, 1e-8, pos, pos.len());
     }
 
     @Override

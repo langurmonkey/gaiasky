@@ -64,7 +64,7 @@ public class BitmapFont implements Disposable {
 	final BitmapFontData data;
 	Array<TextureRegion> regions;
 	private final BitmapFontCache cache;
-	private boolean flipped;
+	private final boolean flipped;
 	boolean integer;
 	private boolean ownsTexture;
 

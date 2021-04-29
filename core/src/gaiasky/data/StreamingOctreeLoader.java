@@ -39,7 +39,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * Data will be pre-loaded at startup down to this octree depth.
      */
-    protected static final int PRELOAD_DEPTH = 4;
+    protected static final int PRELOAD_DEPTH = 3;
     /**
      * Default load queue size in octants
      */
@@ -56,6 +56,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected static final int MAX_LOAD_CHUNK = 5;
 
     public static StreamingOctreeLoader instance;
+
+    /** Octree loader thread lock **/
+    private static final Object threadLock = new Object();
 
     /**
      * Current number of stars that are loaded
@@ -83,6 +86,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     // Dataset name and description
     protected String name, description;
+    // Dataset parameters
+    protected Map<String, Object> params;
 
     /**
      * This queue is sorted ascending by access date, so that we know which
@@ -102,7 +107,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * Daemon thread that gets the data loading requests and serves them
      **/
-    protected DaemonLoader daemon;
+    protected OctreeLoaderThread daemon;
 
     public StreamingOctreeLoader() {
         // TODO Use memory info to figure this out
@@ -144,9 +149,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             /*
              * INITIALIZE DAEMON LOADER THREAD
              */
-            daemon = new DaemonLoader(octreeWrapper, this);
+            daemon = new OctreeLoaderThread(octreeWrapper, this);
             daemon.setDaemon(true);
-            daemon.setName("daemon-octree-loader");
+            daemon.setName("gaiasky-worker-octreeload");
             daemon.setPriority(Thread.MIN_PRIORITY);
             daemon.start();
 
@@ -163,14 +168,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             }, 1000, 1000);
 
             // Add octreeWrapper to result list and return
-            Array<SceneGraphNode> result = new Array<>(1);
+            Array<SceneGraphNode> result = new Array<>(false, 1);
             result.add(octreeWrapper);
 
             logger.info(I18n.bundle.format("notif.catalog.init", octreeWrapper.root.countObjects()));
 
             return result;
         } else {
-            return new Array<>(1);
+            return new Array<>(false, 1);
         }
     }
 
@@ -299,8 +304,10 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      */
     public void flushLoadQueue() {
         if (!daemon.awake && !toLoadQueue.isEmpty() && !loadingPaused) {
-            EventManager.instance.post(Events.BACKGROUND_LOADING_INFO);
-            daemon.interrupt();
+            synchronized (threadLock) {
+                EventManager.instance.post(Events.BACKGROUND_LOADING_INFO);
+                threadLock.notifyAll();
+            }
         }
     }
 
@@ -337,7 +344,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             loadOctant(octant, octreeWrapper, false);
             if (octant.children != null) {
                 for (OctreeNode child : octant.children) {
-                    if (child != null && child.nObjects > 0)
+                    if (child != null && child.numObjectsRec > 0)
                         loadOctant(child, octreeWrapper, level - 1);
                 }
             }
@@ -388,6 +395,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             GaiaSky.postRunnable(() -> {
                 synchronized (octant) {
                     try {
+                        int unloaded = 0;
                         for (SceneGraphNode object : objects) {
                             int count = object.getStarCount();
                             object.dispose();
@@ -398,9 +406,11 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                                 GaiaSky.instance.sg.removeNodeAuxiliaryInfo(object);
 
                             nLoadedStars -= count;
+                            unloaded += count;
                         }
                         objects.clear();
                         octant.setStatus(LoadStatus.NOT_LOADED);
+                        octant.touch(unloaded);
                     } catch (Exception e) {
                         logger.error("Error disposing octant's objects " + octant.pageId, e);
                         logger.info(GlobalConf.APPLICATION_NAME + " will attempt to continue");
@@ -427,16 +437,16 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @author Toni Sagrista
      */
-    protected static class DaemonLoader extends Thread {
+    protected static class OctreeLoaderThread extends Thread {
         private boolean awake;
         private boolean running;
-        private AtomicBoolean abort;
+        private final AtomicBoolean abort;
 
-        private StreamingOctreeLoader loader;
-        private AbstractOctreeWrapper octreeWrapper;
-        private Array<OctreeNode> toLoad;
+        private final StreamingOctreeLoader loader;
+        private final AbstractOctreeWrapper octreeWrapper;
+        private final Array<OctreeNode> toLoad;
 
-        public DaemonLoader(AbstractOctreeWrapper aow, StreamingOctreeLoader loader) {
+        public OctreeLoaderThread(AbstractOctreeWrapper aow, StreamingOctreeLoader loader) {
             this.awake = false;
             this.running = true;
             this.abort = new AtomicBoolean(false);
@@ -462,66 +472,65 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         @Override
         public void run() {
             while (running) {
-                /** ----------- PROCESS OCTANTS ----------- **/
-                while (!instance.toLoadQueue.isEmpty()) {
-                    toLoad.clear();
-                    int i = 0;
-                    while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                        OctreeNode octant = instance.toLoadQueue.poll();
-                        toLoad.add(octant);
-                        i++;
-                    }
-
-                    // Load octants if any
-                    if (toLoad.size > 0) {
-                        logger.debug(I18n.bundle.format("notif.loadingoctants", toLoad.size));
-                        try {
-                            int loaded = loader.loadOctants(toLoad, octreeWrapper, abort);
-                            logger.debug(I18n.bundle.format("notif.loadingoctants.finished", loaded));
-                        } catch (Exception e) {
-                            // This will happen when the queue has been cleared during processing
-                            logger.debug(I18n.bundle.get("notif.loadingoctants.fail"));
+                synchronized (threadLock) {
+                    /** ----------- PROCESS OCTANTS ----------- **/
+                    while (!instance.toLoadQueue.isEmpty()) {
+                        toLoad.clear();
+                        int i = 0;
+                        while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
+                            OctreeNode octant = instance.toLoadQueue.poll();
+                            toLoad.add(octant);
+                            i++;
                         }
-                    }
 
-                    // Release resources if needed
-                    int nUnloaded = 0;
-                    int nStars = loader.nLoadedStars;
-                    if (running && nStars >= loader.maxLoadedStars) //-V6007
-                        while (true) {
-                            // Get first in queue (non-accessed for the longest time)
-                            // and release it
-                            OctreeNode octant = loader.toUnloadQueue.poll();
-                            if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
-                                loader.unloadOctant(octant, octreeWrapper);
+                        // Load octants if any
+                        if (toLoad.size > 0) {
+                            logger.debug(I18n.bundle.format("notif.loadingoctants", toLoad.size));
+                            try {
+                                int loaded = loader.loadOctants(toLoad, octreeWrapper, abort);
+                                logger.debug(I18n.bundle.format("notif.loadingoctants.finished", loaded));
+                            } catch (Exception e) {
+                                // This will happen when the queue has been cleared during processing
+                                logger.debug(I18n.bundle.get("notif.loadingoctants.fail"));
                             }
-                            if (octant != null && octant.objects != null && octant.objects.size() > 0) {
-                                SceneGraphNode sg = octant.objects.get(0);
-                                nUnloaded += sg.getStarCount();
-                                if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
-                                    break;
+                        }
+
+                        // Release resources if needed
+                        int nUnloaded = 0;
+                        int nStars = loader.nLoadedStars;
+                        if (running && nStars >= loader.maxLoadedStars) //-V6007
+                            while (true) {
+                                // Get first in queue (non-accessed for the longest time)
+                                // and release it
+                                OctreeNode octant = loader.toUnloadQueue.poll();
+                                if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
+                                    loader.unloadOctant(octant, octreeWrapper);
+                                }
+                                if (octant != null && octant.objects != null && octant.objects.size() > 0) {
+                                    SceneGraphNode sg = octant.objects.get(0);
+                                    nUnloaded += sg.getStarCount();
+                                    if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
-                    GaiaSky.postRunnable(() -> {
-                        // Update octree numbers
-                        if (octreeWrapper != null && octreeWrapper.root != null)
-                            octreeWrapper.root.updateNumbers();
-                        // Update constellations :S
-                        Constellation.updateConstellations();
-                    });
+                        GaiaSky.postRunnable(() -> {
+                            // Update constellations :S
+                            Constellation.updateConstellations();
+                        });
 
-                }
+                    }
 
-                /* ----------- SLEEP UNTIL INTERRUPTED ----------- */
-                try {
-                    awake = false;
-                    abort.set(false);
-                    Thread.sleep(Long.MAX_VALUE - 8);
-                } catch (InterruptedException e) {
-                    // New data!
-                    awake = true;
+                    /* ----------- WAIT FOR NOTIFY ----------- */
+                    try {
+                        awake = false;
+                        abort.set(false);
+                        threadLock.wait(Long.MAX_VALUE - 8);
+                    } catch (InterruptedException e) {
+                        // New data!
+                        awake = true;
+                    }
                 }
             }
         }
@@ -552,11 +561,18 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
     }
 }

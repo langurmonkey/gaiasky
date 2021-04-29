@@ -62,11 +62,11 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private boolean label;
 
     private float[] cc;
-    private float[] ccEq = ColorUtils.gRed;
-    private float[] ccEcl = ColorUtils.gGreen;
-    private float[] ccGal = ColorUtils.gBlue;
+    private final float[] ccEq = ColorUtils.gRed;
+    private final float[] ccEcl = ColorUtils.gGreen;
+    private final float[] ccGal = ColorUtils.gBlue;
 
-    private float[] ccL = ColorUtils.gYellow;
+    private final float[] ccL = ColorUtils.gYellow;
 
     private Pair<Double, Double> scalingFading;
     private float fovFactor;
@@ -123,8 +123,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         mc.forceInit = true;
         mc.initialize();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], cc[3]));
-        // Depth check, no depth writes
-        mc.setDepthTest(GL20.GL_ONE, false);
+        // Depth reads, no depth writes
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
 
         // Initialize annotations vectorR
         initAnnotations();
@@ -207,6 +207,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         annotation(100000000000d * Constants.PC_TO_U, "100 Gpc");
     }
 
+    public Matrix4d getCoordinateSystemd(){
+        return coordinateSystemd;
+    }
+
     private void annotation(double dist, String text) {
         annotations.add(new Pair<>(dist, text));
     }
@@ -232,7 +236,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     protected void addToRenderLists(ICamera camera) {
         // Render group never changes
         // Add to toRender list
-        if (opacity > 0) {
+        if (this.shouldRender()) {
             addToRender(this, renderGroupModel);
             if (label) {
                 addToRender(this, RenderGroup.FONT_LABEL);
@@ -248,7 +252,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         this.distToCamera = getDistanceToOrigin(camera);
         this.currentDistance = this.distToCamera;
         this.regime = this.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
-        this.opacity = opacity;
+        this.opacity = opacity * this.getVisibilityOpacityFactor();
         super.updateOpacity();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
             // Baked fade-in as we get close to focus
@@ -378,9 +382,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(alpha * cc[3] * opacity);
         if (regime == 1)
-            mc.setDepthTest(GL20.GL_ONE, false);
+            mc.setDepthTest(GL20.GL_LEQUAL, false);
         else
-            mc.setDepthTest(GL20.GL_NONE, false);
+            mc.setDepthTest(0, false);
         mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, scalingFading.getFirst().floatValue());
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
@@ -419,10 +423,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             float min = 0.025f * ff;
             float max = 0.05f * ff;
             if (d01 / distToCamera > 0.1f)
-                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, textScale(), (float) (d01 * 1e-3d * camera.getFovFactor()), min, max);
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, distToCamera, textScale(), (float) (d01 * 1e-3d * camera.getFovFactor()), min, max);
             d = GlobalResources.doubleToDistanceString(d02);
             if (d02 / distToCamera > 0.1f)
-                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, textScale(), (float) (d02 * 1e-3d * camera.getFovFactor()), min, max);
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, distToCamera, textScale(), (float) (d02 * 1e-3d * camera.getFovFactor()), min, max);
         }
 
     }
@@ -448,13 +452,13 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         labelPosition.set(0d, 0d, dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
 
         // -Z
         labelPosition.set(0d, 0d, -dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
     }
 
     /**
@@ -480,7 +484,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         Matrix4d inv = coordinateSystemd;
         Matrix4d trf = mat4daux.set(inv).inv();
         camera.getPos().put(cpos).mul(trf);
-        focus.getAbsolutePosition(fpos).mul(trf);
+        focus.getPredictedPosition(fpos, GaiaSky.instance.time, camera, false).mul(trf);
+        //focus.getAbsolutePosition(fpos).mul(trf);
         fpos.sub(cpos);
     }
 
@@ -551,7 +556,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override

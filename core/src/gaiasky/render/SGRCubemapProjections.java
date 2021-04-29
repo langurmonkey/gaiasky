@@ -28,8 +28,8 @@ import java.util.Set;
  */
 public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver {
 
-    private CubemapProjections cubemapEffect;
-    private Copy copy;
+    private final CubemapProjections cubemapEffect;
+    private final Copy copy;
 
     public SGRCubemapProjections() {
         super();
@@ -78,42 +78,43 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case CUBEMAP_CMD:
-            CubemapProjection p = (CubemapProjection) data[1];
-            GaiaSky.postRunnable(() -> {
-                cubemapEffect.setProjection(p);
-            });
-            break;
-        case CUBEMAP_PROJECTION_CMD:
-            p = (CubemapProjection) data[0];
-            GaiaSky.postRunnable(() -> {
-                cubemapEffect.setProjection(p);
-            });
-            break;
-        case CUBEMAP_RESOLUTION_CMD:
-            int res = (Integer) data[0];
-            GaiaSky.postRunnable(() -> {
-                // Create new ones
-                if (!fbcm.containsKey(getKey(res, res, 0))) {
-                    // Clear
-                    dispose();
-                    fbcm.clear();
-                } else {
-                    // All good
-                }
-            });
-            break;
-        case PLANETARIUM_APERTURE_CMD:
-            cubemapEffect.setPlanetariumAperture((float) data[0]);
-            break;
-        case PLANETARIUM_ANGLE_CMD:
-            cubemapEffect.setPlanetariumAngle((float) data[0]);
-            break;
-        default:
-            break;
+        if(!GlobalConf.runtime.OPENVR) {
+            switch (event) {
+            case CUBEMAP_CMD:
+                CubemapProjection p = (CubemapProjection) data[1];
+                GaiaSky.postRunnable(() -> {
+                    cubemapEffect.setProjection(p);
+                });
+                break;
+            case CUBEMAP_PROJECTION_CMD:
+                p = (CubemapProjection) data[0];
+                GaiaSky.postRunnable(() -> {
+                    cubemapEffect.setProjection(p);
+                });
+                break;
+            case CUBEMAP_RESOLUTION_CMD:
+                int res = (Integer) data[0];
+                GaiaSky.postRunnable(() -> {
+                    // Create new ones
+                    if (!fbcm.containsKey(getKey(res, res, 0))) {
+                        // Clear
+                        dispose();
+                        fbcm.clear();
+                    } else {
+                        // All good
+                    }
+                });
+                break;
+            case PLANETARIUM_APERTURE_CMD:
+                cubemapEffect.setPlanetariumAperture((float) data[0]);
+                break;
+            case PLANETARIUM_ANGLE_CMD:
+                cubemapEffect.setPlanetariumAngle((float) data[0]);
+                break;
+            default:
+                break;
+            }
         }
-
     }
 
 }

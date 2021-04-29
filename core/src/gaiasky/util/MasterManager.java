@@ -49,7 +49,7 @@ public class MasterManager implements IObserver {
     }
 
     // Slave list
-    private List<String> slaves;
+    private final List<String> slaves;
 
     public boolean isSlaveConnected(String slaveName) {
         return isSlaveConnected(getSlaveIndex(slaveName));
@@ -90,7 +90,7 @@ public class MasterManager implements IObserver {
     private ExceptHandler[] exceptHandlers;
 
     // HTTP client
-    private HttpClient http;
+    private final HttpClient http;
 
     private MasterManager() {
         super();
@@ -339,7 +339,7 @@ public class MasterManager implements IObserver {
     }
 
     private class ExceptHandler implements Function<Throwable, String>{
-        private int idx;
+        private final int idx;
 
         public ExceptHandler(int idx){
             this.idx = idx;
@@ -355,7 +355,7 @@ public class MasterManager implements IObserver {
     }
 
     private class ResponseHandler implements BodyHandler<String> {
-        private int idx;
+        private final int idx;
 
         public ResponseHandler(int idx) {
             this.idx = idx;

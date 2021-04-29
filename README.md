@@ -1,7 +1,6 @@
 # Gaia Sky
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
-[![Documentation Status](https://readthedocs.org/projects/gaia-sky/badge/?version=latest)](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
 
 [**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that
@@ -15,7 +14,7 @@ A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Cata
 To get the latest up-to-date and most complete information,
 
 *  Visit our [**home page**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky)
-*  Read the [**Documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)
+*  Read the [**Documentation**](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)
 *  Submit a [**bug** or a **feature request**](https://gitlab.com/langurmonkey/gaiasky/issues)
 *  Follow development news at [@GaiaSky_Dev](https://twitter.com/GaiaSky_Dev)
 
@@ -34,12 +33,12 @@ This file contains the following sections:
 
 ### 1.1. Requirements
 
-| | |
-|-|-|
+| Component             | Minimum requirement                                                            |
+|-----------------------|--------------------------------------------------------------------------------|
 | **Operating system**  | Linux / Windows 7+ / macOS, 64-bit                                             |
 | **CPU**               | Intel Core i5 3rd Generation or similar. 4 core or higher recommended          |
-| **GPU**               | Support for OpenGL 3.2 (4.x recommended),  1 GB RAM                            |
-| **Memory**            | 4+ GB RAM                                                                      |
+| **GPU**               | Support for OpenGL `3.2` (`4.x` recommended) and GLSL `3.3`,  1 GB RAM         |
+| **Memory**            | 2-6 GB RAM depending on catalog                                                |
 | **Hard drive**        | 1 GB of free disk space (depending on datasets)                                |
 
 ### 2. Pre-built packages
@@ -91,7 +90,7 @@ You can also download the **data packs manually** [here](https://gaia.ari.uni-he
 
 ##  4. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always [hosted at gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest). For older versions and other formats, see [here](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
+The most up-to-date documentation of Gaia Sky is always [hosted at gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs). 
 
 We also have a mirror at [gaia-sky.rtfd.org](https://gaia-sky.readthedocs.io).
 

@@ -5,10 +5,11 @@
 
 package gaiasky.data.group;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -45,23 +46,14 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
     private static final String separator = comma;
 
-    /**
-     * Maximum file count to load. 0 or negative for unlimited
-     */
-    private int fileNumberCap = -1;
 
     /**
      * Number formatter
      */
-    private INumberFormat nf;
-
-    /**
-     * Load lines in parallel
-     */
-    private boolean parallel = true;
+    private final INumberFormat nf;
 
     // Buffer in number of lines
-    private int parallelBufferSize = 750000;
+    private int parallelBufferSize = 50000;
 
     public CsvCatalogDataProvider() {
         super();
@@ -97,27 +89,22 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     public void setColumns(String... cols) {
         int c = 0;
-        ColId[] colIds = ColId.values();
         for (String col : cols) {
-            for (ColId colId : colIds) {
-                if (!col.strip().isBlank() && col.strip().equals(colId.toString())) {
-                    indexMap.put(colId, c);
-                    break;
+            if (!col.strip().isBlank()){
+                ColId cid = colIdFromStr(col.strip());
+                if(cid != null) {
+                    indexMap.put(cid, c);
                 }
             }
             c++;
         }
     }
 
-    public void setFileNumberCap(int cap) {
-        fileNumberCap = cap;
-    }
-
-    public List<ParticleBean> loadData(String file) {
+    public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public List<ParticleBean> loadData(String file, double factor, boolean compat) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         initLists(1000000);
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
@@ -137,13 +124,14 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
             int fn = 0;
             for (FileHandle fh : files) {
                 loadDataMapped(fh.path(), factor, fn + 1, numFiles);
-                //loadFileFh(fh, factor, fn + 1);
+                //loadDataFh(fh.path(), factor, fn + 1, numFiles);
                 fn++;
                 if (fileNumberCap > 0 && fn >= fileNumberCap)
                     break;
             }
-        } else if (f.name().endsWith(".csv") || f.name().endsWith(".gz")) {
+        } else if (f.name().toLowerCase().endsWith(".csv") || f.name().toLowerCase().endsWith(".gz")) {
             loadDataMapped(file, factor, 1, 1);
+            //loadDataFh(file, factor, 1, 1);
         } else {
             logger.warn("File skipped: " + f.path());
         }
@@ -151,7 +139,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    public List<ParticleBean> loadData(InputStream is, double factor, boolean compat) {
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
         initLists(100000);
 
         loadFileIs(is, factor, new AtomicLong(0l), new AtomicLong(0l));
@@ -170,29 +158,37 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 discardedStars.incrementAndGet();
         };
         try {
-            List<String> lineBuffer = new ArrayList<>(parallelBufferSize);
-            int i = 0;
-            String line;
-            while ((line = br.readLine()) != null) {
-                // Add to buffer
-                if (i > 0)
-                    lineBuffer.add(line);
-                if (lineBuffer.size() >= parallelBufferSize) {
-                    if (parallel)
+            if (parallelism > 1) {
+                // Use parallel stream with buffer
+                List<String> lineBuffer = new ArrayList<>(parallelBufferSize);
+                long i = 0;
+                String line;
+                while ((line = br.readLine()) != null) {
+                    // Add to buffer
+                    if (i > 0)
+                        lineBuffer.add(line);
+                    if (lineBuffer.size() >= parallelBufferSize) {
                         lineBuffer.parallelStream().forEach(c);
-                    else
-                        lineBuffer.stream().forEach(c);
+                        lineBuffer.clear();
+                    }
+                    i++;
+                }
+                // Flush rest
+                if (lineBuffer.size() > 0) {
+                    lineBuffer.parallelStream().forEach(c);
                     lineBuffer.clear();
                 }
-                i++;
-            }
-            // Flush resting
-            if (lineBuffer.size() > 0) {
-                if (parallel)
-                    lineBuffer.parallelStream().forEach(c);
-                else
-                    lineBuffer.stream().forEach(c);
-                lineBuffer.clear();
+            } else {
+                // Just read line by line
+                int num = 0;
+                String line;
+                while ((line = br.readLine()) != null) {
+                    c.accept(line);
+                    num++;
+                    if(starNumberCap >= 0 && num >= starNumberCap){
+                        break;
+                    }
+                }
             }
         } catch (IOException e) {
             logger.error(e);
@@ -213,12 +209,11 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      */
     private boolean addStar(String line) {
         String[] tokens = line.split(separator);
-        double[] point = new double[StarBean.SIZE + 3];
 
         // Check that parallax exists (5-param solution), otherwise we have no distance
         if (!tokens[idx(ColId.pllx)].isEmpty()) {
             /** Extra attributes **/
-            Map<UCD, Double> extra = new HashMap<>();
+            ObjectDoubleMap<UCD> extra = new ObjectDoubleMap<>(2, 0.9f);
 
             /** ID **/
             long sourceid = Parser.parseLong(tokens[idx(ColId.sourceid)]);
@@ -226,25 +221,19 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
 
             /** PARALLAX **/
             // Add the zero point to the parallax
-            double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) + parallaxZeroPoint;
+            double pllx = Parser.parseDouble(tokens[idx(ColId.pllx)]) - parallaxZeroPoint;
             double pllxerr = Parser.parseDouble(tokens[idx(ColId.pllx_err)]);
-            double appmag = Parser.parseDouble(tokens[idx(ColId.gmag)]);
+            float appmag = (float) Parser.parseDouble(tokens[idx(ColId.gmag)]);
+
             extra.put(new UCD("pllx_err", ColId.pllx_err.toString(), "", 0), pllxerr);
 
             // Keep only stars with relevant parallaxes
             if (mustLoad || acceptParallax(appmag, pllx, pllxerr)) {
-
-                /** DISTANCE **/
-                double distpc = (1000d / pllx);
-                double geodistpc = getGeoDistance(sourceid);
-
+                /** RUWE TEST **/
                 float ruweVal = getRuweValue(sourceid, tokens);
-                if (!mustLoad && !ruwe.isNaN()) {
-                    // RUWE test!
-                    if (ruweVal > ruwe) {
-                        // Do not accept
-                        return false;
-                    }
+                // RUWE test!
+                if (!mustLoad && !ruwe.isNaN() && ruweVal > ruwe) {
+                    return false;
                 }
                 // Add ruwe to extra
                 if (!Float.isNaN(ruweVal)) {
@@ -254,6 +243,9 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 // If we have geometric distances, we only accept those, otherwise, accept all
                 boolean geodist = hasAdditionalColumn(ColId.geodist);
                 if (mustLoad || !geodist || (geodist && hasAdditional(ColId.geodist, sourceid))) {
+                    /** DISTANCE **/
+                    double distpc = (1000d / pllx);
+                    double geodistpc = getGeoDistance(sourceid);
                     distpc = geodistpc > 0 ? geodistpc : distpc;
 
                     if (mustLoad || acceptDistance(distpc)) {
@@ -261,7 +253,8 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         double dist = distpc * Constants.PC_TO_U;
 
                         /** NAME **/
-                        String name = String.valueOf(sourceid);
+                        // Avoid name, takes up too much space!
+                        String name = null;
 
                         /** RA and DEC **/
                         double ra = Parser.parseDouble(tokens[idx(ColId.ra)]);
@@ -282,14 +275,15 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         }
 
                         /** PROPER MOTION VECTOR **/
-                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc);
+                        Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, new Vector3d());
 
+                        /** MAGNITUDES **/
                         // Line of sight extinction in the G band
                         double ag = 0;
                         // Galactic latitude in radians
-                        Vector3d posgal = new Vector3d(pos);
+                        Vector3d posgal = new Vector3d().set(pos);
                         posgal.mul(Coordinates.eqToGal());
-                        Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
+                        Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, posgal);
                         double b = posgalsph.y;
                         double magcorraux = Math.min(distpc, 150d / Math.abs(Math.sin(b)));
 
@@ -303,7 +297,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                             } else {
                                 // Compute extinction analytically
                                 ag = magcorraux * 5.9e-4;
-                                // Limit to 3
+                                // Limit to 3.2
                                 ag = Math.min(ag, 3.2);
                             }
                         }
@@ -315,7 +309,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
                         double pseudoL = Math.pow(10.0, -0.4 * absmag);
                         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-                        double size = Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1.0e10);
+                        float size = (float) Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1.0e10);
                         //double radius = tokens.length >= 19 && !tokens[IDX_RADIUS]].isEmpty() ? Parser.parseDouble(tokens[IDX_RADIUS]]) * Constants.Ro_TO_U : size * Constants.STAR_SIZE_FACTOR;
 
                         /** COLOR, we use the tycBV map if present **/
@@ -355,27 +349,28 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                                 teff = MathUtilsd.lint(xp, 1.5, 15, 3521.6, 3000);
                             }
                         }
-                        float[] rgb = ColorUtils.teffToRGB(teff);
-                        double col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
+                        float[] rgb = ColorUtils.teffToRGB_rough(teff);
+                        float colorPacked = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                        point[StarBean.I_HIP] = -1;
-                        point[StarBean.I_X] = pos.x;
-                        point[StarBean.I_Y] = pos.y;
-                        point[StarBean.I_Z] = pos.z;
-                        point[StarBean.I_PMX] = pm.x;
-                        point[StarBean.I_PMY] = pm.y;
-                        point[StarBean.I_PMZ] = pm.z;
-                        point[StarBean.I_MUALPHA] = mualphastar;
-                        point[StarBean.I_MUDELTA] = mudelta;
-                        point[StarBean.I_RADVEL] = radvel;
-                        point[StarBean.I_COL] = col;
-                        point[StarBean.I_SIZE] = size;
-                        //point[StarBean.I_RADIUS] = radius;
-                        //point[StarBean.I_TEFF] = teff;
-                        point[StarBean.I_APPMAG] = appmag;
-                        point[StarBean.I_ABSMAG] = absmag;
+                        double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
+                        float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
+                        dataD[ParticleRecord.I_X] = pos.x;
+                        dataD[ParticleRecord.I_Y] = pos.y;
+                        dataD[ParticleRecord.I_Z] = pos.z;
 
-                        list.add(new StarBean(point, sourceid, name, extra));
+                        dataF[ParticleRecord.I_FPMX] = (float) pm.x;
+                        dataF[ParticleRecord.I_FPMY] = (float) pm.y;
+                        dataF[ParticleRecord.I_FPMZ] = (float) pm.z;
+                        dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
+                        dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
+                        dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
+                        dataF[ParticleRecord.I_FAPPMAG] = appmag;
+                        dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
+                        dataF[ParticleRecord.I_FCOL] = colorPacked;
+                        dataF[ParticleRecord.I_FSIZE] = size;
+                        dataF[ParticleRecord.I_FHIP] = -1;
+
+                        list.add(new ParticleRecord(dataD, dataF, sourceid, name, extra));
 
                         int appClamp = (int) MathUtilsd.clamp(appmag, 0, 21);
                         countsPerMag[appClamp] += 1;
@@ -388,7 +383,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         return loadDataMapped(file, factor, -1, -1);
     }
 
@@ -399,16 +394,17 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
      * @param factor     Position factor
      * @param fileNumber File number
      * @param totalFiles Total number of files
-     * @return
+     * @return List of particle records
      */
-    public List<ParticleBean> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor, int fileNumber, long totalFiles) {
         boolean gz = file.endsWith(".gz");
         String fileName = file.substring(file.lastIndexOf('/') + 1);
         FileChannel fc = null;
+        InputStream data = null;
         try {
             fc = new RandomAccessFile(file, "r").getChannel();
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
-            InputStream data = new ByteBufferInputStream(mem);
+            data = new ByteBufferInputStream(mem);
 
             if (gz) {
                 try {
@@ -436,12 +432,51 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
                 } catch (Exception e) {
                     logger.error(e);
                 }
+            if (data != null)
+                try {
+                    data.close();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
         }
         return null;
     }
 
-    public void setParallel(boolean parallel) {
-        this.parallel = parallel;
+    public List<IParticleRecord> loadDataFh(String file, double factor, int fileNumber, long totalFiles) {
+        boolean gz = file.endsWith(".gz");
+        String fileName = file.substring(file.lastIndexOf('/') + 1);
+        InputStream data = null;
+        try {
+            FileHandle fh = Gdx.files.absolute(file);
+            data = fh.read();
+            if (gz) {
+                try {
+                    data = new GZIPInputStream(data);
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+            AtomicLong addedStars = new AtomicLong(0l);
+            AtomicLong discardedStars = new AtomicLong(0l);
+            loadFileIs(data, factor, addedStars, discardedStars);
+
+            if (fileNumber >= 0 && totalFiles >= 0)
+                logger.info(fileNumber + "/" + totalFiles + " (" + nf.format((double) fileNumber * 100d / (double) totalFiles) + "%): " + fileName + " --> " + addedStars.get() + "/" + (addedStars.get() + discardedStars.get()) + " stars (" + nf.format(100d * (double) addedStars.get() / (double) (addedStars.get() + discardedStars.get())) + "%)");
+            else
+                logger.info(fileName + " --> " + addedStars.get() + "/" + (addedStars.get() + discardedStars.get()) + " stars (" + nf.format(100d * (double) addedStars.get() / (double) (addedStars.get() + discardedStars.get())) + "%)");
+
+            return list;
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
+            if (data != null)
+                try {
+                    data.close();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+        }
+        return null;
     }
 
     public void setParallelBufferSize(int size) {

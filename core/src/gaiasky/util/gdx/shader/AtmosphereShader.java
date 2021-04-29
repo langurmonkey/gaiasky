@@ -74,9 +74,7 @@ public class AtmosphereShader extends BaseIntShader {
 
         public final static Uniform alpha = new Uniform("fAlpha");
         public final static Uniform cameraHeight = new Uniform("fCameraHeight");
-        public final static Uniform cameraHeight2 = new Uniform("fCameraHeight2");
         public final static Uniform outerRadius = new Uniform("fOuterRadius");
-        public final static Uniform outerRadius2 = new Uniform("fOuterRadius2");
         public final static Uniform innerRadius = new Uniform("fInnerRadius");
         public final static Uniform innerRadius2 = new Uniform("fInnerRadius2");
         public final static Uniform krESun = new Uniform("fKrESun");
@@ -87,9 +85,7 @@ public class AtmosphereShader extends BaseIntShader {
         public final static Uniform scaleDepth = new Uniform("fScaleDepth");
         public final static Uniform scaleOverScaleDepth = new Uniform("fScaleOverScaleDepth");
         public final static Uniform nSamples = new Uniform("nSamples");
-        public final static Uniform fSamples = new Uniform("fSamples");
         public final static Uniform g = new Uniform("g");
-        public final static Uniform g2 = new Uniform("g2");
 
         public final static Uniform planetPos = new Uniform("v3PlanetPos");
         public final static Uniform lightPos = new Uniform("v3LightPos");
@@ -261,18 +257,6 @@ public class AtmosphereShader extends BaseIntShader {
             }
         };
 
-        public final static Setter cameraHeight2 = new Setter() {
-            @Override
-            public boolean isGlobal(BaseIntShader shader, int inputID) {
-                return false;
-            }
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.CameraHeight2))).value);
-            }
-        };
-
         public final static Setter outerRadius = new Setter() {
             @Override
             public boolean isGlobal(BaseIntShader shader, int inputID) {
@@ -285,18 +269,6 @@ public class AtmosphereShader extends BaseIntShader {
             }
         };
 
-        public final static Setter outerRadius2 = new Setter() {
-            @Override
-            public boolean isGlobal(BaseIntShader shader, int inputID) {
-                return false;
-            }
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.OuterRadius2))).value);
-            }
-        };
-
         public final static Setter innerRadius = new Setter() {
             @Override
             public boolean isGlobal(BaseIntShader shader, int inputID) {
@@ -306,18 +278,6 @@ public class AtmosphereShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.InnerRadius))).value);
-            }
-        };
-
-        public final static Setter innerRadius2 = new Setter() {
-            @Override
-            public boolean isGlobal(BaseIntShader shader, int inputID) {
-                return false;
-            }
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.InnerRadius2))).value);
             }
         };
 
@@ -417,18 +377,6 @@ public class AtmosphereShader extends BaseIntShader {
             }
         };
 
-        public final static Setter fSamples = new Setter() {
-            @Override
-            public boolean isGlobal(BaseIntShader shader, int inputID) {
-                return false;
-            }
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.fSamples))).value);
-            }
-        };
-
         public final static Setter g = new Setter() {
             @Override
             public boolean isGlobal(BaseIntShader shader, int inputID) {
@@ -441,17 +389,6 @@ public class AtmosphereShader extends BaseIntShader {
             }
         };
 
-        public final static Setter g2 = new Setter() {
-            @Override
-            public boolean isGlobal(BaseIntShader shader, int inputID) {
-                return false;
-            }
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((AtmosphereAttribute) (combinedAttributes.get(AtmosphereAttribute.G2))).value);
-            }
-        };
         public final static Setter planetPos = new Setter() {
             @Override
             public boolean isGlobal(BaseIntShader shader, int inputID) {
@@ -634,11 +571,8 @@ public class AtmosphereShader extends BaseIntShader {
     // Material uniforms
     public final int fAlpha;
     public final int fCameraHeight;
-    public final int fCameraHeight2;
     public final int fOuterRadius;
-    public final int fOuterRadius2;
     public final int fInnerRadius;
-    public final int fInnerRadius2;
     public final int fKrESun;
     public final int fKmESun;
     public final int fKr4PI;
@@ -648,10 +582,8 @@ public class AtmosphereShader extends BaseIntShader {
     public final int fScaleOverScaleDepth;
 
     public final int nSamples;
-    public final int fSamples;
 
     public final int g;
-    public final int g2;
 
     public final int v3PlanetPos;
     public final int v3LightPos;
@@ -718,11 +650,8 @@ public class AtmosphereShader extends BaseIntShader {
 
         fAlpha = register(Inputs.alpha, Setters.alpha);
         fCameraHeight = register(Inputs.cameraHeight, Setters.cameraHeight);
-        fCameraHeight2 = register(Inputs.cameraHeight2, Setters.cameraHeight2);
         fOuterRadius = register(Inputs.outerRadius, Setters.outerRadius);
-        fOuterRadius2 = register(Inputs.outerRadius2, Setters.outerRadius2);
         fInnerRadius = register(Inputs.innerRadius, Setters.innerRadius);
-        fInnerRadius2 = register(Inputs.innerRadius2, Setters.innerRadius2);
         fKrESun = register(Inputs.krESun, Setters.krESun);
         fKmESun = register(Inputs.kmESun, Setters.kmESun);
         fKr4PI = register(Inputs.kr4PI, Setters.kr4PI);
@@ -731,10 +660,8 @@ public class AtmosphereShader extends BaseIntShader {
         fScaleDepth = register(Inputs.scaleDepth, Setters.scaleDepth);
         fScaleOverScaleDepth = register(Inputs.scaleOverScaleDepth, Setters.scaleOverScaleDepth);
         nSamples = register(Inputs.nSamples, Setters.nSamples);
-        fSamples = register(Inputs.fSamples, Setters.fSamples);
 
         g = register(Inputs.g, Setters.g);
-        g2 = register(Inputs.g2, Setters.g2);
 
         v3PlanetPos = register(Inputs.planetPos, Setters.planetPos);
         v3CameraPos = register(Inputs.cameraPos, Setters.cameraPos);

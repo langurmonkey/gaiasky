@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.SnapshotArray;
 import gaiasky.GaiaSky;
+import gaiasky.desktop.util.ExternalInformationUpdater;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -37,12 +38,12 @@ import gaiasky.util.scene2d.OwnTextTooltip;
  * @author tsagrista
  */
 public class FocusInfoInterface extends TableGuiInterface implements IObserver {
-    static private INetworkChecker daemon;
-    static private int MAX_RULER_NAME_LEN = 9;
+    static private final int MAX_RULER_NAME_LEN = 9;
 
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMag, focusAbsMag, focusRadius;
     protected Button goTo, landOn, landAt, bookmark;
+    protected OwnImageButton visibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camPos, lonLatLabel, RADECPointerLabel, RADECViewLabel, appmagLabel, absmagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
@@ -51,9 +52,16 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected HorizontalGroup focusNameGroup;
 
     protected IFocus currentFocus;
+    private ExternalInformationUpdater externalInfoUpdater;
 
-    private Table focusInfo, pointerInfo, cameraInfo, moreInfo, rulerInfo, focusNames;
-    private Cell<?> focusInfoCell, rulerCell;
+    private final Table focusInfo;
+    private final Table pointerInfo;
+    private final Table cameraInfo;
+    private final Table moreInfo;
+    private final Table rulerInfo;
+    private final Table focusNames;
+    private final Cell<?> focusInfoCell;
+    private final Cell<?> rulerCell;
     Vector3d pos;
 
     INumberFormat nf, sf;
@@ -72,13 +80,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         nf = NumberFormatFactory.getFormatter("##0.##");
         sf = NumberFormatFactory.getFormatter("0.###E0");
 
-        float buttonSize = 15f * GlobalConf.UI_SCALE_FACTOR;
-        float imgSize = 18f * GlobalConf.UI_SCALE_FACTOR;
-        pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-        pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-        pad1 = 1f * GlobalConf.UI_SCALE_FACTOR;
+        float buttonSize = 24f;
+        float imgSize = 28.8f;
+        pad15 = 24f;
+        pad10 = 16f;
+        pad5 = 8f;
+        pad3 = 4.8f;
+        pad1 = 1.6f;
 
         focusInfo = new Table();
         focusInfo.pad(pad5);
@@ -196,8 +204,18 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         });
         landAt.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
+        visibility = new OwnImageButton(skin, "eye-toggle");
+        visibility.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                // Toggle visibility
+                EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, currentFocus, !visibility.isChecked(), false);
+                return true;
+            }
+            return false;
+        });
+
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
-        bw += 2 * GlobalConf.UI_SCALE_FACTOR;
+        bw += 3.2f;
 
         goTo.setWidth(bw);
         landOn.setWidth(bw);
@@ -206,12 +224,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusNameGroup = new HorizontalGroup();
         focusNameGroup.space(pad5);
         focusNameGroup.addActor(focusName);
+        focusNameGroup.addActor(visibility);
         focusNameGroup.addActor(bookmark);
         focusNameGroup.addActor(goTo);
         focusNameGroup.addActor(landOn);
         focusNameGroup.addActor(landAt);
 
-        float w = 130 * GlobalConf.UI_SCALE_FACTOR;
+        float w = 208f;
         focusId.setWidth(w);
 
         focusRA.setWidth(w);
@@ -314,14 +333,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         pack();
         rulerCell.clearActor();
 
-        if (daemon == null && !vr) {
-            daemon = NetworkCheckerManager.getNewtorkChecker();
-            daemon.setParameters(moreInfo, skin, pad10);
-            daemon.start();
+        if (!vr) {
+            externalInfoUpdater = new ExternalInformationUpdater();
+            externalInfoUpdater.setParameters(moreInfo, skin, pad10);
         }
 
         pos = new Vector3d();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST, Events.PER_OBJECT_VISIBILITY_CMD);
     }
 
     private HorizontalGroup hg(Actor... actors) {
@@ -350,227 +368,238 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case FOCUS_CHANGED:
-                IFocus focus;
-                if (data[0] instanceof String) {
-                    focus = (IFocus) GaiaSky.instance.sg.getNode((String) data[0]);
-                } else {
-                    focus = (IFocus) data[0];
+        case FOCUS_CHANGED:
+            IFocus focus;
+            if (data[0] instanceof String) {
+                focus = (IFocus) GaiaSky.instance.sg.getNode((String) data[0]);
+            } else {
+                focus = (IFocus) data[0];
+            }
+            currentFocus = focus;
+
+            final int focusFieldMaxLength = 20;
+
+            // ID
+            boolean cappedId = false;
+            String id = "";
+            if (focus instanceof IStarFocus) {
+                IStarFocus sf = (IStarFocus) focus;
+                if (sf.getId() > 0) {
+                    id = String.valueOf(sf.getId());
+                } else if (sf.getHip() > 0) {
+                    id = "HIP " + sf.getHip();
                 }
-                currentFocus = focus;
+            }
+            if (id.length() == 0) {
+                id = "-";
+            }
+            String idString = id;
+            if (id.length() > focusFieldMaxLength) {
+                idString = TextUtils.capString(id, focusFieldMaxLength);
+                cappedId = true;
+            }
 
-                final int focusFieldMaxLength = !GlobalConf.isHiDPI() ? 17 : 20;
+            // Link
+            boolean vis = focus instanceof Planet;
 
-                // ID
-                boolean cappedId = false;
-                String id = "";
-                if (focus instanceof IStarFocus) {
-                    IStarFocus sf = (IStarFocus) focus;
-                    if (sf.getId() > 0) {
-                        id = String.valueOf(sf.getId());
-                    } else if (sf.getHip() > 0) {
-                        id = "HIP " + sf.getHip();
+            focusNameGroup.removeActor(landOn);
+            focusNameGroup.removeActor(landAt);
+            if (vis) {
+                focusNameGroup.addActor(landOn);
+                focusNameGroup.addActor(landAt);
+            }
+
+            // Type
+            try {
+                focusType.setText(I18n.txt("element." + ComponentType.values()[focus.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
+            } catch (Exception e) {
+                focusType.setText("");
+            }
+
+            // Coords
+            pointerLonLat.setText("-/-");
+
+            // Bookmark
+            bookmark.setProgrammaticChangeEvents(false);
+            bookmark.setChecked(BookmarksManager.instance().containsName(currentFocus.getName()));
+            bookmark.setProgrammaticChangeEvents(true);
+
+            // Visible
+            visibility.setCheckedNoFire(!((IVisibilitySwitch)currentFocus).isVisible(true));
+            visibility.addListener(new OwnTextTooltip(I18n.txt("action.toggle", currentFocus.getName()), skin));
+
+            // Id, names
+            focusId.setText(idString);
+            focusId.clearListeners();
+            if (cappedId) {
+                focusId.addListener(new OwnTextTooltip(id, skin));
+                focusIdExpand.addListener(new OwnTextTooltip(id, skin));
+                focusIdExpand.setVisible(true);
+            } else {
+                focusIdExpand.clearListeners();
+                focusIdExpand.setVisible(false);
+            }
+
+            String objectName = TextUtils.capString(focus.getName(), focusFieldMaxLength);
+            focusName.setText(objectName);
+            focusName.clearListeners();
+            focusName.addListener(new OwnTextTooltip(focus.getName(), skin));
+
+            focusNames.clearChildren();
+            String[] names = focus.getNames();
+            if (names != null && names.length > 0) {
+                int chars = 0;
+                HorizontalGroup currGroup = new HorizontalGroup();
+                for (int i = 0; i < names.length; i++) {
+                    String name = names[i];
+                    String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
+                    OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
+                    if (nameCapped.length() != name.length())
+                        nl.addListener(new OwnTextTooltip(name, skin));
+                    currGroup.addActor(nl);
+                    chars += nameCapped.length() + 1;
+                    if (i < names.length - 1) {
+                        currGroup.addActor(new OwnLabel(", ", skin));
+                        chars++;
+                    }
+                    if (i < names.length - 1 && chars > 14) {
+                        focusNames.add(currGroup).left().row();
+                        currGroup = new HorizontalGroup();
+                        chars = 0;
                     }
                 }
-                if (id.length() == 0) {
-                    id = "-";
+                if (chars > 0)
+                    focusNames.add(currGroup).left();
+            } else {
+                focusNames.add(new OwnLabel("-", skin));
+            }
+
+            Vector2d posSph = focus.getPosSph();
+            if (posSph != null && posSph.len() > 0f) {
+                focusRA.setText(nf.format(posSph.x) + "°");
+                focusDEC.setText(nf.format(posSph.y) + "°");
+            } else {
+                Coordinates.cartesianToSpherical(focus.getAbsolutePosition(pos), pos);
+
+                focusRA.setText(nf.format(MathUtilsd.radDeg * pos.x % 360) + "°");
+                focusDEC.setText(nf.format(MathUtilsd.radDeg * pos.y % 360) + "°");
+            }
+
+            if (focus instanceof IProperMotion) {
+                IProperMotion part = (IProperMotion) focus;
+                focusMuAlpha.setText(nf.format(part.getMuAlpha()) + " mas/yr");
+                focusMuDelta.setText(nf.format(part.getMuDelta()) + " mas/yr");
+                focusRadVel.setText(nf.format(part.getRadialVelocity()) + " km/s");
+            } else {
+                focusMuAlpha.setText("-");
+                focusMuDelta.setText("-");
+                focusRadVel.setText("-");
+            }
+
+            if (!(focus instanceof StarCluster)) {
+                appmagLabel.setText(I18n.txt("gui.focusinfo.appmag"));
+                Float appmag = focus.getAppmag();
+                focusAppMag.setText(nf.format(appmag));
+                absmagLabel.setText(I18n.txt("gui.focusinfo.absmag"));
+                Float absmag = focus.getAbsmag();
+                focusAbsMag.setText(nf.format(absmag));
+            } else {
+                appmagLabel.setText("# " + I18n.txt("element.stars"));
+                StarCluster sc = (StarCluster) focus;
+                focusAppMag.setText(Integer.toString(sc.getNStars()));
+                absmagLabel.setText("");
+                focusAbsMag.setText("");
+            }
+
+            if (ComponentType.values()[focus.getCt().getFirstOrdinal()] == ComponentType.Stars) {
+                focusRadius.setText("-");
+            } else {
+                focusRadius.setText(sf.format(focus.getRadius() * Constants.U_TO_KM) + " km");
+            }
+
+            // Update more info table
+            moreInfo.clear();
+            externalInfoUpdater.update(focus);
+
+            break;
+        case FOCUS_INFO_UPDATED:
+            focusAngle.setText(sf.format(Math.toDegrees((double) data[1]) % 360) + "°");
+
+            // Dist to cam
+            Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0]);
+            focusDistCam.setText(sf.format(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
+
+            // Dist to sol
+            if (data.length > 4) {
+                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4]);
+                focusDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+            }
+
+            focusRA.setText(nf.format((double) data[2] % 360) + "°");
+            focusDEC.setText(nf.format((double) data[3] % 360) + "°");
+            break;
+        case CAMERA_MOTION_UPDATE:
+            Vector3d campos = (Vector3d) data[0];
+            Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x);
+            Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y);
+            Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z);
+            camPos.setText("X: " + sf.format(x.getFirst()) + " " + x.getSecond() + "\nY: " + sf.format(y.getFirst()) + " " + y.getSecond() + "\nZ: " + sf.format(z.getFirst()) + " " + z.getSecond());
+            camVel.setText(sf.format((double) data[1]) + " km/h");
+            break;
+        case CAMERA_MODE_CMD:
+            // Update camera mode selection
+            CameraMode mode = (CameraMode) data[0];
+            if (mode.equals(CameraMode.FOCUS_MODE)) {
+                displayInfo(focusInfoCell, focusInfo);
+            } else {
+                hideInfo(focusInfoCell);
+            }
+            break;
+        case LON_LAT_UPDATED:
+            Double lon = (Double) data[0];
+            Double lat = (Double) data[1];
+            pointerLonLat.setText(nf.format(lat) + "°/" + nf.format(lon) + "°");
+            break;
+        case RA_DEC_UPDATED:
+            Double pra = (Double) data[0];
+            Double pdec = (Double) data[1];
+            Double vra = (Double) data[2];
+            Double vdec = (Double) data[3];
+            pointerRADEC.setText(nf.format(pra) + "°/" + nf.format(pdec) + "°");
+            viewRADEC.setText(nf.format(vra) + "°/" + nf.format(vdec) + "°");
+            break;
+        case RULER_ATTACH_0:
+            String n0 = (String) data[0];
+            rulerName0.setText(capString(n0, MAX_RULER_NAME_LEN));
+            displayInfo(rulerCell, rulerInfo);
+            break;
+        case RULER_ATTACH_1:
+            String n1 = (String) data[0];
+            rulerName1.setText(capString(n1, MAX_RULER_NAME_LEN));
+            displayInfo(rulerCell, rulerInfo);
+            break;
+        case RULER_CLEAR:
+            rulerName0.setText("-");
+            rulerName1.setText("-");
+            rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": -");
+            hideInfo(rulerCell);
+            break;
+        case RULER_DIST:
+            String rd = (String) data[1];
+            rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": " + rd);
+            break;
+        case PER_OBJECT_VISIBILITY_CMD:
+            boolean ui = (boolean) data[2];
+            if(ui){
+                IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
+                if(vs == currentFocus) {
+                    boolean visible = (boolean) data[1];
+                    visibility.setCheckedNoFire(!visible);
                 }
-                String idString = id;
-                if (id.length() > focusFieldMaxLength) {
-                    idString = TextUtils.capString(id, focusFieldMaxLength);
-                    cappedId = true;
-                }
-
-                // Link
-                boolean vis = focus instanceof Planet;
-
-                focusNameGroup.removeActor(landOn);
-                focusNameGroup.removeActor(landAt);
-                if (vis) {
-                    focusNameGroup.addActor(landOn);
-                    focusNameGroup.addActor(landAt);
-                }
-
-                // Type
-                try {
-                    focusType.setText(I18n.txt("element." + ComponentType.values()[focus.getCt().getFirstOrdinal()].toString().toLowerCase() + ".singular"));
-                } catch (Exception e) {
-                    focusType.setText("");
-                }
-
-                // Coords
-                pointerLonLat.setText("-/-");
-
-                // Bookmark
-                bookmark.setProgrammaticChangeEvents(false);
-                bookmark.setChecked(BookmarksManager.instance().containsName(currentFocus.getName()));
-                bookmark.setProgrammaticChangeEvents(true);
-
-                // Id, names
-                focusId.setText(idString);
-                focusId.clearListeners();
-                if (cappedId) {
-                    focusId.addListener(new OwnTextTooltip(id, skin));
-                    focusIdExpand.addListener(new OwnTextTooltip(id, skin));
-                    focusIdExpand.setVisible(true);
-                } else {
-                    focusIdExpand.clearListeners();
-                    focusIdExpand.setVisible(false);
-                }
-
-                String objectName = TextUtils.capString(focus.getName(), focusFieldMaxLength);
-                focusName.setText(objectName);
-                focusName.clearListeners();
-                focusName.addListener(new OwnTextTooltip(focus.getName(), skin));
-
-                focusNames.clearChildren();
-                String[] names = focus.getNames();
-                if (names != null && names.length > 0) {
-                    int chars = 0;
-                    HorizontalGroup currGroup = new HorizontalGroup();
-                    for (int i = 0; i < names.length; i++) {
-                        String name = names[i];
-                        String nameCapped = TextUtils.capString(name, focusFieldMaxLength);
-                        OwnLabel nl = new OwnLabel(nameCapped, skin, "object-name");
-                        if (nameCapped.length() != name.length())
-                            nl.addListener(new OwnTextTooltip(name, skin));
-                        currGroup.addActor(nl);
-                        chars += nameCapped.length() + 1;
-                        if (i < names.length - 1) {
-                            currGroup.addActor(new OwnLabel(", ", skin));
-                            chars++;
-                        }
-                        if (i < names.length - 1 && chars > 14) {
-                            focusNames.add(currGroup).left().row();
-                            currGroup = new HorizontalGroup();
-                            chars = 0;
-                        }
-                    }
-                    if (chars > 0)
-                        focusNames.add(currGroup).left();
-                } else {
-                    focusNames.add(new OwnLabel("-", skin));
-                }
-
-                Vector2d posSph = focus.getPosSph();
-                if (posSph != null && posSph.len() > 0f) {
-                    focusRA.setText(nf.format(posSph.x) + "°");
-                    focusDEC.setText(nf.format(posSph.y) + "°");
-                } else {
-                    Coordinates.cartesianToSpherical(focus.getAbsolutePosition(pos), pos);
-
-                    focusRA.setText(nf.format(MathUtilsd.radDeg * pos.x % 360) + "°");
-                    focusDEC.setText(nf.format(MathUtilsd.radDeg * pos.y % 360) + "°");
-                }
-
-                if (focus instanceof IProperMotion) {
-                    IProperMotion part = (IProperMotion) focus;
-                    focusMuAlpha.setText(nf.format(part.getMuAlpha()) + " mas/yr");
-                    focusMuDelta.setText(nf.format(part.getMuDelta()) + " mas/yr");
-                    focusRadVel.setText(nf.format(part.getRadialVelocity()) + " km/s");
-                } else {
-                    focusMuAlpha.setText("-");
-                    focusMuDelta.setText("-");
-                    focusRadVel.setText("-");
-                }
-
-                if (!(focus instanceof StarCluster)) {
-                    appmagLabel.setText(I18n.txt("gui.focusinfo.appmag"));
-                    Float appmag = focus.getAppmag();
-                    focusAppMag.setText(nf.format(appmag));
-                    absmagLabel.setText(I18n.txt("gui.focusinfo.absmag"));
-                    Float absmag = focus.getAbsmag();
-                    focusAbsMag.setText(nf.format(absmag));
-                } else {
-                    appmagLabel.setText("# " + I18n.txt("element.stars"));
-                    StarCluster sc = (StarCluster) focus;
-                    focusAppMag.setText(Integer.toString(sc.getNStars()));
-                    absmagLabel.setText("");
-                    focusAbsMag.setText("");
-                }
-
-                if (ComponentType.values()[focus.getCt().getFirstOrdinal()] == ComponentType.Stars) {
-                    focusRadius.setText("-");
-                } else {
-                    focusRadius.setText(sf.format(focus.getRadius() * Constants.U_TO_KM) + " km");
-                }
-
-                // Update more info table
-                if (!daemon.executing()) {
-                    moreInfo.clear();
-                    daemon.setFocus(focus);
-                    daemon.doNotify();
-                }
-
-                break;
-            case FOCUS_INFO_UPDATED:
-                focusAngle.setText(sf.format(Math.toDegrees((double) data[1]) % 360) + "°");
-
-                // Dist to cam
-                Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0]);
-                focusDistCam.setText(sf.format(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
-
-                // Dist to sol
-                if (data.length > 4) {
-                    Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4]);
-                    focusDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
-                }
-
-                focusRA.setText(nf.format((double) data[2] % 360) + "°");
-                focusDEC.setText(nf.format((double) data[3] % 360) + "°");
-                break;
-            case CAMERA_MOTION_UPDATE:
-                Vector3d campos = (Vector3d) data[0];
-                Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x);
-                Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y);
-                Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z);
-                camPos.setText("X: " + sf.format(x.getFirst()) + " " + x.getSecond() + "\nY: " + sf.format(y.getFirst()) + " " + y.getSecond() + "\nZ: " + sf.format(z.getFirst()) + " " + z.getSecond());
-                camVel.setText(sf.format((double) data[1]) + " km/h");
-                break;
-            case CAMERA_MODE_CMD:
-                // Update camera mode selection
-                CameraMode mode = (CameraMode) data[0];
-                if (mode.equals(CameraMode.FOCUS_MODE)) {
-                    displayInfo(focusInfoCell, focusInfo);
-                } else {
-                    hideInfo(focusInfoCell);
-                }
-                break;
-            case LON_LAT_UPDATED:
-                Double lon = (Double) data[0];
-                Double lat = (Double) data[1];
-                pointerLonLat.setText(nf.format(lat) + "°/" + nf.format(lon) + "°");
-                break;
-            case RA_DEC_UPDATED:
-                Double pra = (Double) data[0];
-                Double pdec = (Double) data[1];
-                Double vra = (Double) data[2];
-                Double vdec = (Double) data[3];
-                pointerRADEC.setText(nf.format(pra) + "°/" + nf.format(pdec) + "°");
-                viewRADEC.setText(nf.format(vra) + "°/" + nf.format(vdec) + "°");
-                break;
-            case RULER_ATTACH_0:
-                String n0 = (String) data[0];
-                rulerName0.setText(capString(n0, MAX_RULER_NAME_LEN));
-                displayInfo(rulerCell, rulerInfo);
-                break;
-            case RULER_ATTACH_1:
-                String n1 = (String) data[0];
-                rulerName1.setText(capString(n1, MAX_RULER_NAME_LEN));
-                displayInfo(rulerCell, rulerInfo);
-                break;
-            case RULER_CLEAR:
-                rulerName0.setText("-");
-                rulerName1.setText("-");
-                rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": -");
-                hideInfo(rulerCell);
-                break;
-            case RULER_DIST:
-                String rd = (String) data[1];
-                rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": " + rd);
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -582,13 +611,13 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         return in;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private void displayInfo(Cell cell, Actor info) {
         cell.setActor(info);
         pack();
     }
 
-    @SuppressWarnings({"rawtypes"})
+    @SuppressWarnings({ "rawtypes" })
     private void hideInfo(Cell cell) {
         cell.clearActor();
         pack();

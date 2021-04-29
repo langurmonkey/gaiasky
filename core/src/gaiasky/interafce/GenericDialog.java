@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.scene2d.CollapsibleWindow;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -38,10 +37,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     public static void updatePads() {
-        pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
-        pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
-        pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
+        pad20 = 32f;
+        pad15 = 18f;
+        pad10 = 16f;
+        pad5 = 8f;
     }
 
     final protected Stage stage;
@@ -50,6 +49,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
     protected Table content, bottom;
     private String acceptText = null, cancelText = null;
     protected boolean modal = true;
+
+    protected float lastPosX = -1, lastPosY = -1;
 
     protected HorizontalGroup buttonGroup;
     protected TextButton acceptButton, cancelButton;
@@ -76,7 +77,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
         this.me = this;
         this.content = new Table(skin);
         this.bottom = new Table(skin);
-        this.scrolls = new Array<>(5);
+        this.scrolls = new Array<>(false, 5);
     }
 
     public void setAcceptText(String acceptText) {
@@ -101,7 +102,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     protected void recalculateButtonSize() {
-        float w = 80f * GlobalConf.UI_SCALE_FACTOR;
+        float w = 128f;
         for (Actor button : buttonGroup.getChildren()) {
             w = Math.max(button.getWidth() + pad10 * 4f, w);
         }
@@ -274,7 +275,11 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage) {
         show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
-        setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+        if(lastPosX >= 0 && lastPosY >= 0){
+            setPosition(Math.round(lastPosX), Math.round(lastPosY));
+        } else {
+            setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
+        }
         setKeyboardFocus();
         return this;
     }
@@ -302,6 +307,9 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * stage.
      */
     public void hide(Action action) {
+        lastPosX = this.getX();
+        lastPosY = this.getY();
+
         Stage stage = getStage();
         if (stage != null) {
             if (previousKeyboardFocus != null && previousKeyboardFocus.getStage() == null)

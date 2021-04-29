@@ -8,10 +8,12 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -52,14 +54,13 @@ import java.util.Set;
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
 
-    private VRStatus vrStatus;
-    private boolean skipWelcome;
+    private final VRStatus vrStatus;
+    private final boolean skipWelcome;
 
     protected DownloadDataWindow ddw;
     protected CatalogSelectionWindow cdw;
 
     private FileHandle dataDescriptor;
-    private Array<FileHandle> catalogFiles;
 
     private boolean downloadError = false;
     private Texture bgTex;
@@ -74,17 +75,19 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(boolean skipWelcome, VRStatus vrStatus) {
+    public WelcomeGui(Lwjgl3Graphics graphics, Float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
+        super(graphics, unitsPerPixel);
         lock = new Object();
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
-
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        ui = new Stage(new ScreenViewport(), GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
         skin = GlobalResources.skin;
 
         if (vrStatus.vrInitFailed()) {
@@ -97,14 +100,14 @@ public class WelcomeGui extends AbstractGui {
             // If slave, data load can start
             gaiaSky();
         } else {
-            dw = new DatasetsWidget(skin);
-            catalogFiles = dw.buildCatalogFiles();
+            dw = new DatasetsWidget(ui, skin);
+            dw.reloadLocalCatalogs();
 
             // Otherwise, check for updates, etc.
             clearGui();
 
-            dataDescriptor = Gdx.files.absolute(SysUtils.getDefaultTmpDir() + "/gaiasky-data.json");
-            DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, (digest) -> {
+            dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION) + "/gaiasky-data.json");
+            DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, null, (digest) -> {
                 GaiaSky.postRunnable(() -> {
                     // Data descriptor ok. Skip welcome screen only if flag and basedata present
                     if (skipWelcome && basicDataPresent()) {
@@ -166,17 +169,19 @@ public class WelcomeGui extends AbstractGui {
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 
-        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-        float pad15 = 15f * GlobalConf.UI_SCALE_FACTOR;
-        float pad20 = 20f * GlobalConf.UI_SCALE_FACTOR;
-        float pad25 = 25f * GlobalConf.UI_SCALE_FACTOR;
+        float pad16 = 16f;
+        float pad18 = 18f;
+        float pad32 = 32f;
+        float pad28 = 28f;
 
-        float bw = 350f * GlobalConf.UI_SCALE_FACTOR;
-        float bh = 85f * GlobalConf.UI_SCALE_FACTOR;
+        float bw = 540f;
+        float bh = 110f;
 
-        int removed = removeNonExistent();
-        if (removed > 0)
-            logger.warn(I18n.txt("gui.welcome.warn.nonexistent", removed));
+        Set<String> removed = removeNonExistent();
+        if (removed.size() > 0) {
+            logger.warn(I18n.txt("gui.welcome.warn.nonexistent", removed.size()));
+            logger.warn(TextUtils.setToStr(removed));
+        }
         int numCatalogsAvailable = numCatalogsAvailable();
         int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
         int numStarCatalogsSelected = numStarCatalogsSelected();
@@ -185,7 +190,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad20);
+        titleGroup.space(pad32);
         OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", GlobalConf.APPLICATION_NAME, GlobalConf.version.version), skin, "main-title");
         OwnLabel gs = new OwnLabel(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version, skin, "main-title");
         gs.setColor(skin.getColor("theme"));
@@ -196,7 +201,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Start Gaia Sky button
         OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", GlobalConf.APPLICATION_NAME), skin, "start");
-        startButton.setSpace(pad15);
+        startButton.setSpace(pad18);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
         startButton.setSize(bw, bh);
@@ -208,7 +213,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel).top().left().padTop(pad10).padBottom(pad10).row();
+        startGroup.add(startLabel).top().left().padTop(pad16).padBottom(pad16).row();
         if (!basicDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
@@ -233,7 +238,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Data manager button
         OwnTextIconButton downloadButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
-        downloadButton.setSpace(pad15);
+        downloadButton.setSpace(pad18);
         downloadButton.setContentAlign(Align.center);
         downloadButton.align(Align.center);
         downloadButton.setSize(bw, bh);
@@ -246,7 +251,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table downloadGroup = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
-        downloadGroup.add(downloadLabel).top().left().padTop(pad10).padBottom(pad10);
+        downloadGroup.add(downloadLabel).top().left().padTop(pad16).padBottom(pad16);
         if (dd != null && dd.updatesAvailable) {
             downloadGroup.row();
             OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
@@ -261,7 +266,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Catalog selection button
         OwnTextIconButton catalogButton = new OwnTextIconButton(I18n.txt("gui.welcome.catalogsel"), skin, "check");
-        catalogButton.setSpace(pad15);
+        catalogButton.setSpace(pad18);
         catalogButton.setContentAlign(Align.center);
         catalogButton.align(Align.center);
         catalogButton.setSize(bw, bh);
@@ -279,7 +284,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table catalogGroup = new Table(skin);
         OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
-        catalogGroup.add(catalogLabel).top().left().padTop(pad10).padBottom(pad10).row();
+        catalogGroup.add(catalogLabel).top().left().padTop(pad16).padBottom(pad16).row();
         if (numCatalogsAvailable == 0) {
             // No catalog files, disable and add notice
             catalogButton.setDisabled(true);
@@ -290,11 +295,14 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             catalogGroup.add(tooManyDR).bottom().left();
+        } else if (numStarCatalogsSelected > 1) {
+            OwnLabel warn2Star = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
+            warn2Star.setColor(ColorUtils.aOrangeC);
+            catalogGroup.add(warn2Star).bottom().left();
         } else if (numStarCatalogsSelected == 0) {
             OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
             noStarCatalogs.setColor(ColorUtils.aOrangeC);
             catalogGroup.add(noStarCatalogs).bottom().left();
-
         } else {
             OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numTotalCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
             ok.setColor(ColorUtils.gBlueC);
@@ -303,7 +311,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Exit button
         OwnTextIconButton quitButton = new OwnTextIconButton(I18n.txt("gui.exit"), skin, "quit");
-        quitButton.setSpace(pad10);
+        quitButton.setSpace(pad16);
         quitButton.align(Align.center);
         quitButton.setSize(bw * 0.5f, bh * 0.6f);
         quitButton.addListener(new ClickListener() {
@@ -312,24 +320,20 @@ public class WelcomeGui extends AbstractGui {
             }
         });
 
-        center.add(titleGroup).center().padBottom(pad15 * 5f).colspan(2).row();
-        center.add(startButton).center().top().padBottom(pad15 * 4f).padRight(pad25);
-        center.add(startGroup).top().left().padBottom(pad15 * 4f).row();
-        center.add(downloadButton).center().top().padBottom(pad20).padRight(pad25);
-        center.add(downloadGroup).left().top().padBottom(pad20).row();
-        center.add(catalogButton).center().top().padBottom(pad15 * 8f).padRight(pad25);
-        center.add(catalogGroup).left().top().padBottom(pad15 * 8f).row();
+        center.add(titleGroup).center().padBottom(pad18 * 5f).colspan(2).row();
+        center.add(startButton).center().top().padBottom(pad18 * 4f).padRight(pad28);
+        center.add(startGroup).top().left().padBottom(pad18 * 4f).row();
+        center.add(downloadButton).center().top().padBottom(pad32).padRight(pad28);
+        center.add(downloadGroup).left().top().padBottom(pad32).row();
+        center.add(catalogButton).center().top().padBottom(pad18 * 8f).padRight(pad28);
+        center.add(catalogGroup).left().top().padBottom(pad18 * 8f).row();
         center.add(quitButton).center().top().colspan(2);
 
-        // Bottom left table
-        Table bottomRight = new Table();
-        bottomRight.setFillParent(true);
-        bottomRight.right().bottom();
-        bottomRight.pad(pad10);
-        bottomRight.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
+        // Version line table
+        Table topLeft = new VersionLineTable(skin);
 
         ui.addActor(center);
-        ui.addActor(bottomRight);
+        ui.addActor(topLeft);
 
     }
 
@@ -345,9 +349,9 @@ public class WelcomeGui extends AbstractGui {
      */
     private void reloadView() {
         if (dw == null) {
-            dw = new DatasetsWidget(skin);
+            dw = new DatasetsWidget(ui, skin);
         }
-        catalogFiles = dw.buildCatalogFiles();
+        dw.reloadLocalCatalogs();
         clearGui();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
@@ -362,7 +366,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numCatalogsAvailable() {
-        return catalogFiles.size;
+        return dw.datasets.size;
     }
 
     private int numGaiaDRCatalogsSelected() {
@@ -382,14 +386,23 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsSelected() {
         int matches = 0;
-        if(dd == null)
+        if (dd == null && (dw == null || dw.datasets == null))
             return 0;
+
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
             // File name with no extension
             Path path = Path.of(f);
             String filenameExt = path.getFileName().toString();
             try {
-                DatasetDesc dataset = dd.findDatasetByDescriptor(path);
+                DatasetDesc dataset = null;
+                // Try with server description
+                if (dd != null) {
+                    dataset = dd.findDatasetByDescriptor(path);
+                }
+                // Try local description
+                if (dataset == null && dw != null) {
+                    dataset = dw.findDatasetByDescriptor(path);
+                }
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
                     matches++;
                 }
@@ -401,7 +414,7 @@ public class WelcomeGui extends AbstractGui {
         return matches;
     }
 
-    private int removeNonExistent() {
+    private Set<String> removeNonExistent() {
         Set<String> toRemove = new HashSet<>();
         for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
             // File name with no extension
@@ -417,7 +430,7 @@ public class WelcomeGui extends AbstractGui {
             GlobalConf.data.CATALOG_JSON_FILES.removeValue(out, true);
         }
 
-        return toRemove.size();
+        return toRemove;
     }
 
     /**
@@ -464,6 +477,8 @@ public class WelcomeGui extends AbstractGui {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 reloadView();
             });
+        } else {
+            ddw.refresh();
         }
         ddw.show(ui);
     }

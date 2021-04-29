@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import gaiasky.interafce.GenericDialog;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextArea;
@@ -33,8 +32,8 @@ public class MemInfoWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        float pad = 5 * GlobalConf.UI_SCALE_FACTOR;
-        float tawidth = 500 * GlobalConf.UI_SCALE_FACTOR;
+        float pad = 8f;
+        float tawidth = 800f;
 
         String meminfostr = "";
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {

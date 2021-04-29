@@ -10,11 +10,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.util.GlobalResources;
 
 public class LinkButton  extends OwnImageButton {
 
-    private String linkURL;
+    private final String linkURL;
 
     public LinkButton(String linkURL, Skin skin){
         super(skin, "link");
@@ -23,6 +24,19 @@ public class LinkButton  extends OwnImageButton {
     }
 
     private void initialize(Skin skin) {
+        // Fix touchUp issue
+        this.addListener(new ClickListener() {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return super.touchDown(event, x, y, pointer, button);
+            }
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getButton() == Input.Buttons.LEFT && linkURL != null && !linkURL.isEmpty())
+                    Gdx.net.openURI(linkURL);
+
+                // Bubble up
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
         this.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent.Type type = ((InputEvent) event).getType();

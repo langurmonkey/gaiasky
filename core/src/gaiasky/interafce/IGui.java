@@ -6,12 +6,12 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * An interface to be implemented by all top-level GUIs in Gaia Sky
@@ -25,8 +25,9 @@ public interface IGui extends Disposable {
      * for loading
      *
      * @param assetManager The asset manager to load the resources with
+     * @param batch The sprite batch to use for this GUI's stage
      */
-    void initialize(AssetManager assetManager);
+    void initialize(AssetManager assetManager, SpriteBatch batch);
 
     /**
      * Hook that runs after the assets have been loaded. Completes the
@@ -83,13 +84,6 @@ public interface IGui extends Disposable {
     Stage getGuiStage();
 
     /**
-     * Sets the scene graph to this GUI
-     *
-     * @param sg The scene graph
-     */
-    void setSceneGraph(ISceneGraph sg);
-
-    /**
      * Sets the visibility state of the component entities
      *
      * @param entities The entities
@@ -126,4 +120,9 @@ public interface IGui extends Disposable {
      */
     boolean mustDraw();
 
+    /**
+     * Updates the units-per-pixel value of this GUI. The units-per-pixel
+     * is the same as 1/UI_SCALE.
+     */
+    boolean updateUnitsPerPixel(float upp);
 }

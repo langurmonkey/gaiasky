@@ -6,7 +6,6 @@
 
 uniform vec3 v3LightPos;
 uniform float g;
-uniform float g2;
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
 
@@ -28,6 +27,7 @@ float luma(vec3 color){
 }
 
 void main(void) {
+    float g2 = g * g;
     float fCos = dot (v3LightPos, v_direction) / length (v_direction);
     float fCos2 = fCos * fCos;
     float fRayleighPhase = 0.75 + 0.75 * fCos2;

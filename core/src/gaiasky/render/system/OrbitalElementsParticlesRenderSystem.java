@@ -35,8 +35,8 @@ import org.lwjgl.opengl.GL30;
 import java.util.List;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private Vector3 aux1;
-    private Matrix4 maux;
+    private final Vector3 aux1;
+    private final Matrix4 maux;
     private int elems01Offset, elems02Offset, sizeOffset, count;
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
@@ -78,8 +78,8 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
-        int n = renderables.size();
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        int n = renderables.size;
         if (n > 0 && renderables.get(0).getOpacity() > 0) {
             Orbit first = (Orbit) renderables.get(0);
             if (!first.elemsInGpu) {

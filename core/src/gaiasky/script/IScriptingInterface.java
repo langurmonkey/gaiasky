@@ -592,14 +592,44 @@ public interface IScriptingInterface {
     void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time);
 
     /**
+     * See {@link #setComponentTypeVisibility(String, boolean)}.
+     * @deprecated
+     */
+    @Deprecated
+    void setVisibility(String key, boolean visible);
+
+    /**
      * Sets the component described by the given name visible or invisible.
      *
-     * @param key     The key of the component, see
-     *                {@link gaiasky.render.ComponentTypes.ComponentType}. Usually
-     *                'element.stars', 'element.moons', 'element.atmospheres', etc.
+     * @param key     The key of the component: "element.stars", "element.planets",
+     *                "element.moons", etc. See
+     *                {@link gaiasky.render.ComponentTypes.ComponentType}.
      * @param visible The visible value.
      */
-    void setVisibility(String key, boolean visible);
+    void setComponentTypeVisibility(String key, boolean visible);
+
+    /**
+     * Gets the visibility of the component type described by the key. Examples of keys are
+     * "element.stars", "element.planets" or "element.moons". See {@link gaiasky.render.ComponentTypes.ComponentType}.
+     * @param key The key of the component type to query.
+     * @return The visibility of the component type.
+     */
+    boolean getComponentTypeVisibility(String key);
+
+    /**
+     * Sets the visibility of a particular object. Use this method to hide individual objects.
+     * @param name The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
+     * @param visible The visible status to set. Set to false to hide the object. True to make it visible.
+     * @return True if the visibility was set successfully, false if there were errors.
+     */
+    boolean setObjectVisibility(String name, boolean visible);
+
+    /**
+     * Gets the visibility of a particular object.
+     * @param name The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
+     * @return The visibility status of the object, if it exists.
+     */
+    boolean getObjectVisibility(String name);
 
     /**
      * Sets the label size factor. The label size will be multiplied by this.
@@ -773,12 +803,17 @@ public interface IScriptingInterface {
     boolean isSimulationTimeOn();
 
     /**
-     * Changes the pace of time.
-     *
-     * @param pace The pace as a factor of real physical time pace. 2.0 sets the
-     *             pace to be twice as fast as real time.
+     * @deprectaed use {@link IScriptingInterface#setTimeWarp(double)} instead.
      */
     void setSimulationPace(double pace);
+
+    /**
+     * Sets the simulation time warp factor.
+     *
+     * @param pace The warp as a factor of real physical time pace. 2.0 sets the
+     *             time to be twice as fast as real time.
+     */
+    void setTimeWarp(double pace);
 
     /**
      * Sets a time bookmark in the global clock that, when reached, the clock
@@ -1171,7 +1206,7 @@ public interface IScriptingInterface {
      * @param name         The proper name of the object.
      * @param locationName The name of the location to land on
      */
-    void landOnObjectLocation(String name, String locationName);
+    void landAtObjectLocation(String name, String locationName);
 
     /**
      * Lands on the object with the given <code>name</code>, if it is an
@@ -1182,7 +1217,7 @@ public interface IScriptingInterface {
      * @param longitude The location longitude, in degrees.
      * @param latitude  The location latitude, in degrees.
      */
-    void landOnObjectLocation(String name, double longitude, double latitude);
+    void landAtObjectLocation(String name, double longitude, double latitude);
 
     /**
      * Returns the distance to the surface of the object identified with the
@@ -1917,7 +1952,7 @@ public interface IScriptingInterface {
      * this call returns.
      * The actual loading process is carried out
      * making educated guesses about semantics using UCDs and column names.
-     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
@@ -1936,7 +1971,7 @@ public interface IScriptingInterface {
      * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
      * to check whether the dataset is already loaded and available.
      * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
-     * Please check <a href="http://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest/SAMP.html#stil-data-provider">the
+     * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
      * official documentation</a> for a complete reference on what can and what can't be loaded.
      *
      * @param dsName The name of the dataset, used to identify the subsequent operations on the
@@ -1979,7 +2014,26 @@ public interface IScriptingInterface {
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
      * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param particleSize  The size of the particles in pixels.
-     * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param sync          Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, boolean sync);
+    /**
+     * Loads a particle dataset (only positions and extra attributes) from a VOTable file (<code>.vot</code>).
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName        The name of the dataset.
+     * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
+     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
+     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleSize  The size of the particles in pixels.
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync          Whether the load must happen synchronously or asynchronously.
@@ -2002,7 +2056,7 @@ public interface IScriptingInterface {
      * @param labelColor         The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
      * @param particleSize       The size of the particles in pixels.
      * @param particleSizeLimits The minimum and maximum size of the particles in pixels.
-     * @param ct                 The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
+     * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn             Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut            Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync               Whether the load must happen synchronously or asynchronously.

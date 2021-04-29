@@ -29,7 +29,7 @@ public class Epsl extends AnalyticalAttitudeDataServer {
     }
 
     /** The current mode **/
-    private Mode currentMode;
+    private final Mode currentMode;
 
     /** The unit vector towards the North Ecliptic Pole, expressed in ICRS **/
     static final Vector3d NECLP = new Vector3d(-Math.sin(OBLIQUITY_RAD), Math.cos(OBLIQUITY_RAD), 0.0);

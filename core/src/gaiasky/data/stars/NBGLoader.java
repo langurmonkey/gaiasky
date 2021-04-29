@@ -44,6 +44,8 @@ import java.io.InputStreamReader;
  * <li>TT [-3/11] - Morphology T-type code</li>
  * <li>Mcl [char] - Dwarf galaxy morphology (BCD, HIcld, Im, Ir, S0em, Sm, Sph,
  * Tr, dE, dEem, or dS0em)</li>
+ * <li>Img - path to billboard image</li>
+ * <li>Size - the size [pc]</li>
  * </ul>
  *
  * @author Toni Sagrista
@@ -55,7 +57,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
 
     @Override
     public Array<CelestialBody> loadData() {
-        Array<CelestialBody> galaxies = new Array<>(900);
+        Array<CelestialBody> galaxies = new Array<>(false, 900);
         long baseid = 5000;
         long offset = 0;
         if (active)
@@ -96,14 +98,14 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                                 float colorbv = 0;
                                 float absmag = (float) (kmag - 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
 
-                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, altname.isBlank() ? new String[]{name} : new String[]{name, altname}, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseid + offset);
+                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, altname.isBlank() ? new String[] { name } : new String[] { name, altname }, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseid + offset);
                                 gal.setParent("NBG");
                                 g = gal;
                             } else {
                                 // Billboard
-                                BillboardGalaxy gal = new BillboardGalaxy(new String[]{name, altname}, ra, dec, distPc, sizepc, "data/tex/extragal/" + img);
+                                BillboardGalaxy gal = new BillboardGalaxy(new String[] { name, altname }, ra, dec, distPc, sizepc, "data/tex/extragal/" + img);
                                 // Fade in parsecs from sun
-                                gal.setFade(new double[]{distPc * 0.3, distPc * 0.6});
+                                gal.setFade(new double[] { distPc * 0.3, distPc * 0.6 });
                                 g = gal;
                             }
                             galaxies.add(g);

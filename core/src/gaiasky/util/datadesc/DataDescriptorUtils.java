@@ -15,7 +15,7 @@ import gaiasky.util.Logger.Log;
 import java.util.*;
 
 public class DataDescriptorUtils {
-    private static Log logger = Logger.getLogger(DataDescriptorUtils.class);
+    private static final Log logger = Logger.getLogger(DataDescriptorUtils.class);
 
     private static DataDescriptorUtils instance;
     public static DataDescriptorUtils instance(){
@@ -25,7 +25,7 @@ public class DataDescriptorUtils {
     }
 
     private FileHandle fh;
-    private JsonReader reader;
+    private final JsonReader reader;
     private DataDescriptorUtils(){
         super();
         this.reader = new JsonReader();

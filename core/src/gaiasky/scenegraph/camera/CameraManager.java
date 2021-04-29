@@ -145,14 +145,19 @@ public class CameraManager implements ICamera, IObserver {
     public SpacecraftCamera spacecraftCamera;
     public RelativisticCamera relativisticCamera;
 
-    private ICamera[] cameras;
+    private final ICamera[] cameras;
 
     /**
      * Last position, for working out velocity
      **/
-    private Vector3d lastPos, out, in;
-    private Vector3 vec, v0, v1, isec;
-    private Matrix4 localTransformInv;
+    private final Vector3d lastPos;
+    private final Vector3d out;
+    private final Vector3d in;
+    private final Vector3 vec;
+    private final Vector3 v0;
+    private final Vector3 v1;
+    private final Vector3 isec;
+    private final Matrix4 localTransformInv;
 
     /**
      * Current velocity in km/h
@@ -503,6 +508,11 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
         return current.isVisible(time, cb);
+    }
+
+    @Override
+    public boolean isVisible(ITimeFrameProvider time, Vector3d pos) {
+        return current.isVisible(time, pos);
     }
 
     @Override

@@ -35,12 +35,15 @@ import net.jafama.FastMath;
  */
 public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, ILineRenderable, IObserver {
     private String name0, name1;
-    private double[] pos0, pos1;
-    private Vector3d p0, p1, m;
+    private final double[] pos0;
+    private final double[] pos1;
+    private final Vector3d p0;
+    private final Vector3d p1;
+    private final Vector3d m;
     private boolean rulerOk = false;
     private String dist;
-    private ISceneGraph sg;
-    private INumberFormat nf;
+    private final ISceneGraph sg;
+    private final INumberFormat nf;
 
     public CosmicRuler() {
         super();
@@ -107,12 +110,12 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
 
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
     }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (rulerOk) {
+        if (this.shouldRender() && rulerOk) {
             addToRender(this, RenderGroup.LINE);
             addToRender(this, RenderGroup.FONT_LABEL);
         }
@@ -228,7 +231,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override

@@ -29,8 +29,8 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * @author Toni Sagrista
  */
 public final class GravitationalDistortionFilter extends Filter<GravitationalDistortionFilter> {
-    private Vector2 viewport;
-    private Vector2 massPosition;
+    private final Vector2 viewport;
+    private final Vector2 massPosition;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -39,8 +39,8 @@ public final class GravitationalDistortionFilter extends Filter<GravitationalDis
         MassPosition("u_massPosition", 2);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

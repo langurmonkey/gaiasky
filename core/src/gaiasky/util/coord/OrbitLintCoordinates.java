@@ -69,8 +69,8 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         aux.nor().scl(percent * len);
         out.add(aux);
 
-        if (orbit.transformFunction == null && ((CelestialBody) orbit.parent).orientation != null) {
-            transf.set(((CelestialBody) orbit.parent).orientation);
+        if (orbit.transformFunction == null && orbit.parent.orientation != null) {
+            transf.set(orbit.parent.orientation);
         } else if (orbit.transformFunction != null) {
             transf.set(orbit.transformFunction);
         } else {

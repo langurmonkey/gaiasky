@@ -99,7 +99,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
-        this(names, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[]{0.93f, 0.93f, 0.3f, 1f});
+        this(names, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[] { 0.93f, 0.93f, 0.3f, 1f });
     }
 
     public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
@@ -140,7 +140,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         mc.env = new Environment();
         mc.env.add(mc.dLight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.4f));
+        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
         mc.instance = new IntModelInstance(model, modelTransform);
 
         // Relativistic effects
@@ -167,13 +167,13 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public void setColor(double[] color) {
         super.setColor(color);
-        this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
     }
 
     @Override
     public void setColor(float[] color) {
         super.setColor(color);
-        this.labelcolor = new float[]{cc[0], cc[1], cc[2], cc[3]};
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
     }
 
     @Override
@@ -209,7 +209,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
             addToRenderLists(camera);
         }
 
-        this.opacity *= 0.1f;
+        this.opacity *= 0.1f * this.getVisibilityOpacityFactor();
         this.fadeAlpha = (float) MathUtilsd.lint(this.viewAngleApparent, TH_ANGLE, TH_ANGLE_OVERLAP, 0f, 1f);
     }
 
@@ -219,7 +219,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (this.opacity > 0) {
+        if (this.shouldRender()) {
             if (this.viewAngleApparent >= TH_ANGLE) {
                 addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
                 addToRender(this, RenderGroup.FONT_LABEL);
@@ -250,6 +250,8 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.update(null, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
+        // Depth reads, no depth writes
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
         mc.instance.transform.set(this.localTransform);
         modelBatch.render(mc.instance, mc.env);
 
@@ -266,12 +268,12 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
             shader.setUniformi("u_texture0", 0);
         }
 
-        float fa = 1;
+        float fa = (1 - this.fadeAlpha) * 0.6f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
-        shader.setUniformf("u_color", cc[0] * fa, cc[1] * fa, cc[2] * fa, cc[3] * alpha * opacity * 3.5f);
+        shader.setUniformf("u_color", cc[0] * fa, cc[1] * fa, cc[2] * fa, cc[3] * alpha * opacity * 6.5f);
         // Sprite.render
         mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
@@ -288,7 +290,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
 
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
     }
 
     @Override
@@ -345,7 +347,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public void textDepthBuffer() {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        Gdx.gl.glDepthMask(true);
+        Gdx.gl.glDepthMask(false);
     }
 
     @Override
@@ -379,11 +381,6 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     @Override
-    public boolean withinMagLimit() {
-        return true;
-    }
-
-    @Override
     public double getCandidateViewAngleApparent() {
         return this.viewAngleApparent;
     }
@@ -410,7 +407,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     @Override
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && isActive()) {
+        if (isActive()) {
             Vector3 pos = aux3f1.get();
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.posinv);
@@ -452,7 +449,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
-        if (withinMagLimit() && isActive()) {
+        if (isActive()) {
             Vector3d aux = aux3d1.get();
             Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
 

@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.color.ColorUtils;
@@ -130,13 +129,13 @@ public class ColorPicker extends ColorPickerAbstract {
     /** A color picker dialog **/
     private class ColorPickerDialog extends GenericDialog {
         private float[] color;
-        private INumberFormat nf;
+        private final INumberFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
         private OwnSlider[] sliders;
         private Image newColorImage;
         private boolean changeEvents = true;
-        private ColorPickerDialog cpd;
+        private final ColorPickerDialog cpd;
 
         public ColorPickerDialog(String elementName, float[] color, Stage stage, Skin skin) {
             super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
@@ -162,9 +161,9 @@ public class ColorPicker extends ColorPickerAbstract {
 
         @Override
         protected void build() {
-            float textfieldLen = 50f * GlobalConf.UI_SCALE_FACTOR;
-            float sliderLen = 150f * GlobalConf.UI_SCALE_FACTOR;
-            float colsize = 100f * GlobalConf.UI_SCALE_FACTOR;
+            float textfieldLen = 80f;
+            float sliderLen = 240f;
+            float colsize = 160f;
             content.clear();
 
             HorizontalGroup hg = new HorizontalGroup();
@@ -229,8 +228,8 @@ public class ColorPicker extends ColorPickerAbstract {
 
             /* Color table */
             Table coltable = new Table();
-            float size = 15f * GlobalConf.UI_SCALE_FACTOR;
-            float cpad = 1f * GlobalConf.UI_SCALE_FACTOR;
+            float size = 24f;
+            float cpad = 1.6f;
             int i = 1;
             int n = 4 * 4 * 4;
             float a = 1f;
@@ -353,10 +352,10 @@ public class ColorPicker extends ColorPickerAbstract {
     }
 
     private class UpdaterListener implements EventListener {
-        private ColorPickerDialog cpd;
-        private float[] color;
-        private int idx;
-        private boolean slider;
+        private final ColorPickerDialog cpd;
+        private final float[] color;
+        private final int idx;
+        private final boolean slider;
 
         public UpdaterListener(boolean slider, ColorPickerDialog cpd, float[] color, int idx) {
             super();

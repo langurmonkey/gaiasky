@@ -30,23 +30,11 @@
     "title-30": {
       "file": "skins/fonts/title-30.fnt"
     },
-    "title-60": {
-      "file": "skins/fonts/title-60.fnt"
-    },
-    "title-65": {
-      "file": "skins/fonts/title-65.fnt"
-    },
     "title-40": {
       "file": "skins/fonts/title-40.fnt"
     },
-    "title-80": {
-      "file": "skins/fonts/title-80.fnt"
-    },
-    "ui-09": {
-      "file": "skins/fonts/ui-09.fnt"
-    },
-    "ui-10": {
-      "file": "skins/fonts/ui-10.fnt"
+    "title-60": {
+      "file": "skins/fonts/title-60.fnt"
     },
     "ui-11": {
       "file": "skins/fonts/ui-11.fnt"
@@ -115,10 +103,10 @@
       "file": "skins/fonts/ui-19-bold.fnt"
     },
     "mono": {
-      "file": "skins/fonts/mono-small.fnt"
+      "file": "skins/fonts/mono-large.fnt"
     },
     "mono-big": {
-      "file": "skins/fonts/mono-large.fnt"
+      "file": "skins/fonts/mono-huge.fnt"
     },
     "grid-annotation": {
       "file": "skins/fonts/ui-11.fnt"
@@ -251,90 +239,85 @@
     "default": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
-      "font": "title-11",
+      "font": "title-17",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
     "big": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
-      "font": "title-15",
+      "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
     "huge": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
-      "font": "title-17",
+      "font": "title-27",
       "fontColor": "white",
       "disabledFontColor": "dark-gray"
     },
     "download": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
-      "font": "title-15",
+      "disabled": "default-round-disabled",
+      "font": "title-21",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
     "download-big": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
-      "font": "title-17",
+      "disabled": "default-round-disabled",
+      "font": "title-27",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray"
     },
     "toggle": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-11",
+      "font": "title-17",
       "fontColor": "white",
       "downFontColor": "black"
     },
     "toggle-big": {
       "down": "default-round-down",
       "up": "default-round",
+      "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
       "checkedFocused": "default-round-down-sel",
-      "font": "title-15",
-      "fontColor": "white",
-      "downFontColor": "black"
-    },
-    "toggle-huge": {
-      "down": "default-round-down",
-      "up": "default-round",
-      "focused": "default-round-sel",
-      "checked": "default-round-down",
-      "checkedFocused": "default-round-down-sel",
-      "font": "title-20",
+      "font": "title-23",
       "fontColor": "white",
       "downFontColor": "black"
     },
     "key": {
       "up": "key",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "black"
     },
     "key-big": {
       "up": "key",
-      "font": "ui-18",
+      "font": "ui-33",
       "fontColor": "black"
     },
     "link": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "blue",
       "downFontColor": "theme"
     },
     "link-big": {
-      "font": "ui-18",
+      "font": "ui-33",
       "fontColor": "blue",
       "downFontColor": "theme"
     }
@@ -484,8 +467,8 @@
     "start": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
-      "font": "title-20",
+      "disabled": "default-round-disabled",
+      "font": "title-27",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray",
       "imageUp": "car-icon"
@@ -493,8 +476,8 @@
     "cloud-download": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
-      "font": "title-17",
+      "disabled": "default-round-disabled",
+      "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-cloud-download"
@@ -502,11 +485,20 @@
     "check": {
       "down": "default-round-down",
       "up": "default-round",
-      "disabled": "default-round",
-      "font": "title-17",
+      "disabled": "default-round-disabled",
+      "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
       "imageUp": "iconic-check"
+    },
+    "plus": {
+      "down": "default-round-down",
+      "up": "default-round",
+      "disabled": "default-round-disabled",
+      "font": "title-17",
+      "fontColor": "white",
+      "disabledFontColor": "dark-gray",
+      "imageUp": "iconic-plus"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle": {
@@ -603,8 +595,8 @@
       "imageUp": "land-on"
     },
     "rubbish-bin": {
-      "imageUp": "bin-icon",
-      "imageDisabled": "bin-icon-grey"
+      "imageUp": "bin-s-icon",
+      "imageDisabled": "bin-s-icon-grey"
     },
     "eye-toggle": {
       "imageUp": "eye-icon",
@@ -667,14 +659,14 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.SelectBox$SelectBoxStyle": {
     "default": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white",
       "disabledFontColor": "grey",
       "background": "default-select",
       "backgroundDisabled": "default-select-disabled",
       "scrollStyle": "default",
       "listStyle": {
-        "font": "ui-11",
+        "font": "ui-18",
         "fontColorSelected": "white",
         "fontColorUnselected": "white",
         "selection": "default-select-selection",
@@ -692,17 +684,17 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
     "default": {
-      "titleFont": "title-13",
+      "titleFont": "title-21",
       "background": "default-window",
       "titleFontColor": "white"
     },
     "info": {
-      "titleFont": "title-13",
+      "titleFont": "title-21",
       "background": "info-window",
       "titleFontColor": "white"
     },
     "dialog": {
-      "titleFont": "title-13",
+      "titleFont": "title-21",
       "background": "default-window",
       "titleFontColor": "white",
       "stageBackground": "dialogDim"
@@ -724,6 +716,10 @@
       "knob": "big-slider-knob",
       "knobBefore": "big-slider-knob-before"
     },
+    "big-horizontal-arrow": {
+      "background": "big-slider",
+      "knob": "big-slider-knob-arrow"
+    },
     "sc-engine": {
       "background": "sc-engine-power-bg",
       "knob": "sc-engine-power-knob",
@@ -740,79 +736,75 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
     "object-name": {
-      "font": "ui-10",
+      "font": "ui-13",
       "fontColor": "lightblue"
     },
+    "header-large": {
+      "font": "title-40",
+      "fontColor": "theme"
+    },
     "header": {
-      "font": "title-13",
+      "font": "title-21",
       "fontColor": "theme"
     },
     "header-s": {
-      "font": "title-12",
+      "font": "title-20",
       "fontColor": "theme2"
     },
     "question": {
-      "font": "ui-10",
+      "font": "ui-14",
       "fontColor": "grey"
     },
     "hotkey": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "theme"
     },
     "default": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white"
     },
     "default-blue": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "blue"
     },
     "default-red": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "red"
     },
     "default-pink": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "pink"
     },
     "default-inv": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "black"
-    },
-    "ui-10": {
-      "font": "ui-10",
-      "fontColor": "white"
-    },
-    "ui-11": {
-      "font": "ui-11",
-      "fontColor": "white"
-    },
-    "ui-12": {
-      "font": "ui-12",
-      "fontColor": "white"
     },
     "ui-13": {
       "font": "ui-13",
+      "fontColor": "white"
+    },
+    "ui-14": {
+      "font": "ui-14",
       "fontColor": "white"
     },
     "ui-15": {
       "font": "ui-15",
       "fontColor": "white"
     },
+    "ui-17": {
+      "font": "ui-17",
+      "fontColor": "white"
+    },
+    "ui-19": {
+      "font": "ui-19",
+      "fontColor": "white"
+    },
+    "ui-21": {
+      "font": "ui-21",
+      "fontColor": "white"
+    },
     "ui-23": {
       "font": "ui-23",
-      "fontColor": "white"
-    },
-    "msg-10": {
-      "font": "ui-10",
-      "fontColor": "white"
-    },
-    "msg-11": {
-      "font": "ui-11",
-      "fontColor": "white"
-    },
-    "msg-12": {
-      "font": "ui-12",
       "fontColor": "white"
     },
     "msg-13": {
@@ -832,18 +824,30 @@
       "fontColor": "white"
     },
     "msg-18": {
-      "font": "ui-21",
+      "font": "ui-19",
       "fontColor": "white"
     },
     "msg-19": {
       "font": "ui-19",
       "fontColor": "white"
     },
+    "msg-20": {
+      "font": "ui-21",
+      "fontColor": "white"
+    },
     "msg-21": {
       "font": "ui-21",
       "fontColor": "white"
     },
+    "msg-22": {
+      "font": "ui-21",
+      "fontColor": "white"
+    },
     "msg-23": {
+      "font": "ui-23",
+      "fontColor": "white"
+    },
+    "msg-24": {
       "font": "ui-23",
       "fontColor": "white"
     },
@@ -872,64 +876,64 @@
       "fontColor": "white"
     },
     "menuitem-shortcut": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "grey"
     },
     "warp": {
-      "font": "ui-15-bold",
+      "font": "ui-23-bold",
       "fontColor": "theme"
     },
     "headline": {
-      "font": "ui-25-shadow",
+      "font": "ui-25",
       "fontColor": "white"
     },
     "subhead": {
-      "font": "ui-15",
+      "font": "ui-18",
       "fontColor": "white"
     },
     "hud": {
-      "font": "ui-11",
+      "font": "ui-16",
       "fontColor": "white"
     },
     "hud-med": {
-      "font": "ui-12",
+      "font": "ui-17",
       "fontColor": "white"
     },
     "hud-big": {
-      "font": "ui-14",
+      "font": "ui-19",
       "fontColor": "white"
     },
     "hud-header": {
-      "font": "title-17",
+      "font": "title-27",
       "fontColor": "theme"
     },
     "hud-subheader": {
-      "font": "ui-12",
+      "font": "ui-17",
       "fontColor": "theme"
     },
     "link": {
-      "font": "ui-11",
+      "font": "ui-17",
       "fontColor": "blue"
     },
     "sc-header": {
-      "font": "ui-12-bold",
+      "font": "ui-19-bold",
       "fontColor": "sc-blue"
     },
     "tooltip": {
-      "font": "ui-11",
+      "font": "ui-17",
       "fontColor": "white",
       "background": "tooltip-bg"
     },
     "main-title": {
-      "font": "title-40",
+      "font": "title-60",
       "fontColor": "white"
     },
     "main-title-s": {
-      "font": "title-20",
+      "font": "title-30",
       "fontColor": "white"
     },
     "main-title-xs": {
-      "font": "title-12",
+      "font": "title-20",
       "fontColor": "white"
     },
     "mono-pink": {
@@ -942,7 +946,7 @@
       "selection": "selection",
       "background": "textfield",
       "disabledBackground": "textfield-disabled",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white",
       "disabledFontColor": "grey",
       "messageFontColor": "dark-gray",
@@ -952,7 +956,7 @@
       "selection": "selection",
       "background": "textfield",
       "disabledBackground": "textfield-disabled",
-      "font": "ui-18",
+      "font": "ui-30",
       "fontColor": "white",
       "disabledFontColor": "grey",
       "messageFontColor": "dark-gray",
@@ -961,30 +965,25 @@
     "no-disabled": {
       "selection": "selection",
       "background": "textfield",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
     "disabled-nobg": {
       "selection": "selection",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
     "info": {
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "sc-blue",
       "background": null
     },
     "regular": {
-      "font": "ui-11",
-      "fontColor": "white",
-      "background": null
-    },
-    "msg-10": {
-      "font": "ui-10",
+      "font": "ui-18",
       "fontColor": "white",
       "background": null
     },
@@ -1065,7 +1064,7 @@
       "checkboxOnDisabled": "check-on-disabled",
       "checkboxOff": "check-off",
       "checkboxOffDisabled": "check-off-disabled",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white"
     },
     "title": {
@@ -1073,7 +1072,7 @@
       "checkboxOnDisabled": "check-on-disabled",
       "checkboxOff": "check-off",
       "checkboxOffDisabled": "check-off-disabled",
-      "font": "ui-12",
+      "font": "ui-19",
       "fontColor": "theme"
     },
     "radio": {
@@ -1081,7 +1080,7 @@
       "checkboxOnDisabled": "radio-on-disabled",
       "checkboxOff": "radio-off",
       "checkboxOffDisabled": "radio-off-disabled",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white"
     }
   },
@@ -1090,21 +1089,21 @@
       "fontColorUnselected": "white",
       "selection": "selection",
       "fontColorSelected": "white",
-      "font": "ui-11",
+      "font": "ui-18",
       "background": "dark-grey"
     },
     "light": {
       "fontColorUnselected": "black",
       "selection": "selection",
       "fontColorSelected": "black",
-      "font": "ui-11",
+      "font": "ui-18",
       "background": "light-grey"
     },
     "normal": {
       "fontColorUnselected": "white",
       "selection": "selection",
       "fontColorSelected": "white",
-      "font": "ui-12",
+      "font": "ui-21",
       "background": "dark-grey"
     }
   },
@@ -1141,7 +1140,7 @@
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle": {
     "default": {
-      "label": "msg-11",
+      "label": "msg-18",
       "background": "default-round"
     }
   },
@@ -1171,7 +1170,7 @@
       "up": "button-dark",
       "over": "button-over",
       "disabled": "button",
-      "font": "ui-11",
+      "font": "ui-18",
       "fontColor": "white",
       "disabledFontColor": "grey"
     },

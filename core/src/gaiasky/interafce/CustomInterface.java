@@ -32,9 +32,9 @@ import java.util.*;
  */
 public class CustomInterface implements IObserver, IGuiInterface {
     /** Lock object for synchronization **/
-    private Object lock;
-    private Skin skin;
-    private Stage ui;
+    private final Object lock;
+    private final Skin skin;
+    private final Stage ui;
     private List<Integer> sizes;
 
     Map<Integer, Widget> customElements;

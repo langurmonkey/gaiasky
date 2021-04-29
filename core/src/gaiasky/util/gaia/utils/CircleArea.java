@@ -20,9 +20,9 @@ public class CircleArea implements Area {
 
 	private final static double squareDegreesOfSphere = 129600.0 / Math.PI;
 
-	private Place centre;
+	private final Place centre;
 
-	private double radius;
+	private final double radius;
 
 	/**
 	 * Creates an instance of a CircleArea about a given centre and radius.

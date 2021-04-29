@@ -33,7 +33,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 public final class Scattering extends Filter<Scattering> {
     // Number of light supported
     public static int N = 10;
-    private Vector2 viewport;
+    private final Vector2 viewport;
 
     private float[] lightPositions;
     private float[] lightViewAngles;
@@ -61,8 +61,8 @@ public final class Scattering extends Filter<Scattering> {
         NumSamples("u_numSamples", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

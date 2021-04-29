@@ -12,12 +12,13 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import gaiasky.data.group.AbstractStarGroupDataProvider;
+import gaiasky.data.group.BinaryDataProvider;
 import gaiasky.data.group.IStarGroupDataProvider;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.data.octreegen.IStarGroupIO;
 import gaiasky.data.octreegen.MetadataBinaryIO;
+import gaiasky.data.octreegen.StarBrightnessComparator;
 import gaiasky.data.octreegen.StarGroupBinaryIO;
-import gaiasky.data.octreegen.StarGroupSerializedIO;
 import gaiasky.data.octreegen.generator.IOctreeGenerator;
 import gaiasky.data.octreegen.generator.OctreeGeneratorMag;
 import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
@@ -28,8 +29,8 @@ import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
@@ -48,6 +49,7 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.concurrent.ForkJoinPool;
 
 /**
  * Generates an octree of star groups.
@@ -73,74 +75,49 @@ public class OctreeGeneratorRun {
         }
     }
 
-    @Parameter(names = {"-l", "--loader"}, description = "Name of the star group loader class")
-    private String loaderClass = null;
+    @Parameter(names = { "-l", "--loader" }, description = "Name of the star group loader class") private String loaderClass = null;
 
-    @Parameter(names = {"-i", "--input"}, description = "Location of the input catalog")
-    private String input = null;
+    @Parameter(names = { "-i", "--input" }, description = "Location of the input catalog") private String input = null;
 
-    @Parameter(names = {"-o", "--output"}, description = "Output folder. Defaults to system temp")
-    private String outFolder;
+    @Parameter(names = { "-o", "--output" }, description = "Output folder. Defaults to system temp") private String outFolder;
 
-    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant")
-    private int maxPart = 100000;
+    @Parameter(names = "--maxpart", description = "Maximum number of objects in an octant") private int maxPart = 100000;
 
-    @Parameter(names = "--pllxerrfaint", description = "Parallax error factor for faint (gmag>=13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
-    private double pllxerrfaint = 0.125;
+    @Parameter(names = { "--pllxerrfaint", "--plxerrfaint" }, description = "Parallax error factor for faint stars (gmag>=13.1), where the filter [plx_err/plx < pllxerrfaint] is enforced") private double plxerrfaint = 10.0;
 
-    @Parameter(names = "--pllxerrbright", description = "Parallax error factor for bright (gmag<13.1) stars, acceptance criteria as a percentage of parallax error with respect to parallax, in [0..1]")
-    private double pllxerrbright = 0.25;
+    @Parameter(names = { "--pllxerrbright", "--plxerrbright" }, description = "Parallax error factor for bright stars (gmag<13.1), where the filter [plx_err/plx < pllxerrbright] is enforced") private double plxerrbright = 10.0;
 
-    @Parameter(names = "--pllxzeropoint", description = "Zero point value for the parallax in mas")
-    private double pllxzeropoint = 0d;
+    @Parameter(names = { "--pllxzeropoint", "--plxzeropoint" }, description = "Zero point value for the parallax in mas") private double plxzeropoint = 0d;
 
-    @Parameter(names = {"-c", "--nomagcorrections"}, description = "Flag to skip magnitude and color corrections for extinction and reddening")
-    private boolean magCorrections = true;
+    @Parameter(names = { "-p", "--postprocess" }, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees") private boolean postprocess = false;
 
-    @Parameter(names = {"-p", "--postprocess"}, description = "Low object count nodes (<=100) will be merged with their parents if parents have less than 1000 objects. Avoids very large and mostly empty subtrees")
-    private boolean postprocess = false;
+    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects will be merged with their parents. Defaults to 100") private long childCount = 100;
 
-    @Parameter(names = "--childcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parents have less than --parentcount objects) will be merged with their parents. Defaults to 100")
-    private long childCount = 100;
+    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000") private long parentCount = 1000;
 
-    @Parameter(names = "--parentcount", description = "If --postprocess is on, children nodes with less than --childcount objects and whose parent has less than --parentcount objects will be merged with their parents. Defaults to 1000")
-    private long parentCount = 1000;
+    @Parameter(names = "--filescap", description = "Maximum number of input files to be processed") private int fileNumCap = -1;
 
-    @Parameter(names = {"-s", "--suncentre", "--suncenter"}, description = "Make the Sun the centre of the octree")
-    private boolean sunCentre = false;
+    @Parameter(names = "--starscap", description = "Maximum number of stars to be processed per file") private int starNumCap = -1;
 
-    @Parameter(names = "--nfiles", description = "Data file number cap. Defaults to unlimited")
-    private int fileNumCap = -1;
+    @Parameter(names = { "--hip" }, description = "Location (absolute or relative to data folder \"data/...\") of the Hipparcos catalog to add on top of the catalog provided by -l") private String hip = null;
 
-    @Parameter(names = {"--hip"}, description = "Location (absolute or relative to data folder \"data/...\") of the Hipparcos catalog to add on top of the catalog provided by -l")
-    private String hip = null;
+    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.), in case the HIP catalog does not already provide them") private String hipNamesDir = null;
 
-    @Parameter(names = "--hip-names", description = "Directory containing HIP names files (Name_To_HIP.dat, Var_To_HIP.dat, etc.), in case the HIP catalog does not already provide them")
-    private String hipNamesDir = null;
+    @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled") private String xmatchFile = null;
 
-    @Parameter(names = "--xmatchfile", description = "Crossmatch file between Gaia and HIP, containing source_id to hip data, only if --hip is enabled")
-    private String xmatchFile = null;
+    @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded") private double distPcCap = Long.MAX_VALUE;
 
-    @Parameter(names = "--distcap", description = "Maximum distance in parsecs. Stars beyond this distance are not loaded")
-    private double distcap = Long.MAX_VALUE;
+    @Parameter(names = "--ruwe", description = "RUWE threshold value. Filters out all stars with RUWE greater than this value. Also, if present, --pllxerrfaint and --pllxerrbright are ignored") private double ruwe = Double.NaN;
 
-    @Parameter(names = "--ruwe", description = "RUWE threshold value. All stars with a RUWE larger than this value will not be used. Also, if present, --pllxerrfaint and --pllxerrbright are ignored")
-    private double ruwe = Double.NaN;
+    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)") private String columns = null;
 
-    @Parameter(names = "--columns", description = "Column name list separated by commas, in order of appearance, if loading using the CSVCatalogDataProvider (see AbstractStarGroupDataProvider.ColId)")
-    private String columns = null;
+    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with optionally gzipped csv files containing additional columns of main catalog. The first column must contain the Gaia source_id") private String additionalFiles = null;
 
-    @Parameter(names = "--additional", description = "Comma-separated list of files or folders with (optionally gzipped) csv files containing additional columns (matched by name) of main catalog. The file can be gzipped and must contain a Gaia sourceid column in the first position")
-    private String additionalFiles = null;
+    @Parameter(names = "--parallelism", description = "The ForkJoinPool parallelism setting. Set <=0 to use the system default. Set to 1 to disable parallelism") private int parallelism = -1;
 
-    @Parameter(names = "--compat-mode", description = "Use compatibility mode format (DR1/DR2), where the files have tycho ids")
-    private boolean compatibilityMode = false;
+    @Parameter(names = "--outputversion", description = "The output format version. By default, the newest version is used") private int outputVersion = -1;
 
-    @Parameter(names = "--serialized", description = "Use java serialization instead of the binary format to output particle files")
-    private boolean serialized = false;
-
-    @Parameter(names = {"-h", "--help"}, help = true)
-    private boolean help = false;
+    @Parameter(names = { "-h", "--help" }, help = true) private boolean help = false;
 
     protected Map<Long, float[]> colors;
 
@@ -184,6 +161,12 @@ public class OctreeGeneratorRun {
             }
             ConfInit.initialize(new DesktopConfInit(new FileInputStream(Path.of(ASSETS_LOC, "conf/global.properties").toFile()), new FileInputStream(dummyv.toFile())));
 
+            // Parallelism
+            if (parallelism > 0) {
+                System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(parallelism));
+            }
+            logger.info("Parallelism set to " + ForkJoinPool.commonPool().getParallelism());
+
             OctreeNode root = generateOctree();
 
             if (root != null) {
@@ -209,24 +192,27 @@ public class OctreeGeneratorRun {
     private OctreeNode generateOctree() throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException {
         long startMs = TimeUtils.millis();
 
-        OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, sunCentre, postprocess, childCount, parentCount);
+        OctreeGeneratorParams ogp = new OctreeGeneratorParams(maxPart, postprocess, childCount, parentCount);
         IOctreeGenerator og = new OctreeGeneratorMag(ogp);
 
-        List<ParticleBean> listLoader = null, list = null;
+        List<IParticleRecord> listLoader = null, list;
         Map<Long, Integer> xmatchTable = null;
         long[] countsPerMagGaia = null;
 
+        //
+        // GAIA
+        //
         if (loaderClass != null) {
-            /* CATALOG */
             String fullLoaderClass = "gaiasky.data.group." + loaderClass;
             IStarGroupDataProvider loader = (IStarGroupDataProvider) Class.forName(fullLoaderClass).getDeclaredConstructor().newInstance();
+            loader.setOutputFormatVersion(outputVersion);
             loader.setColumns(columns);
-            loader.setParallaxErrorFactorFaint(pllxerrfaint);
-            loader.setParallaxErrorFactorBright(pllxerrbright);
-            loader.setParallaxZeroPoint(pllxzeropoint);
+            loader.setParallaxErrorFactorFaint(plxerrfaint);
+            loader.setParallaxErrorFactorBright(plxerrbright);
+            loader.setParallaxZeroPoint(plxzeropoint);
             loader.setFileNumberCap(fileNumCap);
-            loader.setMagCorrections(magCorrections);
-            loader.setDistanceCap(distcap);
+            loader.setStarNumberCap(starNumCap);
+            loader.setDistanceCap(distPcCap);
             loader.setAdditionalFiles(additionalFiles);
             loader.setRUWECap(ruwe);
             countsPerMagGaia = loader.getCountsPerMag();
@@ -244,8 +230,10 @@ public class OctreeGeneratorRun {
             listLoader = loader.loadData(input);
         }
 
+        //
+        // HIPPARCOS
+        //
         if (hip != null) {
-            /* HIPPARCOS */
             STILDataProvider stil = new STILDataProvider();
 
             // All hip stars for which we have a Gaia star, bypass plx >= 0 condition in STILDataProvider
@@ -257,7 +245,7 @@ public class OctreeGeneratorRun {
                 stil.setMustLoadIds(mustLoad);
             }
 
-            List<ParticleBean> listHip = stil.loadData(hip);
+            List<IParticleRecord> listHip = stil.loadData(hip);
 
             // Update HIP names using external source, if needed
             if (hipNamesDir != null) {
@@ -265,8 +253,8 @@ public class OctreeGeneratorRun {
                 hipNames.load(Paths.get(hipNamesDir));
 
                 Map<Integer, Array<String>> hn = hipNames.getHipNames();
-                for (ParticleBean pb : listHip) {
-                    StarBean star = (StarBean) pb;
+                for (IParticleRecord pb : listHip) {
+                    IParticleRecord star = pb;
                     if (hn.containsKey(star.hip())) {
                         Array<String> names = hn.get(star.hip());
                         for (String name : names)
@@ -280,9 +268,9 @@ public class OctreeGeneratorRun {
             combineCountsPerMag(countsPerMagGaia, countsPerMagHip);
 
             // Create HIP map
-            Map<Integer, StarBean> hipMap = new HashMap<>();
-            for (ParticleBean star : listHip) {
-                hipMap.put(((StarBean) star).hip(), (StarBean) star);
+            Map<Integer, IParticleRecord> hipMap = new HashMap<>();
+            for (IParticleRecord star : listHip) {
+                hipMap.put(star.hip(), star);
             }
 
             // Check x-match file
@@ -293,19 +281,18 @@ public class OctreeGeneratorRun {
             Vector3d aux1 = new Vector3d();
             Vector3d aux2 = new Vector3d();
             if (listLoader != null) {
-                for (ParticleBean pb : listLoader) {
-                    StarBean gaiaStar = (StarBean) pb;
+                for (IParticleRecord pb : listLoader) {
+                    IParticleRecord gaiaStar = pb;
                     // Check if star is also in HIP catalog
-                    if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id)) {
+                    if (xmatchTable == null || !xmatchTable.containsKey(gaiaStar.id())) {
                         // No hit, add to main list
                         listHip.add(gaiaStar);
                     } else {
                         // Update hipStar using gaiaStar data, only when:
-                        // TODO gaia.ruwe small enough (if present) and gaia.pllx_err <= hip.pllx_err
-                        int hipId = xmatchTable.get(gaiaStar.id);
+                        int hipId = xmatchTable.get(gaiaStar.id());
                         if (hipMap.containsKey(hipId)) {
                             // Hip Star
-                            StarBean hipStar = hipMap.get(hipId);
+                            IParticleRecord hipStar = hipMap.get(hipId);
 
                             // Check parallax errors
                             Double gaiaPllxErr = gaiaStar.getExtra("pllx_err");
@@ -313,7 +300,7 @@ public class OctreeGeneratorRun {
 
                             if (gaiaPllxErr <= hipPllxErr) {
                                 // SIZE
-                                double size = gaiaStar.size();
+                                float size = gaiaStar.size();
                                 // POSITION
                                 double x = gaiaStar.x(), y = gaiaStar.y(), z = gaiaStar.z();
                                 aux1.set(x, y, z);
@@ -342,21 +329,16 @@ public class OctreeGeneratorRun {
                                     size = hipStar.size();
                                 }
 
-                                hipStar.id = gaiaStar.id;
-                                hipStar.data[StarBean.I_X] = x;
-                                hipStar.data[StarBean.I_Y] = y;
-                                hipStar.data[StarBean.I_Z] = z;
-                                hipStar.data[StarBean.I_PMX] = gaiaStar.pmx();
-                                hipStar.data[StarBean.I_PMY] = gaiaStar.pmy();
-                                hipStar.data[StarBean.I_PMZ] = gaiaStar.pmz();
-                                hipStar.data[StarBean.I_MUALPHA] = gaiaStar.mualpha();
-                                hipStar.data[StarBean.I_MUDELTA] = gaiaStar.mudelta();
-                                hipStar.data[StarBean.I_RADVEL] = gaiaStar.radvel();
-                                hipStar.data[StarBean.I_APPMAG] = gaiaStar.appmag();
-                                hipStar.data[StarBean.I_ABSMAG] = gaiaStar.absmag();
-                                hipStar.data[StarBean.I_COL] = gaiaStar.col();
-                                hipStar.data[StarBean.I_SIZE] = size;
-                                hipStar.addNames(gaiaStar.names);
+                                hipStar.setId(gaiaStar.id());
+                                hipStar.setPos(x, y, z);
+                                hipStar.setVelocityVector(gaiaStar.pmx(), gaiaStar.pmy(), gaiaStar.pmz());
+
+                                hipStar.setProperMotion(gaiaStar.mualpha(), gaiaStar.mudelta(), gaiaStar.radvel());
+                                hipStar.setMag(gaiaStar.appmag(), gaiaStar.absmag());
+                                hipStar.setCol(gaiaStar.col());
+                                hipStar.setSize(size);
+
+                                hipStar.addNames(gaiaStar.names());
                                 starhits++;
                             }
                         } else {
@@ -386,9 +368,24 @@ public class OctreeGeneratorRun {
 
         logger.info("Generating octree with " + list.size() + " actual stars");
 
+        // Pre-processing (sorting, removing too distant stars)
+        Vector3d pos0 = new Vector3d();
+        Iterator<IParticleRecord> it = list.iterator();
+        while (it.hasNext()) {
+            IParticleRecord s = it.next();
+            double dist = pos0.set(s.x(), s.y(), s.z()).len();
+            if (dist * Constants.U_TO_PC > distPcCap) {
+                // Remove star
+                it.remove();
+            }
+        }
+        logger.info("Sorting list by magnitude with " + list.size() + " objects");
+        list.sort(new StarBrightnessComparator());
+        logger.info("Catalog sorting done");
+
         OctreeNode octree = og.generateOctree(list);
 
-        PrintStream out = new PrintStream(System.out, true, "UTF-8");
+        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.println(octree.toString(true));
 
         long generatingMs = TimeUtils.millis();
@@ -396,7 +393,7 @@ public class OctreeGeneratorRun {
         logger.info("TIME STATS: Octree generated in " + generatingSecs + " seconds");
 
         /** NUMBERS **/
-        logger.info("Octree generated with " + octree.numNodes() + " octants and " + octree.nObjects + " particles");
+        logger.info("Octree generated with " + octree.numNodesRec() + " octants and " + octree.numObjectsRec + " particles");
         logger.info(og.getDiscarded() + " particles have been discarded due to density");
 
         /** CLEAN CURRENT OUT DIR **/
@@ -408,15 +405,17 @@ public class OctreeGeneratorRun {
         /** WRITE METADATA **/
         metadataFile.createNewFile();
 
-        logger.info("Writing metadata (" + octree.numNodes() + " nodes): " + metadataFile.getAbsolutePath());
+        logger.info("Writing metadata (" + octree.numNodesRec() + " nodes): " + metadataFile.getAbsolutePath());
 
         MetadataBinaryIO metadataWriter = new MetadataBinaryIO();
         metadataWriter.writeMetadata(octree, new FileOutputStream(metadataFile));
 
         /** WRITE PARTICLES **/
-        IStarGroupIO particleWriter = serialized ? new StarGroupSerializedIO() : new StarGroupBinaryIO();
+        IStarGroupIO particleWriter = new StarGroupBinaryIO();
         particlesFolder.mkdirs();
-        writeParticlesToFiles(particleWriter, octree, compatibilityMode);
+        int version = outputVersion < BinaryDataProvider.MIN_OUTPUT_VERSION || outputVersion > BinaryDataProvider.MAX_OUTPUT_VERSION ? BinaryDataProvider.DEFAULT_OUTPUT_VERSION : outputVersion;
+        logger.info("Using output format version " + version);
+        writeParticlesToFiles(particleWriter, octree, version);
 
         long writingMs = TimeUtils.millis();
         double writingSecs = (writingMs - generatingMs) / 1000.0;
@@ -425,9 +424,9 @@ public class OctreeGeneratorRun {
         int[][] stats = octree.stats();
         NumberFormat formatter = new DecimalFormat("##########0.0000");
         if (countsPerMagGaia != null) {
-            logger.info("=================");
-            logger.info("STAR COUNTS STATS");
-            logger.info("=================");
+            logger.info("=========================");
+            logger.info("STAR COUNTS PER MAGNITUDE");
+            logger.info("=========================");
             for (int level = 0; level < countsPerMagGaia.length; level++) {
                 logger.info("Magnitude " + level + ": " + countsPerMagGaia[level] + " stars (" + formatter.format((double) countsPerMagGaia[level] * 100d / (double) list.size()) + "%)");
             }
@@ -437,7 +436,7 @@ public class OctreeGeneratorRun {
         logger.info("============");
         logger.info("OCTREE STATS");
         logger.info("============");
-        logger.info("Octants: " + octree.numNodes());
+        logger.info("Octants: " + octree.numNodesRec());
         logger.info("Particles: " + list.size());
         logger.info("Depth: " + octree.getMaxDepth());
         int level = 0;
@@ -479,22 +478,22 @@ public class OctreeGeneratorRun {
     }
 
     private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current) throws IOException {
-        writeParticlesToFiles(particleWriter, current, true);
+        writeParticlesToFiles(particleWriter, current, 2);
     }
 
-    private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current, boolean compat) throws IOException {
+    private void writeParticlesToFiles(IStarGroupIO particleWriter, OctreeNode current, int version) throws IOException {
         // Write current
-        if (current.ownObjects > 0) {
+        if (current.numObjects > 0) {
             File particles = new File(outFolder + "/particles/", "particles_" + String.format("%06d", current.pageId) + ".bin");
-            logger.info("Writing " + current.ownObjects + " particles of node " + current.pageId + " to " + particles.getAbsolutePath());
-            particleWriter.writeParticles(current.objects, new BufferedOutputStream(new FileOutputStream(particles)), compat);
+            logger.info("Writing " + current.numObjects + " particles of node " + current.pageId + " to " + particles.getAbsolutePath());
+            particleWriter.writeParticles(current.objects, new BufferedOutputStream(new FileOutputStream(particles)), version);
         }
 
         // Write each child
-        if (current.childrenCount > 0)
+        if (current.numChildren > 0)
             for (OctreeNode child : current.children) {
                 if (child != null)
-                    writeParticlesToFiles(particleWriter, child, compat);
+                    writeParticlesToFiles(particleWriter, child, version);
             }
     }
 
@@ -513,7 +512,7 @@ public class OctreeGeneratorRun {
                     map.put(sourceId, hip);
                 }
                 br.close();
-                logger.error("Cross-match table read with " + map.size() + " entries: " + xmatchFile);
+                logger.info("Cross-match table read with " + map.size() + " entries: " + xmatchFile);
             } catch (Exception e) {
                 logger.error(e);
             }
@@ -532,13 +531,13 @@ public class OctreeGeneratorRun {
         element.delete();
     }
 
-    protected void dumpToDiskCsv(Array<StarBean> data, String filename) {
+    protected void dumpToDiskCsv(Array<ParticleRecord> data, String filename) {
         String sep = ", ";
         try {
             PrintWriter writer = new PrintWriter(filename, StandardCharsets.UTF_8);
             writer.println("name, x[km], y[km], z[km], absmag, appmag, r, g, b");
             Vector3d gal = new Vector3d();
-            for (StarBean star : data) {
+            for (ParticleRecord star : data) {
                 float[] col = colors.get(star.id);
                 gal.set(star.x(), star.y(), star.z()).scl(Constants.U_TO_KM);
                 //gal.mul(Coordinates.equatorialToGalactic());

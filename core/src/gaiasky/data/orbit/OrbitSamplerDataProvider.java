@@ -89,7 +89,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
     }
 
-    private Vector3d ecl = new Vector3d();
+    private final Vector3d ecl = new Vector3d();
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {

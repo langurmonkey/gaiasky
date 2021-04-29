@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.*;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -22,6 +23,7 @@ import gaiasky.util.coord.IBodyCoordinates;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
@@ -33,29 +35,14 @@ import net.jafama.FastMath;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * An object in the scene graph. Serves as a top class which provides the basic functionality.
  *
  * @author Toni Sagrista
  */
-public class SceneGraphNode implements IStarContainer, IPosition {
+public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch {
     public static final String ROOT_NAME = "Universe";
-
-    protected static class TLV3D extends ThreadLocal<Vector3d> {
-        @Override
-        protected Vector3d initialValue() {
-            return new Vector3d();
-        }
-    }
-
-    protected static class TLV3 extends ThreadLocal<Vector3> {
-        @Override
-        protected Vector3 initialValue() {
-            return new Vector3();
-        }
-    }
 
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
@@ -96,7 +83,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     public Array<SceneGraphNode> children;
 
     /**
-     * Translation object.
+     * Cumulative translation object. In contrast with the position, which contains
+     * the position relative to the parent, this contains the absolute position in the
+     * internal reference system.
      */
     public Vector3d translation;
 
@@ -144,6 +133,16 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * Flag indicating whether the object has been computed in this step.
      */
     public boolean computed = true;
+
+    /**
+     * Is this node visible?
+     */
+    protected boolean visible = true;
+
+    /**
+     * Time of last visibility change in milliseconds
+     */
+    protected long lastStateChangeTimeMs = 0;
 
     /**
      * The ownOpacity value (alpha)
@@ -237,7 +236,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public SceneGraphNode(String name, SceneGraphNode parent) {
-        this(new String[]{name}, parent);
+        this(new String[] { name }, parent);
     }
 
     public SceneGraphNode(String name) {
@@ -415,6 +414,22 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         return list;
     }
 
+    public Array<SceneGraphNode> getChildrenByComponentType(ComponentType ct, Array<SceneGraphNode> list) {
+        if (children != null) {
+            int size = children.size;
+            for (int i = 0; i < size; i++) {
+                SceneGraphNode child = children.get(i);
+                ComponentTypes cct = child.getComponentType();
+                if (cct != null && cct.isEnabled(ct))
+                    list.add(child);
+
+                child.getChildrenByComponentType(ct, list);
+            }
+        }
+        return list;
+    }
+
+
     public SceneGraphNode getNode(String name) {
         if (this.names != null && this.names[0].equals(name)) {
             return this;
@@ -476,11 +491,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         updateLocalValues(time, camera);
 
         this.translation.add(pos);
+        this.opacity *= this.getVisibilityOpacityFactor();
 
         Vector3d aux = aux3d1.get();
         this.distToCamera = (float) aux.set(translation).len();
         this.viewAngle = (float) FastMath.atan(size / distToCamera);
-        this.viewAngleApparent = this.viewAngle;
+        this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
         if (!copy) {
             addToRenderLists(camera);
         }
@@ -539,7 +555,16 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         if (names != null)
             names[0] = name;
         else
-            names = new String[]{name};
+            names = new String[] { name };
+    }
+
+    @Override
+    public String getDescription() {
+        return null;
+    }
+
+    @Override
+    public void setDescription(String description) {
     }
 
     /**
@@ -798,12 +823,12 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * @return True if added, false otherwise
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        boolean on = ct.isEmpty() || ct.intersects(SceneGraphRenderer.visible);
-        if (on || SceneGraphRenderer.alphas[ct.getFirstOrdinal()] > 0) {
-            SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
+        try {
+            SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
             return true;
+        } catch (Exception e) {
+            return false;
         }
-        return false;
     }
 
     /**
@@ -814,17 +839,17 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      * @return True if removed, false otherwise
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
-        return SceneGraphRenderer.render_lists.get(rg.ordinal()).remove(renderable);
+        return SceneGraphRenderer.renderLists().get(rg.ordinal()).removeValue(renderable, true);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup rg) {
-        return SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable);
+        return SceneGraphRenderer.renderLists().get(rg.ordinal()).contains(renderable, true);
     }
 
     protected boolean isInRender(IRenderable renderable, RenderGroup... rgs) {
         boolean is = false;
         for (RenderGroup rg : rgs)
-            is = is || SceneGraphRenderer.render_lists.get(rg.ordinal()).contains(renderable);
+            is = is || SceneGraphRenderer.renderLists().get(rg.ordinal()).contains(renderable, true);
         return is;
     }
 
@@ -878,7 +903,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      *
      * @param map The index
      */
-    protected void addToIndex(Map<String, SceneGraphNode> map) {
+    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
     }
 
     /**
@@ -886,7 +911,7 @@ public class SceneGraphNode implements IStarContainer, IPosition {
      *
      * @param map The index
      */
-    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
+    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
     }
 
     /**
@@ -1142,20 +1167,18 @@ public class SceneGraphNode implements IStarContainer, IPosition {
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, float scale, float size) {
-       render3DLabel(batch, shader, font, camera, rc, label, pos, scale, size, -1, -1);
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size) {
+        render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 
-        if (getRadius() == 0 || distToCamera > getRadius() * 2d) {
+        double r = getRadius();
+        if (r == 0 || distToCamera > r * 2d) {
 
             size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
-
-            // Enable or disable blending
-            ((I3DTextRenderable) this).textDepthBuffer();
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
@@ -1168,6 +1191,9 @@ public class SceneGraphNode implements IStarContainer, IPosition {
             }
 
             shader.setUniformf("u_pos", pos.put(aux3f1.get()));
+
+            // Enable or disable blending
+            ((I3DTextRenderable) this).textDepthBuffer();
 
             DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }
@@ -1190,5 +1216,44 @@ public class SceneGraphNode implements IStarContainer, IPosition {
     }
 
     public void setLabelcolor(double[] labelColor) {
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+        this.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
+    }
+
+    public boolean isVisible() {
+        return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
+    }
+
+    public boolean isVisible(boolean attributeValue){
+        if(attributeValue)
+            return this.visible;
+        else
+            return this.isVisible();
+    }
+
+    protected long msSinceStateChange() {
+        return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
+    }
+
+    protected float getVisibilityOpacityFactor() {
+        long msSinceStateChange = msSinceStateChange();
+
+        // Fast track
+        if (msSinceStateChange > GlobalConf.scene.OBJECT_FADE_MS)
+            return this.visible ? 1 : 0;
+
+        // Fading
+        float visop = MathUtilsd.lint(msSinceStateChange, 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
+        if (!this.visible) {
+            visop = 1 - visop;
+        }
+        return visop;
+    }
+
+    protected boolean shouldRender() {
+        return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < GlobalConf.scene.OBJECT_FADE_MS);
     }
 }

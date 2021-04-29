@@ -361,4 +361,9 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     @Override
     public void setDescription(String description) {
     }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+
+    }
 }

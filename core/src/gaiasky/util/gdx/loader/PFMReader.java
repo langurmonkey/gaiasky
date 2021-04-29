@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PFMReader {
-    private static Logger.Log logger = Logger.getLogger(PFMReader.class);
+    private static final Logger.Log logger = Logger.getLogger(PFMReader.class);
 
     static public TextureData readPFMTextureData(FileHandle file, boolean invert) {
 

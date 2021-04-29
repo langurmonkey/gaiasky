@@ -34,15 +34,15 @@ import java.util.Random;
 /**
  * A single point particle.
  *
- * @deprecated Only the Sun uses this via the Star subclass. Move to star group.
  * @author Toni Sagrista
+ * @deprecated Only the Sun uses this via the Star subclass. Move to star group.
  */
 @Deprecated
 public class Particle extends CelestialBody implements IStarFocus, ILineRenderable {
 
     private static final float DISC_FACTOR = 1.5f;
 
-    private static Random rnd = new Random();
+    private static final Random rnd = new Random();
 
     protected static float thpointTimesFovfactor;
     protected static float thupOverFovfactor;
@@ -60,17 +60,17 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         @Override
         public void notify(final Events event, final Object... data) {
             switch (event) {
-                case FOV_CHANGE_NOTIFICATION:
-                    fovFactor = (Float) data[1];
-                    thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * fovFactor;
-                    thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
-                    thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
-                    break;
-                case STAR_POINT_SIZE_CMD:
-                    innerRad = (0.004f * DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f;
-                    break;
-                default:
-                    break;
+            case FOV_CHANGE_NOTIFICATION:
+                fovFactor = (Float) data[1];
+                thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * fovFactor;
+                thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
+                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
+                break;
+            case STAR_POINT_SIZE_CMD:
+                innerRad = (0.004f * DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f;
+                break;
+            default:
+                break;
             }
         }
     }
@@ -135,6 +135,9 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     boolean hasPm = false;
 
     public Particle() {
+        super();
+        this.pm = new Vector3();
+        this.pmSph = new Vector3();
         this.parentName = ROOT_NAME;
     }
 
@@ -146,7 +149,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * @param appmag  Apparent magnitude.
      * @param absmag  Absolute magnitude.
      * @param colorbv The B-V color index.
-     * @param names    The labels or names.
+     * @param names   The labels or names.
      * @param starid  The star unique id.
      */
     public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
@@ -211,30 +214,27 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      */
     @Override
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
-            this.opacity = opacity;
-            translation.set(parentTransform).add(pos);
-            if (hasPm) {
-                Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
-                translation.add(pmv);
-            }
-            distToCamera = translation.len();
+        this.opacity = opacity;
+        this.opacity *= this.getVisibilityOpacityFactor();
+        translation.set(parentTransform).add(pos);
+        if (hasPm) {
+            Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
+            translation.add(pmv);
+        }
+        distToCamera = translation.len();
 
-            if (!copy) {
-                addToRender(this, RenderGroup.POINT_STAR);
+        if (!copy) {
+            viewAngle = (radius / distToCamera);
+            viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
 
-                viewAngle = (radius / distToCamera) / camera.getFovFactor();
-                viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
+            addToRenderLists(camera);
+        }
 
-                addToRenderLists(camera);
-            }
-
-            // Compute nested
-            if (children != null) {
-                for (int i = 0; i < children.size; i++) {
-                    SceneGraphNode child = children.get(i);
-                    child.update(time, parentTransform, camera, opacity);
-                }
+        // Compute nested
+        if (children != null) {
+            for (int i = 0; i < children.size; i++) {
+                SceneGraphNode child = children.get(i);
+                child.update(time, parentTransform, camera, opacity);
             }
         }
 
@@ -243,7 +243,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if(GaiaSky.instance.isOn(ct)) {
+        if (this.shouldRender()) {
+            addToRender(this, RenderGroup.POINT_STAR);
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
             } else {
@@ -263,7 +264,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
         if (renderOn) {
-            SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
+            SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
             return true;
         }
         return false;
@@ -340,7 +341,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.1f;
+        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.15f;
         return (float) computedSize;
     }
 

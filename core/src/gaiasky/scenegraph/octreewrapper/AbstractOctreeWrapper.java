@@ -115,13 +115,8 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         parenthood.remove(child);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
-        update(time, parentTransform, camera, 1f);
-    }
-
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        this.opacity = opacity;
-        translation.set(parentTransform);
+    public void updateLocal(ITimeFrameProvider time, ICamera camera) {
+        super.updateLocal(time, camera);
 
         // Fade node visibility applies here
         if (this.isVisible()) {
@@ -139,8 +134,6 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
                     AbstractRenderSystem.POINT_UPDATE_FLAG = true;
                     lastNumberObjects = OctreeNode.nObjectsObserved;
                 }
-
-                updateLocal(time, camera);
 
                 // Call the update method of all entities in the roulette list. This
                 // is implemented in the subclass.
@@ -180,7 +173,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     protected abstract void updateOctreeObjects(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera);
 
     public void addToRenderLists(ICamera camera, OctreeNode octant) {
-        if (GlobalConf.runtime.DRAW_OCTREE && octant.observed && this.opacity > 0) {
+        if (this.shouldRender() && GlobalConf.runtime.DRAW_OCTREE && octant.observed) {
             boolean added = addToRender(octant, LINE);
 
             if (added)
@@ -200,26 +193,26 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     @Override
     public int getStarCount() {
-        return root.nObjects;
+        return root.numObjectsRec;
     }
 
     @Override
-    public void highlight(boolean hl, float[] color) {
-        super.highlight(hl, color);
+    public void highlight(boolean hl, float[] color, boolean allVisible) {
+        super.highlight(hl, color, allVisible);
         Array<SceneGraphNode> l = new Array<>();
         getChildrenByType(StarGroup.class, l);
         for (SceneGraphNode n : l) {
-            ((StarGroup) n).highlight(hl, color);
+            ((StarGroup) n).highlight(hl, color, allVisible);
         }
     }
 
     @Override
-    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax) {
-        super.highlight(hl, cmi, cma, cmmin, cmmax);
+    public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
+        super.highlight(hl, cmi, cma, cmmin, cmmax, allVisible);
         Array<SceneGraphNode> l = new Array<>();
         getChildrenByType(StarGroup.class, l);
         for (SceneGraphNode n : l) {
-            ((StarGroup) n).highlight(hl, cmi, cma, cmmin, cmmax);
+            ((StarGroup) n).highlight(hl, cmi, cma, cmmin, cmmax, allVisible);
         }
     }
 

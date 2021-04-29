@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ConstelBoundariesLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final String separator = "\\t";
@@ -115,5 +116,10 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
 
     @Override
     public void setDescription(String description) {
+    }
+
+    @Override
+    public void setParams(Map<String, Object> params) {
+
     }
 }

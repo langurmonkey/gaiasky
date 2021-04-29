@@ -18,7 +18,6 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.MusicManager;
 import gaiasky.util.format.INumberFormat;
@@ -37,7 +36,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
     private String currentTrack;
     private int si = 0;
     private int sp = 1;
-    private int w = getTrackWindowSize();
+    private final int w = getTrackWindowSize();
 
     public MusicComponent(Skin skin, Stage stage) {
         super(skin, stage);
@@ -46,7 +45,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float componentWidth = 165f* GlobalConf.UI_SCALE_FACTOR;
+        float componentWidth = 264f;
         nf = NumberFormatFactory.getFormatter("##0");
         intf = NumberFormatFactory.getFormatter("#00");
 
@@ -108,12 +107,12 @@ public class MusicComponent extends GuiComponent implements IObserver {
         /** Track name **/
         track = new OwnLabel("", skin, "mono");
 
-        float space3 = 3 * GlobalConf.UI_SCALE_FACTOR;
+        float space3 = 4.8f;
         VerticalGroup musicGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left).space(space3);
 
         HorizontalGroup playGroup = new HorizontalGroup();
         playGroup.setWidth(componentWidth);
-        playGroup.space(15 * GlobalConf.UI_SCALE_FACTOR);
+        playGroup.space(18f);
         prev.align(Align.left);
         play.align(Align.left);
         next.align(Align.left);
@@ -123,7 +122,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         playGroup.addActor(vol);
 
         HorizontalGroup trackGroup = new HorizontalGroup();
-        trackGroup.space(10 * GlobalConf.UI_SCALE_FACTOR);
+        trackGroup.space(16f);
         trackGroup.addActor(position);
         trackGroup.addActor(track);
 
@@ -173,7 +172,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
     }
 
     private int getTrackWindowSize() {
-        return GlobalConf.isHiDPI() ? 20 : 14;
+        return 20;
     }
 
     private float getVolumePercentage() {

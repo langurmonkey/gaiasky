@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
@@ -23,7 +22,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.scenegraph.IStarFocus;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -41,36 +40,45 @@ import java.nio.charset.StandardCharsets;
 public class ArchiveViewWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(ArchiveViewWindow.class);
 
-    private static String URL_GAIA_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiadr2.gaia_source+WHERE+source_id=";
-
-    private static String URL_HIP_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+extcat.hipparcos+WHERE+hip=";
-
-    private static String URL_GAIA_WEB_SOURCE = "https://gaia.ari.uni-heidelberg.de/singlesource.html#id=";
-
     private static final String separator = "\n";
 
     private Table table;
     private OwnScrollPane scroll;
 
-    private LabelStyle linkStyle;
     private float pad;
 
     private IStarFocus st;
+    private boolean updating = false;
+
 
     public ArchiveViewWindow(Stage stage, Skin skin){
-        super(I18n.txt("gui.data.catalog", "Gaia"), skin, stage);
+        super(I18n.txt("gui.data.catalog", "Gaia", "?"), skin, stage);
 
         setAcceptText(I18n.txt("gui.close"));
+        setModal(false);
 
         // Build
         buildSuper();
 
     }
 
+    public boolean isUpdating(){
+        return updating;
+    }
+
+    public void update(IStarFocus st) {
+        updating = true;
+        this.st = st;
+
+        this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Gaia", st.getName()));
+
+        table.clear();
+        requestData(new GaiaDataListener(st));
+    }
+
     @Override
     protected void build(){
-        this.linkStyle = skin.get("link", LabelStyle.class);
-        this.pad = 5 * GlobalConf.UI_SCALE_FACTOR;
+        this.pad = 8f;
 
         /** TABLE and SCROLL **/
         table = new Table(skin);
@@ -97,33 +105,16 @@ public class ArchiveViewWindow extends GenericDialog {
         // Nothing
     }
 
-    public void initialize(IStarFocus st) {
-        this.st = st;
-
-        table.clear();
-        requestData(new GaiaDataListener(st));
-        table.pack();
-
-        pack();
-        me.setPosition(Math.round(stage.getWidth() / 2f - me.getWidth() / 2f), Math.round(stage.getHeight() / 2f - me.getHeight() / 2f));
-
-    }
-
-    public void display() {
-        if (!stage.getActors().contains(me, true))
-            stage.addActor(me);
-    }
 
     private void requestData(GaiaDataListener listener) {
         if (st.getCatalogSource() > 0) {
-
             if (st.getId() > 5000000) {
-                this.getTitleLabel().setText(I18n.bundle.format("gui.data.catalog", "Gaia"));
+                this.getTitleLabel().setText(I18n.bundle.format("gui.data.catalog", "Gaia", st.getName()));
                 // Sourceid
                 getDataBySourceId(st.getId(), listener);
                 return;
             } else if (st.getHip() > 0) {
-                this.getTitleLabel().setText(I18n.bundle.format("gui.data.catalog", "Hipparcos"));
+                this.getTitleLabel().setText(I18n.bundle.format("gui.data.catalog", "Hipparcos", st.getName()));
                 // HIP
                 getDataByHipId(st.getHip(), listener);
                 return;
@@ -133,14 +124,14 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     private void getDataBySourceId(long sourceid, GaiaDataListener listener) {
-        getTAPData(URL_GAIA_JSON_SOURCE + sourceid, false, "json", listener);
+        getTAPData(Constants.URL_GAIA_JSON_SOURCE + sourceid, false, "json", listener);
     }
 
     private void getDataByHipId(int hip, GaiaDataListener listener) {
-        getTAPData(URL_HIP_JSON_SOURCE + hip, true, "json", listener);
+        getTAPData(Constants.URL_HIP_JSON_SOURCE + hip, true, "json", listener);
     }
 
-    private String[][] getTAPData(String url, boolean hip, final String format, final GaiaDataListener listener) {
+    private void getTAPData(String url, boolean hip, final String format, final GaiaDataListener listener) {
         HttpRequest request = new HttpRequest(HttpMethods.GET);
         request.setUrl(url);
         request.setTimeOut(5000);
@@ -170,8 +161,6 @@ public class ArchiveViewWindow extends GenericDialog {
                 listener.ko();
             }
         });
-
-        return null;
     }
 
     public String trim(String stringToTrim, String stringToRemove) {
@@ -271,7 +260,7 @@ public class ArchiveViewWindow extends GenericDialog {
     }
 
     private class GaiaDataListener {
-        private IStarFocus st;
+        private final IStarFocus st;
 
         public GaiaDataListener(IStarFocus st) {
             this.st = st;
@@ -286,42 +275,41 @@ public class ArchiveViewWindow extends GenericDialog {
                 links.space(pad);
 
                 if (hip)
-                    links.addActor(new Link(I18n.txt("gui.data.json"), linkStyle, URL_HIP_JSON_SOURCE + st.getHip()));
+                    links.addActor(new Link(I18n.txt("gui.data.json"), skin, Constants.URL_HIP_JSON_SOURCE + st.getHip()));
                 else {
-                    links.addActor(new Link(I18n.txt("gui.data.json"), linkStyle, URL_GAIA_JSON_SOURCE + st.getId()));
+                    links.addActor(new Link(I18n.txt("gui.data.json"), skin, Constants.URL_GAIA_JSON_SOURCE + st.getId()));
                     links.addActor(new OwnLabel("|", skin));
-                    links.addActor(new Link(I18n.txt("gui.data.archive"), linkStyle, URL_GAIA_WEB_SOURCE + st.getId()));
+                    links.addActor(new Link(I18n.txt("gui.data.archive"), skin, Constants.URL_GAIA_WEB_SOURCE + st.getId()));
                 }
 
                 table.add(links).colspan(2).padTop(pad * 2).padBottom(pad * 2);
                 table.row();
 
-                table.add(new OwnLabel(I18n.txt("gui.data.name"), skin, "msg-17")).padLeft(pad * 2).left();
-                table.add(new OwnLabel(st.getName(), skin, "msg-17")).padLeft(pad * 2).padRight(pad * 2).left();
+                table.add(new OwnLabel(I18n.txt("gui.data.name"), skin, "msg-21")).padLeft(pad * 2).left();
+                table.add(new OwnLabel(st.getName(), skin, "msg-21")).padLeft(pad * 2).padRight(pad * 2).left();
                 table.row().padTop(pad * 2);
                 for (int col = 0; col < data[0].length; col++) {
                     Actor first = null;
 
                     if (data.length <= 2) {
-                        first = new OwnLabel(data[0][col], skin, "ui-13");
+                        first = new OwnLabel(data[0][col], skin, "ui-19");
                     } else {
                         HorizontalGroup hg = new HorizontalGroup();
                         hg.space(5);
                         ImageButton tooltip = new ImageButton(skin, "tooltip");
                         tooltip.addListener(new OwnTextTooltip(data[2][col], skin));
                         hg.addActor(tooltip);
-                        hg.addActor(new OwnLabel(data[0][col], skin, "ui-13"));
+                        hg.addActor(new OwnLabel(data[0][col], skin, "ui-19"));
 
                         first = hg;
 
                     }
 
                     table.add(first).padLeft(pad * 2).left();
-                    table.add(new OwnLabel(data[1][col], skin, "ui-12")).padLeft(pad * 2).padRight(pad * 2).left();
+                    table.add(new OwnLabel(data[1][col], skin, "ui-21")).padLeft(pad * 2f).padRight(pad * 2f).left();
                     left();
                     table.row();
                 }
-                scroll.setHeight((float) Math.min(table.getMinHeight(), Gdx.graphics.getHeight() * 0.6) + pad);
                 finish();
             });
         }
@@ -330,9 +318,7 @@ public class ArchiveViewWindow extends GenericDialog {
             // Error getting data
             GaiaSky.postRunnable(() -> {
                 String msg = I18n.bundle.format("error.gaiacatalog.data", st.getName());
-                table.add(new OwnLabel(msg, skin, "ui-15"));
-                table.pack();
-                scroll.setHeight((float) Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.6) + pad);
+                table.add(new OwnLabel(msg, skin, "ui-21"));
                 finish();
             });
         }
@@ -341,9 +327,7 @@ public class ArchiveViewWindow extends GenericDialog {
             // Error
             GaiaSky.postRunnable(() -> {
                 String msg = error;
-                table.add(new OwnLabel(msg, skin, "ui-15"));
-                table.pack();
-                scroll.setHeight(table.getHeight() + pad);
+                table.add(new OwnLabel(msg, skin, "ui-21"));
                 finish();
             });
         }
@@ -351,19 +335,16 @@ public class ArchiveViewWindow extends GenericDialog {
         public void notFound() {
             // Not found
             String msg = I18n.bundle.format("error.gaiacatalog.notfound", st.getName());
-            table.add(new OwnLabel(msg, skin, "ui-15"));
-            table.pack();
-            scroll.setHeight(table.getHeight() + pad);
+            table.add(new OwnLabel(msg, skin, "ui-21"));
             finish();
         }
 
         private void finish() {
             table.pack();
-
             scroll.setWidth(table.getWidth() + scroll.getStyle().vScroll.getMinWidth());
-
+            scroll.setHeight(Math.min(table.getHeight(), Gdx.graphics.getHeight() * 0.8f) + pad);
             pack();
-            me.setPosition(Math.round(stage.getWidth() / 2f - me.getWidth() / 2f), Math.round(stage.getHeight() / 2f - me.getHeight() / 2f));
+            updating = false;
         }
 
     }

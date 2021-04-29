@@ -11,7 +11,6 @@ import gaiasky.scenegraph.Particle;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.Star;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.Vector3d;
@@ -22,7 +21,7 @@ import java.io.*;
  * Loads and writes particle data to/from our own binary format. The format is
  * defined as follows. The operations are based on abstract position entities, so
  * this is not suitable for loading star groups or particle groups.
- * 
+ *
  * <ul>
  * <li>32 bits (int) with the number of stars, starNum repeat the following
  * starNum times (for each star)</li>
@@ -55,9 +54,8 @@ import java.io.*;
  * <li>64 bits (long) - pageId</li>
  * <li>32 bits (int) - particleType</li>
  * </ul>
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class ParticleDataBinaryIO {
     private static final Log logger = Logger.getLogger(ParticleDataBinaryIO.class);
@@ -128,7 +126,7 @@ public class ParticleDataBinaryIO {
         try {
             // Read size of stars
             int size = data_in.readInt();
-            stars = new Array<SceneGraphNode>(size);
+            stars = new Array<>(false, size);
 
             for (int idx = 0; idx < size; idx++) {
                 try {
@@ -136,7 +134,7 @@ public class ParticleDataBinaryIO {
                     // ra[deg], dec[deg], dist[u], (double) x[u], (double) y[u],
                     // (double) z[u], mualpha[mas/yr], mudelta[mas/yr],
                     // radvel[km/s], pmx[u/yr], pmy[u/yr], pmz[u/yr], id, hip,
-                    // tychoLength, tycho, sourceCatalog, pageid, type
+                    // sourceCatalog, pageid, type
                     int nameLength = data_in.readInt();
                     StringBuilder sb = new StringBuilder();
                     for (int i = 0; i < nameLength; i++) {
@@ -176,25 +174,23 @@ public class ParticleDataBinaryIO {
                     byte source = data_in.readByte();
                     long pageId = data_in.readInt();
                     int type = data_in.readInt();
-                    if (appmag < GlobalConf.data.LIMIT_MAG_LOAD) {
-                        Vector3d pos = new Vector3d(x, y, z);
-                        Vector3 pmSph = new Vector3(mualpha, mudelta, radvel);
-                        Vector3 pm = new Vector3(pmx, pmy, pmz);
-                        float[] cc;
+                    Vector3d pos = new Vector3d(x, y, z);
+                    Vector3 pmSph = new Vector3(mualpha, mudelta, radvel);
+                    Vector3 pm = new Vector3(pmx, pmy, pmz);
+                    float[] cc;
 
-                        if (Float.isNaN(colorbv)) {
-                            colorbv = 0.62f;
-                            cc = new float[] { 1.0f, 0.95f, 0.91f, 1.0f };
-                        } else {
-                            cc = new float[] { r, g, b, a };
-                        }
-
-                        Star s = new Star(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, id, hip, tycho, source);
-                        s.cc = cc;
-                        s.octantId = pageId;
-                        s.initialize();
-                        stars.add(s);
+                    if (Float.isNaN(colorbv)) {
+                        colorbv = 0.62f;
+                        cc = new float[] { 1.0f, 0.95f, 0.91f, 1.0f };
+                    } else {
+                        cc = new float[] { r, g, b, a };
                     }
+
+                    Star s = new Star(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, id, hip, tycho, source);
+                    s.cc = cc;
+                    s.octantId = pageId;
+                    s.initialize();
+                    stars.add(s);
                 } catch (EOFException eof) {
                     logger.error(eof);
                 }

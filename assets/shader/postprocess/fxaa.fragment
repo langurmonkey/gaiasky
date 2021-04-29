@@ -122,9 +122,9 @@ FXAA_SUBPIX_TRIM - Controls sub-pixel aliasing removal.
 vec4 fxaa(sampler2D tex, vec2 texCoords, vec2 viewportInv) {
     // LOCAL CONTRAST CHECK
     vec3 rgbN = textureOffset(tex, texCoords.xy, ivec2(0, -1)).xyz;
-    vec3 rgbW= textureOffset(tex, texCoords.xy, ivec2(-1, 0)).xyz;
+    vec3 rgbW = textureOffset(tex, texCoords.xy, ivec2(-1, 0)).xyz;
     vec3 rgbM = texture(tex, texCoords.xy).xyz;
-    vec3 rgbE= textureOffset(tex, texCoords.xy, ivec2(1, 0)).xyz;
+    vec3 rgbE = textureOffset(tex, texCoords.xy, ivec2(1, 0)).xyz;
     vec3 rgbS = textureOffset(tex, texCoords.xy, ivec2(0, 1)).xyz;
 
     float lumaN = luma(rgbN);

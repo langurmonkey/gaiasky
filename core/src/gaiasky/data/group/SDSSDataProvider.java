@@ -5,7 +5,8 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -29,12 +30,12 @@ import java.util.List;
 public class SDSSDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(SDSSDataProvider.class);
 
-    public List<ParticleBean> loadData(String file) {
+    public List<IParticleRecord> loadData(String file) {
         return loadData(file, 1d);
     }
 
-    public List<ParticleBean> loadData(String file, double factor) {
-        List<ParticleBean> pointData = loadDataMapped(GlobalConf.data.dataFile(file), factor);
+    public List<IParticleRecord> loadData(String file, double factor) {
+        List<IParticleRecord> pointData = loadDataMapped(GlobalConf.data.dataFile(file), factor);
         if (pointData != null)
             logger.info(I18n.bundle.format("notif.nodeloader", pointData.size(), file));
 
@@ -42,8 +43,8 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     @Override
-    public List<ParticleBean> loadData(InputStream is, double factor) {
-        List<ParticleBean> pointData = new ArrayList<>();
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
+        List<IParticleRecord> pointData = new ArrayList<>();
 
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
@@ -58,7 +59,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
         return pointData;
     }
 
-    private void loadFromBufferedReader(BufferedReader br, List<ParticleBean> pointData) throws IOException {
+    private void loadFromBufferedReader(BufferedReader br, List<IParticleRecord> pointData) throws IOException {
         String line;
         int tokenslen;
         while ((line = br.readLine()) != null) {
@@ -82,19 +83,24 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
                         point[0] = p.gsposition.x;
                         point[1] = p.gsposition.y;
                         point[2] = p.gsposition.z;
-                        pointData.add(new ParticleBean(point));
+                        pointData.add(new ParticleRecord(point));
                     }
                 }
             }
         }
     }
 
+    @Override
     public void setFileNumberCap(int cap) {
     }
 
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor) {
-        List<ParticleBean> pointData = new ArrayList<>();
+    public void setStarNumberCap(int cap) {
+    }
+
+    @Override
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
+        List<IParticleRecord> pointData = new ArrayList<>();
 
         try {
             FileChannel fc = new RandomAccessFile(file, "r").getChannel();

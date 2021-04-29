@@ -17,7 +17,7 @@ import gaiasky.util.gdx.contrib.postprocess.filters.CubemapProjectionsFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class CubemapProjections extends PostProcessorEffect {
-    private CubemapProjectionsFilter filter;
+    private final CubemapProjectionsFilter filter;
 
     public enum CubemapProjection {
         EQUIRECTANGULAR,

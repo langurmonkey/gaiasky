@@ -27,7 +27,10 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
     private static final double LINE_SIZE_RAD = Math.tan(Math.toRadians(2.9));
     private String transformName;
     private Matrix4d coordinateSystem;
-    private Vector3d o, x, y, z;
+    private final Vector3d o;
+    private final Vector3d x;
+    private final Vector3d y;
+    private final Vector3d z;
     private Vector3d b0, b1, b2;
 
     // RGBA colors for each of the bases XYZ -> [3][3]
@@ -51,7 +54,7 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
     }
 
     @Override
-    public void doneLoading(AssetManager manager){
+    public void doneLoading(AssetManager manager) {
         if (transformName != null) {
             Class<Coordinates> c = Coordinates.class;
             try {
@@ -68,8 +71,8 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
         }
 
         // Axes colors, RGB default
-        if(axesColors == null){
-            axesColors = new float[][]{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        if (axesColors == null) {
+            axesColors = new float[][] { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
         }
 
     }
@@ -86,14 +89,14 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
     }
 
     @Override
-    public void addToRenderLists(ICamera camera){
-        addToRender(this, RenderGroup.LINE);
-
+    public void addToRenderLists(ICamera camera) {
+        if (this.shouldRender())
+            addToRender(this, RenderGroup.LINE);
     }
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        if(alpha > 0) {
+        if (alpha > 0) {
             // X
             renderer.addLine(this, o.x, o.y, o.z, x.x, x.y, x.z, axesColors[0][0], axesColors[0][1], axesColors[0][2], alpha);
             // Y
@@ -103,12 +106,11 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
         }
     }
 
-    public float getLineWidth(){
+    public float getLineWidth() {
         return 1;
     }
 
-
-    public int getGlPrimitive(){
+    public int getGlPrimitive() {
         return GL30.GL_LINES;
     }
 
@@ -116,7 +118,7 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
         this.transformName = transformName;
     }
 
-    public void setAxesColors(double[][] colors){
+    public void setAxesColors(double[][] colors) {
         axesColors = new float[3][3];
         axesColors[0][0] = (float) colors[0][0];
         axesColors[0][1] = (float) colors[0][1];

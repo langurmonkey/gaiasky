@@ -1,0 +1,6 @@
+WizardCaption=Gaia Sky wizard
+LocateJre3=The Gaia Sky wizard could not find a Java(TM) Runtime Environment on your system. Please locate a suitable {0}-bit JRE.
+LocateOrDownloadJre3=The Gaia Sky wizard could not find a Java(TM) Runtime Environment on your system. You can locate or download a suitable {0}-bit JRE.
+LocateJre2=The Gaia Sky wizard could not find a Java(TM) Runtime Environment on your system. Please locate a suitable JRE. (minimum version: {0}, maximum version: {1})
+LocateOrDownloadJre2=The Gaia Sky wizard could not find a Java(TM) Runtime Environment on your system. You can locate or download a suitable JRE. (minimum version: {0}, maximum version: {1})
+PrepareInstaller=Please wait until the Gaia Sky installer is unpacking.

@@ -27,7 +27,7 @@ public class VersionChecker implements Runnable {
     private static final Logger.Log logger = Logger.getLogger(VersionChecker.class);
 
     private static final int VERSIONCHECK_TIMEOUT_MS = 5000;
-    private String stringUrl;
+    private final String stringUrl;
     private EventListener listener;
 
     public VersionChecker(String stringUrl) {

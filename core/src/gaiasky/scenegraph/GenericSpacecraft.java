@@ -5,13 +5,12 @@
 
 package gaiasky.scenegraph;
 
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * A generic spacecraft
- * 
+ *
  * @author tsagrista
  */
 public class GenericSpacecraft extends Satellite {
@@ -23,9 +22,11 @@ public class GenericSpacecraft extends Satellite {
      * camera and the view angle have been determined.
      */
     protected void addToRenderLists(ICamera camera) {
-        super.addToRenderLists(camera);
-        if (!renderQuad)
-            super.removeFromRender(this, RenderGroup.BILLBOARD_SSO);
+        if (this.shouldRender()) {
+            super.addToRenderLists(camera);
+            if (!renderQuad)
+                super.removeFromRender(this, RenderGroup.BILLBOARD_SSO);
+        }
     }
 
     public void setRenderquad(String renderQuad) {

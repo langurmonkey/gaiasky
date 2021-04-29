@@ -5,9 +5,7 @@
 
 package gaiasky.data.group;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
-import gaiasky.scenegraph.StarGroup.StarBean;
-import gaiasky.util.Constants;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 
@@ -19,38 +17,84 @@ import java.util.List;
 
 /**
  * Reads arrays of star beans from binary files, usually to go in an octree.
+ * The header of the format depends on the version.
+ *
+ * <ul>
+ * <li>
+ * Versions 0 and 1:
+ *      <ul><li>int: number of stars</li></ul>
+ * </li>
+ * <li>
+ * Version 2+:
+ *      <ul>
+ *          <li>int: negative integer token to differentiate from versions 0/1 (-1)</li>
+ *          <li>int: format version number</li>
+ *          <li>int: number of stars</li>
+ *      </ul>
+ * </li>
+ * </ul>
  *
  * @author tsagrista
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
+
+    /** The default output format version to use for writing **/
+    public static int DEFAULT_OUTPUT_VERSION = 2;
+
+    public static int MIN_OUTPUT_VERSION = 0;
+    public static int MAX_OUTPUT_VERSION = DEFAULT_OUTPUT_VERSION;
+
+    /** The output format version for writing **/
+    private int outputVersion = -1;
+
+    /**
+     * Binary IO for the different format versions
+     */
+    private final BinaryIO[] binaryVersions;
+
+    public BinaryDataProvider() {
+        super();
+
+        binaryVersions = new BinaryIO[3];
+        binaryVersions[0] = new BinaryVersion0();
+        binaryVersions[1] = new BinaryVersion1();
+        binaryVersions[2] = new BinaryVersion2();
+    }
+
     @Override
-    public List<ParticleBean> loadData(String file, double factor, boolean compatibility) {
+    public List<IParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.bundle.format("notif.datafile", file));
-        loadDataMapped(file, factor, compatibility);
+        loadDataMapped(file, factor);
         logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
 
         return list;
     }
 
-
     @Override
-    public List<ParticleBean> loadData(InputStream is, double factor, boolean compatibility) {
-        list = readData(is, compatibility);
+    public List<IParticleRecord> loadData(InputStream is, double factor) {
+        list = readData(is, factor);
         return list;
     }
 
-    public void writeData(List<? extends ParticleBean> data, OutputStream out) {
-        writeData(data, out, true);
+    public void writeData(List<IParticleRecord> data, OutputStream out) {
+        int version = (outputVersion < MIN_OUTPUT_VERSION || outputVersion > MAX_OUTPUT_VERSION) ? DEFAULT_OUTPUT_VERSION : outputVersion;
+        writeData(data, out, version);
     }
-    public void writeData(List<? extends ParticleBean> data, OutputStream out, boolean compat) {
+
+    public void writeData(List<IParticleRecord> data, OutputStream out, int version) {
         // Wrap the FileOutputStream with a DataOutputStream
         DataOutputStream data_out = new DataOutputStream(out);
         try {
-            // Size of stars
+            if (version >= 2) {
+                // In new version, write token as negative int. Version afterwards
+                data_out.writeInt(-1);
+                data_out.writeInt(version);
+            }
+            // Number of stars
             data_out.writeInt(data.size());
-            for (ParticleBean sb : data) {
-                writeStarBean((StarBean) sb, data_out, compat);
+            for (IParticleRecord sb : data) {
+                binaryVersions[version].writeParticleRecord(sb, data_out);
             }
 
         } catch (Exception e) {
@@ -65,59 +109,25 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 
     }
 
-    protected void writeStarBean(StarBean sb, DataOutputStream out) throws IOException {
-        writeStarBean(sb, out, true);
-    }
-
-    /**
-     * Write the star bean to the output stream
-     *
-     * @param sb     The star bean
-     * @param out    The output stream
-     * @param compat Use compatibility with DR1/DR2 model (with tycho ids)
-     * @throws IOException
-     */
-    protected void writeStarBean(StarBean sb, DataOutputStream out, boolean compat) throws IOException {
-        // Double
-        for (int i = 0; i < StarBean.I_APPMAG; i++) {
-            out.writeDouble(sb.data[i]);
-        }
-        // Float
-        for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
-            out.writeFloat((float) sb.data[i]);
-        }
-        // Int
-        out.writeInt((int) sb.data[StarBean.I_HIP]);
-
-        if (compat) {
-            // 3 integers, keep compatibility
-            out.writeInt(-1);
-            out.writeInt(-1);
-            out.writeInt(-1);
-        }
-
-        // Long
-        out.writeLong(sb.id);
-
-        String namesConcat = sb.namesConcat();
-        out.writeInt(namesConcat.length());
-        out.writeChars(namesConcat);
-    }
-
-    public List<ParticleBean> readData(InputStream in) {
-        return readData(in, true);
-    }
-
-    public List<ParticleBean> readData(InputStream in, boolean compat) {
-        List<ParticleBean> data = null;
+    public List<IParticleRecord> readData(InputStream in, double factor) {
+        List<IParticleRecord> data = null;
         DataInputStream data_in = new DataInputStream(in);
 
         try {
+            int version = 1;
+            data_in.mark(0);
+            int versionToken = data_in.readInt();
+            if (versionToken < 0) {
+                version = data_in.readInt();
+            } else {
+                // Rewind
+                data_in.reset();
+            }
             // Read size of stars
             int size = data_in.readInt();
             data = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                data.add(readStarBean(data_in, compat));
+                data.add(binaryVersions[version].readParticleRecord(data_in, factor));
             }
 
         } catch (IOException e) {
@@ -133,62 +143,27 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return data;
     }
 
-    protected StarBean readStarBean(DataInputStream in) throws IOException {
-        return readStarBean(in, true);
-    }
-
-    /**
-     * Read a star bean from input stream
-     *
-     * @param in     Input stream
-     * @param compat Use compatibility with DR1/DR2 model (with tycho ids)
-     * @return The star bean
-     * @throws IOException
-     */
-    protected StarBean readStarBean(DataInputStream in, boolean compat) throws IOException {
-        double[] data = new double[StarBean.SIZE];
-        // Double
-        for (int i = 0; i < StarBean.I_APPMAG; i++) {
-            data[i] = in.readDouble();
-            if (i < 6)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Float
-        for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
-            data[i] = in.readFloat();
-            if (i == StarBean.I_SIZE)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Int
-        data[StarBean.I_HIP] = in.readInt();
-
-        if (compat) {
-            // Skip unused tycho numbers, 3 Integers
-            in.readInt();
-            in.readInt();
-            in.readInt();
-        }
-
-        Long id = in.readLong();
-        int nameLength = in.readInt();
-        StringBuilder namesConcat = new StringBuilder();
-        for (int i = 0; i < nameLength; i++)
-            namesConcat.append(in.readChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-        return new StarBean(data, id, names);
-    }
-
     @Override
-    public List<ParticleBean> loadDataMapped(String file, double factor, boolean compat) {
+    public List<IParticleRecord> loadDataMapped(String file, double factor) {
         try {
             FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+
+            int version = 1;
+            mem.mark();
+            int versionToken = mem.getInt();
+            if (versionToken < 0) {
+                version = mem.getInt();
+            } else {
+                // Rewind
+                mem.reset();
+            }
             // Read size of stars
             int size = mem.getInt();
             list = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                list.add(readStarBean(mem, factor, compat));
+                list.add(binaryVersions[version].readParticleRecord(mem, factor));
             }
 
             fc.close();
@@ -201,40 +176,49 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-    public StarBean readStarBean(MappedByteBuffer mem, double factor, boolean compat) {
-        double[] data = new double[StarBean.SIZE];
-        // Double
-        for (int i = 0; i < StarBean.I_APPMAG; i++) {
-            data[i] = mem.getDouble();
-            if (i < 3)
-                data[i] *= factor;
-            if (i < 6)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Float
-        for (int i = StarBean.I_APPMAG; i < StarBean.I_HIP; i++) {
-            data[i] = mem.getFloat();
-            if (i == StarBean.I_SIZE)
-                data[i] *= Constants.DISTANCE_SCALE_FACTOR;
-        }
-        // Int
-        data[StarBean.I_HIP] = mem.getInt();
+    /**
+     * Loads data mapped with a version hint.
+     *
+     * @param file        The file to load
+     * @param factor      Distance factor, if any
+     * @param versionHint Data version number, in case of version 0 or 1, since these formats were
+     *                    not annotated. If version >=2, the version number is read from the file header
+     * @return
+     */
+    public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
+        try {
+            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
 
-        if (compat) {
-            // Skip unused tycho numbers, 3 Integers
-            mem.getInt();
-            mem.getInt();
-            mem.getInt();
+            MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
+
+            int version = versionHint;
+            mem.mark();
+            int versionToken = mem.getInt();
+            if (versionToken < 0) {
+                version = mem.getInt();
+            } else {
+                // Rewind
+                mem.reset();
+            }
+            // Read size of stars
+            int size = mem.getInt();
+            list = new ArrayList<>(size);
+            for (int i = 0; i < size; i++) {
+                list.add(binaryVersions[version].readParticleRecord(mem, factor));
+            }
+
+            fc.close();
+
+            return list;
+
+        } catch (Exception e) {
+            logger.error(e);
         }
-
-        Long id = mem.getLong();
-        int nameLength = mem.getInt();
-        StringBuilder namesConcat = new StringBuilder();
-        for (int i = 0; i < nameLength; i++)
-            namesConcat.append(mem.getChar());
-        String[] names = namesConcat.toString().split(Constants.nameSeparatorRegex);
-
-        return new StarBean(data, id, names);
+        return null;
     }
 
+    @Override
+    public void setOutputFormatVersion(int version){
+        this.outputVersion = version;
+    }
 }

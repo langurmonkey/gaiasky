@@ -222,7 +222,7 @@ public abstract class BaseIntShader implements IntShader {
 		return tempArray.items;
 	}
 
-	private Attributes combinedAttributes = new Attributes();
+	private final Attributes combinedAttributes = new Attributes();
 
 	@Override
 	public void render (IntRenderable renderable) {

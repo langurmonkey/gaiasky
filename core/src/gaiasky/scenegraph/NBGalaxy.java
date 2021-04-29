@@ -51,7 +51,8 @@ public class NBGalaxy extends Particle {
     /** Alternative name **/
     String altname;
 
-    public NBGalaxy(){}
+    public NBGalaxy() {
+    }
 
     public NBGalaxy(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
         super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
@@ -96,47 +97,41 @@ public class NBGalaxy extends Particle {
      */
     @Override
     public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
-        if (appmag <= GlobalConf.runtime.LIMIT_MAG_RUNTIME) {
-            TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
-            translation.set(parentTransform).add(pos);
-            distToCamera = translation.len();
+        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
+        translation.set(parentTransform).add(pos);
+        distToCamera = translation.len();
 
-            this.opacity = opacity;
+        this.opacity = opacity;
 
-            if (!copy) {
-                camera.checkClosestBody(this);
+        if (!copy) {
+            camera.checkClosestBody(this);
 
-                viewAngle = (radius / distToCamera) / camera.getFovFactor();
-                viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
+            viewAngle = (radius / distToCamera);
+            viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
 
-                addToRenderLists(camera);
-            }
-
+            addToRenderLists(camera);
         }
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        SceneGraphRenderer.render_lists.get(rg.ordinal()).add(renderable);
+        SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
         return true;
     }
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if(GaiaSky.instance.isOn(ct)) {
+        if (this.shouldRender() && this.opacity > 0) {
             camera.checkClosestBody(this);
-            if (opacity > 0) {
 
-                if (camera.getCurrent() instanceof FovCamera) {
-                    // Render as point, do nothing
-                } else {
-                    addToRender(this, RenderGroup.BILLBOARD_GAL);
-                }
-                if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
-                    addToRender(this, RenderGroup.FONT_LABEL);
-                }
+            if (camera.getCurrent() instanceof FovCamera) {
+                // Render as point, do nothing
+            } else {
+                addToRender(this, RenderGroup.BILLBOARD_GAL);
+            }
+            if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
+                addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
-
     }
 
     @Override

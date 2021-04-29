@@ -17,7 +17,7 @@ import gaiasky.util.gdx.contrib.postprocess.filters.FisheyeDistortion;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 public final class Fisheye extends PostProcessorEffect {
-    private FisheyeDistortion fisheye;
+    private final FisheyeDistortion fisheye;
 
     public Fisheye(float width, float height) {
         fisheye = new FisheyeDistortion(width, height);

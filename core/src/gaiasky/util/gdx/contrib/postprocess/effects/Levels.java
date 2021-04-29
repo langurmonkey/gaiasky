@@ -47,12 +47,12 @@ public final class Levels extends PostProcessorEffect {
     private static final int LUMA_SIZE = 500;
     private int lumaLodLevels;
     private LevelsFilter levels;
-    private Luma luma;
-    private Copy copy;
+    private final Luma luma;
+    private final Copy copy;
 
     private float lumaMax = 0.9f, lumaAvg = 0.09f;
     private float currLumaMax = -1f, currLumaAvg = -1f;
-    private FrameBuffer lumaBuffer;
+    private final FrameBuffer lumaBuffer;
 
     /**
      * Creates the effect

@@ -6,12 +6,15 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
@@ -32,7 +35,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     public static boolean POINT_UPDATE_FLAG = true;
 
     protected ExtShaderProgram[] programs;
-    private RenderGroup group;
+    private final RenderGroup group;
     protected float[] alphas;
     /** Comparator of renderables, in case of need **/
     protected Comparator<IRenderable> comp;
@@ -42,7 +45,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     private boolean vrScaleFlag = false, depthBufferFlag = false;
 
-    protected List<RenderSystemRunnable> preRunnables, postRunnables;
+    protected Array<RenderSystemRunnable> preRunnables, postRunnables;
 
     protected AbstractRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super();
@@ -51,8 +54,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         this.programs = programs;
         this.aux = new Vector3();
         this.auxd = new Vector3d();
-        this.preRunnables = new ArrayList<>(3);
-        this.postRunnables = new ArrayList<>(3);
+        this.preRunnables = new Array<>(false, 1);
+        this.postRunnables = new Array<>(false, 1);
     }
 
     @Override
@@ -61,8 +64,8 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     @Override
-    public void render(List<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
-        if (renderables != null && renderables.size() != 0) {
+    public void render(Array<IRenderable> renderables, ICamera camera, double t, RenderingContext rc) {
+        if (renderables != null && renderables.size != 0) {
             this.rc = rc;
             run(preRunnables, renderables, camera);
             renderStud(renderables, camera, t);
@@ -70,17 +73,17 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
         }
     }
 
-    public abstract void renderStud(List<IRenderable> renderables, ICamera camera, double t);
+    public abstract void renderStud(Array<IRenderable> renderables, ICamera camera, double t);
 
     public void addPreRunnables(RenderSystemRunnable... r) {
-        preRunnables.addAll(Arrays.asList(r));
+        preRunnables.addAll(r);
     }
 
     public void addPostRunnables(RenderSystemRunnable... r) {
-        postRunnables.addAll(Arrays.asList(r));
+        postRunnables.addAll(r);
     }
 
-    protected void run(List<RenderSystemRunnable> runnables, List<IRenderable> renderables, ICamera camera) {
+    protected void run(Array<RenderSystemRunnable> runnables, Array<IRenderable> renderables, ICamera camera) {
         if (runnables != null) {
             for (RenderSystemRunnable runnable : runnables)
                 runnable.run(this, renderables, camera);
@@ -119,7 +122,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     public interface RenderSystemRunnable {
-        void run(AbstractRenderSystem renderSystem, List<IRenderable> renderables, ICamera camera);
+        void run(AbstractRenderSystem renderSystem, Array<IRenderable> renderables, ICamera camera);
     }
 
     protected void addEffectsUniforms(ExtShaderProgram shaderProgram, ICamera camera) {

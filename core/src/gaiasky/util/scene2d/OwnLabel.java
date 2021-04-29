@@ -10,16 +10,22 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
+import gaiasky.util.TextUtils;
 
 public class OwnLabel extends Label implements Disableable {
     private float ownwidth = 0f, ownheight = 0f;
-    private Color regularColor;
+    private final Color regularColor;
     private boolean disabled = false;
 
     public OwnLabel(CharSequence text, Skin skin, float width) {
         super(text, skin);
         this.regularColor = this.getColor().cpy();
         this.setWidth(width);
+    }
+
+    public OwnLabel(CharSequence text, Skin skin, String styleName, int breakCharacters) {
+        super(TextUtils.breakCharacters(text, breakCharacters), skin, styleName);
+        this.regularColor = this.getColor().cpy();
     }
 
     public OwnLabel(CharSequence text, Skin skin) {

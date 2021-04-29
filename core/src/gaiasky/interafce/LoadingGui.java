@@ -7,11 +7,11 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -50,28 +49,29 @@ public class LoadingGui extends AbstractGui {
     private long lastFunnyTime;
     private long lastTipTime;
 
-    public LoadingGui() {
-        this(0, false);
+    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+        this(graphics, unitsPerPixel, 0, false);
     }
 
-    public LoadingGui(Boolean vr) {
-        this(0, vr);
+    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Boolean vr) {
+        this(graphics, unitsPerPixel, 0, vr);
     }
 
-    public LoadingGui(Integer hoffset, Boolean vr) {
-        super();
+    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Integer hoffset, Boolean vr) {
+        super(graphics, unitsPerPixel);
         this.vr = vr;
         this.hoffset = hoffset;
     }
 
     @Override
-    public void initialize(AssetManager assetManager) {
+    public void initialize(AssetManager assetManager, SpriteBatch sb) {
         interfaces = new Array<>();
-        float pad30 = 30f * GlobalConf.UI_SCALE_FACTOR;
-        float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
+        float pad30 = 48f;
+        float pad10 = 16f;
         // User interface
-        Viewport vp = new ScreenViewport();
-        ui = new Stage(vp, GlobalResources.spriteBatch);
+        ScreenViewport vp = new ScreenViewport();
+        vp.setUnitsPerPixel(unitsPerPixel);
+        ui = new Stage(vp, sb);
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
         } else {
@@ -94,7 +94,7 @@ public class LoadingGui extends AbstractGui {
         else if (hoffset < 0)
             center.padRight(-hoffset);
 
-        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(vr), skin, "main-title");
+        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(GlobalConf.runtime.OPENVR), skin, "main-title");
 
         // Funny text
         lastFunnyTime = 0;
@@ -118,11 +118,7 @@ public class LoadingGui extends AbstractGui {
         bottomMiddle.add(tip);
 
         // Version and build
-        topLeft = new Table(skin);
-        topLeft.setFillParent(true);
-        topLeft.left().top();
-        topLeft.pad(pad10);
-        topLeft.add(new OwnLabel(GlobalConf.version.version + " - build " + GlobalConf.version.build, skin, "hud-med"));
+        topLeft = new VersionLineTable(skin);
 
         // SCREEN MODE BUTTON - TOP RIGHT
         screenMode = new Table(skin);

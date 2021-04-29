@@ -25,7 +25,7 @@ public final class AnaglyphicFilter extends Filter<AnaglyphicFilter> {
         // @formatter:on
 
         private final String mnemonic;
-        private int elementSize;
+        private final int elementSize;
 
         Param(String m, int elementSize) {
             this.mnemonic = m;

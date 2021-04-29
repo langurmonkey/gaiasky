@@ -12,9 +12,10 @@ public interface IVisibilitySwitch {
 
     String getDescription();
 
-    void setDescription(String name);
+    void setDescription(String description);
 
     boolean isVisible();
+    boolean isVisible(boolean attributeValue);
 
     void setVisible(boolean visible);
 }

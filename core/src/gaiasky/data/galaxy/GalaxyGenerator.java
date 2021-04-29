@@ -22,6 +22,7 @@ import gaiasky.util.math.StdRandom;
 import gaiasky.util.math.Vector3d;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -35,36 +36,36 @@ public class GalaxyGenerator {
     private static final boolean writeFile = true;
 
     /** spiral | milkyway | uniform | bulge **/
-    private static String GALAXY_TYPE = "uniform";
+    private static final String GALAXY_TYPE = "uniform";
 
     /** star | dust | hii | bulge | gas **/
-    private static String PARTICLE_TYPE = "gas";
+    private static final String PARTICLE_TYPE = "gas";
 
     /** Number of particles **/
-    private static int N = 3000;
+    private static final int N = 3000;
 
     /** Number of spiral arms **/
-    private static int Narms = 8;
+    private static final int Narms = 8;
 
     /** Does the galaxy have a bar? **/
-    private static boolean bar = true;
+    private static final boolean bar = true;
 
     /** The length of the bar, if it has one **/
-    private static double barLength = 0.8;
+    private static final double barLength = 0.8;
 
     /** Radius of the galaxy **/
-    private static double radius = 2.5;
+    private static final double radius = 2.5;
 
     /** Ratio radius/armWidth **/
-    private static double armWidthRatio = 0.04;
+    private static final double armWidthRatio = 0.04;
 
     /** Ratio radius/armHeight **/
-    private static double armHeightRatio = 0.02;
+    private static final double armHeightRatio = 0.02;
 
     /** Maximum spiral rotation (end of arm) in degrees **/
-    private static double maxRotation = 100;
+    private static final double maxRotation = 100;
 
-    private static boolean radialDensity = true;
+    private static final boolean radialDensity = true;
 
     public static void main(String[] args) {
         try {
@@ -97,7 +98,7 @@ public class GalaxyGenerator {
             } else if (GALAXY_TYPE.equals("bulge")) {
                 gal = generateBulge();
             } else {
-                PrintStream out = new PrintStream(System.out, true, "UTF-8");
+                PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
                 out.println("Wrong galaxy type: " + GALAXY_TYPE);
                 return;
             }

@@ -1,4 +1,4 @@
-import org.apache.tools.ant.taskdefs.condition.Os 
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 
 plugins {
   id "com.install4j.gradle" version "8.0.5"
@@ -9,32 +9,39 @@ allprojects {
     apply plugin: "eclipse"
     apply plugin: "idea"
 
-    version = '2.2.5'
+    version = '3.0.3'
 
     ext {
         appName = "GaiaSky"
-        gdxVersion = "1.9.12"
+        gdxVersion = "1.10.0"
+        gdxcontrollersVersion = "2.1.0"
         lwjglVersion = "3.2.3"
-        jcommanderVersion = "1.78"
+        jcommanderVersion = "1.81"
         slf4jVersion = "1.7.25"
         sparkjavaVersion = "2.7.2"
         gsonVersion = "2.8.0"
         jafamaVersion = "2.1.0"
         compressVersion = "1.20"
         commonsioVersion = "2.6"
+        commonsimagingVersion = "+"
         py4jVersion = "0.10.8.1"
         oshiVersion = "4.0.0"
-        jsampVersion = "1.3.7"
-        sdl2gdxVersion = "1.0.4"
+        jsampVersion = "+"
+        sdl2gdxVersion = "1.0.+"
+        jsoupVersion = "+"
     }
 
     repositories {
+        gradlePluginPortal()
         mavenCentral()
-        jcenter()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven { url "https://mvnrepository.com/artifact/xmlrpc/xmlrpc" }
-        maven { url "http://nexus.vamdc.org/nexus/content/repositories/releases" }
+        maven{ url "https://repo1.maven.org/maven2/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
+        maven {
+            url "http://nexus.vamdc.org/nexus/content/repositories/releases/"
+            allowInsecureProtocol true
+        }
+
     }
 }
 
@@ -49,9 +56,9 @@ project(":core") {
     proc = cmd.execute()
     project.ext.rev = proc.text.trim()
 
-    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+    if (DefaultNativePlatform.currentOperatingSystem.windows) {
         project.ext.system = "Windows10 x86_64"
-    }else {
+    } else {
         cmd = "uname -snmr"
         proc = cmd.execute()
         project.ext.system = proc.text.trim()
@@ -112,12 +119,6 @@ project(":core") {
         // ************
         // REGULAR DEPS
         // ************
-        api group: "org.lwjgl", name: "lwjgl", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-glfw", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-jemalloc", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-opengl", version: "$lwjglVersion"
-        api group: "org.lwjgl", name: "lwjgl-openal", version: "$lwjglVersion"
-        
         api group: "org.lwjgl", name: "lwjgl-openvr", version: "$lwjglVersion"
         api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-linux"
         api "org.lwjgl:lwjgl-openvr:$lwjglVersion:natives-windows"
@@ -127,11 +128,15 @@ project(":core") {
         api "com.badlogicgames.gdx:gdx-backend-lwjgl3:$gdxVersion"
         api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
 
-        // Use GDX
-        //api "com.badlogicgames.gdx:gdx-controllers-lwjgl3:$gdxVersion"
-        // Use SDL
-        api "uk.co.electronstudio.sdl2gdx:sdl2gdx:$sdl2gdxVersion"
+        // gdx-controllers:2.+ bases up on SDL 2.0.12
+        api "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxcontrollersVersion"
+        api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
 
+        api "org.astrogrid:jsamp:$jsampVersion"
+
+        // *****************
+        // OTHER SERVER DEPS
+        // *****************
         api group: "commons-io", name: "commons-io", version: "$commonsioVersion"
         api "org.apache.commons:commons-compress:$compressVersion"
         api "com.beust:jcommander:$jcommanderVersion"
@@ -139,7 +144,10 @@ project(":core") {
         
         api group: "net.sf.py4j", name: "py4j", version: "$py4jVersion"
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
-        api group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
+        //api group: "org.astrogrid", name: "jsamp", version: "$jsampVersion"
+
+        api group: "org.jsoup", name: "jsoup", version: "$jsoupVersion"
+        api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
 
         // ****************
         // REST SERVER DEPS
@@ -153,8 +161,8 @@ project(":core") {
         // *************
         // INTERNAL DEPS
         // *************
-        api files("lib/stil.jar",
-                "../assets")
+        api files("lib/stil.jar")
+        api files("../assets")
     }
 
     jar {
@@ -174,8 +182,8 @@ project(":core") {
             include "icon/gsascii.txt"
             include "img/**"
             include "text/**"
-            exclude "img/splash"
             include "shader/**"
+            include "data/**"
             include "shaders/**"
             include "skins/**"
             exclude "skins/raw"

@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -49,21 +50,31 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     private static final double EYE_ANGLE_DEG = 1.5;
 
     /** Viewport to use in steoeroscopic mode **/
-    private Viewport stretchViewport;
+    private final Viewport stretchViewport;
 
     /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
     Map<Integer, FrameBuffer> fb3D;
 
-    private Anaglyphic anaglyphic;
-    private Copy copy;
+    private final SpriteBatch sb;
 
-    private Vector3 aux1, aux2, aux3;
-    private Vector3d aux1d, aux2d, aux3d, aux4d, aux5d;
+    private final Anaglyphic anaglyphic;
+    private final Copy copy;
+
+    private final Vector3 aux1;
+    private final Vector3 aux2;
+    private final Vector3 aux3;
+    private final Vector3d aux1d;
+    private final Vector3d aux2d;
+    private final Vector3d aux3d;
+    private final Vector3d aux4d;
+    private final Vector3d aux5d;
 
     public SGRStereoscopic() {
         super();
         // INIT VIEWPORT
         stretchViewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        sb = GlobalResources.spriteBatch;
 
         // INIT FRAME BUFFER FOR 3D MODE
         fb3D = new HashMap<>();
@@ -217,6 +228,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
                 start2w = 0;
                 start2h = boundsh;
             }
+            boundsw /= GlobalConf.program.UI_SCALE;
+            boundsh /= GlobalConf.program.UI_SCALE;
+            start2w /= GlobalConf.program.UI_SCALE;
+            start2h /= GlobalConf.program.UI_SCALE;
 
             // Side by side rendering
             Viewport viewport = stretch ? stretchViewport : extendViewport;
@@ -248,10 +263,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             resultBuffer.begin();
-            GlobalResources.spriteBatch.begin();
-            GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
-            GlobalResources.spriteBatch.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
-            GlobalResources.spriteBatch.end();
+            sb.begin();
+            sb.setColor(1f, 1f, 1f, 1f);
+            sb.draw(tex, 0, 0, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
+            sb.end();
             resultBuffer.end();
 
             /** RIGHT EYE **/
@@ -277,10 +292,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
             resultBuffer.begin();
-            GlobalResources.spriteBatch.begin();
-            GlobalResources.spriteBatch.setColor(1f, 1f, 1f, 1f);
-            GlobalResources.spriteBatch.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
-            GlobalResources.spriteBatch.end();
+            sb.begin();
+            sb.setColor(1f, 1f, 1f, 1f);
+            sb.draw(tex, start2w, start2h, 0, 0, boundsw, boundsh, 1, 1, 0, 0, 0, boundsw, boundsh, false, true);
+            sb.end();
             resultBuffer.end();
 
             /* Restore viewport */

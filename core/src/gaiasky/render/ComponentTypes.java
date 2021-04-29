@@ -84,7 +84,7 @@ public class ComponentTypes extends BitSet {
         // ALWAYS LAST
         Invisible(null);
 
-        private static Map<String, ComponentType> keysMap = new HashMap<>();
+        private static final Map<String, ComponentType> keysMap = new HashMap<>();
 
         static {
             for (ComponentType ct : ComponentType.values()) {

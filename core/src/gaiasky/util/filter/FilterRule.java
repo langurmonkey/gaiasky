@@ -5,7 +5,7 @@
 
 package gaiasky.util.filter;
 
-import gaiasky.scenegraph.ParticleGroup.ParticleBean;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.filter.attrib.IAttribute;
 
 public class FilterRule {
@@ -28,7 +28,7 @@ public class FilterRule {
         this.comparator = getComparatorFromString(comp);
     }
 
-    public boolean evaluate(ParticleBean bean) {
+    public boolean evaluate(IParticleRecord bean) {
         return comparator.evaluate(attribute.get(bean), value);
     }
 

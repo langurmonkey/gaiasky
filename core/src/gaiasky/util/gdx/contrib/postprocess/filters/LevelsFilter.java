@@ -37,7 +37,12 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
     private float exposure = 1.0f;
     private float avgLuma, maxLuma;
 
-    private ShaderProgram programRegular, programToneMappingExposure, programToneMappingAuto, programToneMappingACES, programToneMappingUncharted, programToneMappingFilmic;
+    private final ShaderProgram programRegular;
+    private final ShaderProgram programToneMappingExposure;
+    private final ShaderProgram programToneMappingAuto;
+    private final ShaderProgram programToneMappingACES;
+    private final ShaderProgram programToneMappingUncharted;
+    private final ShaderProgram programToneMappingFilmic;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -52,8 +57,8 @@ public final class LevelsFilter extends Filter<LevelsFilter> {
         Gamma("u_gamma", 0);
         // @formatter:on
 
-        private String mnemonic;
-        private int elementSize;
+        private final String mnemonic;
+        private final int elementSize;
 
         Param(String mnemonic, int arrayElementSize) {
             this.mnemonic = mnemonic;

@@ -36,8 +36,8 @@ package gaiasky.util.gaia;
  */
 public class EpslAndNsl extends AnalyticalAttitudeDataServer {
 	
-	private Epsl epsl = new Epsl();
-	private Nsl37 nsl = new Nsl37();
+	private final Epsl epsl = new Epsl();
+	private final Nsl37 nsl = new Nsl37();
 
 	/**
 	 * Default constructor:

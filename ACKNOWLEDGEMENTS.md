@@ -7,7 +7,7 @@
 ## Data
 
 -  Dr. Martin Altmann for providing the Gaia orbit data
--  [Stefan Payne-Wardenaar](https://twitter.com/StefanPWinc) for some of the data used in the Milky Way model
+-  [Stefan Payne-Wardenaar](https://twitter.com/StefanPWinc) for the Milky Way model
 -  [DPAC](https://www.cosmos.esa.int/web/gaia/dpac/consortium) and the Gaia Collaboration
 -  The available catalogs and datasets have their own acknowledgements in the form of links to the original source and/or papers
 -  Floor van Leeuwen for the Hipparcos star name files.

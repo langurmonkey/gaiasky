@@ -22,6 +22,8 @@ import gaiasky.desktop.util.camera.Keyframe;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.scenegraph.IFocus;
+import gaiasky.scenegraph.Invisible;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.GlobalConf;
@@ -51,8 +53,8 @@ import java.util.Map;
 public class KeyframesWindow extends GenericDialog implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(KeyframesWindow.class);
 
-    private INumberFormat secondsFormatter;
-    private IDateFormat dateFormat;
+    private final INumberFormat secondsFormatter;
+    private final IDateFormat dateFormat;
 
     /**
      * Seconds
@@ -65,7 +67,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Current keyframes
      **/
-    private Array<Keyframe> keyframes;
+    private final Array<Keyframe> keyframes;
     /**
      * Right and left tables
      **/
@@ -81,15 +83,15 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Seconds cells
      **/
-    private Map<Keyframe, Cell> secondsCells;
+    private final Map<Keyframe, Cell> secondsCells;
     /**
      * Names cells
      **/
-    private Map<Keyframe, Cell> namesCells;
+    private final Map<Keyframe, Cell> namesCells;
     /**
      * Keyframe cells
      */
-    private Map<Keyframe, OwnLabel> keyframeNames;
+    private final Map<Keyframe, OwnLabel> keyframeNames;
     /**
      * Scroll for keyframes
      **/
@@ -97,13 +99,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     /**
      * Current camera params
      **/
-    private Object lock = new Object();
+    private final Object lock = new Object();
     private Vector3d pos, dir, up;
     private ITimeFrameProvider t;
     /**
      * Date format
      **/
-    private DateFormat df;
+    private final DateFormat df;
     /**
      * Last loaded keyframe file name
      **/
@@ -114,7 +116,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      **/
     private KeyframesPathObject keyframesPathObject;
 
-    private float buttonSize, buttonSizeL;
+    private final float buttonSize;
+    private final float buttonSizeL;
 
     /**
      * Contains info on field currently being edited
@@ -124,7 +127,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         private Keyframe kf;
         private int index;
         private OwnTextField tf;
-        private Map<String, Object> map;
+        private final Map<String, Object> map;
 
         public Editing() {
             map = new HashMap<>();
@@ -197,13 +200,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     }
 
-    private Editing editing;
+    private final Editing editing;
 
     public KeyframesWindow(Stage stage, Skin skin) {
         super(I18n.txt("gui.keyframes.title"), skin, stage);
 
-        buttonSize = 15 * GlobalConf.UI_SCALE_FACTOR;
-        buttonSizeL = 17 * GlobalConf.UI_SCALE_FACTOR;
+        buttonSize = 26f;
+        buttonSizeL = 28f;
 
         this.enterExit = false;
         this.editing = new Editing();
@@ -269,7 +272,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             addKeyframe.setDisabled(true);
         });
         secondsInput = new OwnTextField("1.0", skin, secondsValidator);
-        secondsInput.setWidth(60 * GlobalConf.UI_SCALE_FACTOR);
+        secondsInput.setWidth(96f);
         OwnLabel secondsLabel = new OwnLabel(I18n.txt("gui.keyframes.secsafter") + ":", skin);
         left.add(secondsLabel).center().left().padRight(pad10).padBottom(pad10);
         left.add(secondsInput).center().left().padBottom(pad10).row();
@@ -278,7 +281,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         LengthValidator lengthValidator = new LengthValidator(0, 15);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]*$");
         nameInput = new OwnTextField("", skin, nameValidator);
-        nameInput.setWidth(60 * GlobalConf.UI_SCALE_FACTOR);
+        nameInput.setWidth(96f);
         OwnLabel nameLabel = new OwnLabel(I18n.txt("gui.keyframes.name") + ":", skin);
         left.add(nameLabel).center().left().padRight(pad10).padBottom(pad10);
         left.add(nameInput).center().left().padBottom(pad10).row();
@@ -295,8 +298,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rightScroll = new OwnScrollPane(keyframesTable, skin, "minimalist-nobg");
         rightScroll.setExpand(true);
         rightScroll.setScrollingDisabled(true, false);
-        rightScroll.setHeight((GlobalConf.isHiDPI() ? 100 : 110) * GlobalConf.UI_SCALE_FACTOR);
-        rightScroll.setWidth((GlobalConf.isHiDPI() ? 360 : 390) * GlobalConf.UI_SCALE_FACTOR);
+        rightScroll.setHeight(160f);
+        rightScroll.setWidth(540f);
         rightScroll.setFadeScrollBars(true);
 
         right.add(keyframesTitle).top().left().padBottom(pad10).row();
@@ -353,6 +356,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {
@@ -456,6 +461,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     GaiaSky.postRunnable(() -> {
                         keyframesPathObject.resamplePath();
                     });
+
+                });
+                kpw.setCancelRunnable(()->{
+
                 });
                 kpw.show(stage, me.getWidth(), 0);
                 return true;
@@ -470,7 +479,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
         /** FINAL LAYOUT **/
         content.add(left).top().left().padRight(pad10 * 2f).padBottom(pad10 * 3f);
-        content.add(right).width(370f * GlobalConf.UI_SCALE_FACTOR).top().left().padBottom(pad10).row();
+        content.add(right).width(592f).top().left().padBottom(pad10).row();
         notice = content.add();
         notice.padBottom(pad10 * 2f).expandY().center().colspan(2).row();
         content.add(normalizeTime).colspan(2).bottom().center().padBottom(pad10).row();
@@ -623,8 +632,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
 
     private Cell addFrameSeconds(Keyframe kf, double prevT, int index, Table table) {
         // Seconds
-        OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-header");
-        secondsL.setWidth((GlobalConf.isHiDPI() ? 60f : 75f) * GlobalConf.UI_SCALE_FACTOR);
+        OwnLabel secondsL = new OwnLabel(secondsFormatter.format(prevT + kf.seconds), skin, "hud-subheader");
+        secondsL.setWidth(96f);
         Cell secondsCell;
         if (secondsCells.containsKey(kf))
             secondsCell = secondsCells.get(kf);
@@ -649,7 +658,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                         secondsL.clear();
                         secondsCells.get(kf).clearActor();
                         OwnTextField secondsInput = new OwnTextField(valText, skin, new FloatValidator(0.0001f, 500f));
-                        secondsInput.setWidth((GlobalConf.isHiDPI() ? 55f : 75f) * GlobalConf.UI_SCALE_FACTOR);
+                        secondsInput.setWidth(88f);
                         secondsInput.selectAll();
                         stage.setKeyboardFocus(secondsInput);
                         editing.setSeconds(kf, index, secondsInput, prevT);
@@ -695,7 +704,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Cell addFrameName(Keyframe kf, int index, Table table) {
         // Seconds
         OwnLabel nameL = new OwnLabel((index + 1) + ": " + kf.name, skin);
-        nameL.setWidth((GlobalConf.isHiDPI() ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
+        nameL.setWidth(160f);
         Cell nameCell;
         if (namesCells.containsKey(kf))
             nameCell = namesCells.get(kf);
@@ -724,7 +733,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     LengthValidator lengthValidator = new LengthValidator(0, 15);
                     RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\+\\=\\\\\\/@#\\$&\\*()~]*$");
                     OwnTextField nameInput = new OwnTextField(valText, skin, nameValidator);
-                    nameInput.setWidth((GlobalConf.isHiDPI() ? 100f : 130f) * GlobalConf.UI_SCALE_FACTOR);
+                    nameInput.setWidth(160f);
                     nameInput.selectAll();
                     stage.setKeyboardFocus(nameInput);
                     editing.setName(kf, index, nameInput);
@@ -765,7 +774,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         long frame = (long) ((t + kf.seconds) * GlobalConf.frame.RENDER_TARGET_FPS);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
-        framesL.setWidth(40 * GlobalConf.UI_SCALE_FACTOR);
+        framesL.setWidth(64f);
         framesL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.frames", frame, (1d / GlobalConf.frame.RENDER_TARGET_FPS)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad10).padBottom(pad5);
@@ -871,7 +880,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         rubbish.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Remove keyframe
-                Array<Keyframe> newKfs = new Array<>(keyframes.size - 1);
+                Array<Keyframe> newKfs = new Array<>(false, keyframes.size - 1);
                 for (Keyframe k : keyframes) {
                     if (k != kf)
                         newKfs.add(k);
@@ -953,6 +962,13 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     }
 
     private void clean(boolean cleanKeyframesList, boolean cleanModel) {
+        // Clean camera
+        IFocus focus = GaiaSky.instance.getICamera().getFocus();
+        if(focus != null && focus instanceof Invisible && focus.getName().startsWith("Keyframe")){
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GlobalConf.scene.STARTUP_OBJECT);
+            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+        }
+
         if (cleanKeyframesList)
             keyframes.clear();
 
@@ -966,6 +982,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             GaiaSky.postRunnable(() -> {
                 keyframesPathObject.clear();
             });
+
     }
 
     private void scrollToSelected() {

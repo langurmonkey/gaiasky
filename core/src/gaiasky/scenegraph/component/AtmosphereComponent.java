@@ -108,13 +108,8 @@ public class AtmosphereComponent {
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ColorOpacity, 1f));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.CameraHeight, camHeight));
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.CameraHeight2, camHeight * camHeight));
-
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.OuterRadius, m_fOuterRadius));
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.OuterRadius2, m_fOuterRadius * m_fOuterRadius));
-
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.InnerRadius, m_fInnerRadius));
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.InnerRadius2, m_fInnerRadius * m_fInnerRadius));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.KrESun, m_Kr * m_ESun));
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.KmESun, m_Km * m_ESun));
@@ -127,13 +122,11 @@ public class AtmosphereComponent {
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.ScaleOverScaleDepth, m_fScaleOverScaleDepth));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.nSamples, m_nSamples));
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.fSamples, (float) m_nSamples));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.FogDensity, fogDensity));
         mat.set(new Vector3Attribute(Vector3Attribute.FogColor, fogColor));
 
         mat.set(new AtmosphereAttribute(AtmosphereAttribute.G, m_g));
-        mat.set(new AtmosphereAttribute(AtmosphereAttribute.G2, m_g * m_g));
 
         mat.set(new Vector3Attribute(Vector3Attribute.PlanetPos, new Vector3()));
         mat.set(new Vector3Attribute(Vector3Attribute.CameraPos, new Vector3()));
@@ -194,9 +187,6 @@ public class AtmosphereComponent {
             ((AtmosphereAttribute) mat.get(AtmosphereAttribute.CameraHeight)).value = camHeight;
         else
             mat.set(new AtmosphereAttribute(AtmosphereAttribute.CameraHeight, camHeight));
-
-        // Camera height **2
-        ((AtmosphereAttribute) mat.get(AtmosphereAttribute.CameraHeight2)).value = camHeight * camHeight;
 
         // Planet position
         if (ground) {

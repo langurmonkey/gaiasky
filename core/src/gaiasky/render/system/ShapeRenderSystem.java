@@ -7,26 +7,28 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IRenderable;
 import gaiasky.render.IShapeRenderable;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalResources;
 
 import java.util.List;
 
 public class ShapeRenderSystem extends AbstractRenderSystem {
 
-    private ShapeRenderer shapeRenderer;
+    private final ShapeRenderer shapeRenderer;
 
     public ShapeRenderSystem(RenderGroup rg, float[] alphas) {
         super(rg, alphas, null);
-        this.shapeRenderer = new ShapeRenderer();
+        this.shapeRenderer = new ShapeRenderer(5000, GlobalResources.spriteShader);
 
     }
 
     @Override
-    public void renderStud(List<IRenderable> renderables, ICamera camera, double t) {
+    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         shapeRenderer.begin(ShapeType.Line);
         renderables.forEach(r ->{
             IShapeRenderable sr = (IShapeRenderable) r;

@@ -1,9 +1,11 @@
-image: openjdk:11
+image: archlinux:base-devel-20210221.0.15908
 
 stages:
     - compile
 
 before_script:
+    - pacman -Sy
+    - pacman -S --noconfirm glibc git jdk15-openjdk
     - ./gradlew init
 
 compile:

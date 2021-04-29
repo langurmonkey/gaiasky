@@ -12,9 +12,9 @@ SET GSDIR=%~dp0
 cd %GSDIR%
 
 :: Memory
-SET OPTS=-Xms2g -Xmx4g
+SET OPTS=-Xms2g -Xmx6g
 :: Garbage Collector G1
-SET OPTS=%OPTS% -XX:+UseG1GC
+SET OPTS=%OPTS% -XX:+UseShenandoahGC
 :: Assets location
 SET OPTS=%OPTS% -Dassets.location=.
 :: SimpleLogger defaults

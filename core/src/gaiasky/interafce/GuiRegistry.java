@@ -41,7 +41,7 @@ public class GuiRegistry implements IObserver {
     /**
      * Registered GUI array
      **/
-    private static Array<IGui> guis;
+    private static final Array<IGui> guis;
 
     static {
         guis = new Array<>(true, 2);
@@ -184,7 +184,11 @@ public class GuiRegistry implements IObserver {
             synchronized (guirenderlock) {
                 for (int i = 0; i < guis.size; i++) {
                     guis.get(i).getGuiStage().getViewport().apply();
-                    guis.get(i).render(rw, rh);
+                    try {
+                        guis.get(i).render(rw, rh);
+                    } catch (Exception e) {
+
+                    }
                 }
             }
         }
@@ -218,6 +222,10 @@ public class GuiRegistry implements IObserver {
 
     private Skin skin;
 
+    private PreferencesWindow preferencesWindow;
+    private AboutWindow aboutWindow;
+    private SearchDialog searchDialog;
+
     /**
      * Keyframes window
      **/
@@ -243,21 +251,23 @@ public class GuiRegistry implements IObserver {
     /* Slave config window */
     private SlaveConfigWindow slaveConfigWindow;
 
+    // Scene Graph
+    protected ISceneGraph sg;
+
     /**
      * One object to handle observer pattern
      */
-    public GuiRegistry(Skin skin) {
+    public GuiRegistry(Skin skin, ISceneGraph sg) {
         super();
         this.skin = skin;
+        this.sg = sg;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_INDIVIDUAL_VISIBILITY_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
     }
 
     public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
     }
-
-    protected SearchDialog searchDialog;
 
     @Override
     public void notify(final Events event, final Object... data) {
@@ -265,241 +275,261 @@ public class GuiRegistry implements IObserver {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
             switch (event) {
-                case SHOW_QUIT_ACTION:
-                    if (!removeModeChangePopup() && !removeControllerGui()) {
-                        if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
-                            // Release mouse if captured
-                            GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
-                        } else {
-                            Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
-                            if (GlobalConf.program.EXIT_CONFIRMATION) {
-                                QuitWindow quit = new QuitWindow(ui, skin);
-                                if (data.length > 0) {
-                                    quit.setAcceptRunnable(quitRunnable);
-                                }
-                                quit.show(ui);
-                            } else {
-                                if (quitRunnable != null)
-                                    quitRunnable.run();
-                                GaiaSky.postRunnable(() -> Gdx.app.exit());
-                            }
-                        }
-                    }
-                    break;
-                case CAMERA_MODE_CMD:
-                    removeModeChangePopup();
-                    break;
-                case SHOW_ABOUT_ACTION:
-                    (new AboutWindow(ui, skin)).show(ui);
-                    break;
-                case SHOW_PREFERENCES_ACTION:
-                    Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
-                    if (prefs.isEmpty()) {
-                        // Bring new window up
-                        (new PreferencesWindow(ui, skin)).show(ui);
+            case SHOW_SEARCH_ACTION:
+                if (searchDialog == null) {
+                    searchDialog = new SearchDialog(skin, ui, sg);
+                } else {
+                    searchDialog.clearText();
+                }
+                if (!searchDialog.isVisible() | !searchDialog.hasParent())
+                    searchDialog.show(ui);
+                break;
+            case SHOW_QUIT_ACTION:
+                if (!removeModeChangePopup() && !removeControllerGui()) {
+                    if (GLFW.glfwGetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_DISABLED) {
+                        // Release mouse if captured
+                        GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
                     } else {
-                        // Close current windows
-                        for (Actor pref : prefs) {
-                            if (pref instanceof PreferencesWindow) {
-                                ((PreferencesWindow) pref).cancel();
-                                ((PreferencesWindow) pref).hide();
+                        Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
+                        if (GlobalConf.program.EXIT_CONFIRMATION) {
+                            QuitWindow quit = new QuitWindow(ui, skin);
+                            if (data.length > 0) {
+                                quit.setAcceptRunnable(quitRunnable);
                             }
+                            quit.show(ui);
+                        } else {
+                            if (quitRunnable != null)
+                                quitRunnable.run();
+                            GaiaSky.postRunnable(() -> Gdx.app.exit());
                         }
                     }
-                    break;
-                case SHOW_INDIVIDUAL_VISIBILITY_ACTION:
-                    if (indVisWindow == null) {
-                        final ISceneGraph sg = GaiaSky.instance.sg;
-                        indVisWindow = new IndividualVisibilityWindow(sg, ui, skin);
+                }
+                break;
+            case CAMERA_MODE_CMD:
+                removeModeChangePopup();
+                break;
+            case SHOW_ABOUT_ACTION:
+                if (aboutWindow == null)
+                    aboutWindow = new AboutWindow(ui, skin);
+                if (!aboutWindow.isVisible() || !aboutWindow.hasParent())
+                    aboutWindow.show(ui);
+                break;
+            case SHOW_PREFERENCES_ACTION:
+                Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
+                if (prefs.isEmpty()) {
+                    if (preferencesWindow == null) {
+                        preferencesWindow = new PreferencesWindow(ui, skin);
                     }
-                    if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
-                        indVisWindow.show(ui);
-                    break;
-                case SHOW_SLAVE_CONFIG_ACTION:
-                    if (MasterManager.hasSlaves()) {
-                        if (slaveConfigWindow == null)
-                            slaveConfigWindow = new SlaveConfigWindow(ui, skin);
+                    if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent())
+                        preferencesWindow.show(ui);
+                } else {
+                    // Close current windows
+                    for (Actor pref : prefs) {
+                        if (pref instanceof PreferencesWindow) {
+                            ((PreferencesWindow) pref).cancel();
+                            ((PreferencesWindow) pref).hide();
+                        }
+                    }
+                }
+                break;
+            case SHOW_PER_OBJECT_VISIBILITY_ACTION:
+                if (indVisWindow == null) {
+                    final ISceneGraph sg = GaiaSky.instance.sg;
+                    indVisWindow = new IndividualVisibilityWindow(sg, ui, skin);
+                }
+                if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
+                    indVisWindow.show(ui);
+                break;
+            case SHOW_SLAVE_CONFIG_ACTION:
+                if (MasterManager.hasSlaves()) {
+                    if (slaveConfigWindow == null)
+                        slaveConfigWindow = new SlaveConfigWindow(ui, skin);
+                    if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent())
                         slaveConfigWindow.show(ui);
+                }
+                break;
+            case SHOW_LOAD_CATALOG_ACTION:
+                if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
+                    try {
+                        lastOpenLocation = Paths.get(GlobalConf.program.LAST_OPEN_LOCATION);
+                    } catch (Exception e) {
+                        lastOpenLocation = null;
                     }
-                    break;
-                case SHOW_LOAD_CATALOG_ACTION:
-                    if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
-                        try {
-                            lastOpenLocation = Paths.get(GlobalConf.program.LAST_OPEN_LOCATION);
-                        } catch (Exception e) {
-                            lastOpenLocation = null;
-                        }
-                    }
-                    if (lastOpenLocation == null) {
-                        lastOpenLocation = SysUtils.getUserHome();
-                    } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
-                        lastOpenLocation = SysUtils.getHomeDir();
-                    }
+                }
+                if (lastOpenLocation == null) {
+                    lastOpenLocation = SysUtils.getUserHome();
+                } else if (!Files.exists(lastOpenLocation) || !Files.isDirectory(lastOpenLocation)) {
+                    lastOpenLocation = SysUtils.getHomeDir();
+                }
 
-                    FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
-                    fc.setAcceptText(I18n.txt("gui.loadcatalog"));
-                    fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv"));
-                    fc.setAcceptedFiles("*.vot, *.csv");
-                    fc.setResultListener((success, result) -> {
-                        if (success) {
-                            if (Files.exists(result) && Files.exists(result)) {
-                                // Load selected file
-                                try {
-                                    String fileName = result.getFileName().toString();
-                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
-                                    Runnable doLoad = () -> {
-                                        try {
-                                            Thread t = new Thread(() -> {
-                                                DatasetOptions dops = dld.generateDatasetOptions();
-                                                // Load dataset
-                                                EventScriptingInterface.instance().loadDataset(dops.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
-                                                // Select first
-                                                CatalogInfo ci = CatalogManager.instance().get(dops.catalogName);
-                                                if (ci.object != null) {
-                                                    if (ci.object instanceof ParticleGroup) {
-                                                        ParticleGroup pg = (ParticleGroup) ci.object;
-                                                        if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
-                                                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
-                                                        }
-                                                    } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
+                FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
+                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
+                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                fc.setAcceptText(I18n.txt("gui.loadcatalog"));
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits"));
+                fc.setAcceptedFiles("*.vot, *.csv, *.fits");
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (Files.exists(result) && Files.exists(result)) {
+                            // Load selected file
+                            try {
+                                String fileName = result.getFileName().toString();
+                                final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+                                Runnable doLoad = () -> {
+                                    try {
+                                        Thread t = new Thread(() -> {
+                                            DatasetOptions dops = dld.generateDatasetOptions();
+                                            // Load dataset
+                                            EventScriptingInterface.instance().loadDataset(dops.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
+                                            // Select first
+                                            CatalogInfo ci = CatalogManager.instance().get(dops.catalogName);
+                                            if (ci != null && ci.object != null) {
+                                                if (ci.object instanceof ParticleGroup) {
+                                                    ParticleGroup pg = (ParticleGroup) ci.object;
+                                                    if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
                                                         EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
+                                                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
                                                     }
-                                                    // Open UI datasets
-                                                    EventScriptingInterface.instance().maximizeInterfaceWindow();
-                                                    EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                                } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
+                                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
                                                 }
-                                            });
-                                            t.setName("Dataset loader thread (scripting)");
-                                            t.start();
-                                        } catch (Exception e) {
-                                            logger.error(I18n.txt("notif.error", fileName), e);
-                                        }
-                                    };
-                                    dld.setAcceptRunnable(doLoad);
-                                    dld.show(ui);
+                                                // Open UI datasets
+                                                EventScriptingInterface.instance().maximizeInterfaceWindow();
+                                                EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                            } else {
+                                                logger.info("No data loaded (did the load crash?)");
+                                            }
+                                        });
+                                        t.setName("gaiasky-worker-datasetload");
+                                        t.start();
+                                    } catch (Exception e) {
+                                        logger.error(I18n.txt("notif.error", fileName), e);
+                                    }
+                                };
+                                dld.setAcceptRunnable(doLoad);
+                                dld.show(ui);
 
-                                    lastOpenLocation = result.getParent();
-                                    GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
-                                    return true;
-                                } catch (Exception e) {
-                                    logger.error(I18n.txt("notif.error", result.getFileName()), e);
-                                    return false;
-                                }
-
-                            } else {
-                                logger.error("Selection must be a file: " + result.toAbsolutePath());
+                                lastOpenLocation = result.getParent();
+                                GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
+                                return true;
+                            } catch (Exception e) {
+                                logger.error(I18n.txt("notif.error", result.getFileName()), e);
                                 return false;
                             }
+
                         } else {
-                            // Still, update last location
-                            if (!Files.isDirectory(result)) {
-                                lastOpenLocation = result.getParent();
-                            } else {
-                                lastOpenLocation = result;
-                            }
-                            GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
+                            logger.error("Selection must be a file: " + result.toAbsolutePath());
+                            return false;
                         }
-                        return false;
-                    });
-                    fc.show(ui);
-                    break;
-                case SHOW_KEYFRAMES_WINDOW_ACTION:
-                    if (keyframesWindow == null) {
-                        keyframesWindow = new KeyframesWindow(ui, skin);
-                    }
-                    if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
-                        keyframesWindow.show(ui, 0, 0);
-                    break;
-                case UI_THEME_RELOAD_INFO:
-                    if (keyframesWindow != null) {
-                        keyframesWindow.dispose();
-                        keyframesWindow = null;
-                    }
-                    this.skin = (Skin) data[0];
-                    break;
-                case MODE_POPUP_CMD:
-                    if (GlobalConf.runtime.DISPLAY_GUI) {
-                        ModePopupInfo mpi = (ModePopupInfo) data[0];
-                        String name = (String) data[1];
-
-                        if (mpi != null) {
-                            // Add
-                            Float seconds = (Float) data[2];
-                            float pad10 = 10f * GlobalConf.UI_SCALE_FACTOR;
-                            float pad5 = 5f * GlobalConf.UI_SCALE_FACTOR;
-                            float pad3 = 3f * GlobalConf.UI_SCALE_FACTOR;
-                            if (modeChangeTable != null) {
-                                modeChangeTable.remove();
-                            }
-                            modeChangeTable = new Table(skin);
-                            modeChangeTable.setName("mct-" + name);
-                            modeChangeTable.setBackground("table-bg");
-                            modeChangeTable.pad(pad10);
-
-                            // Fill up table
-                            OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
-                            modeChangeTable.add(ttl).left().padBottom(pad10).row();
-
-                            OwnLabel dsc = new OwnLabel(mpi.header, skin);
-                            modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
-
-                            Table keysTable = new Table(skin);
-                            for (Pair<String[], String> m : mpi.mappings) {
-                                HorizontalGroup keysGroup = new HorizontalGroup();
-                                keysGroup.space(pad3);
-                                String[] keys = m.getFirst();
-                                String action = m.getSecond();
-                                for (int i = 0; i < keys.length; i++) {
-                                    TextButton key = new TextButton(keys[i], skin, "key");
-                                    key.pad(0, pad3, 0, pad3);
-                                    key.pad(pad5);
-                                    keysGroup.addActor(key);
-                                    if (i < keys.length - 1) {
-                                        keysGroup.addActor(new OwnLabel("+", skin));
-                                    }
-                                }
-                                keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
-                                keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
-                            }
-                            modeChangeTable.add(keysTable).center().row();
-                            modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
-
-                            modeChangeTable.pack();
-
-                            // Add table to UI
-                            Container mct = new Container<>(modeChangeTable);
-                            mct.setFillParent(true);
-                            mct.top();
-                            mct.pad(pad10 * 2, 0, 0, 0);
-                            ui.addActor(mct);
-
-                            startModePopupInfoThread(modeChangeTable, seconds);
-                        } else {
-                            // Remove
-                            if (modeChangeTable != null && modeChangeTable.hasParent() && modeChangeTable.getName().equals("mct-" + name)) {
-                                modeChangeTable.remove();
-                                modeChangeTable = null;
-                            }
-                        }
-                    }
-                    break;
-                case DISPLAY_GUI_CMD:
-                    boolean displayGui = (Boolean) data[0];
-                    if (!displayGui) {
-                        // Remove processor
-                        im.removeProcessor(current.getGuiStage());
                     } else {
-                        // Add processor
-                        im.addProcessor(0, current.getGuiStage());
+                        // Still, update last location
+                        if (!Files.isDirectory(result)) {
+                            lastOpenLocation = result.getParent();
+                        } else {
+                            lastOpenLocation = result;
+                        }
+                        GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
                     }
-                    break;
-                case UI_RELOAD_CMD:
-                    reloadUI();
-                    break;
-                default:
-                    break;
+                    return false;
+                });
+                fc.show(ui);
+                break;
+            case SHOW_KEYFRAMES_WINDOW_ACTION:
+                if (keyframesWindow == null) {
+                    keyframesWindow = new KeyframesWindow(ui, skin);
+                }
+                if (!keyframesWindow.isVisible() || !keyframesWindow.hasParent())
+                    keyframesWindow.show(ui, 0, 0);
+                break;
+            case UI_THEME_RELOAD_INFO:
+                if (keyframesWindow != null) {
+                    keyframesWindow.dispose();
+                    keyframesWindow = null;
+                }
+                this.skin = (Skin) data[0];
+                break;
+            case MODE_POPUP_CMD:
+                if (GlobalConf.runtime.DISPLAY_GUI) {
+                    ModePopupInfo mpi = (ModePopupInfo) data[0];
+                    String name = (String) data[1];
+
+                    if (mpi != null) {
+                        // Add
+                        Float seconds = (Float) data[2];
+                        float pad10 = 16f;
+                        float pad5 = 8f;
+                        float pad3 = 4.8f;
+                        if (modeChangeTable != null) {
+                            modeChangeTable.remove();
+                        }
+                        modeChangeTable = new Table(skin);
+                        modeChangeTable.setName("mct-" + name);
+                        modeChangeTable.setBackground("table-bg");
+                        modeChangeTable.pad(pad10);
+
+                        // Fill up table
+                        OwnLabel ttl = new OwnLabel(mpi.title, skin, "hud-header");
+                        modeChangeTable.add(ttl).left().padBottom(pad10).row();
+
+                        OwnLabel dsc = new OwnLabel(mpi.header, skin);
+                        modeChangeTable.add(dsc).left().padBottom(pad5 * 3f).row();
+
+                        Table keysTable = new Table(skin);
+                        for (Pair<String[], String> m : mpi.mappings) {
+                            HorizontalGroup keysGroup = new HorizontalGroup();
+                            keysGroup.space(pad3);
+                            String[] keys = m.getFirst();
+                            String action = m.getSecond();
+                            for (int i = 0; i < keys.length; i++) {
+                                TextButton key = new TextButton(keys[i], skin, "key");
+                                key.pad(0, pad3, 0, pad3);
+                                key.pad(pad5);
+                                keysGroup.addActor(key);
+                                if (i < keys.length - 1) {
+                                    keysGroup.addActor(new OwnLabel("+", skin));
+                                }
+                            }
+                            keysTable.add(keysGroup).right().padBottom(pad5).padRight(pad10 * 2f);
+                            keysTable.add(new OwnLabel(action, skin)).left().padBottom(pad5).row();
+                        }
+                        modeChangeTable.add(keysTable).center().row();
+                        modeChangeTable.add(new OwnLabel("ESC - close this", skin, "mono")).right().padTop(pad10 * 2f);
+
+                        modeChangeTable.pack();
+
+                        // Add table to UI
+                        Container mct = new Container<>(modeChangeTable);
+                        mct.setFillParent(true);
+                        mct.top();
+                        mct.pad(pad10 * 2, 0, 0, 0);
+                        ui.addActor(mct);
+
+                        startModePopupInfoThread(modeChangeTable, seconds);
+                    } else {
+                        // Remove
+                        if (modeChangeTable != null && modeChangeTable.hasParent() && modeChangeTable.getName().equals("mct-" + name)) {
+                            modeChangeTable.remove();
+                            modeChangeTable = null;
+                        }
+                    }
+                }
+                break;
+            case DISPLAY_GUI_CMD:
+                boolean displayGui = (Boolean) data[0];
+                if (!displayGui) {
+                    // Remove processor
+                    im.removeProcessor(current.getGuiStage());
+                } else {
+                    // Add processor
+                    im.addProcessor(0, current.getGuiStage());
+                }
+                break;
+            case UI_RELOAD_CMD:
+                reloadUI();
+                break;
+            default:
+                break;
             }
         }
 

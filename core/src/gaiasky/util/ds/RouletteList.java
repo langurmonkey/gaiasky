@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class RouletteList<T> implements Collection<T> {
 
-    private List<T>[] roulette;
+    private final List<T>[] roulette;
     private int currentIndex;
     private int numElements;
 

@@ -13,7 +13,8 @@ import gaiasky.util.scene2d.OwnTextField;
  */
 public class TextFieldComparatorValidator extends CallbackValidator {
 
-    private OwnTextField[] lessThan, greaterThan;
+    private final OwnTextField[] lessThan;
+    private final OwnTextField[] greaterThan;
 
     public TextFieldComparatorValidator(IValidator parent, OwnTextField[] lessThan, OwnTextField[] greaterThan) {
         super(parent);

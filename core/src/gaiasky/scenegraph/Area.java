@@ -19,9 +19,8 @@ import net.jafama.FastMath;
 
 /**
  * Represents the outline of a country
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class Area extends SceneGraphNode implements ILineRenderable {
 
@@ -34,9 +33,10 @@ public class Area extends SceneGraphNode implements ILineRenderable {
     private int censusYear;
 
     /** Max latitud/longitude and min latitude/longitude **/
-    private Vector2 maxlonlat, minlonlat;
+    private final Vector2 maxlonlat;
+    private final Vector2 minlonlat;
     /** Cartesian points correspoding to maximum lonlat and minimum lonlat **/
-    private Vector3 cart0;
+    private final Vector3 cart0;
 
     public Area() {
         cc = new float[] { 0.8f, 0.8f, 0.f, 1f };
@@ -74,7 +74,7 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (isVisibilityOn()) {
+        if (this.shouldRender()) {
             addToRender(this, RenderGroup.LINE);
         }
 
@@ -86,7 +86,7 @@ public class Area extends SceneGraphNode implements ILineRenderable {
         float angleLow = (float) ((ModelBody) parent).THRESHOLD_QUAD() * camera.getFovFactor() * 100f;
         float angleHigh = (float) ((ModelBody) parent).THRESHOLD_QUAD() * camera.getFovFactor() * 200f;
 
-        if (isVisibilityOn() && ((ModelBody) parent).viewAngleApparent > angleLow) {
+        if (isVisibilityOn() && parent.viewAngleApparent > angleLow) {
             //ModelBody papa = (ModelBody) parent;
             localTransform.idt();
             toCartesian(loc2d[0][0][0], loc2d[0][0][1], cart0, localTransform);
@@ -100,11 +100,12 @@ public class Area extends SceneGraphNode implements ILineRenderable {
             updateLocalValues(time, camera);
             this.translation.add(pos);
 
-            this.opacity = (float) MathUtilsd.lint(((ModelBody) parent).viewAngleApparent, angleLow, angleHigh, 0, 1);
+            this.opacity = (float) MathUtilsd.lint(parent.viewAngleApparent, angleLow, angleHigh, 0, 1);
+            this.opacity *= this.getVisibilityOpacityFactor();
 
             this.distToCamera = (float) translation.len();
-            this.viewAngle = (float) FastMath.atan(size / distToCamera) / camera.getFovFactor();
-            this.viewAngleApparent = this.viewAngle;
+            this.viewAngle = (float) FastMath.atan(size / distToCamera);
+            this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
             if (!copy) {
                 addToRenderLists(camera);
             }
@@ -193,7 +194,7 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     @Override
     public float getLineWidth() {
-        return 1;
+        return 0.5f;
     }
 
     @Override

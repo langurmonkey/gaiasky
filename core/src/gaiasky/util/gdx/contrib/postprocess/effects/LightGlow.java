@@ -46,7 +46,7 @@ public final class LightGlow extends PostProcessorEffect {
         }
     }
 
-    private Glow glow;
+    private final Glow glow;
     private Settings settings;
 
     private boolean blending = false;
