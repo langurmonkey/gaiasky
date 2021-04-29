@@ -81,6 +81,8 @@ public class Filter {
         switch (op.toLowerCase()) {
         case "or":
             return new OperationOr();
+        case "xor":
+            return new OperationXor();
         case "and":
         default:
             return new OperationAnd();
@@ -135,6 +137,28 @@ public class Filter {
             boolean result = false;
             for (FilterRule rule : rules) {
                 result = result || rule.evaluate(bean);
+            }
+            return result;
+        }
+
+        @Override
+        public String getOperationString() {
+            return op;
+        }
+    }
+
+    private class OperationXor implements IOperation {
+        public String op;
+
+        public OperationXor() {
+            this.op = "xor";
+        }
+
+        @Override
+        public boolean evaluate(Array<FilterRule> rules, IParticleRecord bean) {
+            boolean result = false;
+            for (FilterRule rule : rules) {
+                result = result ^ rule.evaluate(bean);
             }
             return result;
         }

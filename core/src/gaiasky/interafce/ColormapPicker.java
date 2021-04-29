@@ -364,6 +364,10 @@ public class ColormapPicker extends ColorPickerAbstract {
                 attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
                 attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
             }
+            // Colors
+            attrs.add(new AttributeComboBoxBean(new AttributeColorRed()));
+            attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
+            attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
             // Extra attributes
             if (catalog instanceof ParticleGroup) {
                 ParticleGroup pg = (ParticleGroup) catalog;

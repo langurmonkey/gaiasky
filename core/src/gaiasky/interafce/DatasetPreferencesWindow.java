@@ -216,7 +216,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             // Operation
             OwnSelectBox<String> operation = new OwnSelectBox<>(skin);
             operation.setWidth(minSelectWidth);
-            operation.setItems("and", "or");
+            operation.setItems("and", "or", "xor");
             operation.setSelected(filter.getOperationString().toLowerCase());
             operation.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -258,6 +258,10 @@ public class DatasetPreferencesWindow extends GenericDialog {
                     attrs.add(new AttributeComboBoxBean(new AttributeMudelta()));
                     attrs.add(new AttributeComboBoxBean(new AttributeRadvel()));
                 }
+                // Colors
+                attrs.add(new AttributeComboBoxBean(new AttributeColorRed()));
+                attrs.add(new AttributeComboBoxBean(new AttributeColorGreen()));
+                attrs.add(new AttributeComboBoxBean(new AttributeColorBlue()));
                 // Extra attributes
                 if (ci.object instanceof ParticleGroup) {
                     ParticleGroup pg = (ParticleGroup) ci.object;
