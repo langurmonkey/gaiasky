@@ -29,10 +29,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.Intersectord;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 
 /**
@@ -121,8 +118,8 @@ public abstract class ModelBody extends CelestialBody {
                 mc.dLight.direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
                 mc.dLight.color.set(col[0], col[1], col[2], 1.0f);
             } else {
-                Vector3d campos = camera.getPos();
-                mc.dLight.direction.add((float) campos.x, (float) campos.y, (float) campos.z);
+                Vector3b campos = camera.getPos();
+                mc.dLight.direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
                 mc.dLight.color.set(1f, 1f, 1f, 1f);
             }
         }

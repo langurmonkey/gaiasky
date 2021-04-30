@@ -57,7 +57,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
         position(ura.getAbsolutePosition(aux3d1), uraf);
         position(nep.getAbsolutePosition(aux3d1), nepf);
         position(jup.getAbsolutePosition(aux3d1), jupf);
-        position(GaiaSky.instance.cam.getPos(), camp);
+        position(GaiaSky.instance.cam.getPos().tov3d(aux3d1), camp);
     }
 
 

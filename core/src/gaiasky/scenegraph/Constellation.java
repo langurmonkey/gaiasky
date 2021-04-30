@@ -135,7 +135,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
         Vector3d p1 = aux3d1.get();
         Vector3d p2 = aux3d2.get();
-        Vector3d campos = camera.getPos();
+        Vector3d campos = camera.getPos().tov3d(aux3d3.get());
 
         for (IPosition[] pair : lines) {
             if (pair != null) {

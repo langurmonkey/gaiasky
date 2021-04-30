@@ -201,7 +201,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         updateHard(dt, time);
 
         /* POST */
-        distance = pos.len();
+        distance = pos.lend();
 
         // Update camera
         updatePerspectiveCamera();
@@ -237,7 +237,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      */
     public void updateHard(double dt, ITimeFrameProvider time) {
         if (sc != null) {
-            //double sdt = time.getDt() * Constants.H_TO_S;
             double sdt = dt;
 
             // POSITION

@@ -25,6 +25,7 @@ import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
@@ -539,7 +540,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             focusDEC.setText(nf.format((double) data[3] % 360) + "°");
             break;
         case CAMERA_MOTION_UPDATE:
-            Vector3d campos = (Vector3d) data[0];
+            Vector3b campos = (Vector3b) data[0];
             Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x);
             Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y);
             Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z);

@@ -31,7 +31,8 @@ public abstract class AbstractCamera implements ICamera {
     /** Camera near value **/
     public double CAM_NEAR;
 
-    public Vector3d pos, posinv, prevpos, shift, tmp;
+    public Vector3b pos, posinv, prevpos;
+    public Vector3d tmp, shift;
     /**
      * Angle from the center to the corner of the screen in scene coordinates,
      * in radians
@@ -86,9 +87,9 @@ public abstract class AbstractCamera implements ICamera {
         initNearFar();
 
         this.parent = parent;
-        pos = new Vector3d();
-        prevpos = new Vector3d();
-        posinv = new Vector3d();
+        pos = new Vector3b();
+        prevpos = new Vector3b();
+        posinv = new Vector3b();
         shift = new Vector3d();
         tmp = new Vector3d();
         prevCombined = new Matrix4();
@@ -126,7 +127,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3d getPos() {
+    public Vector3b getPos() {
         return pos;
     }
 
@@ -136,7 +137,17 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3d getPreviousPos(){
+    public void setPos(Vector3b pos) {
+        this.pos.set(pos);
+    }
+
+    @Override
+    public void setPreviousPos(Vector3b pos) {
+        this.prevpos.set(pos);
+    }
+
+    @Override
+    public Vector3b getPreviousPos(){
         return prevpos;
     }
 
@@ -147,7 +158,7 @@ public abstract class AbstractCamera implements ICamera {
 
 
     @Override
-    public Vector3d getInversePos() {
+    public Vector3b getInversePos() {
         return posinv;
     }
 

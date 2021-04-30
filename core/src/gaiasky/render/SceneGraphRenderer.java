@@ -53,6 +53,7 @@ import gaiasky.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
 import gaiasky.util.gdx.shader.provider.IntShaderProvider;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
 import org.lwjgl.opengl.GL30;
@@ -1048,9 +1049,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 float distance = (float) (radius * candidate.shadowMapValues[0] * 0.01);
                 // Position, factor of radius
                 Vector3d objPos = candidate.getAbsolutePosition(aux1d);
-                Vector3d camPos = camera.getPos();
+                Vector3b camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
-                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos, aux3d.set(camPos).add(camDir), objPos, radius);
+                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos, radius);
                 if (intersect) {
                     // Use height
                     camDir.nor().scl(candidate.distToCamera - radius);

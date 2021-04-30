@@ -86,7 +86,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
 
     public void update() {
         // Update camera position
-        position(cam.getPos(), camp);
+        position(cam.getPos().tov3d(aux3d1), camp);
         // Update camera direction
         direction(cam.getDirection(), camd);
         // Local

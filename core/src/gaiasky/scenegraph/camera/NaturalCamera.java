@@ -399,7 +399,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         computeNextPositions(time);
 
         // The whole update thread must lock the value of direction and up
-        distance = pos.len();
+        distance = pos.lend();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
         double realTransUnits = m.isGame() ? speedScaling(1e-5) : speedScaling();
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
@@ -1078,7 +1078,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // New position
             closestBody.getPredictedPosition(aux5, GaiaSky.instance.time, this, false);
 
-            double h = closestBody.getHeight(pos, aux5);
+            double h = closestBody.getHeight(pos.tov3d(), aux5);
             double hs = closestBody.getHeightScale() * GlobalConf.scene.ELEVATION_MULTIPLIER;
             double minDist = h + hs / 10.0;
             double newDist = aux5.scl(-1).add(pos).len();
@@ -1293,10 +1293,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double dist;
         double starEdge = 0.5 * Constants.PC_TO_U;
         if (parent.mode.useFocus() && focus != null) {
-            dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
+            dist = focus.getDistToCamera() - (focus.getHeight(pos.tov3d(), false) + MIN_DIST);
         } else if (parent.mode.useClosest()) {
             if (closestBody != null && closestBody.getDistToCamera() < closestStar.getDistToCamera()) {
-                dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
+                dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos.tov3d(), false) + MIN_DIST);
             } else if (closestStar != null && (closestStar.getClosestDistToCamera() + MIN_DIST) < starEdge) {
                 dist = distance * Math.pow((closestStar.getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
             } else {
@@ -1663,7 +1663,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (focus != null && !(focus instanceof Star) && !(focus instanceof ParticleGroup)) {
             // Move camera if too close to focus
             this.focus.getAbsolutePosition(aux1);
-            if (pos.dst(aux1) < this.focus.getRadius()) {
+            if (pos.dst(aux1).doubleValue() < this.focus.getRadius()) {
                 // Position camera near focus
                 stopTotalMovement();
 

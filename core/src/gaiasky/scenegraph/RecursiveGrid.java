@@ -370,7 +370,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     private double getDistanceToOrigin(ICamera camera) {
         IFocus focus = camera.getFocus();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
-            return camera.getPos().len();
+            return camera.getPos().lend();
         } else {
             return focus.getDistToCamera();
         }

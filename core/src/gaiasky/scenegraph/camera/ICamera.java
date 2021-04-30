@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -43,17 +44,19 @@ public interface ICamera {
 
     float getFovFactor();
 
-    Vector3d getPos();
+    Vector3b getPos();
 
     void setPos(Vector3d pos);
+    void setPos(Vector3b pos);
 
-    Vector3d getPreviousPos();
+    Vector3b getPreviousPos();
 
     void setPreviousPos(Vector3d pos);
+    void setPreviousPos(Vector3b pos);
 
     void setDirection(Vector3d dir);
 
-    Vector3d getInversePos();
+    Vector3b getInversePos();
 
     Vector3d getDirection();
 

@@ -222,7 +222,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 GaiaSky.postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
-                    double[] campos = GaiaSky.instance.cam.getPos().values();
+                    double[] campos = GaiaSky.instance.cam.getPos().valuesd();
                     Vector3d dir = new Vector3d();
                     focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
                     double[] d = dir.nor().values();
@@ -311,7 +311,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getCameraPosition() {
-        Vector3d campos = GaiaSky.instance.cam.getPos();
+        Vector3d campos = GaiaSky.instance.cam.getPos().tov3d(aux3d1);
         return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
     }
 
@@ -1407,7 +1407,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 Vector3d objectPosition = planet.getAbsolutePosition(aux3d2);
 
                 // Check intersection with object
-                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
+                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target, objectPosition, planet.getRadius());
 
                 if (intersects) {
                     cameraRotate(5d, 5d);
@@ -1417,7 +1417,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     sleep(0.1f);
 
                     objectPosition = planet.getAbsolutePosition(aux3d2);
-                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
+                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target, objectPosition, planet.getRadius());
                 }
 
                 cameraStop();
@@ -1859,7 +1859,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.lock = new Object();
 
             // Set up interpolators
-            posl = getPathd(cam.getPos(), pos);
+            posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
             dirl = getPathd(cam.getDirection(), dir);
             upl = getPathd(cam.getUp(), up);
 

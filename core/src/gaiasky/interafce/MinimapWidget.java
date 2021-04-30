@@ -20,6 +20,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.TextureWidget;
 
@@ -30,6 +31,7 @@ public class MinimapWidget implements Disposable {
     private final TextureWidget sideProjection;
     int side, side2;
     int sideshort, sideshort2;
+    private Vector3d aux3d;
 
     private final Array<IMinimapScale> scales;
     private IMinimapScale current;
@@ -92,13 +94,14 @@ public class MinimapWidget implements Disposable {
         String minimapHotkey = KeyBindings.instance.getStringKeys("action.toggle/gui.minimap.title");
         topProjection.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.minimap.title") + " - " + I18n.txt("gui.minimap.top"), minimapHotkey, skin));
         sideProjection.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.minimap.title") + " - " + I18n.txt("gui.minimap.side"), minimapHotkey, skin));
+        aux3d = new Vector3d();
     }
 
     public void update() {
         ICamera cam = GaiaSky.instance.cam;
-        double distSun = cam.getPos().len();
+        double distSun = cam.getPos().lend();
         for (IMinimapScale mms : scales) {
-            if (mms.isActive(cam.getPos(), distSun)) {
+            if (mms.isActive(cam.getPos().tov3d(aux3d), distSun)) {
                 mms.update();
                 mms.renderSideProjection(sfb);
                 mms.renderTopProjection(tfb);

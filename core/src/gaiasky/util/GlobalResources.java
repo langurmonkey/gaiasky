@@ -32,10 +32,12 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
+import org.apfloat.Apfloat;
 import org.lwjgl.opengl.GL30;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
@@ -124,6 +126,9 @@ public class GlobalResources {
     public static void doneLoading(AssetManager manager) {
     }
 
+    public static Pair<Double, String> doubleToDistanceString(Apfloat d) {
+       return doubleToDistanceString(d.doubleValue());
+    }
     /**
      * Converts this double to the string representation of a distance
      *

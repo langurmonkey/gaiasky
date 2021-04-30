@@ -228,7 +228,7 @@ public final class Levels extends PostProcessorEffect {
             GL30.glGetTexImage(lumaBuffer.getColorBufferTexture().glTarget, lumaLodLevels - 1, GL30.GL_RGB, GL30.GL_FLOAT, pixels);
             lumaAvg = pixels.get(0);
             // Ugly hack, but works
-            lumaMax = GaiaSky.instance.getICamera().getPos().len() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
+            lumaMax = GaiaSky.instance.getICamera().getPos().lend() * Constants.U_TO_PC > 10000 ? lumaAvg * 5000f : lumaAvg * 30f;
 
             if (!Double.isNaN(lumaAvg) && !Double.isNaN(lumaMax)) {
                 lowPassFilter();

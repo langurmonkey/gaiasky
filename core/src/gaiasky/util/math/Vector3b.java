@@ -181,6 +181,9 @@ public class Vector3b implements Serializable {
     public Vector3 tov3() {
         return new Vector3(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
+    public Vector3 tov3(Vector3 out) {
+        return out.set(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
+    }
 
     public Vector3d put(final Vector3d vec) {
         return vec.set(this.x.doubleValue(), this.y.doubleValue(), this.z.doubleValue());
@@ -188,6 +191,9 @@ public class Vector3b implements Serializable {
 
     public Vector3d tov3d() {
         return new Vector3d(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
+    }
+    public Vector3d tov3d(Vector3d out) {
+        return out.set(this.x.floatValue(), this.y.floatValue(), this.z.floatValue());
     }
 
     public Vector3b put(final Vector3b vec) {
@@ -464,6 +470,12 @@ public class Vector3b implements Serializable {
         Apfloat c = vec.z.subtract(this.z);
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
+    public Apfloat dst(final Vector3d vec) {
+        Apfloat a = new Apfloat(vec.x).subtract(this.x);
+        Apfloat b = new Apfloat(vec.y).subtract(this.y);
+        Apfloat c = new Apfloat(vec.z).subtract(this.z);
+        return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
+    }
 
     public double dstd(double x, double y, double z) {
         return dst(x, y, z).doubleValue();
@@ -479,6 +491,9 @@ public class Vector3b implements Serializable {
 
     public double dst2d(Vector3b vec) {
         return this.dst2(vec).doubleValue();
+    }
+    public double dst2d(Vector3d vec) {
+        return this.dst2d(vec.x, vec.y, vec.z);
     }
 
     public Apfloat dst2(Vector3b vec) {
@@ -578,6 +593,58 @@ public class Vector3b implements Serializable {
         return this.set(this.y.multiply(vz).subtract(this.z.multiply(vy)), this.z.multiply(vx).subtract(this.x.multiply(vz)), this.x.multiply(vy).subtract(this.y.multiply(vx)));
     }
 
+    /**
+     * Left-multiplies the vector by the given 4x3 column major matrix. The matrix
+     * should be composed by a 3x3 matrix representing rotation and scale plus a 1x3
+     * matrix representing the translation.
+     *
+     * @param matrix The matrix
+     * @return This vector for chaining
+     */
+    public Vector3b mul4x3(double[] matrix) {
+        var m0 = new Apfloat(matrix[0]);
+        var m1 = new Apfloat(matrix[1]);
+        var m2 = new Apfloat(matrix[2]);
+        var m3 = new Apfloat(matrix[3]);
+        var m4 = new Apfloat(matrix[4]);
+        var m5 = new Apfloat(matrix[5]);
+        var m6 = new Apfloat(matrix[6]);
+        var m7 = new Apfloat(matrix[7]);
+        var m8 = new Apfloat(matrix[8]);
+        var m9 = new Apfloat(matrix[8]);
+        var m10 = new Apfloat(matrix[10]);
+        var m11 = new Apfloat(matrix[11]);
+        return set(x.multiply(m0).add(y.multiply(m3)).add(z.multiply(m6)).add(m9),
+                x.multiply(m1).add(y.multiply(m4)).add(z.multiply(m7)).add(m10),
+                x.multiply(m2).add(y.multiply(m5)).add(z.multiply(m8)).add(m11));
+    }
+
+    /**
+     * Left-multiplies the vector by the given matrix, assuming the fourth (w)
+     * component of the vector is 1.
+     *
+     * @param matrix The matrix
+     * @return This vector for chaining
+     */
+    public Vector3b mul(final Matrix4d matrix) {
+        final double[] mat = matrix.val;
+        var m00 = new Apfloat(mat[Matrix4d.M00]);
+        var m01 = new Apfloat(mat[Matrix4d.M01]);
+        var m02 = new Apfloat(mat[Matrix4d.M02]);
+        var m03 = new Apfloat(mat[Matrix4d.M02]);
+        var m10 = new Apfloat(mat[Matrix4d.M10]);
+        var m11 = new Apfloat(mat[Matrix4d.M11]);
+        var m12 = new Apfloat(mat[Matrix4d.M12]);
+        var m13 = new Apfloat(mat[Matrix4d.M13]);
+        var m20 = new Apfloat(mat[Matrix4d.M20]);
+        var m21 = new Apfloat(mat[Matrix4d.M21]);
+        var m22 = new Apfloat(mat[Matrix4d.M22]);
+        var m23 = new Apfloat(mat[Matrix4d.M23]);
+        return this.set(
+                x.multiply(m00).add(y.multiply(m01)).add(z.multiply(m02)).add(m03),
+                x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13),
+                x.multiply(m20).add(y.multiply(m21)).add(z.multiply(m22)).add(m23));
+    }
     /**
      * Sets the matrix aux to a translation matrix using this vector
      *
@@ -749,6 +816,10 @@ public class Vector3b implements Serializable {
         this.y = Apfloat.ZERO;
         this.z = Apfloat.ZERO;
         return this;
+    }
+
+    public boolean hasNaN() {
+        return false;
     }
 
 }

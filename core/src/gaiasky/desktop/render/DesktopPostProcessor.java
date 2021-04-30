@@ -37,6 +37,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.*;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Path;
@@ -685,7 +686,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case CAMERA_MOTION_UPDATE:
             PerspectiveCamera cam = (PerspectiveCamera) data[3];
-            Vector3d campos = (Vector3d) data[0];
+            Vector3b campos = (Vector3b) data[0];
             ZonedDateTime zdt = GaiaSky.instance.time.getTime().atZone(ZoneId.systemDefault());
             float secs = (float) ((float) zdt.getSecond() + (double) zdt.getNano() * 1e-9d);
             float cameraOffset = (cam.direction.x + cam.direction.y + cam.direction.z);

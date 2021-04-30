@@ -12,6 +12,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.shader.Matrix4Attribute;
 import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -57,9 +58,9 @@ public class VelocityBufferComponent {
 
         // Camera position difference
         Vector3 dcampos = ((Vector3Attribute) material.get(Vector3Attribute.DCamPos)).value;
-        Vector3d dp = cam.getPreviousPos();
-        Vector3d p = cam.getPos();
-        dcampos.set((float) (dp.x - p.x), (float) (dp.y - p.y), (float) (dp.z - p.z));
+        Vector3b dp = cam.getPreviousPos();
+        Vector3b p = cam.getPos();
+        dcampos.set(dp.x.subtract(p.x).floatValue(), dp.y.subtract(p.y).floatValue(), dp.z.subtract(p.z).floatValue());
     }
 
     public boolean hasVelocityBuffer(Material mat) {

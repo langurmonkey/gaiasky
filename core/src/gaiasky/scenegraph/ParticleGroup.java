@@ -538,7 +538,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             for (int i = 0; i < Math.min(50, pointData.size()); i++) {
                 IParticleRecord pb = pointData.get(active[i]);
                 if (pb.names() != null) {
-                    Vector3d lpos = fetchPosition(pb, camera.getPos(), aux3d1.get(), 0);
+                    Vector3d lpos = fetchPosition(pb, camera.getPos().tov3d(aux3d4.get()), aux3d1.get(), 0);
                     float distToCamera = (float) lpos.len();
                     float viewAngle = 1e-4f / camera.getFovFactor();
 
@@ -841,7 +841,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 if (filter(i)) {
                     IParticleRecord pb = pointData.get(i);
                     Vector3 pos = aux3f1.get();
-                    Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
+                    Vector3d posd = fetchPosition(pb, camera.getPos().tov3d(aux3d4.get()), aux3d1.get(), getDeltaYears());
                     pos.set(posd.valuesf());
 
                     if (camera.direction.dot(posd) > 0) {
@@ -910,7 +910,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             for (int i = 0; i < n; i++) {
                 if (filter(i)) {
                     IParticleRecord pb = pointData.get(i);
-                    Vector3d posd = fetchPosition(pb, camera.getPos(), aux3d1.get(), getDeltaYears());
+                    Vector3d posd = fetchPosition(pb, camera.getPos().tov3d(aux3d4.get()), aux3d1.get(), getDeltaYears());
                     beamDir.set(p1).sub(p0);
                     if (camera.direction.dot(posd) > 0) {
                         // The star is in front of us
@@ -963,7 +963,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         case CAMERA_MOTION_UPDATE:
             // Check that the particles have names
             if (updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
-                final Vector3d currentCameraPos = (Vector3d) data[0];
+                final Vector3b currentCameraPos = (Vector3b) data[0];
                 long t = TimeUtils.millis() - lastSortTime;
                 if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
                     updating = DatasetUpdater.execute(updaterTask);
@@ -1244,13 +1244,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param camera The camera
      */
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
-        Vector3d camPos = camera.getPos();
+        Vector3b camPos = camera.getPos();
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
             IParticleRecord d = pointData.get(i);
             // Pos
             Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z());
-            metadata[i] = filter(i) ? camPos.dst2(x) : Double.MAX_VALUE;
+            metadata[i] = filter(i) ? camPos.dst2d(x) : Double.MAX_VALUE;
         }
     }
 

@@ -30,7 +30,7 @@ public class OortCloudMinimapScale extends AbstractMinimapScale {
 
     @Override
     public void updateLocal(){
-        position(GaiaSky.instance.cam.getPos(), camp);
+        position(GaiaSky.instance.cam.getPos().tov3d(aux3d1), camp);
     }
 
 

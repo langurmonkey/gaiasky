@@ -20,6 +20,7 @@ import gaiasky.scenegraph.Planet;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -256,7 +257,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getPos() {
+    public Vector3b getPos() {
         return current.getPos();
     }
 
@@ -266,7 +267,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getPreviousPos() {
+    public void setPos(Vector3b pos) {
+        current.setPos(pos);
+    }
+
+    @Override
+    public Vector3b getPreviousPos() {
         return current.getPreviousPos();
     }
 
@@ -276,7 +282,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getInversePos() {
+    public void setPreviousPos(Vector3b prevpos) {
+        current.setPreviousPos(prevpos);
+    }
+
+    @Override
+    public Vector3b getInversePos() {
         return current.getInversePos();
     }
 

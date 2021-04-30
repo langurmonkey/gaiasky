@@ -79,7 +79,7 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        distToCamera = (float) camera.getPos().len();
+        distToCamera = (float) camera.getPos().lend();
         size = (float) (LINE_SIZE_RAD * distToCamera) * camera.getFovFactor();
 
         o.set(camera.getInversePos());

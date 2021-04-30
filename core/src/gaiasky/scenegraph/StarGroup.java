@@ -242,7 +242,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public void updateFocus(ITimeFrameProvider time, ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
-        Vector3d aux = this.fetchPosition(focus, camera.getPos(), aux3d1.get(), currDeltaYears);
+        Vector3d aux = this.fetchPosition(focus, camera.getPos().tov3d(aux3d4.get()), aux3d1.get(), currDeltaYears);
 
         this.focusPosition.set(aux).add(camera.getPos());
         this.focusDistToCamera = aux.len();
@@ -292,7 +292,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         double thdownOverFovfactor = Constants.THRESHOLD_DOWN / camera.getFovFactor();
         double innerRad = 0.006 + GlobalConf.scene.STAR_POINT_SIZE * 0.008;
         alpha = alpha * this.opacity;
-        Vector3d cpos = camera.getPos();
+        Vector3d cpos = camera.getPos().tov3d(aux3d4.get());
         float fovFactor = camera.getFovFactor();
 
         /** GENERAL UNIFORMS **/
@@ -397,7 +397,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             IParticleRecord star = pointData.get(active[i]);
             float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
-            Vector3d lpos = fetchPosition(star, camera.getPos(), aux3d1.get(), currDeltaYears);
+            Vector3d lpos = fetchPosition(star, camera.getPos().tov3d(aux3d4.get()), aux3d1.get(), currDeltaYears);
             // Proper motion
             Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
             // Rest of attributes
@@ -521,7 +521,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
-        Vector3d cpos = camera.getPos();
+        Vector3d cpos = camera.getPos().tov3d(aux3d4.get());
 
         int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_NEAREST);
         if (camera.getCurrent() instanceof FovCamera) {
@@ -845,7 +845,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param camera The camera
      */
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
-        Vector3d camPos = camera.getPos();
+        Vector3d camPos = camera.getPos().tov3d(aux3d4.get());
         double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
         if (pointData != null) {
             int n = pointData.size();
