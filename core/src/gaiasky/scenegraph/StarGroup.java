@@ -686,7 +686,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out) {
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         return out.set(this.closestAbsolutePos);
     }
 

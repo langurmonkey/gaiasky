@@ -319,7 +319,7 @@ public abstract class ModelBody extends CelestialBody {
      * @param out       The vector to store the result
      * @return The cartesian position above the surface of this body
      */
-    public Vector3d getPositionAboveSurface(double longitude, double latitude, double distance, Vector3d out) {
+    public Vector3b getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
         Vector3d aux1 = aux3d1.get();
         Vector3d aux2 = aux3d2.get();
 
@@ -343,14 +343,14 @@ public abstract class ModelBody extends CelestialBody {
     Matrix4d matauxd = new Matrix4d();
 
     @Override
-    public double getHeight(Vector3d camPos) {
+    public double getHeight(Vector3b camPos) {
         return getHeight(camPos, false);
     }
 
     @Override
-    public double getHeight(Vector3d camPos, boolean useFuturePosition) {
+    public double getHeight(Vector3b camPos, boolean useFuturePosition) {
         if (useFuturePosition) {
-            Vector3d nextPos = getPredictedPosition(aux3d1.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+            Vector3b nextPos = getPredictedPosition(aux3b1.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             return getHeight(camPos, nextPos);
         } else {
             return getHeight(camPos, null);
@@ -359,11 +359,11 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     @Override
-    public double getHeight(Vector3d camPos, Vector3d nextPos) {
+    public double getHeight(Vector3b camPos, Vector3b nextPos) {
         double height = 0;
         if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
             double dCam;
-            Vector3d cart = aux3d1.get();
+            Vector3b cart = aux3b1.get();
             if (nextPos != null) {
                 cart.set(nextPos);
                 getPredictedPosition(cart, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);

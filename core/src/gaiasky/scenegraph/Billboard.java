@@ -95,7 +95,7 @@ public class Billboard extends ModelBody {
             Vector3d aux3 = aux3d1.get();
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
-            DecalUtils.setBillboardRotation(q, new Vector3d(pos).nor(), new Vector3d(0, 1, 0));
+            DecalUtils.setBillboardRotation(q, pos.put(aux3d2.get()).nor(), new Vector3d(0, 1, 0));
         }
     }
 

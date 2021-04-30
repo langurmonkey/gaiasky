@@ -5,6 +5,7 @@
 
 package gaiasky.util.tree;
 
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 /**
@@ -15,7 +16,7 @@ import gaiasky.util.math.Vector3d;
  */
 public interface IPosition {
 
-    Vector3d getPosition();
+    Vector3b getPosition();
 
     Vector3d getVelocity();
 

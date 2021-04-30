@@ -305,6 +305,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
+    private Vector3b aux1b, aux2b, aux3b;
 
     // VRContext, may be null
     private final VRContext vrContext;
@@ -449,6 +450,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             aux1d = new Vector3d();
             aux2d = new Vector3d();
             aux3d = new Vector3d();
+            aux1b = new Vector3b();
+            aux2b = new Vector3b();
+            aux3b = new Vector3b();
 
             // Build frame buffers and arrays
             buildShadowMapData();
@@ -989,7 +993,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             // Distance from camera to object, radius * sv[0]
             double distance = radius * candidate.shadowMapValues[0];
             // Position, factor of radius
-            candidate.getAbsolutePosition(aux1d);
+            candidate.getAbsolutePosition(aux1b);
             aux1d.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
             aux1d.put(cameraLight.position);
             // Up is perpendicular to dir
@@ -1048,10 +1052,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 // Distance from camera to object, radius * sv[0]
                 float distance = (float) (radius * candidate.shadowMapValues[0] * 0.01);
                 // Position, factor of radius
-                Vector3d objPos = candidate.getAbsolutePosition(aux1d);
+                Vector3b objPos = candidate.getAbsolutePosition(aux1b);
                 Vector3b camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
-                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos, radius);
+                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
                 if (intersect) {
                     // Use height
                     camDir.nor().scl(candidate.distToCamera - radius);

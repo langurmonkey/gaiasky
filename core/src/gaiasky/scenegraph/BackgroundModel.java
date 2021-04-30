@@ -127,7 +127,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (label2d) {
-            render2DLabel(batch, shader, rc, sys.fontDistanceField, camera, text(), (float) labelPosition.x, (float) labelPosition.y, (float) labelPosition.z);
+            render2DLabel(batch, shader, rc, sys.fontDistanceField, camera, text(), labelPosition.x.floatValue(), labelPosition.y.floatValue(), labelPosition.z.floatValue());
         } else {
             // 3D distance font
             Vector3d pos = aux3d1.get();

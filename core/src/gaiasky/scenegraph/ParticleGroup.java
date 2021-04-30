@@ -316,7 +316,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public void setLabelPosition() {
         // Label position
         if (labelPosition == null)
-            labelPosition = new Vector3d(pos);
+            labelPosition = new Vector3b(pos);
     }
 
     private double len(double x, double y, double z) {
@@ -685,7 +685,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out) {
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         return getAbsolutePosition(out);
     }
 

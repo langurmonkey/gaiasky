@@ -34,6 +34,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -214,7 +215,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     }
 
-    public Vector3d computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3d pos) {
+    public Vector3b computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
         enginePower = Math.signum(enginePower);
         // Compute force from thrust
         thrust.set(direction).scl(thrustLength * thrustFactor[thrustFactorIndex] * enginePower);
@@ -263,32 +264,33 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
         Vector3d velo = aux3d2.get().set(vel);
         // New position in auxd3
-        Vector3d position = aux3d3.get().set(pos).add(velo.scl(dt));
+        Vector3d position = aux3d3.get().set(posb).add(velo.scl(dt));
+        Vector3d pos = posb.put(aux3d4.get());
         // Check collision!
         if (closest != null && closest != this && !this.copy) {
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos()) < twoRadiuses) {
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos().put(aux3d4.get())) < twoRadiuses) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos(), twoRadiuses);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos().put(aux3d4.get()), twoRadiuses);
 
                 if (intersections.size >= 1) {
-                    pos.set(intersections.get(0));
+                    posb.set(intersections.get(0));
                 }
 
                 stopAllMovement();
-            } else if (pos.dst(closest.getPos()) < twoRadiuses) {
-                Vector3d newpos = aux3d1.get().set(pos).sub(closest.getPos()).nor().scl(pos.dst(closest.getPos()));
-                pos.set(newpos);
+            } else if (posb.dstd(closest.getPos()) < twoRadiuses) {
+                Vector3d newpos = aux3d1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dstd(closest.getPos()));
+                posb.set(newpos);
             } else {
-                pos.set(position);
+                posb.set(position);
             }
         } else {
-            pos.set(position);
+            posb.set(position);
         }
 
-        return pos;
+        return posb;
     }
 
     public double computeDirectionUp(double dt, Pair<Vector3d, Vector3d> pair) {
@@ -351,7 +353,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
              * SCALING FACTOR - counteracts double precision problems at very
              * large distances
              **/
-            sizeFactor = MathUtilsd.lint(pos.len(), 100 * Constants.AU_TO_U, 5000 * Constants.PC_TO_U, 10, 10000);
+            sizeFactor = MathUtilsd.lint(pos.lend(), 100 * Constants.AU_TO_U, 5000 * Constants.PC_TO_U, 10, 10000);
 
             if (leveling) {
                 // No velocity, we just stop Euler angle motions

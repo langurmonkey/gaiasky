@@ -25,8 +25,10 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import org.apfloat.Apfloat;
 
 /**
  * Implements a spacecraft-like movement. The spacecraft is modeled as a rigid
@@ -79,7 +81,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private final Vector3d scforce;
     private final Vector3d scaccel;
     private final Vector3d scvel;
-    private Vector3d scpos;
+    private Vector3b scpos;
     private final Vector3d scdir;
     private final Vector3d scup;
     private final Pair<Vector3d, Vector3d> dirup;
@@ -102,7 +104,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scforce = new Vector3d();
         scaccel = new Vector3d();
         scvel = new Vector3d();
-        scpos = new Vector3d();
+        scpos = new Vector3b();
         scdir = new Vector3d();
         scup = new Vector3d();
 
@@ -296,8 +298,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                 sc.stopAllMovement();
                 if (firstTime) {
                     // Put spacecraft close to earth
-                    Vector3d earthpos = GaiaSky.instance.sg.getNode("Earth").getPosition();
-                    sc.pos.set(earthpos.x + 12000 * Constants.KM_TO_U, earthpos.y, earthpos.z);
+                    Vector3b earthpos = GaiaSky.instance.sg.getNode("Earth").getPosition();
+                    sc.pos.set(earthpos.x.add(new Apfloat(12000 * Constants.KM_TO_U, Constants.PREC)), earthpos.y, earthpos.z);
                     pos.set(sc.pos);
                     direction.set(sc.direction);
 

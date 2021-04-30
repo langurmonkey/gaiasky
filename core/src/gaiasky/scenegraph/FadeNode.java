@@ -45,7 +45,7 @@ public class FadeNode extends SceneGraphNode {
     /**
      * Position of label
      */
-    protected Vector3d labelPosition;
+    protected Vector3b labelPosition;
 
     /**
      * Colour of label
@@ -143,7 +143,7 @@ public class FadeNode extends SceneGraphNode {
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-        this.distToCamera = this.position == null ? (float) pos.dst(camera.getPos()) : this.position.distToCamera;
+        this.distToCamera = this.position == null ? pos.dst(camera.getPos()).doubleValue() : this.position.distToCamera;
 
         // Opacity
         updateOpacity();
@@ -211,7 +211,7 @@ public class FadeNode extends SceneGraphNode {
      */
     public void setLabelposition(double[] labelposition) {
         if (labelposition != null)
-            this.labelPosition = new Vector3d(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
+            this.labelPosition = new Vector3b(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
     }
 
     /**

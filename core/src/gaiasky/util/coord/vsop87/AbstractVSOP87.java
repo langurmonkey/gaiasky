@@ -9,6 +9,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -27,7 +28,7 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
     }
 
     @Override
-    public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         if (!Constants.withinVSOPTime(date.toEpochMilli()))
             return null;
 
@@ -43,8 +44,8 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
     }
 
     @Override
-    public Vector3d getEclipticCartesianCoordinates(Instant date, Vector3d out) {
-        Vector3d v = getEclipticSphericalCoordinates(date, out);
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
+        Vector3b v = getEclipticSphericalCoordinates(date, out);
         if (v == null)
             return null;
         Coordinates.sphericalToCartesian(out, out);
@@ -53,8 +54,8 @@ public abstract class AbstractVSOP87 extends AbstractOrbitCoordinates implements
     }
 
     @Override
-    public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
-        Vector3d v = getEclipticSphericalCoordinates(date, out);
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
+        Vector3b v = getEclipticSphericalCoordinates(date, out);
         if (v == null)
             return null;
         Coordinates.sphericalToCartesian(out, out);

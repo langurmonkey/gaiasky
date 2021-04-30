@@ -7,6 +7,7 @@ package gaiasky.util.math;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.Constants;
 import net.jafama.FastMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
@@ -21,7 +22,7 @@ import java.io.Serializable;
 public class Vector3b implements Serializable {
     private static final long serialVersionUID = 3840054589595372522L;
     // Number of digits of precision
-    private static final int prec = 50;
+    private static final int prec = Constants.PREC;
 
     /** the x-component of this vector **/
     public Apfloat x;
@@ -34,6 +35,7 @@ public class Vector3b implements Serializable {
     public final static Vector3b Y = new Vector3b(0, 1, 0);
     public final static Vector3b Z = new Vector3b(0, 0, 1);
 
+    private final static Matrix4d tmpMat = new Matrix4d();
 
     /** Constructs a vector at (0,0,0) */
     public Vector3b() {
@@ -66,6 +68,10 @@ public class Vector3b implements Serializable {
         this.x = new Apfloat(x, prec);
         this.y = new Apfloat(y, prec);
         this.z = new Apfloat(z, prec);
+    }
+
+    public Vector3b(Vector3d vec) {
+        this(vec.x, vec.y, vec.z);
     }
 
     /**
@@ -433,6 +439,9 @@ public class Vector3b implements Serializable {
     public double lend() {
         return this.len().doubleValue();
     }
+    public float lenf() {
+        return this.len().floatValue();
+    }
 
     public Apfloat len() {
         Apfloat sumSq = x.multiply(x).add(y.multiply(y)).add(z.multiply(z));
@@ -530,6 +539,12 @@ public class Vector3b implements Serializable {
         return this.scl(Apfloat.ONE.divide(ApfloatMath.sqrt(len2)));
     }
 
+    public double dot(final Vector3d vec) {
+        var vx = new Apfloat(vec.x, prec);
+        var vy = new Apfloat(vec.y, prec);
+        var vz = new Apfloat(vec.z, prec);
+        return this.x.multiply(vx).add(this.y.multiply(vy)).add(this.z.multiply(vz)).doubleValue();
+    }
     public double dotd(final Vector3b vec) {
         return this.dot(vec).doubleValue();
     }
@@ -562,6 +577,12 @@ public class Vector3b implements Serializable {
      */
     public Vector3b crs(final Vector3b vec) {
         return this.set(this.y.multiply(vec.z).subtract(this.z.multiply(vec.y)), this.z.multiply(vec.x).subtract(this.x.multiply(vec.z)), this.x.multiply(vec.y).subtract(this.y.multiply(vec.x)));
+    }
+    public Vector3b crs(final Vector3d vec) {
+        var vx = new Apfloat(vec.x, prec);
+        var vy = new Apfloat(vec.y, prec);
+        var vz = new Apfloat(vec.z, prec);
+        return this.set(this.y.multiply(vz).subtract(this.z.multiply(vy)), this.z.multiply(vx).subtract(this.x.multiply(vz)), this.x.multiply(vy).subtract(this.y.multiply(vx)));
     }
 
     /**
@@ -645,6 +666,33 @@ public class Vector3b implements Serializable {
                 x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13),
                 x.multiply(m20).add(y.multiply(m21)).add(z.multiply(m22)).add(m23));
     }
+
+    /**
+     * Rotates this vector by the given angle in degrees around the given axis.
+     *
+     * @param degrees the angle in degrees
+     * @param axisX   the x-component of the axis
+     * @param axisY   the y-component of the axis
+     * @param axisZ   the z-component of the axis
+     * @return This vector for chaining
+     */
+    public Vector3b rotate(double degrees, double axisX, double axisY, double axisZ) {
+        return this.mul(tmpMat.setToRotation(axisX, axisY, axisZ, degrees));
+    }
+
+    /**
+     * Rotates this vector by the given angle in degrees around the given axis.
+     *
+     * @param axis    the axis
+     * @param degrees the angle in degrees
+     * @return This vector for chaining
+     */
+    public Vector3b rotate(final Vector3d axis, double degrees) {
+        tmpMat.setToRotation(axis, degrees);
+        return this.mul(tmpMat);
+    }
+
+
     /**
      * Sets the matrix aux to a translation matrix using this vector
      *
@@ -776,6 +824,9 @@ public class Vector3b implements Serializable {
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3b v) {
         return MathUtilsd.radiansToDegrees * FastMath.acos(this.dotd(v) / (this.lend() * v.lend()));
+    }
+    public double angle(Vector3d v) {
+        return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.lend() * v.len()));
     }
 
     /** Gets the angle in degrees between the two vectors **/

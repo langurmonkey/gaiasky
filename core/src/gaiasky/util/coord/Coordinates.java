@@ -6,9 +6,13 @@
 package gaiasky.util.coord;
 
 import com.badlogic.gdx.math.Matrix4;
+import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import org.apfloat.Apfloat;
+import org.apfloat.ApfloatMath;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +25,7 @@ import java.util.Map;
  *
  */
 public class Coordinates {
+
 
     /**
      * Obliquity for low precision calculations in degrees and radians. J2000
@@ -368,6 +373,10 @@ public class Coordinates {
         return sphericalToCartesian(vec.x, vec.y, vec.z, out);
     }
 
+    public static Vector3b sphericalToCartesian(Vector3b vec, Vector3b out) {
+        return sphericalToCartesian(vec.x.doubleValue(), vec.y.doubleValue(), vec.z, out);
+    }
+
     /**
      * Converts from spherical to Cartesian coordinates, given a longitude
      * (&alpha;), a latitude (&delta;) and the radius.
@@ -391,10 +400,16 @@ public class Coordinates {
         out.z = radius * Math.cos(latitude) * Math.cos(longitude);
         return out;
     }
+    public static Vector3b sphericalToCartesian(double longitude, double latitude, Apfloat radius, Vector3b out) {
+        out.x = radius.multiply(new Apfloat(Math.cos(latitude) * Math.sin(longitude), Constants.PREC));
+        out.y = radius.multiply(new Apfloat(Math.sin(latitude), Constants.PREC));
+        out.z = radius.multiply(new Apfloat(Math.cos(latitude) * Math.cos(longitude), Constants.PREC));
+        return out;
+    }
 
     /**
      * Converts from Cartesian coordinates to spherical coordinates.
-     * 
+     *
      * @param vec
      *            Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
@@ -413,10 +428,10 @@ public class Coordinates {
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
          * math.sqrt(xsq + ysq + zsq)
-         * 
+         *
          * alpha = math.atan2(y, x) # Correct the value of alpha depending upon
          * the quadrant. if alpha < 0: alpha += 2 * math.pi
-         * 
+         *
          * if (xsq + ysq) == 0: # In the case of the poles, delta is -90 or +90
          * delta = math.copysign(math.pi / 2, z) else: delta = math.atan(z /
          * math.sqrt(xsq + ysq))
@@ -442,6 +457,111 @@ public class Coordinates {
         out.y = delta;
         out.z = distance;
         return out;
+    }
+
+    /**
+     * Converts from Cartesian coordinates to spherical coordinates.
+     * 
+     * @param vec
+     *            Vector with the Cartesian coordinates[x, y, z] where x and z
+     *            are on the horizontal plane and y is in the up direction.
+     * @param out
+     *            Output vector.
+     * @return Output vector containing the spherical coordinates.
+     *         <ol>
+     *         <li>The longitude or right ascension (&alpha;), from the z
+     *         direction to the x direction.</li>
+     *         <li>The latitude or declination (&delta;).</li>
+     *         <li>The radius or distance to the point.</li>
+     *         </ol>
+     */
+    public static Vector3d cartesianToSpherical(Vector3b vec, Vector3d out) {
+        /**
+         *
+         * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
+         * math.sqrt(xsq + ysq + zsq)
+         * 
+         * alpha = math.atan2(y, x) # Correct the value of alpha depending upon
+         * the quadrant. if alpha < 0: alpha += 2 * math.pi
+         * 
+         * if (xsq + ysq) == 0: # In the case of the poles, delta is -90 or +90
+         * delta = math.copysign(math.pi / 2, z) else: delta = math.atan(z /
+         * math.sqrt(xsq + ysq))
+         */
+
+        Apfloat xsq = vec.x.multiply(vec.x);
+        Apfloat ysq = vec.y.multiply(vec.y);
+        Apfloat zsq = vec.z.multiply(vec.z);
+        Apfloat distance = ApfloatMath.sqrt(xsq.add(ysq).add(zsq));
+
+        Apfloat alpha = ApfloatMath.atan2(vec.x, vec.z);
+        if (alpha.doubleValue() < 0) {
+            alpha = alpha.add(ApfloatMath.pi(Constants.PREC).multiply(new Apfloat(2, Constants.PREC)));
+        }
+
+        Apfloat delta;
+        if (zsq.add(xsq).doubleValue() == 0) {
+            Apfloat piOverTwo =ApfloatMath.pi(Constants.PREC).divide(new Apfloat(2, Constants.PREC));
+            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(new Apfloat(-1, Constants.PREC)));
+        } else {
+            delta = ApfloatMath.atan(vec.y.divide(ApfloatMath.sqrt(zsq.add(xsq))));
+        }
+
+        out.x = alpha.doubleValue();
+        out.y = delta.doubleValue();
+        out.z = distance.doubleValue();
+        return out;
+    }
+
+    /**
+     * Converts from Cartesian coordinates to spherical coordinates.
+     *
+     * @param vec
+     *            Vector with the Cartesian coordinates[x, y, z] where x and z
+     *            are on the horizontal plane and y is in the up direction.
+     * @param out
+     *            Output vector.
+     * @return Output vector containing the spherical coordinates.
+     *         <ol>
+     *         <li>The longitude or right ascension (&alpha;), from the z
+     *         direction to the x direction.</li>
+     *         <li>The latitude or declination (&delta;).</li>
+     *         <li>The radius or distance to the point.</li>
+     *         </ol>
+     */
+    public static Vector3b cartesianToSpherical(Vector3b vec, Vector3b out) {
+        /**
+         *
+         * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
+         * math.sqrt(xsq + ysq + zsq)
+         *
+         * alpha = math.atan2(y, x) # Correct the value of alpha depending upon
+         * the quadrant. if alpha < 0: alpha += 2 * math.pi
+         *
+         * if (xsq + ysq) == 0: # In the case of the poles, delta is -90 or +90
+         * delta = math.copysign(math.pi / 2, z) else: delta = math.atan(z /
+         * math.sqrt(xsq + ysq))
+         */
+
+        Apfloat xsq = vec.x.multiply(vec.x);
+        Apfloat ysq = vec.y.multiply(vec.y);
+        Apfloat zsq = vec.z.multiply(vec.z);
+        Apfloat distance = ApfloatMath.sqrt(xsq.add(ysq).add(zsq));
+
+        Apfloat alpha = ApfloatMath.atan2(vec.x, vec.z);
+        if (alpha.doubleValue() < 0) {
+            alpha = alpha.add(ApfloatMath.pi(Constants.PREC).multiply(new Apfloat(2, Constants.PREC)));
+        }
+
+        Apfloat delta;
+        if (zsq.add(xsq).doubleValue() == 0) {
+            Apfloat piOverTwo =ApfloatMath.pi(Constants.PREC).divide(new Apfloat(2, Constants.PREC));
+            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(new Apfloat(-1, Constants.PREC)));
+        } else {
+            delta = ApfloatMath.atan(vec.y.divide(ApfloatMath.sqrt(zsq.add(xsq))));
+        }
+
+        return out.set(alpha, delta, distance);
     }
 
     public static Matrix4d getTransformD(String name) {

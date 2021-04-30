@@ -11,6 +11,7 @@ import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -41,17 +42,17 @@ public class StaticParentRotationCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         return getEquatorialCartesianCoordinates(date, out);
     }
 
     @Override
-    public Vector3d getEclipticCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         return getEquatorialCartesianCoordinates(date, out);
     }
 
     @Override
-    public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         out.set(position);
         RotationComponent rc = parent.rc;
         if (rc != null) {

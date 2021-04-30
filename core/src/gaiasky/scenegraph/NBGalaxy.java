@@ -55,7 +55,7 @@ public class NBGalaxy extends Particle {
     public NBGalaxy() {
     }
 
-    public NBGalaxy(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
+    public NBGalaxy(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
         super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
         this.bmag = bmag;
         this.a26 = a26;

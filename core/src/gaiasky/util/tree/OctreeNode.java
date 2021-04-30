@@ -301,11 +301,11 @@ public class OctreeNode implements ILineRenderable {
 
     public boolean insert(SceneGraphNode e, int level) {
         int node = 0;
-        if (e.getPosition().y > min.y + ((max.y - min.y) / 2))
+        if (e.getPosition().y.doubleValue() > min.y + ((max.y - min.y) / 2))
             node += 4;
-        if (e.getPosition().z > min.z + ((max.z - min.z) / 2))
+        if (e.getPosition().z.doubleValue() > min.z + ((max.z - min.z) / 2))
             node += 2;
-        if (e.getPosition().x > min.x + ((max.x - min.x) / 2))
+        if (e.getPosition().x.doubleValue() > min.x + ((max.x - min.x) / 2))
             node += 1;
         if (level == this.depth + 1) {
             return children[node].add(e);

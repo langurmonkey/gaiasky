@@ -23,6 +23,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL30;
 
@@ -34,9 +35,8 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     private final Random rand;
     private final Vector3 aux1f;
-    private final Vector3d aux1;
-    private final Vector3d aux2;
-    private final Vector3d aux5;
+    private final Vector3d aux1, aux2, aux5;
+    private final Vector3b aux1b, aux2b, aux5b;
     private int sizeOffset, tOffset;
     private final ComponentTypes ct;
     private final Vector3[] positions;
@@ -50,6 +50,9 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         aux1 = new Vector3d();
         aux2 = new Vector3d();
         aux5 = new Vector3d();
+        aux1b = new Vector3b();
+        aux2b = new Vector3b();
+        aux5b = new Vector3b();
         rand = new Random(123);
         baset = System.currentTimeMillis();
         ct = new ComponentTypes(ComponentType.valueOf("Effects"));
@@ -116,7 +119,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
              * Empirical fit to determine where the particle effects start to break down wrt distance to sol (since they are positioned globally)
              * <a href="https://mycurvefit.com/share/7b20c3bf-267d-4a8a-9498-844832d6509b">See curve and fit</a>
              */
-            double distToSol = cam.getFocus().getAbsolutePosition(aux1).len() * Constants.U_TO_KM;
+            double distToSol = cam.getFocus().getAbsolutePosition(aux1b).lend() * Constants.U_TO_KM;
             double focusDistKm = cam.getFocus().getDistToCamera() * Constants.U_TO_KM;
             double cutDistKm = 11714150000000000d + (1900.228d - 11714150000000000d) / (1d + Math.pow(distToSol / 93302269999999990000d, 1.541734d));
             if (focusDistKm < cutDistKm) {

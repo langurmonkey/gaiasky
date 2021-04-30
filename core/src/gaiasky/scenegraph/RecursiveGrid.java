@@ -103,7 +103,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         cc = GlobalConf.scene.VISIBILITY[ComponentType.Galactic.ordinal()] ? ccGal : (GlobalConf.scene.VISIBILITY[ComponentType.Ecliptic.ordinal()] ? ccEcl : ccEq);
         labelcolor = cc;
         label = true;
-        labelPosition = new Vector3d();
+        labelPosition = new Vector3b();
         localTransform = new Matrix4();
 
         p01 = new Vector3d();
@@ -335,9 +335,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         } else {
             // Focus object
             if (regime == 1)
-                localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).put(aux3f1.get()));
+                localTransform.translate(focus.getAbsolutePosition(aux3b1.get()).sub(camera.getPos()).put(aux3f1.get()));
             else
-                localTransform.translate(focus.getAbsolutePosition(aux3d1.get()).sub(camera.getPos()).setLength(vrScl).add(vroffset).put(aux3f1.get()));
+                localTransform.translate(focus.getAbsolutePosition(aux3b1.get()).sub(camera.getPos()).setLength(vrScl).add(vroffset).put(aux3f1.get()));
         }
         if (regime == 1)
             localTransform.scl((float) (distToCamera * 0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
@@ -439,7 +439,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         shader.setUniformf("u_thOverFactorScl", 1);
 
         IFocus focus = camera.getFocus();
-        Vector3d v = aux3d1.get().setZero();
+        Vector3b v = aux3b1.get().setZero();
         if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && focus != null) {
             focus.getAbsolutePosition(v);
         } else {
@@ -453,13 +453,13 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         labelPosition.set(0d, 0d, dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
 
         // -Z
         labelPosition.set(0d, 0d, -dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition, distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
     }
 
     /**
@@ -485,9 +485,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         Matrix4d inv = coordinateSystemd;
         Matrix4d trf = mat4daux.set(inv).inv();
         camera.getPos().put(cpos).mul(trf);
-        focus.getPredictedPosition(fpos, GaiaSky.instance.time, camera, false).mul(trf);
-        //focus.getAbsolutePosition(fpos).mul(trf);
-        fpos.sub(cpos);
+        Vector3b v3b = new Vector3b(fpos);
+        focus.getPredictedPosition(v3b, GaiaSky.instance.time, camera, false).mul(trf);
+        v3b.put(fpos).sub(cpos);
     }
 
     private void getZXLine(Vector3d a, Vector3d b, Vector3d cpos, Vector3d fpos) {

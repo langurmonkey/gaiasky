@@ -5,6 +5,7 @@
 
 package gaiasky.scenegraph;
 
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 public interface IStarFocus extends IFocus, IProperMotion {
@@ -72,7 +73,7 @@ public interface IStarFocus extends IFocus, IProperMotion {
      * @param out The out vector
      * @return The out vector with the position
      */
-    Vector3d getClosestAbsolutePos(Vector3d out);
+    Vector3b getClosestAbsolutePos(Vector3b out);
 
     /**
      * Returns the color of the closest star

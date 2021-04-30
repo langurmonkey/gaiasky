@@ -6,6 +6,7 @@
 package gaiasky.util.coord;
 
 import gaiasky.scenegraph.Orbit;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -33,7 +34,7 @@ public interface IBodyCoordinates {
      *                units.
      * @return The out vector for chaining.
      */
-    Vector3d getEclipticSphericalCoordinates(Instant instant, Vector3d out);
+    Vector3b getEclipticSphericalCoordinates(Instant instant, Vector3b out);
 
     /**
      * Gets ecliptic cartesian coordinates for the given date.
@@ -44,7 +45,7 @@ public interface IBodyCoordinates {
      * @return The out vector for chaining, or null if the date is out of range,
      * in case of non elliptical orbits such as Gaia.
      */
-    Vector3d getEclipticCartesianCoordinates(Instant instant, Vector3d out);
+    Vector3b getEclipticCartesianCoordinates(Instant instant, Vector3b out);
 
     /**
      * Gets equatorial cartesian coordinates for the given date.
@@ -55,7 +56,7 @@ public interface IBodyCoordinates {
      * @return The out vector for chaining, or null if the date is out of range,
      * in case of non elliptical orbits such as Gaia.
      */
-    Vector3d getEquatorialCartesianCoordinates(Instant instant, Vector3d out);
+    Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out);
 
     /**
      * Gets the orbit object of these coordinates, if any.

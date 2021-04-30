@@ -13,6 +13,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -37,17 +38,17 @@ public class StaticCoordinates implements IBodyCoordinates {
     }
 
     @Override
-    public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         return out.set(position);
     }
 
     @Override
-    public Vector3d getEclipticCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         return out.set(position);
     }
 
     @Override
-    public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         return out.set(position);
     }
 

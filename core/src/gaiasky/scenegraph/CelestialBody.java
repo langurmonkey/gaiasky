@@ -27,6 +27,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -144,7 +145,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
-            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos);
+            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(aux3d1.get()));
         } else {
             // render2DLabel(batch, shader, font, camera, text(),
             // transform.position);
@@ -349,8 +350,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
             Vector3 pos = aux3f1.get();
-            Vector3d aux = aux3d1.get();
-            Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
+            Vector3b aux = aux3b1.get();
+            Vector3b posd = getAbsolutePosition(aux).add(camera.getInversePos());
             pos.set(posd.valuesf());
 
             if (camera.direction.dot(posd) > 0) {
@@ -388,15 +389,15 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
-            Vector3d aux = aux3d1.get();
-            Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
+            Vector3b aux = aux3b1.get();
+            Vector3b posb = getAbsolutePosition(aux).add(camera.getInversePos());
 
-            if (camera.direction.dot(posd) > 0) {
+            if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us
                 // Diminish the size of the star
                 // when we are close by
-                double dist = posd.len();
-                double distToLine = Intersectord.distanceLinePoint(p0, p1, posd);
+                double dist = posb.lend();
+                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.put(aux3d1.get()));
                 double value = distToLine / dist;
 
                 if (value < 0.01) {
@@ -475,7 +476,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out){
+    public Vector3b getClosestAbsolutePos(Vector3b out){
         return getAbsolutePosition(out);
     }
 

@@ -63,7 +63,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private final Table focusNames;
     private final Cell<?> focusInfoCell;
     private final Cell<?> rulerCell;
-    Vector3d pos;
+    private Vector3d pos;
+    private Vector3b posb;
 
     INumberFormat nf, sf;
 
@@ -340,6 +341,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
 
         pos = new Vector3d();
+        posb = new Vector3b();
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST, Events.PER_OBJECT_VISIBILITY_CMD);
     }
 
@@ -480,7 +482,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 focusRA.setText(nf.format(posSph.x) + "°");
                 focusDEC.setText(nf.format(posSph.y) + "°");
             } else {
-                Coordinates.cartesianToSpherical(focus.getAbsolutePosition(pos), pos);
+                Coordinates.cartesianToSpherical(focus.getAbsolutePosition(posb), pos);
 
                 focusRA.setText(nf.format(MathUtilsd.radDeg * pos.x % 360) + "°");
                 focusDEC.setText(nf.format(MathUtilsd.radDeg * pos.y % 360) + "°");

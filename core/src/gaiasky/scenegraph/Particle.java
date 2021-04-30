@@ -153,7 +153,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * @param names   The labels or names.
      * @param starid  The star unique id.
      */
-    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
+    public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
         this();
         this.pos = pos;
         this.names = names;
@@ -170,13 +170,13 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.pmSph = new Vector3();
     }
 
-    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+    public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, names, starid);
         this.posSph = new Vector2d(ra, dec);
 
     }
 
-    public Particle(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+    public Particle(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, names, starid);
         this.posSph = new Vector2d(ra, dec);
         this.pm.set(pm);
@@ -431,7 +431,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out) {
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         return getAbsolutePosition(out);
     }
 

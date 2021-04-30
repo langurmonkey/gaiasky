@@ -182,6 +182,20 @@ public class AstroUtils {
     public static Vector3d moonEclipticCoordinates(Instant date, Vector3d out) {
         return moonEclipticCoordinates(getJulianDateCache(date), out);
     }
+    /**
+     * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
+     * vector with the ecliptic longitude (&lambda;) in radians, the ecliptic
+     * latitude (&beta;) in radians and the distance in kilometers.
+     *
+     * @param date
+     * @param out  The output vector.
+     * @return The output vector, for chaining.
+     */
+    public static Vector3b moonEclipticCoordinates(Instant date, Vector3b out) {
+        Vector3d outd = new Vector3d();
+        moonEclipticCoordinates(getDaysSinceJ2000(date), outd);
+        return out.set(outd);
+    }
 
     /**
      * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
@@ -249,6 +263,21 @@ public class AstroUtils {
      * @param out  The out vector
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
+    public static Vector3b plutoEclipticCoordinates(Instant date, Vector3b out) {
+        if (!Constants.withinVSOPTime(date.toEpochMilli()))
+            return null;
+        Vector3d outd = new Vector3d();
+        plutoEclipticCoordinates(getDaysSinceJ2000(date), outd);
+        return out.set(outd);
+    }
+
+    /**
+     * Ecliptic coordinates of pluto at the given date
+     *
+     * @param date The date
+     * @param out  The out vector
+     * @return Ecliptic coordinates of Pluto at the given julian date
+     */
     public static Vector3d plutoEclipticCoordinates(Instant date, Vector3d out) {
         if (!Constants.withinVSOPTime(date.toEpochMilli()))
             return null;
@@ -263,7 +292,7 @@ public class AstroUtils {
      * @param out The out vector
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
-    public static Vector3d plutoEclipticCoordinates(double d, Vector3d out) {
+    private static Vector3d plutoEclipticCoordinates(double d, Vector3d out) {
         ITrigonometry trigo = MathManager.instance.trigo;
 
         double S = Math.toRadians(50.03 + 0.033459652 * d);
@@ -379,7 +408,7 @@ public class AstroUtils {
      *                     terms for speed
      * @return The output vector with L, B and R, for chaining.
      */
-    public static Vector3d getEclipticCoordinates(String body, Instant instant, Vector3d out, boolean highAccuracy) {
+    public static Vector3b getEclipticCoordinates(String body, Instant instant, Vector3b out, boolean highAccuracy) {
 
         switch (body) {
         case "Moon":
@@ -392,13 +421,6 @@ public class AstroUtils {
             coor.getEclipticSphericalCoordinates(instant, out);
             return out;
         }
-    }
-
-    private static Vector3d aux = new Vector3d();
-
-    public static Vector3b getEclipticCoordinates(String body, Instant instant, Vector3b out, boolean highAccuracy) {
-        AstroUtils.getEclipticCoordinates(body, instant, aux, highAccuracy);
-        return out.set(aux);
     }
 
     private static double prettyAngle(double angle) {

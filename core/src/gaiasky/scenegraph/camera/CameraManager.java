@@ -154,6 +154,7 @@ public class CameraManager implements ICamera, IObserver {
     private final Vector3d lastPos;
     private final Vector3d out;
     private final Vector3d in;
+    private final Vector3b inb;
     private final Vector3 vec;
     private final Vector3 v0;
     private final Vector3 v1;
@@ -183,6 +184,7 @@ public class CameraManager implements ICamera, IObserver {
         this.mode = mode;
         lastPos = new Vector3d();
         in = new Vector3d();
+        inb = new Vector3b();
         out = new Vector3d();
         vec = new Vector3();
         v0 = new Vector3();
@@ -379,7 +381,7 @@ public class CameraManager implements ICamera, IObserver {
         vec.set(pointerX, pointerY, 0.5f);
         camera.getCamera().unproject(vec);
         in.set(vec);
-        Coordinates.cartesianToSpherical(in, out);
+        Coordinates.cartesianToSpherical(inb.set(in), out);
 
         double pointerRA = out.x * Nature.TO_DEG;
         double pointerDEC = out.y * Nature.TO_DEG;
@@ -388,7 +390,7 @@ public class CameraManager implements ICamera, IObserver {
         vec.set(viewX, viewY, 0.5f);
         camera.getCamera().unproject(vec);
         in.set(vec);
-        Coordinates.cartesianToSpherical(in, out);
+        Coordinates.cartesianToSpherical(inb.set(in), out);
 
         double viewRA = out.x * Nature.TO_DEG;
         double viewDEC = out.y * Nature.TO_DEG;

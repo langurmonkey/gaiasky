@@ -10,10 +10,7 @@ import gaiasky.render.ComponentTypes;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
-import gaiasky.util.math.Vector2d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
@@ -103,7 +100,7 @@ public interface IFocus {
      *
      * @return The position
      */
-    Vector3d getPos();
+    Vector3b getPos();
 
     /**
      * Gets the first ancestor of this node that is of type {@link Star}
@@ -119,7 +116,7 @@ public interface IFocus {
      * @param out Vector3d where to put the return value
      * @return The absolute position, same as aux
      */
-    Vector3d getAbsolutePosition(Vector3d out);
+    Vector3b getAbsolutePosition(Vector3b out);
 
     /**
      * Returns the absolute position of the entity identified by
@@ -129,15 +126,15 @@ public interface IFocus {
      * @param out  Vector3d to put the return value
      * @return The absolute position of the entity if it exists, null otherwise
      */
-    Vector3d getAbsolutePosition(String name, Vector3d out);
+    Vector3b getAbsolutePosition(String name, Vector3b out);
 
     /**
-     * Same as {@link IFocus#getAbsolutePosition(Vector3d)}
+     * Same as {@link IFocus#getAbsolutePosition(Vector3b)}
      *
      * @param out Vector3d where to put the return value
      * @return The absolute position, same as aux
      */
-    Vector3d getClosestAbsolutePos(Vector3d out);
+    Vector3b getClosestAbsolutePos(Vector3b out);
 
     /**
      * Gets the position in equatorial spherical coordinates
@@ -159,7 +156,7 @@ public interface IFocus {
      * @param force  Whether to force the computation if time is off
      * @return The aux vector for chaining
      */
-    Vector3d getPredictedPosition(Vector3d aux, ITimeFrameProvider time, ICamera camera, boolean force);
+    Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force);
 
     /**
      * Returns the current distance to the camera in internal units
@@ -234,27 +231,27 @@ public interface IFocus {
      * @param camPos The camera position
      * @return The height of the projected position of the current camera
      */
-    double getHeight(Vector3d camPos);
+    double getHeight(Vector3b camPos);
 
     /**
-     * Same as {@link #getHeight(Vector3d)} but with the option to use the
+     * Same as {@link #getHeight(Vector3b)} but with the option to use the
      * future position of the body instead of the current one.
      *
      * @param camPos            The camera position
      * @param useFuturePosition Whether to use the future position or the current one
      * @return The height of the projected position of the current camera on the surface
      */
-    double getHeight(Vector3d camPos, boolean useFuturePosition);
+    double getHeight(Vector3b camPos, boolean useFuturePosition);
 
     /**
-     * Same as {@link #getHeight(Vector3d)} but with the option to use the
+     * Same as {@link #getHeight(Vector3b)} but with the option to use the
      * given future position of the body instead of the current one.
      *
      * @param camPos  The camera position
      * @param nextPos The future position of this body to use
      * @return The height of the projected position of the current camera on the surface
      */
-    double getHeight(Vector3d camPos, Vector3d nextPos);
+    double getHeight(Vector3b camPos, Vector3b nextPos);
 
     /**
      * Returns the height scale of this focus, or 0 if it has no height info

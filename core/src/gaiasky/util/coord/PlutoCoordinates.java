@@ -6,7 +6,9 @@
 package gaiasky.util.coord;
 
 import gaiasky.util.Constants;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import org.apfloat.Apfloat;
 
 import java.time.Instant;
 
@@ -21,22 +23,22 @@ public class PlutoCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         AstroUtils.plutoEclipticCoordinates(date, out);
         // To internal units
-        out.z *= Constants.KM_TO_U * scaling;
+        out.z = out.z.multiply(new Apfloat(Constants.KM_TO_U * scaling, Constants.PREC));
         return out;
     }
 
     @Override
-    public Vector3d getEclipticCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         getEclipticSphericalCoordinates(date, out);
         Coordinates.sphericalToCartesian(out, out);
         return out;
     }
 
     @Override
-    public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         getEclipticSphericalCoordinates(date, out);
         Coordinates.sphericalToCartesian(out, out);
         out.mul(Coordinates.eclToEq());

@@ -42,6 +42,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public static final String ROOT_NAME = "Universe";
 
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
+    protected static TLV3B aux3b1 = new TLV3B(), aux3b2 = new TLV3B(), aux3b3 = new TLV3B(), aux3b4 = new TLV3B();
     protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
 
     /**
@@ -155,7 +156,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * Position of this entity in the local reference system. The units are
      * {@link gaiasky.util.Constants#U_TO_KM} by default.
      */
-    public Vector3d pos;
+    public Vector3b pos;
 
     /**
      * Coordinates provider. Helps updating the position at each time step.
@@ -210,7 +211,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public SceneGraphNode() {
         // Identity
         this.translation = new Vector3b();
-        pos = new Vector3d();
+        pos = new Vector3b();
         posSph = new Vector2d();
     }
 
@@ -222,7 +223,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public SceneGraphNode(ComponentType ct) {
         super();
         this.ct = new ComponentTypes(ct);
-        pos = new Vector3d();
+        pos = new Vector3b();
         posSph = new Vector2d();
     }
 
@@ -525,7 +526,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             coordinates.doneLoading(sg, this);
     }
 
-    public Vector3d getPos() {
+    public Vector3b getPos() {
         return pos;
     }
 
@@ -962,7 +963,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @param force  Whether to force the computation if time is off.
      * @return The aux vector for chaining.
      */
-    public Vector3d getPredictedPosition(Vector3d aux, ITimeFrameProvider time, ICamera camera, boolean force) {
+    public Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force) {
         if (!mustUpdatePosition(time) && !force) {
             return getAbsolutePosition(aux);
         } else {
@@ -1005,7 +1006,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @param out Auxiliary vector to put the result in
      * @return The vector with the position
      */
-    public Vector3d getAbsolutePosition(Vector3d out) {
+    public Vector3b getAbsolutePosition(Vector3b out) {
         out.set(pos);
         SceneGraphNode entity = this;
         while (entity.parent != null) {
@@ -1015,7 +1016,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return out;
     }
 
-    public Vector3d getAbsolutePosition(String name, Vector3d aux) {
+    public Vector3b getAbsolutePosition(String name, Vector3b aux) {
         return this.hasName(name) ? getAbsolutePosition(aux) : null;
     }
 
@@ -1039,15 +1040,15 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return size / 2d;
     }
 
-    public double getHeight(Vector3d camPos) {
+    public double getHeight(Vector3b camPos) {
         return getRadius();
     }
 
-    public double getHeight(Vector3d camPos, boolean useFuturePosition) {
+    public double getHeight(Vector3b camPos, boolean useFuturePosition) {
         return getRadius();
     }
 
-    public double getHeight(Vector3d camPos, Vector3d nextPos) {
+    public double getHeight(Vector3b camPos, Vector3b nextPos) {
         return getRadius();
     }
 
@@ -1200,7 +1201,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     @Override
-    public Vector3d getPosition() {
+    public Vector3b getPosition() {
         return pos;
     }
 

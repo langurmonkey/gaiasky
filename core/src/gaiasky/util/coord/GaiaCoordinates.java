@@ -9,6 +9,7 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.HeliotropicOrbit;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -30,21 +31,23 @@ public class GaiaCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3d getEclipticCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         return null;
     }
 
     @Override
-    public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         return null;
     }
 
     @Override
-    public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         boolean inRange = data.loadPoint(out, date);
         // Rotate by solar longitude, and convert to equatorial.
-        out.rotate(AstroUtils.getSunLongitude(date) + 180, 0, 1, 0).mul(Coordinates.eclToEq()).scl(scaling);
-        return inRange ? out : null;
+        Vector3d outd = new Vector3d();
+        out.put(outd);
+        outd.rotate(AstroUtils.getSunLongitude(date) + 180, 0, 1, 0).mul(Coordinates.eclToEq()).scl(scaling);
+        return inRange ? out.set(outd) : null;
     }
 
 }

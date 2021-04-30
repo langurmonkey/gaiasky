@@ -13,6 +13,7 @@ import gaiasky.scenegraph.Star;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.io.*;
@@ -88,10 +89,10 @@ public class ParticleDataBinaryIO {
                     data_out.writeFloat(s.cc[3]);
                     data_out.writeFloat((float) s.posSph.x);
                     data_out.writeFloat((float) s.posSph.y);
-                    data_out.writeFloat((float) s.pos.len());
-                    data_out.writeDouble(s.pos.x);
-                    data_out.writeDouble(s.pos.y);
-                    data_out.writeDouble(s.pos.z);
+                    data_out.writeFloat(s.pos.lenf());
+                    data_out.writeDouble(s.pos.x.doubleValue());
+                    data_out.writeDouble(s.pos.y.doubleValue());
+                    data_out.writeDouble(s.pos.z.doubleValue());
                     data_out.writeFloat(s.pmSph != null ? s.pmSph.x : 0f);
                     data_out.writeFloat(s.pmSph != null ? s.pmSph.y : 0f);
                     data_out.writeFloat(s.pmSph != null ? s.pmSph.z : 0f);
@@ -174,7 +175,7 @@ public class ParticleDataBinaryIO {
                     byte source = data_in.readByte();
                     long pageId = data_in.readInt();
                     int type = data_in.readInt();
-                    Vector3d pos = new Vector3d(x, y, z);
+                    Vector3b pos = new Vector3b(x, y, z);
                     Vector3 pmSph = new Vector3(mualpha, mudelta, radvel);
                     Vector3 pm = new Vector3(pmx, pmy, pmz);
                     float[] cc;

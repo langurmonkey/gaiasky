@@ -27,6 +27,7 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -104,11 +105,6 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
         location3d.mul(localTransform);
 
-    }
-
-    @Override
-    public Vector3d getAbsolutePosition(Vector3d out) {
-        return super.getAbsolutePosition(out);
     }
 
     public Vector2 getLocation() {
@@ -262,7 +258,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out) {
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         getAbsolutePosition(out);
         return out;
     }

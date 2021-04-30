@@ -351,4 +351,7 @@ public class Constants {
         return time <= Constants.MAX_VSOP_TIME_MS && time >= Constants.MIN_VSOP_TIME_MS;
     }
 
+    // Apfloat precision
+    public static final int PREC = 50;
+
 }
