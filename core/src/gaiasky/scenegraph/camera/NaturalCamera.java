@@ -1479,9 +1479,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             previousOrientationAngle = 0;
             break;
         case FREE_MODE_COORD_CMD:
-            float ra = (Float) data[0];
-            float dec = (Float) data[1];
-            float dist = (float) (1e12 * Constants.PC_TO_U);
+            double ra = (Double) data[0];
+            double dec = (Double) data[1];
+            double dist = 1e12 * Constants.PC_TO_U;
             aux1.set(MathUtilsd.degRad * ra, MathUtilsd.degRad * dec, dist);
             Coordinates.sphericalToCartesian(aux1, freeTargetPos);
             facingFocus = false;

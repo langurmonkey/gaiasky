@@ -176,8 +176,8 @@ public class SAMPClient implements IObserver {
         conn.addMessageHandler(new AbstractMessageHandler("coord.pointAt.sky") {
             public Map processCall(HubConnection c, String senderId, Message msg) {
                 // do stuff
-                float ra = Float.parseFloat((String) msg.getParam("ra"));
-                float dec = Float.parseFloat((String) msg.getParam("dec"));
+                double ra = Parser.parseDouble((String) msg.getParam("ra"));
+                double dec = Parser.parseDouble((String) msg.getParam("dec"));
                 logger.info("Point to coordinate (ra,dec): (" + ra + ", " + dec + ")");
 
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);

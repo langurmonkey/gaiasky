@@ -367,7 +367,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public void pointAtSkyCoordinate(double ra, double dec) {
         em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-        em.post(Events.FREE_MODE_COORD_CMD, (float) ra, (float) dec);
+        em.post(Events.FREE_MODE_COORD_CMD, ra, dec);
     }
 
     public void pointAtSkyCoordinate(long ra, long dec) {
