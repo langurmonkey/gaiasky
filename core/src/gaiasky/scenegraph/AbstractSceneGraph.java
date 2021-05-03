@@ -39,7 +39,6 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** Does it contain a star group **/
     protected boolean hasStarGroup;
 
-    private final Vector3d aux3d1;
     private final Vector3b aux3b1;
 
     public AbstractSceneGraph() {
@@ -50,7 +49,6 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         // Objects per thread
         objectsPerThread = new int[1];
 
-        aux3d1 = new Vector3d();
         aux3b1 = new Vector3b();
     }
 

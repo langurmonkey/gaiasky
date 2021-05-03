@@ -78,8 +78,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Auxiliary double vectors
      **/
-    private Vector3d aux1, aux2, aux3, aux5, dx;
-    private Vector3b aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
+    private Vector3d aux1, aux2, aux3, aux5;
+    private Vector3b dx, aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
     private Vector2 aux2f2;
     /**
      * Auxiliary float vector
@@ -299,7 +299,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         aux4b = new Vector3b();
         aux5b = new Vector3b();
 
-        dx = new Vector3d();
+        dx = new Vector3b();
         nextFocusPosition = new Vector3b();
         nextClosestPosition = new Vector3b();
 
@@ -1566,9 +1566,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         rotate(rotationAxis, angle);
 
         // aux3 <- pos-point vector
-        aux3.set(pos).sub(rotationCenter);
-        aux3.rotate(rotationAxis, angle);
-        pos.set(aux3).add(rotationCenter);
+        aux3b.set(pos).sub(rotationCenter);
+        aux3b.rotate(rotationAxis, angle);
+        pos.set(aux3b).add(rotationCenter);
         posDistanceCheck();
     }
 

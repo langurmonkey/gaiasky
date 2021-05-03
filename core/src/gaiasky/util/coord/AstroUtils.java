@@ -11,6 +11,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.vsop87.VSOP87;
 import gaiasky.util.coord.vsop87.iVSOP87;
 import gaiasky.util.math.*;
+import org.apfloat.Apfloat;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -98,7 +99,7 @@ public class AstroUtils {
         double T3 = T2 * T;
         double M = 357.5291 + 35999.0503 * T - 0.0001599 * T2 - 0.00000048 * T3;
         double e = 0.016708617 - 0.000042037 * T - 0.0000001236 * T2;
-        double C = (1.9146 - 0.004817 * T - 0.000014 * T2) * Math.sin(Math.toRadians(M)) + (0.019993 - 0.000101 * T) * Math.sin(Math.toRadians(2 * M)) + 0.00029 * Math.sin(Math.toRadians(3 * M));
+        double C = (1.9146 - 0.004817 * T - 0.000014 * T2) * Math.sin(Math.toRadians(M)) + (0.019993 - 0.000101 * T) * Math.sin(Math.toRadians(2.0 * M)) + 0.00029 * Math.sin(Math.toRadians(3 * M));
         double v = M + C;
 
         double R = (1.000001018 * (1 - e * e)) / (1 + e * Math.cos(Math.toRadians(v)));
@@ -142,7 +143,7 @@ public class AstroUtils {
         double n = jd - JD_J2000;
         double L = 280.460d + 0.9856474d * n;
         double g = 357.528d + 0.9856003d * n;
-        double l = L + 1.915 * Math.sin(Math.toRadians(g)) + 0.02 * Math.sin(Math.toRadians(2 * g));
+        double l = L + 1.915 * Math.sin(Math.toRadians(g)) + 0.02 * Math.sin(Math.toRadians(2.0 * g));
         return l;
     }
 
@@ -256,20 +257,6 @@ public class AstroUtils {
         return out.set(Math.toRadians(lambda), Math.toRadians(beta), dist);
     }
 
-    /**
-     * Ecliptic coordinates of pluto at the given date
-     *
-     * @param date The date
-     * @param out  The out vector
-     * @return Ecliptic coordinates of Pluto at the given julian date
-     */
-    public static Vector3b plutoEclipticCoordinates(Instant date, Vector3b out) {
-        if (!Constants.withinVSOPTime(date.toEpochMilli()))
-            return null;
-        Vector3d outd = new Vector3d();
-        plutoEclipticCoordinates(getDaysSinceJ2000(date), outd);
-        return out.set(outd);
-    }
 
     /**
      * Ecliptic coordinates of pluto at the given date
@@ -278,7 +265,7 @@ public class AstroUtils {
      * @param out  The out vector
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
-    public static Vector3d plutoEclipticCoordinates(Instant date, Vector3d out) {
+    public static Vector3b plutoEclipticCoordinates(Instant date, Vector3b out) {
         if (!Constants.withinVSOPTime(date.toEpochMilli()))
             return null;
         return plutoEclipticCoordinates(getDaysSinceJ2000(date), out);
@@ -292,20 +279,21 @@ public class AstroUtils {
      * @param out The out vector
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
-    private static Vector3d plutoEclipticCoordinates(double d, Vector3d out) {
+    private static Vector3b plutoEclipticCoordinates(double d, Vector3b out) {
         ITrigonometry trigo = MathManager.instance.trigo;
 
         double S = Math.toRadians(50.03 + 0.033459652 * d);
         double P = Math.toRadians(238.95 + 0.003968789 * d);
 
-        double lonecl = 238.9508 + 0.00400703 * d - 19.799 * trigo.sin(P) + 19.848 * trigo.cos(P) + 0.897 * trigo.sin(2 * P) - 4.956 * trigo.cos(2 * P) + 0.610 * trigo.sin(3 * P) + 1.211 * trigo.cos(3 * P) - 0.341 * trigo.sin(4 * P) - 0.190 * trigo.cos(4 * P) + 0.128 * trigo.sin(5 * P) - 0.034 * trigo.cos(5 * P) - 0.038 * trigo.sin(6 * P) + 0.031 * trigo.cos(6 * P) + 0.020 * trigo.sin(S - P) - 0.010 * trigo.cos(S - P);
+        double lonecl = 238.9508 + 0.00400703 * d - 19.799 * trigo.sin(P) + 19.848 * trigo.cos(P) + 0.897 * trigo.sin(2.0 * P) - 4.956 * trigo.cos(2.0 * P) + 0.610 * trigo.sin(3.0 * P) + 1.211 * trigo.cos(3.0 * P) - 0.341 * trigo.sin(4.0 * P) - 0.190 * trigo.cos(4.0 * P) + 0.128 * trigo.sin(5.0 * P) - 0.034 * trigo.cos(5.0 * P) - 0.038 * trigo.sin(6.0 * P) + 0.031 * trigo.cos(6.0 * P) + 0.020 * trigo.sin(S - P) - 0.010 * trigo.cos(S - P);
 
-        double latecl = -3.9082 - 5.453 * trigo.sin(P) - 14.975 * trigo.cos(P) + 3.527 * trigo.sin(2 * P) + 1.673 * trigo.cos(2 * P) - 1.051 * trigo.sin(3 * P) + 0.328 * trigo.cos(3 * P) + 0.179 * trigo.sin(4 * P) - 0.292 * trigo.cos(4 * P) + 0.019 * trigo.sin(5 * P) + 0.100 * trigo.cos(5 * P) - 0.031 * trigo.sin(6 * P) - 0.026 * trigo.cos(6 * P) + 0.011 * trigo.cos(S - P);
+        double latecl = -3.9082 - 5.453 * trigo.sin(P) - 14.975 * trigo.cos(P) + 3.527 * trigo.sin(2.0 * P) + 1.673 * trigo.cos(2.0 * P) - 1.051 * trigo.sin(3.0 * P) + 0.328 * trigo.cos(3.0 * P) + 0.179 * trigo.sin(4.0 * P) - 0.292 * trigo.cos(4.0 * P) + 0.019 * trigo.sin(5.0 * P) + 0.100 * trigo.cos(5.0 * P) - 0.031 * trigo.sin(6.0 * P) - 0.026 * trigo.cos(6.0 * P) + 0.011 * trigo.cos(S - P);
 
-        double r = 40.72 + 6.68 * trigo.sin(P) + 6.90 * trigo.cos(P) - 1.18 * trigo.sin(2 * P) - 0.03 * trigo.cos(2 * P) + 0.15 * trigo.sin(3 * P) - 0.14 * trigo.cos(3 * P);
+        double r = 40.72 + 6.68 * trigo.sin(P) + 6.90 * trigo.cos(P) - 1.18 * trigo.sin(2.0 * P) - 0.03 * trigo.cos(2.0 * P) + 0.15 * trigo.sin(3.0 * P) - 0.14 * trigo.cos(3.0 * P);
 
-        return out.set(Math.toRadians(lonecl), Math.toRadians(latecl), Nature.AU_TO_KM * r * 5000000d);
-        //return out.set(Math.toRadians(lonecl), Math.toRadians(latecl), Nature.AU_TO_KM * r);
+        //Apfloat radius = new Apfloat(r, Constants.PREC).multiply(new Apfloat(Nature.AU_TO_KM, Constants.PREC)).multiply(new Apfloat(5000000d, Constants.PREC));
+        //return out.set(new Apfloat(Math.toRadians(lonecl), Constants.PREC), new Apfloat(Math.toRadians(latecl), Constants.PREC), radius);
+        return out.set(Math.toRadians(lonecl), Math.toRadians(latecl), Nature.AU_TO_KM * r);
     }
 
     /**
