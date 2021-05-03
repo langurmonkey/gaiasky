@@ -265,16 +265,16 @@ public class Vector3b implements Serializable {
     }
 
     public Vector3b add(final Vector3d vec) {
-        this.x = this.x.add(new Apfloat(vec.x));
-        this.y = this.y.add(new Apfloat(vec.y));
-        this.z = this.z.add(new Apfloat(vec.z));
+        this.x = this.x.add(new Apfloat(vec.x, prec));
+        this.y = this.y.add(new Apfloat(vec.y, prec));
+        this.z = this.z.add(new Apfloat(vec.z, prec));
         return this;
     }
 
     public Vector3b add(final Vector3 vec) {
-        this.x = this.x.add(new Apfloat(vec.x));
-        this.y = this.y.add(new Apfloat(vec.y));
-        this.z = this.z.add(new Apfloat(vec.z));
+        this.x = this.x.add(new Apfloat(vec.x, prec));
+        this.y = this.y.add(new Apfloat(vec.y, prec));
+        this.z = this.z.add(new Apfloat(vec.z, prec));
         return this;
     }
 
@@ -287,9 +287,9 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining.
      */
     public Vector3b add(double x, double y, double z) {
-        this.x = this.x.add(new Apfloat(x));
-        this.y = this.y.add(new Apfloat(y));
-        this.z = this.z.add(new Apfloat(z));
+        this.x = this.x.add(new Apfloat(x, prec));
+        this.y = this.y.add(new Apfloat(y, prec));
+        this.z = this.z.add(new Apfloat(z, prec));
         return this;
     }
 
@@ -301,9 +301,9 @@ public class Vector3b implements Serializable {
      */
     public Vector3b add(double... vals) {
         assert vals.length == 3 : "vals must contain 3 values";
-        this.x = this.x.add(new Apfloat(vals[0]));
-        this.y = this.y.add(new Apfloat(vals[1]));
-        this.z = this.z.add(new Apfloat(vals[2]));
+        this.x = this.x.add(new Apfloat(vals[0], prec));
+        this.y = this.y.add(new Apfloat(vals[1], prec));
+        this.z = this.z.add(new Apfloat(vals[2], prec));
         return this;
     }
 
@@ -314,7 +314,7 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b add(double value) {
-        var val = new Apfloat(value);
+        var val = new Apfloat(value, prec);
         x = x.add(val);
         y = y.add(val);
         z = z.add(val);
@@ -345,9 +345,9 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b sub(double x, double y, double z) {
-        this.x = this.x.subtract(new Apfloat(x));
-        this.y = this.y.subtract(new Apfloat(y));
-        this.z = this.z.subtract(new Apfloat(z));
+        this.x = this.x.subtract(new Apfloat(x, prec));
+        this.y = this.y.subtract(new Apfloat(y, prec));
+        this.z = this.z.subtract(new Apfloat(z, prec));
         return this;
     }
 
@@ -358,7 +358,7 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b sub(double value) {
-        var val = new Apfloat(value);
+        var val = new Apfloat(value, prec);
         x = x.subtract(val);
         y = y.subtract(val);
         z = z.subtract(val);
@@ -373,7 +373,7 @@ public class Vector3b implements Serializable {
     }
 
     public Vector3b scl(double scalar) {
-        var scl = new Apfloat(scalar);
+        var scl = new Apfloat(scalar, prec);
         x = x.multiply(scl);
         y = y.multiply(scl);
         z = z.multiply(scl);
@@ -396,14 +396,14 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b scl(double x, double y, double z) {
-        this.x = this.x.multiply(new Apfloat(x));
-        this.y = this.y.multiply(new Apfloat(y));
-        this.z = this.z.multiply(new Apfloat(z));
+        this.x = this.x.multiply(new Apfloat(x, prec));
+        this.y = this.y.multiply(new Apfloat(y, prec));
+        this.z = this.z.multiply(new Apfloat(z, prec));
         return this;
     }
 
     public Vector3b mulAdd(Vector3b vec, double scalar) {
-        Apfloat scl = new Apfloat(scalar);
+        Apfloat scl = new Apfloat(scalar, prec);
         x = x.add(vec.x.multiply(scl));
         y = y.add(vec.y.multiply(scl));
         z = z.add(vec.z.multiply(scl));
@@ -480,9 +480,9 @@ public class Vector3b implements Serializable {
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
     public Apfloat dst(final Vector3d vec) {
-        Apfloat a = new Apfloat(vec.x).subtract(this.x);
-        Apfloat b = new Apfloat(vec.y).subtract(this.y);
-        Apfloat c = new Apfloat(vec.z).subtract(this.z);
+        Apfloat a = new Apfloat(vec.x, prec).subtract(this.x);
+        Apfloat b = new Apfloat(vec.y, prec).subtract(this.y);
+        Apfloat c = new Apfloat(vec.z, prec).subtract(this.z);
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
 
@@ -492,9 +492,9 @@ public class Vector3b implements Serializable {
 
     /** @return the distance between this point and the given point */
     public Apfloat dst(double x, double y, double z) {
-        Apfloat a = new Apfloat(x).subtract(this.x);
-        Apfloat b = new Apfloat(y).subtract(this.y);
-        Apfloat c = new Apfloat(z).subtract(this.z);
+        Apfloat a = new Apfloat(x, prec).subtract(this.x);
+        Apfloat b = new Apfloat(y, prec).subtract(this.y);
+        Apfloat c = new Apfloat(z, prec).subtract(this.z);
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
 
@@ -525,9 +525,9 @@ public class Vector3b implements Serializable {
      * @return The squared distance
      */
     public Apfloat dst2(double x, double y, double z) {
-        Apfloat a = new Apfloat(x).subtract(this.x);
-        Apfloat b = new Apfloat(y).subtract(this.y);
-        Apfloat c = new Apfloat(z).subtract(this.z);
+        Apfloat a = new Apfloat(x, prec).subtract(this.x);
+        Apfloat b = new Apfloat(y, prec).subtract(this.y);
+        Apfloat c = new Apfloat(z, prec).subtract(this.z);
         return a.multiply(a).add(b.multiply(b)).add(c.multiply(c));
     }
 
@@ -554,7 +554,7 @@ public class Vector3b implements Serializable {
     }
 
     public double dotd(double x, double y, double z) {
-        return this.dot(new Apfloat(x), new Apfloat(y), new Apfloat(z)).doubleValue();
+        return this.dot(new Apfloat(x, prec), new Apfloat(y, prec), new Apfloat(z, prec)).doubleValue();
     }
 
     /**
@@ -608,9 +608,9 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b crs(double x, double y, double z) {
-        Apfloat vx = new Apfloat(x);
-        Apfloat vy = new Apfloat(y);
-        Apfloat vz = new Apfloat(z);
+        Apfloat vx = new Apfloat(x, prec);
+        Apfloat vy = new Apfloat(y, prec);
+        Apfloat vz = new Apfloat(z, prec);
         return this.set(this.y.multiply(vz).subtract(this.z.multiply(vy)), this.z.multiply(vx).subtract(this.x.multiply(vz)), this.x.multiply(vy).subtract(this.y.multiply(vx)));
     }
 
@@ -623,18 +623,18 @@ public class Vector3b implements Serializable {
      * @return This vector for chaining
      */
     public Vector3b mul4x3(double[] matrix) {
-        var m0 = new Apfloat(matrix[0]);
-        var m1 = new Apfloat(matrix[1]);
-        var m2 = new Apfloat(matrix[2]);
-        var m3 = new Apfloat(matrix[3]);
-        var m4 = new Apfloat(matrix[4]);
-        var m5 = new Apfloat(matrix[5]);
-        var m6 = new Apfloat(matrix[6]);
-        var m7 = new Apfloat(matrix[7]);
-        var m8 = new Apfloat(matrix[8]);
-        var m9 = new Apfloat(matrix[8]);
-        var m10 = new Apfloat(matrix[10]);
-        var m11 = new Apfloat(matrix[11]);
+        var m0 = new Apfloat(matrix[0], prec);
+        var m1 = new Apfloat(matrix[1], prec);
+        var m2 = new Apfloat(matrix[2], prec);
+        var m3 = new Apfloat(matrix[3], prec);
+        var m4 = new Apfloat(matrix[4], prec);
+        var m5 = new Apfloat(matrix[5], prec);
+        var m6 = new Apfloat(matrix[6], prec);
+        var m7 = new Apfloat(matrix[7], prec);
+        var m8 = new Apfloat(matrix[8], prec);
+        var m9 = new Apfloat(matrix[9], prec);
+        var m10 = new Apfloat(matrix[10], prec);
+        var m11 = new Apfloat(matrix[11], prec);
         return set(x.multiply(m0).add(y.multiply(m3)).add(z.multiply(m6)).add(m9),
                 x.multiply(m1).add(y.multiply(m4)).add(z.multiply(m7)).add(m10),
                 x.multiply(m2).add(y.multiply(m5)).add(z.multiply(m8)).add(m11));
@@ -649,18 +649,18 @@ public class Vector3b implements Serializable {
      */
     public Vector3b mul(final Matrix4d matrix) {
         final double[] mat = matrix.val;
-        var m00 = new Apfloat(mat[Matrix4d.M00]);
-        var m01 = new Apfloat(mat[Matrix4d.M01]);
-        var m02 = new Apfloat(mat[Matrix4d.M02]);
-        var m03 = new Apfloat(mat[Matrix4d.M02]);
-        var m10 = new Apfloat(mat[Matrix4d.M10]);
-        var m11 = new Apfloat(mat[Matrix4d.M11]);
-        var m12 = new Apfloat(mat[Matrix4d.M12]);
-        var m13 = new Apfloat(mat[Matrix4d.M13]);
-        var m20 = new Apfloat(mat[Matrix4d.M20]);
-        var m21 = new Apfloat(mat[Matrix4d.M21]);
-        var m22 = new Apfloat(mat[Matrix4d.M22]);
-        var m23 = new Apfloat(mat[Matrix4d.M23]);
+        var m00 = new Apfloat(mat[Matrix4d.M00], prec);
+        var m01 = new Apfloat(mat[Matrix4d.M01], prec);
+        var m02 = new Apfloat(mat[Matrix4d.M02], prec);
+        var m03 = new Apfloat(mat[Matrix4d.M03], prec);
+        var m10 = new Apfloat(mat[Matrix4d.M10], prec);
+        var m11 = new Apfloat(mat[Matrix4d.M11], prec);
+        var m12 = new Apfloat(mat[Matrix4d.M12], prec);
+        var m13 = new Apfloat(mat[Matrix4d.M13], prec);
+        var m20 = new Apfloat(mat[Matrix4d.M20], prec);
+        var m21 = new Apfloat(mat[Matrix4d.M21], prec);
+        var m22 = new Apfloat(mat[Matrix4d.M22], prec);
+        var m23 = new Apfloat(mat[Matrix4d.M23], prec);
         return this.set(
                 x.multiply(m00).add(y.multiply(m01)).add(z.multiply(m02)).add(m03),
                 x.multiply(m10).add(y.multiply(m11)).add(z.multiply(m12)).add(m13),

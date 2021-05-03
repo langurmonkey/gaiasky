@@ -380,8 +380,8 @@ public class CameraManager implements ICamera, IObserver {
         // Pointer
         vec.set(pointerX, pointerY, 0.5f);
         camera.getCamera().unproject(vec);
-        in.set(vec);
-        Coordinates.cartesianToSpherical(inb.set(in), out);
+        inb.set(vec);
+        Coordinates.cartesianToSpherical(inb, out);
 
         double pointerRA = out.x * Nature.TO_DEG;
         double pointerDEC = out.y * Nature.TO_DEG;
@@ -389,8 +389,8 @@ public class CameraManager implements ICamera, IObserver {
         // View
         vec.set(viewX, viewY, 0.5f);
         camera.getCamera().unproject(vec);
-        in.set(vec);
-        Coordinates.cartesianToSpherical(inb.set(in), out);
+        inb.set(vec);
+        Coordinates.cartesianToSpherical(inb, out);
 
         double viewRA = out.x * Nature.TO_DEG;
         double viewDEC = out.y * Nature.TO_DEG;

@@ -499,11 +499,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return This vector for chaining
 	 */
 	public Vector3d mul(final Matrix4d matrix) {
-		final double[] l_mat = matrix.val;
+		final double[] mat = matrix.val;
 		return this.set(
-				x * l_mat[Matrix4d.M00] + y * l_mat[Matrix4d.M01] + z * l_mat[Matrix4d.M02] + l_mat[Matrix4d.M03],
-				x * l_mat[Matrix4d.M10] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M12] + l_mat[Matrix4d.M13],
-				x * l_mat[Matrix4d.M20] + y * l_mat[Matrix4d.M21] + z * l_mat[Matrix4d.M22] + l_mat[Matrix4d.M23]);
+				x * mat[Matrix4d.M00] + y * mat[Matrix4d.M01] + z * mat[Matrix4d.M02] + mat[Matrix4d.M03],
+				x * mat[Matrix4d.M10] + y * mat[Matrix4d.M11] + z * mat[Matrix4d.M12] + mat[Matrix4d.M13],
+				x * mat[Matrix4d.M20] + y * mat[Matrix4d.M21] + z * mat[Matrix4d.M22] + mat[Matrix4d.M23]);
 	}
 
 	public Vector3d mulLeft(final Matrix3 matrix) {

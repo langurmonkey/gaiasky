@@ -78,7 +78,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Auxiliary double vectors
      **/
-    private Vector3d aux1, aux2, aux3, aux5, aux4, dx;
+    private Vector3d aux1, aux2, aux3, aux5, dx;
     private Vector3b aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
     private Vector2 aux2f2;
     /**
@@ -289,7 +289,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         aux1 = new Vector3d();
         aux2 = new Vector3d();
         aux3 = new Vector3d();
-        aux4 = new Vector3d();
         aux5 = new Vector3d();
         auxf1 = new Vector3();
         aux2f2 = new Vector2();
@@ -495,15 +494,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 updateRotation(dt, aux4b);
 
                 // Update focus direction
-                focusDirection.set(aux4).sub(pos).nor();
+                focusDirection.set(aux4b).sub(pos).nor();
                 focus = focusBak;
 
-                double dist = aux4.dst(pos);
+                double dist = aux4b.dstd(pos);
                 if (dist < focus.getRadius()) {
                     // aux2 <- focus-cam with a length of radius
-                    aux2.set(pos).sub(aux4).nor().scl(focus.getRadius());
+                    aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
                     // Correct camera position
-                    pos.set(aux4).add(aux2);
+                    pos.set(aux4b).add(aux2b);
                 }
 
                 EventManager.instance.post(Events.FOCUS_INFO_UPDATED, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius());
@@ -1091,10 +1090,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             double h = closestBody.getHeight(pos, aux5b);
             double hs = closestBody.getHeightScale() * GlobalConf.scene.ELEVATION_MULTIPLIER;
             double minDist = h + hs / 10.0;
-            double newDist = aux5.scl(-1).add(pos).len();
+            double newDist = aux5b.scl(-1).add(pos).lend();
             if (newDist < minDist) {
-                aux5.nor().scl(minDist - newDist);
-                pos.add(aux5);
+                aux5b.nor().scl(minDist - newDist);
+                pos.add(aux5b);
                 posinv.set(pos).scl(-1);
             }
         }
@@ -1480,7 +1479,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                     pos.add(dx, dy, dz);
                     posinv.set(pos).scl(-1d);
-                    direction.set(aux1).sub(pos).nor();
+                    direction.set(aux1b).sub(pos).nor();
                     up.set(direction.x, direction.z, -direction.y).nor();
                     rotate(up, 0.01);
                     updatePerspectiveCamera();
@@ -1494,7 +1493,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FREE_MODE_COORD_CMD:
             double ra = (Double) data[0];
             double dec = (Double) data[1];
-            double dist = 1e12 * Constants.PC_TO_U;
+            double dist = 1e12d * Constants.PC_TO_U;
             aux1.set(MathUtilsd.degRad * ra, MathUtilsd.degRad * dec, dist);
             Coordinates.sphericalToCartesian(aux1, aux2);
             freeTargetPos.set(aux2);
@@ -1684,9 +1683,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 this.focus.getAbsolutePosition(aux1b);
                 pos.set(aux1b);
 
-                pos.add(0, 0, -this.focus.getSize() * 6);
-                posinv.set(pos).scl(-1);
-                direction.set(0, 0, 1);
+                pos.add(0d, 0d, -this.focus.getSize() * 6d);
+                posinv.set(pos).scl(-1d);
+                direction.set(0d, 0d, 1d);
             }
         }
     }
@@ -1883,7 +1882,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             float chw2 = chw / 2;
             float chh2 = chh / (vr ? 1 : 2);
 
-            Vector3d pos = aux1;
+            Vector3d pos = aux5;
             p.put(pos);
             GlobalResources.applyRelativisticAberration(pos, this);
             RelativisticEffectsManager.getInstance().gravitationalWavePos(pos);
