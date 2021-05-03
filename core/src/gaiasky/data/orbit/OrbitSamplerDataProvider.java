@@ -114,8 +114,6 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         for (int i = 0; i <= numSamples; i++) {
             AstroUtils.getEclipticCoordinates(bodyDesc, d, ecl, true);
             double eclx = ecl.x.doubleValue();
-            double ecly = ecl.y.doubleValue();
-            double eclz = ecl.z.doubleValue();
 
             if (last == 0) {
                 last = Math.toDegrees(eclx);
@@ -130,9 +128,9 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
             Coordinates.sphericalToCartesian(ecl, ecl);
             ecl.mul(Coordinates.eclToEq()).scl(1);
-            data.x.add(eclx);
-            data.y.add(ecly);
-            data.z.add(eclz);
+            data.x.add(ecl.x.doubleValue());
+            data.y.add(ecl.y.doubleValue());
+            data.z.add(ecl.z.doubleValue());
             data.time.add(d);
 
             d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);

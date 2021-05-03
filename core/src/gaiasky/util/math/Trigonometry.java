@@ -8,9 +8,8 @@ package gaiasky.util.math;
 /**
  * Uses the default {@link java.lang.Math} library. Very accurate but not the
  * fastest in the West.
- * 
- * @author tsagrista
  *
+ * @author tsagrista
  */
 public class Trigonometry implements ITrigonometry {
 
@@ -42,6 +41,11 @@ public class Trigonometry implements ITrigonometry {
     @Override
     public double atan(double angle) {
         return Math.atan(angle);
+    }
+
+    @Override
+    public double atan2(double y, double x) {
+        return Math.atan2(y, x);
     }
 
 }

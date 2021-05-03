@@ -5,6 +5,7 @@
 
 package gaiasky.util.coord;
 
+import cds.healpix.common.math.FastMath;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
@@ -20,12 +21,10 @@ import java.util.Map;
 /**
  * Provides utility coordinate conversions between some astronomical coordinate
  * systems and to Cartesian coordinates. All angles are in radians.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class Coordinates {
-
 
     /**
      * Obliquity for low precision calculations in degrees and radians. J2000
@@ -70,7 +69,6 @@ public class Coordinates {
         // EQ -> ECL
         equatorialToEcliptic = getRotationMatrix(0, -OBLIQUITY_DEG_J2000, 0);
         equatorialToEclipticF = equatorialToEcliptic.putIn(new Matrix4());
-
 
         // ECL -> EQ
         eclipticToEquatorial = getRotationMatrix(0, OBLIQUITY_DEG_J2000, 0);
@@ -141,13 +139,10 @@ public class Coordinates {
      * </li>
      * <li>Y points upwards.</li>
      * </ul>
-     * 
-     * @param alpha
-     *            The &alpha; angle in degrees, between z and N.
-     * @param beta
-     *            The &beta; angle in degrees, between y and Y.
-     * @param gamma
-     *            The &gamma; angle in degrees, Z and N.
+     *
+     * @param alpha The &alpha; angle in degrees, between z and N.
+     * @param beta  The &beta; angle in degrees, between y and Y.
+     * @param gamma The &gamma; angle in degrees, Z and N.
      * @return The rotation matrix.
      */
     public static Matrix4d getRotationMatrix(double alpha, double beta, double gamma) {
@@ -163,9 +158,9 @@ public class Coordinates {
      * directions of both systems, is precisely the obliquity of the ecliptic,
      * &epsilon;. So we have the Euler angles &alpha;=0&deg;, &beta;=&epsilon;;,
      * &gamma;=0&deg;.
-     * 
+     *
      * @return The matrix to transform from equatorial coordinates to ecliptic
-     *         coordinates.
+     * coordinates.
      */
     public static Matrix4d eclToEq() {
         //return getRotationMatrix(0, obliquity, 0);
@@ -189,7 +184,7 @@ public class Coordinates {
      * Gets the rotation matrix to transform from the ecliptic system to the
      * equatorial system. See {@link Coordinates#equatorialToEcliptic()} for
      * more information, for this is the inverse transformation.
-     * 
+     *
      * @return The transformation matrix.
      */
     public static Matrix4d eclToEq(double julianDate) {
@@ -204,7 +199,7 @@ public class Coordinates {
      * Gets the rotation matrix to transform from the ecliptic system to the
      * equatorial system. See {@link Coordinates#eclToEq()} for more
      * information, for this is the inverse transformation.
-     * 
+     *
      * @return The transformation matrix.
      */
     public static Matrix4d eqToEcl() {
@@ -233,9 +228,9 @@ public class Coordinates {
      * directions of both systems, is precisely the obliquity of the ecliptic,
      * &epsilon;. So we have the Euler angles &alpha;=0&deg;, &beta;=&epsilon;;,
      * &gamma;=0&deg;.
-     * 
+     *
      * @return The matrix to transform from equatorial coordinates to ecliptic
-     *         coordinates.
+     * coordinates.
      */
     public static Matrix4d eqToEcl(double julianDate) {
         return getRotationMatrix(0, -AstroUtils.obliquity(julianDate), 0);
@@ -251,7 +246,7 @@ public class Coordinates {
      * information, since this is the inverse transformation. Use this matrix if
      * you need to convert equatorial cartesian coordinates to galactic
      * cartesian coordinates.
-     * 
+     *
      * @return The transformation matrix.
      */
     public static Matrix4d galToEq() {
@@ -276,7 +271,7 @@ public class Coordinates {
      * 62.9&deg;. The intersection, or node line, of the two equators is at
      * RA=282.25&deg; DEC=0&deg; and l=33&deg; b=0&deg;. So we have the Euler
      * angles &alpha;=-33&deg;, &beta;=62.9&deg;, &gamma;=282.25&deg;.
-     * 
+     *
      * @return The transformation matrix.
      */
     public static Matrix4d eqToGal() {
@@ -297,14 +292,12 @@ public class Coordinates {
 
     /**
      * Transforms from ecliptic to equatorial coordinates
-     * 
-     * @param vec
-     *            Vector with ecliptic longitude (&lambda;) and ecliptic
+     *
+     * @param vec Vector with ecliptic longitude (&lambda;) and ecliptic
      *            latitude (&beta;) in radians.
-     * @param out
-     *            The output vector.
+     * @param out The output vector.
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
-     *         for chaining.
+     * for chaining.
      */
     public static Vector2d eclipticToEquatorial(Vector2d vec, Vector2d out) {
         return eclipticToEquatorial(vec.x, vec.y, out);
@@ -312,15 +305,12 @@ public class Coordinates {
 
     /**
      * Transforms from ecliptic to equatorial coordinates
-     * 
-     * @param lambda
-     *            Ecliptic longitude (&lambda;) in radians.
-     * @param beta
-     *            Ecliptic latitude (&beta;) in radians.
-     * @param out
-     *            The output vector.
+     *
+     * @param lambda Ecliptic longitude (&lambda;) in radians.
+     * @param beta   Ecliptic latitude (&beta;) in radians.
+     * @param out    The output vector.
      * @return The output vector with ra (&alpha;) and dec (&delta;) in radians,
-     *         for chaining.
+     * for chaining.
      */
     public static Vector2d eclipticToEquatorial(double lambda, double beta, Vector2d out) {
 
@@ -349,25 +339,22 @@ public class Coordinates {
         return galacticToEclipticF;
     }
 
-
     /**
      * Converts from spherical to Cartesian coordinates, given a longitude
      * (&alpha;), a latitude (&delta;) and the radius. The result is in the XYZ
      * space, where ZX is the fundamental plane, with Z pointing to the the
      * origin of coordinates (equinox) and Y pointing to the north pole.
-     * 
-     * @param vec
-     *            Vector containing the spherical coordinates.
+     *
+     * @param vec Vector containing the spherical coordinates.
      *            <ol>
      *            <li>The longitude or right ascension (&alpha;), from the Z
      *            direction to the X direction, in radians.</li>
      *            <li>The latitude or declination (&delta;), in radians.</li>
      *            <li>The radius or distance to the point.</li>
      *            </ol>
-     * @param out
-     *            The output vector.
+     * @param out The output vector.
      * @return Output vector in Cartesian coordinates where x and z are on the
-     *         horizontal plane and y is in the up direction.
+     * horizontal plane and y is in the up direction.
      */
     public static Vector3d sphericalToCartesian(Vector3d vec, Vector3d out) {
         return sphericalToCartesian(vec.x, vec.y, vec.z, out);
@@ -380,19 +367,15 @@ public class Coordinates {
     /**
      * Converts from spherical to Cartesian coordinates, given a longitude
      * (&alpha;), a latitude (&delta;) and the radius.
-     * 
-     * @param longitude
-     *            The longitude or right ascension angle, from the z direction
-     *            to the x direction, in radians.
-     * @param latitude
-     *            The latitude or declination, in radians.
-     * @param radius
-     *            The radius or distance to the point.
-     * @param out
-     *            The output vector.
+     *
+     * @param longitude The longitude or right ascension angle, from the z direction
+     *                  to the x direction, in radians.
+     * @param latitude  The latitude or declination, in radians.
+     * @param radius    The radius or distance to the point.
+     * @param out       The output vector.
      * @return Output vector with the Cartesian coordinates[x, y, z] where x and
-     *         z are on the horizontal plane and y is in the up direction, for
-     *         chaining.
+     * z are on the horizontal plane and y is in the up direction, for
+     * chaining.
      */
     public static Vector3d sphericalToCartesian(double longitude, double latitude, double radius, Vector3d out) {
         out.x = radius * Math.cos(latitude) * Math.sin(longitude);
@@ -400,6 +383,7 @@ public class Coordinates {
         out.z = radius * Math.cos(latitude) * Math.cos(longitude);
         return out;
     }
+
     public static Vector3b sphericalToCartesian(double longitude, double latitude, Apfloat radius, Vector3b out) {
         out.x = radius.multiply(new Apfloat(Math.cos(latitude) * Math.sin(longitude), Constants.PREC));
         out.y = radius.multiply(new Apfloat(Math.sin(latitude), Constants.PREC));
@@ -410,18 +394,16 @@ public class Coordinates {
     /**
      * Converts from Cartesian coordinates to spherical coordinates.
      *
-     * @param vec
-     *            Vector with the Cartesian coordinates[x, y, z] where x and z
+     * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
-     * @param out
-     *            Output vector.
+     * @param out Output vector.
      * @return Output vector containing the spherical coordinates.
-     *         <ol>
-     *         <li>The longitude or right ascension (&alpha;), from the z
-     *         direction to the x direction.</li>
-     *         <li>The latitude or declination (&delta;).</li>
-     *         <li>The radius or distance to the point.</li>
-     *         </ol>
+     * <ol>
+     * <li>The longitude or right ascension (&alpha;), from the z
+     * direction to the x direction.</li>
+     * <li>The latitude or declination (&delta;).</li>
+     * <li>The radius or distance to the point.</li>
+     * </ol>
      */
     public static Vector3d cartesianToSpherical(Vector3d vec, Vector3d out) {
         /**
@@ -439,18 +421,18 @@ public class Coordinates {
         double xsq = vec.x * vec.x;
         double ysq = vec.y * vec.y;
         double zsq = vec.z * vec.z;
-        double distance = (float) Math.sqrt(xsq + ysq + zsq);
+        double distance = FastMath.sqrt(xsq + ysq + zsq);
 
         double alpha = Math.atan2(vec.x, vec.z);
         if (alpha < 0) {
             alpha += 2 * Math.PI;
         }
 
-        double delta = 0;
+        double delta;
         if (zsq + xsq == 0) {
             delta = (vec.y > 0 ? Math.PI / 2 : -Math.PI / 2);
         } else {
-            delta = Math.atan(vec.y / Math.sqrt(zsq + xsq));
+            delta = FastMath.atan(vec.y / FastMath.sqrt(zsq + xsq));
         }
 
         out.x = alpha;
@@ -461,73 +443,72 @@ public class Coordinates {
 
     /**
      * Converts from Cartesian coordinates to spherical coordinates.
-     * 
-     * @param vec
-     *            Vector with the Cartesian coordinates[x, y, z] where x and z
+     *
+     * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
-     * @param out
-     *            Output vector.
+     * @param out Output vector.
      * @return Output vector containing the spherical coordinates.
-     *         <ol>
-     *         <li>The longitude or right ascension (&alpha;), from the z
-     *         direction to the x direction.</li>
-     *         <li>The latitude or declination (&delta;).</li>
-     *         <li>The radius or distance to the point.</li>
-     *         </ol>
+     * <ol>
+     * <li>The longitude or right ascension (&alpha;), from the z
+     * direction to the x direction.</li>
+     * <li>The latitude or declination (&delta;).</li>
+     * <li>The radius or distance to the point.</li>
+     * </ol>
      */
     public static Vector3d cartesianToSpherical(Vector3b vec, Vector3d out) {
         /**
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
          * math.sqrt(xsq + ysq + zsq)
-         * 
+         *
          * alpha = math.atan2(y, x) # Correct the value of alpha depending upon
          * the quadrant. if alpha < 0: alpha += 2 * math.pi
-         * 
+         *
          * if (xsq + ysq) == 0: # In the case of the poles, delta is -90 or +90
          * delta = math.copysign(math.pi / 2, z) else: delta = math.atan(z /
          * math.sqrt(xsq + ysq))
          */
 
-        Apfloat xsq = vec.x.multiply(vec.x);
-        Apfloat ysq = vec.y.multiply(vec.y);
-        Apfloat zsq = vec.z.multiply(vec.z);
-        Apfloat distance = ApfloatMath.sqrt(xsq.add(ysq).add(zsq));
+        double x = vec.x.doubleValue();
+        double y = vec.y.doubleValue();
+        double z = vec.z.doubleValue();
 
-        Apfloat alpha = ApfloatMath.atan2(vec.x, vec.z);
-        if (alpha.doubleValue() < 0) {
-            alpha = alpha.add(ApfloatMath.pi(Constants.PREC).multiply(new Apfloat(2, Constants.PREC)));
+        double xsq = x * x;
+        double ysq = y * y;
+        double zsq = z * z;
+        double distance = FastMath.sqrt(xsq + ysq + zsq);
+
+        double alpha = Math.atan2(x, z);
+        if (alpha < 0) {
+            alpha += 2 * Math.PI;
         }
 
-        Apfloat delta;
-        if (zsq.add(xsq).doubleValue() == 0) {
-            Apfloat piOverTwo =ApfloatMath.pi(Constants.PREC).divide(new Apfloat(2, Constants.PREC));
-            delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(new Apfloat(-1, Constants.PREC)));
+        double delta;
+        if (zsq + xsq == 0) {
+            delta = (y > 0 ? Math.PI / 2 : -Math.PI / 2);
         } else {
-            delta = ApfloatMath.atan(vec.y.divide(ApfloatMath.sqrt(zsq.add(xsq))));
+            delta = FastMath.atan(y / FastMath.sqrt(zsq + xsq));
         }
 
-        out.x = alpha.doubleValue();
-        out.y = delta.doubleValue();
-        out.z = distance.doubleValue();
+        out.x = alpha;
+        out.y = delta;
+        out.z = distance;
         return out;
     }
 
     /**
      * Converts from Cartesian coordinates to spherical coordinates.
      *
-     * @param vec
-     *            Vector with the Cartesian coordinates[x, y, z] where x and z
+     * @param vec Vector with the Cartesian coordinates[x, y, z] where x and z
      *            are on the horizontal plane and y is in the up direction.
-     * @param out
-     *            Output vector.
+     * @param out Output vector.
      * @return Output vector containing the spherical coordinates.
-     *         <ol>
-     *         <li>The longitude or right ascension (&alpha;), from the z
-     *         direction to the x direction.</li>
-     *         <li>The latitude or declination (&delta;).</li>
-     *         <li>The radius or distance to the point.</li>
-     *         </ol>
+     * <ol>
+     * <li>The longitude or right ascension (&alpha;), from the z
+     * direction to the x direction.</li>
+     * <li>The latitude or declination (&delta;).</li>
+     * <li>The radius or distance to the point.</li>
+     * </ol>
      */
     public static Vector3b cartesianToSpherical(Vector3b vec, Vector3b out) {
         /**
@@ -555,7 +536,7 @@ public class Coordinates {
 
         Apfloat delta;
         if (zsq.add(xsq).doubleValue() == 0) {
-            Apfloat piOverTwo =ApfloatMath.pi(Constants.PREC).divide(new Apfloat(2, Constants.PREC));
+            Apfloat piOverTwo = ApfloatMath.pi(Constants.PREC).divide(new Apfloat(2, Constants.PREC));
             delta = (vec.y.doubleValue() > 0 ? piOverTwo : piOverTwo.multiply(new Apfloat(-1, Constants.PREC)));
         } else {
             delta = ApfloatMath.atan(vec.y.divide(ApfloatMath.sqrt(zsq.add(xsq))));

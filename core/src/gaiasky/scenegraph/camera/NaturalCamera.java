@@ -8,6 +8,7 @@ package gaiasky.scenegraph.camera;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
@@ -1242,28 +1243,31 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     @Override
     public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
-        InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
-        switch (mode) {
-        case FOCUS_MODE:
-            diverted = !centerFocus;
-            checkFocus();
-        case FREE_MODE:
-        case GAIA_SCENE_MODE:
-        case GAME_MODE:
-            MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
-            setMouseKbdListener(newListener);
-            addControllerListener();
-            if (GlobalConf.runtime.OPENVR)
-                GaiaSky.instance.vrContext.addListener(openVRListener);
-            break;
-        default:
-            // Unregister input controllers
-            im.removeProcessor(currentMouseKbdListener);
-            removeControllerListener();
-            // Remove vr listener
-            if (GlobalConf.runtime.OPENVR)
-                GaiaSky.instance.vrContext.removeListener(openVRListener);
-            break;
+        InputProcessor ip = Gdx.input.getInputProcessor();
+        if (ip instanceof InputMultiplexer) {
+            InputMultiplexer im = (InputMultiplexer) ip;
+            switch (mode) {
+            case FOCUS_MODE:
+                diverted = !centerFocus;
+                checkFocus();
+            case FREE_MODE:
+            case GAIA_SCENE_MODE:
+            case GAME_MODE:
+                MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
+                setMouseKbdListener(newListener);
+                addControllerListener();
+                if (GlobalConf.runtime.OPENVR)
+                    GaiaSky.instance.vrContext.addListener(openVRListener);
+                break;
+            default:
+                // Unregister input controllers
+                im.removeProcessor(currentMouseKbdListener);
+                removeControllerListener();
+                // Remove vr listener
+                if (GlobalConf.runtime.OPENVR)
+                    GaiaSky.instance.vrContext.removeListener(openVRListener);
+                break;
+            }
         }
     }
 

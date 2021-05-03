@@ -352,6 +352,6 @@ public class Constants {
     }
 
     // Apfloat precision
-    public static final int PREC = 50;
+    public static final int PREC = 28;
 
 }

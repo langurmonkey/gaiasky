@@ -46,4 +46,9 @@ public class FastTrigonometry implements ITrigonometry {
         return FastMath.atan(angle);
     }
 
+    @Override
+    public double atan2(double y, double x) {
+        return FastMath.atan2(y, x);
+    }
+
 }
