@@ -215,9 +215,10 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      */
     @Override
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        this.updateLocalValues(time, camera);
+        translation.set(parentTransform).add(pos);
         this.opacity = opacity;
         this.opacity *= this.getVisibilityOpacityFactor();
-        translation.set(parentTransform).add(pos);
         if (hasPm) {
             Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
             translation.add(pmv);
@@ -352,6 +353,22 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
+        forceUpdateLocalValues(time, false);
+    }
+
+    protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
+        if (coordinates != null && (time.getDt() != 0 || force)) {
+            Vector3d aux3 = aux3d1.get();
+            // Load this objects's equatorial cartesian coordinates into pos
+            coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
+
+            // Convert to cartesian coordinates and put them in aux3 vector
+            //Coordinates.cartesianToSpherical(pos, aux3);
+            posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+            // Update angle
+            if (rc != null)
+                rc.update(time);
+        }
     }
 
     @Override

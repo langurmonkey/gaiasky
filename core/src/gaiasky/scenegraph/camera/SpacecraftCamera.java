@@ -8,6 +8,7 @@ package gaiasky.scenegraph.camera;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -286,36 +287,39 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
-        InputMultiplexer im = (InputMultiplexer) Gdx.input.getInputProcessor();
-        if (mode == CameraMode.SPACECRAFT_MODE && sc != null) {
-            GaiaSky.postRunnable(() -> {
-                // Register input inputListener
-                if (!im.getProcessors().contains(inputController, true))
-                    im.addProcessor(im.size(), inputController);
-                // Register inputListener listener
-                Controllers.clearListeners();
-                //GlobalConf.controls.addControllerListener(controllerListener);
-                sc.stopAllMovement();
-                if (firstTime) {
-                    // Put spacecraft close to earth
-                    Vector3b earthpos = GaiaSky.instance.sg.getNode("Earth").getPosition();
-                    sc.pos.set(earthpos.x.add(new Apfloat(12000 * Constants.KM_TO_U, Constants.PREC)), earthpos.y, earthpos.z);
-                    pos.set(sc.pos);
-                    direction.set(sc.direction);
-
-                    firstTime = false;
-                }
-                updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-            });
-        } else {
-            if (sc != null)
+        InputProcessor ip = Gdx.input.getInputProcessor();
+        if(ip instanceof InputMultiplexer) {
+            InputMultiplexer im = new InputMultiplexer();
+            if (mode == CameraMode.SPACECRAFT_MODE && sc != null) {
                 GaiaSky.postRunnable(() -> {
-                    // Unregister input inputListener
-                    im.removeProcessor(inputController);
-                    // Unregister inputListener listener
-                    //GlobalConf.controls.removeControllerListener(controllerListener);
+                    // Register input inputListener
+                    if (!im.getProcessors().contains(inputController, true))
+                        im.addProcessor(im.size(), inputController);
+                    // Register inputListener listener
+                    Controllers.clearListeners();
+                    //GlobalConf.controls.addControllerListener(controllerListener);
                     sc.stopAllMovement();
+                    if (firstTime) {
+                        // Put spacecraft close to earth
+                        Vector3b earthpos = GaiaSky.instance.sg.getNode("Earth").getPosition();
+                        sc.pos.set(earthpos.x.add(new Apfloat(12000 * Constants.KM_TO_U, Constants.PREC)), earthpos.y, earthpos.z);
+                        pos.set(sc.pos);
+                        direction.set(sc.direction);
+
+                        firstTime = false;
+                    }
+                    updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 });
+            } else {
+                if (sc != null)
+                    GaiaSky.postRunnable(() -> {
+                        // Unregister input inputListener
+                        im.removeProcessor(inputController);
+                        // Unregister inputListener listener
+                        //GlobalConf.controls.removeControllerListener(controllerListener);
+                        sc.stopAllMovement();
+                    });
+            }
         }
     }
 
