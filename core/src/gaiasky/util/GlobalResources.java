@@ -54,6 +54,7 @@ import java.util.stream.Stream;
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
 
+    public static ShaderProgram shapeShader;
     public static ShaderProgram spriteShader;
     /** Global all-purpose sprite batch **/
     public static SpriteBatch spriteBatch, spriteBatchVR;
@@ -69,6 +70,11 @@ public class GlobalResources {
     private static final Vector3d aux = new Vector3d();
 
     public static void initialize(AssetManager manager) {
+        // Shape shader
+        shapeShader = new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl"));
+        if (!shapeShader.isCompiled()) {
+            logger.info("ShapeRenderer shader compilation failed: " + shapeShader.getLog());
+        }
         // Sprite shader
         spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
         if (!spriteShader.isCompiled()) {
