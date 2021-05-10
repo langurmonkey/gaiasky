@@ -6,7 +6,6 @@
 package gaiasky.util.coord;
 
 import gaiasky.data.util.PointCloudData;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
@@ -77,7 +76,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         } else {
             transf.idt();
         }
-        if (!orbit.newmethod) {
+        if (!orbit.newMethod) {
             transf.rotate(0, 1, 0, orbitalParams.argofpericenter);
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);

@@ -7,6 +7,7 @@ package gaiasky.util;
 
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import org.apfloat.Apfloat;
 
 public class Constants {
 
@@ -351,7 +352,7 @@ public class Constants {
         return time <= Constants.MAX_VSOP_TIME_MS && time >= Constants.MIN_VSOP_TIME_MS;
     }
 
-    // Apfloat precision
+    /** {@link Apfloat} default precision **/
     public static final int PREC = 28;
 
 }
