@@ -236,7 +236,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         if (children != null) {
             for (int i = 0; i < children.size; i++) {
                 SceneGraphNode child = children.get(i);
-                child.update(time, parentTransform, camera, opacity);
+                child.update(time, translation, camera, opacity);
             }
         }
 

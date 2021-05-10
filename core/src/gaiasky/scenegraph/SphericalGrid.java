@@ -95,7 +95,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
         Vector3 vroffset = aux3f4.get();
         if (GlobalConf.runtime.OPENVR) {
             if (camera.getCurrent() instanceof NaturalCamera) {
-                ((NaturalCamera) camera.getCurrent()).vroffset.put(vroffset);
+                ((NaturalCamera) camera.getCurrent()).vrOffset.put(vroffset);
                 vroffset.scl((float)(1f / Constants.M_TO_U));
             }
         } else {

@@ -319,7 +319,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         if (GlobalConf.runtime.OPENVR) {
             vrScl = 100f;
             if (camera.getCurrent() instanceof NaturalCamera) {
-                ((NaturalCamera) camera.getCurrent()).vroffset.put(vroffset);
+                ((NaturalCamera) camera.getCurrent()).vrOffset.put(vroffset);
                 vroffset.scl((float) (1f / Constants.M_TO_U));
             }
         } else {

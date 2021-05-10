@@ -57,12 +57,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * VR offset
      **/
-    public Vector3d vroffset;
+    public Vector3d vrOffset;
 
     /**
      * Acceleration and velocity
      **/
-    public Vector3d accel, vel, posbak;
+    public Vector3d accel, vel, posBak;
     /**
      * The force acting on the entity and the friction
      **/
@@ -78,7 +78,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Auxiliary double vectors
      **/
-    private Vector3d aux1, aux2, aux3, aux5;
+    private Vector3d aux1, aux2, aux5;
     private Vector3b dx, aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
     private Vector2 aux2f2;
     /**
@@ -240,11 +240,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr) {
         super(parent);
-        vroffset = new Vector3d();
+        vrOffset = new Vector3d();
         vel = new Vector3d();
         accel = new Vector3d();
         force = new Vector3d();
-        posbak = new Vector3d();
+        posBak = new Vector3d();
         orip = new Matrix4d();
         this.vr = vr;
         initialize(assetManager);
@@ -288,7 +288,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         aux1 = new Vector3d();
         aux2 = new Vector3d();
-        aux3 = new Vector3d();
         aux5 = new Vector3d();
         auxf1 = new Vector3();
         aux2f2 = new Vector2();
@@ -432,9 +431,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         RotationComponent rc = focus.getRotationComponent();
                         if (rc != null) {
                             // Rotation component present - planets, etc
-                            Double anglebak = rc.angle;
-                            if (anglebak != null) {
-                                Double angle = previousOrientationAngle != 0 ? (anglebak - previousOrientationAngle) : 0;
+                            Double angleBak = rc.angle;
+                            if (angleBak != null) {
+                                Double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
                                 // aux5 <- focus (future) position
                                 focus.getAbsolutePosition(aux5b);
                                 // aux3 <- focus to camera vector
@@ -449,7 +448,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 pos.set(aux3b);
                                 direction.rotate(aux2, angle);
                                 up.rotate(aux2, angle);
-                                previousOrientationAngle = anglebak;
+                                previousOrientationAngle = angleBak;
                             }
                         } else if (focus.getOrientationQuaternion() != null) {
                             Matrix4d ori = focus.getOrientation();
@@ -582,9 +581,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         posDistanceCheck();
 
         if (pos.hasNaN()) {
-            pos.set(posbak);
+            pos.set(posBak);
         } else {
-            posbak.set(pos);
+            posBak.set(pos);
         }
 
         updatePerspectiveCamera();
@@ -1697,7 +1696,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void resetState() {
         pos.setZero();
         posinv.setZero();
-        vroffset.setZero();
+        vrOffset.setZero();
         direction.set(0, 0, -1);
         for (PerspectiveCamera cam : cameras) {
             cam.position.setZero();
@@ -1905,7 +1904,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     firstAux = !firstAux;
                     aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
                     aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
-                    aux1.set(vroffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
+                    aux1.set(vrOffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
                     projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
                     spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
