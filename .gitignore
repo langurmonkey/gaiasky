@@ -83,3 +83,7 @@ venv
 # VR logs #
 ###########
 **/openovr_log
+
+# jenv #
+########
+.java-version
