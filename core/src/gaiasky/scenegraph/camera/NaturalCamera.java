@@ -115,7 +115,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     float fovBackup;
 
-    /** Gravity in game mode **/
+    /**
+     * Gravity in game mode
+     **/
     boolean gravity = true;
 
     /**
@@ -180,7 +182,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double velocityVRX = 0;
     private double velocityVRY = 0;
 
-    /** Home object as defined in the properties file **/
+    /**
+     * Home object as defined in the properties file
+     **/
     private IFocus home;
 
     /**
@@ -252,7 +256,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void initialize(AssetManager assetManager) {
-        if(vr){
+        if (vr) {
             camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
         } else {
             camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -529,7 +533,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (!GlobalConf.runtime.OPENVR) {
                 // If target is present, update direction
                 if (freeTargetOn) {
-                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f));
+                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3d : 1e2d));
                     if (facingFocus) {
                         freeTargetOn = false;
                     }
@@ -549,11 +553,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 entity3 = (CelestialBody) GaiaSky.instance.sg.getNode("Mars");
             }
             SceneGraphNode fccopy = entity1.getLineCopy();
-            fccopy.getRoot().translation.set(0f, 0f, 0f);
+            fccopy.getRoot().translation.set(0, 0, 0);
             fccopy.getRoot().update(time, null, this);
             fccopy.translation.put(this.pos);
 
-            this.pos.add(0, 0, entity1.getRadius() * 5);
+            this.pos.add(0, 0, entity1.getRadius() * 5.0);
             this.posinv.set(this.pos).scl(-1);
             this.direction.set(0, 0, -1);
             this.up.set(0, 1, 0);
@@ -1308,7 +1312,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else if (parent.mode.useClosest()) {
             if (closestBody != null && closestBody.getDistToCamera() < closestStar.getDistToCamera()) {
                 dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
-            } else if (closestStar != null && (closestStar.getClosestDistToCamera() + MIN_DIST) < starEdge) {
+            } else if (closestStar != null && !(closestStar instanceof Star) && (closestStar.getClosestDistToCamera() + MIN_DIST) < starEdge) {
                 dist = distance * Math.pow((closestStar.getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
             } else {
                 dist = distance;
@@ -1369,7 +1373,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
 
-            if(data[0] == null){
+            if (data[0] == null) {
                 focus = null;
 
             }
@@ -1472,7 +1476,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     double dx = 0d;
                     double dy = f.getSize() / 4d;
                     double dz = -f.getSize() * 4d;
-                    if(GlobalConf.runtime.OPENVR){
+                    if (GlobalConf.runtime.OPENVR) {
                         dz = -dz;
                     }
 
@@ -1862,7 +1866,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Draws a crosshair given a camera-relative position
      *
-     * @param p          The position in floating camera coordinates
+     * @param p            The position in floating camera coordinates
      * @param distToCam    The distance to the camera
      * @param radius       Radius of object
      * @param crosshairTex Crosshair texture
@@ -1981,7 +1985,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void resize(int width, int height) {
-        if(!vr) {
+        if (!vr) {
             camera.viewportHeight = height;
             camera.viewportWidth = width;
             camera.update(true);
