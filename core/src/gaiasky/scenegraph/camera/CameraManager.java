@@ -416,16 +416,15 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     /**
-     * Sets the new camera mode and updates the frustum
-     *
-     * @param mode
+     * Runs on each camera after a mode change.
      */
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
-        CameraMode previousMode = this.mode;
+    public void updateMode(Vector3b previousCamPos, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
+        previousMode = this.mode;
+        previousCamPos = this.current.getPos();
         this.mode = mode;
         updateCurrentCamera(previousMode);
         for (ICamera cam : cameras) {
-            cam.updateMode(mode, centerFocus, postEvent);
+            cam.updateMode(previousCamPos, previousMode, mode, centerFocus, postEvent);
         }
 
         if (postEvent) {
@@ -441,7 +440,7 @@ public class CameraManager implements ICamera, IObserver {
                 boolean centerFocus = true;
                 if (data.length > 1)
                     centerFocus = (Boolean) data[1];
-                updateMode(cm, centerFocus, true);
+                updateMode(current.getPos(), this.mode, cm, centerFocus, true);
                 break;
             case FOV_CHANGE_NOTIFICATION:
                 updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

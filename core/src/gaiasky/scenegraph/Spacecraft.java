@@ -83,9 +83,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     /** Mass in kg **/
     public double mass;
 
-    /** Factor hack **/
-    public double sizeFactor = 1d;
-
     /** Only the rotation matrix **/
     public Matrix4 rotationMatrix;
 
@@ -204,8 +201,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         // Local transform
         try {
             localTransform.idt().setToLookAt(posf, directionf.add(posf), upf).inv();
-            float sizeFac = (float) (sizeFactor * size);
-            localTransform.scale(sizeFac, sizeFac, sizeFac);
+            localTransform.scale(size, size, size);
 
             // Rotation for attitude indicator
             rotationMatrix.idt().setToLookAt(directionf, upf);
@@ -348,12 +344,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
             /** POSITION **/
             pos = computePosition(dt, camera.getSecondClosestBody(), enginePower, thrust, direction, force, accel, vel, pos);
-
-            /**
-             * SCALING FACTOR - counteracts double precision problems at very
-             * large distances
-             **/
-            sizeFactor = MathUtilsd.lint(pos.lend(), 100 * Constants.AU_TO_U, 5000 * Constants.PC_TO_U, 10, 10000);
 
             if (leveling) {
                 // No velocity, we just stop Euler angle motions
@@ -524,16 +514,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         this.size = (float) size * (float) Constants.KM_TO_U;
     }
 
-    @Override
-    public double getRadius() {
-        return super.getRadius() * sizeFactor;
-    }
-
-    @Override
-    public double getSize() {
-        return super.getSize() * sizeFactor;
-    }
-
     public void setMass(Double mass) {
         this.mass = mass;
     }
@@ -590,12 +570,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         // Direction
         Vector3d d = aux3d1.get().set(direction);
-        d.nor().scl(.5e-4 * sizeFactor);
+        d.nor().scl(.5e-4);
         renderer.addLine(this, posf.x, posf.y, posf.z, posf.x + d.x, posf.y + d.y, posf.z + d.z, 1, 0, 0, 1);
 
         // Up
         Vector3d u = aux3d1.get().set(up);
-        u.nor().scl(.2e-4 * sizeFactor);
+        u.nor().scl(.2e-4);
         renderer.addLine(this, posf.x, posf.y, posf.z, posf.x + u.x, posf.y + u.y, posf.z + u.z, 0, 0, 1, 1);
 
     }
@@ -617,7 +597,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         copy.thrust.set(this.thrust);
 
         copy.mass = this.mass;
-        copy.sizeFactor = this.sizeFactor;
 
         copy.rotationMatrix.set(this.rotationMatrix);
 

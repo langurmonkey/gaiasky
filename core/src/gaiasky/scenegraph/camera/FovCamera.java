@@ -31,10 +31,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
-import gaiasky.util.math.Frustumd;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.ArrayList;
@@ -43,9 +40,8 @@ import java.util.List;
 
 /**
  * The field of view cameras.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class FovCamera extends AbstractCamera implements IObserver {
     private static final float FOV_CORR = 0.2f;
@@ -193,7 +189,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     /**
      * Updates both FOVs' directions applying the right transformation.
-     * 
+     *
      * @param time
      */
     public void updateDirections(ITimeFrameProvider time) {
@@ -223,7 +219,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     /**
      * Updates the given camera using the given direction and up vectors. Sets
      * the position to zero.
-     * 
+     *
      * @param dir
      * @param up
      * @param cam
@@ -252,7 +248,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public PerspectiveCamera getCamera() {
         switch (parent.mode) {
-            case GAIA_FOV2_MODE:
+        case GAIA_FOV2_MODE:
             return camera2;
         default:
             return camera;
@@ -301,7 +297,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(Vector3b previousCamPos, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
     }
 
     @Override

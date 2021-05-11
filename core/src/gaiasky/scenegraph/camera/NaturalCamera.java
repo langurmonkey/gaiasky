@@ -1244,18 +1244,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Updates the camera mode
      */
     @Override
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(Vector3b previousCamPos, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
         InputProcessor ip = Gdx.input.getInputProcessor();
         if (ip instanceof InputMultiplexer) {
             InputMultiplexer im = (InputMultiplexer) ip;
-            switch (mode) {
+            switch (newMode) {
             case FOCUS_MODE:
                 diverted = !centerFocus;
                 checkFocus();
             case FREE_MODE:
             case GAIA_SCENE_MODE:
             case GAME_MODE:
-                MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
+                MouseKbdListener newListener = newMode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
                 setMouseKbdListener(newListener);
                 addControllerListener();
                 if (GlobalConf.runtime.OPENVR)
