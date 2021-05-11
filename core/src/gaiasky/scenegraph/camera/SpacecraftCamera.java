@@ -197,8 +197,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         sc.computeDirectionUp(sdt, dirup);
 
         /* ACTUAL UPDATE */
-
-        updateHard(dt, time);
+        updateHard(dt);
 
         /* POST */
         distance = pos.lend();
@@ -233,23 +232,22 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      * Updates the position and direction of the camera using a hard analytical algorithm.
      *
      * @param dt
-     * @param time
      */
-    public void updateHard(double dt, ITimeFrameProvider time) {
+    public void updateHard(double dt) {
         if (sc != null) {
             double sdt = dt;
 
             // POSITION
-            double tgfac = targetDistance / fovFactor;
-            desired.set(scdir).nor().scl(-tgfac);
+            double tDistOverFov = targetDistance / fovFactor;
+            desired.set(scdir).nor().scl(-tDistOverFov);
             todesired.set(desired).sub(relpos);
             todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6);
             relpos.add(todesired);
             pos.set(scpos).add(relpos);
 
             // DIRECTION
-            aux1.set(scup).nor().scl(targetDistance * 1d);
-            aux2.set(scdir).nor().scl(tgfac * 3d).add(aux1);
+            aux1.set(scup).nor().scl(targetDistance);
+            aux2.set(scdir).nor().scl(tDistOverFov * 3d).add(aux1);
             direction.set(scpos).add(aux2).sub(pos).nor();
 
             // UP
