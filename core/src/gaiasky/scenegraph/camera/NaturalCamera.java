@@ -1244,7 +1244,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Updates the camera mode
      */
     @Override
-    public void updateMode(Vector3b previousCamPos, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
         InputProcessor ip = Gdx.input.getInputProcessor();
         if (ip instanceof InputMultiplexer) {
             InputMultiplexer im = (InputMultiplexer) ip;

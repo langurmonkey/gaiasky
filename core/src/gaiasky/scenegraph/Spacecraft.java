@@ -194,7 +194,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (render) {
             EventManager.instance.post(Events.SPACECRAFT_INFO, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], enginePower, yawp, pitchp, rollp);
         }
-
     }
 
     protected void updateLocalTransform() {
@@ -208,7 +207,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             rotationMatrix.getRotation(qf);
         } catch (Exception e) {
         }
-
     }
 
     public Vector3b computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
@@ -258,18 +256,17 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
         vel.add(acc.scl(dt));
 
-        Vector3d velo = aux3d2.get().set(vel);
-        // New position in auxd3
-        Vector3d position = aux3d3.get().set(posb).add(velo.scl(dt));
-        Vector3d pos = posb.put(aux3d4.get());
+        Vector3b velo = aux3b2.get().set(vel);
+        Vector3b position = aux3b3.get().set(posb).add(velo.scl(dt));
+        Vector3b pos = posb.put(aux3b4.get());
         // Check collision!
         if (closest != null && closest != this && !this.copy) {
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos().put(aux3d4.get())) < twoRadiuses) {
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadiuses) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos().put(aux3d4.get()), twoRadiuses);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadiuses);
 
                 if (intersections.size >= 1) {
                     posb.set(intersections.get(0));
@@ -277,8 +274,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
                 stopAllMovement();
             } else if (posb.dstd(closest.getPos()) < twoRadiuses) {
-                Vector3d newpos = aux3d1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dstd(closest.getPos()));
-                posb.set(newpos);
+                posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos())));
             } else {
                 posb.set(position);
             }
@@ -379,7 +375,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             yaw = Math.toDegrees(yaw);
         }
         // Update float vectors
-        aux3d1.get().set(pos).add(camera.getInversePos()).put(posf);
+        Vector3b camPos = aux3b1.get().set(pos).add(camera.getInversePos());
+        camPos.put(posf);
         direction.put(directionf);
         up.put(upf);
 

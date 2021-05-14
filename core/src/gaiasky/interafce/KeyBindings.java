@@ -49,12 +49,11 @@ public class KeyBindings {
         }
     }
 
-    /** CONTROL **/
-    public static int CTRL_L;
-    /** SHIFT **/
-    public static int SHIFT_L;
-    /** ALT **/
-    public static int ALT_L;
+    // Special keys
+    public static final int CTRL_L = Keys.CONTROL_LEFT;
+    public static final int SHIFT_L = Keys.SHIFT_LEFT;
+    public static final int ALT_L = Keys.ALT_LEFT;
+    public static final int[] SPECIAL = new int[] { CTRL_L, SHIFT_L, ALT_L };
 
     /**
      * Creates a key mappings instance.
@@ -63,11 +62,6 @@ public class KeyBindings {
         actions = new HashMap<>();
         mappings = new HashMap<>();
         mappingsInv = new TreeMap<>();
-        // Init special keys
-        CTRL_L = Keys.CONTROL_LEFT;
-        SHIFT_L = Keys.SHIFT_LEFT;
-        ALT_L = Keys.ALT_LEFT;
-        // For now this will do
         initDefault();
     }
 
@@ -185,7 +179,6 @@ public class KeyBindings {
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
         // Condition that checks that we are a master and have slaves
         BooleanRunnable masterWithSlaves = () -> MasterManager.hasSlaves();
-
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);

@@ -22,12 +22,14 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import org.apfloat.Apfloat;
 
 /**
  * Implements a spacecraft-like movement. The spacecraft is modeled as a rigid
@@ -40,7 +42,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * Direction and up vectors
      **/
-    public Vector3d direction, up, relpos;
+    public Vector3d direction, up;
+    public Vector3b relpos;
 
     private Spacecraft sc;
 
@@ -74,8 +77,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     private final Vector3d aux1;
     private final Vector3d aux2;
-    private final Vector3d todesired;
-    private final Vector3d desired;
+    private final Vector3b todesired;
+    private final Vector3b desired;
     private final Vector3d scthrust;
     private final Vector3d scforce;
     private final Vector3d scaccel;
@@ -93,9 +96,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         // Vectors
         direction = new Vector3d(1, 0, 0);
         up = new Vector3d(0, 1, 0);
-        relpos = new Vector3d();
-        todesired = new Vector3d();
-        desired = new Vector3d();
+        relpos = new Vector3b();
+        todesired = new Vector3b();
+        desired = new Vector3b();
         aux1 = new Vector3d();
         aux2 = new Vector3d();
         scthrust = new Vector3d();
@@ -241,7 +244,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             double tDistOverFov = targetDistance / fovFactor;
             desired.set(scdir).nor().scl(-tDistOverFov);
             todesired.set(desired).sub(relpos);
-            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6);
+            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6d);
             relpos.add(todesired);
             pos.set(scpos).add(relpos);
 
@@ -253,7 +256,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             // UP
             desired.set(scup);
             todesired.set(desired).sub(up);
-            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6);
+            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6d);
             up.add(todesired).nor();
         }
     }
@@ -267,29 +270,33 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         camera.update();
 
-        posinv.set(pos).scl(-1);
+        posinv.set(pos).scl(new Apfloat(-1, Constants.PREC));
 
     }
 
     @Override
-    public void updateMode(Vector3b previousCamPos, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
         InputProcessor ip = Gdx.input.getInputProcessor();
         if (ip instanceof InputMultiplexer) {
-            InputMultiplexer im = new InputMultiplexer();
+            InputMultiplexer im = (InputMultiplexer) ip;
             if (mode == CameraMode.SPACECRAFT_MODE && sc != null && previousMode != CameraMode.SPACECRAFT_MODE) {
                 // Enter SC mode
                 GaiaSky.postRunnable(() -> {
                     // Register input inputListener
                     if (!im.getProcessors().contains(inputController, true))
-                        im.addProcessor(im.size(), inputController);
+                        im.addProcessor(inputController);
                     // Register inputListener listener
                     Controllers.clearListeners();
                     sc.stopAllMovement();
 
-                    // Put spacecraft close to earth
-                    sc.pos.set(previousCamPos);
+                    // Put spacecraft at location of previous camera
+                    sc.pos.set(previousCam.getPos());
+                    sc.direction.set(previousCam.getDirection());
+                    sc.up.set(sc.pos.crs(sc.direction));
+
                     pos.set(sc.pos);
                     direction.set(sc.direction);
+                    up.set(sc.up);
 
                     updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
                 });

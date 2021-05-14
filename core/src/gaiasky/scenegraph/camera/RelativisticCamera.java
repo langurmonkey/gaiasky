@@ -101,7 +101,7 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public void updateMode(Vector3b previousCamPos, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
         // TODO Auto-generated method stub
     }
 

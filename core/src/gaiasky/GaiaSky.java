@@ -170,6 +170,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      */
     private ConsoleLogger clogger;
 
+    public InputMultiplexer inputMultiplexer;
+
     /**
      * The user interfaces
      */
@@ -566,7 +568,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise input multiplexer to handle various input processors
         // The input multiplexer
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer = new InputMultiplexer();
         GuiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
