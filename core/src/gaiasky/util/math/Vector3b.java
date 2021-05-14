@@ -437,7 +437,7 @@ public class Vector3b implements Serializable {
     }
 
     public double lend() {
-        return this.len().doubleValue();
+        return len(x.doubleValue(), y.doubleValue(), z.doubleValue());
     }
     public float lenf() {
         return this.len().floatValue();

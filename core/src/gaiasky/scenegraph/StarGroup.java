@@ -523,12 +523,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
         Vector3b cpos = camera.getPos();
 
+        Vector3b auxb = aux3b1.get();
+        Vector3d auxd = aux3d1.get();
         int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_NEAREST);
         if (camera.getCurrent() instanceof FovCamera) {
             for (int i = 0; i < n; i++) {
                 IParticleRecord star = pointData.get(active[i]);
-                Vector3b starPosition = fetchPosition(star, cpos, aux3b1.get(), currDeltaYears);
-                Vector3d starPositionD = aux3d1.get().set(starPosition);
+                Vector3b starPosition = fetchPosition(star, cpos, auxb, currDeltaYears);
+                Vector3d starPositionD = auxd.set(starPosition);
                 double distToCamera = starPosition.lend();
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 6f);
@@ -540,8 +542,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         } else {
             for (int i = 0; i < n; i++) {
                 IParticleRecord star = pointData.get(active[i]);
-                Vector3b starPosition = fetchPosition(star, cpos, aux3b1.get(), currDeltaYears);
-                Vector3d starPositionD = aux3d1.get().set(starPosition);
+                Vector3b starPosition = fetchPosition(star, cpos, auxb, currDeltaYears);
+                Vector3d starPositionD = auxd.set(starPosition);
                 double distToCamera = starPosition.lend();
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1.5f);
@@ -726,10 +728,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     protected Vector3b fetchPosition(IParticleRecord pb, Vector3b campos, Vector3b destination, double deltaYears) {
         IParticleRecord sb = pb;
         Vector3d pm = aux3d2.get().set(sb.pmx(), sb.pmy(), sb.pmz()).scl(deltaYears);
+        Vector3d dest = aux3d3.get().set(sb.x(), sb.y(), sb.z());
         if (campos != null && !campos.hasNaN())
-            return destination.set(sb.x(), sb.y(), sb.z()).sub(campos).add(pm);
+            dest.sub(campos).add(pm);
         else
-            return destination.set(sb.x(), sb.y(), sb.z()).add(pm);
+            dest.add(pm);
+
+        return destination.set(dest);
     }
 
     @Override

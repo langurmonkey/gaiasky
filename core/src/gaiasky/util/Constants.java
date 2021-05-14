@@ -353,6 +353,6 @@ public class Constants {
     }
 
     /** {@link Apfloat} default precision **/
-    public static final int PREC = 28;
+    public static final int PREC = 24;
 
 }
