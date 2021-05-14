@@ -135,7 +135,7 @@ public class SpacecraftGui extends AbstractGui {
         indicatory = -40f;
 
         // init gui camera
-        aiCam = new PerspectiveCamera(30, indicatorw, indicatorh);
+        aiCam = new PerspectiveCamera(30, indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE);
         aiCam.near = (float) (1e5 * Constants.KM_TO_U);
         aiCam.far = (float) (1e8 * Constants.KM_TO_U);
         aiCam.up.set(0, 1, 0);
@@ -183,7 +183,7 @@ public class SpacecraftGui extends AbstractGui {
         aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
-        aiViewport = new ExtendViewport(indicatorw, indicatorh, aiCam);
+        aiViewport = new ExtendViewport(indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE, aiCam);
 
         buildGui();
 
@@ -540,8 +540,8 @@ public class SpacecraftGui extends AbstractGui {
 
         /** ATTITUDE INDICATOR **/
         aiViewport.setCamera(aiCam);
-        aiViewport.setWorldSize(indicatorw, indicatorh);
-        aiViewport.setScreenBounds((int) indicatorx, (int) indicatory, (int) indicatorw, (int) indicatorh);
+        aiViewport.setWorldSize(indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE);
+        aiViewport.setScreenBounds((int) (indicatorx * GlobalConf.program.UI_SCALE), (int) (indicatory * GlobalConf.program.UI_SCALE), (int) (indicatorw * GlobalConf.program.UI_SCALE), (int) (indicatorh * GlobalConf.program.UI_SCALE));
         aiViewport.apply();
 
         mb.begin(aiCam);
