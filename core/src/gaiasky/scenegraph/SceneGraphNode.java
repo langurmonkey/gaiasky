@@ -1164,11 +1164,11 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size) {
         render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, float size, float minSizeDegrees, float maxSizeDegrees) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, float minSizeDegrees, float maxSizeDegrees) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
 

@@ -76,7 +76,7 @@ public class DecalUtils {
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
      * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float size, float rotationCenter, Camera camera, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, double size, float rotationCenter, Camera camera, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
@@ -90,7 +90,8 @@ public class DecalUtils {
             size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
         }
 
-        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(size, size, size);
+        float sizeF = (float) size;
+        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(sizeF, sizeF, sizeF);
         // Force matrices to be set to shader
         batch.setProjectionMatrix(idt);
 

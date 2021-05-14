@@ -1203,10 +1203,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void directionToTarget(double dt, final Vector3b target, double turnVelocity) {
         desired.set(target).sub(pos);
         desired.nor();
-        double angl = desired.angle(direction);
-        // boolean samedir = aux1.set(desired).add(direction).len2() >
-        // Math.max(desired.len2(), direction.len2());
-        if (angl > Math.min(0.3, 0.3 * fovFactor)) {
+        double desiredDirectionAngle = desired.angle(direction);
+        if (desiredDirectionAngle > Math.min(0.3, 0.3 * fovFactor)) {
             // Add desired to direction with given turn velocity (v*dt)
             desired.scl(turnVelocity * dt);
             direction.add(desired).nor();
