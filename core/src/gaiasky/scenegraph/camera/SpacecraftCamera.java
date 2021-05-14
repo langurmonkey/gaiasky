@@ -75,8 +75,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
      **/
     private IFocus secondClosest;
 
-    private final Vector3d aux1;
-    private final Vector3d aux2;
+    private final Vector3d aux1, aux2;
+    private final Vector3b aux1b;
     private final Vector3b todesired;
     private final Vector3b desired;
     private final Vector3d scthrust;
@@ -101,6 +101,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         desired = new Vector3b();
         aux1 = new Vector3d();
         aux2 = new Vector3d();
+        aux1b = new Vector3b();
         scthrust = new Vector3d();
         scforce = new Vector3d();
         scaccel = new Vector3d();
@@ -244,19 +245,20 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             double tDistOverFov = targetDistance / fovFactor;
             desired.set(scdir).nor().scl(-tDistOverFov);
             todesired.set(desired).sub(relpos);
-            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6d);
+            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-6d);
             relpos.add(todesired);
             pos.set(scpos).add(relpos);
 
             // DIRECTION
             aux1.set(scup).nor().scl(targetDistance);
             aux2.set(scdir).nor().scl(tDistOverFov * 3d).add(aux1);
-            direction.set(scpos).add(aux2).sub(pos).nor();
+            aux1b.set(scpos).add(aux2).sub(pos).nor();
+            aux1b.put(direction);
 
             // UP
             desired.set(scup);
             todesired.set(desired).sub(up);
-            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS / 1e6d);
+            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-6d);
             up.add(todesired).nor();
         }
     }
@@ -292,7 +294,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     // Put spacecraft at location of previous camera
                     sc.pos.set(previousCam.getPos());
                     sc.direction.set(previousCam.getDirection());
-                    sc.up.set(sc.pos.crs(sc.direction));
+                    sc.up.set(sc.pos).crs(sc.direction);
 
                     pos.set(sc.pos);
                     direction.set(sc.direction);

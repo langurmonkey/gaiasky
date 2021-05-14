@@ -109,7 +109,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     // Are we in the process of stabilising or stopping the spaceship?
     public boolean leveling, stopping;
 
-    /** Aux vectors **/
     private final Quaternion qf;
 
     private boolean render;
