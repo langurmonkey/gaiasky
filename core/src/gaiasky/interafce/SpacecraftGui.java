@@ -537,7 +537,6 @@ public class SpacecraftGui extends AbstractGui {
 
     @Override
     public void render(int rw, int rh) {
-
         /** ATTITUDE INDICATOR **/
         aiViewport.setCamera(aiCam);
         aiViewport.setWorldSize(indicatorw, indicatorh);

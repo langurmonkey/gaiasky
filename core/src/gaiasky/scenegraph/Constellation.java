@@ -82,23 +82,25 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         // Recompute mean position
         pos.setZero();
         Vector3d p = aux3d1.get();
-        int nstars = 0;
+        int nStars = 0;
         for (int i = 0; i < lines.length; i++) {
             IPosition[] line = lines[i];
             if (line != null) {
                 p.set(line[0].getPosition()).add(camera.getInversePos());
                 pos.add(p);
-                nstars++;
+                nStars++;
             }
         }
-        pos.scl((1d / nstars));
-        pos.nor().scl(100d * Constants.PC_TO_U);
+        if (nStars > 0) {
+            pos.scl(1d / nStars);
+            pos.nor().scl(100d * Constants.PC_TO_U);
 
-        super.update(time, parentTransform, camera, opacity);
+            super.update(time, parentTransform, camera, opacity);
 
-        addToRenderLists(camera);
+            addToRenderLists(camera);
 
-        deltaYears = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
+            deltaYears = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
+        }
 
     }
 

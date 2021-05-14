@@ -63,14 +63,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     //private SpacecraftControllerListener controllerListener;
 
     /**
-     * Crosshair
-     **/
-    private final SpriteBatch spriteBatch;
-    private final Texture crosshairTex;
-    private final float chw2;
-    private final float chh2;
-
-    /**
      * Closest body apart from the spacecraft (second closest)
      **/
     private IFocus secondClosest;
@@ -132,12 +124,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         fovFactor = camera.fieldOfView / 40f;
 
         inputController = new SpacecraftInputController(new GestureAdapter());
-
-        // Init sprite batch for crosshair and cockpit
-        spriteBatch = new SpriteBatch(1000, GlobalResources.spriteShader);
-        crosshairTex = new Texture(Gdx.files.internal("img/crosshair-sc-yellow.png"));
-        chw2 = crosshairTex.getWidth() / 2f;
-        chh2 = crosshairTex.getHeight() / 2f;
 
         // FOCUS_MODE is changed from GUI
         EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SPACECRAFT_LOADED);
@@ -244,6 +230,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             // POSITION
             double tDistOverFov = targetDistance / fovFactor;
             desired.set(scdir).nor().scl(-tDistOverFov);
+            aux1b.set(scup).nor().scl(tDistOverFov * 0.25d);
+            desired.add(aux1b);
             todesired.set(desired).sub(relpos);
             todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-6d);
             relpos.add(todesired);
@@ -251,7 +239,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
             // DIRECTION
             aux1.set(scup).nor().scl(targetDistance);
-            aux2.set(scdir).nor().scl(tDistOverFov * 3d).add(aux1);
+            aux2.set(scdir).nor().scl(tDistOverFov * 50d).add(aux1);
             aux1b.set(scpos).add(aux2).sub(pos).nor();
             aux1b.put(direction);
 
@@ -341,7 +329,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         case SPACECRAFT_LOADED:
             this.sc = (Spacecraft) data[0];
             this.targetDistance = sc.size * 3.5;
-            this.relpos.set(targetDistance, targetDistance / 2d, 0);
             break;
         default:
             break;
@@ -351,12 +338,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void render(int rw, int rh) {
-        // Renders crosshair if focus mode
-        if (GlobalConf.scene.CROSSHAIR_FOCUS && !GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP_MODE) {
-            spriteBatch.begin();
-            spriteBatch.draw(crosshairTex, rw / 2f - chw2, rh / 2f - chh2);
-            spriteBatch.end();
-        }
     }
 
     /**
@@ -488,7 +469,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void resize(int width, int height) {
-        spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, width, height);
     }
 
     @Override
