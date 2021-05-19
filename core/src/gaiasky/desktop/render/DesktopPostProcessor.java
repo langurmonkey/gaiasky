@@ -68,7 +68,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     BackgroundModel blurObject;
     boolean blurObjectAdded = false;
 
-    Vector3d auxd, prevCampos;
+    Vector3b auxb, prevCampos;
     Vector3 auxf;
     Matrix4 prevViewProj;
     Matrix4 invView, invProj;
@@ -76,7 +76,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}]] for raymarching post-processors
+    // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}]] for raymarching post-processors
     private final Map<String, Object[]> raymarchingDef;
 
     private void addRayMarchingDef(String name, Object[] list) {
@@ -88,9 +88,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ShaderLoader.BasePath = "shader/postprocess/";
         instance = this;
 
-        auxd = new Vector3d();
+        auxb = new Vector3b();
         auxf = new Vector3();
-        prevCampos = new Vector3d();
+        prevCampos = new Vector3b();
         prevViewProj = new Matrix4();
         invView = new Matrix4();
         invProj = new Matrix4();
@@ -500,7 +500,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         case RAYMARCHING_CMD:
             String name = (String) data[0];
             boolean status = (Boolean) data[1];
-            Vector3d position = (Vector3d) data[2];
+            Vector3b position = (Vector3b) data[2];
             if (data.length > 3) {
                 // Add effect description for later initialization
                 String shader = (String) data[3];
@@ -701,8 +701,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     if (rms != null)
                         rms.forEach((key, rm) -> {
                             if (rm.isEnabled()) {
-                                Vector3d pos = (Vector3d) raymarchingDef.get(key)[2];
-                                Vector3 camPos = auxd.set(campos).sub(pos).put(auxf);
+                                Vector3b pos = (Vector3b) raymarchingDef.get(key)[2];
+                                Vector3 camPos = auxb.set(campos).sub(pos).put(auxf);
                                 Raymarching raymarching = (Raymarching) rm;
                                 raymarching.setTime(secs);
                                 raymarching.setPos(camPos);

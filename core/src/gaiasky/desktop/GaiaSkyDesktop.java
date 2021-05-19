@@ -66,7 +66,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static int SOURCE_VERSION = 30003;
+    public static int SOURCE_VERSION = 30004;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
@@ -367,14 +367,16 @@ public class GaiaSkyDesktop implements IObserver {
         } catch (GdxRuntimeException e) {
             checkLogger(consoleLogger);
             logger.error(e);
-            gs.setCrashed(true);
-            try {
-                gs.dispose();
-            } catch (Exception e1) {
-                logger.error(I18n.txt("error.dispose"), e1);
+            if(gs != null) {
+                gs.setCrashed(true);
+                try {
+                    gs.dispose();
+                } catch (Exception e1) {
+                    logger.error(I18n.txt("error.dispose"), e1);
+                }
             }
             if (!JAVA_VERSION_FLAG) {
-                if (!gs.windowCreated) {
+                if (gs != null && !gs.windowCreated) {
                     // Probably, OpenGL 4.x is not supported and window creation failed
                     logger.error(I18n.txt("error.windowcreation", DEFAULT_OPENGL, MIN_OPENGL));
                     setSafeMode(cfg);
@@ -384,19 +386,19 @@ public class GaiaSkyDesktop implements IObserver {
                         runGaiaSky(cfg);
                     } catch (GdxRuntimeException e1) {
                         logger.error(I18n.txt("error.opengl", MIN_OPENGL, MIN_GLSL));
-                        showDialogOGL(I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
+                        showDialogOGL(e, I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
                     logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
-                    showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
                 logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
-                showDialogOGL(I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
+                showDialogOGL(e, I18n.txt("dialog.java.title"), I18n.txt("dialog.java.message", REQUIRED_JAVA_VERSION));
             }
         } catch (Exception e) {
             logger.error(e);
-            showDialogOGL(I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+            showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
     }
 
@@ -458,15 +460,15 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
-    private void showDialogOGL(String title, String message) {
+    private void showDialogOGL(Exception ex, String title, String message) {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
-        cfg.setWindowedMode(900, 350);
+        cfg.setWindowedMode(1300, 450);
         cfg.setResizable(false);
         cfg.setTitle(title);
 
-        new Lwjgl3Application(new ErrorDialog(title, message), cfg);
+        new Lwjgl3Application(new ErrorDialog(ex, message), cfg);
     }
 
     private static void checkLogger(ConsoleLogger consoleLogger) {
