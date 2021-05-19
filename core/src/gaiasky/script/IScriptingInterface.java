@@ -682,24 +682,23 @@ public interface IScriptingInterface {
     void setProperMotionsArrowheads(boolean arrowheadsEnabled);
 
     /**
-     * Overrides the maximum number of proper motion vectors that the program
-     * is allowed to show.
+     * Sets the maximum number of proper motion vectors to add per star group.
      *
-     * @param maxNumber The maximum number of proper motion vectors. Negative to use default.
+     * @param maxNumber The maximum number of proper motion vectors per star group.
      */
     void setProperMotionsMaxNumber(long maxNumber);
 
     /**
-     * Returns the current maximum number of proper motion vectors allowed.
+     * Returns the current maximum number of velocity vectors per star group.
      *
-     * @return Max number of pm vectors.
+     * @return Max number of velocity vectors per star group.
      */
     long getProperMotionsMaxNumber();
 
     /**
-     * Sets the visibility of all crosshairs.
+     * Sets the visibility of all cross-hairs.
      *
-     * @param visible The visibility state, which applies to all crosshairs.
+     * @param visible The visibility state, which applies to all cross-hairs.
      */
     void setCrosshairVisibility(boolean visible);
 

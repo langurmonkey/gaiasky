@@ -1453,11 +1453,6 @@ public class GlobalConf {
         public float PM_NUM_FACTOR;
 
         /**
-         * Overrides the maximum number of proper motion vectors that are allowed to show
-         */
-        public long N_PM_STARS;
-
-        /**
          * Color mode for velocity vectors
          * <ul>
          * <li>0 - direction</li>
@@ -1566,15 +1561,23 @@ public class GlobalConf {
          * Star texture index (01, 02, 03)
          */
         public int STAR_TEX_INDEX;
-        /**
-         * Number of closeup stars in star groups (for labels, billboards, proper motions, etc.)
-         */
-        public int STAR_GROUP_N_NEAREST;
 
         /**
          * Flag to switch off star group billboard rendering
          */
         public boolean STAR_GROUP_BILLBOARD_FLAG;
+        /**
+         * Max. number of billboards per star group
+         */
+        public int STAR_GROUP_N_BILLBOARDS;
+        /**
+         * Max. number of labels per star group
+         */
+        public int STAR_GROUP_N_LABELS;
+        /**
+         * Max. number of velocity vectors per star group
+         */
+        public int STAR_GROUP_N_VELVECS;
 
         /**
          * Particle fade in/out flag for octree-backed catalogs. WARNING: This
@@ -1615,8 +1618,8 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
         }
 
-        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, int sTAR_TEX_INDEX, int sTAR_GROUP_N_NEAREST, boolean sTAR_GROUP_BILLBOARD_FLAG, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR,
-                boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, long n_PM_STARS, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST,
+        public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, int sTAR_TEX_INDEX, boolean sTAR_GROUP_BILLBOARD_FLAG, int sTAR_GROUP_N_BILLBOARDS, int sTAR_GROUP_N_LABELS, int sTAR_GROUP_N_VELVECS, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR,
+                boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST,
                 boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
@@ -1645,7 +1648,6 @@ public class GlobalConf {
             OCTANT_THRESHOLD_1 = oCTANT_TH_ANGLE_1;
             PM_NUM_FACTOR = pM_NUM_FACTOR;
             PM_LEN_FACTOR = pM_LEN_FACTOR;
-            N_PM_STARS = n_PM_STARS;
             PM_COLOR_MODE = pM_COLOR_MODE;
             PM_ARROWHEADS = pM_ARROWHEADS;
             STAR_BRIGHTNESS = sTAR_BRIGHTNESS;
@@ -1655,8 +1657,10 @@ public class GlobalConf {
             STAR_MIN_OPACITY = sTAR_MIN_OPACITY;
             STAR_MAX_OPACITY = sTAR_MAX_OPACITY;
             STAR_TEX_INDEX = sTAR_TEX_INDEX;
-            STAR_GROUP_N_NEAREST = sTAR_GROUP_N_NEAREST;
             STAR_GROUP_BILLBOARD_FLAG = sTAR_GROUP_BILLBOARD_FLAG;
+            STAR_GROUP_N_BILLBOARDS = sTAR_GROUP_N_BILLBOARDS;
+            STAR_GROUP_N_LABELS = sTAR_GROUP_N_LABELS;
+            STAR_GROUP_N_VELVECS = sTAR_GROUP_N_VELVECS;
             GALAXY_3D = gALAXY_3D;
             CROSSHAIR_FOCUS = cROSSHAIR_FOCUS;
             CROSSHAIR_CLOSEST = cROSSHAIR_CLOSEST;
@@ -1835,7 +1839,9 @@ public class GlobalConf {
                 STAR_GROUP_BILLBOARD_FLAG = (boolean) data[0];
                 break;
             case STAR_GROUP_NEAREST_CMD:
-                STAR_GROUP_N_NEAREST = (int) data[0];
+                STAR_GROUP_N_BILLBOARDS = (int) data[0];
+                STAR_GROUP_N_LABELS = (int) data[0];
+                STAR_GROUP_N_VELVECS = (int) data[0];
                 break;
             case STAR_TEXTURE_IDX_CMD:
                 STAR_TEX_INDEX = (int) data[0];

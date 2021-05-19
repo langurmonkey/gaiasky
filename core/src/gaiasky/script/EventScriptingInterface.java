@@ -687,12 +687,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsMaxNumber(long maxNumber) {
-        GlobalConf.scene.N_PM_STARS = maxNumber;
+        GlobalConf.scene.STAR_GROUP_N_VELVECS = (int) maxNumber;
     }
 
     @Override
     public long getProperMotionsMaxNumber() {
-        return GlobalConf.scene.N_PM_STARS;
+        return GlobalConf.scene.STAR_GROUP_N_VELVECS;
     }
 
     @Override

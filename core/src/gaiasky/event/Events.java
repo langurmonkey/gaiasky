@@ -1123,7 +1123,9 @@ public enum Events {
     STAR_POINT_SIZE_RESET_CMD,
 
     /**
-     * Update the number of nearest stars in star groups
+     * Update the number of nearest stars in star groups. This updates
+     * the maximum number of billboards, labels and
+     * velocity vectors per star group.
      */
     STAR_GROUP_NEAREST_CMD,
 

@@ -303,7 +303,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         /** RENDER ACTUAL STARS **/
         boolean focusRendered = false;
-        int n = Math.min(GlobalConf.scene.STAR_GROUP_N_NEAREST, pointData.size());
+        int n = Math.min(GlobalConf.scene.STAR_GROUP_N_BILLBOARDS, pointData.size());
         for (int i = 0; i < n; i++) {
             renderCloseupStar(active[i], fovFactor, cPosD, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
             focusRendered = focusRendered || active[i] == focusIndex;
@@ -379,8 +379,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     private long getMaxProperMotionLines() {
-        int n = GlobalConf.scene.STAR_GROUP_N_NEAREST * 5;
-        return Math.min(pointData.size(), GlobalConf.scene.N_PM_STARS > 0 ? GlobalConf.scene.N_PM_STARS : n);
+        return Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_VELVECS);
     }
 
     private final float[] rgba = new float[4];
@@ -523,7 +522,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         float thOverFactor = (float) (GlobalConf.scene.STAR_THRESHOLD_POINT / GlobalConf.scene.LABEL_NUMBER_FACTOR / camera.getFovFactor());
 
         Vector3d auxd = aux3d1.get();
-        int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_NEAREST);
+        int n = Math.min(pointData.size(), GlobalConf.scene.STAR_GROUP_N_LABELS);
         if (camera.getCurrent() instanceof FovCamera) {
             for (int i = 0; i < n; i++) {
                 IParticleRecord star = pointData.get(active[i]);
