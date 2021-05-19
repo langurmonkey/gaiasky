@@ -641,22 +641,6 @@
     {
       "name": "catalog-mwsc",
       "type": "catalog-cluster",
-      "version": 1,
-      "mingsversion": 20206,
-      "size": 208327,
-      "check": "autoload-mwsc.json",
-      "data": [
-        "autoload-mwsc.json",
-        "mwsc"
-      ],
-      "description": "MWSC - Milky Way Star Clusters catalog - 3017 clusters",
-      "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
-      "sha256" : "d64a87a04416a84c90000568d255088575b1c7480cef4906def773451f031125",
-      "file": "@mirror-url@clusters/001_20200326/mwsc-clusters.tar.gz"
-    },
-    {
-      "name": "catalog-mwsc",
-      "type": "catalog-cluster",
       "version": 3,
       "mingsversion": 30000,
       "size": 78311,
@@ -672,6 +656,25 @@
       "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
       "sha256" : "0a9d59bcb34388249d313e1a6370f64f10d04260f40c8eb8884150e80116041d",
       "file": "@mirror-url@clusters/mwsc/v03_20201216/clusters-mwsc.tar.gz"
+    },
+    {
+      "name": "catalog-mwsc",
+      "type": "catalog-cluster",
+      "version": 4,
+      "mingsversion": 30000,
+      "size": 77993,
+      "nobjects": 3017,
+      "check": "catalog-mwsc.json",
+      "data": [
+        "catalog-mwsc.json",
+        "particles-mwsc.json",
+        "mwsc"
+      ],
+      "description" : "MWSC - Milky Way Star Clusters catalog",
+      "releasenotes" : "Fix 'S 242' and 'Herbig 1'",
+      "link" : "https://heasarc.gsfc.nasa.gov/W3Browse/all/mwsc.html",
+      "sha256" : "95e5feffbb470e76c436671f361baa9da1cc490286121ec3e3400ef6d8c3ae6e",
+      "file": "@mirror-url@clusters/mwsc/v04_20210519/clusters-mwsc.tar.gz"
     },
     {
       "name": "catalog-nebulae",
