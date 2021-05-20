@@ -1,4 +1,4 @@
-# Gaia Sky
+<img src="assets/icon/gs_logo.png" alt="Gaia Sky logo" />
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
@@ -7,7 +7,6 @@
 
 A part of Gaia Sky is described in the paper [Gaia Sky: Navigating the Gaia Catalog](https://dx.doi.org/10.1109/TVCG.2018.2864508).
 
-<img src="header.jpg" alt="Gaia Sky header" style="max-height: 20em;" />
 
 To get the latest up-to-date and most complete information,
 
