@@ -9,6 +9,10 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import org.apfloat.Apfloat;
 
+/**
+ * This class contains some constant values, global to the workings
+ * of Gaia Sky
+ */
 public class Constants {
 
     /**
@@ -338,7 +342,6 @@ public class Constants {
     // TODO Use Wikipedia API to get localized content to the current language
     public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
     public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
-    public static final String URL_WIKI_API_MOBILEHTML = "https://en.wikipedia.org/api/rest_v1/page/mobile-html/";
 
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
@@ -353,6 +356,6 @@ public class Constants {
     }
 
     /** {@link Apfloat} default precision **/
-    public static final int PREC = 24;
+    public static final int PREC = 32;
 
 }
