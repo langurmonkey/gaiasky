@@ -558,7 +558,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
          */
         AbstractRenderer.initialize(sg);
         sgr.doneLoading(manager);
-        sgr.resize(graphics.getWidth(), graphics.getHeight(), Math.round(graphics.getWidth() * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(graphics.getHeight() * GlobalConf.screen.BACKBUFFER_SCALE));
+        sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * GlobalConf.screen.BACKBUFFER_SCALE), (int) Math.round(graphics.getHeight() * GlobalConf.screen.BACKBUFFER_SCALE));
 
         // First time, set assets
         Array<SceneGraphNode> nodes = sg.getNodes();
@@ -1121,8 +1121,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis, boolean resizeScreenConf) {
         try {
-            int renderWidth = Math.round(width * GlobalConf.screen.BACKBUFFER_SCALE);
-            int renderHeight = Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
+            int renderWidth = (int) Math.round(width * GlobalConf.screen.BACKBUFFER_SCALE);
+            int renderHeight = (int) Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
 
             // Resize global UI sprite batch
             GlobalResources.spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, renderWidth, renderHeight);

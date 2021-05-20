@@ -38,7 +38,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.nio.file.Path;
 import java.time.ZoneId;
@@ -134,12 +133,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private int[] getSize(RenderType type) {
         switch (type) {
-        case screen:
-            return new int[] { Math.round(GlobalConf.screen.SCREEN_WIDTH * GlobalConf.screen.BACKBUFFER_SCALE), Math.round(GlobalConf.screen.SCREEN_HEIGHT * GlobalConf.screen.BACKBUFFER_SCALE) };
-        case screenshot:
-            return new int[] { GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT };
-        case frame:
-            return new int[] { GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT };
+            case screen:
+                return new int[]{(int) Math.round(GlobalConf.screen.SCREEN_WIDTH * GlobalConf.screen.BACKBUFFER_SCALE), (int) Math.round(GlobalConf.screen.SCREEN_HEIGHT * GlobalConf.screen.BACKBUFFER_SCALE)};
+            case screenshot:
+                return new int[]{GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT};
+            case frame:
+                return new int[]{GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT};
         }
         return null;
     }
@@ -194,7 +193,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setLightGlowTexture(glow);
         lightGlow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
         lightGlow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
-        lightGlow.setBackbufferScale(GlobalConf.runtime.OPENVR ? GlobalConf.screen.BACKBUFFER_SCALE : 1);
+        lightGlow.setBackbufferScale(GlobalConf.runtime.OPENVR ? (float) GlobalConf.screen.BACKBUFFER_SCALE : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
@@ -307,13 +306,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // Create blur object
         BackgroundModel bm = new BackgroundModel();
         bm.setName("BlurObject1199");
-        bm.setColor(new float[] { 0, 0, 0, 0 });
+        bm.setColor(new float[]{0, 0, 0, 0});
         bm.setSize(1e14d);
         bm.setCt("");
         bm.setLabel(false);
         bm.setParent("Universe");
         StaticCoordinates sc = new StaticCoordinates();
-        sc.setPosition(new double[] { 0, 0, 0 });
+        sc.setPosition(new double[]{0, 0, 0});
         bm.setCoordinates(sc);
         ModelComponent mc = new ModelComponent(true);
         mc.setType("sphere");
@@ -408,16 +407,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         levels.setGamma(GlobalConf.postprocess.POSTPROCESS_GAMMA);
 
         switch (GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE) {
-        case AUTO:
-            levels.enableToneMappingAuto();
-            break;
-        case EXPOSURE:
-            levels.enableToneMappingExposure();
-            levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
-            break;
-        case NONE:
-            levels.disableToneMapping();
-            break;
+            case AUTO:
+                levels.enableToneMappingAuto();
+                break;
+            case EXPOSURE:
+                levels.enableToneMappingExposure();
+                levels.setExposure(GlobalConf.postprocess.POSTPROCESS_EXPOSURE);
+                break;
+            case NONE:
+                levels.disableToneMapping();
+                break;
         }
 
         ppb.set(levels);
@@ -425,14 +424,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private int getFxaaQuality(GraphicsQuality gq) {
         switch (gq) {
-        case LOW:
-            return 0;
-        case NORMAL:
-            return 1;
-        case HIGH:
-        case ULTRA:
-        default:
-            return 2;
+            case LOW:
+                return 0;
+            case NORMAL:
+                return 1;
+            case HIGH:
+            case ULTRA:
+            default:
+                return 2;
         }
     }
 
@@ -458,12 +457,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public void resize(final int width, final int height) {
-        GaiaSky.postRunnable(() -> replace(RenderType.screen, width * GlobalConf.screen.BACKBUFFER_SCALE, height * GlobalConf.screen.BACKBUFFER_SCALE, width, height));
+        GaiaSky.postRunnable(() -> replace(RenderType.screen, (float) (width * GlobalConf.screen.BACKBUFFER_SCALE), (float) (height * GlobalConf.screen.BACKBUFFER_SCALE), width, height));
     }
 
     @Override
     public void resizeImmediate(final int width, final int height) {
-        replace(RenderType.screen, width * GlobalConf.screen.BACKBUFFER_SCALE, height * GlobalConf.screen.BACKBUFFER_SCALE, width, height);
+        replace(RenderType.screen, (float) (width * GlobalConf.screen.BACKBUFFER_SCALE), (float) (height * GlobalConf.screen.BACKBUFFER_SCALE), width, height);
     }
 
     @Override

@@ -107,7 +107,7 @@ public class DesktopConfInit extends ConfInit {
         String ARCH = System.getProperty("sun.arch.data.model");
 
         /** VERSION CONF **/
-        VersionConf vc = new VersionConf();
+        VersionConf versionConf = new VersionConf();
         String versionStr = vp.getProperty("version");
         DateTimeFormatter mydf = DateTimeFormatter.ofPattern("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
         Instant buildtime = null;
@@ -121,18 +121,18 @@ public class DesktopConfInit extends ConfInit {
                 logger.error(e1);
             }
         }
-        vc.initialize(versionStr, buildtime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
+        versionConf.initialize(versionStr, buildtime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
 
         /** PERFORMANCE CONF **/
-        PerformanceConf pc = new PerformanceConf();
+        PerformanceConf performanceConf = new PerformanceConf();
         boolean MULTITHREADING = Parser.parseBoolean(p.getProperty("global.conf.multithreading"));
         String propNumthreads = p.getProperty("global.conf.numthreads");
         int NUMBER_THREADS = Parser.parseInt((propNumthreads == null || propNumthreads.isEmpty()) ? "0" : propNumthreads);
-        pc.initialize(MULTITHREADING, NUMBER_THREADS);
+        performanceConf.initialize(MULTITHREADING, NUMBER_THREADS);
 
         /** POSTPROCESS CONF **/
-        PostprocessConf ppc = new PostprocessConf();
-        Antialias POSTPROCESS_ANTIALIAS = ppc.getAntialias(Parser.parseInt(p.getProperty("postprocess.antialiasing")));
+        PostprocessConf postprocessConf = new PostprocessConf();
+        Antialias POSTPROCESS_ANTIALIAS = postprocessConf.getAntialias(Parser.parseInt(p.getProperty("postprocess.antialiasing")));
         float POSTPROCESS_BLOOM_INTENSITY = Parser.parseFloat(p.getProperty("postprocess.bloom.intensity"));
         float POSTPROCESS_UNSHARPMASK_FACTOR = Parser.parseFloat(p.getProperty("postprocess.unsharpmask.factor", "0.3"));
         boolean POSTPROCESS_MOTION_BLUR = Parser.parseFloat(p.getProperty("postprocess.motionblur")) > 0;
@@ -146,14 +146,14 @@ public class DesktopConfInit extends ConfInit {
         float POSTPROCESS_GAMMA = Parser.parseFloat(p.getProperty("postprocess.gamma", "1"));
         PostprocessConf.ToneMapping POSTPROCESS_TONEMAPPING_TYPE = PostprocessConf.ToneMapping.valueOf(p.getProperty("postprocess.tonemapping.type", "auto").toUpperCase());
         float POSTPROCESS_EXPOSURE = Parser.parseFloat(p.getProperty("postprocess.exposure", "0"));
-        ppc.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_UNSHARPMASK_FACTOR, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
+        postprocessConf.initialize(POSTPROCESS_ANTIALIAS, POSTPROCESS_BLOOM_INTENSITY, POSTPROCESS_UNSHARPMASK_FACTOR, POSTPROCESS_MOTION_BLUR, POSTPROCESS_LENS_FLARE, POSTPROCESS_LIGHT_SCATTERING, POSTPROCESS_FISHEYE, POSTPROCESS_BRIGHTNESS, POSTPROCESS_CONTRAST, POSTPROCESS_HUE, POSTPROCESS_SATURATION, POSTPROCESS_GAMMA, POSTPROCESS_TONEMAPPING_TYPE, POSTPROCESS_EXPOSURE);
 
         /** RUNTIME CONF **/
-        RuntimeConf rc = new RuntimeConf();
-        rc.initialize(true, false, false, true, false, false, false);
+        RuntimeConf runtimeConf = new RuntimeConf();
+        runtimeConf.initialize(true, false, false, true, false, false, false);
 
         /** DATA CONF **/
-        DataConf dc = new DataConf();
+        DataConf dataConf = new DataConf();
 
         String DATA_LOCATION = p.getProperty("data.location");
         if (DATA_LOCATION == null || DATA_LOCATION.isEmpty())
@@ -171,10 +171,10 @@ public class DesktopConfInit extends ConfInit {
 
         String SKYBOX_LOCATION = p.getProperty("data.skybox.location", "data/tex/skybox/stars/");
 
-        dc.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
+        dataConf.initialize(DATA_LOCATION, CATALOG_JSON_FILES, OBJECTS_JSON_FILE, REAL_GAIA_ATTITUDE, HIGH_ACCURACY_POSITIONS, SKYBOX_LOCATION);
 
         /** PROGRAM CONF **/
-        ProgramConf prc = new ProgramConf();
+        ProgramConf programConf = new ProgramConf();
         String LOCALE = p.getProperty("program.locale");
 
         boolean SHOW_DEBUG_INFO = Parser.parseBoolean(p.getProperty("program.debuginfo"));
@@ -241,7 +241,7 @@ public class DesktopConfInit extends ConfInit {
             }
         }
 
-        prc.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, UI_SCALE, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE, FILE_CHOOSER_SHOW_HIDDEN);
+        programConf.initialize(SHOW_DEBUG_INFO, LAST_CHECKED, LAST_VERSION, VERSION_CHECK_URL, DATA_DESCRIPTOR_URL, UI_THEME, UI_SCALE, SCRIPT_LOCATION, REST_PORT, LOCALE, STEREOSCOPIC_MODE, STEREO_PROFILE, CUBEMAP_MODE, CUBEMAP_PROJECTION, CUBEMAP_FACE_RESOLUTION, DISPLAY_HUD, DISPLAY_POINTER_COORDS, NET_MASTER, NET_SLAVE, NET_MASTER_SLAVES, NET_SLAVE_CONFIG, NET_SLAVE_YAW, NET_SLAVE_PITCH, NET_SLAVE_ROLL, NET_SLAVE_WARP, NET_SLAVE_BLEND, LAST_FOLDER_LOCATION, DISPLAY_MINIMAP, MINIMAP_SIZE, PLANETARIUM_APERTURE, PLANETARIUM_ANGLE, DISPLAY_POINTER_GUIDES, POINTER_GUIDES_COLOR, POINTER_GUIDES_WIDTH, RECURSIVE_GRID_ORIGIN, RECURSIVE_GRID_ORIGIN_LINES, EXIT_CONFIRMATION, MIRROR_URL, SAFE_GRAPHICS_MODE, FILE_CHOOSER_SHOW_HIDDEN);
 
         /** SCENE CONF **/
         String gc = p.getProperty("scene.graphics.quality");
@@ -329,8 +329,8 @@ public class DesktopConfInit extends ConfInit {
         double DIST_SCALE_DESKTOP = 1d;
         double DIST_SCALE_VR = 1e4d;
 
-        SceneConf sc = new SceneConf();
-        sc.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, STAR_BRIGHTNESS_POWER, STAR_TEX_INDEX, STAR_GROUP_BILLBOARD_FLAG, STAR_GROUP_N_BILLBOARDS, STAR_GROUP_N_LABELS, STAR_GROUP_N_VELVECS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, LINE_WIDTH_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, STAR_MIN_OPACITY, STAR_MAX_OPACITY, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, LAZY_MESH_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
+        SceneConf sceneConf = new SceneConf();
+        sceneConf.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, STAR_BRIGHTNESS_POWER, STAR_TEX_INDEX, STAR_GROUP_BILLBOARD_FLAG, STAR_GROUP_N_BILLBOARDS, STAR_GROUP_N_LABELS, STAR_GROUP_N_VELVECS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, LINE_WIDTH_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, STAR_MIN_OPACITY, STAR_MAX_OPACITY, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, LAZY_MESH_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
 
         /** FRAME CONF **/
         String renderFolder;
@@ -357,12 +357,13 @@ public class DesktopConfInit extends ConfInit {
         CameraKeyframeManager.PathType KF_POS = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.position", CameraKeyframeManager.PathType.SPLINE.toString()));
         CameraKeyframeManager.PathType KF_ORI = CameraKeyframeManager.PathType.valueOf(p.getProperty("graphics.camera.keyframe.path.orientation", CameraKeyframeManager.PathType.SPLINE.toString()));
 
-        FrameConf fc = new FrameConf();
-        fc.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY, KF_POS, KF_ORI);
+        FrameConf frameConf = new FrameConf();
+        frameConf.initialize(RENDER_WIDTH, RENDER_HEIGHT, RENDER_TARGET_FPS, CAMERA_REC_TARGET_FPS, AUTO_FRAME_OUTPUT_CAMERA_PLAY, RENDER_FOLDER, RENDER_FILE_NAME, RENDER_SCREENSHOT_TIME, RENDER_SCREENSHOT_TIME, FRAME_MODE, FRAME_FORMAT, FRAME_QUALITY, KF_POS, KF_ORI);
 
         /** SCREEN CONF **/
         int SCREEN_WIDTH = Parser.parseInt(p.getProperty("graphics.screen.width"));
         int SCREEN_HEIGHT = Parser.parseInt(p.getProperty("graphics.screen.height"));
+        double BACKBUFFER_SCALE = Parser.parseDouble(p.getProperty("graphics.backbuffer.scale", "1.0"));
         int FULLSCREEN_WIDTH = Parser.parseInt(p.getProperty("graphics.screen.fullscreen.width"));
         int FULLSCREEN_HEIGHT = Parser.parseInt(p.getProperty("graphics.screen.fullscreen.height"));
         boolean FULLSCREEN = Parser.parseBoolean(p.getProperty("graphics.screen.fullscreen"));
@@ -370,8 +371,8 @@ public class DesktopConfInit extends ConfInit {
         boolean VSYNC = Parser.parseBoolean(p.getProperty("graphics.screen.vsync"));
         double LIMIT_FPS = Parser.parseDouble(p.getProperty("graphics.limit.fps", "0.0"));
         boolean SCREEN_OUTPUT = Parser.parseBoolean(p.getProperty("graphics.screen.screenoutput"));
-        ScreenConf scrc = new ScreenConf();
-        scrc.initialize(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, FULLSCREEN, RESIZABLE, VSYNC, SCREEN_OUTPUT, LIMIT_FPS);
+        ScreenConf screenConf = new ScreenConf();
+        screenConf.initialize(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, FULLSCREEN, RESIZABLE, VSYNC, SCREEN_OUTPUT, LIMIT_FPS, BACKBUFFER_SCALE);
 
         /** SCREENSHOT CONF **/
         String screenshotFolder = null;
@@ -388,29 +389,29 @@ public class DesktopConfInit extends ConfInit {
         ScreenshotMode SCREENSHOT_MODE = ScreenshotMode.valueOf(p.getProperty("screenshot.mode"));
         ImageFormat SCREENSHOT_FORMAT = ImageFormat.valueOf(p.getProperty("screenshot.format", "jpg").toUpperCase());
         float SCREENSHOT_QUALITY = Parser.parseFloat(p.getProperty("screenshot.quality", "0.93"));
-        ScreenshotConf shc = new ScreenshotConf();
-        shc.initialize(SCREENSHOT_WIDTH, SCREENSHOT_HEIGHT, SCREENSHOT_FOLDER, SCREENSHOT_MODE, SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
+        ScreenshotConf screenshotConf = new ScreenshotConf();
+        screenshotConf.initialize(SCREENSHOT_WIDTH, SCREENSHOT_HEIGHT, SCREENSHOT_FOLDER, SCREENSHOT_MODE, SCREENSHOT_FORMAT, SCREENSHOT_QUALITY);
 
         /** CONTROLS CONF **/
-        ControlsConf cc = new ControlsConf();
+        ControlsConf controlsConf = new ControlsConf();
         String CONTROLLER_MAPPINGS_FILE = p.getProperty("controls.gamepad.mappings.file", "mappings/SDL_Controller.controller");
         boolean INVERT_LOOK_X_AXIS = Parser.parseBoolean(p.getProperty("controls.invert.x", "false"));
         boolean INVERT_LOOK_Y_AXIS = Parser.parseBoolean(p.getProperty("controls.invert.y", "true"));
         String[] CONTROLLER_BLACKLIST = GlobalResources.parseWhitespaceSeparatedList(p.getProperty("controls.blacklist"));
 
-        cc.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_X_AXIS, INVERT_LOOK_Y_AXIS, CONTROLLER_BLACKLIST);
+        controlsConf.initialize(CONTROLLER_MAPPINGS_FILE, INVERT_LOOK_X_AXIS, INVERT_LOOK_Y_AXIS, CONTROLLER_BLACKLIST);
 
         /** SPACECRAFT CONF **/
-        SpacecraftConf scc = new SpacecraftConf();
+        SpacecraftConf spacecraftConf = new SpacecraftConf();
         float sC_RESPONSIVENESS = MathUtilsd.lint(Parser.parseFloat(p.getProperty("spacecraft.responsiveness", "0.1")), 0, 1, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         boolean sC_VEL_TO_DIRECTION = Parser.parseBoolean(p.getProperty("spacecraft.velocity.direction", "false"));
         float sC_HANDLING_FRICTION = Parser.parseFloat(p.getProperty("spacecraft.handling.friction", "0.37"));
         boolean sC_SHOW_AXES = Parser.parseBoolean(p.getProperty("spacecraft.show.axes", "false"));
 
-        scc.initialize(sC_RESPONSIVENESS, sC_VEL_TO_DIRECTION, sC_HANDLING_FRICTION, sC_SHOW_AXES);
+        spacecraftConf.initialize(sC_RESPONSIVENESS, sC_VEL_TO_DIRECTION, sC_HANDLING_FRICTION, sC_SHOW_AXES);
 
         /** INIT GLOBAL CONF **/
-        GlobalConf.initialize(vc, prc, sc, dc, rc, ppc, pc, fc, scrc, shc, cc, scc);
+        GlobalConf.initialize(versionConf, programConf, sceneConf, dataConf, runtimeConf, postprocessConf, performanceConf, frameConf, screenConf, screenshotConf, controlsConf, spacecraftConf);
 
     }
 
