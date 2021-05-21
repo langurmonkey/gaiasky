@@ -137,7 +137,7 @@ public class SpacecraftGui extends AbstractGui {
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f), new ColorAttribute(ColorAttribute.Specular, .5f, .5f, .5f, 1f));
         env.add(dlight);
-        db = new DecalBatch(new CameraGroupStrategy(aiCam));
+        db = new DecalBatch(4, new CameraGroupStrategy(aiCam));
         mb = new IntModelBatch();
 
         assetManager.load(GlobalConf.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
@@ -594,7 +594,7 @@ public class SpacecraftGui extends AbstractGui {
             Gdx.gl.glEnable(GL20.GL_BLEND);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
             Gdx.gl.glDepthFunc(GL20.GL_GREATER);
-            Gdx.gl.glDepthMask(false);
+            Gdx.gl.glDepthMask(true);
             db.add(aiVelDec);
             db.add(aiAntivelDec);
             db.flush();
