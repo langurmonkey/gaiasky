@@ -826,7 +826,7 @@ public class GlobalConf {
 
         public int SCREEN_WIDTH;
         public int SCREEN_HEIGHT;
-        public float BACKBUFFER_SCALE = 1f;
+        public double BACKBUFFER_SCALE = 1.0;
         public int BACKBUFFER_WIDTH;
         public int BACKBUFFER_HEIGHT;
         public int FULLSCREEN_WIDTH;
@@ -841,7 +841,8 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.LIMIT_FPS_CMD);
         }
 
-        public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS) {
+        public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS, double bACKBUFFER_SCALE) {
+            BACKBUFFER_SCALE = bACKBUFFER_SCALE;
             SCREEN_WIDTH = sCREEN_WIDTH;
             SCREEN_HEIGHT = sCREEN_HEIGHT;
             BACKBUFFER_WIDTH = (int) (sCREEN_WIDTH * BACKBUFFER_SCALE);
