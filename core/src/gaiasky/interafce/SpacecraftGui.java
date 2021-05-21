@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
@@ -166,7 +167,7 @@ public class SpacecraftGui extends AbstractGui {
         aiVelDec = Decal.newDecal(new TextureRegion(aiVelTex));
         aiAntivelDec = Decal.newDecal(new TextureRegion(aiAntivelTex));
 
-        Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f));
+        Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f), new DepthTestAttribute(GL20.GL_LESS, aiCam.near, aiCam.far, true));
         aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
@@ -383,7 +384,7 @@ public class SpacecraftGui extends AbstractGui {
         rollvel.setWidth(valueWidth);
         HorizontalGroup rvg = new HorizontalGroup();
         rvg.space(groupspacing);
-        Label roll =new OwnLabel(I18n.txt("gui.sc.roll") + ":", skin, "sc-header");
+        Label roll = new OwnLabel(I18n.txt("gui.sc.roll") + ":", skin, "sc-header");
         roll.setWidth(labelWidth);
         rvg.addActor(roll);
         rvg.addActor(rollvel);
@@ -560,8 +561,8 @@ public class SpacecraftGui extends AbstractGui {
         aiViewport.setScreenBounds((int) (indicatorx * GlobalConf.program.UI_SCALE), (int) (indicatory * GlobalConf.program.UI_SCALE), (int) (indicatorw * GlobalConf.program.UI_SCALE), (int) (indicatorh * GlobalConf.program.UI_SCALE));
         aiViewport.apply();
 
+        // Model
         mb.begin(aiCam);
-
         aiTransform.idt();
 
         aiTransform.translate(0, 0, 6.4f);
@@ -569,30 +570,31 @@ public class SpacecraftGui extends AbstractGui {
         aiTransform.rotate(0, 1, 0, 90);
 
         mb.render(aiModelInstance, env);
-
         mb.end();
 
         // VELOCITY INDICATORS IN NAVBALL
-        // velocity
         if (!vel.isZero()) {
+            // velocity
             aux3f1.set(vel.valuesf()).nor().scl(0.864f);
             aux3f1.mul(qf);
-            aux3f1.add(0, 0, 6.4f);
-
-            // antivelocity
-            aux3f2.set(vel.valuesf()).nor().scl(-0.864f);
-            aux3f2.mul(qf);
-            aux3f2.add(0, 0, 6.4f);
-
+            aux3f1.add(0, 0, 6.3f);
             aiVelDec.setPosition(aux3f1);
-            aiVelDec.setScale(0.0048f);
+            aiVelDec.setScale(0.0078f);
             aiVelDec.lookAt(aiCam.position, aiCam.up);
 
+            // anti-velocity
+            aux3f2.set(vel.valuesf()).nor().scl(-0.864f);
+            aux3f2.mul(qf);
+            aux3f2.add(0, 0, 6.3f);
             aiAntivelDec.setPosition(aux3f2);
             aiAntivelDec.setScale(0.0048f);
             aiAntivelDec.lookAt(aiCam.position, aiCam.up);
 
+            // Depth
             Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthFunc(GL20.GL_GREATER);
+            Gdx.gl.glDepthMask(false);
             db.add(aiVelDec);
             db.add(aiAntivelDec);
             db.flush();
