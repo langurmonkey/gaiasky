@@ -305,7 +305,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
-    private Vector3b aux1b, aux2b, aux3b;
+    private Vector3b aux1b;
 
     // VRContext, may be null
     private final VRContext vrContext;
@@ -451,8 +451,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             aux2d = new Vector3d();
             aux3d = new Vector3d();
             aux1b = new Vector3b();
-            aux2b = new Vector3b();
-            aux3b = new Vector3b();
 
             // Build frame buffers and arrays
             buildShadowMapData();
@@ -994,8 +992,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             double distance = radius * candidate.shadowMapValues[0];
             // Position, factor of radius
             candidate.getAbsolutePosition(aux1b);
-            aux1d.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
-            aux1d.put(cameraLight.position);
+            aux1b.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
+            aux1b.put(cameraLight.position);
             // Up is perpendicular to dir
             if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
                 aux1.set(1, 0, 0);
