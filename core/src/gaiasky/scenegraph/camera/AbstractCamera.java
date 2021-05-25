@@ -291,7 +291,6 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     public void update(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
-        proximity.clear();
         double aspect = cam.viewportWidth / cam.viewportHeight;
         projection.setToProjection(cam.near, cam.far, cam.fieldOfView, aspect);
         view.setToLookAt(position, tmp.set(position).add(direction), up);

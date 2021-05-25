@@ -406,6 +406,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (GlobalConf.runtime.OPENVR)
             openVRListener.update();
 
+        // Proximity
+        proximity.clear();
+
         // Next focus and closest positions
         computeNextPositions(time);
 

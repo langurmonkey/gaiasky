@@ -186,6 +186,9 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scup.set(sc.up);
         sc.computeDirectionUp(sdt, dirup);
 
+        // Proximity
+        proximity.clear();
+
         /* ACTUAL UPDATE */
         updateHard(dt);
 
