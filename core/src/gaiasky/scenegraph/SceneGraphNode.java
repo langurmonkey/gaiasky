@@ -189,7 +189,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public double viewAngleApparent;
 
     /**
-     * Base color
+     * Base RGB color
      */
     public float[] cc;
 
@@ -1252,5 +1252,9 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     protected boolean shouldRender() {
         return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < GlobalConf.scene.OBJECT_FADE_MS);
+    }
+
+    public float[] getColor(){
+        return cc;
     }
 }

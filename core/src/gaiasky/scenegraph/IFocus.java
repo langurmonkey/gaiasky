@@ -361,4 +361,10 @@ public interface IFocus {
      */
     boolean isCopy();
 
+    /**
+     * Gets the color of this object
+     * @return The color as a RGBA float array
+     */
+    float[] getColor();
+
 }

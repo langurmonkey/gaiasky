@@ -132,10 +132,10 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
         mc = new ModelComponent(false);
         mc.initialize();
-        mc.dLight = new DirectionalLight();
-        mc.dLight.set(1, 1, 1, 1, 1, 1);
+        DirectionalLight dLight = new DirectionalLight();
+        dLight.set(1, 1, 1, 1, 1, 1);
         mc.env = new Environment();
-        mc.env.add(mc.dLight);
+        mc.env.add(dLight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
         mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
         mc.instance = new IntModelInstance(model, modelTransform);

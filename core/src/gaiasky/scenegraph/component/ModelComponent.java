@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
@@ -41,9 +42,13 @@ public class ModelComponent implements Disposable, IObserver {
      * Light never changes; set fixed ambient light for this model
      */
     private Boolean staticLight = false;
-    /** Ambient light level for static light objects **/
+    /**
+     * Ambient light level for static light objects
+     **/
     private float staticLightLevel = 0.6f;
-    /** Flag **/
+    /**
+     * Flag
+     **/
     private boolean updateStaticLight = false;
 
     static {
@@ -69,8 +74,6 @@ public class ModelComponent implements Disposable, IObserver {
 
     public IntModelInstance instance;
     public Environment env;
-    /** Directional light **/
-    public DirectionalLight dLight;
 
     public Map<String, Object> params;
 
@@ -102,11 +105,32 @@ public class ModelComponent implements Disposable, IObserver {
         if (initEnvironment) {
             env = new Environment();
             env.set(ambient);
-            // Direction from Sun to Earth
-            dLight = new DirectionalLight();
-            dLight.color.set(1f, 0f, 0f, 1f);
-            env.add(dLight);
+            // Directional lights
+            for(int i = 0; i < Constants.N_CLOSEST; i++) {
+                DirectionalLight dLight = new DirectionalLight();
+                dLight.color.set(0f, 0f, 0f, 1f);
+                env.add(dLight);
+            }
         }
+    }
+
+    /**
+     * Returns the given directional light
+     * @param i The index of the light (must be less than {@link Constants#N_CLOSEST}.
+     * @return The directional light with index i
+     */
+    public DirectionalLight directional(int i) {
+        return ((DirectionalLightsAttribute) env.get(DirectionalLightsAttribute.Type)).lights.get(i);
+    }
+
+    /**
+     * Turns off all directional lights
+     */
+    public void clearDirectionals(){
+       Array<DirectionalLight> lights = ((DirectionalLightsAttribute) env.get(DirectionalLightsAttribute.Type)).lights;
+       for(DirectionalLight light: lights){
+           light.color.set(0f, 0f, 0f, 1f);
+       }
     }
 
     public void initialize() {
@@ -230,20 +254,20 @@ public class ModelComponent implements Disposable, IObserver {
         return new Pair<>(model, materials);
     }
 
-    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst){
+    public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
         touch(localTransform);
-        if(instance != null) {
+        if (instance != null) {
             setTransparency(alpha, blendSrc, blendDst);
             updateRelativisticEffects(GaiaSky.instance.getICamera());
             updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
         }
     }
 
-    public void update(Matrix4 localTransform, float alpha){
+    public void update(Matrix4 localTransform, float alpha) {
         update(localTransform, alpha, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    public void update(float alpha){
+    public void update(float alpha) {
         update(null, alpha);
     }
 
@@ -348,20 +372,20 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void setTransparency(float alpha, int src, int dst) {
-            int n = instance.materials.size;
-            for (int i = 0; i < n; i++) {
-                Material mat = instance.materials.get(i);
-                BlendingAttribute ba;
-                if (mat.has(BlendingAttribute.Type)) {
-                    ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
-                    ba.destFunction = dst;
-                    ba.sourceFunction = src;
-                } else {
-                    ba = new BlendingAttribute(src, dst);
-                    mat.set(ba);
-                }
-                ba.opacity = alpha;
+        int n = instance.materials.size;
+        for (int i = 0; i < n; i++) {
+            Material mat = instance.materials.get(i);
+            BlendingAttribute ba;
+            if (mat.has(BlendingAttribute.Type)) {
+                ba = (BlendingAttribute) mat.get(BlendingAttribute.Type);
+                ba.destFunction = dst;
+                ba.sourceFunction = src;
+            } else {
+                ba = new BlendingAttribute(src, dst);
+                mat.set(ba);
             }
+            ba.opacity = alpha;
+        }
     }
 
     public void setDepthTest(int func, boolean mask) {
@@ -395,12 +419,12 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-    public void setFloatExtAttribute(long attrib, float value){
+    public void setFloatExtAttribute(long attrib, float value) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
-                if(!mat.has(attrib)){
+                if (!mat.has(attrib)) {
                     mat.set(new FloatExtAttribute(attrib, value));
                 } else {
                     ((FloatExtAttribute) mat.get(attrib)).value = value;
@@ -409,12 +433,12 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-    public void setColorAttribute(long attrib, float[] rgba){
+    public void setColorAttribute(long attrib, float[] rgba) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
-                if(!mat.has(attrib)){
+                if (!mat.has(attrib)) {
                     mat.set(new ColorAttribute(attrib, new Color(rgba[0], rgba[1], rgba[2], rgba[3])));
                 } else {
                     ((ColorAttribute) mat.get(attrib)).color.set(rgba[0], rgba[1], rgba[2], rgba[3]);
@@ -545,23 +569,23 @@ public class ModelComponent implements Disposable, IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case GRAPHICS_QUALITY_UPDATED:
-            GaiaSky.postRunnable(() -> {
-                if (mtc != null && mtc.texInitialised) {
-                    // Remove current textures
-                    if (mtc != null)
-                        mtc.disposeTextures(this.manager);
-                }
-            });
-            break;
-        default:
-            break;
+            case GRAPHICS_QUALITY_UPDATED:
+                GaiaSky.postRunnable(() -> {
+                    if (mtc != null && mtc.texInitialised) {
+                        // Remove current textures
+                        if (mtc != null)
+                            mtc.disposeTextures(this.manager);
+                    }
+                });
+                break;
+            default:
+                break;
         }
     }
 
-    public String toString(){
+    public String toString() {
         String desc;
-        if(modelFile != null)
+        if (modelFile != null)
             desc = modelFile;
         else
             desc = "{" + type + ", params: " + params.toString() + "}";

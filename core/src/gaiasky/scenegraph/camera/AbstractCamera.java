@@ -15,20 +15,25 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.camera.Proximity;
+import gaiasky.util.camera.Proximity.NearbyRecord;
 import gaiasky.util.math.Frustumd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.time.ITimeFrameProvider;
 
 public abstract class AbstractCamera implements ICamera {
     protected static final Log logger = Logger.getLogger(AbstractCamera.class);
 
     private static final Matrix4d invProjectionView = new Matrix4d();
 
-    /** Camera far value **/
+    /**
+     * Camera far value
+     **/
     public double CAM_FAR;
-    /** Camera near value **/
+    /**
+     * Camera near value
+     **/
     public double CAM_NEAR;
 
     public Vector3b pos, posinv, prevpos;
@@ -38,23 +43,35 @@ public abstract class AbstractCamera implements ICamera {
      * in radians
      **/
     protected float angleEdgeRad;
-    /** Aspect ratio **/
+    /**
+     * Aspect ratio
+     **/
     protected float ar;
 
-    /** Distance of camera to center **/
+    /**
+     * Distance of camera to center
+     **/
     protected double distance;
 
-    /** The parent **/
+    /**
+     * The parent
+     **/
     protected CameraManager parent;
 
 
-    /** The main camera **/
+    /**
+     * The main camera
+     **/
     public PerspectiveCamera camera;
 
-    /** Stereoscopic mode cameras **/
+    /**
+     * Stereoscopic mode cameras
+     **/
     protected PerspectiveCamera camLeft, camRight;
 
-    /** Vector with all perspective cameras **/
+    /**
+     * Vector with all perspective cameras
+     **/
     protected PerspectiveCamera[] cameras;
 
     protected Matrix4d projection, view, combined;
@@ -62,13 +79,16 @@ public abstract class AbstractCamera implements ICamera {
 
     public float fovFactor;
 
-    /** Closest non-star body to the camera **/
+    /**
+     * Closest non-star body to the camera
+     **/
     protected IFocus closestBody;
 
     /**
      * The closest particle to the camera
      */
     protected IFocus closestStar;
+    protected Proximity proximity;
 
     protected Matrix4 prevCombined;
 
@@ -106,6 +126,8 @@ public abstract class AbstractCamera implements ICamera {
         view = new Matrix4d();
         combined = new Matrix4d();
         frustumd = new Frustumd();
+
+        proximity = new Proximity(Constants.N_CLOSEST);
     }
 
     @Override
@@ -147,12 +169,12 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Vector3b getPreviousPos(){
+    public Vector3b getPreviousPos() {
         return prevpos;
     }
 
     @Override
-    public void setPreviousPos(Vector3d prevpos){
+    public void setPreviousPos(Vector3d prevpos) {
         this.prevpos.set(prevpos);
     }
 
@@ -269,6 +291,7 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     public void update(PerspectiveCamera cam, Vector3d position, Vector3d direction, Vector3d up) {
+        proximity.clear();
         double aspect = cam.viewportWidth / cam.viewportHeight;
         projection.setToProjection(cam.near, cam.far, cam.fieldOfView, aspect);
         view.setToLookAt(position, tmp.set(position).add(direction), up);
@@ -282,7 +305,7 @@ public abstract class AbstractCamera implements ICamera {
 
     @Override
     public void checkClosestBody(IFocus cb) {
-        // A copy can never bee the closest
+        // A copy can never be the closest
         if (!cb.isCopy())
             if (closestBody == null) {
                 closestBody = cb;
@@ -308,13 +331,20 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     public void checkClosestParticle(IFocus star) {
+
+        if (star instanceof NearbyRecord) {
+            proximity.update((NearbyRecord) star);
+        } else {
+            proximity.update(star, this);
+        }
+
         if (closestStar == null || closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
             closestStar = star;
         }
     }
 
     @Override
-    public IFocus getClosest(){
+    public IFocus getClosest() {
         return closest;
     }
 
@@ -353,17 +383,17 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     @Override
-    public Matrix4 getProjView(){
+    public Matrix4 getProjView() {
         return camera.combined;
     }
 
     @Override
-    public Matrix4 getPreviousProjView(){
+    public Matrix4 getPreviousProjView() {
         return prevCombined;
     }
 
     @Override
-    public void setPreviousProjView(Matrix4 mat){
+    public void setPreviousProjView(Matrix4 mat) {
         prevCombined.set(mat);
     }
 }

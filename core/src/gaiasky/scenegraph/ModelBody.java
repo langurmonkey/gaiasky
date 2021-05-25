@@ -105,22 +105,27 @@ public abstract class ModelBody extends CelestialBody {
         }
     }
 
+    private static final double LIGHT_X0 = 0.1 * Constants.AU_TO_U;
+    private static final double LIGHT_X1 = 5e5 * Constants.AU_TO_U;
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
         // Update light with global position
         if (mc != null) {
-            translation.put(mc.dLight.direction);
-            IFocus pf = camera.getClosestParticle();
-            if (pf != null && pf instanceof IStarFocus) {
-                IStarFocus sf = (IStarFocus) pf;
+            translation.put(mc.directional(0).direction);
+            IFocus closestLight = camera.getClosestParticle();
+            if (closestLight != null && closestLight instanceof IStarFocus) {
+                IStarFocus sf = (IStarFocus) closestLight;
                 float[] col = sf.getClosestCol();
-                mc.dLight.direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
-                mc.dLight.color.set(col[0], col[1], col[2], 1.0f);
+                double closestSize = sf.getClosestSize();
+                double closestDist = sf.getClosestDistToCamera();
+                float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                mc.directional(0).direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
+                mc.directional(0).color.set(col[0] * colFactor, col[1] * colFactor, col[2]* colFactor, 1.0f);
             } else {
                 Vector3b campos = camera.getPos();
-                mc.dLight.direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
-                mc.dLight.color.set(1f, 1f, 1f, 1f);
+                mc.directional(0).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
+                mc.directional(0).color.set(1f, 1f, 1f, 1f);
             }
         }
         updateLocalTransform();
