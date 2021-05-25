@@ -100,6 +100,7 @@ public class Proximity {
         for (NearbyRecord record : array) {
             if (record == null) {
                 set(i, object);
+                return true;
             } else if (record == object) {
                 // Already in
                 return false;

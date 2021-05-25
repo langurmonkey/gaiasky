@@ -153,6 +153,9 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     public void update(double dt, ITimeFrameProvider time) {
+        // Proximity
+        proximity.clear();
+
         distance = pos.lend();
 
         up.set(0, 1, 0);

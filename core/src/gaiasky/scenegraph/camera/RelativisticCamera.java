@@ -97,6 +97,8 @@ public class RelativisticCamera extends AbstractCamera {
     @Override
     public void update(double dt, ITimeFrameProvider time) {
         // TODO Auto-generated method stub
+        // Proximity
+        proximity.clear();
 
     }
 
