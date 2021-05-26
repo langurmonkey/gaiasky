@@ -37,6 +37,11 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.time.Instant;
 import java.util.Date;
 
+/**
+ * A polyline that represents a closed orbit. Contains a reference to the body and some other goodies.
+ *
+ * @author tsagrista
+ */
 public class Orbit extends Polyline {
     private static final Log logger = Logger.getLogger(Orbit.class);
 
@@ -71,9 +76,9 @@ public class Orbit extends Polyline {
     protected Class<? extends IOrbitDataProvider> providerClass;
     public OrbitComponent oc;
     // Only adds the body, not the orbit
-    protected boolean onlybody = false;
+    protected boolean onlyBody = false;
     // Use new method for orbital elements
-    public boolean newmethod = false;
+    public boolean newMethod = false;
 
     /**
      * Refreshing state
@@ -121,14 +126,14 @@ public class Orbit extends Polyline {
     @SuppressWarnings("unchecked")
     @Override
     public void initialize() {
-        if (!onlybody)
+        if (!onlyBody)
             try {
                 providerClass = (Class<? extends IOrbitDataProvider>) ClassReflection.forName(provider);
                 // Orbit data
                 IOrbitDataProvider provider;
                 try {
                     provider = ClassReflection.newInstance(providerClass);
-                    provider.load(oc.source, new OrbitDataLoaderParameter(names[0], providerClass, oc, multiplier, 100), newmethod);
+                    provider.load(oc.source, new OrbitDataLoaderParameter(names[0], providerClass, oc, multiplier, 100), newMethod);
                     pointCloudData = provider.getData();
                 } catch (Exception e) {
                     logger.error(e);
@@ -160,7 +165,7 @@ public class Orbit extends Polyline {
         if (pointCloudData != null) {
             orbitStartMs = pointCloudData.getDate(0).toEpochMilli();
             orbitEndMs = pointCloudData.getDate(pointCloudData.getNumPoints() - 1).toEpochMilli();
-            if (!onlybody) {
+            if (!onlyBody) {
                 int last = pointCloudData.getNumPoints() - 1;
                 Vector3d v = new Vector3d(pointCloudData.x.get(last), pointCloudData.y.get(last), pointCloudData.z.get(last));
                 this.size = (float) v.len() * 5;
@@ -173,14 +178,14 @@ public class Orbit extends Polyline {
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
-        if (!onlybody)
+        if (!onlyBody)
             updateLocalTransform(time.getTime());
 
     }
 
     protected void updateLocalTransform(Instant date) {
         translation.getMatrix(localTransformD);
-        if (newmethod) {
+        if (newMethod) {
             if (transformFunction != null) {
                 localTransformD.mul(transformFunction).rotate(0, 1, 0, 90);
             }
@@ -207,7 +212,7 @@ public class Orbit extends Polyline {
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
-            if (!onlybody) {
+            if (!onlyBody) {
                 // If overflow, return
                 if (body != null && body.coordinatesTimeOverflow)
                     return;
@@ -251,7 +256,7 @@ public class Orbit extends Polyline {
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        if (!onlybody) {
+        if (!onlyBody) {
             alpha *= this.alpha * this.opacity;
 
             int last = 1;
@@ -412,12 +417,12 @@ public class Orbit extends Polyline {
         this.distDown = (float) Math.max(this.body.getRadius() * 20, 50 * Constants.KM_TO_U);
     }
 
-    public void setOnlybody(Boolean onlybody) {
-        this.onlybody = onlybody;
+    public void setOnlybody(Boolean onlyBody) {
+        this.onlyBody = onlyBody;
     }
 
-    public void setNewmethod(Boolean newmethod) {
-        this.newmethod = newmethod;
+    public void setNewmethod(Boolean newMethod) {
+        this.newMethod = newMethod;
     }
 
     @Override

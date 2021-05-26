@@ -25,6 +25,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector2d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
@@ -152,7 +153,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * @param names   The labels or names.
      * @param starid  The star unique id.
      */
-    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
+    public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
         this();
         this.pos = pos;
         this.names = names;
@@ -169,13 +170,13 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.pmSph = new Vector3();
     }
 
-    public Particle(Vector3d pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+    public Particle(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, names, starid);
         this.posSph = new Vector2d(ra, dec);
 
     }
 
-    public Particle(Vector3d pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
+    public Particle(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
         this(pos, appmag, absmag, colorbv, names, starid);
         this.posSph = new Vector2d(ra, dec);
         this.pm.set(pm);
@@ -204,7 +205,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
@@ -213,15 +214,16 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      * {@link SceneGraphNode}.
      */
     @Override
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
+        this.updateLocalValues(time, camera);
+        translation.set(parentTransform).add(pos);
         this.opacity = opacity;
         this.opacity *= this.getVisibilityOpacityFactor();
-        translation.set(parentTransform).add(pos);
         if (hasPm) {
             Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
             translation.add(pmv);
         }
-        distToCamera = translation.len();
+        distToCamera = translation.lend();
 
         if (!copy) {
             viewAngle = (radius / distToCamera);
@@ -234,7 +236,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         if (children != null) {
             for (int i = 0; i < children.size; i++) {
                 SceneGraphNode child = children.get(i);
-                child.update(time, parentTransform, camera, opacity);
+                child.update(time, translation, camera, opacity);
             }
         }
 
@@ -256,7 +258,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                     addToRender(this, RenderGroup.LINE);
                 }
             }
-            if (renderText() && camera.isVisible(GaiaSky.instance.time, this)) {
+            if (renderText() && camera.isVisible(this)) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
@@ -351,6 +353,22 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
+        forceUpdateLocalValues(time, false);
+    }
+
+    protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
+        if (coordinates != null && (time.getDt() != 0 || force)) {
+            Vector3d aux3 = aux3d1.get();
+            // Load this objects's equatorial cartesian coordinates into pos
+            coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
+
+            // Convert to cartesian coordinates and put them in aux3 vector
+            //Coordinates.cartesianToSpherical(pos, aux3);
+            posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+            // Update angle
+            if (rc != null)
+                rc.update(time);
+        }
     }
 
     @Override
@@ -430,7 +448,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out) {
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         return getAbsolutePosition(out);
     }
 

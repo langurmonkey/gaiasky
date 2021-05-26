@@ -324,7 +324,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
         } else {
             currentDrag.set((float) deltaX, (float) deltaY);
             // Check orientation of last vs current
-            if (Math.abs(currentDrag.angle(lastDrag)) > 90) {
+            if (Math.abs(currentDrag.angleDeg(lastDrag)) > 90) {
                 // Reset
                 dragDx = 0;
                 dragDy = 0;

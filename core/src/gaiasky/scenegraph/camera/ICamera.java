@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -43,17 +44,19 @@ public interface ICamera {
 
     float getFovFactor();
 
-    Vector3d getPos();
+    Vector3b getPos();
 
     void setPos(Vector3d pos);
+    void setPos(Vector3b pos);
 
-    Vector3d getPreviousPos();
+    Vector3b getPreviousPos();
 
     void setPreviousPos(Vector3d pos);
+    void setPreviousPos(Vector3b pos);
 
     void setDirection(Vector3d dir);
 
-    Vector3d getInversePos();
+    Vector3b getInversePos();
 
     Vector3d getDirection();
 
@@ -87,7 +90,7 @@ public interface ICamera {
      */
     void update(double dt, ITimeFrameProvider time);
 
-    void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent);
+    void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent);
 
     CameraMode getMode();
 
@@ -151,10 +154,9 @@ public interface ICamera {
 
     IFocus getSecondClosestBody();
 
-    boolean isVisible(ITimeFrameProvider time, CelestialBody cb);
-    boolean isVisible(ITimeFrameProvider time, Vector3d position);
+    boolean isVisible(CelestialBody cb);
 
-    boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera);
+    boolean isVisible(double viewAngle, Vector3d pos, double distToCamera);
 
     void resize(int width, int height);
 
@@ -164,6 +166,13 @@ public interface ICamera {
      * @return The closest particle
      */
     IFocus getClosestParticle();
+
+    /**
+     * Gets the current i-close light source to this camera
+     *
+     * @return The i close light source (star?)
+     */
+    //IFocus getCloseLightSource(int i);
 
     /**
      * Sets the current closest particle to this camera. This will be only set if

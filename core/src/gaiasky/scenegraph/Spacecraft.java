@@ -34,6 +34,7 @@ import gaiasky.util.Pair;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -82,9 +83,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     /** Mass in kg **/
     public double mass;
 
-    /** Factor hack **/
-    public double sizeFactor = 1d;
-
     /** Only the rotation matrix **/
     public Matrix4 rotationMatrix;
 
@@ -111,7 +109,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     // Are we in the process of stabilising or stopping the spaceship?
     public boolean leveling, stopping;
 
-    /** Aux vectors **/
     private final Quaternion qf;
 
     private boolean render;
@@ -196,25 +193,22 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (render) {
             EventManager.instance.post(Events.SPACECRAFT_INFO, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], enginePower, yawp, pitchp, rollp);
         }
-
     }
 
     protected void updateLocalTransform() {
         // Local transform
         try {
             localTransform.idt().setToLookAt(posf, directionf.add(posf), upf).inv();
-            float sizeFac = (float) (sizeFactor * size);
-            localTransform.scale(sizeFac, sizeFac, sizeFac);
+            localTransform.scale(size, size, size);
 
             // Rotation for attitude indicator
             rotationMatrix.idt().setToLookAt(directionf, upf);
             rotationMatrix.getRotation(qf);
         } catch (Exception e) {
         }
-
     }
 
-    public Vector3d computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3d pos) {
+    public Vector3b computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
         enginePower = Math.signum(enginePower);
         // Compute force from thrust
         thrust.set(direction).scl(thrustLength * thrustFactor[thrustFactorIndex] * enginePower);
@@ -261,34 +255,33 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
         vel.add(acc.scl(dt));
 
-        Vector3d velo = aux3d2.get().set(vel);
-        // New position in auxd3
-        Vector3d position = aux3d3.get().set(pos).add(velo.scl(dt));
+        Vector3b velo = aux3b2.get().set(vel);
+        Vector3b position = aux3b3.get().set(posb).add(velo.scl(dt));
+        Vector3b pos = posb.put(aux3b4.get());
         // Check collision!
         if (closest != null && closest != this && !this.copy) {
             double twoRadiuses = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos, position, closest.getPos()) < twoRadiuses) {
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadiuses) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos, position, closest.getPos(), twoRadiuses);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadiuses);
 
                 if (intersections.size >= 1) {
-                    pos.set(intersections.get(0));
+                    posb.set(intersections.get(0));
                 }
 
                 stopAllMovement();
-            } else if (pos.dst(closest.getPos()) < twoRadiuses) {
-                Vector3d newpos = aux3d1.get().set(pos).sub(closest.getPos()).nor().scl(pos.dst(closest.getPos()));
-                pos.set(newpos);
+            } else if (posb.dstd(closest.getPos()) < twoRadiuses) {
+                posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos())));
             } else {
-                pos.set(position);
+                posb.set(position);
             }
         } else {
-            pos.set(position);
+            posb.set(position);
         }
 
-        return pos;
+        return posb;
     }
 
     public double computeDirectionUp(double dt, Pair<Vector3d, Vector3d> pair) {
@@ -347,12 +340,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             /** POSITION **/
             pos = computePosition(dt, camera.getSecondClosestBody(), enginePower, thrust, direction, force, accel, vel, pos);
 
-            /**
-             * SCALING FACTOR - counteracts double precision problems at very
-             * large distances
-             **/
-            sizeFactor = MathUtilsd.lint(pos.len(), 100 * Constants.AU_TO_U, 5000 * Constants.PC_TO_U, 10, 10000);
-
             if (leveling) {
                 // No velocity, we just stop Euler angle motions
                 if (yawv != 0) {
@@ -387,7 +374,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             yaw = Math.toDegrees(yaw);
         }
         // Update float vectors
-        aux3d1.get().set(pos).add(camera.getInversePos()).put(posf);
+        Vector3b camPos = aux3b1.get().set(pos).add(camera.getInversePos());
+        camPos.put(posf);
         direction.put(directionf);
         up.put(upf);
 
@@ -522,16 +510,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         this.size = (float) size * (float) Constants.KM_TO_U;
     }
 
-    @Override
-    public double getRadius() {
-        return super.getRadius() * sizeFactor;
-    }
-
-    @Override
-    public double getSize() {
-        return super.getSize() * sizeFactor;
-    }
-
     public void setMass(Double mass) {
         this.mass = mass;
     }
@@ -588,12 +566,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         // Direction
         Vector3d d = aux3d1.get().set(direction);
-        d.nor().scl(.5e-4 * sizeFactor);
+        d.nor().scl(.5e-4);
         renderer.addLine(this, posf.x, posf.y, posf.z, posf.x + d.x, posf.y + d.y, posf.z + d.z, 1, 0, 0, 1);
 
         // Up
         Vector3d u = aux3d1.get().set(up);
-        u.nor().scl(.2e-4 * sizeFactor);
+        u.nor().scl(.2e-4);
         renderer.addLine(this, posf.x, posf.y, posf.z, posf.x + u.x, posf.y + u.y, posf.z + u.z, 0, 0, 1, 1);
 
     }
@@ -615,7 +593,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         copy.thrust.set(this.thrust);
 
         copy.mass = this.mass;
-        copy.sizeFactor = this.sizeFactor;
 
         copy.rotationMatrix.set(this.rotationMatrix);
 

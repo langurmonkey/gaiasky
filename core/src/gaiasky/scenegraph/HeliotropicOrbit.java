@@ -11,10 +11,9 @@ import gaiasky.util.coord.Coordinates;
 import java.time.Instant;
 
 /**
- * Heliotropic orbits must be corrected using the Sun longitude. They are by
- * default in equatorial coordinates.
- * 
- * @author Toni Sagrista
+ * Orbit in the heliotropic reference system. Must be corrected using the longitude of the Sun.
+ *
+ * @author tsagrista
  *
  */
 public class HeliotropicOrbit extends Orbit {

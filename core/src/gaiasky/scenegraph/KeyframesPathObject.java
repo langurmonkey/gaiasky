@@ -33,6 +33,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -371,7 +372,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         orientations.add(up);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         for (VertsObject vo : objects)
             vo.update(time, parentTransform, camera, opacity);
 

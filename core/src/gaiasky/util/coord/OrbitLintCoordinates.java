@@ -6,9 +6,9 @@
 package gaiasky.util.coord;
 
 import gaiasky.data.util.PointCloudData;
-import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -36,7 +36,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         getEquatorialCartesianCoordinates(date, out);
         out.mul(Coordinates.eqToEcl());
 
@@ -46,14 +46,14 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     }
 
     @Override
-    public Vector3d getEclipticCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         getEquatorialCartesianCoordinates(date, out);
         out.mul(Coordinates.eqToEcl());
         return out;
     }
 
     @Override
-    public Vector3d getEquatorialCartesianCoordinates(Instant date, Vector3d out) {
+    public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
         // Find out index
 
         long dateWrap = data.getWrapTimeMs(date);
@@ -76,7 +76,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         } else {
             transf.idt();
         }
-        if (!orbit.newmethod) {
+        if (!orbit.newMethod) {
             transf.rotate(0, 1, 0, orbitalParams.argofpericenter);
             transf.rotate(0, 0, 1, orbitalParams.i);
             transf.rotate(0, 1, 0, orbitalParams.ascendingnode);

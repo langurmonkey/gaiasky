@@ -29,12 +29,15 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import net.jafama.FastMath;
+import org.apfloat.Apfloat;
 import org.lwjgl.opengl.GL30;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.channels.FileChannel;
@@ -129,6 +132,9 @@ public class GlobalResources {
     public static void doneLoading(AssetManager manager) {
     }
 
+    public static Pair<Double, String> doubleToDistanceString(Apfloat d) {
+       return doubleToDistanceString(d.doubleValue());
+    }
     /**
      * Converts this double to the string representation of a distance
      *
@@ -198,14 +204,14 @@ public class GlobalResources {
      *
      * @param point     The position of the body in the reference system of the camera
      *                  (i.e. camera is at origin)
+     * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
      * @return True if the body is visible
      */
-    public static boolean isInView(Vector3d point, float coneAngle, Vector3d dir) {
-        return FastMath.acos(point.dot(dir) / point.len()) < coneAngle;
+    public static boolean isInView(Vector3b point, double len, float coneAngle, Vector3d dir) {
+        return FastMath.acos(point.tov3d().dot(dir) / len) < coneAngle;
     }
-
     /**
      * Computes whether a body with the given position is visible by a camera
      * with the given direction and angle. Coordinates are assumed to be in the
@@ -219,10 +225,6 @@ public class GlobalResources {
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
-        return FastMath.acos(point.dot(dir) / len) < coneAngle;
-    }
-
-    public static boolean isInView(Vector3 point, double len, float coneAngle, Vector3 dir) {
         return FastMath.acos(point.dot(dir) / len) < coneAngle;
     }
 

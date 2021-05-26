@@ -39,6 +39,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapPr
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
@@ -56,12 +57,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * VR offset
      **/
-    public Vector3d vroffset;
+    public Vector3d vrOffset;
 
     /**
      * Acceleration and velocity
      **/
-    public Vector3d accel, vel, posbak;
+    public Vector3d accel, vel, posBak;
     /**
      * The force acting on the entity and the friction
      **/
@@ -77,7 +78,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Auxiliary double vectors
      **/
-    private Vector3d aux1, aux2, aux3, aux5, aux4, dx, nextFocusPosition, nextClosestPosition;
+    private Vector3d aux1, aux2, aux5;
+    private Vector3b dx, aux1b, aux2b, aux3b, aux4b, aux5b, nextFocusPosition, nextClosestPosition;
     private Vector2 aux2f2;
     /**
      * Auxiliary float vector
@@ -113,7 +115,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     float fovBackup;
 
-    /** Gravity in game mode **/
+    /**
+     * Gravity in game mode
+     **/
     boolean gravity = true;
 
     /**
@@ -146,14 +150,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * FOCUS_MODE position
      **/
-    private Vector3d focusPos;
+    private Vector3b focusPos;
     /**
      * Free mode target
      **/
-    private Vector3d freeTargetPos;
+    private Vector3b freeTargetPos;
     private boolean freeTargetOn;
 
-    private Vector3d desired;
+    private Vector3b desired;
 
     /**
      * VR mode stuff
@@ -178,7 +182,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private double velocityVRX = 0;
     private double velocityVRY = 0;
 
-    /** Home object as defined in the properties file **/
+    /**
+     * Home object as defined in the properties file
+     **/
     private IFocus home;
 
     /**
@@ -238,11 +244,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr) {
         super(parent);
-        vroffset = new Vector3d();
+        vrOffset = new Vector3d();
         vel = new Vector3d();
         accel = new Vector3d();
         force = new Vector3d();
-        posbak = new Vector3d();
+        posBak = new Vector3d();
         orip = new Matrix4d();
         this.vr = vr;
         initialize(assetManager);
@@ -250,7 +256,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     public void initialize(AssetManager assetManager) {
-        if(vr){
+        if (vr) {
             camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
         } else {
             camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -267,7 +273,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         up = new Vector3d(1, 0, 0);
         direction = new Vector3d(0, 1, 0);
         focusDirection = new Vector3d();
-        desired = new Vector3d();
+        desired = new Vector3b();
         pitch = new Vector3d(0.0f, 0.0f, -3.0291599E-6f);
         yaw = new Vector3d(0.0f, 0.0f, -7.9807205E-6f);
         roll = new Vector3d(0.0f, 0.0f, -1.4423944E-4f);
@@ -276,8 +282,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         friction = new Vector3d();
         lastVel = new Vector3d();
-        focusPos = new Vector3d();
-        freeTargetPos = new Vector3d();
+        focusPos = new Vector3b();
+        freeTargetPos = new Vector3b();
         freeTargetOn = false;
 
         DIST_A = 0.1 * Constants.PC_TO_U;
@@ -286,15 +292,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         aux1 = new Vector3d();
         aux2 = new Vector3d();
-        aux3 = new Vector3d();
-        aux4 = new Vector3d();
         aux5 = new Vector3d();
         auxf1 = new Vector3();
         aux2f2 = new Vector2();
 
-        dx = new Vector3d();
-        nextFocusPosition = new Vector3d();
-        nextClosestPosition = new Vector3d();
+        aux1b = new Vector3b();
+        aux2b = new Vector3b();
+        aux3b = new Vector3b();
+        aux4b = new Vector3b();
+        aux5b = new Vector3b();
+
+        dx = new Vector3b();
+        nextFocusPosition = new Vector3b();
+        nextClosestPosition = new Vector3b();
 
         // Mouse and keyboard listeners
         naturalMouseKbdListener = new NaturalMouseKbdListener(this);
@@ -400,7 +410,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         computeNextPositions(time);
 
         // The whole update thread must lock the value of direction and up
-        distance = pos.len();
+        distance = pos.lend();
         CameraMode m = (parent.current == this ? parent.mode : lastMode);
         double realTransUnits = m.isGame() ? speedScaling(1e-5) : speedScaling();
         double translateUnits = Math.max(10d * Constants.M_TO_U, realTransUnits);
@@ -408,10 +418,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FOCUS_MODE:
             if (focus != null && !focus.isCoordinatesTimeOverflow()) {
                 focusBak = focus;
-                focus.getAbsolutePosition(aux4);
+                focus.getAbsolutePosition(aux4b);
                 // Hack, fix this by understanding underlying problem
-                if (!aux4.hasNaN()) {
-                    focusPos.set(aux4);
+                if (!aux4b.hasNaN()) {
+                    focusPos.set(aux4b);
                 }
                 dx.set(0, 0, 0);
 
@@ -425,37 +435,37 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         RotationComponent rc = focus.getRotationComponent();
                         if (rc != null) {
                             // Rotation component present - planets, etc
-                            Double anglebak = rc.angle;
-                            if (anglebak != null) {
-                                Double angle = previousOrientationAngle != 0 ? (anglebak - previousOrientationAngle) : 0;
+                            Double angleBak = rc.angle;
+                            if (angleBak != null) {
+                                Double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
                                 // aux5 <- focus (future) position
-                                focus.getAbsolutePosition(aux5);
+                                focus.getAbsolutePosition(aux5b);
                                 // aux3 <- focus to camera vector
-                                aux3.set(pos).sub(aux5);
+                                aux3b.set(pos).sub(aux5b);
                                 // aux2 <- spin axis
                                 aux2.set(0, 1, 0).mul(focus.getOrientation());
                                 // rotate aux3 around focus spin axis
-                                aux3.rotate(aux2, angle);
+                                aux3b.rotate(aux2, angle);
                                 // aux3 <- camera pos after rotating
-                                aux3.add(aux5);
+                                aux3b.add(aux5b);
                                 // pos <- aux3
-                                pos.set(aux3);
+                                pos.set(aux3b);
                                 direction.rotate(aux2, angle);
                                 up.rotate(aux2, angle);
-                                previousOrientationAngle = anglebak;
+                                previousOrientationAngle = angleBak;
                             }
                         } else if (focus.getOrientationQuaternion() != null) {
                             Matrix4d ori = focus.getOrientation();
                             // aux5 <- focus (future) position
-                            focus.getAbsolutePosition(aux5);
+                            focus.getAbsolutePosition(aux5b);
                             // aux3 <- focus->camera vector
-                            aux3.set(pos).sub(aux5);
+                            aux3b.set(pos).sub(aux5b);
                             // aux3 <- orientation difference from last frame = aux * O * O'^-1
-                            aux3.mul(ori).mul(orip);
+                            aux3b.mul(ori).mul(orip);
                             // aux3 <- camera pos after rotating
-                            aux3.add(aux5);
+                            aux3b.add(aux5b);
                             // pos <- aux3
-                            pos.set(aux3);
+                            pos.set(aux3b);
                             direction.mul(ori).mul(orip);
                             up.mul(ori).mul(orip);
                             // Set orip to this frame's inv(ori)
@@ -471,11 +481,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                 // Update direction to follow focus and activate custom input
                 // listener
-                this.focus.getAbsolutePosition(aux4).add(dx);
+                // aux4b <- foucs.abspos + dx
+                this.focus.getAbsolutePosition(aux4b).add(dx);
 
                 if (!GlobalConf.runtime.OPENVR) {
                     if (!diverted) {
-                        directionToTarget(dt, aux4, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f));
+                        directionToTarget(dt, aux4b, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f));
                     } else {
                         updateRotationFree(dt, GlobalConf.scene.TURNING_SPEED);
                     }
@@ -483,21 +494,21 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
 
                 updatePosition(dt, translateUnits, realTransUnits);
-                updateRotation(dt, aux4);
+                updateRotation(dt, aux4b);
 
                 // Update focus direction
-                focusDirection.set(aux4).sub(pos).nor();
+                focusDirection.set(aux4b).sub(pos).nor();
                 focus = focusBak;
 
-                double dist = aux4.dst(pos);
+                double dist = aux4b.dstd(pos);
                 if (dist < focus.getRadius()) {
                     // aux2 <- focus-cam with a length of radius
-                    aux2.set(pos).sub(aux4).nor().scl(focus.getRadius());
+                    aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
                     // Correct camera position
-                    pos.set(aux4).add(aux2);
+                    pos.set(aux4b).add(aux2b);
                 }
 
-                EventManager.instance.post(Events.FOCUS_INFO_UPDATED, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2).len() - focus.getRadius());
+                EventManager.instance.post(Events.FOCUS_INFO_UPDATED, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius());
             } else {
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
             }
@@ -505,11 +516,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case GAME_MODE:
             if (gravity && (closestBody != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                 // Add gravity to force, pulling to closest body
-                Vector3d camObj = closestBody.getAbsolutePosition(aux1).sub(pos);
-                double dist = camObj.len();
+                Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
+                double dist = camObj.lend();
                 // Gravity adds only at twice the radius
-                if (dist < closestBody.getRadius() * 2) {
-                    force.add(camObj.nor().scl(0.002));
+                if (dist < closestBody.getRadius() * 2d) {
+                    force.add(camObj.nor().scl(0.002d));
                     fullStop = false;
                 } else {
                     fullStop = true;
@@ -522,7 +533,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (!GlobalConf.runtime.OPENVR) {
                 // If target is present, update direction
                 if (freeTargetOn) {
-                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3f : 1e2f));
+                    directionToTarget(dt, freeTargetPos, GlobalConf.scene.TURNING_SPEED / (GlobalConf.scene.CINEMATIC_CAMERA ? 1e3d : 1e2d));
                     if (facingFocus) {
                         freeTargetOn = false;
                     }
@@ -542,11 +553,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 entity3 = (CelestialBody) GaiaSky.instance.sg.getNode("Mars");
             }
             SceneGraphNode fccopy = entity1.getLineCopy();
-            fccopy.getRoot().translation.set(0f, 0f, 0f);
+            fccopy.getRoot().translation.set(0, 0, 0);
             fccopy.getRoot().update(time, null, this);
-            this.pos.set(fccopy.translation);
+            fccopy.translation.put(this.pos);
 
-            this.pos.add(0, 0, entity1.getRadius() * 5);
+            this.pos.add(0, 0, entity1.getRadius() * 5.0);
             this.posinv.set(this.pos).scl(-1);
             this.direction.set(0, 0, -1);
             this.up.set(0, 1, 0);
@@ -574,12 +585,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         posDistanceCheck();
 
         if (pos.hasNaN()) {
-            pos.set(posbak);
+            pos.set(posBak);
         } else {
-            posbak.set(pos);
+            posBak.set(pos);
         }
 
         updatePerspectiveCamera();
+        // Proximity
+        proximity.clear();
     }
 
     /**
@@ -1077,15 +1090,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Check terrain collision
         if (closestBody != null) {
             // New position
-            closestBody.getPredictedPosition(aux5, GaiaSky.instance.time, this, false);
+            closestBody.getPredictedPosition(aux5b, GaiaSky.instance.time, this, false);
 
-            double h = closestBody.getHeight(pos, aux5);
+            double h = closestBody.getHeight(pos, aux5b);
             double hs = closestBody.getHeightScale() * GlobalConf.scene.ELEVATION_MULTIPLIER;
             double minDist = h + hs / 10.0;
-            double newDist = aux5.scl(-1).add(pos).len();
+            double newDist = aux5b.scl(-1).add(pos).lend();
             if (newDist < minDist) {
-                aux5.nor().scl(minDist - newDist);
-                pos.add(aux5);
+                aux5b.nor().scl(minDist - newDist);
+                pos.add(aux5b);
                 posinv.set(pos).scl(-1);
             }
         }
@@ -1123,7 +1136,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      *
      * @param dt
      */
-    private void updateRotation(double dt, final Vector3d rotationCenter) {
+    private void updateRotation(double dt, final Vector3b rotationCenter) {
         // Add position to compensate for coordinates centered on camera
         // rotationCenter.add(pos);
         if (updatePosition(vertical, dt)) {
@@ -1189,13 +1202,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param target       The position of the target
      * @param turnVelocity The velocity at which to turn
      */
-    private void directionToTarget(double dt, final Vector3d target, double turnVelocity) {
+    private void directionToTarget(double dt, final Vector3b target, double turnVelocity) {
         desired.set(target).sub(pos);
         desired.nor();
-        double angl = desired.angle(direction);
-        // boolean samedir = aux1.set(desired).add(direction).len2() >
-        // Math.max(desired.len2(), direction.len2());
-        if (angl > Math.min(0.3, 0.3 * fovFactor)) {
+        double desiredDirectionAngle = desired.angle(direction);
+        if (desiredDirectionAngle > Math.min(0.3, 0.3 * fovFactor)) {
             // Add desired to direction with given turn velocity (v*dt)
             desired.scl(turnVelocity * dt);
             direction.add(desired).nor();
@@ -1233,18 +1244,18 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Updates the camera mode
      */
     @Override
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
         InputProcessor ip = Gdx.input.getInputProcessor();
-        if(ip instanceof InputMultiplexer) {
+        if (ip instanceof InputMultiplexer) {
             InputMultiplexer im = (InputMultiplexer) ip;
-            switch (mode) {
+            switch (newMode) {
             case FOCUS_MODE:
                 diverted = !centerFocus;
                 checkFocus();
             case FREE_MODE:
             case GAIA_SCENE_MODE:
             case GAME_MODE:
-                MouseKbdListener newListener = mode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
+                MouseKbdListener newListener = newMode == CameraMode.GAME_MODE ? gameMouseKbdListener : naturalMouseKbdListener;
                 setMouseKbdListener(newListener);
                 addControllerListener();
                 if (GlobalConf.runtime.OPENVR)
@@ -1297,12 +1308,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         double dist;
         double starEdge = 0.5 * Constants.PC_TO_U;
         if (parent.mode.useFocus() && focus != null) {
+            // FOCUS mode -> use focus object
             dist = focus.getDistToCamera() - (focus.getHeight(pos, false) + MIN_DIST);
-        } else if (parent.mode.useClosest()) {
-            if (closestBody != null && closestBody.getDistToCamera() < closestStar.getDistToCamera()) {
+        } else if (parent.mode.useClosest() && proximity.array[0] != null) {
+            // FREE/GAME mode -> use closest object
+            if (closestBody != null && closestBody.getDistToCamera() < proximity.array[0].getDistToCamera()) {
                 dist = closestBody.getDistToCamera() - (closestBody.getHeight(pos, false) + MIN_DIST);
-            } else if (closestStar != null && (closestStar.getClosestDistToCamera() + MIN_DIST) < starEdge) {
-                dist = distance * Math.pow((closestStar.getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
+            } else if (proximity.array[0] != null && !proximity.array[0].isStar() && (proximity.array[0].getClosestDistToCamera() + MIN_DIST) < starEdge) {
+                dist = distance * Math.pow((proximity.array[0].getClosestDistToCamera() + MIN_DIST) / starEdge, 1.6);
             } else {
                 dist = distance;
             }
@@ -1312,13 +1325,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         double func;
         if (dist < DIST_A) {
-            // 0.1 pc < d
+            // d < 0.1 pc
             func = MathUtilsd.lint(dist, 0, DIST_A, 0, 1e6) * Constants.DISTANCE_SCALE_FACTOR;
         } else if (dist < DIST_B) {
             // 0.1 pc < d < 5 Kpc
             func = MathUtilsd.lint(dist, DIST_A, DIST_B, 1e6, 1e10) * Constants.DISTANCE_SCALE_FACTOR;
         } else {
-            // 5 Kpc < d
+            // d > 5 Kpc
             func = MathUtilsd.lint(dist, DIST_B, DIST_C, 1e10, 2e16) * Constants.DISTANCE_SCALE_FACTOR;
         }
 
@@ -1362,7 +1375,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (data.length > 1)
                 centerFocus = (Boolean) data[1];
 
-            if(data[0] == null){
+            if (data[0] == null) {
                 focus = null;
 
             }
@@ -1459,19 +1472,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // Position camera near focus
                     stopTotalMovement();
 
-                    f.getAbsolutePosition(aux1);
-                    pos.set(aux1);
+                    f.getAbsolutePosition(aux1b);
+                    pos.set(aux1b);
 
                     double dx = 0d;
                     double dy = f.getSize() / 4d;
                     double dz = -f.getSize() * 4d;
-                    if(GlobalConf.runtime.OPENVR){
+                    if (GlobalConf.runtime.OPENVR) {
                         dz = -dz;
                     }
 
                     pos.add(dx, dy, dz);
                     posinv.set(pos).scl(-1d);
-                    direction.set(aux1).sub(pos).nor();
+                    direction.set(aux1b).sub(pos).nor();
                     up.set(direction.x, direction.z, -direction.y).nor();
                     rotate(up, 0.01);
                     updatePerspectiveCamera();
@@ -1485,9 +1498,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FREE_MODE_COORD_CMD:
             double ra = (Double) data[0];
             double dec = (Double) data[1];
-            double dist = 1e12 * Constants.PC_TO_U;
+            double dist = 1e12d * Constants.PC_TO_U;
             aux1.set(MathUtilsd.degRad * ra, MathUtilsd.degRad * dec, dist);
-            Coordinates.sphericalToCartesian(aux1, freeTargetPos);
+            Coordinates.sphericalToCartesian(aux1, aux2);
+            freeTargetPos.set(aux2);
             facingFocus = false;
             freeTargetOn = true;
             break;
@@ -1553,13 +1567,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param rotationAxis   the axis to rotate around
      * @param angle          the angle, in degrees
      */
-    public void rotateAround(final Vector3d rotationCenter, Vector3d rotationAxis, double angle) {
+    public void rotateAround(final Vector3b rotationCenter, Vector3d rotationAxis, double angle) {
         rotate(rotationAxis, angle);
 
         // aux3 <- pos-point vector
-        aux3.set(pos).sub(rotationCenter);
-        aux3.rotate(rotationAxis, angle);
-        pos.set(aux3).add(rotationCenter);
+        aux3b.set(pos).sub(rotationCenter);
+        aux3b.rotate(rotationAxis, angle);
+        pos.set(aux3b).add(rotationCenter);
         posDistanceCheck();
     }
 
@@ -1666,17 +1680,17 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void checkFocus() {
         if (focus != null && !(focus instanceof Star) && !(focus instanceof ParticleGroup)) {
             // Move camera if too close to focus
-            this.focus.getAbsolutePosition(aux1);
-            if (pos.dst(aux1) < this.focus.getRadius()) {
+            this.focus.getAbsolutePosition(aux1b);
+            if (pos.dst(aux1b).doubleValue() < this.focus.getRadius()) {
                 // Position camera near focus
                 stopTotalMovement();
 
-                this.focus.getAbsolutePosition(aux1);
-                pos.set(aux1);
+                this.focus.getAbsolutePosition(aux1b);
+                pos.set(aux1b);
 
-                pos.add(0, 0, -this.focus.getSize() * 6);
-                posinv.set(pos).scl(-1);
-                direction.set(0, 0, 1);
+                pos.add(0d, 0d, -this.focus.getSize() * 6d);
+                posinv.set(pos).scl(-1d);
+                direction.set(0d, 0d, 1d);
             }
         }
     }
@@ -1688,7 +1702,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void resetState() {
         pos.setZero();
         posinv.setZero();
-        vroffset.setZero();
+        vrOffset.setZero();
         direction.set(0, 0, -1);
         for (PerspectiveCamera cam : cameras) {
             cam.position.setZero();
@@ -1844,9 +1858,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void drawCrosshair(IFocus chFocus, boolean focusMode, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
         if (chFocus != null) {
             if (!focusMode) {
-                drawCrosshair(chFocus.getClosestAbsolutePos(aux1).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
+                drawCrosshair(chFocus.getClosestAbsolutePos(aux1b).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
             } else {
-                drawCrosshair(chFocus.getAbsolutePosition(aux1).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
+                drawCrosshair(chFocus.getAbsolutePosition(aux1b).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
             }
         }
     }
@@ -1854,7 +1868,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Draws a crosshair given a camera-relative position
      *
-     * @param pos          The position in floating camera coordinates
+     * @param p            The position in floating camera coordinates
      * @param distToCam    The distance to the camera
      * @param radius       Radius of object
      * @param crosshairTex Crosshair texture
@@ -1866,13 +1880,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param b            Blue
      * @param a            Alpha
      */
-    private void drawCrosshair(Vector3d pos, double distToCam, double radius, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
+    private void drawCrosshair(Vector3b p, double distToCam, double radius, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
         if (distToCam > radius * 2) {
             float chw = crosshairTex.getWidth();
             float chh = crosshairTex.getHeight();
             float chw2 = chw / 2;
             float chh2 = chh / (vr ? 1 : 2);
 
+            Vector3d pos = aux5;
+            p.put(pos);
             GlobalResources.applyRelativisticAberration(pos, this);
             RelativisticEffectsManager.getInstance().gravitationalWavePos(pos);
 
@@ -1894,7 +1910,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     firstAux = !firstAux;
                     aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
                     aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
-                    aux1.set(vroffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
+                    aux1.set(vrOffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
                     projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
                     spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
@@ -1971,7 +1987,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void resize(int width, int height) {
-        if(!vr) {
+        if (!vr) {
             camera.viewportHeight = height;
             camera.viewportWidth = width;
             camera.update(true);

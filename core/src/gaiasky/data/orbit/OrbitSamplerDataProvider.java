@@ -23,6 +23,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.io.File;
@@ -89,7 +90,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
     }
 
-    private final Vector3d ecl = new Vector3d();
+    private final Vector3b ecl = new Vector3b();
 
     @Override
     public void load(String file, OrbitDataLoaderParameter parameter) {
@@ -112,13 +113,14 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
         // Load orbit data
         for (int i = 0; i <= numSamples; i++) {
             AstroUtils.getEclipticCoordinates(bodyDesc, d, ecl, true);
+            double eclx = ecl.x.doubleValue();
 
             if (last == 0) {
-                last = Math.toDegrees(ecl.x);
+                last = Math.toDegrees(eclx);
             }
 
-            accum += Math.toDegrees(ecl.x) - last;
-            last = Math.toDegrees(ecl.x);
+            accum += Math.toDegrees(eclx) - last;
+            last = Math.toDegrees(eclx);
 
             if (accum > 360) {
                 break;
@@ -126,9 +128,9 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
 
             Coordinates.sphericalToCartesian(ecl, ecl);
             ecl.mul(Coordinates.eclToEq()).scl(1);
-            data.x.add(ecl.x);
-            data.y.add(ecl.y);
-            data.z.add(ecl.z);
+            data.x.add(ecl.x.doubleValue());
+            data.y.add(ecl.y.doubleValue());
+            data.z.add(ecl.z.doubleValue());
             data.time.add(d);
 
             d = Instant.ofEpochMilli(d.toEpochMilli() + (long) stepMs);

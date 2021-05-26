@@ -127,8 +127,8 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         super.updateLocal(time, camera);
         // Update light with global position
         if (mc != null) {
-            mc.dLight.direction.set(1f, 0f, 0f);
-            mc.dLight.color.set(1f, 1f, 1f, 1f);
+            mc.directional(0).direction.set(1f, 0f, 0f);
+            mc.directional(0).color.set(1f, 1f, 1f, 1f);
 
             updateLocalTransform();
         }

@@ -25,6 +25,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
@@ -73,31 +74,33 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         allConstellations.add(this);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera) {
         update(time, parentTransform, camera, 1f);
     }
 
-    public void update(ITimeFrameProvider time, final Vector3d parentTransform, ICamera camera, float opacity) {
+    public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Recompute mean position
         pos.setZero();
         Vector3d p = aux3d1.get();
-        int nstars = 0;
+        int nStars = 0;
         for (int i = 0; i < lines.length; i++) {
             IPosition[] line = lines[i];
             if (line != null) {
                 p.set(line[0].getPosition()).add(camera.getInversePos());
                 pos.add(p);
-                nstars++;
+                nStars++;
             }
         }
-        pos.scl((1d / nstars));
-        pos.nor().scl(100d * Constants.PC_TO_U);
+        if (nStars > 0) {
+            pos.scl(1d / nStars);
+            pos.nor().scl(100d * Constants.PC_TO_U);
 
-        super.update(time, parentTransform, camera, opacity);
+            super.update(time, parentTransform, camera, opacity);
 
-        addToRenderLists(camera);
+            addToRenderLists(camera);
 
-        deltaYears = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
+            deltaYears = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
+        }
 
     }
 
@@ -134,7 +137,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
         Vector3d p1 = aux3d1.get();
         Vector3d p2 = aux3d2.get();
-        Vector3d campos = camera.getPos();
+        Vector3d campos = camera.getPos().tov3d(aux3d3.get());
 
         for (IPosition[] pair : lines) {
             if (pair != null) {

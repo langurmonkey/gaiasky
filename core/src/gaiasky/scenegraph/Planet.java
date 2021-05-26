@@ -26,7 +26,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
 import gaiasky.util.camera.CameraUtils;
-import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
@@ -137,7 +136,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
             // Convert to cartesian coordinates and put them in aux3 vector
-            Coordinates.cartesianToSpherical(pos, aux3);
+            //Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
             // Update angle
             if (rc != null)
@@ -203,16 +202,14 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     protected void addToRenderLists(ICamera camera) {
-        if (this.shouldRender()) {
-            super.addToRenderLists(camera);
-            // Add atmosphere to default render group if necessary
-            if (ac != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
-                addToRender(this, RenderGroup.MODEL_ATM);
-            }
-            // Cloud
-            if (clc != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
-                addToRender(this, RenderGroup.MODEL_CLOUD);
-            }
+        super.addToRenderLists(camera);
+        // Add atmosphere to default render group if necessary
+        if (ac != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
+            addToRender(this, RenderGroup.MODEL_ATM);
+        }
+        // Cloud
+        if (clc != null && isInRender(this, RenderGroup.MODEL_PIX, RenderGroup.MODEL_PIX_TESS) && !coordinatesTimeOverflow) {
+            addToRender(this, RenderGroup.MODEL_CLOUD);
         }
     }
 
@@ -240,7 +237,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        renderer.addLine(this, translation.x, translation.y, translation.z, endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
+        renderer.addLine(this, translation.x.doubleValue(), translation.y.doubleValue(), translation.z.doubleValue(), endLine.x, endLine.y, endLine.z, 1, 0, 0, 1);
     }
 
     @Override

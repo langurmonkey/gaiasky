@@ -10,8 +10,9 @@ import gaiasky.util.coord.AstroUtils;
 import java.time.Instant;
 
 /**
- * @author Toni Sagrista
+ * Orbit on the ecliptic plane.
  *
+ * @author tsagrista
  */
 public class EclipticOrbit extends Orbit {
     double angle;

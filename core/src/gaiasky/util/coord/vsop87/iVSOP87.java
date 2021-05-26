@@ -5,6 +5,7 @@
 
 package gaiasky.util.coord.vsop87;
 
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -49,5 +50,5 @@ public interface iVSOP87 {
 
     void setHighAccuracy(boolean highAccuracy);
 
-    Vector3d getEclipticSphericalCoordinates(Instant date, Vector3d out);
+    Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out);
 }

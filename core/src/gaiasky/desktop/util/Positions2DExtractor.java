@@ -17,6 +17,7 @@ import gaiasky.util.coord.vsop87.AbstractVSOP87;
 import gaiasky.util.coord.vsop87.VSOP87;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.io.BufferedWriter;
@@ -78,7 +79,7 @@ public class Positions2DExtractor {
         long inims = ini.getTime();
 
         long dtms = MS_IN_YEAR / steps;
-        Vector3d e = new Vector3d(), m = new Vector3d();
+        Vector3b e = new Vector3b(), m = new Vector3b();
 
         bw.write("precomputed=True");
         bw.newLine();

@@ -40,9 +40,7 @@ public class KeyboardInputController extends InputAdapter {
 
     @Override
     public boolean keyDown(int keycode) {
-        // Fix leftovers
-        if (!input.isKeyPressed(KeyBindings.CTRL_L))
-            pressedKeys.remove(KeyBindings.CTRL_L);
+        cleanSpecial();
 
         if (GlobalConf.runtime.INPUT_ENABLED) {
             pressedKeys.add(keycode);
@@ -55,9 +53,7 @@ public class KeyboardInputController extends InputAdapter {
     public boolean keyUp(int keycode) {
         EventManager.instance.post(Events.INPUT_EVENT, keycode);
 
-        // Fix leftovers
-        if (!input.isKeyPressed(KeyBindings.CTRL_L))
-            pressedKeys.remove(KeyBindings.CTRL_L);
+        cleanSpecial();
 
         if (GlobalConf.runtime.INPUT_ENABLED) {
             // Use key mappings
@@ -72,5 +68,15 @@ public class KeyboardInputController extends InputAdapter {
         pressedKeys.remove(keycode);
         return false;
 
+    }
+
+    /**
+     * Makes sure all unpressed special keys are not on the pressed keys list.
+     */
+    private void cleanSpecial(){
+        for (int special : KeyBindings.SPECIAL){
+            if (!input.isKeyPressed(special))
+                pressedKeys.remove(special);
+        }
     }
 }

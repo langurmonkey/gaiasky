@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
@@ -56,7 +57,7 @@ public class SpacecraftGui extends AbstractGui {
     private Container<Label> thrustContainer;
     private HorizontalGroup buttonRow, engineGroup;
     private VerticalGroup thrustGroup;
-    private Table motionGroup, nearestGroup, controlsGroup;
+    private Table main, motionGroup, nearestGroup, controlsGroup;
     private OwnImageButton stabilise, stop, exit, enginePlus, engineMinus;
     private Slider enginePower, drag, responsiveness;
     private Slider thrustv, thrusty, thrustp, thrustr;
@@ -64,25 +65,17 @@ public class SpacecraftGui extends AbstractGui {
     private OwnLabel mainvel, yawvel, pitchvel, rollvel, closestname, closestdist, thrustfactor;
     private CheckBox velToDir;
 
-    /**
-     * The spacecraft object
-     **/
+    // The spacecraft object
     private Spacecraft sc;
 
-    /**
-     * Number format
-     **/
+    // Number format
     private final INumberFormat nf;
     private final INumberFormat sf;
 
-    /**
-     * Camera to render the attitude indicator system
-     **/
+    // Camera to render the attitude indicator system
     private PerspectiveCamera aiCam;
 
-    /**
-     * Attitude indicator
-     **/
+    // Attitude indicator
     private IntModelBatch mb;
     private DecalBatch db;
     private SpriteBatch sb;
@@ -94,20 +87,15 @@ public class SpacecraftGui extends AbstractGui {
     private Matrix4 aiTransform;
     private Viewport aiViewport;
     private DirectionalLight dlight;
-    /**
-     * Reference to spacecraft camera rotation quaternion
-     **/
+
+    // Reference to spacecraft camera rotation quaternion
     private Quaternion qf;
-    /**
-     * Reference to spacecraft camera velocity vector
-     **/
+    // Reference to spacecraft camera velocity vector
     private Vector3d vel;
 
     private float indicatorw, indicatorh, indicatorx, indicatory;
 
-    /**
-     * Aux vectors
-     **/
+    // Auxiliary vectors
     private final Vector3 aux3f1;
     private final Vector3 aux3f2;
 
@@ -132,7 +120,7 @@ public class SpacecraftGui extends AbstractGui {
         indicatorw = 480f;
         indicatorh = 480f;
         indicatorx = -32f;
-        indicatory = -40f;
+        indicatory = -20f;
 
         // init gui camera
         aiCam = new PerspectiveCamera(30, indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE);
@@ -149,7 +137,7 @@ public class SpacecraftGui extends AbstractGui {
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f), new ColorAttribute(ColorAttribute.Specular, .5f, .5f, .5f, 1f));
         env.add(dlight);
-        db = new DecalBatch(new CameraGroupStrategy(aiCam));
+        db = new DecalBatch(4, new CameraGroupStrategy(aiCam));
         mb = new IntModelBatch();
 
         assetManager.load(GlobalConf.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
@@ -179,7 +167,7 @@ public class SpacecraftGui extends AbstractGui {
         aiVelDec = Decal.newDecal(new TextureRegion(aiVelTex));
         aiAntivelDec = Decal.newDecal(new TextureRegion(aiAntivelTex));
 
-        Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f));
+        Material mat = new Material(new TextureAttribute(TextureAttribute.Diffuse, aiTexture), new ColorAttribute(ColorAttribute.Specular, 0.3f, 0.3f, 0.3f, 1f), new DepthTestAttribute(GL20.GL_LESS, aiCam.near, aiCam.far, true));
         aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
@@ -194,10 +182,9 @@ public class SpacecraftGui extends AbstractGui {
 
     private void buildGui() {
 
-        /** BUTTONS **/
+        // BUTTONS
         buttonContainer = new Container<>();
         buttonRow = new HorizontalGroup();
-        buttonRow.pad(0, 112f, 8f, 0);
         buttonRow.space(4.8f);
         buttonRow.setFillParent(true);
         buttonRow.align(Align.bottomLeft);
@@ -256,15 +243,14 @@ public class SpacecraftGui extends AbstractGui {
 
         buttonContainer.pack();
 
-        /** ENGINE GROUP **/
+        // ENGINE GROUP
         engineGroup = new HorizontalGroup();
-        engineGroup.pad(0, 16f, 8f, 0);
         engineGroup.space(0.8f);
         engineGroup.align(Align.bottomLeft);
 
         // Engine controls
-        float enginePowerH = (indicatory + indicatorh / 1.14f);
-        Table engineControls = new Table();
+        float enginePowerH = 380f;
+        Table engineControls = new Table(skin);
         engineControls.pad(0f);
 
         enginePlus = new OwnImageButton(skin, "sc-engine-power-up");
@@ -319,9 +305,8 @@ public class SpacecraftGui extends AbstractGui {
 
         engineGroup.pack();
 
-        /** CONTROLS **/
-        controlsGroup = new Table();
-        controlsGroup.pad(0, 16f, 448f, 0);
+        // CONTROLS
+        controlsGroup = new Table(skin);
         controlsGroup.align(Align.topLeft);
 
         responsiveness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
@@ -363,35 +348,49 @@ public class SpacecraftGui extends AbstractGui {
         controlsGroup.add(velToDir).left().colspan(2).row();
         controlsGroup.pack();
 
-        /** INFORMATION **/
-        float groupspacing = 3.2f;
+        // INFORMATION
+        float groupspacing = 10f;
         thrustfactor = new OwnLabel("", skin);
-        thrustContainer = new Container<Label>(thrustfactor);
-        thrustContainer.pad(0, 64f, (enginePowerH * 2f + 40f), 0);
+        thrustContainer = new Container<>(thrustfactor);
+
+        float labelWidth = 110f;
+        float valueWidth = 150f;
 
         mainvel = new OwnLabel("", skin);
+        mainvel.setWidth(valueWidth);
         HorizontalGroup mvg = new HorizontalGroup();
         mvg.space(groupspacing);
-        mvg.addActor(new OwnLabel(I18n.txt("gui.sc.velocity") + ":", skin, "sc-header"));
+        Label speed = new OwnLabel(I18n.txt("gui.sc.velocity") + ":", skin, "sc-header");
+        speed.setWidth(labelWidth);
+        mvg.addActor(speed);
         mvg.addActor(mainvel);
         yawvel = new OwnLabel("", skin);
+        yawvel.setWidth(valueWidth);
         HorizontalGroup yvg = new HorizontalGroup();
         yvg.space(groupspacing);
-        yvg.addActor(new OwnLabel(I18n.txt("gui.sc.yaw") + ":", skin, "sc-header"));
+        Label yaw = new OwnLabel(I18n.txt("gui.sc.yaw") + ":", skin, "sc-header");
+        yaw.setWidth(labelWidth);
+        yvg.addActor(yaw);
         yvg.addActor(yawvel);
         pitchvel = new OwnLabel("", skin);
+        pitchvel.setWidth(valueWidth);
         HorizontalGroup pvg = new HorizontalGroup();
         pvg.space(groupspacing);
-        pvg.addActor(new OwnLabel(I18n.txt("gui.sc.pitch") + ":", skin, "sc-header"));
+        Label pitch = new OwnLabel(I18n.txt("gui.sc.pitch") + ":", skin, "sc-header");
+        pitch.setWidth(labelWidth);
+        pvg.addActor(pitch);
         pvg.addActor(pitchvel);
         rollvel = new OwnLabel("", skin);
+        rollvel.setWidth(valueWidth);
         HorizontalGroup rvg = new HorizontalGroup();
         rvg.space(groupspacing);
-        rvg.addActor(new OwnLabel(I18n.txt("gui.sc.roll") + ":", skin, "sc-header"));
+        Label roll = new OwnLabel(I18n.txt("gui.sc.roll") + ":", skin, "sc-header");
+        roll.setWidth(labelWidth);
+        rvg.addActor(roll);
         rvg.addActor(rollvel);
 
-        motionGroup = new Table();
-        motionGroup.pad(0, 128f, 320f, 0);
+
+        motionGroup = new Table(skin);
         motionGroup.align(Align.topLeft);
 
         motionGroup.add(mvg).left().row();
@@ -401,9 +400,8 @@ public class SpacecraftGui extends AbstractGui {
 
         motionGroup.pack();
 
-        /** NEAREST **/
-        nearestGroup = new Table();
-        nearestGroup.pad(0, 256f, 8f, 0);
+        // NEAREST
+        nearestGroup = new Table(skin);
         nearestGroup.align(Align.topLeft);
 
         closestname = new OwnLabel("", skin);
@@ -425,12 +423,11 @@ public class SpacecraftGui extends AbstractGui {
 
         nearestGroup.pack();
 
-        /** THRUST INDICATORS for VEL, YAW, PITCH, ROLL **/
+        // THRUST INDICATORS for VEL, YAW, PITCH, ROLL
         float thrustHeight = 96f;
         float thrustWidth = 16f;
         thrustGroup = new VerticalGroup();
         thrustGroup.space(1.6f);
-        thrustGroup.pad(0, 344f, 136f, 0);
 
         HorizontalGroup thrustPlus = new HorizontalGroup().space(1f);
         HorizontalGroup thrustMinus = new HorizontalGroup().space(1f);
@@ -488,21 +485,39 @@ public class SpacecraftGui extends AbstractGui {
 
         thrustGroup.pack();
 
+        Table motionThrustGroup = new Table(skin);
+        motionThrustGroup.add(motionGroup).left().padBottom(50f).row();
+        motionThrustGroup.add(thrustGroup).right();
+
+        Table buttonNearestGroup = new Table(skin);
+        buttonNearestGroup.add(buttonContainer).left().padRight(15f);
+        buttonNearestGroup.add(nearestGroup).left();
+
+        // Main table
+        main = new Table(skin);
+        main.setBackground("table-bg");
+        main.setWidth(410f);
+        main.setHeight(580f);
+        main.setFillParent(false);
+        main.bottom().left();
+        main.pad(0, 20, 20, 0);
+
+        float pad = 10f;
+        main.add(controlsGroup).left().colspan(2).padBottom(pad).row();
+        main.add(thrustContainer).left().colspan(2).row();
+        main.add(engineGroup).left().padBottom(pad).padRight(pad * 8f);
+        main.add(motionThrustGroup).left().top().padBottom(pad).row();
+        main.add(buttonNearestGroup).left().colspan(2);
+
         rebuildGui();
     }
 
     protected void rebuildGui() {
         if (ui != null) {
             ui.clear();
-            ui.addActor(buttonContainer);
-            ui.addActor(engineGroup);
-            ui.addActor(controlsGroup);
-            ui.addActor(motionGroup);
-            ui.addActor(nearestGroup);
-            ui.addActor(thrustContainer);
-            ui.addActor(thrustGroup);
+            ui.addActor(main);
 
-            /** CAPTURE SCROLL FOCUS **/
+            // CAPTURE SCROLL FOCUS
             ui.addListener(new EventListener() {
 
                 @Override
@@ -537,15 +552,17 @@ public class SpacecraftGui extends AbstractGui {
 
     @Override
     public void render(int rw, int rh) {
+        // Draw UI
+        ui.draw();
 
-        /** ATTITUDE INDICATOR **/
+        // Draw attitude indicator
         aiViewport.setCamera(aiCam);
         aiViewport.setWorldSize(indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE);
         aiViewport.setScreenBounds((int) (indicatorx * GlobalConf.program.UI_SCALE), (int) (indicatory * GlobalConf.program.UI_SCALE), (int) (indicatorw * GlobalConf.program.UI_SCALE), (int) (indicatorh * GlobalConf.program.UI_SCALE));
         aiViewport.apply();
 
+        // Model
         mb.begin(aiCam);
-
         aiTransform.idt();
 
         aiTransform.translate(0, 0, 6.4f);
@@ -553,30 +570,31 @@ public class SpacecraftGui extends AbstractGui {
         aiTransform.rotate(0, 1, 0, 90);
 
         mb.render(aiModelInstance, env);
-
         mb.end();
 
         // VELOCITY INDICATORS IN NAVBALL
-        // velocity
         if (!vel.isZero()) {
+            // velocity
             aux3f1.set(vel.valuesf()).nor().scl(0.864f);
             aux3f1.mul(qf);
-            aux3f1.add(0, 0, 6.4f);
-
-            // antivelocity
-            aux3f2.set(vel.valuesf()).nor().scl(-0.864f);
-            aux3f2.mul(qf);
-            aux3f2.add(0, 0, 6.4f);
-
+            aux3f1.add(0, 0, 6.3f);
             aiVelDec.setPosition(aux3f1);
-            aiVelDec.setScale(0.0048f);
+            aiVelDec.setScale(0.0078f);
             aiVelDec.lookAt(aiCam.position, aiCam.up);
 
+            // anti-velocity
+            aux3f2.set(vel.valuesf()).nor().scl(-0.864f);
+            aux3f2.mul(qf);
+            aux3f2.add(0, 0, 6.3f);
             aiAntivelDec.setPosition(aux3f2);
             aiAntivelDec.setScale(0.0048f);
             aiAntivelDec.lookAt(aiCam.position, aiCam.up);
 
+            // Depth
             Gdx.gl.glEnable(GL20.GL_BLEND);
+            Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+            Gdx.gl.glDepthFunc(GL20.GL_GREATER);
+            Gdx.gl.glDepthMask(true);
             db.add(aiVelDec);
             db.add(aiAntivelDec);
             db.flush();
@@ -590,9 +608,6 @@ public class SpacecraftGui extends AbstractGui {
         sb.begin();
         sb.draw(aiPointerTexture, (indicatorx + indicatorw / 2 - 16), (indicatory + indicatorh / 2 - 16));
         sb.end();
-
-        /** REST OF GUI **/
-        ui.draw();
 
     }
 

@@ -21,6 +21,7 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.AtmosphereAttribute;
 import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
@@ -74,7 +75,7 @@ public class AtmosphereComponent {
 
     }
 
-    public void update(Vector3d transform) {
+    public void update(Vector3b transform) {
         transform.getMatrix(localTransform).scl(size);
     }
 
@@ -151,7 +152,7 @@ public class AtmosphereComponent {
      *            The planet itself, holder of this atmosphere
      */
     public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vroffset) {
-        Vector3d transform = planet.translation;
+        Vector3b transform = planet.translation;
         RotationComponent rc = planet.rc;
         SceneGraphNode sol = planet.parent;
         transform.put(aux3);

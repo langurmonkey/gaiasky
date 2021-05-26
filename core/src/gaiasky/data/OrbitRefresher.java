@@ -95,7 +95,6 @@ public class OrbitRefresher {
     protected static class OrbitUpdaterThread extends Thread {
         private boolean awake;
         private boolean running;
-        private final AtomicBoolean abort;
         private final OrbitSamplerDataProvider provider;
 
         private final Array<OrbitDataLoaderParameter> toLoad;
@@ -103,23 +102,15 @@ public class OrbitRefresher {
         public OrbitUpdaterThread() {
             this.awake = false;
             this.running = true;
-            this.abort = new AtomicBoolean(false);
             this.toLoad = new Array<>();
             this.provider = new OrbitSamplerDataProvider();
         }
 
         /**
-         * Stops the daemon iterations when
+         * Stops the daemon
          */
         public void stopDaemon() {
             running = false;
-        }
-
-        /**
-         * Aborts only the current iteration
-         */
-        public void abort() {
-            abort.set(true);
         }
 
         @Override
@@ -168,7 +159,6 @@ public class OrbitRefresher {
                     /** ----------- SLEEP UNTIL INTERRUPTED ----------- **/
                     try {
                         awake = false;
-                        abort.set(false);
                         threadLock.wait(Long.MAX_VALUE - 8);
                     } catch (InterruptedException e) {
                         // New data!

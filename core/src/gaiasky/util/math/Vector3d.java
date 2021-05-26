@@ -112,6 +112,12 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this;
 	}
 
+	public Vector3d set(final Vector3b vec) {
+		if (vec != null)
+			return this.set(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
+		return this;
+	}
+
 	public Vector3d set(final Vector3 vec) {
 		if (vec != null)
 			return this.set(vec.x, vec.y, vec.z);
@@ -182,6 +188,13 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		return this;
 	}
 
+	public Vector3d add(final Vector3b vec) {
+		this.x += vec.x.doubleValue();
+		this.y += vec.y.doubleValue();
+		this.z += vec.z.doubleValue();
+		return this;
+	}
+
 	public Vector3d add(final Vector3 vec) {
 		this.x += vec.x;
 		this.y += vec.y;
@@ -230,6 +243,10 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	public Vector3d sub(final Vector3d vec) {
 		return this.sub(vec.x, vec.y, vec.z);
+	}
+
+	public Vector3d sub(final Vector3b vec) {
+		return this.sub(vec.x.doubleValue(), vec.y.doubleValue(), vec.z.doubleValue());
 	}
 
 	public Vector3d sub(final Vector3 vec) {
@@ -347,6 +364,12 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 		final double c = vec.z - z;
 		return FastMath.sqrt(a * a + b * b + c * c);
 	}
+	public double dst(final Vector3b vec) {
+		final double a = vec.x.doubleValue() - x;
+		final double b = vec.y.doubleValue() - y;
+		final double c = vec.z.doubleValue() - z;
+		return FastMath.sqrt(a * a + b * b + c * c);
+	}
 
 	/** @return the distance between this point and the given point */
 	public double dst(double x, double y, double z) {
@@ -401,6 +424,9 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	public double dot(final Vector3d vector) {
 		return x * vector.x + y * vector.y + z * vector.z;
+	}
+	public double dot(final Vector3b vector) {
+		return x * vector.x.doubleValue() + y * vector.y.doubleValue() + z * vector.z.doubleValue();
 	}
 
 	/**
@@ -473,11 +499,11 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	 * @return This vector for chaining
 	 */
 	public Vector3d mul(final Matrix4d matrix) {
-		final double[] l_mat = matrix.val;
+		final double[] mat = matrix.val;
 		return this.set(
-				x * l_mat[Matrix4d.M00] + y * l_mat[Matrix4d.M01] + z * l_mat[Matrix4d.M02] + l_mat[Matrix4d.M03],
-				x * l_mat[Matrix4d.M10] + y * l_mat[Matrix4d.M11] + z * l_mat[Matrix4d.M12] + l_mat[Matrix4d.M13],
-				x * l_mat[Matrix4d.M20] + y * l_mat[Matrix4d.M21] + z * l_mat[Matrix4d.M22] + l_mat[Matrix4d.M23]);
+				x * mat[Matrix4d.M00] + y * mat[Matrix4d.M01] + z * mat[Matrix4d.M02] + mat[Matrix4d.M03],
+				x * mat[Matrix4d.M10] + y * mat[Matrix4d.M11] + z * mat[Matrix4d.M12] + mat[Matrix4d.M13],
+				x * mat[Matrix4d.M20] + y * mat[Matrix4d.M21] + z * mat[Matrix4d.M22] + mat[Matrix4d.M23]);
 	}
 
 	public Vector3d mulLeft(final Matrix3 matrix) {
@@ -873,6 +899,10 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 	/** Gets the angle in degrees between the two vectors **/
 	public double angle(Vector3d v) {
 		return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.len() * v.len()));
+	}
+	/** Gets the angle in degrees between the two vectors **/
+	public double angle(Vector3b v) {
+		return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.len() * v.lend()));
 	}
 
 	/** Gets the angle in degrees between the two vectors **/

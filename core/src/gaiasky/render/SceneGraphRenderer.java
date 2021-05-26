@@ -53,6 +53,7 @@ import gaiasky.util.gdx.shader.ShaderProgramProvider.ShaderProgramParameter;
 import gaiasky.util.gdx.shader.provider.IntShaderProvider;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
 import org.lwjgl.opengl.GL30;
@@ -304,6 +305,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private Vector3 aux1;
     private Vector3d aux1d, aux2d, aux3d;
+    private Vector3b aux1b;
 
     // VRContext, may be null
     private final VRContext vrContext;
@@ -448,6 +450,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             aux1d = new Vector3d();
             aux2d = new Vector3d();
             aux3d = new Vector3d();
+            aux1b = new Vector3b();
 
             // Build frame buffers and arrays
             buildShadowMapData();
@@ -980,7 +983,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             // Yes!
             candidate.shadow = shadowNRender;
 
-            Vector3 camDir = aux1.set(candidate.mc.dLight.direction);
+            Vector3 camDir = aux1.set(candidate.mc.directional(0).direction);
             // Direction is that of the light
             cameraLight.direction.set(camDir);
 
@@ -988,9 +991,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             // Distance from camera to object, radius * sv[0]
             double distance = radius * candidate.shadowMapValues[0];
             // Position, factor of radius
-            candidate.getAbsolutePosition(aux1d);
-            aux1d.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
-            aux1d.put(cameraLight.position);
+            candidate.getAbsolutePosition(aux1b);
+            aux1b.sub(camera.getPos()).sub(camDir.nor().scl((float) distance));
+            aux1b.put(cameraLight.position);
             // Up is perpendicular to dir
             if (cameraLight.direction.y != 0 || cameraLight.direction.z != 0)
                 aux1.set(1, 0, 0);
@@ -1035,22 +1038,22 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (candidate.distToCamera < radius * 1.1) {
                 candidate.shadow = shadowNRender;
 
-                Vector3 shadowCameraDir = aux1.set(candidate.mc.dLight.direction);
+                Vector3 shadowCameraDir = aux1.set(candidate.mc.directional(0).direction);
 
                 // Shadow camera direction is that of the light
                 cameraLight.direction.set(shadowCameraDir);
 
-                Vector3 shadowCamDir = aux1.set(candidate.mc.dLight.direction);
+                Vector3 shadowCamDir = aux1.set(candidate.mc.directional(0).direction);
                 // Direction is that of the light
                 cameraLight.direction.set(shadowCamDir);
 
                 // Distance from camera to object, radius * sv[0]
                 float distance = (float) (radius * candidate.shadowMapValues[0] * 0.01);
                 // Position, factor of radius
-                Vector3d objPos = candidate.getAbsolutePosition(aux1d);
-                Vector3d camPos = camera.getPos();
+                Vector3b objPos = candidate.getAbsolutePosition(aux1b);
+                Vector3b camPos = camera.getPos();
                 Vector3d camDir = aux3d.set(camera.getDirection()).nor().scl(100 * Constants.KM_TO_U);
-                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos, aux3d.set(camPos).add(camDir), objPos, radius);
+                boolean intersect = Intersectord.checkIntersectSegmentSphere(camPos.tov3d(), aux3d.set(camPos).add(camDir), objPos.put(aux1d), radius);
                 if (intersect) {
                     // Use height
                     camDir.nor().scl(candidate.distToCamera - radius);
@@ -1186,7 +1189,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     process.render(null, camera, t, rc);
                 }
             }
-            rc.ppb.pp.getCombinedBuffer().getResultBuffer().getDepthBufferHandle();
         } catch (Exception e) {
         }
 

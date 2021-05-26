@@ -66,12 +66,14 @@ import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.openvr.Texture;
 import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
+import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
@@ -167,6 +169,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Provisional console logger
      */
     private ConsoleLogger clogger;
+
+    public InputMultiplexer inputMultiplexer;
 
     /**
      * The user interfaces
@@ -287,12 +291,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         window = graphics.getWindow();
 
         // Basic info
-        logger.info(GlobalConf.version.version, I18n.bundle.format("gui.build", GlobalConf.version.build));
+        logger.info(GlobalConf.version.version, I18n.txt("gui.build", GlobalConf.version.build));
         logger.info("Display mode", graphics.getWidth() + "x" + graphics.getHeight(), "Fullscreen: " + Gdx.graphics.isFullscreen());
         logger.info("Device", GL30.glGetString(GL30.GL_RENDERER));
-        logger.info(I18n.bundle.format("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
-        logger.info(I18n.bundle.format("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
-        logger.info("Java version", System.getProperty("java.version"), System.getProperty("java.vendor"));
+        logger.info(I18n.txt("notif.glversion", GL30.glGetString(GL30.GL_VERSION)));
+        logger.info(I18n.txt("notif.glslversion", GL30.glGetString(GL30.GL_SHADING_LANGUAGE_VERSION)));
+        logger.info(I18n.txt("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
 
         // Frame buffer map
         fbmap = new HashMap<>();
@@ -564,7 +568,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise input multiplexer to handle various input processors
         // The input multiplexer
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer = new InputMultiplexer();
         GuiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 

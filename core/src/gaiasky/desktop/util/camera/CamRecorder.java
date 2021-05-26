@@ -13,6 +13,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -86,13 +87,13 @@ public class CamRecorder implements IObserver {
         EventManager.instance.subscribe(this, Events.RECORD_CAMERA_CMD, Events.PLAY_CAMERA_CMD, Events.UPDATE_CAM_RECORDER, Events.STOP_CAMERA_PLAY);
     }
 
-    public void update(ITimeFrameProvider time, Vector3d position, Vector3d direction, Vector3d up) {
+    public void update(ITimeFrameProvider time, Vector3b position, Vector3d direction, Vector3d up) {
         switch (mode) {
             case RECORDING:
                 if (os != null) {
                     try {
                         os.append(Long.toString(time.getTime().toEpochMilli())).append(sep);
-                        os.append(Double.toString(position.x)).append(sep).append(Double.toString(position.y)).append(sep).append(Double.toString(position.z));
+                        os.append(Double.toString(position.x.doubleValue())).append(sep).append(Double.toString(position.y.doubleValue())).append(sep).append(Double.toString(position.z.doubleValue()));
                         os.append(sep).append(Double.toString(direction.x)).append(sep).append(Double.toString(direction.y)).append(sep).append(Double.toString(direction.z));
                         os.append(sep).append(Double.toString(up.x)).append(sep).append(Double.toString(up.y)).append(sep).append(Double.toString(up.z));
                         os.append("\n");
@@ -265,7 +266,7 @@ public class CamRecorder implements IObserver {
             case UPDATE_CAM_RECORDER:
                 // Update with current position
                 ITimeFrameProvider dt = (ITimeFrameProvider) data[0];
-                Vector3d pos = (Vector3d) data[1];
+                Vector3b pos = (Vector3b) data[1];
                 Vector3d dir = (Vector3d) data[2];
                 Vector3d up = (Vector3d) data[3];
                 update(dt, pos, dir, up);

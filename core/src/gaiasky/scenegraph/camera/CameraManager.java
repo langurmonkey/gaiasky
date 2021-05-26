@@ -20,6 +20,7 @@ import gaiasky.scenegraph.Planet;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -153,6 +154,7 @@ public class CameraManager implements ICamera, IObserver {
     private final Vector3d lastPos;
     private final Vector3d out;
     private final Vector3d in;
+    private final Vector3b inb;
     private final Vector3 vec;
     private final Vector3 v0;
     private final Vector3 v1;
@@ -182,6 +184,7 @@ public class CameraManager implements ICamera, IObserver {
         this.mode = mode;
         lastPos = new Vector3d();
         in = new Vector3d();
+        inb = new Vector3b();
         out = new Vector3d();
         vec = new Vector3();
         v0 = new Vector3();
@@ -256,7 +259,7 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getPos() {
+    public Vector3b getPos() {
         return current.getPos();
     }
 
@@ -266,7 +269,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getPreviousPos() {
+    public void setPos(Vector3b pos) {
+        current.setPos(pos);
+    }
+
+    @Override
+    public Vector3b getPreviousPos() {
         return current.getPreviousPos();
     }
 
@@ -276,7 +284,12 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public Vector3d getInversePos() {
+    public void setPreviousPos(Vector3b prevpos) {
+        current.setPreviousPos(prevpos);
+    }
+
+    @Override
+    public Vector3b getInversePos() {
         return current.getInversePos();
     }
 
@@ -367,8 +380,8 @@ public class CameraManager implements ICamera, IObserver {
         // Pointer
         vec.set(pointerX, pointerY, 0.5f);
         camera.getCamera().unproject(vec);
-        in.set(vec);
-        Coordinates.cartesianToSpherical(in, out);
+        inb.set(vec);
+        Coordinates.cartesianToSpherical(inb, out);
 
         double pointerRA = out.x * Nature.TO_DEG;
         double pointerDEC = out.y * Nature.TO_DEG;
@@ -376,8 +389,8 @@ public class CameraManager implements ICamera, IObserver {
         // View
         vec.set(viewX, viewY, 0.5f);
         camera.getCamera().unproject(vec);
-        in.set(vec);
-        Coordinates.cartesianToSpherical(in, out);
+        inb.set(vec);
+        Coordinates.cartesianToSpherical(inb, out);
 
         double viewRA = out.x * Nature.TO_DEG;
         double viewDEC = out.y * Nature.TO_DEG;
@@ -403,16 +416,15 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     /**
-     * Sets the new camera mode and updates the frustum
-     *
-     * @param mode
+     * Runs on each camera after a mode change.
      */
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
-        CameraMode previousMode = this.mode;
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode mode, boolean centerFocus, boolean postEvent) {
+        previousMode = this.mode;
+        previousCam = this.current;
         this.mode = mode;
         updateCurrentCamera(previousMode);
         for (ICamera cam : cameras) {
-            cam.updateMode(mode, centerFocus, postEvent);
+            cam.updateMode(previousCam, previousMode, mode, centerFocus, postEvent);
         }
 
         if (postEvent) {
@@ -428,7 +440,7 @@ public class CameraManager implements ICamera, IObserver {
                 boolean centerFocus = true;
                 if (data.length > 1)
                     centerFocus = (Boolean) data[1];
-                updateMode(cm, centerFocus, true);
+                updateMode(current, this.mode, cm, centerFocus, true);
                 break;
             case FOV_CHANGE_NOTIFICATION:
                 updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -506,18 +518,13 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
-        return current.isVisible(time, cb);
+    public boolean isVisible(CelestialBody cb) {
+        return current.isVisible(cb);
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, Vector3d pos) {
-        return current.isVisible(time, pos);
-    }
-
-    @Override
-    public boolean isVisible(ITimeFrameProvider time, double viewAngle, Vector3d pos, double distToCamera) {
-        return current.isVisible(time, viewAngle, pos, distToCamera);
+    public boolean isVisible(double viewAngle, Vector3d pos, double distToCamera) {
+        return current.isVisible(viewAngle, pos, distToCamera);
     }
 
     @Override

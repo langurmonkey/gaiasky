@@ -18,6 +18,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCDParser;
@@ -25,6 +26,7 @@ import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import gaiasky.util.units.Quantity.Length;
 import gaiasky.util.units.Quantity.Length.LengthUnit;
+import org.apfloat.Apfloat;
 import uk.ac.starlink.table.ColumnInfo;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
@@ -200,7 +202,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
     }
 
     private void addCluster(String[] names, double ra, double rarad, double dec, double decrad, double dist, double distpc, double mualphastar, double mudelta, double radvel, double radius, int nstars, Array<StarCluster> clusters){
-        Vector3d pos = Coordinates.sphericalToCartesian(rarad, decrad, dist, new Vector3d());
+        Vector3b pos = Coordinates.sphericalToCartesian(rarad, decrad, new Apfloat(dist, Constants.PREC), new Vector3b());
 
         Vector3d pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, Math.toRadians(ra), Math.toRadians(dec), distpc, new Vector3d());
 

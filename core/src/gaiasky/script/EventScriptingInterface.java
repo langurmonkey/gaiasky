@@ -43,6 +43,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
+import org.apfloat.Apfloat;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
@@ -81,12 +82,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return instance;
     }
 
-    private final Vector3d aux3d1;
-    private final Vector3d aux3d2;
-    private final Vector3d aux3d3;
-    private final Vector3d aux3d4;
-    private final Vector3d aux3d5;
-    private final Vector3d aux3d6;
+    private final Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
+    private final Vector3b aux3b1, aux3b2, aux3b3, aux3b4, aux3b5, aux3b6;
     private final Vector2d aux2d1;
 
     private final Set<AtomicBoolean> stops;
@@ -103,6 +100,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3d4 = new Vector3d();
         aux3d5 = new Vector3d();
         aux3d6 = new Vector3d();
+        aux3b1 = new Vector3b();
+        aux3b2 = new Vector3b();
+        aux3b3 = new Vector3b();
+        aux3b4 = new Vector3b();
+        aux3b5 = new Vector3b();
+        aux3b6 = new Vector3b();
         aux2d1 = new Vector2d();
 
         em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
@@ -222,10 +225,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 GaiaSky.postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
-                    double[] campos = GaiaSky.instance.cam.getPos().values();
-                    Vector3d dir = new Vector3d();
+                    double[] campos = GaiaSky.instance.cam.getPos().valuesd();
+                    Vector3b dir = new Vector3b();
                     focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
-                    double[] d = dir.nor().values();
+                    Apfloat[] b = dir.nor().values();
+                    double[] d = new double[] { b[0].doubleValue(), b[1].doubleValue(), b[2].doubleValue() };
                     em.post(Events.CAMERA_DIR_CMD, d);
                 });
                 // Make sure the last action is flushed
@@ -311,7 +315,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double[] getCameraPosition() {
-        Vector3d campos = GaiaSky.instance.cam.getPos();
+        Vector3d campos = GaiaSky.instance.cam.getPos().tov3d(aux3d1);
         return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
     }
 
@@ -386,12 +390,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Up to ecliptic north pole
             Vector3d up = new Vector3d(0, 1, 0).mul(Coordinates.eclToEq());
 
-            Vector3d focusPos = aux3d1;
+            Vector3b focusPos = aux3b1;
             focus.getAbsolutePosition(focusPos);
-            Vector3d otherPos = aux3d2;
+            Vector3b otherPos = aux3b2;
             other.getAbsolutePosition(otherPos);
 
-            Vector3d otherToFocus = aux3d3;
+            Vector3b otherToFocus = aux3b3;
             otherToFocus.set(focusPos).sub(otherPos).nor();
             Vector3d focusToOther = aux3d4.set(otherToFocus);
             focusToOther.scl(-dist).rotate(up, rotation);
@@ -590,12 +594,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean setObjectVisibility(String name, boolean visible) {
         SceneGraphNode obj = getObject(name);
-        if(obj == null){
-            logger.error("No object found with name '" + name +"'");
+        if (obj == null) {
+            logger.error("No object found with name '" + name + "'");
             return false;
         }
 
-        if(obj instanceof IVisibilitySwitch){
+        if (obj instanceof IVisibilitySwitch) {
             IVisibilitySwitch vs = obj;
             vs.setVisible(visible);
             return true;
@@ -608,12 +612,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean getObjectVisibility(String name) {
         SceneGraphNode obj = getObject(name);
-        if(obj == null){
-            logger.error("No object found with name '" + name +"'");
+        if (obj == null) {
+            logger.error("No object found with name '" + name + "'");
             return false;
         }
 
-        if(obj instanceof IVisibilitySwitch){
+        if (obj instanceof IVisibilitySwitch) {
             IVisibilitySwitch vs = obj;
             return vs.isVisible(true);
         } else {
@@ -683,12 +687,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsMaxNumber(long maxNumber) {
-        GlobalConf.scene.N_PM_STARS = maxNumber;
+        GlobalConf.scene.STAR_GROUP_N_VELVECS = (int) maxNumber;
     }
 
     @Override
     public long getProperMotionsMaxNumber() {
-        return GlobalConf.scene.N_PM_STARS;
+        return GlobalConf.scene.STAR_GROUP_N_VELVECS;
     }
 
     @Override
@@ -1229,12 +1233,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 /* target distance */
                 double target = 100 * Constants.M_TO_U;
 
-                object.getAbsolutePosition(aux3d1).add(cam.posinv).nor();
+                object.getAbsolutePosition(aux3b1).add(cam.posinv).nor();
                 Vector3d dir = cam.direction;
 
                 // Add forward movement while distance > target distance
                 boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
-                boolean viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
+                boolean viewNotMet = Math.abs(dir.angle(aux3b1)) < 90;
 
                 long prevtime = TimeUtils.millis();
                 while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
@@ -1272,22 +1276,22 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Roll till done
                 Vector3d up = cam.up;
                 // aux1 <- camera-object
-                object.getAbsolutePosition(aux3d1).sub(cam.pos);
-                double ang1 = up.angle(aux3d1);
-                double ang2 = up.cpy().rotate(cam.direction, 1).angle(aux3d1);
+                Vector3b camObj = object.getAbsolutePosition(aux3b1).sub(cam.pos);
+                double ang1 = up.angle(camObj);
+                double ang2 = up.cpy().rotate(cam.direction, 1).angle(camObj);
                 double rollsign = ang1 < ang2 ? -1d : 1d;
 
                 if (ang1 < 170) {
 
-                    rollAndWait(rollsign * 0.02d, 170d, 50L, cam, aux3d1, stop);
+                    rollAndWait(rollsign * 0.02d, 170d, 50L, cam, camObj, stop);
                     // STOP
                     cam.stopMovement();
 
-                    rollAndWait(rollsign * 0.006d, 176d, 50L, cam, aux3d1, stop);
+                    rollAndWait(rollsign * 0.006d, 176d, 50L, cam, camObj, stop);
                     // STOP
                     cam.stopMovement();
 
-                    rollAndWait(rollsign * 0.003d, 178d, 50L, cam, aux3d1, stop);
+                    rollAndWait(rollsign * 0.003d, 178d, 50L, cam, camObj, stop);
                 }
                 /*
                  * RESTORE
@@ -1400,14 +1404,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 GlobalConf.scene.CROSSHAIR_FOCUS = false;
 
                 // Get target position
-                Vector3d target = aux3d1;
+                Vector3b target = aux3b1;
                 planet.getPositionAboveSurface(longitude, latitude, 50, target);
 
                 // Get object position
-                Vector3d objectPosition = planet.getAbsolutePosition(aux3d2);
+                Vector3b objectPosition = planet.getAbsolutePosition(aux3b2);
 
                 // Check intersection with object
-                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
+                boolean intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), planet.getRadius());
 
                 if (intersects) {
                     cameraRotate(5d, 5d);
@@ -1416,8 +1420,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 while (intersects && (stop == null || !stop.get())) {
                     sleep(0.1f);
 
-                    objectPosition = planet.getAbsolutePosition(aux3d2);
-                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos, target, objectPosition, planet.getRadius());
+                    objectPosition = planet.getAbsolutePosition(aux3b2);
+                    intersects = Intersectord.checkIntersectSegmentSphere(cam.pos.tov3d(aux3d3), target.tov3d(aux3d1), objectPosition.tov3d(aux3d2), planet.getRadius());
                 }
 
                 cameraStop();
@@ -1451,7 +1455,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3d camobj, AtomicBoolean stop) {
+    private void rollAndWait(double roll, double target, long sleep, NaturalCamera cam, Vector3b camobj, AtomicBoolean stop) {
         // Apply roll and wait
         double ang = cam.up.angle(camobj);
 
@@ -1473,9 +1477,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         SceneGraphNode sgn = getObject(name);
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
-            if (obj instanceof ParticleGroup){
-                var pos = obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
-                return pos.sub(GaiaSky.instance.getICamera().getPos()).len() * Constants.U_TO_KM;
+            if (obj instanceof ParticleGroup) {
+                var pos = obj.getAbsolutePosition(name.toLowerCase(), aux3b1);
+                return pos.sub(GaiaSky.instance.getICamera().getPos()).lend() * Constants.U_TO_KM;
             } else {
                 return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;
             }
@@ -1507,7 +1511,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         SceneGraphNode sgn = getObject(name);
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
-            obj.getAbsolutePosition(name.toLowerCase(), aux3d1);
+            obj.getAbsolutePosition(name.toLowerCase(), aux3b1);
             return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
         }
         return null;
@@ -1859,7 +1863,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.lock = new Object();
 
             // Set up interpolators
-            posl = getPathd(cam.getPos(), pos);
+            posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
             dirl = getPathd(cam.getDirection(), dir);
             upl = getPathd(cam.getUp(), up);
 
@@ -2059,10 +2063,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
-        Vector3d in = aux3d1.set(x, y, z);
+        Vector3b in = aux3b1.set(x, y, z);
         Vector3d out = aux3d2;
         Coordinates.cartesianToSpherical(in, out);
-        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.len() };
+        return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lend() };
     }
 
     @Override

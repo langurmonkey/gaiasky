@@ -20,6 +20,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.Pair;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import net.jafama.FastMath;
@@ -300,11 +301,11 @@ public class OctreeNode implements ILineRenderable {
 
     public boolean insert(SceneGraphNode e, int level) {
         int node = 0;
-        if (e.getPosition().y > min.y + ((max.y - min.y) / 2))
+        if (e.getPosition().y.doubleValue() > min.y + ((max.y - min.y) / 2))
             node += 4;
-        if (e.getPosition().z > min.z + ((max.z - min.z) / 2))
+        if (e.getPosition().z.doubleValue() > min.z + ((max.z - min.z) / 2))
             node += 2;
-        if (e.getPosition().x > min.x + ((max.x - min.x) / 2))
+        if (e.getPosition().x.doubleValue() > min.x + ((max.x - min.x) / 2))
             node += 1;
         if (level == this.depth + 1) {
             return children[node].add(e);
@@ -535,7 +536,7 @@ public class OctreeNode implements ILineRenderable {
      * @param roulette        List where the nodes to be processed are to be added.
      * @param opacity         The opacity to set.
      */
-    public void update(Vector3d parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
+    public void update(Vector3b parentTransform, ICamera cam, List<SceneGraphNode> roulette, float opacity) {
         this.opacity = opacity;
         this.observed = false;
 

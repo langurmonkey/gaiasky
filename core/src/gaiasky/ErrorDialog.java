@@ -16,11 +16,12 @@ import gaiasky.util.GlobalConf;
 
 public class ErrorDialog implements ApplicationListener {
 
-    private String title, message;
+    private Exception cause;
+    private String message;
     private Stage ui;
 
-    public ErrorDialog(String title, String message) {
-        this.title = title;
+    public ErrorDialog(Exception cause, String message) {
+        this.cause = cause;
         this.message = message;
     }
 
@@ -39,8 +40,9 @@ public class ErrorDialog implements ApplicationListener {
         t.setFillParent(true);
         ui.addActor(t);
 
-        Label l = new Label(message, skin, "ui-19");
-        Button b = new TextButton("Close", skin, "big");
+        Label msg = new Label(message, skin, "ui-15");
+        Label ex = new Label("Error: " + cause.getLocalizedMessage(), skin, "ui-15");
+        Button b = new TextButton("Close", skin, "default");
         b.addListener((event) -> {
             if(event instanceof ChangeListener.ChangeEvent){
                 Gdx.app.exit();
@@ -48,7 +50,8 @@ public class ErrorDialog implements ApplicationListener {
             return true;
         });
         b.pad(10);
-        t.add(l).center().padBottom(30).row();
+        t.add(ex).center().padBottom(30).row();
+        t.add(msg).center().padBottom(30).row();
         t.add(b).center().row();
 
         Gdx.input.setInputProcessor(ui);

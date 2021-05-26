@@ -31,10 +31,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
-import gaiasky.util.math.Frustumd;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Quaterniond;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.ArrayList;
@@ -43,9 +40,8 @@ import java.util.List;
 
 /**
  * The field of view cameras.
- * 
- * @author Toni Sagrista
  *
+ * @author Toni Sagrista
  */
 public class FovCamera extends AbstractCamera implements IObserver {
     private static final float FOV_CORR = 0.2f;
@@ -157,16 +153,19 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     public void update(double dt, ITimeFrameProvider time) {
-        distance = pos.len();
+        // Proximity
+        proximity.clear();
+
+        distance = pos.lend();
 
         up.set(0, 1, 0);
 
         /** POSITION **/
         SceneGraphNode fccopy = gaia.getLineCopy();
-        fccopy.getRoot().translation.set(0f, 0f, 0f);
+        fccopy.getRoot().translation.setZero();
         fccopy.getRoot().update(time, null, this);
 
-        this.pos.set(fccopy.translation);
+        fccopy.translation.put(this.pos);
         this.posinv.set(this.pos).scl(-1);
 
         /** ORIENTATION - directions and up **/
@@ -193,7 +192,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     /**
      * Updates both FOVs' directions applying the right transformation.
-     * 
+     *
      * @param time
      */
     public void updateDirections(ITimeFrameProvider time) {
@@ -223,7 +222,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     /**
      * Updates the given camera using the given direction and up vectors. Sets
      * the position to zero.
-     * 
+     *
      * @param dir
      * @param up
      * @param cam
@@ -252,7 +251,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public PerspectiveCamera getCamera() {
         switch (parent.mode) {
-            case GAIA_FOV2_MODE:
+        case GAIA_FOV2_MODE:
             return camera2;
         default:
             return camera;
@@ -301,7 +300,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
     }
 
     @Override
@@ -354,11 +353,11 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public boolean isVisible(ITimeFrameProvider time, CelestialBody cb) {
+    public boolean isVisible(CelestialBody cb) {
         switch (parent.mode) {
         case GAIA_FOV1_MODE:
         case GAIA_FOV2_MODE:
-            return super.isVisible(time, cb);
+            return super.isVisible(cb);
         case GAIA_FOVS_MODE:
             return computeVisibleFovs(cb, this);
         default:

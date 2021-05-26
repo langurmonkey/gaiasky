@@ -44,10 +44,7 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.Intersectord;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.math.Quaterniond;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -98,11 +95,11 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         this.pmSph = new Vector3();
     }
 
-    public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
+    public StarCluster(String[] names, String parentName, Vector3b pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars) {
         this(names, parentName, pos, pm, posSph, pmSph, raddeg, nstars, new float[] { 0.93f, 0.93f, 0.3f, 1f });
     }
 
-    public StarCluster(String[] names, String parentName, Vector3d pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
+    public StarCluster(String[] names, String parentName, Vector3b pos, Vector3d pm, Vector3d posSph, Vector3 pmSph, double raddeg, int nstars, float[] color) {
         this();
         this.parentName = parentName;
         this.setNames(names);
@@ -135,10 +132,10 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
         mc = new ModelComponent(false);
         mc.initialize();
-        mc.dLight = new DirectionalLight();
-        mc.dLight.set(1, 1, 1, 1, 1, 1);
+        DirectionalLight dLight = new DirectionalLight();
+        dLight.set(1, 1, 1, 1, 1, 1);
         mc.env = new Environment();
-        mc.env.add(mc.dLight);
+        mc.env.add(dLight);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
         mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
         mc.instance = new IntModelInstance(model, modelTransform);
@@ -232,7 +229,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     @Override
-    public Vector3d getAbsolutePosition(Vector3d aux) {
+    public Vector3b getAbsolutePosition(Vector3b aux) {
         aux.set(pos);
         Vector3d pmv = aux3d2.get().set(pm).scl(ySinceEpoch);
         aux.add(pmv);
@@ -409,11 +406,11 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
         if (isActive()) {
             Vector3 pos = aux3f1.get();
-            Vector3d aux = aux3d1.get();
-            Vector3d posd = getAbsolutePosition(aux).add(camera.posinv);
-            pos.set(posd.valuesf());
+            Vector3b aux = aux3b1.get();
+            Vector3b posb = getAbsolutePosition(aux).add(camera.posinv);
+            pos.set(posb.valuesf());
 
-            if (camera.direction.dot(posd) > 0) {
+            if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us
                 // Diminish the size of the star
                 // when we are close by
@@ -450,15 +447,15 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (isActive()) {
-            Vector3d aux = aux3d1.get();
-            Vector3d posd = getAbsolutePosition(aux).add(camera.getInversePos());
+            Vector3b aux = aux3b1.get();
+            Vector3b posb = getAbsolutePosition(aux).add(camera.getInversePos());
 
-            if (camera.direction.dot(posd) > 0) {
+            if (camera.direction.dot(posb) > 0) {
                 // The star is in front of us
                 // Diminish the size of the star
                 // when we are close by
-                double dist = posd.len();
-                double distToLine = Intersectord.distanceLinePoint(p0, p1, posd);
+                double dist = posb.lend();
+                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.tov3d(aux3d2.get()));
                 double value = distToLine / dist;
 
                 if (value < 0.01) {
@@ -493,7 +490,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     }
 
     @Override
-    public Vector3d getClosestAbsolutePos(Vector3d out) {
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         return getAbsolutePosition(out);
     }
 

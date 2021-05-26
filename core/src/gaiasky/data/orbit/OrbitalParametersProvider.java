@@ -57,26 +57,26 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                 data.period = period;
 
                 // Step time in days, a full period over number of samples starting at epoch
-                double t_step = period / (parameter.numSamples - 1);
-                double t = 0;
+                double t_step = period / (parameter.numSamples - 1.0);
+                double t = 0.0;
 
                 for (int n = 0; n < parameter.numSamples; n++) {
                     // 1
-                    double deltat = t * Nature.D_TO_S;
-                    double M = M0 + deltat * Math.sqrt(mu / Math.pow(a, 3d));
+                    double dt = t * Nature.D_TO_S;
+                    double M = M0 + dt * Math.sqrt(mu / Math.pow(a, 3.0));
 
                     // 2
                     double E = M;
                     for (int j = 0; j < 2; j++) {
-                        E = E - ((E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)));
+                        E = E - ((E - e * Math.sin(E) - M) / (1.0 - e * Math.cos(E)));
                     }
                     double E_t = E;
 
                     // 3
-                    double nu_t = 2d * Math.atan2(Math.sqrt(1d + e) * Math.sin(E_t / 2d), Math.sqrt(1d - e) * Math.cos(E_t / 2d));
+                    double nu_t = 2.0 * Math.atan2(Math.sqrt(1.0 + e) * Math.sin(E_t / 2.0), Math.sqrt(1.0 - e) * Math.cos(E_t / 2.0));
 
                     // 4
-                    double rc_t = a * (1d - e * Math.cos(E_t));
+                    double rc_t = a * (1.0 - e * Math.cos(E_t));
 
                     // 5
                     double ox = rc_t * Math.cos(nu_t);
@@ -135,9 +135,9 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
             double f = params.e * params.semimajoraxis;
             double b = Math.sqrt(Math.pow(a, 2) - Math.pow(f, 2));
 
-            int nsamples = Math.min(Math.max(50, (int) (a * 0.01)), 100);
-            double step = 360d / nsamples;
-            Vector3d[] samples = new Vector3d[nsamples + 1];
+            int nSamples = Math.min(Math.max(50, (int) (a * 0.01)), 100);
+            double step = 360d / nSamples;
+            Vector3d[] samples = new Vector3d[nSamples + 1];
             int i = 0;
             for (double angledeg = 0; angledeg < 360; angledeg += step) {
                 double angleRad = Math.toRadians(angledeg);

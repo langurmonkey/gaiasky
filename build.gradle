@@ -29,6 +29,7 @@ allprojects {
         jsampVersion = "+"
         sdl2gdxVersion = "1.0.+"
         jsoupVersion = "+"
+        apfloatVersion = "1.9.1"
     }
 
     repositories {
@@ -133,6 +134,8 @@ project(":core") {
         api "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxcontrollersVersion"
 
         api "org.astrogrid:jsamp:$jsampVersion"
+        api group: "org.apfloat", name: "apfloat", version: "$apfloatVersion"
+
 
         // *****************
         // OTHER SERVER DEPS

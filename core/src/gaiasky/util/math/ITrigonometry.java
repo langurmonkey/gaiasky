@@ -24,4 +24,6 @@ public interface ITrigonometry {
 
     double atan(double angle);
 
+    double atan2(double y, double x);
+
 }

@@ -17,8 +17,10 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
+import org.apfloat.Apfloat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -93,8 +95,8 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                             CelestialBody g;
                             if (img == null || img.isEmpty()) {
                                 // Regular shaded light point
-                                double dist = distMpc * Constants.MPC_TO_U;
-                                Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3d());
+                                Apfloat dist = new Apfloat(distMpc * Constants.MPC_TO_U, Constants.PREC);
+                                Vector3b pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3b());
                                 float colorbv = 0;
                                 float absmag = (float) (kmag - 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
 

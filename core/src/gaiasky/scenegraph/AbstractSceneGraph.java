@@ -13,6 +13,7 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
@@ -38,7 +39,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** Does it contain a star group **/
     protected boolean hasStarGroup;
 
-    private final Vector3d aux3d1;
+    private final Vector3b aux3b1;
 
     public AbstractSceneGraph() {
         // Id = -1 for root
@@ -48,7 +49,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         // Objects per thread
         objectsPerThread = new int[1];
 
-        aux3d1 = new Vector3d();
+        aux3b1 = new Vector3b();
     }
 
     /**
@@ -352,10 +353,10 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
                 SceneGraphNode object = sg.getNode(name);
                 if (object instanceof IFocus) {
                     IFocus obj = (IFocus) object;
-                    obj.getAbsolutePosition(name, aux3d1);
-                    out[0] = aux3d1.x;
-                    out[1] = aux3d1.y;
-                    out[2] = aux3d1.z;
+                    obj.getAbsolutePosition(name, aux3b1);
+                    out[0] = aux3b1.x.doubleValue();
+                    out[1] = aux3b1.y.doubleValue();
+                    out[2] = aux3b1.z.doubleValue();
                     return out;
                 }
             }

@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalConf;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -96,13 +97,14 @@ public class RelativisticCamera extends AbstractCamera {
     @Override
     public void update(double dt, ITimeFrameProvider time) {
         // TODO Auto-generated method stub
+        // Proximity
+        proximity.clear();
 
     }
 
     @Override
-    public void updateMode(CameraMode mode, boolean centerFocus, boolean postEvent) {
+    public void updateMode(ICamera previousCam, CameraMode previousMode, CameraMode newMode, boolean centerFocus, boolean postEvent) {
         // TODO Auto-generated method stub
-
     }
 
     @Override

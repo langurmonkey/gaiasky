@@ -118,7 +118,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
                 tempVerts[curr.vertexIdx + sizeOffset] = (float) cb.getRadius();
 
                 // POSITION
-                aux.set((float) cb.pos.x, (float) cb.pos.y, (float) cb.pos.z);
+                aux.set(cb.pos.x.floatValue(), cb.pos.y.floatValue(), cb.pos.z.floatValue());
                 final int idx = curr.vertexIdx;
                 tempVerts[idx] = aux.x;
                 tempVerts[idx + 1] = aux.y;

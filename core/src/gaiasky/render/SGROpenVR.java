@@ -289,10 +289,10 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
         // Update main camera
         if (cam != null) {
-            cam.vroffset.set(pos).scl(Constants.M_TO_U);
+            cam.vrOffset.set(pos).scl(Constants.M_TO_U);
             cam.direction.set(dir);
             cam.up.set(up);
-            rc.vroffset = cam.vroffset;
+            rc.vroffset = cam.vrOffset;
         }
 
         // Update Eye camera

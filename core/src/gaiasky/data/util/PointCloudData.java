@@ -6,6 +6,7 @@
 package gaiasky.data.util;
 
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
@@ -121,6 +122,9 @@ public class PointCloudData {
     public void loadPoint(Vector3d v, int index) {
         v.set(x.get(index), y.get(index), z.get(index));
     }
+    public void loadPoint(Vector3b v, int index) {
+        v.set(x.get(index), y.get(index), z.get(index));
+    }
 
     public Instant loadTime(int index) {
         return time.get(index);
@@ -204,6 +208,9 @@ public class PointCloudData {
     public boolean loadPoint(Vector3d v, Instant instant) {
         return loadPoint(v, instant.toEpochMilli());
     }
+    public boolean loadPoint(Vector3b v, Instant instant) {
+        return loadPoint(v, instant.toEpochMilli());
+    }
 
     /**
      * Returns a vector with the data point at the given time. It uses linear
@@ -214,6 +221,29 @@ public class PointCloudData {
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, long timeMs) {
+        // Data is sorted
+        int idx = binarySearch(time, timeMs);
+
+        if (idx < 0 || idx >= time.size()) {
+            // No data for this time
+            return false;
+        }
+
+        if (time.get(idx).toEpochMilli() == timeMs) {
+            v.set(x.get(idx), y.get(idx), z.get(idx));
+        } else {
+            // Interpolate
+            loadPoint(v0, idx);
+            loadPoint(v1, idx + 1);
+            Instant t0 = time.get(idx);
+            Instant t1 = time.get(idx + 1);
+
+            double scl = (double) (timeMs - t0.toEpochMilli()) / (t1.toEpochMilli() - t0.toEpochMilli());
+            v.set(v1.sub(v0).scl(scl).add(v0));
+        }
+        return true;
+    }
+    public boolean loadPoint(Vector3b v, long timeMs) {
         // Data is sorted
         int idx = binarySearch(time, timeMs);
 
