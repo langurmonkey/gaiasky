@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.render.ComponentTypes;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
@@ -17,7 +18,14 @@ import gaiasky.util.tree.OctreeNode;
  * Holds information on the order and properties of nearby particles to the camera.
  */
 public class Proximity {
+    // Default number of proximity entries
     private static final int DEFAULT_SIZE = 4;
+
+    // proximity record type
+    private static byte TYPE_UNDEFINED = -1;
+    private static byte TYPE_STAR = 0;
+    private static byte TYPE_STAR_GROUP = 1;
+    private static byte TYPE_OTHER = 2;
 
     public NearbyRecord[] array;
 
@@ -128,8 +136,7 @@ public class Proximity {
                 // Already in
                 return false;
             } else if (object.getName().equalsIgnoreCase(record.name)) {
-                // Update
-
+                // This should not happen!
             } else if (object.getClosestDistToCamera() < record.distToCamera) {
                 // Insert
                 insert(i, object, camera);
@@ -138,6 +145,14 @@ public class Proximity {
             i++;
         }
         return false;
+    }
+
+    private byte getType(IFocus f) {
+        if (f instanceof Star) {
+            return TYPE_STAR;
+        } else {
+            return TYPE_OTHER;
+        }
     }
 
     public void clear() {
@@ -154,6 +169,7 @@ public class Proximity {
         c.radius = pr.radius();
         c.distToCamera = c.pos.len() - c.radius;
         c.name = pr.names()[0];
+        c.type = TYPE_STAR_GROUP;
 
         Color col = new Color();
         Color.abgr8888ToColor(col, pr.col());
@@ -174,6 +190,7 @@ public class Proximity {
         c.radius = focus.getRadius();
         c.distToCamera = focus.getClosestDistToCamera();
         c.name = focus.getName();
+        c.type = getType(focus);
 
         float[] col = focus.getColor();
         c.col[0] = col[0];
@@ -188,12 +205,29 @@ public class Proximity {
         public Vector3d pos, pm, absolutePos;
         public float[] col;
         public String name;
+        public byte type = TYPE_UNDEFINED;
 
         public NearbyRecord() {
             pos = new Vector3d();
             pm = new Vector3d();
             absolutePos = new Vector3d();
             col = new float[4];
+        }
+
+        public boolean isStar() {
+            return type == TYPE_STAR;
+        }
+
+        public boolean isStarGroup() {
+            return type == TYPE_STAR_GROUP;
+        }
+
+        public boolean isOther() {
+            return type == TYPE_OTHER;
+        }
+
+        public boolean isUndefined() {
+            return type == TYPE_UNDEFINED;
         }
 
         @Override
