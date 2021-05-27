@@ -875,14 +875,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // Dynamic resolution
             float fps = 1f / graphics.getDeltaTime();
             if (!lowResolution && fps < 20) {
-                // Set to low rez
+                // Downscale
                 GlobalConf.screen.BACKBUFFER_SCALE = 0.6f;
                 resize(graphics.getWidth(), graphics.getHeight());
                 postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true, true));
                 lowResolution = true;
                 lastResolutionChange = TimeUtils.millis();
             } else if (lowResolution && fps > 60) {
-                // Set to high rez
+                // Set to regular resolution
                 GlobalConf.screen.BACKBUFFER_SCALE = 1f;
                 postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true, true));
                 lowResolution = false;
