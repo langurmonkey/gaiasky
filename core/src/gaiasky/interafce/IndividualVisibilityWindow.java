@@ -69,8 +69,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         buttonGroup.setMinCheckCount(1);
         buttonGroup.setMaxCheckCount(1);
 
-        content.add(buttonTable).left().padBottom(pad10).row();
-        elementsCell = content.add().left();
+        content.add(buttonTable).top().left().padBottom(pad10).row();
+        elementsCell = content.add().top().left();
 
         ComponentType[] visibilityEntities = ComponentType.values();
         if (visibilityEntities != null) {
@@ -104,13 +104,9 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                             // Change content only when button is checked!
                             Group elementsList = visibilitySwitcher(ct, TextUtils.capitalise(ct.getName()), ct.getName());
                             elementsCell.clearActor();
-
-                            if (elementsList == null) {
-                                elementsCell.setActor(new OwnLabel(I18n.txt("gui.elements.type.none"), skin));
-                            } else {
-                                elementsCell.setActor(elementsList);
-                            }
+                            elementsCell.setActor(elementsList);
                             content.pack();
+                            pack();
                             currentComponentType = name;
                             return true;
                         }
@@ -156,32 +152,36 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         }
         names.sort();
 
-        for (String name : names) {
-            HorizontalGroup objectHgroup = new HorizontalGroup();
-            objectHgroup.space(space4);
-            objectHgroup.left();
-            OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
-            IVisibilitySwitch obj = cMap.get(name);
-            cb.setChecked(obj.isVisible(true));
+        if(names.isEmpty()){
+            objectsGroup.addActor(new OwnLabel(I18n.txt("gui.elements.type.none"), skin));
+        } else {
+            for (String name : names) {
+                HorizontalGroup objectHgroup = new HorizontalGroup();
+                objectHgroup.space(space4);
+                objectHgroup.left();
+                OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
+                IVisibilitySwitch obj = cMap.get(name);
+                cb.setChecked(obj.isVisible(true));
 
-            cb.addListener((event) -> {
-                if (event instanceof ChangeListener.ChangeEvent && cMap.containsKey(name)) {
-                    GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, cb.isChecked(), true));
-                    return true;
+                cb.addListener((event) -> {
+                    if (event instanceof ChangeListener.ChangeEvent && cMap.containsKey(name)) {
+                        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, cb.isChecked(), true));
+                        return true;
+                    }
+                    return false;
+                });
+
+                objectHgroup.addActor(cb);
+                // Tooltips
+                if (obj.getDescription() != null) {
+                    ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
+                    meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
+                    objectHgroup.addActor(meshDescTooltip);
                 }
-                return false;
-            });
 
-            objectHgroup.addActor(cb);
-            // Tooltips
-            if (obj.getDescription() != null) {
-                ImageButton meshDescTooltip = new OwnImageButton(skin, "tooltip");
-                meshDescTooltip.addListener(new OwnTextTooltip((obj.getDescription() == null || obj.getDescription().isEmpty() ? "No description" : obj.getDescription()), skin));
-                objectHgroup.addActor(meshDescTooltip);
+                objectsGroup.addActor(objectHgroup);
+                cbs.add(cb);
             }
-
-            objectsGroup.addActor(objectHgroup);
-            cbs.add(cb);
         }
 
         objectsGroup.pack();
@@ -191,7 +191,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
 
-        scrollPane.setHeight(Math.min(360f, objectsGroup.getHeight()));
+        scrollPane.setHeight(360f);
         scrollPane.setWidth(componentWidth);
 
         HorizontalGroup buttons = new HorizontalGroup();
@@ -228,7 +228,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         group.addActor(scrollPane);
         group.addActor(buttons);
 
-        return objects.size == 0 ? null : group;
+        return group;
     }
 
     /**
