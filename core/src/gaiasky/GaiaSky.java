@@ -160,8 +160,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // Registry
     private GuiRegistry guiRegistry;
 
-    // Dynamic resolution scaling
-    private final boolean dynamicResolutionScaling = false;
+    // Dynamic resolution state
     private boolean lowResolution = false;
     private long lastResolutionChange = 0;
 
@@ -872,7 +871,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         if (GlobalConf.screen.LIMIT_FPS > 0.0) {
             sleep(GlobalConf.screen.LIMIT_FPS);
-        } else if (dynamicResolutionScaling && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastResolutionChange > 2000 && !GlobalConf.runtime.OPENVR) {
+        } else if (GlobalConf.screen.DYNAMIC_RESOLUTION && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastResolutionChange > 2000 && !GlobalConf.runtime.OPENVR) {
             // Dynamic resolution
             float fps = 1f / graphics.getDeltaTime();
             if (!lowResolution && fps < 20) {
@@ -1072,9 +1071,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Update cameras
         cam.update(dtGs, time);
-
-        // Precompute isOn for all stars and galaxies
-        Particle.renderOn = isOn(ComponentType.Stars);
 
         // Update GravWaves params
         RelativisticEffectsManager.getInstance().update(time, cam.current);

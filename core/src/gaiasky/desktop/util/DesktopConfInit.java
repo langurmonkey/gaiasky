@@ -364,6 +364,7 @@ public class DesktopConfInit extends ConfInit {
         int SCREEN_WIDTH = Parser.parseInt(p.getProperty("graphics.screen.width"));
         int SCREEN_HEIGHT = Parser.parseInt(p.getProperty("graphics.screen.height"));
         double BACKBUFFER_SCALE = Parser.parseDouble(p.getProperty("graphics.backbuffer.scale", "1.0"));
+        boolean DYNAMIC_RESOLUTION = Parser.parseBoolean(p.getProperty("graphics.dynamic.resolution", "false"));
         int FULLSCREEN_WIDTH = Parser.parseInt(p.getProperty("graphics.screen.fullscreen.width"));
         int FULLSCREEN_HEIGHT = Parser.parseInt(p.getProperty("graphics.screen.fullscreen.height"));
         boolean FULLSCREEN = Parser.parseBoolean(p.getProperty("graphics.screen.fullscreen"));
@@ -372,7 +373,7 @@ public class DesktopConfInit extends ConfInit {
         double LIMIT_FPS = Parser.parseDouble(p.getProperty("graphics.limit.fps", "0.0"));
         boolean SCREEN_OUTPUT = Parser.parseBoolean(p.getProperty("graphics.screen.screenoutput"));
         ScreenConf screenConf = new ScreenConf();
-        screenConf.initialize(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, FULLSCREEN, RESIZABLE, VSYNC, SCREEN_OUTPUT, LIMIT_FPS, BACKBUFFER_SCALE);
+        screenConf.initialize(SCREEN_WIDTH, SCREEN_HEIGHT, FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT, FULLSCREEN, RESIZABLE, VSYNC, SCREEN_OUTPUT, LIMIT_FPS, BACKBUFFER_SCALE, DYNAMIC_RESOLUTION);
 
         // SCREENSHOT CONF
         String screenshotFolder;

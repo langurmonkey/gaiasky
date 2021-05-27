@@ -826,7 +826,10 @@ public class GlobalConf {
 
         public int SCREEN_WIDTH;
         public int SCREEN_HEIGHT;
+        // Here be dragons! Unstable!
         public double BACKBUFFER_SCALE = 1.0;
+        // Here be dragons! Unstable!
+        public boolean DYNAMIC_RESOLUTION = false;
         public int BACKBUFFER_WIDTH;
         public int BACKBUFFER_HEIGHT;
         public int FULLSCREEN_WIDTH;
@@ -841,7 +844,7 @@ public class GlobalConf {
             EventManager.instance.subscribe(this, Events.LIMIT_FPS_CMD);
         }
 
-        public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS, double bACKBUFFER_SCALE) {
+        public void initialize(int sCREEN_WIDTH, int sCREEN_HEIGHT, int fULLSCREEN_WIDTH, int fULLSCREEN_HEIGHT, boolean fULLSCREEN, boolean rESIZABLE, boolean vSYNC, boolean sCREEN_OUTPUT, double lIMIT_FPS, double bACKBUFFER_SCALE, boolean dYNAMIC_RESOLUTION) {
             BACKBUFFER_SCALE = bACKBUFFER_SCALE;
             SCREEN_WIDTH = sCREEN_WIDTH;
             SCREEN_HEIGHT = sCREEN_HEIGHT;
@@ -854,6 +857,7 @@ public class GlobalConf {
             VSYNC = vSYNC;
             SCREEN_OUTPUT = sCREEN_OUTPUT;
             LIMIT_FPS = lIMIT_FPS;
+            DYNAMIC_RESOLUTION = dYNAMIC_RESOLUTION;
         }
 
         public int getScreenWidth() {

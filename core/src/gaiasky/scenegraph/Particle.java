@@ -106,11 +106,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     /**
-     * Must be updated every cycle
-     **/
-    public static boolean renderOn = false;
-
-    /**
      * Proper motion in cartesian coordinates [U/yr]
      **/
     public Vector3 pm;
@@ -265,7 +260,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        if (renderOn) {
+        if(shouldRender()) {
             SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
             return true;
         }
