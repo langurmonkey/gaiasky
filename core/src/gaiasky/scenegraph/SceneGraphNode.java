@@ -720,6 +720,10 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return ct;
     }
 
+    public boolean hasCt(ComponentType ct){
+       return ct != null && this.ct.isEnabled(ct);
+    }
+
     /**
      * Gets the number of nodes contained in this node, including itself
      *

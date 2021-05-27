@@ -5,6 +5,12 @@
 
 package gaiasky.scenegraph;
 
+import gaiasky.render.ComponentTypes;
+
+/**
+ * This interface must be implemented by all objects whose visibility
+ * can be manipulated using the per-object visibility controls.
+ */
 public interface IVisibilitySwitch {
     String getName();
 
@@ -18,4 +24,6 @@ public interface IVisibilitySwitch {
     boolean isVisible(boolean attributeValue);
 
     void setVisible(boolean visible);
+
+    boolean hasCt(ComponentTypes.ComponentType ct);
 }

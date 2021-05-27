@@ -19,10 +19,8 @@ import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This window controls the visibility of individual objects
@@ -34,6 +32,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     protected Cell elementsCell;
     // Component type currently selected
     protected String currentComponentType = null;
+    protected ComponentType currentCt = null;
+    protected Map<String, CheckBox> cbMap;
 
     public IndividualVisibilityWindow(ISceneGraph sg, Stage stage, Skin skin) {
         super(I18n.txt("gui.visibility.individual"), skin, stage);
@@ -42,6 +42,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         space8 = 12.8f;
         space4 = 6.4f;
         space2 = 3.2f;
+
+        cbMap = new HashMap<>();
 
         setAcceptText(I18n.txt("gui.close"));
         setModal(false);
@@ -106,8 +108,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                             elementsCell.clearActor();
                             elementsCell.setActor(elementsList);
                             content.pack();
-                            pack();
                             currentComponentType = name;
+                            currentCt = ct;
                             return true;
                         }
                         return false;
@@ -132,6 +134,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     }
 
     private Group visibilitySwitcher(ComponentType ct, String title, String id) {
+
         float componentWidth = 400f;
         VerticalGroup objectsGroup = new VerticalGroup();
         objectsGroup.space(space4);
@@ -141,18 +144,19 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         List<OwnCheckBox> cbs = new ArrayList<>();
         sg.getRoot().getChildrenByComponentType(ct, objects);
         Array<String> names = new Array<>(false, objects.size);
-        Map<String, IVisibilitySwitch> cMap = new HashMap<>();
+        Map<String, IVisibilitySwitch> objMap = new HashMap<>();
+        cbMap.clear();
 
         for (SceneGraphNode object : objects) {
             // Omit stars with no proper names
             if (object.getName() != null && !GlobalResources.isNumeric(object.getName()) && !exception(ct, object)) {
                 names.add(object.getName());
-                cMap.put(object.getName(), object);
+                objMap.put(object.getName(), object);
             }
         }
         names.sort();
 
-        if(names.isEmpty()){
+        if (names.isEmpty()) {
             objectsGroup.addActor(new OwnLabel(I18n.txt("gui.elements.type.none"), skin));
         } else {
             for (String name : names) {
@@ -160,11 +164,12 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 objectHgroup.space(space4);
                 objectHgroup.left();
                 OwnCheckBox cb = new OwnCheckBox(name, skin, space4);
-                IVisibilitySwitch obj = cMap.get(name);
+                IVisibilitySwitch obj = objMap.get(name);
                 cb.setChecked(obj.isVisible(true));
+                cbMap.put(name, cb);
 
                 cb.addListener((event) -> {
-                    if (event instanceof ChangeListener.ChangeEvent && cMap.containsKey(name)) {
+                    if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
                         GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, cb.isChecked(), true));
                         return true;
                     }
@@ -257,8 +262,20 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     public void notify(Events event, Object... data) {
 
         if (event == Events.PER_OBJECT_VISIBILITY_CMD) {
-            // Reload
-            build();
+            IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
+            boolean checked = (Boolean) data[1];
+            boolean ui = (Boolean) data[2];
+            if(!ui){
+                // Update checkbox if necessary
+                if(currentCt != null && obj.hasCt(currentCt)){
+                    CheckBox cb = cbMap.get(obj);
+                    if(cb != null){
+                        cb.setProgrammaticChangeEvents(false);
+                        cb.setChecked(checked);
+                        cb.setProgrammaticChangeEvents(true);
+                    }
+                }
+            }
         }
 
     }
