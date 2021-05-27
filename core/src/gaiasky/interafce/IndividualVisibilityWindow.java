@@ -265,11 +265,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
             boolean checked = (Boolean) data[1];
             boolean ui = (Boolean) data[2];
-            if(!ui){
+            if (!ui) {
                 // Update checkbox if necessary
-                if(currentCt != null && obj.hasCt(currentCt)){
+                if (currentCt != null && obj.hasCt(currentCt)) {
                     CheckBox cb = cbMap.get(obj);
-                    if(cb != null){
+                    if (cb != null) {
                         cb.setProgrammaticChangeEvents(false);
                         cb.setChecked(checked);
                         cb.setProgrammaticChangeEvents(true);
