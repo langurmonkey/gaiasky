@@ -47,6 +47,7 @@
 
 ## Translations
 
+-  [Georgi Georgiev (Жоро)](mailto:g.georgiev.shumen@gmail.com) for the Bulgarian translation
 -  [Stefan Jordan](mailto:jordan@ari.uni-heidelberg.de) for the German translation
 -  [Klemen Čotar](mailto:klemen.cotar@fmf.uni-lj.si) for the Slovene translation
 -  [Catherine Turon](mailto:cacatherine.turon@obspm.fr), Nicolas Leclerc and Guillaume Plum for the French translation

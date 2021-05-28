@@ -6,4 +6,4 @@
 | Catherine Turon   | catherine.turon@obspm.fr         | French translation                    |
 | Nicolas Leclerc   | Nicolas.Leclerc@obspm.fr         | French translation                    |
 | Guillaume Plum    | https://github.com/ElricleNecro  | French translation                    |
-| Georgi Georgiev   | https://gitlab.com/RacerBG       | Bulgarian translation, cleanup        |
+| Georgi Georgiev   | g.georgiev.shumen@gmail.com      | Bulgarian translation, cleanup        |
