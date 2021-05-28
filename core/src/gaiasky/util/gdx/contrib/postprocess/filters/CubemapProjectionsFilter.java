@@ -177,6 +177,13 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
         setParam(Param.PlanetariumAngle, angle);
     }
 
+    public float getPlanetariumAperture(){
+        return this.planetariumAperture;
+    }
+    public float getPlanetariumAngle(){
+        return this.planetariumAngle;
+    }
+
     @Override
     public void rebind() {
         // reimplement super to batch every parameter

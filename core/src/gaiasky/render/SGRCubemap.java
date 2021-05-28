@@ -35,6 +35,8 @@ public abstract class SGRCubemap extends SGRAbstract {
 
     // Frame buffers
     protected FrameBuffer zposfb, znegfb, xposfb, xnegfb, yposfb, ynegfb;
+    // Flags
+    protected boolean zposFlag, znegFlag, xposFlag, xnegFlag, yposFlag, ynegFlag;
 
     protected SGRCubemap() {
         super();
@@ -44,6 +46,13 @@ public abstract class SGRCubemap extends SGRAbstract {
         dirbak = new Vector3();
         upbak = new Vector3();
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
+
+        xposFlag = true;
+        xnegFlag = true;
+        yposFlag = true;
+        ynegFlag = true;
+        zposFlag = true;
+        znegFlag = true;
 
         fbcm = new HashMap<>();
     }
@@ -74,64 +83,76 @@ public abstract class SGRCubemap extends SGRAbstract {
         viewport.apply();
 
         // RIGHT +X
-        rc.cubemapSide = CubemapSide.SIDE_RIGHT;
+        if(xposFlag) {
+            rc.cubemapSide = CubemapSide.SIDE_RIGHT;
 
-        cam.up.set(upbak);
-        cam.direction.set(dirbak).rotate(upbak, -90);
-        cam.update();
+            cam.up.set(upbak);
+            cam.direction.set(dirbak).rotate(upbak, -90);
+            cam.update();
 
-        renderFace(xposfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(xposfb, camera, sgr, ppb, rw, rh, wh, t);
+        }
 
-        // LEFT -X
-        rc.cubemapSide = CubemapSide.SIDE_LEFT;
+        if(xnegFlag) {
+            // LEFT -X
+            rc.cubemapSide = CubemapSide.SIDE_LEFT;
 
-        cam.up.set(upbak);
-        cam.direction.set(dirbak).rotate(upbak, 90);
-        cam.update();
+            cam.up.set(upbak);
+            cam.direction.set(dirbak).rotate(upbak, 90);
+            cam.update();
 
-        renderFace(xnegfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(xnegfb, camera, sgr, ppb, rw, rh, wh, t);
+        }
 
-        // UP +Y
-        rc.cubemapSide = CubemapSide.SIDE_UP;
+        if(yposFlag) {
+            // UP +Y
+            rc.cubemapSide = CubemapSide.SIDE_UP;
 
-        aux1.set(dirbak);
-        aux2.set(upbak);
-        aux1.crs(aux2).scl(-1);
-        cam.direction.set(dirbak).rotate(aux1, 90);
-        cam.up.set(upbak).rotate(aux1, 90);
-        cam.update();
+            aux1.set(dirbak);
+            aux2.set(upbak);
+            aux1.crs(aux2).scl(-1);
+            cam.direction.set(dirbak).rotate(aux1, 90);
+            cam.up.set(upbak).rotate(aux1, 90);
+            cam.update();
 
-        renderFace(yposfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(yposfb, camera, sgr, ppb, rw, rh, wh, t);
+        }
 
-        // DOWN -Y
-        rc.cubemapSide = CubemapSide.SIDE_DOWN;
+        if(ynegFlag) {
+            // DOWN -Y
+            rc.cubemapSide = CubemapSide.SIDE_DOWN;
 
-        aux1.set(dirbak);
-        aux2.set(upbak);
-        aux1.crs(aux2).scl(-1);
-        cam.direction.set(dirbak).rotate(aux1, -90);
-        cam.up.set(upbak).rotate(aux1, -90);
-        cam.update();
+            aux1.set(dirbak);
+            aux2.set(upbak);
+            aux1.crs(aux2).scl(-1);
+            cam.direction.set(dirbak).rotate(aux1, -90);
+            cam.up.set(upbak).rotate(aux1, -90);
+            cam.update();
 
-        renderFace(ynegfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(ynegfb, camera, sgr, ppb, rw, rh, wh, t);
+        }
 
-        // FRONT +Z
-        rc.cubemapSide = CubemapSide.SIDE_FRONT;
+        if(zposFlag) {
+            // FRONT +Z
+            rc.cubemapSide = CubemapSide.SIDE_FRONT;
 
-        cam.direction.set(dirbak);
-        cam.up.set(upbak);
-        cam.update();
+            cam.direction.set(dirbak);
+            cam.up.set(upbak);
+            cam.update();
 
-        renderFace(zposfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(zposfb, camera, sgr, ppb, rw, rh, wh, t);
+        }
 
-        // BACK -Z
-        rc.cubemapSide = CubemapSide.SIDE_BACK;
+        if(znegFlag) {
+            // BACK -Z
+            rc.cubemapSide = CubemapSide.SIDE_BACK;
 
-        cam.up.set(upbak);
-        cam.direction.set(dirbak).rotate(upbak, -180);
-        cam.update();
+            cam.up.set(upbak);
+            cam.direction.set(dirbak).rotate(upbak, -180);
+            cam.update();
 
-        renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);
+            renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);
+        }
 
         // Restore camera parameters
         cam.direction.set(dirbak);

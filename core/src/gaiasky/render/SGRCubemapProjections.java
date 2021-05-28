@@ -35,13 +35,40 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         super();
 
         cubemapEffect = new CubemapProjections(0, 0);
-        cubemapEffect.setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
         cubemapEffect.setPlanetariumAperture(GlobalConf.program.PLANETARIUM_APERTURE);
         cubemapEffect.setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
+        setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
 
         copy = new Copy();
 
         EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_CMD, Events.PLANETARIUM_APERTURE_CMD, Events.PLANETARIUM_ANGLE_CMD);
+    }
+
+    private void setProjection(CubemapProjection projection){
+        if(cubemapEffect != null) {
+            cubemapEffect.setProjection(projection);
+        }
+        switch(projection){
+            case FISHEYE:
+                // In planetarium mode we only render back iff aperture > 180
+                xposFlag = true;
+                xnegFlag = true;
+                yposFlag = true;
+                ynegFlag = true;
+                zposFlag = true;
+                znegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
+                break;
+            default:
+                // In 360 mode we always need all sides
+                xposFlag = true;
+                xnegFlag = true;
+                yposFlag = true;
+                ynegFlag = true;
+                zposFlag = true;
+                znegFlag = true;
+                break;
+        }
+
     }
 
     @Override
@@ -89,7 +116,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
             case CUBEMAP_PROJECTION_CMD:
                 p = (CubemapProjection) data[0];
                 GaiaSky.postRunnable(() -> {
-                    cubemapEffect.setProjection(p);
+                    setProjection(p);
                 });
                 break;
             case CUBEMAP_RESOLUTION_CMD:
