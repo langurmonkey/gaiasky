@@ -25,13 +25,15 @@ import java.util.Map;
 
 public abstract class SGRCubemap extends SGRAbstract {
 
-    protected Vector3 aux1, aux2, aux3, dirbak, upbak;
+    protected Vector3 aux1, aux2, aux3, dirbak, upbak, dirUpCrs;
     protected StretchViewport stretchViewport;
     // Frame buffers for each side of the cubemap
     protected Map<Integer, FrameBuffer> fbcm;
 
     // Backup of fov value
     protected float fovbak;
+    // Angle from zenith, for planetarium mode
+    protected float angleFromZenith = 0;
 
     // Frame buffers
     protected FrameBuffer zposfb, znegfb, xposfb, xnegfb, yposfb, ynegfb;
@@ -45,6 +47,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         aux2 = new Vector3();
         dirbak = new Vector3();
         upbak = new Vector3();
+        dirUpCrs = new Vector3();
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
 
         xposFlag = true;
@@ -64,6 +67,8 @@ public abstract class SGRCubemap extends SGRAbstract {
         fovbak = cam.fieldOfView;
         dirbak.set(cam.direction);
         upbak.set(cam.up);
+        // dirUpCrs <- dir X up
+        dirUpCrs.set(dirbak).crs(upbak).nor().scl(-1f);
 
         EventManager.instance.post(Events.FOV_CHANGED_CMD, 90f);
 
@@ -83,72 +88,66 @@ public abstract class SGRCubemap extends SGRAbstract {
         viewport.apply();
 
         // RIGHT +X
-        if(xposFlag) {
+        if (xposFlag) {
             rc.cubemapSide = CubemapSide.SIDE_RIGHT;
 
-            cam.up.set(upbak);
-            cam.direction.set(dirbak).rotate(upbak, -90);
+            cam.up.set(upbak).rotate(dirUpCrs, -angleFromZenith);
+            cam.direction.set(dirbak).rotate(dirUpCrs, -angleFromZenith).rotate(cam.up, -90);
             cam.update();
 
             renderFace(xposfb, camera, sgr, ppb, rw, rh, wh, t);
         }
 
-        if(xnegFlag) {
+        if (xnegFlag) {
             // LEFT -X
             rc.cubemapSide = CubemapSide.SIDE_LEFT;
 
-            cam.up.set(upbak);
-            cam.direction.set(dirbak).rotate(upbak, 90);
+            cam.up.set(upbak).rotate(dirUpCrs, -angleFromZenith);
+            cam.direction.set(dirbak).rotate(dirUpCrs, -angleFromZenith).rotate(cam.up, 90);
             cam.update();
 
             renderFace(xnegfb, camera, sgr, ppb, rw, rh, wh, t);
         }
 
-        if(yposFlag) {
+        if (yposFlag) {
             // UP +Y
             rc.cubemapSide = CubemapSide.SIDE_UP;
 
-            aux1.set(dirbak);
-            aux2.set(upbak);
-            aux1.crs(aux2).scl(-1);
-            cam.direction.set(dirbak).rotate(aux1, 90);
-            cam.up.set(upbak).rotate(aux1, 90);
+            cam.direction.set(dirbak).rotate(dirUpCrs, -angleFromZenith + 90);
+            cam.up.set(upbak).rotate(dirUpCrs, -angleFromZenith + 90);
             cam.update();
 
             renderFace(yposfb, camera, sgr, ppb, rw, rh, wh, t);
         }
 
-        if(ynegFlag) {
+        if (ynegFlag) {
             // DOWN -Y
             rc.cubemapSide = CubemapSide.SIDE_DOWN;
 
-            aux1.set(dirbak);
-            aux2.set(upbak);
-            aux1.crs(aux2).scl(-1);
-            cam.direction.set(dirbak).rotate(aux1, -90);
-            cam.up.set(upbak).rotate(aux1, -90);
+            cam.direction.set(dirbak).rotate(dirUpCrs, -angleFromZenith - 90);
+            cam.up.set(upbak).rotate(dirUpCrs, -angleFromZenith - 90);
             cam.update();
 
             renderFace(ynegfb, camera, sgr, ppb, rw, rh, wh, t);
         }
 
-        if(zposFlag) {
+        if (zposFlag) {
             // FRONT +Z
             rc.cubemapSide = CubemapSide.SIDE_FRONT;
 
-            cam.direction.set(dirbak);
-            cam.up.set(upbak);
+            cam.direction.set(dirbak).rotate(dirUpCrs, -angleFromZenith);
+            cam.up.set(upbak).rotate(dirUpCrs, -angleFromZenith);
             cam.update();
 
             renderFace(zposfb, camera, sgr, ppb, rw, rh, wh, t);
         }
 
-        if(znegFlag) {
+        if (znegFlag) {
             // BACK -Z
             rc.cubemapSide = CubemapSide.SIDE_BACK;
 
-            cam.up.set(upbak);
-            cam.direction.set(dirbak).rotate(upbak, -180);
+            cam.up.set(upbak).rotate(dirUpCrs, -angleFromZenith);
+            cam.direction.set(dirbak).rotate(dirUpCrs, -angleFromZenith).rotate(upbak, -180);
             cam.update();
 
             renderFace(znegfb, camera, sgr, ppb, rw, rh, wh, t);

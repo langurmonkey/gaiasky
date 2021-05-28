@@ -35,8 +35,8 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         super();
 
         cubemapEffect = new CubemapProjections(0, 0);
-        cubemapEffect.setPlanetariumAperture(GlobalConf.program.PLANETARIUM_APERTURE);
-        cubemapEffect.setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
+        setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
+        setPlanetariumAperture(GlobalConf.program.PLANETARIUM_APERTURE);
         setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
 
         copy = new Copy();
@@ -44,11 +44,11 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_CMD, Events.PLANETARIUM_APERTURE_CMD, Events.PLANETARIUM_ANGLE_CMD);
     }
 
-    private void setProjection(CubemapProjection projection){
-        if(cubemapEffect != null) {
+    private void setProjection(CubemapProjection projection) {
+        if (cubemapEffect != null) {
             cubemapEffect.setProjection(projection);
         }
-        switch(projection){
+        switch (projection) {
             case FISHEYE:
                 // In planetarium mode we only render back iff aperture > 180
                 xposFlag = true;
@@ -57,6 +57,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
                 ynegFlag = true;
                 zposFlag = true;
                 znegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
+                setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
                 break;
             default:
                 // In 360 mode we always need all sides
@@ -66,9 +67,23 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
                 ynegFlag = true;
                 zposFlag = true;
                 znegFlag = true;
+                setPlanetariumAngle(0);
                 break;
         }
+    }
 
+    private void setPlanetariumAngle(float planetariumAngle) {
+        // We do not use the planetarium angle in the effect because
+        // we optimize the rendering of the cubemap sides when
+        // using planetarium mode and the aperture is <= 180 by
+        // skipping the -Z direction (back). We manipulate
+        // the cameras before rendering instead.
+        cubemapEffect.setPlanetariumAngle(0);
+        angleFromZenith = planetariumAngle;
+    }
+
+    private void setPlanetariumAperture(float planetariumAperture) {
+        cubemapEffect.setPlanetariumAperture(planetariumAperture);
     }
 
     @Override
@@ -105,41 +120,41 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
     @Override
     public void notify(final Events event, final Object... data) {
-        if(!GlobalConf.runtime.OPENVR) {
+        if (!GlobalConf.runtime.OPENVR) {
             switch (event) {
-            case CUBEMAP_CMD:
-                CubemapProjection p = (CubemapProjection) data[1];
-                GaiaSky.postRunnable(() -> {
-                    cubemapEffect.setProjection(p);
-                });
-                break;
-            case CUBEMAP_PROJECTION_CMD:
-                p = (CubemapProjection) data[0];
-                GaiaSky.postRunnable(() -> {
-                    setProjection(p);
-                });
-                break;
-            case CUBEMAP_RESOLUTION_CMD:
-                int res = (Integer) data[0];
-                GaiaSky.postRunnable(() -> {
-                    // Create new ones
-                    if (!fbcm.containsKey(getKey(res, res, 0))) {
-                        // Clear
-                        dispose();
-                        fbcm.clear();
-                    } else {
-                        // All good
-                    }
-                });
-                break;
-            case PLANETARIUM_APERTURE_CMD:
-                cubemapEffect.setPlanetariumAperture((float) data[0]);
-                break;
-            case PLANETARIUM_ANGLE_CMD:
-                cubemapEffect.setPlanetariumAngle((float) data[0]);
-                break;
-            default:
-                break;
+                case CUBEMAP_CMD:
+                    CubemapProjection p = (CubemapProjection) data[1];
+                    GaiaSky.postRunnable(() -> {
+                        setProjection(p);
+                    });
+                    break;
+                case CUBEMAP_PROJECTION_CMD:
+                    p = (CubemapProjection) data[0];
+                    GaiaSky.postRunnable(() -> {
+                        setProjection(p);
+                    });
+                    break;
+                case CUBEMAP_RESOLUTION_CMD:
+                    int res = (Integer) data[0];
+                    GaiaSky.postRunnable(() -> {
+                        // Create new ones
+                        if (!fbcm.containsKey(getKey(res, res, 0))) {
+                            // Clear
+                            dispose();
+                            fbcm.clear();
+                        } else {
+                            // All good
+                        }
+                    });
+                    break;
+                case PLANETARIUM_APERTURE_CMD:
+                    setPlanetariumAperture((float) data[0]);
+                    break;
+                case PLANETARIUM_ANGLE_CMD:
+                    setPlanetariumAngle((float) data[0]);
+                    break;
+                default:
+                    break;
             }
         }
     }
