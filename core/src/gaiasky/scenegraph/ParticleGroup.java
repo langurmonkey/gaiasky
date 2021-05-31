@@ -89,7 +89,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Particle size limits, in pixels
      */
-    public double[] particleSizeLimits = new double[]{3.5d, 800d};
+    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
 
     /**
      * Are the data of this group in the GPU memory?
@@ -190,6 +190,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected Integer[] active;
     // Background indices list (the one we sort)
     protected Integer[] background;
+
+    // Visibility array with 1 (visible) or 0 (hidden) for each particle
+    protected byte[] visibilityArray;
 
     // Is it updating?
     protected volatile boolean updating = false;
@@ -364,6 +367,67 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Regenerate index
         if (regenerateIndex)
             regenerateIndex();
+        // Initialize visibility - all visible
+        this.visibilityArray = new byte[pointData.size()];
+        for (int i = 0; i < pointData.size(); i++) {
+            this.visibilityArray[i] = (byte) 1;
+        }
+    }
+
+    /**
+     * Checks whether the particle with the given index is visible
+     *
+     * @param index The index of the particle
+     * @return The visibility of the particle
+     */
+    public boolean isVisible(int index) {
+        return this.visibilityArray != null && this.visibilityArray[index] != (byte) 0;
+    }
+
+    public boolean isVisible() {
+        if (focusIndex < 0)
+            return false;
+
+        return isVisible(focusIndex);
+    }
+
+    /**
+     * Overrides the isVisible() method, and uses the current focus index, if any
+     *
+     * @param attributeValue Whether to use the visibility attribute directly
+     * @return The visibility
+     */
+    public boolean isVisible(boolean attributeValue) {
+        if (focusIndex < 0)
+            return false;
+
+        return this.isVisible();
+    }
+
+    /**
+     * Sets the visibility of the particle with the given index. If the visibility
+     * has changed, it marks the particle group for update.
+     *
+     * @param index   The index of the particle
+     * @param visible Visibility flag
+     */
+    public void setVisible(int index, boolean visible) {
+        boolean previousVisibility = this.visibilityArray[index] != 0;
+        this.visibilityArray[index] = (byte) (visible ? 1 : 0);
+        if (previousVisibility != visible) {
+            this.setInGpu(false);
+        }
+    }
+
+    /**
+     * Overrides the setVisible() method and uses the current focus index, if any.
+     *
+     * @param visible The visibility state
+     */
+    public void setVisible(boolean visible) {
+        if (focusIndex >= 0) {
+            setVisible(focusIndex, visible);
+        }
     }
 
     /**
@@ -468,7 +532,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
-        if (pointData != null && this.isVisible()) {
+        if (pointData != null) {
             cPosD.set(camera.getPos());
             this.opacity = opacity;
             super.update(time, parentTransform, camera, opacity);
@@ -570,10 +634,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float textScale() {
         return .5f / GlobalConf.scene.LABEL_SIZE_FACTOR;
     }
-
-    /**
-     * LABEL
-     */
 
     public String getProvider() {
         return provider;
@@ -943,26 +1003,26 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case FOCUS_CHANGED:
-                if (data[0] instanceof String) {
-                    focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
-                } else {
-                    focusIndex = data[0] == this ? focusIndex : -1;
+        case FOCUS_CHANGED:
+            if (data[0] instanceof String) {
+                focusIndex = data[0].equals(this.getName()) ? focusIndex : -1;
+            } else {
+                focusIndex = data[0] == this ? focusIndex : -1;
+            }
+            updateFocusDataPos();
+            break;
+        case CAMERA_MOTION_UPDATE:
+            // Check that the particles have names
+            if (updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
+                final Vector3b currentCameraPos = (Vector3b) data[0];
+                long t = TimeUtils.millis() - lastSortTime;
+                if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
+                    updating = DatasetUpdater.execute(updaterTask);
                 }
-                updateFocusDataPos();
-                break;
-            case CAMERA_MOTION_UPDATE:
-                // Check that the particles have names
-                if (updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
-                    final Vector3b currentCameraPos = (Vector3b) data[0];
-                    long t = TimeUtils.millis() - lastSortTime;
-                    if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
-                        updating = DatasetUpdater.execute(updaterTask);
-                    }
-                }
-                break;
-            default:
-                break;
+            }
+            break;
+        default:
+            break;
         }
 
     }
@@ -1178,10 +1238,20 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
+     * Overridden because the {@link SceneGraphNode#visible} is not used in particle groups.
+     * {@link ParticleGroup#visibilityArray} is used instead.
+     *
+     * @return Whether the particle group should be sent to render
+     */
+    protected boolean shouldRender() {
+        return GaiaSky.instance.isOn(ct) && opacity > 0;
+    }
+
+    /**
      * Evaluates the filter of this dataset (if any) for the given particle index
      *
      * @param index The index to filter
-     * @return The result of the filter evaluation
+     * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
      */
     public boolean filter(int index) {
         if (catalogInfo != null && catalogInfo.filter != null) {
@@ -1201,11 +1271,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public static ParticleGroup getParticleGroup(String name, List<IParticleRecord> data, DatasetOptions dops) {
         double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
         double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
-        double[] particleColor = dops == null || dops.particleColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.particleColor;
+        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
         double colorNoise = dops == null ? 0 : dops.particleColorNoise;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[]{1.0, 1.0, 1.0, 1.0} : dops.labelColor;
+        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
         double particleSize = dops == null ? 0 : dops.particleSize;
-        double[] minParticleSize = dops == null ? new double[]{2d, 200d} : dops.particleSizeLimits;
+        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
         double profileDecay = dops == null ? 1 : dops.profileDecay;
         String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
 

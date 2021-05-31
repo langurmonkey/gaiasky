@@ -143,7 +143,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             ensureTempVertsSize(n * curr.vertexSize);
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
-                                if (starGroup.filter(i)) {
+                                if (starGroup.filter(i) && starGroup.isVisible(i)) {
                                     IParticleRecord sb = starGroup.data().get(i);
                                     if (!Double.isFinite(sb.size())) {
                                         logger.debug("Star " + sb.id() + " has a non-finite size");

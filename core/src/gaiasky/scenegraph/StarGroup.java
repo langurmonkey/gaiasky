@@ -196,22 +196,24 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Fade node visibility
-        if (this.isVisible() && active.length > 0) {
+        if (active.length > 0) {
             cPosD.set(camera.getPos());
             // Delta years
             currDeltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
 
             super.update(time, parentTransform, camera, opacity);
 
+            // Update close stars
             for (int i = 0; i < Math.min(proximity.array.length, pointData.size()); i++) {
-                // Update close stars
-                IParticleRecord closeStar = pointData.get(active[i]);
-                proximity.set(i, closeStar, camera, currDeltaYears);
-                camera.checkClosestParticle(proximity.array[i]);
+                if(filter(active[i]) && isVisible(active[i])) {
+                    IParticleRecord closeStar = pointData.get(active[i]);
+                    proximity.set(i, closeStar, camera, currDeltaYears);
+                    camera.checkClosestParticle(proximity.array[i]);
 
-                // Model distance
-                if (i == 0) {
-                    modelDist = 172.4643429 * closeStar.radius();
+                    // Model distance
+                    if (i == 0) {
+                        modelDist = 172.4643429 * closeStar.radius();
+                    }
                 }
             }
         }
@@ -294,35 +296,36 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (focus != null && !focusRendered) {
             renderCloseupStar(focusIndex, fovFactor, cPosD, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
         }
-
     }
 
     Color c = new Color();
 
     private void renderCloseupStar(int idx, float fovFactor, Vector3d cposd, ExtShaderProgram shader, IntMesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
-        IParticleRecord star = pointData.get(idx);
-        double size = getSize(idx);
-        double radius = size * Constants.STAR_SIZE_FACTOR;
-        Vector3d starPos = fetchPosition(star, cposd, aux3d1.get(), currDeltaYears);
-        double distToCamera = starPos.len();
-        double viewAngle = (radius / distToCamera) / fovFactor;
+        if(filter(idx) && isVisible(idx)) {
+            IParticleRecord star = pointData.get(idx);
+            double size = getSize(idx);
+            double radius = size * Constants.STAR_SIZE_FACTOR;
+            Vector3d starPos = fetchPosition(star, cposd, aux3d1.get(), currDeltaYears);
+            double distToCamera = starPos.len();
+            double viewAngle = (radius / distToCamera) / fovFactor;
 
-        Color.abgr8888ToColor(c, getColor(idx));
-        if (viewAngle >= thpointTimesFovfactor) {
-            double fuzzySize = getFuzzyRenderSize(size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
+            Color.abgr8888ToColor(c, getColor(idx));
+            if (viewAngle >= thpointTimesFovfactor) {
+                double fuzzySize = getFuzzyRenderSize(size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
 
-            Vector3 pos = starPos.put(aux3f3.get());
-            shader.setUniformf("u_pos", pos);
-            shader.setUniformf("u_size", (float) fuzzySize);
+                Vector3 pos = starPos.put(aux3f3.get());
+                shader.setUniformf("u_pos", pos);
+                shader.setUniformf("u_size", (float) fuzzySize);
 
-            shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
-            shader.setUniformf("u_distance", (float) distToCamera);
-            shader.setUniformf("u_apparent_angle", (float) (viewAngle * GlobalConf.scene.STAR_BRIGHTNESS));
-            shader.setUniformf("u_radius", (float) radius);
+                shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
+                shader.setUniformf("u_distance", (float) distToCamera);
+                shader.setUniformf("u_apparent_angle", (float) (viewAngle * GlobalConf.scene.STAR_BRIGHTNESS));
+                shader.setUniformf("u_radius", (float) radius);
 
-            // Sprite.render
-            mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
+                // Sprite.render
+                mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
 
+            }
         }
     }
 

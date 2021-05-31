@@ -22,7 +22,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.MyPools;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 

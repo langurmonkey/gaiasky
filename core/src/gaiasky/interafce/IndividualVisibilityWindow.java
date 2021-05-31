@@ -10,10 +10,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.IVisibilitySwitch;
-import gaiasky.scenegraph.Orbit;
-import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.*;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
@@ -148,7 +145,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         cbMap.clear();
 
         for (SceneGraphNode object : objects) {
-            // Omit stars with no proper names
+            // Omit stars with no proper names and particle groups
             if (object.getName() != null && !GlobalResources.isNumeric(object.getName()) && !exception(ct, object)) {
                 names.add(object.getName());
                 objMap.put(object.getName(), object);
@@ -242,10 +239,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
      *
      * @param ct     The component type
      * @param object The object
-     * @return Whether this object is an exception (shoud not be listed) or not
+     * @return Whether this object is an exception (should not be listed) or not
      */
     private boolean exception(ComponentType ct, SceneGraphNode object) {
-        return ct == ComponentType.Planets && object instanceof Orbit;
+        return ct == ComponentType.Planets && object instanceof Orbit
+                || object instanceof ParticleGroup;
     }
 
     @Override
@@ -260,7 +258,6 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
     @Override
     public void notify(Events event, Object... data) {
-
         if (event == Events.PER_OBJECT_VISIBILITY_CMD) {
             IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
             boolean checked = (Boolean) data[1];
@@ -268,7 +265,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             if (!ui) {
                 // Update checkbox if necessary
                 if (currentCt != null && obj.hasCt(currentCt)) {
-                    CheckBox cb = cbMap.get(obj);
+                    CheckBox cb = cbMap.get(obj.getName());
                     if (cb != null) {
                         cb.setProgrammaticChangeEvents(false);
                         cb.setChecked(checked);

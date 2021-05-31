@@ -112,7 +112,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                             int n = particleGroup.data().size();
                             int nadded = 0;
                             for (int i = 0; i < n; i++) {
-                                if (particleGroup.filter(i)) {
+                                if (particleGroup.filter(i) && particleGroup.isVisible(i)) {
                                     IParticleRecord pb = particleGroup.get(i);
                                     double[] p = pb.rawDoubleData();
                                     // COLOR

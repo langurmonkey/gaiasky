@@ -66,14 +66,12 @@ import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 import gaiasky.vr.openvr.VRContext.VRDeviceType;
 import gaiasky.vr.openvr.VRStatus;
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.openvr.Texture;
 import org.lwjgl.openvr.VR;
 import org.lwjgl.openvr.VRCompositor;
 
 import java.io.File;
-import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;

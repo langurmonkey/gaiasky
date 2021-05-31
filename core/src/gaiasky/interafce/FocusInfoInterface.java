@@ -428,7 +428,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             bookmark.setProgrammaticChangeEvents(true);
 
             // Visible
-            visibility.setCheckedNoFire(!((IVisibilitySwitch)currentFocus).isVisible(true));
+            visibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
             visibility.addListener(new OwnTextTooltip(I18n.txt("action.toggle", currentFocus.getName()), skin));
 
             // Id, names
@@ -593,9 +593,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             break;
         case PER_OBJECT_VISIBILITY_CMD:
             boolean ui = (boolean) data[2];
-            if(ui){
+            if (ui) {
                 IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-                if(vs == currentFocus) {
+                if (vs == currentFocus) {
                     boolean visible = (boolean) data[1];
                     visibility.setCheckedNoFire(!visible);
                 }
