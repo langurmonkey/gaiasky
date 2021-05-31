@@ -329,6 +329,12 @@ public abstract class AbstractCamera implements ICamera {
         return closestStar;
     }
 
+    public IFocus getCloseLightSource(int i){
+        assert proximity != null && i < proximity.array.length : "Index out of bounds: i=" + i + ", length=" + proximity.array.length;
+        return proximity.array[i];
+    }
+
+
     public void checkClosestParticle(IFocus star) {
 
         if (star instanceof NearbyRecord) {

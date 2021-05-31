@@ -568,6 +568,11 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
+    public IFocus getCloseLightSource(int i){
+        return current.getCloseLightSource(i);
+    }
+
+    @Override
     public void resize(int width, int height) {
         for (ICamera cam : cameras)
             cam.resize(width, height);

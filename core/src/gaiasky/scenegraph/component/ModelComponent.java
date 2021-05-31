@@ -167,10 +167,7 @@ public class ModelComponent implements Disposable, IObserver {
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc, boolean mesh) {
         this.manager = manager;
         this.cc = cc;
-
         IntModel model = null;
-        Map<String, Material> materials = null;
-
         if (staticLight) {
             // Remove dir and global ambient. Add ambient
             //env.remove(dLight);
@@ -327,7 +324,6 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-
     private void updateStaticLight() {
         GaiaSky.postRunnable(() -> {
             updateStaticLightImmediate();
@@ -358,12 +354,6 @@ public class ModelComponent implements Disposable, IObserver {
                 }
             }
         }
-    }
-
-    public void addDirectionalLight(float r, float g, float b, float x, float y, float z) {
-        DirectionalLight dl = new DirectionalLight();
-        dl.set(r, g, b, x, y, z);
-        env.add(dl);
     }
 
     public void dispose() {

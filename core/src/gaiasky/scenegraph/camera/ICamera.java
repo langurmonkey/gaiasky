@@ -172,7 +172,7 @@ public interface ICamera {
      *
      * @return The i close light source (star?)
      */
-    //IFocus getCloseLightSource(int i);
+    IFocus getCloseLightSource(int i);
 
     /**
      * Sets the current closest particle to this camera. This will be only set if

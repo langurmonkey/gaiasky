@@ -25,6 +25,7 @@ import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
+import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -107,25 +108,32 @@ public abstract class ModelBody extends CelestialBody {
 
     private static final double LIGHT_X0 = 0.1 * Constants.AU_TO_U;
     private static final double LIGHT_X1 = 5e5 * Constants.AU_TO_U;
+
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
         // Update light with global position
         if (mc != null) {
+            // TODO use all directional lights (first, make normal shader accept more than one light)
             translation.put(mc.directional(0).direction);
-            IFocus closestLight = camera.getClosestParticle();
-            if (closestLight != null && closestLight instanceof IStarFocus) {
-                IStarFocus sf = (IStarFocus) closestLight;
-                float[] col = sf.getClosestCol();
-                double closestSize = sf.getClosestSize();
-                double closestDist = sf.getClosestDistToCamera();
-                float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
-                mc.directional(0).direction.sub(sf.getClosestPos(aux3d1.get()).put(aux3f1.get()));
-                mc.directional(0).color.set(col[0] * colFactor, col[1] * colFactor, col[2]* colFactor, 1.0f);
-            } else {
-                Vector3b campos = camera.getPos();
-                mc.directional(0).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
-                mc.directional(0).color.set(1f, 1f, 1f, 1f);
+            IFocus lightSource = camera.getCloseLightSource(0);
+            if(lightSource != null){
+                if(lightSource instanceof Proximity.NearbyRecord){
+                    Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
+                    if(nr.isStar() || nr.isStarGroup()){
+                        float[] col = nr.getColor();
+                        double closestSize = nr.getSize();
+                        double closestDist = nr.getClosestDistToCamera();
+                        float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                        mc.directional(0).direction.sub(nr.pos.put(aux3f1.get()));
+                        mc.directional(0).color.set(col[0] * colFactor, col[1] * colFactor, col[2]* colFactor, 1.0f);
+                    } else {
+                        Vector3b campos = camera.getPos();
+                        mc.directional(0).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
+                        mc.directional(0).color.set(1f, 1f, 1f, 1f);
+                    }
+
+                }
             }
         }
         updateLocalTransform();
@@ -195,7 +203,7 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     private void addToRenderModel() {
-        if(this.shouldRender()) {
+        if (this.shouldRender()) {
             RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
             addToRender(this, rg);
         }
