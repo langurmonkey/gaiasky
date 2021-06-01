@@ -485,13 +485,13 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
                         // Load octants if any
                         if (toLoad.size > 0) {
-                            logger.debug(I18n.bundle.format("notif.loadingoctants", toLoad.size));
+                            logger.debug(I18n.txt("notif.loadingoctants", toLoad.size));
                             try {
                                 int loaded = loader.loadOctants(toLoad, octreeWrapper, abort);
-                                logger.debug(I18n.bundle.format("notif.loadingoctants.finished", loaded));
+                                logger.debug(I18n.txt("notif.loadingoctants.finished", loaded));
                             } catch (Exception e) {
                                 // This will happen when the queue has been cleared during processing
-                                logger.debug(I18n.bundle.get("notif.loadingoctants.fail"));
+                                logger.debug(I18n.txt("notif.loadingoctants.fail"));
                             }
                         }
 

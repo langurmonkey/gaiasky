@@ -276,17 +276,19 @@ out vec3 v_ambientLight;
 #endif // numDirectionalLights
 #endif //lightingFlag
 
-#ifdef directionalLightsFlag
 struct DirectionalLight
 {
     vec3 color;
     vec3 direction;
 };
+#ifdef directionalLightsFlag
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif
 
-out vec3 v_lightDir;
-out vec3 v_lightCol;
+#define N_LIGHTS 4
+flat out int v_numDirectionalLights;
+out vec3 v_directionalLightDir[N_LIGHTS];
+out vec3 v_directionalLightColor[N_LIGHTS];
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
 
@@ -352,16 +354,22 @@ void main() {
 	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    #ifdef directionalLightsFlag
-        #ifdef heightFlag
-        v_lightDir = normalize(-u_dirLights[0].direction);
-        #else
-        v_lightDir = normalize(-u_dirLights[0].direction * TBN);
-        #endif
-        v_lightCol = u_dirLights[0].color;
+    #if defined(numDirectionalLights)
+        v_numDirectionalLights = numDirectionalLights;
+        for (int i = 0; i < numDirectionalLights; i++) {
+            #ifdef heightFlag
+            v_directionalLightDir[i] = normalize(-u_dirLights[i].direction);
+            #else
+            v_directionalLightDir[i] = normalize(-u_dirLights[i].direction * TBN);
+            #endif
+            v_directionalLightColor[i] = u_dirLights[i].color;
+        }
     #else
-        v_lightDir = vec3(0.0, 0.0, 0.0);
-        v_lightCol = vec3(0.0);
+        v_numDirectionalLights = 0;
+        for (int i = 0; i < N_LIGHTS; i++) {
+            v_directionalLightDir[i] = vec3(0.0, 0.0, 0.0);
+            v_directionalLightColor[i] = vec3(0.0);
+        }
     #endif // directionalLightsFlag
 
     // Camera is at origin, view direction is inverse of vertex position

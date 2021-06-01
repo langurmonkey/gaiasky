@@ -157,7 +157,7 @@ float getShadow(){
         }
     }
     return result / 25.0;
-    
+
     // Simple lookup
     //return getShadowness(v_shadowMapUv.xy, vec2(0.0), v_shadowMapUv.z);
 }
@@ -196,7 +196,7 @@ in vec3 v_ambientLight;
 #elif defined(emissiveColorFlag)
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
 #endif // emissiveTextureFlag && emissiveColorFlag
-    
+
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
     #define fetchColorEmissive(emissiveTex, texCoord) fetchColorEmissiveTD(emissiveTex, texCoord)
 #else
@@ -221,12 +221,14 @@ in vec3 v_ambientLight;
     #define fetchColorNight(texCoord) vec3(0.0)
 #endif // nightTextureFlag
 
-// Light direction in world space
-in vec3 v_lightDir;
+#define N_LIGHTS 4
+flat in int v_numDirectionalLights;
+// Light directions in world space
+in vec3 v_directionalLightDir[N_LIGHTS];
+// Light colors
+in vec3 v_directionalLightColor[N_LIGHTS];
 // View direction in world space
 in vec3 v_viewDir;
-// Light color
-in vec3 v_lightCol;
 // Logarithmic depth
 in float v_depth;
 // Fragment position in world space
@@ -343,20 +345,27 @@ float luma(vec3 color){
 void main() {
     vec2 texCoords = v_texCoord0;
 
-    vec3 lightDir, viewDir;
+    vec3 lightDir[N_LIGHTS], lightCol[N_LIGHTS], viewDir;
+
     #ifdef heightFlag
     // Compute tangent space
     pullNormal();
-    mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-    viewDir = normalize(v_viewDir * TBN);
-    lightDir = normalize(v_lightDir * TBN);
+    #endif
 
-    // Parallax occlusion mapping
-    texCoords = parallaxMapping(texCoords, viewDir);
-    #else // heightFlag
-    lightDir = v_lightDir;
-    viewDir = v_viewDir;
-    #endif // heightFlag
+    for(int i = 0; i < v_numDirectionalLights; i++) {
+        #ifdef heightFlag
+        mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
+        viewDir = normalize(v_viewDir * TBN);
+        lightDir[i] = normalize(v_directionalLightDir[i] * TBN);
+        lightCol[i] = v_directionalLightColor[i];
+        // Parallax occlusion mapping
+        texCoords = parallaxMapping(texCoords, viewDir);
+        #else // heightFlag
+        lightDir[i] = v_directionalLightDir[i];
+        lightCol[i] = v_directionalLightColor[i];
+        viewDir = v_viewDir;
+        #endif // heightFlag
+    }
 
     vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
@@ -390,7 +399,7 @@ void main() {
     #endif // normalTextureFlag
 
     // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-    vec3 L = lightDir;
+    vec3 L = lightDir[0];
     vec3 V = viewDir;
     vec3 H = normalize(L + V);
     float NL = max(0.0, dot(N, L));
@@ -409,8 +418,8 @@ void main() {
     #endif // environmentCubemapFlag
 
     float shdw = clamp(getShadow(), 0.0, 1.0);
-    vec3 nightColor = v_lightCol * night * max(0.0, 0.6 - NL) * shdw;
-    vec3 dayColor = (v_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
+    vec3 nightColor = lightCol[0] * night * max(0.0, 1.0 - NL) * shdw;
+    vec3 dayColor = (lightCol[0] * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
     fragColor = vec4(dayColor + nightColor + emissive.rgb + env, texAlpha * v_opacity);
     fragColor.rgb += selfShadow * specular;
 
@@ -420,7 +429,7 @@ void main() {
     #endif
 
     // Prevent saturation
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
+    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.99);
 
     if(fragColor.a <= 0.0){
         discard;
