@@ -6,13 +6,13 @@ First of all, thanks for reading this! It means you are considering to contribut
 
 There are several ways to contribute to the Gaia Sky project:
 
-### Pull requests and source code
+### Merge requests and source code
 
-Start by checking the official docs ([here](https://gaia.ari.uni-heidelberg.de/gaiasky/docs/html/latest)) to get acquainted with the project. It may also help decide what part you want to contribute to. Pull requests should be accompanied with extensive and comprehensive comments. In case that changes in the documentations are needed, they should be also part of the pull request (folder [/docs](docs)).
+Start by checking out the official documentation ([here](https://gaia.ari.uni-heidelberg.de/gaiasky/docs)) to get acquainted with the project. It may also help decide what part you actually want to contribute to. Merge requests should be accompanied with extensive and comprehensive comments. In case that changes in the documentations are needed, a new merge request should be created in the [documentation project](https://gitlab.com/gaiasky/gaiasky-docs).
 
-Pull requests should never contain configuration files unless totally necessary (do not commit your `conf/global.properties`). Also, make sure that the project compiles and all the dependencies are well specified in the `build.gradle`. 
+Merge requests should never contain configuration files unless totally necessary (do not commit your `conf/global.properties`). Also, make sure that the project compiles and all the dependencies are well specified in the `build.gradle` file. 
 
-The code style format is available in the root of the project, [eclipse-formatter.xml](eclipse-formatter.xml).
+The code style template is available in the root of the project in the IntelliJ IDEA format: [gaiasky.codestyle.xml](gaiasky.codestyle.xml).
 
 ### Commit message format
 
@@ -38,14 +38,14 @@ Fixes #123
 
 #### type
 
--  **feat**: new feature
--  **fix**: bug fix, should possibly reference the issue id in footer
--  **docs**: changes to the documentation
+-  **feat**: new feature or improvement
+-  **fix**: bug fix, should possibly reference the issue id in footer or body
+-  **docs**: changes to the documentation (README, ACKNOWLEDGEMENTS, etc.)
 -  **style**: changes that don't affect functionality or such as cosmetic changes or formatting
 -  **refactor**: code refactorings which do not modify functionality or fix a bug, class changes, name changes, moves, etc.
 -  **perf**: changes that improve performance
--  **build**: changes to the build and continuous integration systems
--  **none**: minor changes that will not appear in the changelog
+-  **build**: changes to the build and continuous integration systems, or to run scripts and installer files
+-  **none**: minor changes that will not appear in the changelog, use for everything else or partial, non-finished commits
 
 #### subject
 
@@ -58,7 +58,6 @@ Thorough description of the change. You can elaborate at will. Not required.
 #### footer
 
 Cites any issues that the commit closes. Not required.
-
 
 ### Bug reports and requests
 
