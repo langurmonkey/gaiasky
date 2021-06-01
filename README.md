@@ -89,7 +89,7 @@ You can also download the **data packs manually** [here](https://gaia.ari.uni-he
 
 ##  4. Documentation and help
 
-The most up-to-date documentation of Gaia Sky is always [hosted at gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
+The most up-to-date documentation of Gaia Sky is always [hosted at gaia.ari.uni-heidelberg.de/gaiasky/docs](https://gaia.ari.uni-heidelberg.de/gaiasky/docs).
 
 ### 4.1. Documentation submodule
 
