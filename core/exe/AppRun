@@ -19,7 +19,7 @@ LIB_PATH="$GSDIR/lib/*"
 #
 # Set bundled jre
 #
-JAVA="/usr/bin/java"
+JAVA="$GSDIR/usr/bin/java"
 
 #
 # Settings.

@@ -389,8 +389,10 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         // Set up /usr/bin and /usr/lib with jvm
         File usrbin = new File("$appimgDir", "usr/bin/")
         File usrlib = new File("$appimgDir", "usr/lib/")
+        File usrconf = new File("$appimgDir", "usr/conf/")
         mkdir usrbin
         mkdir usrlib
+        mkdir usrconf
         copy {
             from "${System.env.JAVA_HOME}/bin/java"
             into usrbin
@@ -398,6 +400,10 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         copy {
             from "${System.env.JAVA_HOME}/lib/"
             into usrlib
+        }
+        copy {
+            from "${System.env.JAVA_HOME}/conf/"
+            into usrconf
         }
 
         // Set up AppRun executable, remove unneeded files
