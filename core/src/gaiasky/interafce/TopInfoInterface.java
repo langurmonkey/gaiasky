@@ -23,6 +23,9 @@ import gaiasky.util.scene2d.OwnLabel;
 
 import java.time.Instant;
 
+/**
+ * The HUD UI at the top of the regular view
+ */
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     /** Date format **/

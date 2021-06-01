@@ -25,7 +25,6 @@
 -  [gdx2sdl](https://github.com/electronstudio/sdl2gdx), licensed under GNU General Public License with the classpath exception
 
 
-
 ## Textures, models, music and other assets
 
 -  Nick Risinger for the artist’s conception of the Milky Way (versions lower than `2.2.0`)
@@ -48,6 +47,7 @@
 ## Translations
 
 -  [Georgi Georgiev (Жоро)](mailto:g.georgiev.shumen@gmail.com) for the Bulgarian translation
+-  [Alexandre Prokoudine](https://librearts.org) for the Russian translation
 -  [Stefan Jordan](mailto:jordan@ari.uni-heidelberg.de) for the German translation
 -  [Klemen Čotar](mailto:klemen.cotar@fmf.uni-lj.si) for the Slovene translation
 -  [Catherine Turon](mailto:cacatherine.turon@obspm.fr), Nicolas Leclerc and Guillaume Plum for the French translation
