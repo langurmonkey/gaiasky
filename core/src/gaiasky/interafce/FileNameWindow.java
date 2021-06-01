@@ -20,7 +20,7 @@ public class FileNameWindow extends GenericDialog{
     private OwnTextField fileName;
 
     public FileNameWindow(String defaultName, Stage stage, Skin skin){
-        super("Choose file name", skin, stage);
+        super(I18n.txt("gui.filename.choose"), skin, stage);
         setModal(true);
         this.defaultName = defaultName;
 
@@ -34,7 +34,7 @@ public class FileNameWindow extends GenericDialog{
 
     @Override
     protected void build() {
-        OwnLabel label = new OwnLabel("File name: ", skin);
+        OwnLabel label = new OwnLabel(I18n.txt("gui.filename.filename")+ ": ", skin);
         LengthValidator lengthValidator = new LengthValidator(3, 40);
         RegexpValidator nameValidator = new RegexpValidator(lengthValidator, "^[^*&%\\s\\+\\=\\\\\\/@#\\$&\\*()~]+$");
         fileName = new OwnTextField(defaultName, skin, nameValidator);

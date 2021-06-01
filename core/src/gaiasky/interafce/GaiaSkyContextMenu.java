@@ -236,7 +236,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
             sg.insert((cr = new CosmicRuler()), true);
         }
         if (cr.rulerOk() || cr.hasAttached()) {
-            MenuItem clearRuler = new MenuItem("Clear ruler", skin, rulerDwb);
+            MenuItem clearRuler = new MenuItem(I18n.txt("context.ruler.clear"), skin, rulerDwb);
             clearRuler.addListener((evt) -> {
                 if (evt instanceof ChangeEvent) {
                     GaiaSky.postRunnable(() -> {

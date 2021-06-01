@@ -90,7 +90,7 @@ public class ExternalInformationUpdater {
                     EventManager.instance.post(Events.UPDATE_ARCHIVE_VIEW_ACTION, focus);
                     if (gaiaButton != null)
                         gaiaButton.remove();
-                    gaiaButton = new OwnTextButton("Archive", skin);
+                    gaiaButton = new OwnTextButton(I18n.txt("gui.focusinfo.archive"), skin);
                     gaiaButton.pad(pad / 3f, pad, pad / 3f, pad);
                     gaiaButton.addListener(new GaiaButtonListener((IStarFocus) focus));
                     gaiaButton.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.gaiaarchive"), skin));
@@ -110,7 +110,7 @@ public class ExternalInformationUpdater {
                                 EventManager.instance.post(Events.UPDATE_WIKI_INFO_ACTION, actualWikiname);
                                 if (infoButton != null)
                                     infoButton.remove();
-                                infoButton = new OwnTextButton("+ Info", skin);
+                                infoButton = new OwnTextButton(I18n.txt("gui.focusinfo.moreinfo"), skin);
                                 infoButton.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.wiki"), skin));
                                 infoButton.pad(pad / 3f, pad, pad / 3f, pad);
                                 infoButton.addListener((event) -> {
@@ -140,7 +140,7 @@ public class ExternalInformationUpdater {
                                 if (simbadLink != null) {
                                     simbadLink.remove();
                                 }
-                                simbadLink = new Link("Simbad", linkStyle, "");
+                                simbadLink = new Link(I18n.txt("gui.focusinfo.simbad"), linkStyle, "");
                                 simbadLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.simbad"), skin));
                                 simbadLink.setLinkURL(link);
                                 simbadCell.setActor(simbadLink);

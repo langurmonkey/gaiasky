@@ -338,7 +338,7 @@ public class FileChooser extends GenericDialog {
         fileNameLabel = new Label(I18n.txt("gui.fc.filename") + ":", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
-        hidden = new OwnCheckBox("Show hidden", skin, 8f);
+        hidden = new OwnCheckBox(I18n.txt("gui.fc.showhidden"), skin, 8f);
         hidden.setChecked(false);
         hidden.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -477,7 +477,7 @@ public class FileChooser extends GenericDialog {
     }
 
     public void setAcceptedFiles(String accepted) {
-        acceptedFiles.setText("Accepted: " + accepted);
+        acceptedFiles.setText(I18n.txt("gui.fc.accepted", accepted));
     }
 
     public Path getResult() {

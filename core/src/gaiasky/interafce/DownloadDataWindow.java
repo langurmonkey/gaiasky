@@ -486,7 +486,7 @@ public class DownloadDataWindow extends GenericDialog {
         // Progress
 
         // External download link
-        Link manualDownload = new Link("Manual download", skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+        Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
         downloadTable.add(manualDownload).center().colspan(2);
 
         topCell.setActor(downloadTable);
