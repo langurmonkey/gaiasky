@@ -24,6 +24,7 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.MusicManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.*;
 
@@ -226,17 +227,19 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         //	panes.put(gaiaComponent.getClass().getSimpleName(), gaia);
 
         /** ----MUSIC GROUP---- **/
-        MusicComponent musicComponent = new MusicComponent(skin, ui);
-        musicComponent.initialize();
+        if(MusicManager.initialized()) {
+            MusicComponent musicComponent = new MusicComponent(skin, ui);
+            musicComponent.initialize();
 
-        Actor[] musicActors = MusicActorsManager.getMusicActors() != null ? MusicActorsManager.getMusicActors().getActors(skin) : null;
+            Actor[] musicActors = MusicActorsManager.getMusicActors() != null ? MusicActorsManager.getMusicActors().getActors(skin) : null;
 
-        shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
+            shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.music");
 
-        CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), getContentWidth(), skin, false, shortcut, musicActors);
-        music.align(Align.left);
-        mainActors.add(music);
-        panes.put(musicComponent.getClass().getSimpleName(), music);
+            CollapsiblePane music = new CollapsiblePane(ui, I18n.txt("gui.music"), musicComponent.getActor(), getContentWidth(), skin, false, shortcut, musicActors);
+            music.align(Align.left);
+            mainActors.add(music);
+            panes.put(musicComponent.getClass().getSimpleName(), music);
+        }
 
         Table buttonsTable;
         /** BUTTONS **/

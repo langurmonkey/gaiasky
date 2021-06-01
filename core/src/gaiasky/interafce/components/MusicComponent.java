@@ -91,7 +91,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
                 InputEvent ie = (InputEvent) event;
                 if (ie.getType().equals(InputEvent.Type.scrolled)) {
                     float scroll = -ie.getScrollAmountY() * 0.1f;
-                    float currentVol = MusicManager.instance.getVolume();
+                    float currentVol = getVolume();
                     float newVol = Math.max(0f, Math.min(1f, currentVol + scroll));
                     EventManager.instance.post(Events.MUSIC_VOLUME_CMD, newVol);
                     vol.setText("VOL: " + nf.format(getVolumePercentage()) + "%");
@@ -152,7 +152,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         if (currentTrack != null && w < currentTrack.length()) {
             int l = currentTrack.length();
 
-            if(si + w == l && sp > 0) {
+            if (si + w == l && sp > 0) {
                 sp *= -1;
             } else if (si <= 0 && sp < 0) {
                 sp *= -1;
@@ -163,10 +163,10 @@ public class MusicComponent extends GuiComponent implements IObserver {
         }
     }
 
-    private String capStr(String in, int start, int end){
-        if(in.length() <= end - start){
+    private String capStr(String in, int start, int end) {
+        if (in.length() <= end - start) {
             return in;
-        }else{
+        } else {
             return in.substring(start, end);
         }
     }
@@ -175,8 +175,18 @@ public class MusicComponent extends GuiComponent implements IObserver {
         return 20;
     }
 
+    private float getVolume(){
+        if (MusicManager.initialized())
+            return MusicManager.instance.getVolume();
+        else
+            return 0f;
+    }
+
     private float getVolumePercentage() {
-        return MusicManager.instance.getVolume() * 100f;
+        if (MusicManager.initialized())
+            return MusicManager.instance.getVolume() * 100f;
+        else
+            return 0f;
     }
 
     @Override
