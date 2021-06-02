@@ -161,11 +161,11 @@ float getShadow(){
     // Simple lookup
     //return getShadowness(v_shadowMapUv.xy, vec2(0.0), v_shadowMapUv.z);
 }
-    #else
+#else
 float getShadow(){
     return 1.0;
 }
-    #endif //shadowMapFlag
+#endif //shadowMapFlag
 
 
 // AMBIENT LIGHT
@@ -173,52 +173,52 @@ in vec3 v_ambientLight;
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
 #elif defined(diffuseTextureFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
 #elif defined(diffuseColorFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
 #else
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) defaultValue
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) defaultValue
 #endif // diffuseTextureFlag && diffuseColorFlag
 
 #if defined(diffuseTextureFlag) || defined(diffuseColorFlag)
-#define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(tex, texCoord, defaultValue)
+    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(tex, texCoord, defaultValue)
 #else
-#define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor
+    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor
 #endif // diffuseTextureFlag || diffuseColorFlag
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5 + u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5 + u_emissiveColor * 2.0
 #elif defined(emissiveTextureFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5
 #elif defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
 #endif // emissiveTextureFlag && emissiveColorFlag
 
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-#define fetchColorEmissive(emissiveTex, texCoord) fetchColorEmissiveTD(emissiveTex, texCoord)
+    #define fetchColorEmissive(emissiveTex, texCoord) fetchColorEmissiveTD(emissiveTex, texCoord)
 #else
-#define fetchColorEmissive(emissiveTex, texCoord) vec4(0.0, 0.0, 0.0, 0.0)
+    #define fetchColorEmissive(emissiveTex, texCoord) vec4(0.0, 0.0, 0.0, 0.0)
 #endif // emissiveTextureFlag || emissiveColorFlag
 
 // COLOR SPECULAR
 #if defined(specularTextureFlag) && defined(specularColorFlag)
-#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
-#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
 #elif defined(specularColorFlag)
-#define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
+    #define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
 #else
-#define fetchColorSpecular(texCoord, defaultValue) defaultValue
+    #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
 
 // COLOR NIGHT
 #if defined(nightTextureFlag)
-#define fetchColorNight(texCoord) texture(u_nightTexture, texCoord).rgb
+    #define fetchColorNight(texCoord) texture(u_nightTexture, texCoord).rgb
 #else
-#define fetchColorNight(texCoord) vec3(0.0)
+    #define fetchColorNight(texCoord) vec3(0.0)
 #endif // nightTextureFlag
 
 #define N_LIGHTS 4
@@ -311,7 +311,7 @@ vec2 parallaxMappingSimple(vec2 texCoords, vec3 viewDir){
     vec2 p = displacement.xy;
     return texCoords - p;
 }
-    #endif // heightFlag
+#endif // heightFlag
 
 // http://www.thetenthplanet.de/archives/1180
 mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
@@ -332,11 +332,11 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
     return mat3( T * invmax, B * invmax, N );
 }
 
-    #include shader/lib_logdepthbuff.glsl
+#include shader/lib_logdepthbuff.glsl
 
-    #ifdef velocityBufferFlag
-    #include shader/lib_velbuffer.frag.glsl
-    #endif
+#ifdef velocityBufferFlag
+#include shader/lib_velbuffer.frag.glsl
+#endif
 
 float luma(vec3 color){
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
@@ -347,23 +347,28 @@ void main() {
 
     vec3 lightDir[N_LIGHTS], lightCol[N_LIGHTS], viewDir;
 
+    // TBN and viewDir do not depend on light
     #ifdef heightFlag
     // Compute tangent space
     pullNormal();
-    #endif
+    mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
+    viewDir = normalize(v_viewDir * TBN);
+    // Parallax occlusion mapping
+    texCoords = parallaxMapping(texCoords, viewDir);
+    #else // heightFlag
+    viewDir = v_viewDir;
+    #endif // heightFlag
 
-    for(int i = 0; i < v_numDirectionalLights; i++) {
+    //int nLights = v_numDirectionalLights;
+    int nLights = 1;
+
+    for(int i = 0; i < nLights; i++) {
         #ifdef heightFlag
-        mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-        viewDir = normalize(v_viewDir * TBN);
         lightDir[i] = normalize(v_directionalLightDir[i] * TBN);
         lightCol[i] = v_directionalLightColor[i];
-        // Parallax occlusion mapping
-        texCoords = parallaxMapping(texCoords, viewDir);
         #else // heightFlag
         lightDir[i] = v_directionalLightDir[i];
         lightCol[i] = v_directionalLightColor[i];
-        viewDir = v_viewDir;
         #endif // heightFlag
     }
 
@@ -382,20 +387,20 @@ void main() {
     #endif
 
     #ifdef normalTextureFlag
-    // Normal in tangent space
-    vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
-    #ifdef environmentCubemapFlag
-    // Perturb the normal to get reflect direction
-    pullNormal();
-    mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-    vec3 reflectDir = normalize(reflect(-v_fragPosWorld, normalize(TBN * N)));
-    #endif // environmentCubemapFlag
+        // Normal in tangent space
+        vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
+		#ifdef environmentCubemapFlag
+            // Perturb the normal to get reflect direction
+            pullNormal();
+            mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
+			vec3 reflectDir = normalize(reflect(-v_fragPosWorld, normalize(TBN * N)));
+		#endif // environmentCubemapFlag
     #else
-    // Normal in tangent space
-    vec3 N = vec3(0.0, 0.0, 1.0);
-    #ifdef environmentCubemapFlag
-    vec3 reflectDir = normalize(v_reflect);
-    #endif // environmentCubemapFlag
+	    // Normal in tangent space
+	    vec3 N = vec3(0.0, 0.0, 1.0);
+		#ifdef environmentCubemapFlag
+			vec3 reflectDir = normalize(v_reflect);
+		#endif // environmentCubemapFlag
     #endif // normalTextureFlag
 
     // Shadow
@@ -403,7 +408,6 @@ void main() {
     // Cubemap
     vec3 env = vec3(0.0);
     #ifdef environmentCubemapFlag
-
     env = texture(u_environmentCubemap, reflectDir).rgb;
     #ifdef reflectionColorFlag
     env = env * u_reflectionColor.rgb;
@@ -413,10 +417,10 @@ void main() {
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);
-    float selfShadow = 0.0;
+    float selfShadow = 1.0;
 
-    // Loop over directional lights
-    for(int i = 0; i < v_numDirectionalLights; i++) {
+    // Loop for directional light contributitons
+    for(int i = 0; i < nLights; i++) {
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = lightDir[i];
         vec3 V = viewDir;
