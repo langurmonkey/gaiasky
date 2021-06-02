@@ -359,8 +359,7 @@ void main() {
     viewDir = v_viewDir;
     #endif // heightFlag
 
-    //int nLights = v_numDirectionalLights;
-    int nLights = 1;
+    int nLights = v_numDirectionalLights;
 
     for(int i = 0; i < nLights; i++) {
         #ifdef heightFlag
@@ -421,6 +420,11 @@ void main() {
 
     // Loop for directional light contributitons
     for(int i = 0; i < nLights; i++) {
+        vec3 col = lightCol[i];
+        // Skip non-lights
+        if (i > 0 && col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+            continue;
+        }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = lightDir[i];
         vec3 V = viewDir;
