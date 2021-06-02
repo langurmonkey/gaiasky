@@ -376,7 +376,8 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
 
 task createAppimage(dependsOn: createTar, description: "Creates the appimage package for Gaia Sky") {
     doLast{
-        String appimgDir = "$packageDir/GaiaSky.AppDir"
+        String gsId = "gaiasky"
+        String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
 
         delete "$appimgDir"
         mkdir "$appimgDir"
@@ -395,8 +396,7 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         usrbin.mkdirs()
         usrlib.mkdirs()
         usrconf.mkdirs()
-        usrshare.mkdirs()
-        usrsharemeta.mkdirs()
+        usrmeta.mkdirs()
         copy {
             from "${System.env.JAVA_HOME}/bin/java"
             into usrbin
@@ -410,7 +410,7 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
             into usrconf
         }
         copy {
-            from file("$appimgDir/gaiasky.appdata.xml")
+            from file("$appimgDir/" + "$gsId" + ".appdata.xml")
             into usrmeta
         }
 
@@ -418,10 +418,10 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         delete "$appimgDir/gaiasky", "$appimgDir/gaiasky.cmd"
         delete "$appimgDir/gs_icon.ico", "$appimgDir/gs_icon.svg", "$appimgDir/gsvr_icon.ico", "$appimgDir/gsvr_icon.png"
         delete "$appimgDir/gaiasky.desktop"
-        delete "$appimgDir/gaiasky.appdata.xml"
+        delete "$appimgDir/" + "$gsId" + ".appdata.xml"
         file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))
 
-        String appImgFilename = "GaiaSky_" + "$tagRev" + "_x86_64.appimage"
+        String appImgFilename = "$gsId" + "_" + "$tagRev" + "_x86_64.appimage"
         // Generate appimage
         exec {
             executable "appimagetool"
