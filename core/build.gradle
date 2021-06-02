@@ -360,6 +360,7 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
                 include(name: "$distName/**")
                 exclude(name: "$distName/AppRun")
                 exclude(name: "$distName/gaiasky-appimage.desktop")
+                exclude(name: "$distName/gaiasky.appdata.xml")
             }
             tarfileset(dir: "$releasesDir", filemode: '755') {
                 include(name: "$distName/gaiasky")
@@ -375,7 +376,8 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
 
 task createAppimage(dependsOn: createTar, description: "Creates the appimage package for Gaia Sky") {
     doLast{
-        String appimgDir = "$packageDir/GaiaSky.AppDir"
+        String gsId = "gaiasky"
+        String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
 
         delete "$appimgDir"
         mkdir "$appimgDir"
@@ -390,9 +392,11 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         File usrbin = new File("$appimgDir", "usr/bin/")
         File usrlib = new File("$appimgDir", "usr/lib/")
         File usrconf = new File("$appimgDir", "usr/conf/")
-        mkdir usrbin
-        mkdir usrlib
-        mkdir usrconf
+        File usrmeta = new File("$appimgDir", "usr/share/metainfo/")
+        usrbin.mkdirs()
+        usrlib.mkdirs()
+        usrconf.mkdirs()
+        usrmeta.mkdirs()
         copy {
             from "${System.env.JAVA_HOME}/bin/java"
             into usrbin
@@ -405,14 +409,19 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
             from "${System.env.JAVA_HOME}/conf/"
             into usrconf
         }
+        copy {
+            from file("$appimgDir/" + "$gsId" + ".appdata.xml")
+            into usrmeta
+        }
 
         // Set up AppRun executable, remove unneeded files
         delete "$appimgDir/gaiasky", "$appimgDir/gaiasky.cmd"
         delete "$appimgDir/gs_icon.ico", "$appimgDir/gs_icon.svg", "$appimgDir/gsvr_icon.ico", "$appimgDir/gsvr_icon.png"
         delete "$appimgDir/gaiasky.desktop"
+        delete "$appimgDir/" + "$gsId" + ".appdata.xml"
         file("$appimgDir/gaiasky-appimage.desktop").renameTo(file("$appimgDir/gaiasky.desktop"))
 
-        String appImgFilename = "GaiaSky_" + "$tagRev" + "_x86_64.appimage"
+        String appImgFilename = "$gsId" + "_" + "$tagRev" + "_x86_64.appimage"
         // Generate appimage
         exec {
             executable "appimagetool"
@@ -539,7 +548,7 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
 
 task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], description: "Creates the releases for windows, mac, linux and the tar package") {
     doLast {
-        println("Appending md5 checksum of " + project.distName + ".tar.gz and GaiaSky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
+        println("Appending md5 checksum of " + project.distName + ".tar.gz and gaiasky_" + "$tagRev" + "_x86_64.appimage to md5sums file")
         File md5File = file("$packageDir/" + 'md5sums')
         if (md5File.exists()) {
             // Tar
@@ -547,13 +556,13 @@ task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], descrip
             md5Tar = md5Tar.replace("\n", "").replace("\r", "");
 
             // Appimage
-            String md5AppImg = file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5").text
+            String md5AppImg = file("$packageDir/gaiasky_" + "$tagRev" + "_x86_64.appimage.md5").text
             md5AppImg = md5AppImg.replace("\n", "").replace("\r", "");
 
-            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n" + md5AppImg + " *GaiaSky_" + "$tagRev" + "_x86_64.appimage\n"
-            println("Removing files " + project.distName + ".tar.gz.md5 and GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5")
+            md5File.text = file("$packageDir/" + 'md5sums').text + md5Tar + " *" + project.distName + ".tar.gz\n" + md5AppImg + " *gaiasky_" + "$tagRev" + "_x86_64.appimage\n"
+            println("Removing files " + project.distName + ".tar.gz.md5 and gaiasky_" + "$tagRev" + "_x86_64.appimage.md5")
             file("$packageDir/" + project.distName + ".tar.gz.md5").delete()
-            file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.md5").delete()
+            file("$packageDir/gaiasky_" + "$tagRev" + "_x86_64.appimage.md5").delete()
         } else {
             println("md5 file not found: " + md5File)
         }
@@ -566,13 +575,13 @@ task pack(dependsOn: ['install4jMedia', 'createAppimage', 'createArch'], descrip
             sha256Tar = sha256Tar.replace("\n", "").replace("\r", "");
 
             // Appimage
-            String sha256AppImg = file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256").text
+            String sha256AppImg = file("$packageDir/gaiasky_" + "$tagRev" + "_x86_64.appimage.sha-256").text
             sha256AppImg = sha256AppImg.replace("\n", "").replace("\r", "");
 
-            sha256File.text = file("$packageDir/" + 'sha256sums').text + sha256Tar + " *" + project.distName + ".tar.gz\n" + sha256AppImg + " *GaiaSky_" + "$tagRev" + "_x86_64.appimage\n"
-            println("Removing files " + project.distName + ".tar.gz.sha-256 and GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256")
+            sha256File.text = file("$packageDir/" + 'sha256sums').text + sha256Tar + " *" + project.distName + ".tar.gz\n" + sha256AppImg + " *gaiasky_" + "$tagRev" + "_x86_64.appimage\n"
+            println("Removing files " + project.distName + ".tar.gz.sha-256 and gaiasky_" + "$tagRev" + "_x86_64.appimage.sha-256")
             file("$packageDir/" + project.distName + ".tar.gz.sha-256").delete()
-            file("$packageDir/GaiaSky_" + "$tagRev" + "_x86_64.appimage.sha-256").delete()
+            file("$packageDir/gaiasky_" + "$tagRev" + "_x86_64.appimage.sha-256").delete()
         } else {
             println("sha256 file not found: " + sha256File)
         }

@@ -2,7 +2,7 @@
 <img src="assets/icon/gs_logo.png" alt="Gaia Sky logo" width="500" />
 </p>
 
-<h2 align="center">An open source 3D universe simulator with support for more than a billion objects</h2>
+<h2 align="center">An open source 3D universe simulator for desktop and VR with support for more than a billion objects</h2>
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
