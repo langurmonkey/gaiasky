@@ -229,7 +229,7 @@ public class CollapsiblePane extends Table {
         window.add(contentScroll).pad(8f).row();
 
         /** Close button **/
-        OwnTextButton close = new OwnTextButton(I18n.bundle.get("gui.close"), skin, "default");
+        OwnTextButton close = new OwnTextButton(I18n.txt("gui.close"), skin, "default");
         close.setName("close");
         close.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -245,7 +245,7 @@ public class CollapsiblePane extends Table {
             return false;
         });
         Container<Button> closeContainer = new Container<>(close);
-        close.setWidth(112f);
+        close.setWidth(185f);
         closeContainer.align(Align.right);
 
         window.add(closeContainer).pad(8f).bottom().right();
