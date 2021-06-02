@@ -425,7 +425,7 @@ void main() {
         vec3 L = lightDir[i];
         vec3 V = viewDir;
         vec3 H = normalize(L + V);
-        float NL = max(1.0, dot(N, L));
+        float NL = max(0.0, dot(N, L));
         float NH = max(0.0, dot(N, H));
 
         specular *= min(1.0, pow(NH, 40.0));
