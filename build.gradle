@@ -28,7 +28,7 @@ allprojects {
         oshiVersion = "4.0.0"
         jsampVersion = "+"
         sdl2gdxVersion = "1.0.+"
-        jsoupVersion = "+"
+        jsoupVersion = "1.13.1"
         apfloatVersion = "1.9.1"
     }
 
@@ -38,11 +38,6 @@ allprojects {
         maven{ url "https://repo1.maven.org/maven2/" }
         maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
         maven{ url "https://oss.sonatype.org/content/repositories/releases/" }
-        maven {
-            url "http://nexus.vamdc.org/nexus/content/repositories/releases/"
-            allowInsecureProtocol true
-        }
-
     }
 }
 
