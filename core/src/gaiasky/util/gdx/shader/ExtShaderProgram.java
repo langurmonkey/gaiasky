@@ -32,6 +32,9 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 
 import java.lang.StringBuilder;
 import java.nio.*;
@@ -67,20 +70,14 @@ import java.nio.*;
  * @author mzechner
  */
 public class ExtShaderProgram implements Disposable {
+    private static final Log logger = Logger.getLogger(ExtShaderProgram.class);
+
     /** default name for position attributes **/
     public static final String POSITION_ATTRIBUTE = "a_position";
-    /** default name for normal attributes **/
-    public static final String NORMAL_ATTRIBUTE = "a_normal";
     /** default name for color attributes **/
     public static final String COLOR_ATTRIBUTE = "a_color";
-    /** default name for texcoords attributes, append texture unit number **/
+    /** default name for texture coordinates attributes, append texture unit number **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
-    /** default name for tangent attribute **/
-    public static final String TANGENT_ATTRIBUTE = "a_tangent";
-    /** default name for binormal attribute **/
-    public static final String BINORMAL_ATTRIBUTE = "a_binormal";
-    /** default name for boneweight attribute **/
-    public static final String BONEWEIGHT_ATTRIBUTE = "a_boneWeight";
 
     /** flag indicating whether attributes & uniforms must be present at all times **/
     public static boolean pedantic = true;
@@ -98,7 +95,7 @@ public class ExtShaderProgram implements Disposable {
     public static String prependFragmentCode = "";
 
     /** the list of currently available shaders **/
-    private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<Application, Array<ExtShaderProgram>>();
+    private final static ObjectMap<Application, Array<ExtShaderProgram>> shaders = new ObjectMap<>();
 
     /** the log **/
     private String log = "";
@@ -107,25 +104,25 @@ public class ExtShaderProgram implements Disposable {
     private boolean isCompiled;
 
     /** uniform lookup **/
-    private final ObjectIntMap<String> uniforms = new ObjectIntMap<String>();
+    private final ObjectIntMap<String> uniforms = new ObjectIntMap<>();
 
     /** uniform types **/
-    private final ObjectIntMap<String> uniformTypes = new ObjectIntMap<String>();
+    private final ObjectIntMap<String> uniformTypes = new ObjectIntMap<>();
 
     /** uniform sizes **/
-    private final ObjectIntMap<String> uniformSizes = new ObjectIntMap<String>();
+    private final ObjectIntMap<String> uniformSizes = new ObjectIntMap<>();
 
     /** uniform names **/
     private String[] uniformNames;
 
     /** attribute lookup **/
-    private final ObjectIntMap<String> attributes = new ObjectIntMap<String>();
+    private final ObjectIntMap<String> attributes = new ObjectIntMap<>();
 
     /** attribute types **/
-    private final ObjectIntMap<String> attributeTypes = new ObjectIntMap<String>();
+    private final ObjectIntMap<String> attributeTypes = new ObjectIntMap<>();
 
     /** attribute sizes **/
-    private final ObjectIntMap<String> attributeSizes = new ObjectIntMap<String>();
+    private final ObjectIntMap<String> attributeSizes = new ObjectIntMap<>();
 
     /** attribute names **/
     private String[] attributeNames;
@@ -139,9 +136,6 @@ public class ExtShaderProgram implements Disposable {
     /** fragment shader handle **/
     private int fragmentShaderHandle;
 
-    /** matrix float buffer **/
-    private FloatBuffer matrix;
-
     /** vertex shader source **/
     private String vertexShaderSource;
 
@@ -150,9 +144,6 @@ public class ExtShaderProgram implements Disposable {
 
     /** whether this shader was invalidated **/
     private boolean invalidated;
-
-    /** reference count **/
-    private final int refCount = 0;
 
     public ExtShaderProgram() {
     }
@@ -177,13 +168,14 @@ public class ExtShaderProgram implements Disposable {
 
         this.vertexShaderSource = vertexShader;
         this.fragmentShaderSource = fragmentShader;
-        this.matrix = BufferUtils.newFloatBuffer(16);
 
         compileShaders(vertexShader, fragmentShader);
         if (isCompiled()) {
             fetchAttributes();
             fetchUniforms();
             addManagedShader(Gdx.app, this);
+        } else {
+            logger.error("Shader compilation failed: " + getLog());
         }
     }
 

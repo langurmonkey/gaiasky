@@ -246,7 +246,7 @@ out vec3 v_ambientLight;
 
 #ifdef ambientCubemapFlag
     uniform vec3 u_ambientCubemap[6];
-#endif // ambientCubemapFlag 
+#endif // ambientCubemapFlag
 
 //////////////////////////////////////////////////////
 ////// POINTS LIGHTS
@@ -311,7 +311,7 @@ void main() {
     #ifdef relativisticEffects
         pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
     #endif // relativisticEffects
-    
+
     #ifdef gravitationalWaves
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
@@ -345,8 +345,8 @@ void main() {
     #else
 	v_ambientLight = vec3(0.0);
     #endif // ambientLightFlag
-    
-    #ifdef ambientCubemapFlag 		
+
+    #ifdef ambientCubemapFlag
 	vec3 squaredNormal = g_normal * g_normal;
 	vec3 isPositive = step(0.0, g_normal);
 	v_ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
