@@ -388,28 +388,16 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
             into "$appimgDir"
         }
 
-        // Set up /usr/bin and /usr/lib with jvm
-        File usrbin = new File("$appimgDir", "usr/bin/")
-        File usrlib = new File("$appimgDir", "usr/lib/")
-        File usrconf = new File("$appimgDir", "usr/conf/")
-        File usrmeta = new File("$appimgDir", "usr/share/metainfo/")
-        usrbin.mkdirs()
-        usrlib.mkdirs()
-        usrconf.mkdirs()
-        usrmeta.mkdirs()
+        // Package JRE
         println("Packaging JRE ${System.env.JAVA_HOME} into Appimage")
-        copy {
-            from "${System.env.JAVA_HOME}/bin/java"
-            into usrbin
+        exec {
+            executable "${System.env.JAVA_HOME}/bin/jlink"
+            args "--no-header-files", "--no-man-pages", "--compress=2", "--strip-debug", "--add-modules", "java.base,java.naming,java.datatransfer,java.desktop,java.logging,java.xml,jdk.unsupported,java.net.http,java.management,jdk.management,java.sql", "--output", "$appimgDir/usr"
         }
-        copy {
-            from "${System.env.JAVA_HOME}/lib/"
-            into usrlib
-        }
-        copy {
-            from "${System.env.JAVA_HOME}/conf/"
-            into usrconf
-        }
+
+        // Metadata
+        File usrmeta = new File("$appimgDir", "usr/share/metainfo/")
+        usrmeta.mkdirs()
         copy {
             from file("$appimgDir/" + "$gsId" + ".appdata.xml")
             into usrmeta
