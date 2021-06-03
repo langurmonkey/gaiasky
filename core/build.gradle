@@ -397,6 +397,7 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         usrlib.mkdirs()
         usrconf.mkdirs()
         usrmeta.mkdirs()
+        println("Packaging JRE ${System.env.JAVA_HOME} into Appimage")
         copy {
             from "${System.env.JAVA_HOME}/bin/java"
             into usrbin
@@ -425,7 +426,7 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         // Generate appimage
         exec {
             executable "appimagetool"
-            args "$appimgDir", "$packageDir/$appImgFilename"
+            args "-n", "$appimgDir", "$packageDir/$appImgFilename"
         }
 
         // Checksums
