@@ -7,7 +7,6 @@ package gaiasky.util.coord;
 
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import org.apfloat.Apfloat;
 
 import java.time.Instant;

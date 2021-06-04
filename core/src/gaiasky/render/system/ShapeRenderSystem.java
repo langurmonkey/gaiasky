@@ -10,15 +10,18 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IRenderable;
 import gaiasky.render.IShapeRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalResources;
 
-import java.util.List;
-
+/**
+ * System that renders shapes through a {@link ShapeRenderer}
+ */
 public class ShapeRenderSystem extends AbstractRenderSystem {
 
+    /**
+     * The shape renderer
+     */
     private final ShapeRenderer shapeRenderer;
 
     public ShapeRenderSystem(RenderGroup rg, float[] alphas) {

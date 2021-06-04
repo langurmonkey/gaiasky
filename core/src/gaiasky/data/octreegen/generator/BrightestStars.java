@@ -9,7 +9,6 @@ import com.badlogic.gdx.math.MathUtils;
 import gaiasky.data.octreegen.StarBrightnessComparator;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.tree.OctreeNode;
 
 import java.util.ArrayList;

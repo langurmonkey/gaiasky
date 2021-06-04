@@ -35,19 +35,19 @@ public class SGRAbstract {
         extendViewport = new ExtendViewport(200, 200);
     }
 
-    protected boolean postprocessCapture(PostProcessBean ppb, FrameBuffer fb, int rw, int rh) {
-        boolean postproc = ppb.capture();
-        if (postproc) {
+    protected boolean postProcessCapture(PostProcessBean ppb, FrameBuffer fb, int rw, int rh) {
+        boolean postProcess = ppb.capture();
+        if (postProcess) {
             rc.ppb = ppb;
         } else {
             rc.ppb = null;
         }
         rc.fb = fb;
         rc.set(rw, rh);
-        return postproc;
+        return postProcess;
     }
 
-    protected void postprocessRender(PostProcessBean ppb, FrameBuffer fb, boolean postproc, ICamera camera, int rw, int rh) {
+    protected void postProcessRender(PostProcessBean ppb, FrameBuffer fb, boolean postproc, ICamera camera, int rw, int rh) {
         ppb.render(fb);
 
         // Render camera

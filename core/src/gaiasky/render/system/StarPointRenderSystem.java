@@ -27,10 +27,8 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-import java.util.List;
-
 public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {
-    private final double BRIGHTNESS_FACTOR;
+    private final double BRIGHTNESS_FACTOR = 10;
 
     boolean starColorTransit = false;
     Vector3 aux;
@@ -43,7 +41,6 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
         EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
-        BRIGHTNESS_FACTOR = 10;
         this.ct = ct;
         this.alphaSizeFovBr = new float[4];
         initializing = true;
@@ -74,7 +71,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
 
         aux = new Vector3();
 
-        /** Init renderer **/
+        // Init renderer
         int nVertices = 30;
 
         VertexAttribute[] attribs = buildVertexAttributes();
@@ -179,14 +176,10 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             for (ExtShaderProgram p : programs) {
                 if (p != null && p.isCompiled()) {
                     pointAlpha[0] = (float) data[0];
-                    GaiaSky.postRunnable(new Runnable() {
-                        @Override
-                        public void run() {
-                            p.begin();
-                            p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                            p.end();
-                        }
-
+                    GaiaSky.postRunnable(() -> {
+                        p.begin();
+                        p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
+                        p.end();
                     });
                 }
             }

@@ -30,8 +30,6 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
-import java.util.Map;
-
 /**
  * Represents a constellation object.
  *

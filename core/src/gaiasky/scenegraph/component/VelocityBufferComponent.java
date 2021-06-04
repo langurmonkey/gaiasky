@@ -13,7 +13,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.shader.Matrix4Attribute;
 import gaiasky.util.gdx.shader.Vector3Attribute;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
 import java.util.Set;

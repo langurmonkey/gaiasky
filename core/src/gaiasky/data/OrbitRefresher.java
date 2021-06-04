@@ -16,7 +16,6 @@ import gaiasky.util.Logger.Log;
 
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class OrbitRefresher {
     private static final Log logger = Logger.getLogger(OrbitRefresher.class);

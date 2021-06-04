@@ -13,8 +13,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.comp.ModelComparator;
 import gaiasky.util.gdx.IntModelBatch;
 
-import java.util.List;
-
 /**
  * Renders with a given model batch.
  * 
@@ -66,7 +64,7 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
                         s.render(batch, getAlpha(s), t, rc);
                         break;
                     case ATMOSPHERE:
-                        ((IAtmosphereRenderable) s).renderAtmosphere(batch, getAlpha(ctAtm), t, rc.vroffset);
+                        ((IAtmosphereRenderable) s).renderAtmosphere(batch, getAlpha(ctAtm), t, rc.vrOffset);
                         break;
                     case CLOUD:
                         ((ICloudRenderable) s).renderClouds(batch, getAlpha(ctClouds), t);

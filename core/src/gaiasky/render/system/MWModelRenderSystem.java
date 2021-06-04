@@ -21,7 +21,6 @@ import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.MilkyWay;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -179,16 +178,17 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     /**
+     * Converts a given list of particle records to GPU data
      * 0 - dust
      * 1 - star
      * 2 - bulge
      * 3 - gas
      * 4 - hii
      *
-     * @param data
-     * @param cg
+     * @param data List with the particle records
+     * @param cg   The color generator
      * @param type The type
-     * @return
+     * @return The GPU data object
      */
     private GpuData convertDataToGpu(List<IParticleRecord> data, ColorGenerator cg, PType type) {
         GpuData ad = new GpuData();
@@ -365,17 +365,13 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case GRAPHICS_QUALITY_UPDATED:
+        if (event == Events.GRAPHICS_QUALITY_UPDATED) {
             GraphicsQuality gq = (GraphicsQuality) data[0];
             GaiaSky.postRunnable(() -> {
                 disposeTextureArray();
                 initializeTextureArray(gq);
                 initializeMaxSizes(gq);
             });
-            break;
-        default:
-            break;
         }
     }
 
@@ -383,7 +379,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         float[] generateColor();
     }
 
-    private class StarColorGenerator implements ColorGenerator {
+    private static class StarColorGenerator implements ColorGenerator {
         public float[] generateColor() {
             float r = (float) StdRandom.gaussian() * 0.15f;
             if (StdRandom.uniform(2) == 0) {
@@ -396,7 +392,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         }
     }
 
-    private class DustColorGenerator implements ColorGenerator {
+    private static class DustColorGenerator implements ColorGenerator {
         @Override
         public float[] generateColor() {
             float r = (float) Math.abs(StdRandom.uniform() * 0.19);
@@ -404,7 +400,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         }
     }
 
-    private class GpuData {
+    private static class GpuData {
         float[] vertices;
         int vertexIdx;
     }

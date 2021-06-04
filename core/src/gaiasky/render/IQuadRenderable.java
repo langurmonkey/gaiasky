@@ -14,10 +14,10 @@ public interface IQuadRenderable extends IRenderable {
     /**
      * Renders the renderable as a quad using the star shader.
      *
-     * @param shader
-     * @param alpha
-     * @param mesh
-     * @param camera
+     * @param shader The shader program
+     * @param alpha  Opacity value
+     * @param mesh   The mesh
+     * @param camera The camera
      */
     void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera);
 }

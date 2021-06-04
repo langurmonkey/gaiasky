@@ -11,8 +11,6 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 
-import java.util.List;
-
 /**
  * A component that renders a type of objects.
  *

@@ -209,7 +209,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Left);
 
-            boolean postproc = postprocessCapture(ppb, fbLeft, rw, rh);
+            boolean postProcess = postProcessCapture(ppb, fbLeft, rw, rh);
 
             // Render scene
             sgr.renderScene(camera, t, rc);
@@ -228,7 +228,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             }
 
             sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postprocessRender(ppb, fbLeft, postproc, camera, rw, rh);
+            postProcessRender(ppb, fbLeft, postProcess, camera, rw, rh);
 
             /** RIGHT EYE **/
 
@@ -237,7 +237,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Right);
 
-            postproc = postprocessCapture(ppb, fbRight, rw, rh);
+            postProcess = postProcessCapture(ppb, fbRight, rw, rh);
 
             // Render scene
             sgr.renderScene(camera, t, rc);
@@ -258,7 +258,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             }
 
             sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postprocessRender(ppb, fbRight, postproc, camera, rw, rh);
+            postProcessRender(ppb, fbRight, postProcess, camera, rw, rh);
 
             /** SUBMIT TO VR COMPOSITOR **/
             VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, texLeft, null, VR.EVRSubmitFlags_Submit_Default);
@@ -292,7 +292,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             cam.vrOffset.set(pos).scl(Constants.M_TO_U);
             cam.direction.set(dir);
             cam.up.set(up);
-            rc.vroffset = cam.vrOffset;
+            rc.vrOffset = cam.vrOffset;
         }
 
         // Update Eye camera

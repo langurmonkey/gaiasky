@@ -7,7 +7,6 @@ package gaiasky.util.coord;
 
 import gaiasky.scenegraph.Orbit;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

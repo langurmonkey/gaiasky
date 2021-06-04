@@ -6,7 +6,6 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.math.Vector2;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;

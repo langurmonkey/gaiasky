@@ -28,24 +28,24 @@ public class SGRFov extends SGRAbstract implements ISGR {
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postproc = postprocessCapture(ppb, fb, tw, th);
+        boolean postProcess = postProcessCapture(ppb, fb, tw, th);
 
         /** FIELD OF VIEW CAMERA - we only render the star group process **/
 
         FovCamera cam = ((CameraManager) camera).fovCamera;
-        int fovmode = camera.getMode().getGaiaFovMode();
-        if (fovmode == 1 || fovmode == 3) {
+        int fovMode = camera.getMode().getGaiaFovMode();
+        if (fovMode == 1 || fovMode == 3) {
             cam.dirindex = 0;
             sgr.renderSystem(camera, t, rc, StarGroupRenderSystem.class);
         }
 
-        if (fovmode == 2 || fovmode == 3) {
+        if (fovMode == 2 || fovMode == 3) {
             cam.dirindex = 1;
             sgr.renderSystem(camera, t, rc, StarGroupRenderSystem.class);
         }
 
         sendOrientationUpdate(camera.getCamera(), rw, rh);
-        postprocessRender(ppb, fb, postproc, camera, rw, rh);
+        postProcessRender(ppb, fb, postProcess, camera, rw, rh);
 
     }
 

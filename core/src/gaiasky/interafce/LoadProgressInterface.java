@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.scene2d.OwnProgressBar;
 
 public class LoadProgressInterface extends TableGuiInterface implements IObserver {

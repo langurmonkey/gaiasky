@@ -94,8 +94,8 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             curr.capacity = 10000;
             currExt.maxIndices = curr.capacity + curr.capacity / 2;
 
-            VertexAttribute[] attribs = buildVertexAttributes();
-            currExt.mesh = new IntMesh(false, curr.capacity, currExt.maxIndices, attribs);
+            VertexAttribute[] attributes = buildVertexAttributes();
+            currExt.mesh = new IntMesh(false, curr.capacity, currExt.maxIndices, attributes);
 
             currExt.indices = new int[currExt.maxIndices];
             currExt.vertexSize = currExt.mesh.getVertexAttributes().vertexSize / 4;
@@ -110,14 +110,14 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv"));
+        Array<VertexAttribute> attributes = new Array<>();
+        attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, "a_uv"));
 
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
+        VertexAttribute[] array = new VertexAttribute[attributes.size];
+        for (int i = 0; i < attributes.size; i++)
+            array[i] = attributes.get(i);
         return array;
     }
 
@@ -197,19 +197,19 @@ public class LineQuadRenderSystem extends LineRenderSystem {
     }
 
     public void addLinePostproc(Line l) {
-        int npoints = l.points.length;
-        // Check if npoints more indices fit
-        if (currExt.numVertices + npoints * 2 - 2 > curr.capacity) {
+        int nPoints = l.points.length;
+        // Check if nPoints more indices fit
+        if (currExt.numVertices + nPoints * 2 - 2 > curr.capacity) {
             initVertices(meshIdx++);
         }
 
-        for (int i = 1; i < npoints; i++) {
+        for (int i = 1; i < nPoints; i++) {
             if (i == 1) {
                 // Line from 0 to 1
                 line.set(l.points[1][0] - l.points[0][0], l.points[1][1] - l.points[0][1], l.points[1][2] - l.points[0][2]);
-            } else if (i == npoints - 1) {
+            } else if (i == nPoints - 1) {
                 // Line from npoints-1 to npoints
-                line.set(l.points[npoints - 1][0] - l.points[npoints - 2][0], l.points[npoints - 1][1] - l.points[npoints - 2][1], l.points[npoints - 1][2] - l.points[npoints - 2][2]);
+                line.set(l.points[nPoints - 1][0] - l.points[nPoints - 2][0], l.points[nPoints - 1][1] - l.points[nPoints - 2][1], l.points[nPoints - 1][2] - l.points[nPoints - 2][2]);
             } else {
                 // Line from i-1 to i+1
                 line.set(l.points[i + 1][0] - l.points[i - 1][0], l.points[i + 1][1] - l.points[i - 1][1], l.points[i + 1][2] - l.points[i - 1][2]);
@@ -221,13 +221,13 @@ public class LineQuadRenderSystem extends LineRenderSystem {
             // P1
             point.set(l.points[i]).add(camdir0);
             color(l.r, l.g, l.b, l.a);
-            uv(i / (npoints - 1), 0);
+            uv(i / (nPoints - 1), 0);
             vertex((float) point.x, (float) point.y, (float) point.z);
 
             // P2
             point.set(l.points[i]).sub(camdir0);
             color(l.r, l.g, l.b, l.a);
-            uv(i / (npoints - 1), 1);
+            uv(i / (nPoints - 1), 1);
             vertex((float) point.x, (float) point.y, (float) point.z);
 
             // Indices
@@ -358,16 +358,16 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     protected class DPool extends Pool<double[]> {
 
-        private final int dsize;
+        private final int poolSize;
 
-        public DPool(int initialCapacity, int max, int dsize) {
+        public DPool(int initialCapacity, int max, int poolSize) {
             super(initialCapacity, max);
-            this.dsize = dsize;
+            this.poolSize = poolSize;
         }
 
         @Override
         protected double[] newObject() {
-            return new double[dsize];
+            return new double[poolSize];
         }
 
     }

@@ -31,7 +31,10 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
-import gaiasky.util.math.*;
+import gaiasky.util.math.Frustumd;
+import gaiasky.util.math.Matrix4d;
+import gaiasky.util.math.Quaterniond;
+import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.ArrayList;

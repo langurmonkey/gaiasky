@@ -152,7 +152,7 @@ public class LineRenderSystem extends ImmediateRenderSystem {
         vertex((float) x1, (float) y1, (float) z1);
     }
 
-    protected class LineArraySorter implements Comparator<double[]> {
+    protected static class LineArraySorter implements Comparator<double[]> {
         private final int idx;
 
         public LineArraySorter(int idx) {

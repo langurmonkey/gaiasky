@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 

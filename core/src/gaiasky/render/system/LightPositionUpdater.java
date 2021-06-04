@@ -25,7 +25,6 @@ import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
@@ -59,7 +58,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         }
     }
 
-    public float[] initializeList(float[] list, int size) {
+    public float[] initializeList(final float[] list, int size) {
         if (list == null) {
             return new float[size];
         } else {

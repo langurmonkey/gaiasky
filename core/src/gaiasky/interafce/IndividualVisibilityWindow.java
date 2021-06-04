@@ -16,8 +16,10 @@ import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This window controls the visibility of individual objects

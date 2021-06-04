@@ -18,7 +18,6 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 public class NBGalaxy extends Particle {

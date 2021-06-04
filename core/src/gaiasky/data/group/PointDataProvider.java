@@ -6,7 +6,6 @@
 package gaiasky.data.group;
 
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.scenegraph.particle.PointParticleRecord;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;

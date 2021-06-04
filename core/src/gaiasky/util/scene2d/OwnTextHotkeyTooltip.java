@@ -24,7 +24,6 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.TextTooltip.TextTooltipStyle;
-import gaiasky.util.GlobalConf;
 
 /**
  * A tooltip that shows a label and a hotkey shortcut in gray.

@@ -11,7 +11,6 @@ import gaiasky.util.Nature;
 import gaiasky.util.coord.vsop87.VSOP87;
 import gaiasky.util.coord.vsop87.iVSOP87;
 import gaiasky.util.math.*;
-import org.apfloat.Apfloat;
 
 import java.time.Instant;
 import java.time.LocalDateTime;

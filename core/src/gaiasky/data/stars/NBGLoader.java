@@ -18,7 +18,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import org.apfloat.Apfloat;
 

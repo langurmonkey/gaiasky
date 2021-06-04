@@ -80,7 +80,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     @Override
     protected void initVertices() {
-        /** STARS **/
+        // STARS
         meshes = new Array<>();
     }
 
@@ -132,7 +132,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             alphaSizeFovBr[3] = rc.scaleFactor;
 
             renderables.forEach(r -> {
-                StarGroup starGroup = (StarGroup) r;
+                final StarGroup starGroup = (StarGroup) r;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();

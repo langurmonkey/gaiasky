@@ -6,7 +6,6 @@
 package gaiasky.util.coord.vsop87;
 
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
 

@@ -29,7 +29,6 @@ import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
-import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
 /**

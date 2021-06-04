@@ -18,7 +18,6 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.system.AbstractRenderSystem;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.DateFormatFactory.DateType;

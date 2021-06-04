@@ -31,7 +31,7 @@ public abstract class SGRCubemap extends SGRAbstract {
     protected Map<Integer, FrameBuffer> fbcm;
 
     // Backup of fov value
-    protected float fovbak;
+    protected float fovBak;
     // Angle from zenith, for planetarium mode
     protected float angleFromZenith = 0;
 
@@ -64,7 +64,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         PerspectiveCamera cam = camera.getCamera();
 
         // Backup fov, direction and up
-        fovbak = cam.fieldOfView;
+        fovBak = cam.fieldOfView;
         dirbak.set(cam.direction);
         upbak.set(cam.up);
         // dirUpCrs <- dir X up
@@ -168,7 +168,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
         // Restore fov
-        EventManager.instance.post(Events.FOV_CHANGED_CMD, fovbak);
+        EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBak);
     }
 
     protected void renderFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
@@ -178,10 +178,10 @@ public abstract class SGRCubemap extends SGRAbstract {
     protected void renderRegularFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         sgr.renderGlowPass(camera, null, 0);
 
-        boolean postproc = postprocessCapture(ppb, fb, wh, wh);
+        boolean postProcess = postProcessCapture(ppb, fb, wh, wh);
         sgr.renderScene(camera, t, rc);
         sendOrientationUpdate(camera.getCamera(), rw, rh);
-        postprocessRender(ppb, fb, postproc, camera, rw, rh);
+        postProcessRender(ppb, fb, postProcess, camera, rw, rh);
     }
 
     protected int getKey(int w, int h, int extra) {

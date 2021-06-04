@@ -27,8 +27,6 @@ import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-import java.util.List;
-
 public class BillboardStarRenderSystem extends AbstractRenderSystem implements IObserver {
 
     private IntMesh mesh;
@@ -121,7 +119,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         vertices[idx++] = y;
         vertices[idx++] = color;
         vertices[idx++] = u2;
-        vertices[idx++] = v;
+        vertices[idx] = v;
     }
 
     @Override
@@ -162,12 +160,8 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-            case STAR_TEXTURE_IDX_CMD:
-                GaiaSky.postRunnable(()-> setStarTexture(GlobalConf.scene.getStarTexture()));
-                break;
-            default:
-                break;
+        if (event == Events.STAR_TEXTURE_IDX_CMD) {
+            GaiaSky.postRunnable(() -> setStarTexture(GlobalConf.scene.getStarTexture()));
         }
     }
 }

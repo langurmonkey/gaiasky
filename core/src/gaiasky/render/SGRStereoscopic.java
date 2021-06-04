@@ -40,8 +40,8 @@ import java.util.Set;
 /**
  * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for
  * each eye, and then blends them together on screen with the necessary
- * processing depending on the 3D regime (anaglyphic, 3dtv, crosseye, vr).
- * 
+ * processing depending on the 3D regime (anaglyph 3D, 3DTV, cross-eye, VR).
+ *
  * @author tsagrista
  *
  */
@@ -49,7 +49,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
     private static final double EYE_ANGLE_DEG = 1.5;
 
-    /** Viewport to use in steoeroscopic mode **/
+    /** Viewport to use in stereoscopic mode **/
     private final Viewport stretchViewport;
 
     /** Frame buffers for 3D mode (screen, screenshot, frame output) **/
@@ -80,7 +80,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         fb3D = new HashMap<>();
         fb3D.put(getKey(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()), new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
 
-        // Init anaglyphic effect
+        // Init anaglyph 3D effect
         anaglyphic = new Anaglyphic();
 
         // Copy
@@ -101,14 +101,14 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        boolean movecam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
+        boolean moveCam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
 
 
         PerspectiveCamera cam = camera.getCamera();
         // Vector of 1 meter length pointing to the side of the camera
         double separation = Constants.M_TO_U * GlobalConf.program.STEREOSCOPIC_EYE_SEPARATION_M;
         double separationCapped;
-        double dirangleDeg = 0;
+        double dirAngleDeg = 0;
 
         IFocus currentFocus = null;
         if (camera.getMode() == CameraMode.FOCUS_MODE) {
@@ -128,7 +128,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             // Lets cap it
             separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
-            dirangleDeg = EYE_ANGLE_DEG;
+            dirAngleDeg = EYE_ANGLE_DEG;
         } else {
             separationCapped = Math.min(separation, 0.1 * Constants.AU_TO_U);
         }
@@ -150,41 +150,41 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             extendViewport.setScreenBounds(0, 0, rw, rh);
             extendViewport.apply();
 
-            /** LEFT EYE **/
+            // LEFT EYE
 
             // Camera to the left
-            if (movecam) {
-                moveCamera(camera, sideRemainder, side, sideCapped, dirangleDeg, false);
+            if (moveCam) {
+                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, false);
             }
             camera.setCameraStereoLeft(cam);
 
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
-            boolean postproc = postprocessCapture(ppb, fb1, tw, th);
+            boolean postProcess = postProcessCapture(ppb, fb1, tw, th);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
-            postprocessRender(ppb, fb1, postproc, camera, rw, rh);
+            postProcessRender(ppb, fb1, postProcess, camera, rw, rh);
             Texture texLeft = fb1.getColorBufferTexture();
 
-            /** RIGHT EYE **/
+            // RIGHT EYE
 
             // Camera to the right
-            if (movecam) {
+            if (moveCam) {
                 restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
-                moveCamera(camera, sideRemainder, side, sideCapped, dirangleDeg, true);
+                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, true);
             }
             camera.setCameraStereoRight(cam);
 
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
-            postproc = postprocessCapture(ppb, fb2, tw, th);
+            postProcess = postProcessCapture(ppb, fb2, tw, th);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
-            postprocessRender(ppb, fb2, postproc, camera, rw, rh);
+            postProcessRender(ppb, fb2, postProcess, camera, rw, rh);
             Texture texRight = fb2.getColorBufferTexture();
 
             // We have left and right images to texLeft and texRight
@@ -203,7 +203,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             int srw, srh, boundsw, boundsh, start2w, start2h;
 
             boolean stretch = GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV_HORIZONTAL || GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV_VERTICAL;
-            boolean changesides = GlobalConf.program.STEREO_PROFILE == StereoProfile.CROSSEYE;
+            boolean changeSides = GlobalConf.program.STEREO_PROFILE == StereoProfile.CROSSEYE;
 
             if (GlobalConf.program.STEREO_PROFILE.isHorizontal()) {
                 if (stretch) {
@@ -239,26 +239,26 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             viewport.setCamera(camera.getCamera());
             viewport.setWorldSize(srw, srh);
 
-            /** LEFT EYE **/
+            // LEFT EYE
 
             viewport.setScreenBounds(0, 0, boundsw, boundsh);
             viewport.apply();
 
             // Camera to left
-            if (movecam) {
-                moveCamera(camera, sideRemainder, side, sideCapped, dirangleDeg, changesides);
+            if (moveCam) {
+                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, changeSides);
             }
             camera.setCameraStereoLeft(cam);
 
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
 
             FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh, 3);
-            boolean postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
+            boolean postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
             Texture tex;
-            postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
+            postProcessRender(ppb, fb3d, postProcess, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
@@ -269,25 +269,25 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             sb.end();
             resultBuffer.end();
 
-            /** RIGHT EYE **/
+            // RIGHT EYE
 
             viewport.setScreenBounds(start2w, start2h, boundsw, boundsh);
             viewport.apply();
 
             // Camera to right
-            if (movecam) {
+            if (moveCam) {
                 restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
-                moveCamera(camera, sideRemainder, side, sideCapped, dirangleDeg, !changesides);
+                moveCamera(camera, sideRemainder, side, sideCapped, dirAngleDeg, !changeSides);
             }
             camera.setCameraStereoRight(cam);
 
             sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
 
-            postproc = postprocessCapture(ppb, fb3d, boundsw, boundsh);
+            postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
 
             sendOrientationUpdate(cam, rw, rh);
-            postprocessRender(ppb, fb3d, postproc, camera, boundsw, boundsh);
+            postProcessRender(ppb, fb3d, postProcess, camera, boundsw, boundsh);
             tex = fb3d.getColorBufferTexture();
 
             resultBuffer = fb == null ? getFrameBuffer(rw, rh, 0) : fb;
@@ -303,7 +303,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
         }
 
-        /** RESTORE **/
+        // RESTORE
         restoreCameras(camera, cam, backupPosd, backupPos, backupDir);
 
         // To screen

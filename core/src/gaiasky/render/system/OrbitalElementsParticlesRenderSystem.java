@@ -18,7 +18,6 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
@@ -31,8 +30,6 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
-
-import java.util.List;
 
 public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final Vector3 aux1;
@@ -96,14 +93,14 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                         // COLOR
                         tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbitElems.pointColor[0], orbitElems.pointColor[1], orbitElems.pointColor[2], orbitElems.pointColor[3]);
 
-                        // ORBIT ELEMS 01
-                        tempVerts[curr.vertexIdx + elems01Offset + 0] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                        // ORBIT ELEMENTS 01
+                        tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
                         tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
                         tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
                         tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
-                        // ORBIT ELEMS 02
-                        tempVerts[curr.vertexIdx + elems02Offset + 0] = (float) (oc.i * MathUtilsd.degRad);
+                        // ORBIT ELEMENTS 02
+                        tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
                         tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
                         tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
                         tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);

@@ -14,11 +14,11 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
     private static final Log logger = Logger.getLogger(AbstractSceneGraph.class);

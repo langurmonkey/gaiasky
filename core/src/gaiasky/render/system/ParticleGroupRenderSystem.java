@@ -21,7 +21,6 @@ import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.color.Colormap;
@@ -56,7 +55,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
     @Override
     protected void initVertices() {
-        /** STARS **/
+        // STARS
         meshes = new Array<>();
     }
 
@@ -94,7 +93,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
             addEffectsUniforms(shaderProgram, camera);
 
             renderables.forEach(rend -> {
-                ParticleGroup particleGroup = (ParticleGroup) rend;
+                final ParticleGroup particleGroup = (ParticleGroup) rend;
                 synchronized (particleGroup) {
                     if (!particleGroup.disposed) {
                         boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
@@ -142,7 +141,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
                                     }
 
                                     // SIZE, CMAP_VALUE
-                                    tempVerts[curr.vertexIdx + additionalOffset + 0] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
 
                                     // POSITION
                                     final int idx = curr.vertexIdx;
@@ -202,13 +201,9 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case DISPOSE_PARTICLE_GROUP_GPU_MESH:
+        if (event == Events.DISPOSE_PARTICLE_GROUP_GPU_MESH) {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
-            break;
-        default:
-            break;
         }
     }
 

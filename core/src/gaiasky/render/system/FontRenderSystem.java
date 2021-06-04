@@ -19,7 +19,6 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 import java.util.Comparator;
-import java.util.List;
 
 public class FontRenderSystem extends AbstractRenderSystem {
 
@@ -65,7 +64,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
 
     }
 
-    private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float lalpha) {
+    private void renderFont3D(Array<IRenderable> renderables, ExtShaderProgram program, ICamera camera, float alpha) {
 
         fontDistanceField.getData().setScale(0.6f);
         renderables.forEach(r -> {
@@ -74,10 +73,10 @@ public class FontRenderSystem extends AbstractRenderSystem {
             // Label color
             program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
             // Component alpha
-            program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : lalpha));
+            program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : alpha));
             // Font opacity multiplier, take into account element opacity
             program.setUniformf("u_opacity", 0.75f * lr.getTextOpacity());
-            // zfar and k
+            // z-far and k
             addDepthBufferUniforms(program, camera);
 
             lr.render(batch, program, this, rc, camera);

@@ -95,8 +95,7 @@ public interface IPostProcessor extends Disposable {
          * @return The map of effects
          */
         public Map<String, PostProcessorEffect> getAll(Class<? extends PostProcessorEffect> clazz) {
-            Map<String, PostProcessorEffect> l = effects.get(clazz);
-            return l;
+            return effects.get(clazz);
         }
 
         /**
@@ -150,8 +149,8 @@ public interface IPostProcessor extends Disposable {
             return pp.captureEnd();
         }
 
-        public void render(FrameBuffer dest) {
-            pp.render(dest);
+        public void render(FrameBuffer destination) {
+            pp.render(destination);
         }
 
         public void dispose(boolean cleanAllBuffers) {

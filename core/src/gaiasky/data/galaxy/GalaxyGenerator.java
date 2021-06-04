@@ -81,7 +81,7 @@ public class GalaxyGenerator {
 
             I18n.initialize(new FileHandle("assets/i18n/gsbundle"));
 
-            // Add notif watch
+            // Add notifications watch
             new ConsoleLogger();
 
             // Seed RNG

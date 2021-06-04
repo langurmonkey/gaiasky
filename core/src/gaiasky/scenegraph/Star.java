@@ -22,9 +22,6 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
-import gaiasky.GaiaSky;
-import gaiasky.render.ComponentTypes;
-import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -40,7 +37,6 @@ import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
 import java.util.TreeMap;

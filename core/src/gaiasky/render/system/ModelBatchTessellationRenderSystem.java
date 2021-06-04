@@ -8,14 +8,11 @@ package gaiasky.render.system;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IModelRenderable;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.comp.ModelComparator;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
-
-import java.util.List;
 
 public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
     private final IntModelBatch batch;

@@ -32,7 +32,7 @@ public class RenderingContext {
     private int w, h;
 
     /** VR position offset **/
-    public Vector3d vroffset;
+    public Vector3d vrOffset;
 
     /**
      * Scale factor, the ratio between the diagonal of HD resolution (1280x720)

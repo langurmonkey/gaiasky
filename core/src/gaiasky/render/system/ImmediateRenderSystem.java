@@ -22,7 +22,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     // Auxiliary array that holds vertices temporarily
     protected float[] tempVerts;
 
-    protected class MeshData {
+    protected static class MeshData {
 
         protected IntMesh mesh;
 

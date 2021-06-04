@@ -10,7 +10,7 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
- * Normal SGR, takes care of the regular to-screen rednering with no strange
+ * Normal SGR, takes care of the regular to-screen rendering with no strange
  * modes (stereoscopic, planetarium, cubemap) active.
  *
  * @author tsagrista
@@ -23,7 +23,7 @@ public class SGR extends SGRAbstract implements ISGR {
 
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
-        boolean postproc = postprocessCapture(ppb, fb, rw, rh);
+        boolean postProcess = postProcessCapture(ppb, fb, rw, rh);
 
         // Viewport
         extendViewport.setCamera(camera.getCamera());
@@ -50,7 +50,7 @@ public class SGR extends SGRAbstract implements ISGR {
         // GLFW reports a window size of 0x0 with AMD Graphics on windows when minimizing
         if (rw > 0 && rh > 0) {
             sendOrientationUpdate(camera.getCamera(), rw, rh);
-            postprocessRender(ppb, fb, postproc, camera, tw, th);
+            postProcessRender(ppb, fb, postProcess, camera, tw, th);
         }
 
     }

@@ -21,8 +21,6 @@ import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-import java.util.List;
-
 public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     private IntMesh mesh;
@@ -86,7 +84,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         final float u2 = 1;
         final float v2 = 0;
 
-        float color = Color.WHITE.toFloatBits();
+        final float color = Color.WHITE.toFloatBits();
 
         int idx = 0;
         vertices[idx++] = x;
@@ -111,7 +109,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         vertices[idx++] = y;
         vertices[idx++] = color;
         vertices[idx++] = u2;
-        vertices[idx++] = v;
+        vertices[idx] = v;
     }
 
     @Override

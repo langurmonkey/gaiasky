@@ -155,7 +155,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
             // If atmosphere ground params are present, set them
             float atmopacity = (float) MathUtilsd.lint(viewAngle, 0.00745329f, 0.02490659f, 0f, 1f);
             if (GlobalConf.scene.VISIBILITY[ComponentType.Atmospheres.ordinal()] && atmopacity > 0) {
-                ac.updateAtmosphericScatteringParams(mc.instance.materials.first(), alpha * atmopacity, true, this, rc.vroffset);
+                ac.updateAtmosphericScatteringParams(mc.instance.materials.first(), alpha * atmopacity, true, this, rc.vrOffset);
             } else {
                 ac.removeAtmosphericScattering(mc.instance.materials.first());
             }
@@ -170,7 +170,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
      * Renders the atmosphere
      */
     @Override
-    public void renderAtmosphere(IntModelBatch modelBatch, float alpha, double t, Vector3d vroffset) {
+    public void renderAtmosphere(IntModelBatch modelBatch, float alpha, double t, Vector3d vrOffset) {
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();
         // We are an atmosphere :_D
@@ -181,7 +181,7 @@ public class Planet extends ModelBody implements IAtmosphereRenderable, ICloudRe
         }
         float atmopacity = (float) MathUtilsd.lint(viewAngle, 0.00745329f, 0.02490659f, 0f, 1f) * nearopacity;
         if (atmopacity > 0) {
-            ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmopacity, false, this, vroffset);
+            ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmopacity, false, this, vrOffset);
             ac.mc.updateRelativisticEffects(cam);
             modelBatch.render(ac.mc.instance, mc.env);
         }

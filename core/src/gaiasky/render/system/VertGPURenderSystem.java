@@ -22,8 +22,6 @@ import gaiasky.util.math.Vector3d;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 
-import java.util.List;
-
 /**
  * Renders vertices using a VBO.
  *

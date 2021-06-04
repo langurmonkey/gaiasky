@@ -22,8 +22,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Contains utilities to download files

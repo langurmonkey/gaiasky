@@ -18,7 +18,6 @@ import gaiasky.util.coord.vsop87.VSOP87;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.Vector3b;
-import gaiasky.util.math.Vector3d;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

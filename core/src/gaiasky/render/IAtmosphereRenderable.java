@@ -21,7 +21,7 @@ public interface IAtmosphereRenderable extends IRenderable {
      * @param modelBatch The model batch to use.
      * @param alpha      The opacity.
      * @param t          The time in seconds since the start.
-     * @param vroffset   Positional offset in vr mode, if any.
+     * @param vrOffset   Positional offset in vr mode, if any.
      */
-    void renderAtmosphere(IntModelBatch modelBatch, float alpha, double t, Vector3d vroffset);
+    void renderAtmosphere(IntModelBatch modelBatch, float alpha, double t, Vector3d vrOffset);
 }

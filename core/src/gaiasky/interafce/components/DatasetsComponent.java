@@ -124,12 +124,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         // Color picker
         ColormapPicker cp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
         cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
-        cp.setNewColorRunnable(() -> {
-            ci.setHlColor(cp.getPickedColor());
-        });
-        cp.setNewColormapRunnable(() -> {
-            ci.setHlColormap(cp.getPickedCmapIndex(), cp.getPickedCmapAttribute(), cp.getPickedCmapMin(), cp.getPickedCmapMax());
-        });
+        cp.setNewColorRunnable(() -> ci.setHlColor(cp.getPickedColor()));
+        cp.setNewColormapRunnable(() -> ci.setHlColormap(cp.getPickedCmapIndex(), cp.getPickedCmapAttribute(), cp.getPickedCmapMin(), cp.getPickedCmapMax()));
         colorMap.put(ci.name, cp);
 
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 26), skin, "hud-subheader");

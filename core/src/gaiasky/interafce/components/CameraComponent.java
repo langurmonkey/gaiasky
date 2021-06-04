@@ -181,7 +181,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** CAMERA SPEED LIMIT **/
+        // CAMERA SPEED LIMIT
         String[] speedLimits = new String[19];
         speedLimits[0] = I18n.txt("gui.camera.speedlimit.100kmh");
         speedLimits[1] = I18n.txt("gui.camera.speedlimit.cfactor", "0.5");
@@ -217,7 +217,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
         cameraSpeedLimit.setSelectedIndex(GlobalConf.scene.CAMERA_SPEED_LIMIT_IDX);
 
-        /** CAMERA SPEED **/
+        // CAMERA SPEED
         cameraSpeed = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(contentWidth);
@@ -230,7 +230,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** ROTATION SPEED **/
+        // ROTATION SPEED
         rotateSpeed = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(contentWidth);
@@ -243,7 +243,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** TURNING SPEED **/
+        // TURNING SPEED
         turnSpeed = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(contentWidth);
@@ -256,7 +256,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** FOCUS_MODE lock **/
+        // FOCUS_MODE lock
         focusLock = new CheckBox(" " + I18n.txt("gui.camera.lock"), skin);
         focusLock.setName("focus lock");
         focusLock.setChecked(GlobalConf.scene.FOCUS_LOCK);
@@ -269,7 +269,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** FOCUS_MODE orientation lock **/
+        // FOCUS_MODE orientation lock
         orientationLock = new CheckBox(" " + I18n.txt("gui.camera.lock.orientation"), skin);
         orientationLock.setName("orientation lock");
         orientationLock.setChecked(GlobalConf.scene.FOCUS_LOCK_ORIENTATION);
@@ -342,8 +342,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 cameraMode.getSelection().setProgrammaticChangeEvents(false);
                 cameraMode.setSelected(selected);
                 cameraMode.getSelection().setProgrammaticChangeEvents(true);
-            } else {
-                // Error?
             }
             break;
         case ROTATION_SPEED_CMD:
