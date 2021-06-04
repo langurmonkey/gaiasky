@@ -287,12 +287,12 @@ public class Star extends Particle {
     }
 
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        float opac = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext renderContext) {
+        float opacity = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
         float[] col = GlobalConf.scene.STAR_COLOR_TRANSIT ? ccTransit : cc;
         ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
         ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;
-        mc.update(alpha * opac);
+        mc.update(alpha * opacity);
         // Local transform
         translation.getMatrix(mc.instance.transform).scl((float) (getRadius() * 2d));
         modelBatch.render(mc.instance, mc.env);

@@ -199,4 +199,6 @@ public interface ICamera {
     double getNear();
     double getFar();
 
+    void swapBuffers();
+
 }

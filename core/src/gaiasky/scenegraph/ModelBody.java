@@ -106,33 +106,36 @@ public abstract class ModelBody extends CelestialBody {
         }
     }
 
+    // At what distance the light has the maximum intensity
     private static final double LIGHT_X0 = 0.1 * Constants.AU_TO_U;
-    private static final double LIGHT_X1 = 5e5 * Constants.AU_TO_U;
+    // At what distance the light is 0
+    private static final double LIGHT_X1 = 5e4 * Constants.AU_TO_U;
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
         // Update light with global position
-        if (mc != null) {
-            // TODO use all directional lights (first, make normal shader accept more than one light)
-            translation.put(mc.directional(0).direction);
-            IFocus lightSource = camera.getCloseLightSource(0);
-            if(lightSource != null){
-                if(lightSource instanceof Proximity.NearbyRecord){
-                    Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
-                    if(nr.isStar() || nr.isStarGroup()){
-                        float[] col = nr.getColor();
-                        double closestSize = nr.getSize();
-                        double closestDist = nr.getClosestDistToCamera();
-                        float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
-                        mc.directional(0).direction.sub(nr.pos.put(aux3f1.get()));
-                        mc.directional(0).color.set(col[0] * colFactor, col[1] * colFactor, col[2]* colFactor, 1.0f);
-                    } else {
-                        Vector3b campos = camera.getPos();
-                        mc.directional(0).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
-                        mc.directional(0).color.set(1f, 1f, 1f, 1f);
-                    }
+        if (mc != null && distToCamera <= LIGHT_X1) {
+            for (int i = 0; i < Constants.N_CLOSEST; i++) {
+                IFocus lightSource = camera.getCloseLightSource(i);
+                if (lightSource != null) {
+                    if (lightSource instanceof Proximity.NearbyRecord) {
+                        translation.put(mc.directional(i).direction);
+                        Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
+                        if (nr.isStar() || nr.isStarGroup()) {
+                            float[] col = nr.getColor();
+                            double closestSize = nr.getSize();
+                            double closestDist = nr.getClosestDistToCamera();
+                            float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
+                            mc.directional(i).direction.sub(nr.pos.put(aux3f1.get()));
+                            mc.directional(i).color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
+                        } else {
+                            Vector3b campos = camera.getPos();
+                            mc.directional(i).direction.add(campos.x.floatValue(), campos.y.floatValue(), campos.z.floatValue());
+                            mc.directional(i).color.set(1f, 1f, 1f, 1f);
+                        }
 
+                    }
                 }
             }
         }

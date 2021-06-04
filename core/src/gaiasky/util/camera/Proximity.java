@@ -14,7 +14,7 @@ import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.OctreeNode;
 
-/**
+/*0 - Purposeful Networking*
  * Holds information on the order and properties of nearby particles to the camera.
  */
 public class Proximity {
@@ -27,14 +27,17 @@ public class Proximity {
     private static byte TYPE_STAR_GROUP = 1;
     private static byte TYPE_OTHER = 2;
 
-    public NearbyRecord[] array;
+    public NearbyRecord[] updating, effective, array0, array1;
 
     public Proximity() {
         this(DEFAULT_SIZE);
     }
 
     public Proximity(int size) {
-        this.array = new NearbyRecord[size];
+        this.array0 = new NearbyRecord[size];
+        this.array1 = new NearbyRecord[size];
+        this.updating = this.array0;
+        this.effective = this.array1;
     }
 
     public void set(int index, IParticleRecord pr, ICamera camera) {
@@ -42,18 +45,18 @@ public class Proximity {
     }
 
     public void set(int index, IParticleRecord pr, ICamera camera, double deltaYears) {
-        if (this.array[index] == null) {
-            this.array[index] = new NearbyRecord();
+        if (this.updating[index] == null) {
+            this.updating[index] = new NearbyRecord();
         }
-        NearbyRecord c = this.array[index];
+        NearbyRecord c = this.updating[index];
         convert(pr, c, camera, deltaYears);
     }
 
     public void set(int index, IFocus focus, ICamera camera) {
-        if (this.array[index] == null) {
-            this.array[index] = new NearbyRecord();
+        if (this.updating[index] == null) {
+            this.updating[index] = new NearbyRecord();
         }
-        NearbyRecord c = this.array[index];
+        NearbyRecord c = this.updating[index];
         convert(focus, c, camera);
     }
 
@@ -65,7 +68,7 @@ public class Proximity {
      * @param record The nearby record
      */
     public void set(int index, NearbyRecord record) {
-        this.array[index] = record;
+        this.updating[index] = record;
     }
 
     /**
@@ -78,9 +81,9 @@ public class Proximity {
     public void insert(int index, NearbyRecord record) {
         NearbyRecord oldRecord;
         NearbyRecord newRecord = record;
-        for (int i = index; i < this.array.length; i++) {
-            oldRecord = this.array[i];
-            this.array[i] = newRecord;
+        for (int i = index; i < this.updating.length; i++) {
+            oldRecord = this.updating[i];
+            this.updating[i] = newRecord;
             newRecord = oldRecord;
         }
     }
@@ -105,7 +108,7 @@ public class Proximity {
      */
     public boolean update(NearbyRecord object) {
         int i = 0;
-        for (NearbyRecord record : array) {
+        for (NearbyRecord record : updating) {
             if (record == null) {
                 set(i, object);
                 return true;
@@ -129,7 +132,7 @@ public class Proximity {
      */
     public boolean update(IFocus object, ICamera camera) {
         int i = 0;
-        for (NearbyRecord record : array) {
+        for (NearbyRecord record : updating) {
             if (record == null) {
                 set(i, object, camera);
             } else if (record == object) {
@@ -155,9 +158,28 @@ public class Proximity {
         }
     }
 
-    public void clear() {
-        for (int i = 0; i < this.array.length; i++) {
-            this.array[i] = null;
+    /**
+     * Swaps the arrays in this double-buffer implementation
+      */
+    public void swapBuffers() {
+        if(updating == array0){
+            // updating <- array1
+            // effective <- array0
+            updating = array1;
+            effective = array0;
+            clear(updating);
+        } else {
+            // updating <- array0
+            // effective <- array1
+            updating = array0;
+            effective = array1;
+            clear(updating);
+        }
+    }
+
+    private void clear(NearbyRecord[] arr){
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = null;
         }
     }
 

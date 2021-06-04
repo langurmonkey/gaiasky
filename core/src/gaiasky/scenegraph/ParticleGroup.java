@@ -727,7 +727,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public String getClosestName() {
-        return proximity.array[0].name;
+        return proximity.updating[0].name;
     }
 
     @Override

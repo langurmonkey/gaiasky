@@ -416,6 +416,7 @@ void main() {
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);
+    vec3 specularColor = vec3(0.0);
     float selfShadow = 1.0;
 
     // Loop for directional light contributitons
@@ -432,16 +433,16 @@ void main() {
         float NL = max(0.0, dot(N, L));
         float NH = max(0.0, dot(N, H));
 
-        specular *= min(1.0, pow(NH, 40.0));
         selfShadow *= saturate(4.0 * NL);
 
+        specularColor += specular * min(1.0, pow(NH, 40.0));
         shadowColor += lightCol[i] * night * max(0.0, 1.0 - NL) * shdw;
         diffuseColor += (lightCol[i] * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
     }
 
     // Final color equation
     fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + env, texAlpha * v_opacity);
-    fragColor.rgb += selfShadow * specular;
+    fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
     #define exposure 4.0

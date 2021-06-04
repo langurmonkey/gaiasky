@@ -1076,6 +1076,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Update scene graph
         sg.update(time, cam);
 
+        // Swap proximity buffers
+        cam.swapBuffers();
+
     }
 
     public void preRenderScene() {

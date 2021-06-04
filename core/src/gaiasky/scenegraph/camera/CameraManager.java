@@ -313,6 +313,10 @@ public class CameraManager implements ICamera, IObserver {
         return current.getUp();
     }
 
+    public void swapBuffers(){
+        current.swapBuffers();
+    }
+
     /**
      * Update method.
      *

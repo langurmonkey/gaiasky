@@ -204,11 +204,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             super.update(time, parentTransform, camera, opacity);
 
             // Update close stars
-            for (int i = 0; i < Math.min(proximity.array.length, pointData.size()); i++) {
+            for (int i = 0; i < Math.min(proximity.updating.length, pointData.size()); i++) {
                 if(filter(active[i]) && isVisible(active[i])) {
                     IParticleRecord closeStar = pointData.get(active[i]);
                     proximity.set(i, closeStar, camera, currDeltaYears);
-                    camera.checkClosestParticle(proximity.array[i]);
+                    camera.checkClosestParticle(proximity.updating[i]);
 
                     // Model distance
                     if (i == 0) {
@@ -350,14 +350,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
         mc.touch();
-        float opcty = (float) MathUtilsd.lint(proximity.array[0].distToCamera, modelDist / 50f, modelDist, 1f, 0f);
-        if (alpha * opcty > 0) {
-            mc.setTransparency(alpha * opcty);
-            float[] col = proximity.array[0].col;
+        float opacity = (float) MathUtilsd.lint(proximity.updating[0].distToCamera, modelDist / 50f, modelDist, 1f, 0f);
+        if (alpha * opacity > 0) {
+            mc.setTransparency(alpha * opacity);
+            float[] col = proximity.updating[0].col;
             ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
             ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;
             // Local transform
-            mc.instance.transform.idt().translate((float) proximity.array[0].pos.x, (float) proximity.array[0].pos.y, (float) proximity.array[0].pos.z).scl((float) (getRadius(active[0]) * 2d));
+            mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d));
             mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
             mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
             modelBatch.render(mc.instance, mc.env);
@@ -652,32 +652,32 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public double getClosestDistToCamera() {
-        return this.proximity.array[0].distToCamera;
+        return this.proximity.updating[0].distToCamera;
     }
 
     @Override
     public String getClosestName() {
-        return this.proximity.array[0].name;
+        return this.proximity.updating[0].name;
     }
 
     @Override
     public double getClosestSize() {
-        return this.proximity.array[0].size;
+        return this.proximity.updating[0].size;
     }
 
     @Override
     public Vector3d getClosestPos(Vector3d out) {
-        return out.set(this.proximity.array[0].pos);
+        return out.set(this.proximity.updating[0].pos);
     }
 
     @Override
     public Vector3b getClosestAbsolutePos(Vector3b out) {
-        return out.set(this.proximity.array[0].absolutePos);
+        return out.set(this.proximity.updating[0].absolutePos);
     }
 
     @Override
     public float[] getClosestCol() {
-        return this.proximity.array[0].col;
+        return this.proximity.updating[0].col;
     }
 
     @Override

@@ -330,13 +330,11 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     public IFocus getCloseLightSource(int i){
-        assert proximity != null && i < proximity.array.length : "Index out of bounds: i=" + i + ", length=" + proximity.array.length;
-        return proximity.array[i];
+        assert proximity != null && i < proximity.effective.length : "Index out of bounds: i=" + i + ", length=" + proximity.effective.length;
+        return proximity.effective[i];
     }
 
-
     public void checkClosestParticle(IFocus star) {
-
         if (star instanceof NearbyRecord) {
             proximity.update((NearbyRecord) star);
         } else {
@@ -346,6 +344,10 @@ public abstract class AbstractCamera implements ICamera {
         if (closestStar == null || closestStar.getClosestDistToCamera() > star.getClosestDistToCamera()) {
             closestStar = star;
         }
+    }
+
+    public void swapBuffers(){
+        proximity.swapBuffers();
     }
 
     @Override
