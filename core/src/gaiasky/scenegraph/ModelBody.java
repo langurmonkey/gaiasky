@@ -116,7 +116,7 @@ public abstract class ModelBody extends CelestialBody {
         super.updateLocal(time, camera);
         // Update light with global position
         if (mc != null && distToCamera <= LIGHT_X1) {
-            for (int i = 0; i < Constants.N_CLOSEST; i++) {
+            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
                 IFocus lightSource = camera.getCloseLightSource(i);
                 if (lightSource != null) {
                     if (lightSource instanceof Proximity.NearbyRecord) {

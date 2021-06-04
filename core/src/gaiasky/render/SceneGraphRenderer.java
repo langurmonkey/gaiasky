@@ -291,8 +291,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     // Camera at light position, with same direction. For shadow mapping
     private Camera cameraLight;
     private List<ModelBody> shadowCandidates, shadowCandidatesTess;
-    public FrameBuffer[] shadowMapFb;
-    private Matrix4[] shadowMapCombined;
+    // Dimension 1: number of shadows, dimension 2: number of lights
+    public FrameBuffer[][] shadowMapFb;
+    // Dimension 1: number of shadows, dimension 2: number of lights
+    private Matrix4[][] shadowMapCombined;
     public Map<ModelBody, Texture> smTexMap;
     public Map<ModelBody, Matrix4> smCombinedMap;
 
@@ -944,10 +946,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private void renderShadowMapCandidates(List<ModelBody> candidates, int shadowNRender, ICamera camera) {
         int i = 0;
+        int j = 0;
         // Normal bodies
         for (ModelBody candidate : candidates) {
-            // Yes!
-            candidate.shadow = shadowNRender;
 
             Vector3 camDir = aux1.set(candidate.mc.directional(0).direction);
             // Direction is that of the light
@@ -976,7 +977,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             cameraLight.update(false);
 
             // Render model depth map to frame buffer
-            shadowMapFb[i].begin();
+            shadowMapFb[i][j].begin();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             // No tessellation
@@ -986,17 +987,18 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             // Save frame buffer and combined matrix
             candidate.shadow = shadowNRender;
-            shadowMapCombined[i].set(cameraLight.combined);
-            smCombinedMap.put(candidate, shadowMapCombined[i]);
-            smTexMap.put(candidate, shadowMapFb[i].getColorBufferTexture());
+            shadowMapCombined[i][j].set(cameraLight.combined);
+            smCombinedMap.put(candidate, shadowMapCombined[i][j]);
+            smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
 
-            shadowMapFb[i].end();
+            shadowMapFb[i][j].end();
             i++;
         }
     }
 
     private void renderShadowMapCandidatesTess(Array<ModelBody> candidates, int shadowNRender, ICamera camera, RenderingContext rc) {
         int i = 0;
+        int j = 0;
         // Normal bodies
         for (ModelBody candidate : candidates) {
             double radius = candidate.getRadius();
@@ -1045,7 +1047,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 cameraLight.update(false);
 
                 // Render model depth map to frame buffer
-                shadowMapFb[i].begin();
+                shadowMapFb[i][j].begin();
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
                 // Tessellation
@@ -1055,11 +1057,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
                 // Save frame buffer and combined matrix
                 candidate.shadow = shadowNRender;
-                shadowMapCombined[i].set(cameraLight.combined);
-                smCombinedMap.put(candidate, shadowMapCombined[i]);
-                smTexMap.put(candidate, shadowMapFb[i].getColorBufferTexture());
+                shadowMapCombined[i][j].set(cameraLight.combined);
+                smCombinedMap.put(candidate, shadowMapCombined[i][j]);
+                smTexMap.put(candidate, shadowMapFb[i][j].getColorBufferTexture());
 
-                shadowMapFb[i].end();
+                shadowMapFb[i][j].end();
                 i++;
             } else {
                 candidate.shadow = -1;
@@ -1377,20 +1379,23 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      */
     private void buildShadowMapData() {
         if (shadowMapFb != null) {
-            for (FrameBuffer fb : shadowMapFb)
-                fb.dispose();
+            for (FrameBuffer[] frameBufferArray : shadowMapFb)
+                for (FrameBuffer fb : frameBufferArray)
+                    fb.dispose();
             shadowMapFb = null;
         }
         shadowMapCombined = null;
 
         // Shadow map frame buffer
-        shadowMapFb = new FrameBuffer[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS];
+        shadowMapFb = new FrameBuffer[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS][Constants.N_DIR_LIGHTS];
         // Shadow map combined matrices
-        shadowMapCombined = new Matrix4[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS];
+        shadowMapCombined = new Matrix4[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS][Constants.N_DIR_LIGHTS];
         // Init
         for (int i = 0; i < GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS; i++) {
-            shadowMapFb[i] = new FrameBuffer(Format.RGBA8888, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, true);
-            shadowMapCombined[i] = new Matrix4();
+            for (int j = 0; j < 1; j++) {
+                shadowMapFb[i][j] = new FrameBuffer(Format.RGBA8888, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, true);
+                shadowMapCombined[i][j] = new Matrix4();
+            }
         }
         if (smTexMap == null)
             smTexMap = new HashMap<>();

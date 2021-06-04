@@ -127,7 +127,7 @@ public abstract class AbstractCamera implements ICamera {
         combined = new Matrix4d();
         frustumd = new Frustumd();
 
-        proximity = new Proximity(Constants.N_CLOSEST);
+        proximity = new Proximity(Constants.N_DIR_LIGHTS);
     }
 
     @Override

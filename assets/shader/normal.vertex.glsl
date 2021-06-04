@@ -285,10 +285,10 @@ struct DirectionalLight
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif
 
-#define N_LIGHTS 4
+#define N_LIGHTS 3
 flat out int v_numDirectionalLights;
-out vec3 v_directionalLightDir[N_LIGHTS];
-out vec3 v_directionalLightColor[N_LIGHTS];
+out vec3 v_directionalLightDir[numDirectionalLights];
+out vec3 v_directionalLightColor[numDirectionalLights];
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
 

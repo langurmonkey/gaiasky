@@ -358,6 +358,6 @@ public class Constants {
     /** {@link Apfloat} default precision **/
     public static final int PREC = 32;
 
-    /** Number of closest objects **/
-    public static final int N_CLOSEST = 4;
+    /** Number of directional lights **/
+    public static final int N_DIR_LIGHTS = 3;
 }

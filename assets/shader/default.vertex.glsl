@@ -46,7 +46,7 @@ out float v_opacity;
 #ifdef alphaTestFlag
 uniform float u_alphaTest;
 out float v_alphaTest;
-#endif //alphaTestFlag
+#endif // alphaTestFlag
 #endif // blendedFlag
 
 #ifdef lightingFlag
@@ -62,7 +62,7 @@ uniform vec3 u_ambientCubemap[6];
 
 #ifdef sphericalHarmonicsFlag
 uniform vec3 u_sphericalHarmonics[9];
-#endif //sphericalHarmonicsFlag
+#endif // sphericalHarmonicsFlag
 
 #ifdef specularFlag
 out vec3 v_lightSpecular;
@@ -98,17 +98,17 @@ uniform PointLight u_pointLights[numPointLights];
 
 #if defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
 #define ambientFlag
-#endif //ambientFlag
+#endif // ambientFlag
 
 #ifdef shadowMapFlag
 uniform mat4 u_shadowMapProjViewTrans;
 out vec3 v_shadowMapUv;
 #define separateAmbientFlag
-#endif //shadowMapFlag
+#endif // shadowMapFlag
 
 #if defined(ambientFlag) && defined(separateAmbientFlag)
 out vec3 v_ambientLight;
-#endif //separateAmbientFlag
+#endif // separateAmbientFlag
 
 #endif // lightingFlag
 
@@ -148,7 +148,7 @@ void main() {
 		v_opacity = u_opacity;
 		#ifdef alphaTestFlag
 			v_alphaTest = u_alphaTest;
-		#endif //alphaTestFlag
+		#endif // alphaTestFlag
 	#endif // blendedFlag
 
 	vec4 pos = u_worldTrans * vec4(a_position, 1.0);
@@ -172,7 +172,7 @@ void main() {
 		vec4 spos = u_shadowMapProjViewTrans * pos;
 		v_shadowMapUv.xy = (spos.xy / spos.w) * 0.5 + 0.5;
 		v_shadowMapUv.z = min(spos.z * 0.5 + 0.5, 0.998);
-	#endif //shadowMapFlag
+	#endif // shadowMapFlag
 
 	#if defined(normalFlag)
 		vec3 normal = normalize(u_normalMatrix * a_normal);
@@ -218,10 +218,10 @@ void main() {
 				v_lightDiffuse = vec3(0.0);
 			#else
 				v_lightDiffuse = ambientLight;
-			#endif //separateAmbientFlag
+			#endif // separateAmbientFlag
 		#else
 	        v_lightDiffuse = vec3(0.0);
-		#endif //ambientFlag
+		#endif // ambientFlag
 
 
 		#ifdef specularFlag

@@ -106,7 +106,7 @@ public class ModelComponent implements Disposable, IObserver {
             env = new Environment();
             env.set(ambient);
             // Directional lights
-            for(int i = 0; i < Constants.N_CLOSEST; i++) {
+            for(int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
                 DirectionalLight dLight = new DirectionalLight();
                 dLight.color.set(0f, 0f, 0f, 1f);
                 env.add(dLight);
@@ -116,7 +116,7 @@ public class ModelComponent implements Disposable, IObserver {
 
     /**
      * Returns the given directional light
-     * @param i The index of the light (must be less than {@link Constants#N_CLOSEST}.
+     * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
      * @return The directional light with index i
      */
     public DirectionalLight directional(int i) {

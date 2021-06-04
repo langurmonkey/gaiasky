@@ -152,8 +152,8 @@ float getShadow(){
     for(int x=-2; x<=2; x++){
         for(int y=-2; y<=2; y++){
             vec2 offset = vec2(float(x), float(y)) / size;
-            //result += textureShadowLerp(size, v_shadowMapUv.xy + offset, v_shadowMapUv.z);
-            result += getShadowness(v_shadowMapUv.xy, offset, v_shadowMapUv.z);
+            result += textureShadowLerp(size, v_shadowMapUv.xy + offset, v_shadowMapUv.z);
+            //result += getShadowness(v_shadowMapUv.xy, offset, v_shadowMapUv.z);
         }
     }
     return result / 25.0;
@@ -221,7 +221,7 @@ in vec3 v_ambientLight;
     #define fetchColorNight(texCoord) vec3(0.0)
 #endif // nightTextureFlag
 
-#define N_LIGHTS 4
+#define N_LIGHTS 3
 flat in int v_numDirectionalLights;
 // Light directions in world space
 in vec3 v_directionalLightDir[N_LIGHTS];

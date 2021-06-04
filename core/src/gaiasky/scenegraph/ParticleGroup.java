@@ -236,7 +236,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         id = idSeq++;
         inGpu = false;
         focusIndex = -1;
-        proximity = new Proximity(Constants.N_CLOSEST);
+        proximity = new Proximity(Constants.N_DIR_LIGHTS);
         focusPosition = new Vector3d();
         focusPositionSph = new Vector2d();
         cPosD = new Vector3d();
