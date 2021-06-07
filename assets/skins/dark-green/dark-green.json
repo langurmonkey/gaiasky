@@ -1067,6 +1067,14 @@
       "font": "ui-18",
       "fontColor": "white"
     },
+    "large": {
+      "checkboxOn": "check-on",
+      "checkboxOnDisabled": "check-on-disabled",
+      "checkboxOff": "check-off",
+      "checkboxOffDisabled": "check-off-disabled",
+      "font": "ui-23",
+      "fontColor": "white"
+    },
     "title": {
       "checkboxOn": "check-on",
       "checkboxOnDisabled": "check-on-disabled",

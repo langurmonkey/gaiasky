@@ -273,7 +273,8 @@ public class DownloadDataWindow extends GenericDialog {
                 // Check if dataset requires a minimum version of Gaia Sky
 
                 // Add dataset to desc table
-                OwnCheckBox cb = new OwnCheckBox(dataset.shortDescription, skin, "default", pad * 2f);
+                OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.shortDescription, 33), skin, "large", pad * 2f);
+                cb.addListener(new OwnTextTooltip(dataset.shortDescription, skin, 10));
                 cb.left();
                 cb.setMinWidth(420f);
                 cb.setChecked(dataset.mustDownload);

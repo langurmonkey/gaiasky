@@ -143,7 +143,7 @@ public class DatasetsWidget {
             Collections.sort(type.datasets, byName);
 
             for (DatasetDesc dataset : type.datasets) {
-                OwnCheckBox cb = new OwnCheckBox(dataset.name, skin, "default", pad * 2f);
+                OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.name, 33), skin, "large", pad * 2f);
                 boolean gsVersionTooSmall = false;
                 if (dataset.minGsVersion >= 0 && dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
                     // Can't select! minimum GS version larger than current
