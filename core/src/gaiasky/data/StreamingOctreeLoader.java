@@ -171,7 +171,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             Array<SceneGraphNode> result = new Array<>(false, 1);
             result.add(octreeWrapper);
 
-            logger.info(I18n.bundle.format("notif.catalog.init", octreeWrapper.root.countObjects()));
+            logger.info(I18n.txt("notif.catalog.init", octreeWrapper.root.countObjects()));
 
             return result;
         } else {
@@ -190,7 +190,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected void flushLoadedIds() {
         if (idxLoadedIds > 0) {
             String str = "[" + loadedIds[0] + ", ..., " + loadedIds[idxLoadedIds - 1] + "]";
-            logger.info(I18n.bundle.format("notif.octantsloaded", loadedObjects, idxLoadedIds, str));
+            logger.info(I18n.txt("notif.octantsloaded", loadedObjects, idxLoadedIds, str));
 
             idxLoadedIds = 0;
             loadedObjects = 0;
@@ -269,7 +269,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                 octant.setStatus(LoadStatus.NOT_LOADED);
             }
             toLoadQueue.clear();
-            logger.info(I18n.bundle.format("notif.loadingoctants.emtpied", n));
+            logger.info(I18n.txt("notif.loadingoctants.emtpied", n));
         }
     }
 

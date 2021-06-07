@@ -150,7 +150,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             }
         }
 
-        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.orbitdataof.loaded", parameter.name, data.getNumPoints()));
+        Logger.getLogger(this.getClass()).info(I18n.txt("notif.orbitdataof.loaded", parameter.name, data.getNumPoints()));
 
     }
 

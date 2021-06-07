@@ -62,7 +62,7 @@ public class AttitudeXmlParser {
                     Instant date = parseActivationTime(fh);
                     datesMap.put(date, fh);
                 } catch (Exception e) {
-                    logger.error(e, I18n.bundle.format("error.file.parse", fh.name()));
+                    logger.error(e, I18n.txt("error.file.parse", fh.name()));
                 }
             }
             Map<FileHandle, Duration> durationMap = new HashMap<>();
@@ -86,16 +86,16 @@ public class AttitudeXmlParser {
 
             // PARSE ATTITUDES
             for (FileHandle fh : list) {
-                logger.info(I18n.bundle.format("notif.attitude.loadingfile", fh.name()));
+                logger.info(I18n.txt("notif.attitude.loadingfile", fh.name()));
                 try {
                     AttitudeIntervalBean att = parseFile(fh, durationMap.get(fh), findActivationDate(fh, datesMap));
                     bst.insert(att);
                 } catch (Exception e) {
-                    logger.error(e, I18n.bundle.format("notif.error", e.getMessage()));
+                    logger.error(e, I18n.txt("notif.error", e.getMessage()));
                 }
             }
 
-            logger.info(I18n.bundle.format("notif.attitude.initialized", list.size));
+            logger.info(I18n.txt("notif.attitude.initialized", list.size));
             return bst;
         } catch (Exception e) {
             logger.error("Error loading attitude files");

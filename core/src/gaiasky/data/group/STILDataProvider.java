@@ -74,7 +74,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public List<IParticleRecord> loadData(String file, double factor) {
-        logger.info(I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.txt("notif.datafile", file));
         try {
             loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
         } catch (Exception e1) {
@@ -86,7 +86,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 logger.error(e2);
             }
         }
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
+        logger.info(I18n.txt("notif.nodeloader", list.size(), file));
         return list;
     }
 

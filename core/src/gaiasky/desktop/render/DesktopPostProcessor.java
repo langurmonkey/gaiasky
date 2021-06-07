@@ -439,10 +439,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         Antialiasing antialiasing = null;
         if (aavalue.equals(Antialias.FXAA)) {
             antialiasing = new Fxaa(width, height, getFxaaQuality(GlobalConf.scene.GRAPHICS_QUALITY));
-            Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "FXAA"));
+            Logger.getLogger(this.getClass()).debug(I18n.txt("notif.selected", "FXAA"));
         } else if (aavalue.equals(Antialias.NFAA)) {
             antialiasing = new Nfaa(width, height);
-            Logger.getLogger(this.getClass()).debug(I18n.bundle.format("notif.selected", "NFAA"));
+            Logger.getLogger(this.getClass()).debug(I18n.txt("notif.selected", "NFAA"));
         }
         if (antialiasing != null) {
             antialiasing.setEnabled(GlobalConf.postprocess.POSTPROCESS_ANTIALIAS.isPostProcessAntialias());

@@ -102,7 +102,7 @@ public class ComponentTypes extends BitSet {
 
         public String getName() {
             try {
-                return I18n.bundle.get(key);
+                return I18n.txt(key);
             } catch (MissingResourceException e) {
                 return null;
             }

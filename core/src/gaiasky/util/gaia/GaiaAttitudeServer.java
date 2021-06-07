@@ -74,7 +74,7 @@ public class GaiaAttitudeServer {
 
                     if (prevAttitude != null && !att.equals(prevAttitude)) {
                         // Change!
-                        logger.info(I18n.bundle.format("notif.attitude.changed", att.toString(), att.activationTime));
+                        logger.info(I18n.txt("notif.attitude.changed", att.toString(), att.activationTime));
                     }
 
                     prevAttitude = att;

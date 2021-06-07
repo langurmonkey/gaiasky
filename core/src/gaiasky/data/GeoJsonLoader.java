@@ -61,7 +61,7 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
 
                     child = child.next;
                 }
-                Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.nodeloader", size, filePath));
+                Logger.getLogger(this.getClass()).info(I18n.txt("notif.nodeloader", size, filePath));
             }
 
         } catch (Exception e) {

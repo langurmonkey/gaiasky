@@ -60,7 +60,7 @@ public class ScreenModeCmd implements IObserver {
                 // set the window to fullscreen mode
                 boolean good = Gdx.graphics.setFullscreenMode(mymode);
                 if (!good) {
-                    logger.error(I18n.bundle.format("notif.error", I18n.bundle.get("gui.fullscreen")));
+                    logger.error(I18n.txt("notif.error", I18n.txt("gui.fullscreen")));
                 }
 
             } else {
@@ -69,7 +69,7 @@ public class ScreenModeCmd implements IObserver {
 
                 boolean good = Gdx.graphics.setWindowedMode(width, height);
                 if (!good) {
-                    logger.error(I18n.bundle.format("notif.error", I18n.bundle.get("gui.windowed")));
+                    logger.error(I18n.txt("notif.error", I18n.txt("gui.windowed")));
                 }
 
             }

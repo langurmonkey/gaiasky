@@ -240,7 +240,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         private final Array<SceneGraphNode> apearray;
 
         public ColorPickerColormapDialog(String elementName, float[] color, Stage stage, Skin skin) {
-            super(I18n.bundle.get("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
+            super(I18n.txt("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
             this.cpd = this;
             this.color = new float[4];
             this.color[0] = color[0];

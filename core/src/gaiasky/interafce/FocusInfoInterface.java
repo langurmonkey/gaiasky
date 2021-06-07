@@ -124,7 +124,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         absmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud");
 
         // Pointer
-        pointerName = new OwnLabel(I18n.bundle.get("gui.pointer"), skin, "hud-header");
+        pointerName = new OwnLabel(I18n.txt("gui.pointer"), skin, "hud-header");
         pointerRADEC = new OwnLabel("", skin, "hud");
         pointerLonLat = new OwnLabel("", skin, "hud");
         viewRADEC = new OwnLabel("", skin, "hud");
@@ -142,12 +142,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         viewImgBtn.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.view"), skin));
 
         // Camera
-        camName = new OwnLabel(I18n.bundle.get("gui.camera"), skin, "hud-header");
+        camName = new OwnLabel(I18n.txt("gui.camera"), skin, "hud-header");
         camVel = new OwnLabel("", skin, "hud");
         camPos = new OwnLabel("", skin, "hud");
 
         // Ruler
-        rulerName = new OwnLabel(I18n.bundle.get("gui.ruler.title"), skin, "hud-header");
+        rulerName = new OwnLabel(I18n.txt("gui.ruler.title"), skin, "hud-header");
         rulerName0 = new OwnLabel("-", skin, "hud");
         rulerName1 = new OwnLabel("-", skin, "hud");
         HorizontalGroup rulerNameGroup = new HorizontalGroup();
@@ -584,12 +584,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         case RULER_CLEAR:
             rulerName0.setText("-");
             rulerName1.setText("-");
-            rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": -");
+            rulerDist.setText(I18n.txt("gui.sc.distance") + ": -");
             hideInfo(rulerCell);
             break;
         case RULER_DIST:
             String rd = (String) data[1];
-            rulerDist.setText(I18n.bundle.get("gui.sc.distance") + ": " + rd);
+            rulerDist.setText(I18n.txt("gui.sc.distance") + ": " + rd);
             break;
         case PER_OBJECT_VISIBILITY_CMD:
             boolean ui = (boolean) data[2];

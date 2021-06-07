@@ -123,9 +123,9 @@ public class CloudComponent {
             if (!texLoading) {
                 initialize(true);
                 if (cloud != null)
-                    logger.info(I18n.bundle.format("notif.loading", cloudUnpacked));
+                    logger.info(I18n.txt("notif.loading", cloudUnpacked));
                 if (cloudtrans != null)
-                    logger.info(I18n.bundle.format("notif.loading", cloudtransUnpacked));
+                    logger.info(I18n.txt("notif.loading", cloudtransUnpacked));
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {

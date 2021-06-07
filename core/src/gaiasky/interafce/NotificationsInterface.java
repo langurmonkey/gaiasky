@@ -231,22 +231,22 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                     } else {
                         sgn = (IFocus) data[0];
                     }
-                    addMessage(I18n.bundle.format("notif.camerafocus", sgn.getName()));
+                    addMessage(I18n.txt("notif.camerafocus", sgn.getName()));
                 }
                 break;
             case TIME_STATE_CMD:
                 Boolean bool = (Boolean) data[0];
                 if (bool == null) {
-                    addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.format("gui.time")));
+                    addMessage(I18n.txt("notif.toggle", I18n.txt("gui.time")));
                 } else {
-                    addMessage(I18n.bundle.format("notif.simulation." + (bool ? "resume" : "pause")));
+                    addMessage(I18n.txt("notif.simulation." + (bool ? "resume" : "pause")));
                 }
                 break;
             case TOGGLE_VISIBILITY_CMD:
                 if (data.length == 3)
-                    addMessage(I18n.bundle.format("notif.visibility." + (((Boolean) data[2]) ? "on" : "off"), I18n.bundle.get((String) data[0])));
+                    addMessage(I18n.txt("notif.visibility." + (((Boolean) data[2]) ? "on" : "off"), I18n.txt((String) data[0])));
                 else
-                    addMessage(I18n.bundle.format("notif.visibility.toggle", I18n.bundle.get((String) data[0])));
+                    addMessage(I18n.txt("notif.visibility.toggle", I18n.txt((String) data[0])));
                 break;
             case FOCUS_LOCK_CMD:
             case ORIENTATION_LOCK_CMD:
@@ -259,10 +259,10 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
             case CAMERA_MODE_CMD:
                 CameraMode cm = (CameraMode) data[0];
                 if (cm != CameraMode.FOCUS_MODE)
-                    addMessage(I18n.bundle.format("notif.cameramode.change", data[0]));
+                    addMessage(I18n.txt("notif.cameramode.change", data[0]));
                 break;
             case TIME_WARP_CHANGED_INFO:
-                addMessage(I18n.bundle.format("notif.timepace.change", data[0]));
+                addMessage(I18n.txt("notif.timepace.change", data[0]));
                 break;
             case FOV_CHANGE_NOTIFICATION:
                 // addMessage("Field of view changed to " + (float) data[0]);
@@ -275,38 +275,38 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 String stackTrace = sw.toString();
                 if (data.length == 1) {
                     if (I18n.bundle != null)
-                        addMessage(I18n.bundle.format("notif.error", stackTrace));
+                        addMessage(I18n.txt("notif.error", stackTrace));
                     else
                         addMessage("Error: " + stackTrace);
                 } else {
                     if (I18n.bundle != null)
-                        addMessage(I18n.bundle.format("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
+                        addMessage(I18n.txt("notif.error", data[1] + TAG_SEPARATOR + stackTrace));
                     else
                         addMessage("Error: " + data[1] + TAG_SEPARATOR + stackTrace);
                 }
                 break;
             case ORBIT_DATA_LOADED:
-                addMessage(I18n.bundle.format("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
+                addMessage(I18n.txt("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
                 break;
             case SCREENSHOT_INFO:
-                addMessage(I18n.bundle.format("notif.screenshot", data[0]));
+                addMessage(I18n.txt("notif.screenshot", data[0]));
                 break;
             case STEREOSCOPIC_CMD:
-                addMessage(I18n.bundle.format("notif.toggle", I18n.bundle.get("notif.stereoscopic")));
+                addMessage(I18n.txt("notif.toggle", I18n.txt("notif.stereoscopic")));
                 break;
             case DISPLAY_GUI_CMD:
                 boolean displayGui = (Boolean) data[0];
-                addMessage(I18n.bundle.format("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
+                addMessage(I18n.txt("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
                 break;
             case STEREO_PROFILE_CMD:
-                addMessage(I18n.bundle.format("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
+                addMessage(I18n.txt("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
                 break;
             case FRAME_OUTPUT_CMD:
                 boolean activated = (Boolean) data[0];
                 if (activated) {
-                    addMessage(I18n.bundle.format("notif.activated", I18n.bundle.get("element.frameoutput")));
+                    addMessage(I18n.txt("notif.activated", I18n.txt("element.frameoutput")));
                 } else {
-                    addMessage(I18n.bundle.format("notif.deactivated", I18n.bundle.get("element.frameoutput")));
+                    addMessage(I18n.txt("notif.deactivated", I18n.txt("element.frameoutput")));
                 }
                 break;
             case SCREEN_NOTIFICATION_CMD:

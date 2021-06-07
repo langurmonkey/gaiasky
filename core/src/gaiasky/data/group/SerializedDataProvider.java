@@ -21,11 +21,11 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     }
 
     public List<IParticleRecord> loadData(String file, double factor) {
-        logger.info(I18n.bundle.format("notif.datafile", file));
+        logger.info(I18n.txt("notif.datafile", file));
 
         FileHandle f = GlobalConf.data.dataFileHandle(file);
         loadData(f.read(), factor);
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), file));
+        logger.info(I18n.txt("notif.nodeloader", list.size(), file));
 
         return list;
     }

@@ -37,7 +37,7 @@ public class DateDialog extends CollapsibleWindow {
     private final Color defaultColor;
 
     public DateDialog(Stage stage, Skin skin) {
-        super(I18n.bundle.get("gui.pickdate"), skin);
+        super(I18n.txt("gui.pickdate"), skin);
         this.me = this;
         this.stage = stage;
 
@@ -97,7 +97,7 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.addActor(new OwnLabel("/", skin));
         dayGroup.addActor(year);
 
-        add(new OwnLabel(I18n.bundle.get("gui.time.date") + " (dd/MM/yyyy):", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.txt("gui.time.date") + " (dd/MM/yyyy):", skin)).pad(pad, pad, 0, pad * 2).right();
         add(dayGroup).pad(pad, 0, 0, pad);
         row();
 
@@ -152,7 +152,7 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.addActor(new OwnLabel(":", skin));
         hourGroup.addActor(sec);
 
-        add(new OwnLabel(I18n.bundle.get("gui.time.time") + " (hh:mm:ss):", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.txt("gui.time.time") + " (hh:mm:ss):", skin)).pad(pad, pad, 0, pad * 2).right();
         add(hourGroup).pad(pad, 0, 0, pad);
         row();
 
@@ -160,7 +160,7 @@ public class DateDialog extends CollapsibleWindow {
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.pad(pad);
         buttonGroup.space(pad);
-        TextButton ok = new OwnTextButton(I18n.bundle.get("gui.ok"), skin, "default");
+        TextButton ok = new OwnTextButton(I18n.txt("gui.ok"), skin, "default");
         ok.setName("close");
         ok.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -186,7 +186,7 @@ public class DateDialog extends CollapsibleWindow {
 
             return false;
         });
-        TextButton cancel = new OwnTextButton(I18n.bundle.get("gui.cancel"), skin, "default");
+        TextButton cancel = new OwnTextButton(I18n.txt("gui.cancel"), skin, "default");
         cancel.setName("close");
         cancel.addListener(event -> {
             if (event instanceof ChangeEvent) {

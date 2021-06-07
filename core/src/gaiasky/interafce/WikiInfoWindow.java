@@ -344,7 +344,7 @@ public class WikiInfoWindow extends GenericDialog {
         public void ko() {
             // Error getting data
             GaiaSky.postRunnable(() -> {
-                String msg = I18n.bundle.format("error.wiki.data", wikiname);
+                String msg = I18n.txt("error.wiki.data", wikiname);
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 table.pack();
                 finish();

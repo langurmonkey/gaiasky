@@ -422,7 +422,7 @@ public class KeyBindings {
                 logger.error(e);
             }
         }
-        logger.info("Using keyboard mappings file: " + mappingsFile);
+        logger.info(I18n.txt("notif.kbd.mappings.file.use", mappingsFile));
 
         try {
             Array<Pair<String, String>> mappings = readMappingsFile(mappingsFile);
@@ -441,12 +441,12 @@ public class KeyBindings {
                     addMapping(action, keyCodes);
 
                 } else {
-                    logger.warn(key + " is defined in the mappings file, but Action could not be found!");
+                    logger.warn(I18n.txt("notif.kbd.mappings.action.notfound", key));
                 }
             }
 
         } catch (Exception e) {
-            logger.error(e, "Error loading keyboard mappings: " + mappingsFile);
+            logger.error(e, I18n.txt("notif.kbd.mappings.error", mappingsFile));
         }
 
     }

@@ -62,7 +62,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
      */
     @Override
     public void initialize(Array<SceneGraphNode> nodes, ITimeFrameProvider time, boolean hasOctree, boolean hasStarGroup) {
-        logger.info(I18n.bundle.format("notif.sg.insert", nodes.size));
+        logger.info(I18n.txt("notif.sg.insert", nodes.size));
 
         // Set the reference
         SceneGraphNode.sg = this;
@@ -97,7 +97,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             insert(node, false);
         }
 
-        logger.info(I18n.bundle.format("notif.sg.init", root.numChildren));
+        logger.info(I18n.txt("notif.sg.init", root.numChildren));
     }
 
     public void insert(SceneGraphNode node, boolean addToIndex) {

@@ -116,7 +116,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
             }
         }
 
-        Logger.getLogger(this.getClass()).info(I18n.bundle.format("notif.constellations.init", constellations.size));
+        Logger.getLogger(this.getClass()).info(I18n.txt("notif.constellations.init", constellations.size));
         return constellations;
     }
 

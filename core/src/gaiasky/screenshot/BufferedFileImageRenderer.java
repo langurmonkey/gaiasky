@@ -77,7 +77,7 @@ public class BufferedFileImageRenderer implements IFileImageRenderer {
             final int size = outputFrameBufferCopy.size();
             if (size > 0) {
                 // Notify
-                logger.info(I18n.bundle.get("notif.flushframebuffer"));
+                logger.info(I18n.txt("notif.flushframebuffer"));
 
                 TimerTask tt = new TimerTask() {
                     @Override
@@ -89,7 +89,7 @@ public class BufferedFileImageRenderer implements IFileImageRenderer {
                             folder = bf.folder;
                             bfPool.free(bf);
                         }
-                        logger.info(I18n.bundle.format("notif.flushframebuffer.finished", size, folder));
+                        logger.info(I18n.txt("notif.flushframebuffer.finished", size, folder));
                     }
                 };
                 timer.schedule(tt, 0);

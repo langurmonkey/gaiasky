@@ -109,7 +109,7 @@ public class MilkyWayReshaper {
                     }
                     fw.flush();
                     fw.close();
-                    logger.info(I18n.bundle.format("notif.written", added, out));
+                    logger.info(I18n.txt("notif.written", added, out));
                 } else {
                     logger.info("No particles in input file");
                 }

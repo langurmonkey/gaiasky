@@ -99,7 +99,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
             }
         }
 
-        logger.info(I18n.bundle.format("notif.catalog.init", clusters.size));
+        logger.info(I18n.txt("notif.catalog.init", clusters.size));
         return clusters;
     }
 

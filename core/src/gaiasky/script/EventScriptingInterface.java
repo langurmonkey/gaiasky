@@ -257,7 +257,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraLock(final boolean lock) {
-        GaiaSky.postRunnable(() -> em.post(Events.FOCUS_LOCK_CMD, I18n.bundle.get("gui.camera.lock"), lock));
+        GaiaSky.postRunnable(() -> em.post(Events.FOCUS_LOCK_CMD, I18n.txt("gui.camera.lock"), lock));
     }
 
     @Override
@@ -458,7 +458,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraOrientationLock(boolean lock) {
-        GaiaSky.postRunnable(() -> em.post(Events.ORIENTATION_LOCK_CMD, I18n.bundle.get("gui.camera.lock.orientation"), lock, false));
+        GaiaSky.postRunnable(() -> em.post(Events.ORIENTATION_LOCK_CMD, I18n.txt("gui.camera.lock.orientation"), lock, false));
     }
 
     @Override
@@ -1529,12 +1529,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void enableGui() {
-        GaiaSky.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode")));
+        GaiaSky.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, true, I18n.txt("notif.cleanmode")));
     }
 
     @Override
     public void disableGui() {
-        GaiaSky.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, false, I18n.bundle.get("notif.cleanmode")));
+        GaiaSky.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, false, I18n.txt("notif.cleanmode")));
     }
 
     @Override
@@ -2258,7 +2258,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSmoothLodTransitions(boolean value) {
-        GaiaSky.postRunnable(() -> em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.bundle.get("element.octreeparticlefade"), value));
+        GaiaSky.postRunnable(() -> em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), value));
     }
 
     @Override

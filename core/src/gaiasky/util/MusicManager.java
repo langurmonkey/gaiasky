@@ -18,6 +18,10 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 
+/**
+ * This guy is in charge of managing the music playlist and actually
+ * playing the sounds
+ */
 public class MusicManager implements IObserver {
     private static final Log logger = Logger.getLogger(MusicManager.class);
 
@@ -52,7 +56,7 @@ public class MusicManager implements IObserver {
             for (Path folder : folders) {
                 GlobalResources.listRec(folder, musicFiles, new MusicFileFilter());
             }
-            logger.debug(I18n.bundle.format("gui.music.load", musicFiles.size));
+            logger.debug(I18n.txt("gui.music.load", musicFiles.size));
         } else {
             musicFiles = new Array<>();
         }
@@ -95,7 +99,7 @@ public class MusicManager implements IObserver {
 
             currentMusic.play();
             EventManager.instance.post(Events.MUSIC_TRACK_INFO, musicFiles.get(i).getFileName().toString());
-            logger.info(I18n.bundle.format("gui.music.playing", musicFiles.get(i).getFileName().toString()));
+            logger.info(I18n.txt("gui.music.playing", musicFiles.get(i).getFileName().toString()));
         } catch (Exception e) {
             logger.error(e);
         }

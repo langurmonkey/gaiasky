@@ -135,7 +135,7 @@ public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
         } else {
             logger.warn("File skipped: " + f.path());
         }
-        logger.info(I18n.bundle.format("notif.nodeloader", list.size(), f.path()));
+        logger.info(I18n.txt("notif.nodeloader", list.size(), f.path()));
         return list;
     }
 

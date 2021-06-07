@@ -80,7 +80,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
                         child = child.next;
                     }
-                    logger.info(I18n.bundle.format("notif.nodeloader", size, filePath));
+                    logger.info(I18n.txt("notif.nodeloader", size, filePath));
                 }
             } catch (Exception e) {
                 logger.error(e);

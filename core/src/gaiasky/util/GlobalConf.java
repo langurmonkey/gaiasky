@@ -1210,7 +1210,7 @@ public class GlobalConf {
                     STEREOSCOPIC_MODE = stereomode;
                     if (STEREOSCOPIC_MODE && CUBEMAP_MODE) {
                         CUBEMAP_MODE = false;
-                        EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.bundle.get("notif.cleanmode"));
+                        EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.txt("notif.cleanmode"));
                     }
                 }
                 break;

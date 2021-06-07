@@ -626,9 +626,9 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      */
     public void updateNames() {
         if (namekey != null)
-            setName(I18n.bundle.get(namekey));
+            setName(I18n.txt(namekey));
         if (parentkey != null)
-            this.parentName = I18n.bundle.get(parentkey);
+            this.parentName = I18n.txt(parentkey);
     }
 
     /**

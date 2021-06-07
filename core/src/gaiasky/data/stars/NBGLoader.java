@@ -126,7 +126,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                 }
             }
 
-        logger.info(I18n.bundle.format("notif.catalog.init", galaxies.size));
+        logger.info(I18n.txt("notif.catalog.init", galaxies.size));
         return galaxies;
     }
 

@@ -11,6 +11,9 @@ import gaiasky.util.Logger.Log;
 
 import java.lang.reflect.Field;
 
+/**
+ * Contains key definitions for Gaia Sky
+ */
 public class GSKeys {
     private static final Log logger = Logger.getLogger(GSKeys.class);
 
@@ -157,13 +160,13 @@ public class GSKeys {
     public static final int F11 = Keys.F11;
     public static final int F12 = Keys.F12;
 
-    public static int valueOf(String name){
+    public static int valueOf(String name) {
         int code = ANY_KEY;
 
         try {
             Field f = GSKeys.class.getField(name.toUpperCase());
             code = f.getInt(null);
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error(e, "Error getting value of field GSKeys." + name);
         }
 

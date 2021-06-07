@@ -109,12 +109,12 @@ public class ArchiveViewWindow extends GenericDialog {
     private void requestData(GaiaDataListener listener) {
         if (st.getCatalogSource() > 0) {
             if (st.getId() > 5000000) {
-                this.getTitleLabel().setText(I18n.bundle.format("gui.data.catalog", "Gaia", st.getName()));
+                this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Gaia", st.getName()));
                 // Sourceid
                 getDataBySourceId(st.getId(), listener);
                 return;
             } else if (st.getHip() > 0) {
-                this.getTitleLabel().setText(I18n.bundle.format("gui.data.catalog", "Hipparcos", st.getName()));
+                this.getTitleLabel().setText(I18n.txt("gui.data.catalog", "Hipparcos", st.getName()));
                 // HIP
                 getDataByHipId(st.getHip(), listener);
                 return;
@@ -317,7 +317,7 @@ public class ArchiveViewWindow extends GenericDialog {
         public void ko() {
             // Error getting data
             GaiaSky.postRunnable(() -> {
-                String msg = I18n.bundle.format("error.gaiacatalog.data", st.getName());
+                String msg = I18n.txt("error.gaiacatalog.data", st.getName());
                 table.add(new OwnLabel(msg, skin, "ui-21"));
                 finish();
             });
@@ -334,7 +334,7 @@ public class ArchiveViewWindow extends GenericDialog {
 
         public void notFound() {
             // Not found
-            String msg = I18n.bundle.format("error.gaiacatalog.notfound", st.getName());
+            String msg = I18n.txt("error.gaiacatalog.notfound", st.getName());
             table.add(new OwnLabel(msg, skin, "ui-21"));
             finish();
         }
