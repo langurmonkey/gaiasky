@@ -25,8 +25,6 @@ import java.security.MessageDigest;
 
 /**
  * Contains utilities to download files
- *
- * @author tsagrista
  */
 public class DownloadHelper {
     private static final Log logger = Logger.getLogger(DownloadHelper.class);

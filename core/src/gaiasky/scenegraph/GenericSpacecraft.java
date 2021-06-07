@@ -10,8 +10,6 @@ import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * A generic spacecraft
- *
- * @author tsagrista
  */
 public class GenericSpacecraft extends Satellite {
 

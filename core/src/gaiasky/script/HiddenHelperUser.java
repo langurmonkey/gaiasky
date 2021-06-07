@@ -19,9 +19,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * This guy implements high level operations which run concurrently to the main
  * thread by starting new threads
- * 
- * @author tsagrista
- *
  */
 public class HiddenHelperUser implements IObserver {
 

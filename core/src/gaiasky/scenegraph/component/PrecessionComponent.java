@@ -6,9 +6,7 @@
 package gaiasky.scenegraph.component;
 
 /**
- * Provides the information for the precession of this body.
- * @author Toni Sagrista
- *
+ * Provides the information for the precession of this body
  */
 public class PrecessionComponent {
     /** Precession angle in deg **/

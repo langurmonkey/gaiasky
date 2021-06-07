@@ -11,8 +11,6 @@ import gaiasky.util.units.Quantity.Length.LengthUnit;
 
 /**
  * A wee utility class that provides unit conversion mechanisms.
- * @author Toni Sagrista
- *
  */
 public class Quantity {
 

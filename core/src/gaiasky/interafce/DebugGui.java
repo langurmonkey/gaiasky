@@ -15,9 +15,6 @@ import gaiasky.util.GlobalResources;
 
 /**
  * This GUI shows debug information at the top-right corner of the screen
- * 
- * @author tsagrista
- *
  */
 public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;

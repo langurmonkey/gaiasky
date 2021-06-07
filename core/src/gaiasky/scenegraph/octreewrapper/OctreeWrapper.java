@@ -16,9 +16,6 @@ import java.util.ArrayList;
 /**
  * Static Octree wrapper that can be inserted into the scene graph. This
  * implementation is single-threaded.
- * 
- * @author Toni Sagrista
- *
  */
 public class OctreeWrapper extends AbstractOctreeWrapper {
 

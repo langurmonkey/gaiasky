@@ -13,8 +13,6 @@ import org.astrogrid.samp.client.HubConnector;
 /**
  * Extends hub connector to provide some very basic logging using
  * the Gaia Sky internal logging system.
- * @author tsagrista
- *
  */
 public class GaiaSkyHubConnector extends HubConnector {
     private static final Log logger = Logger.getLogger(GaiaSkyHubConnector.class);

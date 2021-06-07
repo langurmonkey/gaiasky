@@ -20,10 +20,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 /**
- * Buffers the writing of images to disk.
- * 
- * @author Toni Sagrista
- *
+ * Buffers the writing of images to disk
  */
 public class BufferedFileImageRenderer implements IFileImageRenderer {
     private static final Log logger = Logger.getLogger(BufferedFileImageRenderer.class);

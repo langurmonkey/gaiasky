@@ -22,10 +22,7 @@ import java.util.List;
 
 /**
  * Loads and writes star groups using java's default {@link ObjectOutputStream} and
- * {@link ObjectInputStream} through {@link SerializedDataProvider}
- * 
- * @author Toni Sagrista
- *
+ * {@link ObjectInputStream} through {@link SerializedDataProvider}.
  */
 public class StarGroupSerializedIO implements IStarGroupIO {
     private static final Log logger = Logger.getLogger(StarGroupSerializedIO.class);
@@ -41,9 +38,9 @@ public class StarGroupSerializedIO implements IStarGroupIO {
      * group.
      * 
      * @param list
-     *            The list with the star group to write
+     *            The list with the star group to write.
      * @param out
-     *            The output stream to write to
+     *            The output stream to write to.
      */
     public void writeParticles(List<SceneGraphNode> list, OutputStream out) {
         writeParticles(list, out, 1);

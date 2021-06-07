@@ -11,9 +11,7 @@ import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Normal SGR, takes care of the regular to-screen rendering with no strange
- * modes (stereoscopic, planetarium, cubemap) active.
- *
- * @author tsagrista
+ * modes (stereoscopic, planetarium, cubemap) active
  */
 public class SGR extends SGRAbstract implements ISGR {
 

@@ -25,8 +25,6 @@ import net.jafama.FastMath;
 /**
  * Renders lines as Polyline Quadstrips (Polyboards).
  * Slower but higher quality.
- *
- * @author tsagrista
  */
 public class LineQuadRenderSystem extends LineRenderSystem {
     protected static final int INI_DPOOL_SIZE = 1000;

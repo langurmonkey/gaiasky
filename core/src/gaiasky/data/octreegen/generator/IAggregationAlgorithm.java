@@ -13,9 +13,6 @@ import java.util.List;
 /**
  * Interface to be implemented by all algorithms that create a group of virtual
  * particles for an octant.
- * 
- * @author Toni Sagrista
- *
  */
 public interface IAggregationAlgorithm {
 

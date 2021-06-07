@@ -18,8 +18,6 @@ import gaiasky.util.TextUtils;
 
 /**
  * A collapsible pane with a detach-to-window button.
- *
- * @author Toni Sagrista
  */
 public class CollapsiblePane extends Table {
 

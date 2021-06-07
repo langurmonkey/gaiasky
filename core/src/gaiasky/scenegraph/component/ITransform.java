@@ -9,8 +9,6 @@ import com.badlogic.gdx.math.Matrix4;
 
 /**
  * Represents a generic matrix transformation
- * @author tsagrista
- *
  */
 public interface ITransform {
     void apply(Matrix4 mat);

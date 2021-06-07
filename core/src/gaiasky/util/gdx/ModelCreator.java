@@ -25,8 +25,6 @@ public abstract class ModelCreator {
 
     /**
      * Contains the index info for a face.
-     * @author Toni Sagrista
-     *
      */
     public class Face implements IFace {
         /** This stores the indices for both the vertices and the UV coordinates **/

@@ -6,9 +6,7 @@
 package gaiasky.scenegraph.component;
 
 /**
- * Colour component containing information about a colour.
- * @author Toni Sagrista
- *
+ * Colour component containing information about a colour
  */
 public class ColourComponent {
     public float[] rgba;

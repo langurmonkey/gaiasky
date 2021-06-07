@@ -23,9 +23,6 @@ import java.time.Instant;
 
 /**
  * Only for frame output mode, it displays the current time.
- * 
- * @author Toni Sagrista
- *
  */
 public class RenderGui extends AbstractGui {
     protected Label time;

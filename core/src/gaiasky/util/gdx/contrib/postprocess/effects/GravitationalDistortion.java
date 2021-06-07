@@ -28,9 +28,7 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * This is just a test for now
- *
- * @author Toni Sagrista
- **/
+ */
 public final class GravitationalDistortion extends PostProcessorEffect {
     private GravitationalDistortionFilter gravFilter = null;
 

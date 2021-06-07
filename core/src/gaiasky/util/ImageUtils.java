@@ -26,10 +26,10 @@ public class ImageUtils {
     }
 
     /**
-     * Converts the image in the incoming file to RGB if it is a monochrome image.
+     * Converts the image in the incoming file to RGB if it is a monochrome image
      *
      * @param file The image to convert
-     * @return A boolean indicating whether the conversion was carried out (i.e. the image was actually monochrome).
+     * @return A boolean indicating whether the conversion was carried out (i.e. the image was actually monochrome)
      * @throws IOException
      * @throws ImageReadException
      * @throws ImageWriteException

@@ -26,7 +26,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Fast approximate anti-aliasing filter.
  *
- * @author Toni Sagrista
+ 
  */
 public final class GravitationalDistortionFilter extends Filter<GravitationalDistortionFilter> {
     private final Vector2 viewport;

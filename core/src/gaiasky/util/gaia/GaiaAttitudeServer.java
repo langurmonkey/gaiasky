@@ -18,8 +18,6 @@ import java.util.Date;
  * Provides caching of the last Nsl37 attitude requested. This allows for
  * calculating the attitude only once in each time step and using it in several
  * points in the processing.
- *
- * @author Toni Sagrista
  */
 public class GaiaAttitudeServer {
     private static final Log logger = Logger.getLogger(GaiaAttitudeServer.class);

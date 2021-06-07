@@ -35,8 +35,6 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 /**
  * Part of the user interface which holds the information on the current focus
  * object and on the camera.
- *
- * @author tsagrista
  */
 public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     static private final int MAX_RULER_NAME_LEN = 9;

@@ -20,9 +20,6 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 /**
  * Contains elements which depend on the current state of the program, such as
  * the running scripts, the buttons to pause the camera subsystem, etc.
- * 
- * @author tsagrista
- *
  */
 public class RunStateInterface extends TableGuiInterface implements IObserver {
 

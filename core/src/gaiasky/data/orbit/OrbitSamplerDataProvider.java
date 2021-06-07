@@ -34,8 +34,6 @@ import java.util.Date;
 
 /**
  * Samples an orbit for a particular Body.
- *
- * @author Toni Sagrista
  */
 public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     private static boolean writeData = false;

@@ -57,8 +57,6 @@ import java.util.TreeSet;
 
 /**
  * The default preferences window.
- *
- * @author tsagrista
  */
 public class PreferencesWindow extends GenericDialog implements IObserver {
     private static final Log logger = Logger.getLogger(PreferencesWindow.class);

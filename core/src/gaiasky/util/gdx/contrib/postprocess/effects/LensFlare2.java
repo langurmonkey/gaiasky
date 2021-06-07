@@ -36,8 +36,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * Pseudo lens flare implementation. This is a post-processing effect entirely,
  * no need for light positions or anything. It includes ghost generation, halos,
  * chromatic distortion and blur.
- *
- * @author Toni Sagrista
  */
 public final class LensFlare2 extends PostProcessorEffect {
     public static class Settings {

@@ -7,9 +7,6 @@ package gaiasky.desktop.concurrent;
 
 /**
  * Class that returns the thread indices.
- * 
- * @author Toni Sagrista
- *
  */
 public abstract class ThreadIndexer {
 
@@ -24,16 +21,16 @@ public abstract class ThreadIndexer {
     }
 
     /**
-     * Gets the index of the current thread
+     * Gets the index of the current thread.
      * 
-     * @return The index
+     * @return The index.
      */
     public abstract int idx();
 
     /**
-     * Number of threads
+     * Number of threads.
      * 
-     * @return The number of threads
+     * @return The number of threads.
      */
     public abstract int nthreads();
 

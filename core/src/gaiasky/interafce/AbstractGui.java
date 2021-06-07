@@ -20,8 +20,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 
 /**
  * Provides general methods and attributes that all GUIs should have
- *
- * @author tsagrista
  */
 public abstract class AbstractGui implements IObserver, IGui {
 

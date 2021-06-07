@@ -6,7 +6,7 @@
 /**
  * Fisheye effect
  *
- * @author tsagrista
+ 
  */
 
 package gaiasky.util.gdx.contrib.postprocess.effects;

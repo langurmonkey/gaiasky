@@ -14,8 +14,6 @@ import gaiasky.util.tree.IPosition;
 
 /**
  * Defines the interface for any scene graph implementation
- *
- * @author tsagrista
  */
 public interface ISceneGraph extends Disposable {
     /**

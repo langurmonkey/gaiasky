@@ -25,8 +25,6 @@ import gaiasky.util.format.NumberFormatFactory;
 
 /**
  * Full OpenGL GUI with all the controls and whistles.
- *
- * @author Toni Sagrista
  */
 public class StereoGui extends AbstractGui {
     private Skin skin;

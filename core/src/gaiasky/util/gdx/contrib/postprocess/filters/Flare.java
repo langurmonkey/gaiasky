@@ -29,7 +29,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * or diffraction starburst). Lens color image (lenscolor.png) is located in
  * src/main/resources/ folder.
  *
- * @author Toni Sagrista
+ 
  * @see <a href=
  * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/

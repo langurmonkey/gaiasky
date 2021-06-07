@@ -20,8 +20,6 @@ import java.util.GregorianCalendar;
 
 /**
  * Writes Gaia attitude to a file. Assumes attitude has been initialised.
- * @author tsagrista
- *
  */
 public class GaiaAttitudeWriter {
     enum OutputType {

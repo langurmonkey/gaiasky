@@ -50,8 +50,6 @@ import java.util.stream.Stream;
 
 /**
  * Holds and initialises resources utilised globally.
- *
- * @author Toni Sagrista
  */
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);

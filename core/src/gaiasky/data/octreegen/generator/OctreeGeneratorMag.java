@@ -19,8 +19,6 @@ import java.util.*;
  * magnitude-sorted stars until one of them is saturated before proceeding to lower
  * levels. This uses more memory than the outdated {@link OctreeGeneratorPart} but
  * it generally produces an artifact-free octree. The technique is called MS-LOD.
- *
- * @author Toni Sagrista
  */
 public class OctreeGeneratorMag implements IOctreeGenerator {
 

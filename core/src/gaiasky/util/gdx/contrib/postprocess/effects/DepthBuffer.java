@@ -28,8 +28,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Debug effect. Renders the contents of the depth texture attachment.
- *
- * @author tsagrista
  */
 public final class DepthBuffer extends PostProcessorEffect {
     private DepthBufferFilter filter;

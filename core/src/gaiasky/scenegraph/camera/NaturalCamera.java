@@ -47,8 +47,6 @@ import org.lwjgl.opengl.GL30;
 
 /**
  * Models the movement of the camera
- *
- * @author Toni Sagrista
  */
 public class NaturalCamera extends AbstractCamera implements IObserver {
 

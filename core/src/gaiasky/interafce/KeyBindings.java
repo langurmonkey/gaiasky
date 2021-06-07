@@ -31,8 +31,6 @@ import java.util.*;
 /**
  * Contains the key mappings and the actions. This should be persisted somehow
  * in the future.
- *
- * @author Toni Sagrista
  */
 public class KeyBindings {
     private static final Log logger = Logger.getLogger(KeyBindings.class);
@@ -471,7 +469,7 @@ public class KeyBindings {
      * A simple program action. It can optionally contain a condition which must
      * evaluate to true for the action to be run.
      *
-     * @author Toni Sagrista
+ 
      */
     public class ProgramAction implements Runnable, Comparable<ProgramAction> {
         final String actionId;

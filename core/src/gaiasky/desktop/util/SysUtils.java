@@ -17,21 +17,19 @@ import java.nio.file.Paths;
 /**
  * Wee utility class to check the operating system and the desktop environment.
  * It also offers retrieval of common system folders.
- *
- * @author Toni Sagrista
  */
 public class SysUtils {
     private static final Log logger = Logger.getLogger(SysUtils.class);
 
     /**
-     * Initialise directories
+     * Initialise directories.
      */
     public static void mkdirs() {
-        // Top level
+        // Top level.
         try {
             Files.createDirectories(getDataDir());
             Files.createDirectories(getConfigDir());
-            // Bottom level
+            // Bottom level.
             Files.createDirectories(getDefaultCameraDir());
             Files.createDirectories(getDefaultMusicDir());
             Files.createDirectories(getDefaultFramesDir());
@@ -176,7 +174,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the camera directory.
      *
-     * @return A pointer to the Gaia Sky camera directory
+     * @return A pointer to the Gaia Sky camera directory.
      */
     public static Path getDefaultCameraDir() {
         return getDataDir().resolve(CAMERA_DIR_NAME);
@@ -185,7 +183,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the default screenshots directory.
      *
-     * @return A pointer to the Gaia Sky screenshots directory
+     * @return A pointer to the Gaia Sky screenshots directory.
      */
     public static Path getDefaultScreenshotsDir() {
         return getDataDir().resolve(SCREENSHOTS_DIR_NAME);
@@ -194,7 +192,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the frames directory.
      *
-     * @return A pointer to the Gaia Sky frames directory
+     * @return A pointer to the Gaia Sky frames directory.
      */
     public static Path getDefaultFramesDir() {
         return getDataDir().resolve(FRAMES_DIR_NAME);
@@ -203,7 +201,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the music directory.
      *
-     * @return A pointer to the Gaia Sky music directory
+     * @return A pointer to the Gaia Sky music directory.
      */
     public static Path getDefaultMusicDir() {
         return getDataDir().resolve(MUSIC_DIR_NAME);
@@ -212,7 +210,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the mappings directory.
      *
-     * @return A pointer to the Gaia Sky mappings directory
+     * @return A pointer to the Gaia Sky mappings directory.
      */
     public static Path getDefaultMappingsDir() {
         return getConfigDir().resolve(MAPPINGS_DIR_NAME);
@@ -226,7 +224,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the bookmarks directory.
      *
-     * @return A pointer to the Gaia Sky bookmarks directory
+     * @return A pointer to the Gaia Sky bookmarks directory.
      */
     public static Path getDefaultBookmarksDir() {
         return getConfigDir().resolve(BOOKMARKS_DIR_NAME);
@@ -239,7 +237,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the mpcdi directory.
      *
-     * @return A pointer to the Gaia Sky mpcdi directory
+     * @return A pointer to the Gaia Sky mpcdi directory.
      */
     public static Path getDefaultMpcdiDir() {
         return getDataDir().resolve(MPCDI_DIR_NAME);
@@ -248,7 +246,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the local data directory where the data files are downloaded and stored.
      *
-     * @return A pointer to the local data directory where the data files are
+     * @return A pointer to the local data directory where the data files are.
      */
     public static Path getLocalDataDir() {
         return getDataDir().resolve(DATA_DIR_NAME);
@@ -257,7 +255,7 @@ public class SysUtils {
     /**
      * Gets a file pointer to the crash reports directory, where crash reports are stored.
      *
-     * @return A pointer to the crash reports directory
+     * @return A pointer to the crash reports directory.
      */
     public static Path getCrashReportsDir() {
         return getDataDir().resolve(CRASHREPORTS_DIR_NAME);
@@ -278,7 +276,7 @@ public class SysUtils {
      * Returns the default data directory. That is ~/.gaiasky/ in Windows and macOS, and ~/.local/share/gaiasky
      * in Linux.
      *
-     * @return Default data directory
+     * @return Default data directory.
      */
     public static Path getDataDir() {
         if (isLinux()) {
@@ -292,7 +290,7 @@ public class SysUtils {
      * Returns the default cache directory, for non-essential data. This is ~/.gaiasky/ in Windows and macOS, and ~/.cache/gaiasky
      * in Linux.
      *
-     * @return The default cache directory
+     * @return The default cache directory.
      */
     public static Path getCacheDir() {
         if (isLinux()) {

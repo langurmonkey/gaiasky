@@ -20,8 +20,6 @@ import java.util.Set;
 /**
  * Parses the ucds of a star table and builds some metadata on
  * the relevant quantities for Gaia Sky (position, proper motion, magnitudes, colors, etc.)
- *
- * @author tsagrista
  */
 public class UCDParser {
     // The following column names can either be strings or regular expressions. They are checked

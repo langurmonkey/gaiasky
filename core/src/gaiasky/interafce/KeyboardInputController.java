@@ -18,9 +18,6 @@ import java.util.Set;
 
 /**
  * This input inputListener connects the input events with the key binding actions
- * 
- * @author tsagrista
- *
  */
 public class KeyboardInputController extends InputAdapter {
 

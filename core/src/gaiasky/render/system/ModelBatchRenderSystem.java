@@ -15,9 +15,6 @@ import gaiasky.util.gdx.IntModelBatch;
 
 /**
  * Renders with a given model batch.
- * 
- * @author Toni Sagrista
- *
  */
 public class ModelBatchRenderSystem extends AbstractRenderSystem {
 

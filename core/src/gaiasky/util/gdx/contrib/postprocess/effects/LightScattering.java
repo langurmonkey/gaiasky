@@ -37,8 +37,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Light scattering implementation.
- *
- * @author Toni Sagrista
  */
 public final class LightScattering extends PostProcessorEffect {
     public static class Settings {

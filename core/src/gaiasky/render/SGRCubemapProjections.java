@@ -22,9 +22,7 @@ import java.util.Set;
 /**
  * Renders the cube map projection mode. Basically, it renders the six sides of
  * the cube map (front, back, up, down, right, left) with a 90 degree fov each
- * and applies a cube map projection (spherical, cylindrical, hammer, fisheye).
- *
- * @author tsagrista
+ * and applies a cube map projection (spherical, cylindrical, hammer, fisheye)
  */
 public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver {
 

@@ -33,8 +33,6 @@ import java.nio.file.Paths;
 
 /**
  * Manages the Graphical User Interfaces of Gaia Sky
- *
- * @author tsagrista
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);

@@ -40,8 +40,6 @@ import java.nio.FloatBuffer;
 /**
  * Implements brightness, contrast, hue and saturation levels, plus
  * auto-tone mapping HDR and gamma correction.
- *
- * @author tsagrista
  */
 public final class Levels extends PostProcessorEffect {
     private static final int LUMA_SIZE = 500;

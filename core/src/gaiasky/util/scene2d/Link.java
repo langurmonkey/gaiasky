@@ -18,8 +18,6 @@ import gaiasky.util.GlobalResources;
 
 /**
  * Link widget.
- *
- * @author Toni Sagrista
  */
 public class Link extends Label {
 

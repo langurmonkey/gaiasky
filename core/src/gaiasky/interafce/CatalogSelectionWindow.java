@@ -22,8 +22,6 @@ import gaiasky.util.scene2d.OwnTextTooltip;
 /**
  * GUI window to choose the catalogs to load at startup.
  * This is shown at startup if no catalogs are selected and {@link GlobalConf#program#SKIP_CATALOG_CHOOSER} is false.
- * @author tsagrista
- *
  */
 public class CatalogSelectionWindow extends GenericDialog {
 

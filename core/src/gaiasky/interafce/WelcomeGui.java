@@ -48,8 +48,6 @@ import java.util.Set;
 
 /**
  * Welcome screen that allows access to the main application, as well as the dataset manager and the catalog selection.
- *
- * @author Toni Sagrista
  */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);

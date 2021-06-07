@@ -7,9 +7,6 @@ package gaiasky.util.math;
 
 /**
  * Trigonometry interface to enable multiple implementations
- * 
- * @author tsagrista
- *
  */
 public interface ITrigonometry {
     double sin(double angle);

@@ -31,8 +31,6 @@ import java.util.List;
 /**
  * Implements the loading and streaming of octree nodes from files. This version
  * loads star groups using {@link gaiasky.data.group.BinaryDataProvider}.
- *
- * @author tsagrista
  */
 public class OctreeGroupLoader extends StreamingOctreeLoader {
     private static final Log logger = Logger.getLogger(OctreeGroupLoader.class);

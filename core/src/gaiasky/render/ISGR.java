@@ -12,8 +12,6 @@ import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Interface that must be extended by all types of scene graph renderers
- *
- * @author tsagrista
  */
 public interface ISGR extends Disposable {
     /**

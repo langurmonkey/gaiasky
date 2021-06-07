@@ -48,8 +48,6 @@ import java.util.List;
 
 /**
  * Full OpenGL GUI with all the controls and whistles.
- *
- * @author Toni Sagrista
  */
 public class FullGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(FullGui.class);

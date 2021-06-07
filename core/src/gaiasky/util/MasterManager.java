@@ -28,8 +28,6 @@ import java.util.function.Function;
 /**
  * Manages a master instance which makes available state information to others
  * in order to synchronize a session.
- *
- * @author tsagrista
  */
 public class MasterManager implements IObserver {
     private static final Log logger = Logger.getLogger(MasterManager.class);

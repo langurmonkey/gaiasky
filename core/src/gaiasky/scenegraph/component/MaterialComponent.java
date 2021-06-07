@@ -32,9 +32,7 @@ import gaiasky.util.gdx.shader.TextureExtAttribute;
 import gaiasky.util.gdx.shader.Vector2Attribute;
 
 /**
- * A basic component that contains the info on a material.
- *
- * @author Toni Sagrista
+ * A basic component that contains the info on a material
  */
 public class MaterialComponent implements IObserver {
     private static final Log logger = Logger.getLogger(MaterialComponent.class);

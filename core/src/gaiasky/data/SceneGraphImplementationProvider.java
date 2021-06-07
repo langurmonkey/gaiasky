@@ -9,9 +9,6 @@ import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * Provides the scene graph implementation.
- * 
- * @author tsagrista
- *
  */
 public abstract class SceneGraphImplementationProvider {
     public static SceneGraphImplementationProvider provider;
@@ -22,7 +19,7 @@ public abstract class SceneGraphImplementationProvider {
 
     /**
      * Gets the right scene graph implementation for the given information about
-     * it
+     * it.
      * 
      * @param multithreading
      *            Multithreading on?
@@ -31,8 +28,8 @@ public abstract class SceneGraphImplementationProvider {
      * @param hasStarGroup
      *            Does it contain a star gorup?
      * @param maxThreads
-     *            Max number of threads
-     * @return The scene graph
+     *            Max number of threads.
+     * @return The scene graph.
      */
     public abstract ISceneGraph getImplementation(boolean multithreading, boolean hasOctree, boolean hasStarGroup, int maxThreads);
 

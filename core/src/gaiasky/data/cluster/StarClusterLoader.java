@@ -57,8 +57,6 @@ import java.util.Map;
  * <li>radius[deg]: {@link gaiasky.util.ucd.UCDParser#radiuscolnames}</li>
  * <li>nstars: {@link gaiasky.util.ucd.UCDParser#nstarscolnames}</li>
  * </ul>
- *
- * @author Toni Sagrista
  */
 public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(StarClusterLoader.class);

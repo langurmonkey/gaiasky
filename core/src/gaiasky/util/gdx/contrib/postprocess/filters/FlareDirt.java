@@ -26,7 +26,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * This adds the lens dirt and starburst effects to the lens flare.
  *
- * @author Toni Sagrista
+ 
  * @see <a href=
  * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/

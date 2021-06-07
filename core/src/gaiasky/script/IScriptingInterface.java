@@ -17,8 +17,6 @@ import java.util.List;
  * exposes all the methods that are callable from a script in order to interact
  * with the program (create demonstrations, tutorials, load data, etc.). You
  * should never use any integration other than this interface for scripting.
- *
- * @author Toni Sagrista
  */
 @SuppressWarnings("unused")
 public interface IScriptingInterface {

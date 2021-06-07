@@ -16,8 +16,6 @@ import gaiasky.util.GlobalResources;
 
 /**
  * ImageButton in which the cursor changes when the mouse rolls over.
- *
- * @author Toni Sagrista
  */
 public class OwnImageButton extends ImageButton {
     OwnImageButton me;

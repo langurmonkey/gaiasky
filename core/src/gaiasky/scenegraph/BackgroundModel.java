@@ -33,8 +33,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 /**
  * A model which renders as a background, unaffected by the camera. It should
  * usually be a flipped sphere or cube map.
- *
- * @author tsagrista
  */
 public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTextRenderable {
     protected String transformName;

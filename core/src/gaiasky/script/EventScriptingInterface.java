@@ -61,9 +61,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * Implementation of the scripting interface using the event system.
- *
- * @author Toni Sagrista
+ * Implementation of the scripting interface using the event system
  */
 @SuppressWarnings({ "unused", "WeakerAccess", "SwitchStatementWithTooFewBranches", "SingleStatementInBlock", "SameParameterValue" })
 public class EventScriptingInterface implements IScriptingInterface, IObserver {

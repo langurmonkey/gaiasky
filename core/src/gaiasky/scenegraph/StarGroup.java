@@ -59,8 +59,6 @@ import java.util.TreeMap;
 /**
  * A particle group which additionally to the xyz position, supports color and
  * magnitude. id x y z pmx pmy pmz appmag absmag col size additional
- *
- * @author tsagrista
  */
 public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFocus, IQuadRenderable, IModelRenderable, IObserver {
 

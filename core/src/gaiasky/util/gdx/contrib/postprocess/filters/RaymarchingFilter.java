@@ -30,7 +30,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Raymarching filter.
  *
- * @author Toni Sagrista
+ 
  */
 public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 viewport;

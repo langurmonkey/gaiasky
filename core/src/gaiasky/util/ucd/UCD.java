@@ -7,8 +7,6 @@ package gaiasky.util.ucd;
 
 /**
  * Very naive class that represents and UCD and does the parsing.
- * @author tsagrista
- *
  */
 public class UCD {
 

@@ -16,26 +16,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Abstract catalog loader with the transformation from spherical to cartesian coordinates
- * @author Toni Sagrista
- *
+ * Abstract catalog loader with the transformation from spherical to cartesian coordinates.
  */
 public abstract class AbstractCatalogLoader {
-    /** Catalog files to load **/
+    // Catalog files to load.
     public String[] files;
     public List<CatalogFilter> filters;
 
-    /** Data source, if using that instead of **/
     public DataSource dataSource;
 
-    /** Name **/
     protected String name;
-    /** Description **/
     protected String description;
-    /** Parameters (size, nobjets, etc.) **/
+    // Parameters (size, nobjets, etc.).
     protected Map<String, Object> params;
 
-    // Default parent name
+    // Default parent name.
     protected String parentName;
 
     public void initialize(String[] files) {
@@ -55,8 +50,8 @@ public abstract class AbstractCatalogLoader {
 
     /**
      * Runs all filters on the star and returns true only if all have passed.
-     * @param s The star
-     * @return True if all filters have passed
+     * @param s The star.
+     * @return True if all filters have passed.
      */
     protected boolean runFiltersAnd(CelestialBody s) {
         if (filters == null || filters.isEmpty())
@@ -69,9 +64,9 @@ public abstract class AbstractCatalogLoader {
     }
 
     /**
-     * Runs all filters on the star and returns true if any of them passes
-     * @param s The star
-     * @return True if any filter has passed
+     * Runs all filters on the star and returns true if any of them passes.
+     * @param s The star.
+     * @return True if any filter has passed.
      */
     protected boolean runFiltersOr(CelestialBody s) {
         if (filters == null || filters.isEmpty())

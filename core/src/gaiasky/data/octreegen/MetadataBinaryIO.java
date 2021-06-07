@@ -38,8 +38,6 @@ import java.util.Map;
  * - 32 bits (int) - nObjects - The cumulative number of objects of this node and its descendants
  * - 32 bits (int) - ownObjects - The number of objects of this node
  * - 32 bits (int) - childCount - The number of children nodes
- *
- * @author Toni Sagrista
  */
 public class MetadataBinaryIO {
     private static final Log logger = Logger.getLogger(MetadataBinaryIO.class);

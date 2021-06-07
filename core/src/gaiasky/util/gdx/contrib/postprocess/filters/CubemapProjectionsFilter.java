@@ -32,7 +32,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Cubemap projections (spherical, cylindrical, hammer, fisheye) filter.
  *
- * @author Toni Sagrista
+ 
  */
 public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFilter> {
 

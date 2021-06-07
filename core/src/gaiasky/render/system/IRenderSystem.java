@@ -13,8 +13,6 @@ import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * A component that renders a type of objects.
- *
- * @author Toni Sagrista
  */
 public interface IRenderSystem {
 

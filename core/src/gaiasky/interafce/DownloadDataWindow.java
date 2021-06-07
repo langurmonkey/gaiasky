@@ -54,8 +54,6 @@ import java.util.stream.Stream;
  * Download manager. It gets a descriptor file from the server containing all
  * available datasets, detects them in the current system and offers and manages
  * their downloads.
- *
- * @author tsagrista
  */
 public class DownloadDataWindow extends GenericDialog {
     private static final Log logger = Logger.getLogger(DownloadDataWindow.class);

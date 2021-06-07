@@ -9,8 +9,6 @@ import gaiasky.scenegraph.ISceneGraph;
 
 /**
  * An abstract renderer.
- * @author Toni Sagrista
- *
  */
 public abstract class AbstractRenderer {
 

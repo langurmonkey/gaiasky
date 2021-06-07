@@ -26,7 +26,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Scattering Light effect.
  *
- * @author Toni Sagrista
+
  * @see <a href="https://medium.com/community-play-3d/god-rays-whats-that-5a67f26aeac2">https://medium.com/community-play-3d/god-
  * rays-whats-that-5a67f26aeac2</a>
  **/

@@ -40,10 +40,7 @@ import java.util.Set;
 /**
  * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for
  * each eye, and then blends them together on screen with the necessary
- * processing depending on the 3D regime (anaglyph 3D, 3DTV, cross-eye, VR).
- *
- * @author tsagrista
- *
+ * processing depending on the 3D regime (anaglyph 3D, 3DTV, cross-eye, VR)
  */
 public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 

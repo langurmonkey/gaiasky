@@ -12,9 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.Align;
 
 /** 
- * A GUI component
- * @author Toni Sagrista
- *
+ * A GUI component.
  */
 public abstract class GuiComponent {
 
@@ -37,7 +35,7 @@ public abstract class GuiComponent {
     }
 
     /**
-     * Initialises the component
+     * Initialises the component.
      */
     public abstract void initialize();
 
@@ -46,7 +44,7 @@ public abstract class GuiComponent {
     }
 
     /**
-     * Disposes the component
+     * Disposes the component.
      */
     public abstract void dispose();
 

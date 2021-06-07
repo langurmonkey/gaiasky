@@ -42,9 +42,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * The field of view cameras.
- *
- * @author Toni Sagrista
+ * The field of view cameras
  */
 public class FovCamera extends AbstractCamera implements IObserver {
     private static final float FOV_CORR = 0.2f;

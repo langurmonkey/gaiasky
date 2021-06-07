@@ -7,8 +7,6 @@ package gaiasky.render;
 
 /**
  * A top-level renderable interface that all renderable objects must extend
- *
- * @author Toni Sagrista
  */
 public interface IRenderable {
 

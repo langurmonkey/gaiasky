@@ -14,9 +14,6 @@ import java.util.*;
 /**
  * Compares performances of different lists such as {@link java.util.ArrayList}
  * and {@link com.badlogic.gdx.utils.Array}.
- * 
- * @author tsagrista
- *
  */
 public class SortTest {
     private static final int N_SORTS = 5;

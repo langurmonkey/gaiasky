@@ -34,8 +34,6 @@ import java.math.BigInteger;
 
 /**
  * Displays the loading screen.
- *
- * @author Toni Sagrista
  */
 public class LoadingGui extends AbstractGui {
     protected Table center, topLeft, bottomMiddle, screenMode;

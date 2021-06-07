@@ -65,15 +65,13 @@ import java.util.*;
 import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
 
 /**
- * Renders the scene graph.
- *
- * @author Toni Sagrista
+ * Renders the scene graph
  */
 public class SceneGraphRenderer extends AbstractRenderer implements IProcessRenderer, IObserver {
 
     /**
      * Describes to which render group this node belongs at a particular time
-     * step.
+     * step
      */
     public enum RenderGroup {
         /**

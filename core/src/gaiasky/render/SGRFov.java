@@ -15,10 +15,7 @@ import gaiasky.scenegraph.camera.ICamera;
 /**
  * Renders the Gaia Field of View camera mode. Positions two cameras inside
  * gaia, each looking through one of the apertures, and renders them in the same
- * viewport with a CCD texture.
- * 
- * @author tsagrista
- *
+ * viewport with a CCD texture
  */
 public class SGRFov extends SGRAbstract implements ISGR {
 

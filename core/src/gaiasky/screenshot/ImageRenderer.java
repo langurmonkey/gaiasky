@@ -20,10 +20,7 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
- * Utility class to render the current frame buffer to images.
- * 
- * @author Toni Sagrista
- *
+ * Utility class to render the current frame buffer to images
  */
 public class ImageRenderer {
     private static int sequenceNumber = 0;

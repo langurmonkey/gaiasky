@@ -53,8 +53,6 @@ import java.util.*;
  * stay there, so all particles get rendered directly in the GPU from the GPU
  * with no CPU intervention. This allows for much faster rendering. Use this for
  * large groups of particles.
- *
- * @author tsagrista
  */
 public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus, IObserver {
 

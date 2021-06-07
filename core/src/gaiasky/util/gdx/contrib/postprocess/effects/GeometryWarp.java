@@ -30,8 +30,6 @@ import gaiasky.util.gdx.loader.PFMData;
 
 /**
  * Implements geometry warp and blending from MPCDI
- *
- * @author Toni Sagrista
  */
 public final class GeometryWarp extends PostProcessorEffect {
     private GeometryWarpFilter warpFilter;

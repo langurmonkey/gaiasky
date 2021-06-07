@@ -33,12 +33,10 @@ import java.util.function.Consumer;
 import java.util.zip.GZIPInputStream;
 
 /**
- * Loads star catalogs in CSV format
+ * Loads star catalogs in CSV format.
  * <p>
  * Source position and corresponding errors are in radians, parallax in mas and
  * proper motion in mas/yr.
- *
- * @author Toni Sagrista
  */
 public class CsvCatalogDataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(CsvCatalogDataProvider.class);

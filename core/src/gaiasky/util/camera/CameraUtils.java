@@ -17,18 +17,14 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 
 /**
- * Contains camera utilities/
- * 
- * @author tsagrista
- *
+ * Contains camera utilities
  */
 public class CameraUtils {
 
     /**
      * Checks if the planet p is hit by the screen position x and y.
-     * 
-     * @param p
-     *            The planet
+     *
+     * @param p The planet
      * @return Whether an intersection has occurred
      */
     public static boolean intersectScreenSphere(Planet p, ICamera camera, int sx, int sy, Vector3 v0, Vector3 v1, Vector3 vec, Vector3 intersection) {

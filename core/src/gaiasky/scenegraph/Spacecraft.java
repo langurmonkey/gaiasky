@@ -39,9 +39,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 /**
- * The spacecraft.
- *
- * @author tsagrista
+ * The spacecraft
  */
 public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IObserver {
     private static final Log logger = Logger.getLogger(Spacecraft.class);

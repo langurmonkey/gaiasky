@@ -17,8 +17,6 @@ import java.util.Set;
 /**
  * Event manager that allows for subscription of observers to events (identified
  * by strings), and also for the creation of event objects by anyone.
- *
- * @author Toni Sagrista
  */
 public class EventManager implements IObserver {
 

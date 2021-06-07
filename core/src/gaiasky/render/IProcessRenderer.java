@@ -12,14 +12,12 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
 
 /**
- * Interface for component renderers.
- *
- * @author Toni Sagrista
+ * Interface for component renderers
  */
 public interface IProcessRenderer extends Disposable {
 
     /**
-     * Renders the scene.
+     * Renders the scene
      *
      * @param camera The camera to use
      * @param dt     The delta time computed in the update method in seconds

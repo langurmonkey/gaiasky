@@ -10,8 +10,6 @@ package gaiasky.util;
  * @param <A> First type
  * @param <B> Second type
  * @param <C> Third type
- *
- * @author Toni Sagrista
  */
 public class Trio<A, B, C> {
     

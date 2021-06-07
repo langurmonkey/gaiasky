@@ -29,8 +29,6 @@ import java.util.Iterator;
 
 /**
  * Input listener for the natural camera.
- *
- * @author tsagrista
  */
 public class NaturalMouseKbdListener extends MouseKbdListener implements IObserver {
 

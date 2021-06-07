@@ -41,8 +41,6 @@ import java.util.Properties;
 /**
  * Desktop GlobalConf initializer, where the configuration comes from a
  * global.properties file (global.vr.properties in case of VR).
- *
- * @author tsagrista
  */
 public class DesktopConfInit extends ConfInit {
     private static final Log logger = Logger.getLogger(DesktopConfInit.class);

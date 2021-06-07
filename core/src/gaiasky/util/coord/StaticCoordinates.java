@@ -20,9 +20,6 @@ import java.time.Instant;
 
 /**
  * A position that never changes
- * 
- * @author Toni Sagrista
- *
  */
 public class StaticCoordinates implements IBodyCoordinates {
 

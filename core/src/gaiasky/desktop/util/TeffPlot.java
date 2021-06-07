@@ -10,10 +10,7 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Produces a plot of ColorXP (BP-RP) vs log(Teff))
- * 
- * @author tsagrista
- *
+ * Produces a plot of ColorXP (BP-RP) vs log(Teff)).
  */
 public class TeffPlot {
 

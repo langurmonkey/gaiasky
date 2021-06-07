@@ -35,9 +35,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 /**
  * Abstract class with the basic functionality of bodies represented by a 3D
- * model.
- *
- * @author Toni Sagrista
+ * model
  */
 public abstract class ModelBody extends CelestialBody {
     protected static final double TH_ANGLE_POINT = Math.toRadians(0.30);

@@ -16,8 +16,6 @@ import java.io.Serializable;
 
 /**
  * Vector of arbitrary precision floating point numbers using ApFloat.
- *
- * @author Toni Sagrista
  */
 public class Vector3b implements Serializable {
     private static final long serialVersionUID = 3840054589595372522L;

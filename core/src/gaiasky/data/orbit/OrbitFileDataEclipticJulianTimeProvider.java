@@ -15,8 +15,6 @@ import gaiasky.util.GlobalConf;
 
 /**
  * Reads an orbit file into an OrbitData object.
- * @author Toni Sagrista
- *
  */
 public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvider {
     PointCloudData data;

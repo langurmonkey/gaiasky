@@ -14,8 +14,6 @@ import com.badlogic.gdx.utils.Align;
 /**
  * OwnTextButton with an icon. Also, the cursor changes when the mouse rolls
  * over. It also fixes the size issue.
- *
- * @author Toni Sagrista
  */
 public class OwnTextIconButton extends OwnTextButton {
 

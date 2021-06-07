@@ -10,10 +10,7 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.util.math.Vector3d;
 
 /**
- * Holds some context information useful when rendering.
- * 
- * @author tsagrista
- *
+ * Holds some context information useful when rendering
  */
 public class RenderingContext {
     // Reference screen size to compare to

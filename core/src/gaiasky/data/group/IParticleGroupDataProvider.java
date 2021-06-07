@@ -12,8 +12,6 @@ import java.util.List;
 
 /**
  * Data provider for a particle group.
- *
- * @author tsagrista
  */
 public interface IParticleGroupDataProvider {
     /**

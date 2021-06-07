@@ -6,7 +6,7 @@
 /**
  * Fisheye distortion filter
  *
- * @author tsagrista
+ 
  */
 
 package gaiasky.util.gdx.contrib.postprocess.filters;

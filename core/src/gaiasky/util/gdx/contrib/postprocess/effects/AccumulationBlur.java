@@ -16,8 +16,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 /**
  * A motion blur effect which draws the last frame with a lower opacity. The
  * result is then stored as the next last frame to create the trail effect.
- *
- * @author Toni Sagrista
  */
 public class AccumulationBlur extends PostProcessorEffect {
     private AccumulationBlurFilter motionFilter;

@@ -27,8 +27,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Implements the fast approximate anti-aliasing. Very fast and useful for combining with other post-processing effects.
- *
- * @author Toni Sagrista
  */
 public final class Fxaa extends Antialiasing {
     private FxaaFilter fxaaFilter = null;

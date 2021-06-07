@@ -23,9 +23,6 @@ import java.util.Date;
 
 /**
  * Abstract data loader to rule them all.
- * 
- * @author Toni Sagrista
- *
  */
 public class OrbitDataLoader extends AsynchronousAssetLoader<PointCloudData, OrbitDataLoader.OrbitDataLoaderParameter> {
 

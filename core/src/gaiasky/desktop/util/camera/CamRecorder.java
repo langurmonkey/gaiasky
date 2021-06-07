@@ -35,7 +35,7 @@ import java.util.Date;
  * The time is the time in seconds since the start of the recording, to
  * synchronize with the current FPS in playing mode.
  *
- * @author Toni Sagrista
+ 
  */
 public class CamRecorder implements IObserver {
     private static final Log logger = Logger.getLogger(CamRecorder.class);

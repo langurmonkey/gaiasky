@@ -8,9 +8,6 @@ package gaiasky.util;
 /**
  * This class contains various unit conversion constants for
  * angles, distance and time units
- * 
- * @author Toni Sagrista
- *
  */
 public class Nature {
 

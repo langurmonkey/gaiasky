@@ -8,10 +8,7 @@ package gaiasky.screenshot;
 import gaiasky.util.GlobalConf.ImageFormat;
 
 /**
- * Renders image files synchronously.
- * 
- * @author Toni Sagrista
- *
+ * Renders image files synchronously
  */
 public class BasicFileImageRenderer implements IFileImageRenderer {
 

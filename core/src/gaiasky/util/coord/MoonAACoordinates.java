@@ -14,9 +14,6 @@ import java.time.Instant;
 /**
  * Coordinates of the Moon given by the algorithm in Jean Meeus' Astronomical
  * Algorithms book.
- * 
- * @author Toni Sagrista
- *
  */
 public class MoonAACoordinates extends AbstractOrbitCoordinates {
     public MoonAACoordinates(){

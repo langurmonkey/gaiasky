@@ -79,8 +79,6 @@ import java.util.*;
 /**
  * The main class. Holds all the entities manages the update/draw cycle as well
  * as the image rendering.
- *
- * @author Toni Sagrista
  */
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);

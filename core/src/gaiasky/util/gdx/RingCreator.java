@@ -11,9 +11,6 @@ import gaiasky.util.math.MathUtilsd;
 
 /**
  * Helper generic class to create rings.
- * 
- * @author Toni Sagrista
- *
  */
 public class RingCreator extends ModelCreator {
 

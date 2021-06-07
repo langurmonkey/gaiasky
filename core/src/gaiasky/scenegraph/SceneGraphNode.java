@@ -35,8 +35,6 @@ import java.util.List;
 
 /**
  * An object in the scene graph. Serves as a top class which provides the basic functionality.
- *
- * @author Toni Sagrista
  */
 public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch {
     public static final String ROOT_NAME = "Universe";

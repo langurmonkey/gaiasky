@@ -28,8 +28,6 @@ import java.time.Instant;
  * The sole purpose of this class is to act as an invisible focus.
  * It can also optionally include a connection to a ray marching shader, implemented
  * in screen space.
- *
- * @author tsagrista
  */
 public class Invisible extends CelestialBody {
 

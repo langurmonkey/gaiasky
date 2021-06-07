@@ -6,7 +6,7 @@
 /**
  * Anaglyphic 3D red-cyan filter
  *
- * @author tsagrista
+ 
  */
 
 package gaiasky.util.gdx.contrib.postprocess.filters;

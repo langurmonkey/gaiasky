@@ -15,9 +15,6 @@ import gaiasky.util.Logger;
 
 /**
  * Reads an orbit file into an OrbitData object.
- * 
- * @author Toni Sagrista
- *
  */
 public class OrbitFileDataProvider implements IOrbitDataProvider {
     PointCloudData data;

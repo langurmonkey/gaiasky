@@ -54,8 +54,6 @@ import java.io.*;
  * <li>64 bits (long) - pageId</li>
  * <li>32 bits (int) - particleType</li>
  * </ul>
- *
- * @author Toni Sagrista
  */
 public class ParticleDataBinaryIO {
     private static final Log logger = Logger.getLogger(ParticleDataBinaryIO.class);

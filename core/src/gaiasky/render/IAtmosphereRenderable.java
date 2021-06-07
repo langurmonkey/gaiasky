@@ -9,9 +9,7 @@ import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector3d;
 
 /**
- * To be implemented by all entities wanting to render an atmosphere.
- *
- * @author Toni Sagrista
+ * To be implemented by all entities wanting to render an atmosphere
  */
 public interface IAtmosphereRenderable extends IRenderable {
 

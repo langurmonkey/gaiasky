@@ -27,8 +27,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 public class CameraManager implements ICamera, IObserver {
     /**
      * Convenience enum to describe the camera mode
-     *
-     * @author Toni Sagrista
      */
     public enum CameraMode {
         /**

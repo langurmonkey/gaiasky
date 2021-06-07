@@ -25,7 +25,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Fast approximate anti-aliasing filter.
  *
- * @author Toni Sagrista
+ 
  */
 public final class UnsharpMaskFilter extends Filter<UnsharpMaskFilter> {
     private float u_sharpenFactor = 1f;

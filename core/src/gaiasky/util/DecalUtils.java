@@ -18,8 +18,6 @@ import gaiasky.util.math.Vector3d;
 /**
  * This class provides utils to use Sprites and Fonts as if they were Decals,
  * this is, flat textures in the 3D space.
- *
- * @author Toni Sagrista
  */
 public class DecalUtils {
 

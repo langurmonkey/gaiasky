@@ -22,8 +22,6 @@ import static gaiasky.util.GlobalResources.skin;
 /**
  * TextButton in which the cursor changes when the mouse rolls over.
  * It also fixes the size issue.
- *
- * @author Toni Sagrista
  */
 public class OwnTextField extends TextField {
 

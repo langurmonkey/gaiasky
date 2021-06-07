@@ -38,9 +38,7 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * A polyline that represents a closed orbit. Contains a reference to the body and some other goodies.
- *
- * @author tsagrista
+ * A polyline that represents a closed orbit. Contains a reference to the body and some other goodies
  */
 public class Orbit extends Polyline {
     private static final Log logger = Logger.getLogger(Orbit.class);

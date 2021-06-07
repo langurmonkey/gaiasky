@@ -20,9 +20,6 @@ import java.util.Map;
 
 /**
  * Helper generic class to create icospheres.
- * 
- * @author Toni Sagrista
- *
  */
 public class IcoSphereCreator extends ModelCreator {
 

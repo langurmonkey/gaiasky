@@ -26,8 +26,6 @@ import java.util.Map;
 
 /**
  * Node that offers fade-in and fade-out capabilities.
- *
- * @author tsagrista
  */
 public class FadeNode extends SceneGraphNode {
 

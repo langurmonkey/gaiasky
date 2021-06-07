@@ -10,9 +10,6 @@ import net.jafama.FastMath;
 /**
  * Uses jafama ({@link net.jafama.FastMath}) library. It is not super accurate,
  * but it's the fastest shot in the West.
- * 
- * @author tsagrista
- *
  */
 public class FastTrigonometry implements ITrigonometry {
 

@@ -18,8 +18,6 @@ import java.util.*;
  * outdated and should not be used. Use {@link OctreeGeneratorMag} instead.
  * This uses less memory than the its magnitude counterpart, but does not
  * implement the bijective map f: mag -> level.
- *
- * @author Toni Sagrista
  */
 public class OctreeGeneratorPart implements IOctreeGenerator {
 

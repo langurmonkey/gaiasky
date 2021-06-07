@@ -29,8 +29,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Anaglyphic 3D red-cyan effect
- *
- * @author Toni Sagrista
  */
 public final class Anaglyphic extends PostProcessorEffect {
     private final AnaglyphicFilter anaglyphic;

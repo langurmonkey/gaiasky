@@ -33,9 +33,6 @@ import net.jafama.FastMath;
 
 /**
  * Represents any celestial body.
- * 
- * @author Toni Sagrista
- *
  */
 public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
     private static final float[] labelColour = new float[] { 1, 1, 1, 1 };

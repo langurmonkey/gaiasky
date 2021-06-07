@@ -12,9 +12,6 @@ import java.time.Instant;
 
 /**
  * Orbit in the heliotropic reference system. Must be corrected using the longitude of the Sun.
- *
- * @author tsagrista
- *
  */
 public class HeliotropicOrbit extends Orbit {
     double angle;

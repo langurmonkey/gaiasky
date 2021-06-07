@@ -53,8 +53,6 @@ import java.util.concurrent.ForkJoinPool;
 
 /**
  * Generates an octree of star groups.
- *
- * @author tsagrista
  */
 public class OctreeGeneratorRun {
     private static final Log logger = Logger.getLogger(OctreeGeneratorRun.class);

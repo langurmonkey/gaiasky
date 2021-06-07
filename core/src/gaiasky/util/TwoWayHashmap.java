@@ -12,8 +12,6 @@ import java.util.Map;
  * Simple two-way hashmap implemented with two maps.
  * @param <K> Key type in forward map, value in backward map
  * @param <V> Value type in forward map, key in backward map
- *
- * @author Toni Sagrista
  */
 public class TwoWayHashmap<K extends Object, V extends Object> {
 

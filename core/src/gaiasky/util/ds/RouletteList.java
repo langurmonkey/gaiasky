@@ -10,8 +10,6 @@ import java.util.*;
 /**
  * A structure composed of a set of collections of a given size in which
  * additions happen to the next list in the roulette before it is spun. 
- * @author Toni Sagrista
- *
  */
 public class RouletteList<T> implements Collection<T> {
 

@@ -12,12 +12,10 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 /**
  * Implementation of a 3D scene graph.
- *
- * @author Toni Sagrista
  */
 public class SceneGraph extends AbstractSceneGraph {
 
-    int nobjects = -1;
+    int nObjects = -1;
 
     public SceneGraph() {
         super();
@@ -29,9 +27,9 @@ public class SceneGraph extends AbstractSceneGraph {
         objectsPerThread[0] = root.numChildren;
 
         if (!hasOctree) {
-            if (nobjects < 0)
-                nobjects = getNObjects();
-            EventManager.instance.post(Events.DEBUG_OBJECTS, nobjects, nobjects);
+            if (nObjects < 0)
+                nObjects = getNObjects();
+            EventManager.instance.post(Events.DEBUG_OBJECTS, nObjects, nObjects);
         }
     }
 

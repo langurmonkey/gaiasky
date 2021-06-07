@@ -11,8 +11,6 @@ import java.time.Instant;
 
 /**
  * Orbit on the ecliptic plane.
- *
- * @author tsagrista
  */
 public class EclipticOrbit extends Orbit {
     double angle;

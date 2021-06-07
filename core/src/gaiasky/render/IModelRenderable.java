@@ -8,9 +8,7 @@ package gaiasky.render;
 import gaiasky.util.gdx.IntModelBatch;
 
 /**
- * Interface to implement by all the entities that can be rendered as a model.
- *
- * @author Toni Sagrista
+ * Interface to implement by all the entities that can be rendered as a model
  */
 public interface IModelRenderable extends IRenderable {
 

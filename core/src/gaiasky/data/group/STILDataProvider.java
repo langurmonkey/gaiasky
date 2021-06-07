@@ -41,8 +41,6 @@ import java.util.logging.Level;
  * match columns to attributes.
  * <p>
  * More information on this can be found <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">here</a>.
- *
- * @author tsagrista
  */
 public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(STILDataProvider.class);

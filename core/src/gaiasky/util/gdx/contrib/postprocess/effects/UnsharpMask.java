@@ -28,8 +28,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Implements an unsharp mask filter.
- *
- * @author Toni Sagrista
  */
 public final class UnsharpMask extends PostProcessorEffect {
     private UnsharpMaskFilter filter = null;

@@ -30,9 +30,7 @@ import org.apfloat.Apfloat;
 
 /**
  * Implements a spacecraft-like movement. The spacecraft is modeled as a rigid
- * solid and it has a mass and an engine model. The rest is physics.
- *
- * @author tsagrista
+ * solid and it has a mass and an engine model. The rest is physics
  */
 public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
@@ -340,7 +338,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     /**
      * Input inputListener for the spacecraft camera
      *
-     * @author tsagrista
+     
      */
     private class SpacecraftInputController extends GestureDetector {
 

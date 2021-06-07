@@ -19,8 +19,6 @@ import net.jafama.FastMath;
 
 /**
  * Represents the outline of a country
- *
- * @author tsagrista
  */
 public class Area extends SceneGraphNode implements ILineRenderable {
 

@@ -26,8 +26,6 @@ import java.io.StringWriter;
 
 /**
  * Displays info about the current crash.
- *
- * @author Toni Sagrista
  */
 public class CrashGui extends AbstractGui {
     protected Throwable crash;

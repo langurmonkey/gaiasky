@@ -7,8 +7,6 @@ package gaiasky.scenegraph;
 
 /**
  * Any entity which contains a proper motion
- *
- * @author tsagrista
  */
 public interface IProperMotion {
 

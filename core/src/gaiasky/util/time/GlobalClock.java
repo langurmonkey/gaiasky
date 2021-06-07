@@ -19,9 +19,6 @@ import java.time.Instant;
 /**
  * Keeps pace of the simulation time vs real time and holds the global clock. It
  * uses a time warp factor which is a multiplier to real time.
- * 
- * @author Toni Sagrista
- *
  */
 public class GlobalClock implements IObserver, ITimeFrameProvider {
     private static final Log logger = Logger.getLogger(GlobalClock.class);

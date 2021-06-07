@@ -26,7 +26,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Controls levels of brightness and contrast
  *
- * @author tsagrista
+ 
  */
 public final class LevelsFilter extends Filter<LevelsFilter> {
     private float brightness = 0.0f;

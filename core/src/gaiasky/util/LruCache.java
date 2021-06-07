@@ -10,10 +10,6 @@ import java.util.Map;
 
 /**
  * Least Recently Used cache implementation
- * @author Toni Sagrista
- *
- * @param <A>
- * @param <B>
  */
 public class LruCache<A, B> extends LinkedHashMap<A, B> {
     private final int maxEntries;

@@ -41,7 +41,6 @@ import gaiasky.util.I18n;
  * the title bar.
  *
  * @author Xoppa
- * @author Toni Sagrista
  **/
 public class CollapsibleWindow extends OwnWindow {
     private boolean collapsed, collapsing = false, expanding = false;

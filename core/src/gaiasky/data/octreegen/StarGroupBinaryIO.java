@@ -16,9 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Loads and writes star groups
- *
- * @author Toni Sagrista
+ * Loads and writes star groups.
  */
 public class StarGroupBinaryIO implements IStarGroupIO {
 

@@ -8,10 +8,7 @@ package gaiasky.desktop.concurrent;
 import gaiasky.desktop.concurrent.GaiaSkyThreadFactory.GSThread;
 
 /**
- * Thread indexer for a multithread environment.
- * 
- * @author Toni Sagrista
- *
+ * Thread indexer for a multi-thread environment.
  */
 public class MultiThreadIndexer extends ThreadIndexer {
 

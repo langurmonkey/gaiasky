@@ -14,8 +14,6 @@ import gaiasky.util.math.Vector3d;
 
 /**
  * Represents a polyline. Can use GPU or CPU method.
- *
- * @author tsagrista
  */
 public class Polyline extends VertsObject implements ILineRenderable {
 

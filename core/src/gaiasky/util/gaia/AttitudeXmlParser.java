@@ -27,8 +27,6 @@ import java.util.stream.Stream;
 
 /**
  * Parses the XML files with the attitudes and their activaton times into a binary search tree.
- *
- * @author Toni Sagrista
  */
 public class AttitudeXmlParser {
     private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);

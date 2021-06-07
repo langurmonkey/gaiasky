@@ -51,8 +51,6 @@ import java.util.Map;
 
 /**
  * A recursive grid which adapts to equatorial, ecliptic and galactic systems.
- *
- * @author tsagrista
  */
 public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DTextRenderable, ILineRenderable, IObserver {
     protected String transformName;

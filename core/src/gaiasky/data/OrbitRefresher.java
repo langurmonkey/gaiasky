@@ -20,36 +20,17 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class OrbitRefresher {
     private static final Log logger = Logger.getLogger(OrbitRefresher.class);
 
-    /**
-     * Maximum size of load queue
-     */
+    // Maximum size of load queue.
     private static final int LOAD_QUEUE_MAX_SIZE = 15;
-    /**
-     * Maximum number of pages to send to load every batch
-     **/
+    // Maximum number of pages to send to load every batch.
     protected static final int MAX_LOAD_CHUNK = 5;
 
-    /** Orbit updater thread lock **/
+    // Orbit updater thread lock
     private static final Object threadLock = new Object();
 
-    /**
-     * The instance
-     */
     private static OrbitRefresher instance;
-
-    /**
-     * The loading queue
-     */
     private final Queue<OrbitDataLoaderParameter> toLoadQueue;
-
-    /**
-     * The daemon
-     */
     private final OrbitUpdaterThread daemon;
-
-    /**
-     * Loading is paused
-     */
     private final boolean loadingPaused = false;
 
     public OrbitRefresher() {
@@ -89,7 +70,7 @@ public class OrbitRefresher {
     /**
      * The orbit refresher thread.
      *
-     * @author Toni Sagrista
+ 
      */
     protected static class OrbitUpdaterThread extends Thread {
         private boolean awake;
@@ -106,7 +87,7 @@ public class OrbitRefresher {
         }
 
         /**
-         * Stops the daemon
+         * Stops the daemon.
          */
         public void stopDaemon() {
             running = false;
@@ -149,7 +130,7 @@ public class OrbitRefresher {
                                     }
                                 }
                             } catch (Exception e) {
-                                // This will happen when the queue has been cleared during processing
+                                // This will happen when the queue has been cleared during processing.
                                 logger.debug("Refreshing orbits operation failed");
                             }
                         }

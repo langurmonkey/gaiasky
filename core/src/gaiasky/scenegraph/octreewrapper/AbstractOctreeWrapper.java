@@ -34,9 +34,7 @@ import static gaiasky.render.SceneGraphRenderer.RenderGroup.LINE;
 
 /**
  * Abstract Octree wrapper with the common parts of the regular Octree wrapper
- * and the concurrent one.
- *
- * @author Toni Sagrista
+ * and the concurrent one
  */
 public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable<OctreeNode> {
 

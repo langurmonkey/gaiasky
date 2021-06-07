@@ -31,8 +31,6 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Implements a raymarching effect, usually for SDFs.
- *
- * @author Toni Sagrista
  */
 public final class Raymarching extends PostProcessorEffect {
     private RaymarchingFilter filter;

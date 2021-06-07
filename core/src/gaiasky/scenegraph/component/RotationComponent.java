@@ -10,10 +10,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.time.ITimeFrameProvider;
 
 /**
- * Provides the information for the rotation of this body.
- * 
- * @author Toni Sagrista
- *
+ * Provides the information for the rotation of this body
  */
 public class RotationComponent {
     /** Angular velocity [deg/hour] around the rotation axis. **/

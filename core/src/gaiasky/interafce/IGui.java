@@ -15,8 +15,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 
 /**
  * An interface to be implemented by all top-level GUIs in Gaia Sky
- *
- * @author tsagrista
  */
 public interface IGui extends Disposable {
 

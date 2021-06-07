@@ -15,11 +15,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 
 /**
  * Small overriding that returns the user set size as preferred size.
- *
- * @author Toni Sagrista
  */
 public class OwnScrollPane extends ScrollPane {
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownWidth = 0f, ownHeight = 0f;
     // Whether to expand pane if possible
     private boolean expand = false;
     // Whether to bubble events
@@ -77,30 +75,30 @@ public class OwnScrollPane extends ScrollPane {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownWidth = width;
         super.setWidth(width);
     }
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownHeight = height;
         super.setHeight(height);
     }
 
     @Override
     public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+        ownWidth = width;
+        ownHeight = height;
         super.setSize(width, height);
     }
 
     @Override
     public float getPrefWidth() {
-        if (ownwidth != 0) {
+        if (ownWidth != 0) {
             if (expand && getActor() instanceof Layout)
-                return Math.max(ownwidth, super.getPrefWidth());
+                return Math.max(ownWidth, super.getPrefWidth());
             else
-                return ownwidth;
+                return ownWidth;
         } else {
             return super.getPrefWidth();
         }
@@ -114,11 +112,11 @@ public class OwnScrollPane extends ScrollPane {
 
     @Override
     public float getPrefHeight() {
-        if (ownheight != 0) {
+        if (ownHeight != 0) {
             if (expand && getActor() instanceof Layout)
-                return Math.max(ownheight, super.getPrefHeight());
+                return Math.max(ownHeight, super.getPrefHeight());
             else
-                return ownheight;
+                return ownHeight;
         } else {
             return super.getPrefHeight();
         }

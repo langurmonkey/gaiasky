@@ -32,8 +32,6 @@ import static gaiasky.interafce.DownloadDataWindow.getIcon;
 
 /**
  * Widget which lists all detected catalogs and offers a way to select them.
- *
- * @author tsagrista
  */
 public class DatasetsWidget {
 

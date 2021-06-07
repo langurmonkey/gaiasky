@@ -22,8 +22,6 @@ import java.time.Instant;
 
 /**
  * Reads an orbit file into an OrbitData object.
- *
- * @author Toni Sagrista
  */
 public class OrbitalParametersProvider implements IOrbitDataProvider {
     PointCloudData data;

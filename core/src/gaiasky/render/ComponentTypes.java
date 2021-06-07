@@ -38,8 +38,6 @@ import java.util.MissingResourceException;
 
 /**
  * BitSet with some added functionality
- *
- * @author Toni Sagrista
  */
 public class ComponentTypes extends BitSet {
     private static final long serialVersionUID = 1L;

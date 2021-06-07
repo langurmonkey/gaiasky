@@ -27,8 +27,6 @@ import java.time.Instant;
 
 /**
  * Widget that captures and displays messages in a GUI.
- *
- * @author Toni Sagrista
  */
 public class ConsoleLogger implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;

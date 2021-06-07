@@ -11,8 +11,6 @@ import java.util.Comparator;
 
 /**
  * Compares models. Nearer models go first, further models go last.
- * 
- * @author Toni Sagrista
  */
 public class ModelComparator<T> implements Comparator<T> {
 

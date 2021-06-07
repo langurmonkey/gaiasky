@@ -10,9 +10,6 @@ import gaiasky.util.math.Vector3d;
 
 /**
  * Interface that must implement all entities that have a position.
- * 
- * @author Toni Sagrista
- *
  */
 public interface IPosition {
 

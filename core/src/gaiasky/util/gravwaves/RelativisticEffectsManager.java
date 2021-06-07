@@ -23,8 +23,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 /**
  * Central hub where the parameters of the current relativistic
  * effects (aberration, doppler, grav waves) are updated and served to the renderers.
- * @author tsagrista
- *
  */
 public class RelativisticEffectsManager implements IObserver {
 

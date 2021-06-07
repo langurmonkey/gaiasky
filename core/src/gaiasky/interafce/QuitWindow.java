@@ -17,8 +17,6 @@ import gaiasky.util.scene2d.OwnLabel;
 /**
  * Generic dialog that displays the confirmation quit message and offers options
  * to cancel it or go through.
- *
- * @author tsagrista
  */
 public class QuitWindow extends GenericDialog {
 

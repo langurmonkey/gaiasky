@@ -17,9 +17,6 @@ import gaiasky.util.GlobalConf;
 
 /**
  * Abstract implementation with some useful methods for all SGRs.
- * 
- * @author tsagrista
- *
  */
 public class SGRAbstract {
 

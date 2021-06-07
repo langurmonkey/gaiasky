@@ -20,14 +20,11 @@ import uk.ac.starlink.util.DataSource;
 import java.util.Map;
 
 /**
- * Loads GeoJson files to Area objects
- * @author Toni Sagrista
- *
- * @param <T>
+ * Loads GeoJson files to Area objects.
  */
 public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
-    /** Contains all the files to be loaded by this loader **/
+    // Contains all the files to be loaded by this loader.
     private String[] filePaths;
 
     @Override

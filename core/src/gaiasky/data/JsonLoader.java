@@ -27,18 +27,15 @@ import java.util.TreeMap;
 /**
  * Implements the loading of scene graph nodes using libgdx's json library.
  * It loads entities in the JSON format described in <a href="https://github.com/ari-zah/gaiasandbox/wiki/Non-particle-data-loading">this link</a>.
- *
- * @param <T>
- * @author Toni Sagrista
  */
 public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(JsonLoader.class);
 
     private static final String COMPONENTS_PACKAGE = "gaiasky.scenegraph.component.";
-    /** Params to skip in the normal processing **/
+    // Params to skip in the normal processing
     private static final List<String> PARAM_SKIP = Arrays.asList("args", "impl", "comment", "comments");
 
-    /** Contains all the files to be loaded by this loader **/
+    // Contains all the files to be loaded by this loader
     private String[] filePaths;
 
     @Override
@@ -56,14 +53,14 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
         Array<String> filePaths = new Array<>(this.filePaths);
 
-        // Actually load the files
+        // Actually load the files.
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
             try {
                 FileHandle file = GlobalConf.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
 
-                // Must have an 'objects' element
+                // Must have an 'objects' element.
                 if (model.has("objects")) {
                     JsonValue child = model.get("objects").child;
                     int size = 0;
@@ -73,7 +70,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
 
-                        // Convert to object and add to list
+                        // Convert to object and add to list.
                         @SuppressWarnings("unchecked") T object = (T) convertJsonToObject(child, clazz);
 
                         bodies.add(object);

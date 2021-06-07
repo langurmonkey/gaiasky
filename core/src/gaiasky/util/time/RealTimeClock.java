@@ -14,9 +14,6 @@ import java.time.Instant;
 /**
  * Implements a real time clock. Time flows at the same pace as real life.
  * Similar to GlobalClock with a time warp of 1.
- * 
- * @author tsagrista
- *
  */
 public class RealTimeClock implements ITimeFrameProvider {
     private static final double SEC_TO_HOUR = 1d / 3600d;

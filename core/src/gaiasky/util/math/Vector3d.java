@@ -13,9 +13,6 @@ import java.io.Serializable;
 
 /**
  * Copy of libgdx's Vector3d class using 64-bit floating point numbers.
- *
- * @author Toni Sagrista
- *
  */
 public class Vector3d implements Serializable, Vectord<Vector3d> {
 	private static final long serialVersionUID = 3840054589595372522L;

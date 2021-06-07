@@ -6,9 +6,7 @@
 package gaiasky.data.octreegen.generator;
 
 /**
- * Holds the parameters for the octree generation
- *
- * @author Toni Sagrista
+ * Holds the parameters for the octree generation.
  */
 public class OctreeGeneratorParams {
 

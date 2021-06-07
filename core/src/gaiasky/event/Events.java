@@ -8,9 +8,7 @@ package gaiasky.event;
 import gaiasky.util.GlobalConf;
 
 /**
- * Contains all the events
- *
- * @author Toni Sagrista
+ * Contains all the events that go through the event system.
  */
 public enum Events {
     /**

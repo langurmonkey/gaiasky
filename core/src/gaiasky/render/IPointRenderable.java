@@ -10,9 +10,7 @@ import gaiasky.scenegraph.camera.ICamera;
 
 /**
  * Interface to be implemented by those entities that can be rendered
- * as a single point, floated by the camera position in the CPU.
- * @author Toni Sagrista
- *
+ * as a single point, floated by the camera position in the CPU
  */
 public interface IPointRenderable extends IRenderable {
 

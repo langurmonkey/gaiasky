@@ -48,8 +48,6 @@ import java.io.InputStreamReader;
  * <li>Img - path to billboard image</li>
  * <li>Size - the size [pc]</li>
  * </ul>
- *
- * @author Toni Sagrista
  */
 public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(NBGLoader.class);

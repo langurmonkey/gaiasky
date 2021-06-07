@@ -28,7 +28,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Camera blur that relies on a precomputed velocity map for the scene
  *
- * @author Toni Sagrista
+ 
  */
 public final class CameraBlur extends Filter<CameraBlur> {
 

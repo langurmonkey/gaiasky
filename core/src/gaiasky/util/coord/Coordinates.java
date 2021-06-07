@@ -21,8 +21,6 @@ import java.util.Map;
 /**
  * Provides utility coordinate conversions between some astronomical coordinate
  * systems and to Cartesian coordinates. All angles are in radians.
- *
- * @author Toni Sagrista
  */
 public class Coordinates {
 

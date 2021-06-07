@@ -21,9 +21,6 @@ import gaiasky.util.GlobalResources;
 /**
  * Head-up display GUI which only displays information and has no options
  * window.
- * 
- * @author Toni Sagrista
- *
  */
 public class HUDGui implements IGui {
     private Skin skin;

@@ -9,8 +9,6 @@ import java.time.Instant;
 
 /**
  * Basic interface for entities that provide an time frame in the scene
- *
- * @author Toni Sagrista
  */
 public interface ITimeFrameProvider {
 

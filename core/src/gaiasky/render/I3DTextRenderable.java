@@ -14,8 +14,6 @@ import gaiasky.util.math.Vector3d;
 /**
  * Interface to be implemented by all entities that can render a text in 3d
  * space
- *
- * @author Toni Sagrista
  */
 public interface I3DTextRenderable extends IRenderable {
 

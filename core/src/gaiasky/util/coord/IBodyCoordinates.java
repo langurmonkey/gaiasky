@@ -12,8 +12,6 @@ import java.time.Instant;
 
 /**
  * Defines the interface to get the coordinates of a body
- *
- * @author Toni Sagrista
  */
 public interface IBodyCoordinates {
 

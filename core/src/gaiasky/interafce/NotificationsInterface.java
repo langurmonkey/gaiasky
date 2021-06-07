@@ -33,8 +33,6 @@ import java.util.List;
 
 /**
  * Widget that captures and displays messages in a GUI.
- *
- * @author Toni Sagrista
  */
 public class NotificationsInterface extends TableGuiInterface implements IObserver {
     private static final long DEFAULT_TIMEOUT = 5000;

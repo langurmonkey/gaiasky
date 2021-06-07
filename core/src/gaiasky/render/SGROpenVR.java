@@ -38,8 +38,6 @@ import java.util.Map;
 /**
  * Renders to OpenVR. Renders basically two scenes, one for each eye, using the
  * OpenVR context.
- *
- * @author tsagrista
  */
 public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private static final Log logger = Logger.getLogger(SGROpenVR.class);

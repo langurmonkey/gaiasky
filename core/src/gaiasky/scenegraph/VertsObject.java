@@ -17,8 +17,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 /**
  * Represents a group of vertices which are sent to the GPU in a VBO
- *
- * @author tsagrista
  */
 public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
 

@@ -21,9 +21,6 @@ import java.io.IOException;
 
 /**
  * Writes JPG images
- * 
- * @author tsagrista
- *
  */
 public class JPGWriter {
     private static final Log logger = Logger.getLogger(JPGWriter.class);

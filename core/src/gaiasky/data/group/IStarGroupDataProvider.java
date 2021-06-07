@@ -15,8 +15,6 @@ import java.util.Set;
 /**
  * Data provider for a star group, which contains an index map with the names
  * and indices of the stars.
- *
- * @author tsagrista
  */
 public interface IStarGroupDataProvider extends IParticleGroupDataProvider {
     LongMap<float[]> getColors();

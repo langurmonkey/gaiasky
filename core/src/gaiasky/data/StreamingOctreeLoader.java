@@ -31,8 +31,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /**
  * Contains the infrastructure common to all multifile octree loaders which
  * streams data on-demand from disk and unloads unused data.
- *
- * @author tsagrista
  */
 public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoader {
     private static final Log logger = Logger.getLogger(StreamingOctreeLoader.class);
@@ -41,62 +39,62 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      */
     protected static final int PRELOAD_DEPTH = 3;
     /**
-     * Default load queue size in octants
+     * Default load queue size in octants.
      */
     protected static final int LOAD_QUEUE_MAX_SIZE = 100;
 
     /**
-     * Minimum time to pass to be able to clear the queue again
+     * Minimum time to pass to be able to clear the queue again.
      */
     protected static final long MIN_QUEUE_CLEAR_MS = 2000;
 
     /**
-     * Maximum number of pages to send to load every batch
+     * Maximum number of pages to send to load every batch.
      **/
     protected static final int MAX_LOAD_CHUNK = 5;
 
     public static StreamingOctreeLoader instance;
 
-    /** Octree loader thread lock **/
+    /** Octree loader thread lock. **/
     private static final Object threadLock = new Object();
 
     /**
-     * Current number of stars that are loaded
+     * Current number of stars that are loaded.
      **/
     protected int nLoadedStars = 0;
     /**
-     * Max number of stars loaded at once
+     * Max number of stars loaded at once.
      **/
     protected final long maxLoadedStars;
 
     /**
-     * The octant loading queue
+     * The octant loading queue.
      **/
     protected Queue<OctreeNode> toLoadQueue;
 
     /**
-     * Whether loading is paused or not
+     * Whether loading is paused or not.
      **/
     protected boolean loadingPaused = false;
 
     /**
-     * Last time of a queue clear event went through
+     * Last time of a queue clear event went through.
      **/
     protected long lastQueueClearMs = 0;
 
-    // Dataset name and description
+    // Dataset name and description.
     protected String name, description;
     // Dataset parameters
     protected Map<String, Object> params;
 
     /**
      * This queue is sorted ascending by access date, so that we know which
-     * element to release if needed (oldest)
+     * element to release if needed (oldest).
      **/
     protected Queue<OctreeNode> toUnloadQueue;
 
     /**
-     * Loaded octant ids, for logging
+     * Loaded octant ids, for logging.
      **/
     protected long[] loadedIds;
     protected int loadedObjects;
@@ -105,13 +103,13 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected String metadata, particles;
 
     /**
-     * Daemon thread that gets the data loading requests and serves them
+     * Daemon thread that gets the data loading requests and serves them.
      **/
     protected OctreeLoaderThread daemon;
 
     public StreamingOctreeLoader() {
         // TODO Use memory info to figure this out
-        // We assume 1Gb of graphics memory
+        // We assume 1Gb of graphics memory.
         // GPU ~ 32 byte/star
         // CPU ~ 136 byte/star
         maxLoadedStars = GlobalConf.scene.MAX_LOADED_STARS;
@@ -146,18 +144,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         AbstractOctreeWrapper octreeWrapper = loadOctreeData();
 
         if (octreeWrapper != null) {
-            /*
-             * INITIALIZE DAEMON LOADER THREAD
-             */
+            // Initialize daemon loader thread.
             daemon = new OctreeLoaderThread(octreeWrapper, this);
             daemon.setDaemon(true);
             daemon.setName("gaiasky-worker-octreeload");
             daemon.setPriority(Thread.MIN_PRIORITY);
             daemon.start();
 
-            /*
-             * INITIALIZE TIMER TO FLUSH THE QUEUE AT REGULAR INTERVALS
-             */
+            // Initialize timer to flush the queue at regular intervals.
             Timer timer = new Timer();
             timer.schedule(new TimerTask() {
                 @Override
@@ -167,7 +161,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
             }, 1000, 1000);
 
-            // Add octreeWrapper to result list and return
+            // Add octreeWrapper to result list and return.
             Array<SceneGraphNode> result = new Array<>(false, 1);
             result.add(octreeWrapper);
 
@@ -199,16 +193,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Loads the nodes and the octree
-     *
-     * @return
+     * Loads the nodes and the octree.
      */
     protected abstract AbstractOctreeWrapper loadOctreeData();
 
     /**
-     * Adds the octant to the load queue
-     *
-     * @param octant
+     * Adds the octant to the load queue.
      */
     public static void queue(OctreeNode octant) {
         if (instance != null && instance.daemon != null) {
@@ -217,7 +207,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Clears the current load queue
+     * Clears the current load queue.
      */
     public static void clearQueue() {
         if (instance != null && instance.daemon != null) {
@@ -246,9 +236,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Moves the octant to the end of the unload queue
-     *
-     * @param octant
+     * Moves the octant to the end of the unload queue.
      */
     public static void touch(OctreeNode octant) {
         if (instance != null && instance.daemon != null) {
@@ -260,7 +248,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * Removes all octants from the current load queue. This happens when the
      * camera viewport changes radically (velocity is high, direction changes a
      * lot, etc.) so that the old octants are dropped and newly observed octants
-     * are loaded right away
+     * are loaded right away.
      */
     public void emptyLoadQueue() {
         int n = toLoadQueue.size();
@@ -274,7 +262,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     public void addToQueue(OctreeNode octant) {
-        // Add only if there is room
+        // Add only if there is room.
         if (!loadingPaused) {
             if (toLoadQueue.size() >= LOAD_QUEUE_MAX_SIZE) {
                 OctreeNode out = toLoadQueue.poll();
@@ -286,7 +274,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Puts it at the end of the toUnloadQueue
+     * Puts it at the end of the toUnloadQueue.
      **/
     public void touchOctant(OctreeNode octant) {
         // Since higher levels are always observed, or 'touched',
@@ -332,7 +320,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * Loads the data of the given octant and its children down to the given
-     * level
+     * level.
      *
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
@@ -352,7 +340,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Loads the objects of the given octants
+     * Loads the objects of the given octants.
      *
      * @param octants       The list holding the octants to load.
      * @param octreeWrapper The octree wrapper.
@@ -384,10 +372,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Unloads the given octant
-     *
-     * @param octant
-     * @param octreeWrapper
+     * Unloads the given octant.
      */
     public void unloadOctant(OctreeNode octant, final AbstractOctreeWrapper octreeWrapper) {
         List<SceneGraphNode> objects = octant.objects;
@@ -421,7 +406,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     /**
-     * Loads the data of the given octant
+     * Loads the data of the given octant.
      *
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
@@ -434,8 +419,6 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
 
     /**
      * The daemon loader thread.
-     *
-     * @author Toni Sagrista
      */
     protected static class OctreeLoaderThread extends Thread {
         private boolean awake;
@@ -456,14 +439,14 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         }
 
         /**
-         * Stops the daemon iterations when
+         * Stops the daemon iterations when.
          */
         public void stopDaemon() {
             running = false;
         }
 
         /**
-         * Aborts only the current iteration
+         * Aborts only the current iteration.
          */
         public void abort() {
             abort.set(true);
@@ -483,25 +466,25 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                             i++;
                         }
 
-                        // Load octants if any
+                        // Load octants, if any.
                         if (toLoad.size > 0) {
                             logger.debug(I18n.txt("notif.loadingoctants", toLoad.size));
                             try {
                                 int loaded = loader.loadOctants(toLoad, octreeWrapper, abort);
                                 logger.debug(I18n.txt("notif.loadingoctants.finished", loaded));
                             } catch (Exception e) {
-                                // This will happen when the queue has been cleared during processing
+                                // This will happen when the queue has been cleared during processing.
                                 logger.debug(I18n.txt("notif.loadingoctants.fail"));
                             }
                         }
 
-                        // Release resources if needed
+                        // Release resources if needed.
                         int nUnloaded = 0;
                         int nStars = loader.nLoadedStars;
                         if (running && nStars >= loader.maxLoadedStars) //-V6007
                             while (true) {
                                 // Get first in queue (non-accessed for the longest time)
-                                // and release it
+                                // and release it.
                                 OctreeNode octant = loader.toUnloadQueue.poll();
                                 if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
                                     loader.unloadOctant(octant, octreeWrapper);

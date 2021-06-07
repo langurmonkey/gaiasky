@@ -26,7 +26,7 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Debug filter, renders the contents of the depth texture attachment
  *
- * @author tsagrista
+ 
  */
 public final class DepthBufferFilter extends Filter<DepthBufferFilter> {
 

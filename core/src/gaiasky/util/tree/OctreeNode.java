@@ -30,8 +30,6 @@ import java.util.*;
 /**
  * Octree node implementation which contains a list of {@link IPosition} objects
  * and possibly 8 subnodes.
- *
- * @author Toni Sagrista
  */
 public class OctreeNode implements ILineRenderable {
     public static int nOctantsObserved = 0;

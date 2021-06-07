@@ -16,8 +16,6 @@ import gaiasky.util.GlobalResources;
 /**
  * TextButton in which the cursor changes when the mouse rolls over. It also
  * fixes the size issue.
- *
- * @author Toni Sagrista
  */
 public class OwnTextButton extends TextButton {
 

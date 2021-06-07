@@ -21,8 +21,6 @@ import java.util.Properties;
 
 /**
  * Reads inputListener mappings from a file
- *
- * @author tsagrista
  */
 public class ControllerMappings extends AbstractControllerMappings {
     private String controllerName;

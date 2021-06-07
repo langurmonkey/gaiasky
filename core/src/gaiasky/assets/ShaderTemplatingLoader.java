@@ -13,8 +13,6 @@ import java.util.Scanner;
 /**
  * Loads shaders with extra functionality to add code from other shaders.
  * Recognizes the directive #include shader.glsl in <code>.glsl</code> files.
- * @author tsagrista
- *
  */
 public class ShaderTemplatingLoader {
 

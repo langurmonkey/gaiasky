@@ -30,8 +30,6 @@ import net.jafama.FastMath;
 
 /**
  * Cosmic ruler between two objects
- *
- * @author tsagrista
  */
 public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, ILineRenderable, IObserver {
     private String name0, name1;

@@ -16,8 +16,6 @@ import gaiasky.util.tree.OctreeNode;
 
 /**
  * Contract that all focus objects must implement
- *
- * @author tsagrista
  */
 public interface IFocus {
 

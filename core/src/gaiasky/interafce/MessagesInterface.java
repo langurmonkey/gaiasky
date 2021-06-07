@@ -18,9 +18,6 @@ import java.util.Map;
 
 /**
  * Widget that displays big messages on screen.
- * 
- * @author Toni Sagrista
- *
  */
 public class MessagesInterface extends TableGuiInterface implements IObserver {
     Label headline, subhead;

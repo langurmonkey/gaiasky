@@ -15,9 +15,6 @@ import gaiasky.util.units.Quantity.Length.LengthUnit;
 /**
  * Helper class that transforms various positional information into the internal
  * position of the application.
- * 
- * @author Toni Sagrista
- *
  */
 public class Position {
 

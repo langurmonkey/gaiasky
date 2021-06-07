@@ -14,8 +14,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 
-/**
- * @author tsagrista
+/*
+ * Loader for Gaia attitude data.
  */
 public class GaiaAttitudeLoader extends AsynchronousAssetLoader<GaiaAttitudeServer, GaiaAttitudeLoader.GaiaAttitudeLoaderParameter> {
 

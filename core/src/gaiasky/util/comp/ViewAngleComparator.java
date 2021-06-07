@@ -11,8 +11,6 @@ import java.util.Comparator;
 
 /**
  * Compares entities. Further entities go first, nearer entities go last.
- * 
- * @author Toni Sagrista
  */
 public class ViewAngleComparator<T> implements Comparator<T> {
 

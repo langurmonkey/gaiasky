@@ -14,8 +14,6 @@ import java.util.Set;
 /**
  * Utility class to hold the assets that must be loaded when the OpenGL context is present.
  * If the AssetManager has been set, it delegates the loading to it.
- * @author Toni Sagrista
- *
  */
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class AssetBean {

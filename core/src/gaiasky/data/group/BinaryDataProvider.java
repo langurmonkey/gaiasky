@@ -33,8 +33,6 @@ import java.util.List;
  *      </ul>
  * </li>
  * </ul>
- *
- * @author tsagrista
  */
 public class BinaryDataProvider extends AbstractStarGroupDataProvider {
 

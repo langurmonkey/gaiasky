@@ -10,8 +10,6 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * Clone of the Satellite class in GaiaParams with very few needed parameters.
- * @author Toni Sagrista
- *
  */
 public class Satellite {
 

@@ -20,8 +20,6 @@ import java.time.temporal.ChronoField;
 /**
  * Some astronomical goodies to get the position of the Sun, Moon, work out
  * Julian dates, etc.
- *
- * @author Toni Sagrista
  */
 public class AstroUtils {
 

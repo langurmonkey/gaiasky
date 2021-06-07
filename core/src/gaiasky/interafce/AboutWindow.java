@@ -44,8 +44,6 @@ import java.util.Date;
 
 /**
  * The help window with About, Help and System sections.
- *
- * @author tsagrista
  */
 public class AboutWindow extends GenericDialog {
     private static final Logger.Log logger = Logger.getLogger(AboutWindow.class);

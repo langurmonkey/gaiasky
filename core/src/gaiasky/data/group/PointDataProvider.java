@@ -21,10 +21,7 @@ import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 /**
- * This provider loads point data into particle beans
- * 
- * @author tsagrista
- *
+ * This provider loads point data into particle beans.
  */
 public class PointDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(PointDataProvider.class);

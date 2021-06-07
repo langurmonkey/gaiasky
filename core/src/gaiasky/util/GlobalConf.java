@@ -38,8 +38,6 @@ import java.util.*;
 
 /**
  * Holds the global configuration options
- *
- * @author Toni Sagrista
  */
 public class GlobalConf {
     private static final Log logger = Logger.getLogger(GlobalConf.class);
@@ -439,7 +437,7 @@ public class GlobalConf {
     /**
      * Runtime configuration values, which are never persisted.
      *
-     * @author Toni Sagrista
+ 
      */
     public static class RuntimeConf implements IConf, IObserver {
         /**
@@ -573,7 +571,7 @@ public class GlobalConf {
      * Holds the configuration for the output frame subsystem and the camera
      * recording.
      *
-     * @author Toni Sagrista
+ 
      */
     public static class FrameConf implements IConf, IObserver {
         public static final int MIN_FRAME_SIZE = 50;
@@ -716,7 +714,7 @@ public class GlobalConf {
     /**
      * Holds all configuration values related to data.
      *
-     * @author Toni Sagrista
+ 
      */
     public static class DataConf implements IConf {
 

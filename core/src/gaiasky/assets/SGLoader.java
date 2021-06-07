@@ -32,8 +32,6 @@ import java.nio.file.Paths;
 /**
  * {@link AssetLoader} for all the {@link SceneGraphNode} instances. Loads all
  * the entities in the scene graph.
- *
- * @author Toni Sagrista
  */
 public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLoaderParameter> {
     private static final Log logger = Logger.getLogger(SGLoader.class);
