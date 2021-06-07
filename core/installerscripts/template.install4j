@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="8.0.9" transformSequenceNumber="8">
+<install4j version="9.0.2" transformSequenceNumber="9">
   <directoryPresets config="@gs-git-folder@/assets/img" />
   <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="11">
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="15/jdk-15.0.2+7" />
   </application>
-  <files defaultOverwriteMode="1" defaultUninstallMode="2">
+  <files defaultOverwriteMode="1" defaultUninstallMode="2" preserveSymlinks="false">
     <mountPoints>
       <mountPoint id="24" />
     </mountPoints>
@@ -18,7 +18,7 @@
   <launchers>
     <launcher name="gaiasky" id="22" menuName="${compiler:sys.fullName}/${compiler:sys.fullName}">
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" dpiAware="false">
-        <versionInfo include="true" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileDescription="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseShenandoahGC -Dpython.console.encoding=UTF-8 -Dassets.location=./">
         <classPath>
@@ -102,11 +102,19 @@
             <group id="468" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup">
               <serializedBean>
                 <property name="backgroundColor">
-                  <object class="java.awt.Color">
-                    <int>255</int>
-                    <int>255</int>
-                    <int>255</int>
-                    <int>255</int>
+                  <object class="com.install4j.runtime.beans.LightOrDarkColor">
+                    <object class="java.awt.Color">
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                    </object>
+                    <object class="java.awt.Color">
+                      <int>49</int>
+                      <int>52</int>
+                      <int>53</int>
+                      <int>255</int>
+                    </object>
                   </object>
                 </property>
                 <property name="imageAnchor" type="enum" class="com.install4j.api.beans.Anchor" value="NORTHEAST" />
@@ -125,11 +133,19 @@
             <group id="573" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" useExternalParametrization="true" externalParametrizationName="Customize banner image" externalParametrizationMode="include">
               <serializedBean>
                 <property name="backgroundColor">
-                  <object class="java.awt.Color">
-                    <int>255</int>
-                    <int>255</int>
-                    <int>255</int>
-                    <int>255</int>
+                  <object class="com.install4j.runtime.beans.LightOrDarkColor">
+                    <object class="java.awt.Color">
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                      <int>255</int>
+                    </object>
+                    <object class="java.awt.Color">
+                      <int>49</int>
+                      <int>52</int>
+                      <int>53</int>
+                      <int>255</int>
+                    </object>
                   </object>
                 </property>
                 <property name="borderSides">
@@ -1073,11 +1089,19 @@ return true;</property>
           <group id="461" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" useExternalParametrization="true" externalParametrizationName="Customize banner image" externalParametrizationMode="include">
             <serializedBean>
               <property name="backgroundColor">
-                <object class="java.awt.Color">
-                  <int>255</int>
-                  <int>255</int>
-                  <int>255</int>
-                  <int>255</int>
+                <object class="com.install4j.runtime.beans.LightOrDarkColor">
+                  <object class="java.awt.Color">
+                    <int>255</int>
+                    <int>255</int>
+                    <int>255</int>
+                    <int>255</int>
+                  </object>
+                  <object class="java.awt.Color">
+                    <int>49</int>
+                    <int>52</int>
+                    <int>53</int>
+                    <int>255</int>
+                  </object>
                 </object>
               </property>
               <property name="borderSides">
@@ -1086,11 +1110,19 @@ return true;</property>
                 </object>
               </property>
               <property name="imageEdgeBackgroundColor">
-                <object class="java.awt.Color">
-                  <int>25</int>
-                  <int>143</int>
-                  <int>220</int>
-                  <int>255</int>
+                <object class="com.install4j.runtime.beans.LightOrDarkColor">
+                  <object class="java.awt.Color">
+                    <int>25</int>
+                    <int>143</int>
+                    <int>220</int>
+                    <int>255</int>
+                  </object>
+                  <object class="java.awt.Color">
+                    <int>0</int>
+                    <int>74</int>
+                    <int>151</int>
+                    <int>255</int>
+                  </object>
                 </object>
               </property>
               <property name="imageEdgeBorder" type="boolean" value="true" />
@@ -1144,11 +1176,19 @@ return true;</property>
               <group id="468" beanClass="com.install4j.runtime.beans.groups.VerticalFormComponentGroup" useExternalParametrization="true" externalParametrizationName="Customize title bar" externalParametrizationMode="include">
                 <serializedBean>
                   <property name="backgroundColor">
-                    <object class="java.awt.Color">
-                      <int>255</int>
-                      <int>255</int>
-                      <int>255</int>
-                      <int>255</int>
+                    <object class="com.install4j.runtime.beans.LightOrDarkColor">
+                      <object class="java.awt.Color">
+                        <int>255</int>
+                        <int>255</int>
+                        <int>255</int>
+                        <int>255</int>
+                      </object>
+                      <object class="java.awt.Color">
+                        <int>49</int>
+                        <int>52</int>
+                        <int>53</int>
+                        <int>255</int>
+                      </object>
                     </object>
                   </property>
                   <property name="borderSides">
@@ -1268,7 +1308,7 @@ return true;</property>
         <entry location="gs_icon.png" />
         <entry location="gsvr_icon.png" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" overrideJdkRelease="true" jreBundleSource="generated" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="15/jdk-15.0.2+7" overrideJdkRelease="true" />
     </windows>
     <macos name="macOS Single Bundle" id="221" launcherId="573">
       <exclude>
@@ -1279,7 +1319,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gaiasky.desktop" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="openjdk15/jdk-15.0.2+7" overrideJdkRelease="true" jreBundleSource="generated" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="15/jdk-15.0.2+7" overrideJdkRelease="true" />
     </macos>
     <unixInstaller name="Unix Installer" id="28">
       <excludedLaunchers>
@@ -1293,6 +1333,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
+      <jreBundle jreBundleSource="none" />
     </unixInstaller>
     <linuxDeb name="Linux DEB" id="30" dependencies="openjdk-11-jre" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de">
       <excludedLaunchers>
@@ -1306,6 +1347,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
+      <jreBundle jreBundleSource="none" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1321,6 +1363,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
+      <jreBundle jreBundleSource="none" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
