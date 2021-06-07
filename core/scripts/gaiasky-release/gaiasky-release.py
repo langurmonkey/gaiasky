@@ -93,6 +93,7 @@ if __name__ == '__main__':
 
     print("Gaia Sky folder: %s" % arguments.gs_folder)
 
+
     # PARSE FILE DATA
     if arguments.def_file is None:
         arguments.def_file = "%s/%s" % (get_script_path(), "gaiasky-release-none.json")
@@ -100,6 +101,13 @@ if __name__ == '__main__':
     print("Loading definitions file: %s" % arguments.def_file)
     with open(arguments.def_file, 'r') as f:
         defs = json.load(f)
+
+    # Make sure the version is set wherever it needs to be set
+    print("Before running this script, remember to bump up the version number in:")
+    print("   build.gradle")
+    print("   core/exe/gaiasky.appdata.xml")
+    print()
+    input("Press any key to continue, or C-c to quit...")
 
     releaserules = defs["releaserules"]
 
