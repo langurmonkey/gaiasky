@@ -142,7 +142,7 @@ public class RelativisticShader extends DefaultIntShader {
     }
 
     public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
-        this(renderable, config, new ExtShaderProgram(ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+        this(renderable, config, new ExtShaderProgram(vertexShader, fragmentShader, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
     public RelativisticShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {

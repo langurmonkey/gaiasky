@@ -92,7 +92,7 @@ public class ShaderProgramProvider extends AsynchronousAssetLoader<ExtShaderProg
                 fragmentCode = getShaderCode(parameter.prependFragmentCode, fragmentCode);
         }
 
-        ExtShaderProgram shaderProgram = new ExtShaderProgram(vertexCode, fragmentCode);
+        ExtShaderProgram shaderProgram = new ExtShaderProgram(vertFileName, fragFileName, vertexCode, fragmentCode);
         if ((parameter == null || parameter.logOnCompileFailure) && !shaderProgram.isCompiled()) {
             manager.getLogger().error("ExtShaderProgram " + fileName + " failed to compile:\n" + shaderProgram.getLog());
         }

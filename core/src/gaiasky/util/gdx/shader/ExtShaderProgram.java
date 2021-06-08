@@ -150,32 +150,50 @@ public class ExtShaderProgram implements Disposable {
     /**
      * Constructs a new ShaderProgram and immediately compiles it.
      *
-     * @param vertexShader   the vertex shader
-     * @param fragmentShader the fragment shader
+     * @param vertexFile         The vertex shader file.
+     * @param fragmentFile       The fragment shader file.
+     * @param vertexShaderCode   The vertex shader code.
+     * @param fragmentShaderCode The fragment shader code.
      */
-
-    public ExtShaderProgram(String vertexShader, String fragmentShader) {
-        if (vertexShader == null)
+    public ExtShaderProgram(String vertexFile, String fragmentFile, String vertexShaderCode, String fragmentShaderCode) {
+        if (vertexShaderCode == null)
             throw new IllegalArgumentException("vertex shader must not be null");
-        if (fragmentShader == null)
+        if (fragmentShaderCode == null)
             throw new IllegalArgumentException("fragment shader must not be null");
 
         if (prependVertexCode != null && prependVertexCode.length() > 0)
-            vertexShader = prependVertexCode + vertexShader;
+            vertexShaderCode = prependVertexCode + vertexShaderCode;
         if (prependFragmentCode != null && prependFragmentCode.length() > 0)
-            fragmentShader = prependFragmentCode + fragmentShader;
+            fragmentShaderCode = prependFragmentCode + fragmentShaderCode;
 
-        this.vertexShaderSource = vertexShader;
-        this.fragmentShaderSource = fragmentShader;
+        this.vertexShaderSource = vertexShaderCode;
+        this.fragmentShaderSource = fragmentShaderCode;
 
-        compileShaders(vertexShader, fragmentShader);
+        compileShaders(vertexShaderCode, fragmentShaderCode);
         if (isCompiled()) {
             fetchAttributes();
             fetchUniforms();
             addManagedShader(Gdx.app, this);
         } else {
-            logger.error("Shader compilation failed: " + getLog());
+            logger.error("Shader compilation failed");
+            if(vertexFile != null){
+                logger.error("Vertex shader file: " + vertexFile);
+            }
+            if(fragmentFile != null){
+                logger.error("Fragment shader file: " + fragmentFile);
+            }
+            logger.error(getLog());
         }
+    }
+
+    /**
+     * Constructs a new ShaderProgram and immediately compiles it.
+     *
+     * @param vertexShader   The vertex shader code.
+     * @param fragmentShader The fragment shader code.
+     */
+    public ExtShaderProgram(String vertexShader, String fragmentShader) {
+        this(null, null, vertexShader, fragmentShader);
     }
 
     public ExtShaderProgram(FileHandle vertexShader, FileHandle fragmentShader) {
@@ -185,8 +203,8 @@ public class ExtShaderProgram implements Disposable {
     /**
      * Loads and compiles the shaders, creates a new program and links the shaders.
      *
-     * @param vertexShader
-     * @param fragmentShader
+     * @param vertexShader   The vertex shader code.
+     * @param fragmentShader The fragment shader code.
      */
     private void compileShaders(String vertexShader, String fragmentShader) {
         vertexShaderHandle = loadShader(GL20.GL_VERTEX_SHADER, vertexShader);
