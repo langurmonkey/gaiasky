@@ -29,8 +29,8 @@ import java.time.Instant;
 public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
     /** Date format **/
-    private final IDateFormat dfdate;
-    private final IDateFormat dftime;
+    private final IDateFormat dfDate;
+    private final IDateFormat dfTime;
 
     private final int maxNameLen = 15;
 
@@ -50,8 +50,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         float pad = 18f;
 
-        dfdate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
-        dftime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
+        dfDate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
+        dfTime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
 
         date = new OwnLabel(I18n.txt("gui.top.date.ut"), skin, "mono");
         date.setName("label date tii");
@@ -104,8 +104,8 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
             // Update input time
             Instant datetime = (Instant) data[0];
             GaiaSky.postRunnable(() -> {
-                date.setText(dfdate.format(datetime));
-                time.setText(dftime.format(datetime) + " UTC");
+                date.setText(dfDate.format(datetime));
+                time.setText(dfTime.format(datetime) + " UTC");
                 pack();
             });
 

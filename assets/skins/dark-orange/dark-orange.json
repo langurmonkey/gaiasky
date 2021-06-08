@@ -51,9 +51,6 @@
     "ui-15": {
       "file": "skins/fonts/ui-15.fnt"
     },
-    "ui-15-bold": {
-      "file": "skins/fonts/ui-15-bold.fnt"
-    },
     "ui-16": {
       "file": "skins/fonts/ui-16.fnt"
     },
@@ -92,12 +89,6 @@
     },
     "ui-33": {
       "file": "skins/fonts/ui-33.fnt"
-    },
-    "ui-25-shadow": {
-      "file": "skins/fonts/ui-25-shadow.fnt"
-    },
-    "ui-12-bold": {
-      "file": "skins/fonts/ui-12-bold.fnt"
     },
     "ui-19-bold": {
       "file": "skins/fonts/ui-19-bold.fnt"
