@@ -27,7 +27,7 @@ public class ShaderTemplatingLoader {
     }
 
     public static String resolveIncludes(String in){
-        StringBuffer sb = new StringBuffer();
+        final StringBuilder stringBuilder = new StringBuilder();
 
         Scanner scanner = new Scanner(in);
         while (scanner.hasNextLine()) {
@@ -36,15 +36,15 @@ public class ShaderTemplatingLoader {
                 // Load file and include
                 String inc = line.substring(line.indexOf("#include") + 9);
                 String incSource = ShaderTemplatingLoader.load(inc);
-                sb.append(incSource);
-                sb.append('\n');
+                stringBuilder.append(incSource);
+                stringBuilder.append('\n');
             } else if (!line.isEmpty() && !line.startsWith("//")) {
-                sb.append(line);
-                sb.append('\n');
+                stringBuilder.append(line);
+                stringBuilder.append('\n');
             }
         }
         scanner.close();
-        return sb.toString();
+        return stringBuilder.toString();
     }
 
 }

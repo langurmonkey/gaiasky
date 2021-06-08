@@ -47,10 +47,14 @@ import gaiasky.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
     public static class Config {
+        /** File with the vertex shader, if any **/
+        public String vertexShaderFile = null;
+        /** File with the fragment shader, if any **/
+        public String fragmentShaderFile = null;
         /** The uber vertex shader to use, null to use the default vertex shader. */
-        public String vertexShader = null;
+        public String vertexShaderCode = null;
         /** The uber fragment shader to use, null to use the default fragment shader. */
-        public String fragmentShader = null;
+        public String fragmentShaderCode = null;
         /** The number of directional lights to use */
         public int numDirectionalLights = 2;
         /** The number of point lights to use */
@@ -71,9 +75,14 @@ public class DefaultIntShader extends BaseIntShader {
         public Config() {
         }
 
-        public Config(final String vertexShader, final String fragmentShader) {
-            this.vertexShader = vertexShader;
-            this.fragmentShader = fragmentShader;
+        public Config(final String vertexShaderFile, final String fragmentShaderFile, final String vertexShaderCode, final String fragmentShaderCode) {
+            this.vertexShaderFile = vertexShaderFile;
+            this.fragmentShaderFile = fragmentShaderFile;
+            this.vertexShaderCode = vertexShaderCode;
+            this.fragmentShaderCode = fragmentShaderCode;
+        }
+        public Config(final String vertexShaderCode, final String fragmentShaderCode) {
+            this(null, null, vertexShaderCode, fragmentShaderCode);
         }
     }
 
@@ -538,7 +547,7 @@ public class DefaultIntShader extends BaseIntShader {
     }
 
     public DefaultIntShader(final IntRenderable renderable, final Config config, final String prefix) {
-        this(renderable, config, prefix, config.vertexShader != null ? config.vertexShader : getDefaultVertexShader(), config.fragmentShader != null ? config.fragmentShader : getDefaultFragmentShader());
+        this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(), config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
     public DefaultIntShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {

@@ -83,8 +83,8 @@ public class DepthIntShader extends DefaultIntShader {
 	}
 
 	public DepthIntShader(final IntRenderable renderable, final Config config, final String prefix) {
-		this(renderable, config, prefix, config.vertexShader != null ? config.vertexShader : getDefaultVertexShader(),
-			config.fragmentShader != null ? config.fragmentShader : getDefaultFragmentShader());
+		this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(),
+			config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
 	}
 
 	public DepthIntShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader,

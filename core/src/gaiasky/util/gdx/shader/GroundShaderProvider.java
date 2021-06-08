@@ -17,12 +17,12 @@ public class GroundShaderProvider extends DefaultIntShaderProvider {
         this.config = (config == null) ? new GroundShader.Config() : config;
     }
 
-    public GroundShaderProvider(final String vertexShader, final String fragmentShader) {
-        this(new GroundShader.Config(vertexShader, fragmentShader));
+    public GroundShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShader, final String fragmentShader) {
+        this(new GroundShader.Config(vertexFile, fragmentFile, vertexShader, fragmentShader));
     }
 
     public GroundShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
-        this(ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
+        this(vertexShader.name(), fragmentShader.name(), ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
     public GroundShaderProvider() {

@@ -287,8 +287,8 @@ uniform DirectionalLight u_dirLights[numDirectionalLights];
 
 #define N_LIGHTS 3
 flat out int v_numDirectionalLights;
-out vec3 v_directionalLightDir[numDirectionalLights];
-out vec3 v_directionalLightColor[numDirectionalLights];
+out vec3 v_directionalLightDir[N_LIGHTS];
+out vec3 v_directionalLightColor[N_LIGHTS];
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
 
@@ -356,13 +356,18 @@ void main() {
 
     #if defined(numDirectionalLights)
         v_numDirectionalLights = numDirectionalLights;
-        for (int i = 0; i < numDirectionalLights; i++) {
-            #ifdef heightFlag
-            v_directionalLightDir[i] = normalize(-u_dirLights[i].direction);
-            #else
-            v_directionalLightDir[i] = normalize(-u_dirLights[i].direction * TBN);
-            #endif
-            v_directionalLightColor[i] = u_dirLights[i].color;
+        for (int i = 0; i < N_LIGHTS; i++) {
+            if(i >= numDirectionalLights){
+                v_directionalLightDir[i] = vec3(0.0, 0.0, 0.0);
+                v_directionalLightColor[i] = vec3(0.0);
+            } else {
+                #ifdef heightFlag
+                v_directionalLightDir[i] = normalize(-u_dirLights[i].direction);
+                #else
+                v_directionalLightDir[i] = normalize(-u_dirLights[i].direction * TBN);
+                #endif
+                v_directionalLightColor[i] = u_dirLights[i].color;
+                }
         }
     #else
         v_numDirectionalLights = 0;

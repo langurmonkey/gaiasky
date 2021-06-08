@@ -50,7 +50,7 @@ public class RelativisticShader extends DefaultIntShader {
             }
         };
         
-        public final static Setter hterms = new Setter() {
+        public final static Setter hTerms = new Setter() {
             @Override
             public boolean isGlobal(BaseIntShader shader, int inputID) {
                 return false;
@@ -138,11 +138,11 @@ public class RelativisticShader extends DefaultIntShader {
     }
 
     public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix) {
-        this(renderable, config, prefix, config.vertexShader != null ? config.vertexShader : getDefaultVertexShader(), config.fragmentShader != null ? config.fragmentShader : getDefaultFragmentShader());
+        this(renderable, config, prefix, config.vertexShaderCode != null ? config.vertexShaderCode : getDefaultVertexShader(), config.fragmentShaderCode != null ? config.fragmentShaderCode : getDefaultFragmentShader());
     }
 
     public RelativisticShader(final IntRenderable renderable, final Config config, final String prefix, final String vertexShader, final String fragmentShader) {
-        this(renderable, config, new ExtShaderProgram(vertexShader, fragmentShader, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
+        this(renderable, config, new ExtShaderProgram(config.vertexShaderFile, config.fragmentShaderFile, ShaderProgramProvider.getShaderCode(prefix, vertexShader), ShaderProgramProvider.getShaderCode(prefix, fragmentShader)));
     }
 
     public RelativisticShader(final IntRenderable renderable, final Config config, final ExtShaderProgram shaderProgram) {
@@ -151,7 +151,7 @@ public class RelativisticShader extends DefaultIntShader {
         u_vc = register(Inputs.vc, Setters.vc);
         u_velDir = register(Inputs.velDir, Setters.velDir);
         
-        u_hterms = register(Inputs.hterms, Setters.hterms);
+        u_hterms = register(Inputs.hterms, Setters.hTerms);
         u_gw = register(Inputs.gw, Setters.gw);
         u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
         u_ts = register(Inputs.ts, Setters.ts);

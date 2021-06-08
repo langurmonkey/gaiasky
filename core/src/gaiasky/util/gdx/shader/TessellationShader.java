@@ -24,7 +24,7 @@ public class TessellationShader extends GroundShader {
     }
 
     public TessellationShader(final IntRenderable renderable, final TessellationShaderProvider.Config config, final String prefix) {
-        this(renderable, config, prefix, config.vertexShader, config.controlShader, config.evaluationShader, config.fragmentShader);
+        this(renderable, config, prefix, config.vertexShaderCode, config.controlShader, config.evaluationShader, config.fragmentShaderCode);
     }
 
     @Override

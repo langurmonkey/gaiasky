@@ -17,12 +17,12 @@ public class RelativisticShaderProvider extends DefaultIntShaderProvider {
         this.config = (config == null) ? new RelativisticShader.Config() : config;
     }
 
-    public RelativisticShaderProvider(final String vertexShader, final String fragmentShader) {
-        this(new RelativisticShader.Config(vertexShader, fragmentShader));
+    public RelativisticShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShader, final String fragmentShader) {
+        this(new RelativisticShader.Config(vertexFile, fragmentFile, vertexShader, fragmentShader));
     }
 
     public RelativisticShaderProvider(final FileHandle vertexShader, final FileHandle fragmentShader) {
-        this(ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
+        this(vertexShader.name(), fragmentShader.name(), ShaderTemplatingLoader.load(vertexShader), ShaderTemplatingLoader.load(fragmentShader));
     }
 
     public RelativisticShaderProvider() {
