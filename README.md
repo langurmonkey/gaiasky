@@ -5,6 +5,7 @@
 <h2 align="center">An open source 3D universe simulator for desktop and VR with support for more than a billion objects</h2>
 
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
+[![Docs](https://img.shields.io/badge/docs-master-3245a9)](https://img.shields.io/badge/docs-latest-3245a9)
 [![Issues](https://img.shields.io/badge/issues-open-bbbb00.svg)](https://gitlab.com/langurmonkey/gaiasky/issues)
 
 [**Gaia Sky**](https://zah.uni-heidelberg.de/gaia/outreach/gaiasky) is a real-time 3D Universe application that runs on Linux, Windows and macOS. It is developed within the framework of [ESA](https://www.esa.int/ESA)'s [Gaia mission](https://sci.esa.int/gaia) to chart more than 1 billion stars.
