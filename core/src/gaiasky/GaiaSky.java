@@ -354,6 +354,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Bookmarks
         BookmarksManager.initialize();
 
+        // Location log
+        LocationLogManager.initialize();
+
         // Load slave assets
         SlaveManager.load(manager);
 
@@ -644,6 +647,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Timer.schedule(debugTask1, 2, 1);
         // Every 10 seconds
         Timer.schedule(debugTask10, 2, 10);
+
+        // Start capturing locations
+        Task startCapturing = new Task(){
+            @Override
+            public void run() {
+                LocationLogManager.instance().startCapturing();
+            }
+        };
+        Timer.schedule(startCapturing, 1f);
 
         // Go home
         goHome();

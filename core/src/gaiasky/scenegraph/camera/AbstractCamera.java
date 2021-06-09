@@ -100,7 +100,7 @@ public abstract class AbstractCamera implements ICamera {
 
     private void initNearFar() {
         CAM_NEAR = 0.5d * Constants.M_TO_U;
-        CAM_FAR = 1d * Constants.MPC_TO_U;
+        CAM_FAR = Constants.MPC_TO_U;
     }
 
     public AbstractCamera(CameraManager parent) {
@@ -114,11 +114,11 @@ public abstract class AbstractCamera implements ICamera {
         tmp = new Vector3d();
         prevCombined = new Matrix4();
 
-        camLeft = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+        camLeft = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
         camLeft.near = (float) CAM_NEAR;
         camLeft.far = (float) CAM_FAR;
 
-        camRight = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight());
+        camRight = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
         camRight.near = (float) CAM_NEAR;
         camRight.far = (float) CAM_FAR;
 
@@ -225,15 +225,13 @@ public abstract class AbstractCamera implements ICamera {
      * given directions using the given cone angle
      *
      * @param cb      The body.
-     * @param fcamera The FovCamera.
+     * @param fCamera The FovCamera.
      * @return True if the body is observed. False otherwise.
      */
-    protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fcamera) {
-        boolean visible = false;
+    protected boolean computeVisibleFovs(CelestialBody cb, FovCamera fCamera) {
         Vector3d[] dirs;
-        dirs = fcamera.directions;
-        visible = visible || GlobalResources.isInView(cb.translation, cb.distToCamera, fcamera.angleEdgeRad, dirs[0]) || GlobalResources.isInView(cb.translation, cb.distToCamera, fcamera.angleEdgeRad, dirs[1]);
-        return visible;
+        dirs = fCamera.directions;
+        return GlobalResources.isInView(cb.translation, cb.distToCamera, fCamera.angleEdgeRad, dirs[0]) || GlobalResources.isInView(cb.translation, cb.distToCamera, fCamera.angleEdgeRad, dirs[1]);
     }
 
     public double getDistance() {

@@ -35,6 +35,7 @@ import gaiasky.util.format.IDateFormat;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.Interpolationd;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -100,7 +101,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
      * Current camera params
      **/
     private final Object lock = new Object();
-    private Vector3d pos, dir, up;
+    private Vector3b pos;
+    private Vector3d dir, up;
     private ITimeFrameProvider t;
     /**
      * Date format
@@ -865,8 +867,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                     time = k1.time + (long) ((k1.time - k0.time) / 2d);
                 }
                 // Add at end
-                boolean ret = addKeyframe(index + 1, pos, dir, up, time);
-                return ret;
+                return addKeyframe(index + 1, pos, dir, up, time);
             }
             return false;
         });
@@ -1022,7 +1023,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         case UPDATE_CAM_RECORDER:
             synchronized (lock) {
                 t = (ITimeFrameProvider) data[0];
-                pos = (Vector3d) data[1];
+                pos = (Vector3b) data[1];
                 dir = (Vector3d) data[2];
                 up = (Vector3d) data[3];
             }

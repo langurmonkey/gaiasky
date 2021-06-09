@@ -49,7 +49,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     protected OwnScrollPane bookmarksScrollPane;
 
     protected Table infoTable;
-    protected Cell infoCell1, infoCell2;
+    protected Cell<?> infoCell1, infoCell2;
     protected OwnLabel infoMessage1, infoMessage2;
 
     private boolean events = true;

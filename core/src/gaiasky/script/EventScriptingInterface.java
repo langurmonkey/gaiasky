@@ -240,6 +240,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraFocusInstantAndGo(final String focusName) {
+        setCameraFocusInstantAndGo(focusName, true);
+    }
+
+    public void setCameraFocusInstantAndGo(final String focusName, final boolean sleep) {
         if (checkString(focusName, "focusName")) {
             SceneGraphNode sgn = getObject(focusName);
             if (sgn instanceof IFocus) {
@@ -248,7 +252,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 em.post(Events.FOCUS_CHANGE_CMD, focus, true);
                 em.post(Events.GO_TO_OBJECT_CMD);
                 // Make sure the last action is flushed
-                sleepFrames(2);
+                if (sleep)
+                    sleepFrames(2);
             }
         }
     }

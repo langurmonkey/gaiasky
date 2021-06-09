@@ -284,6 +284,11 @@ public class EventManager implements IObserver {
         return false;
     }
 
+    public boolean isSubscribedTo(IObserver o, Events event) {
+        Set<IObserver> scr = subscriptions.get(event.ordinal());
+        return scr != null && scr.contains(o);
+    }
+
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {

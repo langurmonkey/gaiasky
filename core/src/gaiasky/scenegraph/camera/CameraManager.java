@@ -144,6 +144,8 @@ public class CameraManager implements ICamera, IObserver {
     public SpacecraftCamera spacecraftCamera;
     public RelativisticCamera relativisticCamera;
 
+    public IFocus previousClosest;
+
     private final ICamera[] cameras;
 
     /**
@@ -372,8 +374,13 @@ public class CameraManager implements ICamera, IObserver {
                 setClosest(closestBody.getDistToCamera() < closestParticle.getClosestDistToCamera() ? closestBody : closestParticle);
             }
         }
-        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, getClosest(), getClosestBody(), getClosestParticle());
+        IFocus newClosest = getClosest();
+        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, newClosest, getClosestBody(), getClosestParticle());
 
+        if(newClosest != previousClosest){
+            EventManager.instance.post(Events.CAMERA_NEW_CLOSEST, newClosest);
+            previousClosest = newClosest;
+        }
     }
 
     private void updateRADEC(int pointerX, int pointerY, int viewX, int viewY) {

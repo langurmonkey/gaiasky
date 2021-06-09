@@ -205,17 +205,26 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(datasets);
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
 
-        /** ----OBJECTS TREE---- **/
+        /** ----LOCATION LOG---- **/
+        LocationLogComponent locationLogComponent = new LocationLogComponent(skin, ui);
+        locationLogComponent.initialize();
+
+        CollapsiblePane locationLog = new CollapsiblePane(ui, I18n.txt("gui.locationlog"), locationLogComponent.getActor(), getContentWidth(), skin, false, null);
+        locationLog.align(Align.left);
+        mainActors.add(locationLog);
+        panes.put(locationLogComponent.getClass().getSimpleName(), locationLog);
+
+        /** ----BOOKMARKS---- **/
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, ui);
         bookmarksComponent.setSceneGraph(sg);
         bookmarksComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.objects");
 
-        CollapsiblePane objects = new CollapsiblePane(ui, I18n.txt("gui.bookmarks"), bookmarksComponent.getActor(), getContentWidth(), skin, false, shortcut);
-        objects.align(Align.left);
-        mainActors.add(objects);
-        panes.put(bookmarksComponent.getClass().getSimpleName(), objects);
+        CollapsiblePane bookmarks = new CollapsiblePane(ui, I18n.txt("gui.bookmarks"), bookmarksComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        bookmarks.align(Align.left);
+        mainActors.add(bookmarks);
+        panes.put(bookmarksComponent.getClass().getSimpleName(), bookmarks);
 
         /** ----GAIA SCAN GROUP---- **/
         //	GaiaComponent gaiaComponent = new GaiaComponent(skin, ui);

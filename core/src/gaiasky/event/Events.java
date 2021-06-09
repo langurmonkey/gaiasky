@@ -126,6 +126,11 @@ public enum Events {
     CAMERA_CINEMATIC_CMD,
     /** Broadcasts the overall closest (in [0]), the closest non-star body (in [1]) and the closest particle (in [2]) to this camera. Happens every frame **/
     CAMERA_CLOSEST_INFO,
+    /**
+     * This event is broadcast whenever the closest object to the camera
+     * changes. Contains the closest object as an {@link gaiasky.scenegraph.IFocus}.
+     */
+    CAMERA_NEW_CLOSEST,
 
     /**
      * Contains a double[] with the new direction
@@ -1310,6 +1315,11 @@ public enum Events {
     /**
      * This event informs a new DISTANCE_SCALE_FACTOR is in place
      */
-    NEW_DISTANCE_SCALE_FACTOR
+    NEW_DISTANCE_SCALE_FACTOR,
+
+    /**
+     * Broadcast a new location record, added to the location log
+     */
+    NEW_LOCATION_RECORD
 
 }

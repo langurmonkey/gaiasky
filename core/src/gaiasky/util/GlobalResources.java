@@ -806,7 +806,7 @@ public class GlobalResources {
             return Collections.emptyList();
         }
 
-        List<List<T>> combination = new LinkedList<List<T>>();
+        List<List<T>> combination = new LinkedList<>();
 
         T actual = values.iterator().next();
 
@@ -836,5 +836,25 @@ public class GlobalResources {
         } else {
             return objs + "";
         }
+    }
+
+    public static String msToTimeString(long ms){
+        double seconds = ms / 1000d;
+        double minutes = seconds / 60d;
+        double hours = minutes / 60d;
+        double days = hours / 24d;
+        double years = days / 365.25d;
+        if(seconds < 60 ){
+            return String.format("%.0f", seconds) + " s";
+        } else if (minutes < 60) {
+            return String.format("%.0f", minutes) + " m";
+        } else if (hours < 24) {
+            return String.format("%.0f", hours) + " h";
+        } else if (days < 365.25d) {
+            return String.format("%.0f", days) + " d";
+        } else {
+            return String.format("%.0f", years) + " y";
+        }
+
     }
 }
