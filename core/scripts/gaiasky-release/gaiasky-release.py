@@ -164,7 +164,7 @@ if __name__ == '__main__':
         print(" > Update TYPO3 ARI website to point to new files: http://zah.uni-heidelberg.de/typo3")
         print(" > Update docs if necessary (in particular, scripting API links): %s/docs" % arguments.gs_folder)
         print(" > Add new release to gitlab: https://gitlab.com/langurmonkey/gaiasky/-/releases")
-        print(" > Create new docs tag (%s) and generate the docs: make versions && make publish" % arguments.tag)
+        print(" > Create new docs tag (%s) and generate the docs: make versions publish" % arguments.tag)
         print(" > Build AUR package (do 'makepkg --printsrcinfo > .SRCINFO') and commit AUR git repository")
         print(" > Update flatpak repo and do pull request. See here: https://gitlab.com/langurmonkey/gaiasky/-/issues/337#note_460878130")
         print(" > Upload javadoc for new version (publish-javadoc %s && publish-javadoc latest)" % arguments.tag)
