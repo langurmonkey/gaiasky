@@ -10,7 +10,7 @@
   
   <metadata_license>CC-BY-SA-4.0</metadata_license>
   <project_license>MPL-2.0</project_license>
-  <developer_name>Zentrum für Astronomie Heidelberg - Astronomisches Rechen Institut</developer_name>
+  <developer_name>ARI/Zentrum für Astronomie Heidelberg</developer_name>
   <launchable type="desktop-id">gaiasky</launchable>
   
   <recommends>
