@@ -350,9 +350,15 @@ public class CameraManager implements ICamera, IObserver {
 
         int screenX = Gdx.input.getX();
         int screenY = Gdx.input.getY();
+        int width = Gdx.graphics.getWidth();;
+        int height = Gdx.graphics.getHeight();
 
-        // Update Pointer and view Alpha/Delta
-        updateRADEC(screenX, screenY, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2);
+        // This check is for windows, which crashes when the window is minimized
+        // as graphics.get[Width|Height]() returns 0.
+        if(width > 0 && height > 0) {
+            // Update Pointer and view Alpha/Delta
+            updateRADEC(screenX, screenY, width / 2, height / 2);
+        }
         // Update Pointer LAT/LON
         updateFocusLatLon(screenX, screenY);
 
