@@ -1,9 +1,17 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.0...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.1...HEAD)
+
+
+<a name="3.1.1"></a>
+## [3.1.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.1.0) (2021-06-11)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.0...3.1.1)
+
+### Bug Fixes
+- crash when window is minimized (Windows) [#366](https://gitlab.com/langurmonkey/gaiasky/issues/366) 
 
 ### Build System
-- change developer_name to be consistent with flathub metadata (max 60 chars)
+- change developer_name to be consistent with flathub metadata (max 60 chars) 
 
 <a name="3.1.0"></a>
 ## [3.1.0](https://gitlab.com/langurmonkey/gaiasky/tree/3.0.3) (2021-06-10)
