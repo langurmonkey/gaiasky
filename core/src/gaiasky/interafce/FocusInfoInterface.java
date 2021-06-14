@@ -40,11 +40,11 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     static private final int MAX_RULER_NAME_LEN = 9;
 
     protected Skin skin;
-    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMag, focusAbsMag, focusRadius;
+    protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadius;
     protected Button goTo, landOn, landAt, bookmark;
     protected OwnImageButton visibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
-    protected OwnLabel camName, camVel, camPos, lonLatLabel, RADECPointerLabel, RADECViewLabel, appmagLabel, absmagLabel;
+    protected OwnLabel camName, camVel, camPos, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
     protected OwnLabel focusIdExpand;
 
@@ -54,8 +54,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     private ExternalInformationUpdater externalInfoUpdater;
 
     private final Table focusInfo;
-    private final Table pointerInfo;
-    private final Table cameraInfo;
     private final Table moreInfo;
     private final Table rulerInfo;
     private final Table focusNames;
@@ -90,9 +88,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         focusInfo = new Table();
         focusInfo.pad(pad5);
-        cameraInfo = new Table();
+        Table cameraInfo = new Table();
         cameraInfo.pad(pad5);
-        pointerInfo = new Table();
+        Table pointerInfo = new Table();
         pointerInfo.pad(pad5);
         moreInfo = new Table();
         rulerInfo = new Table();
@@ -110,7 +108,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusMuAlpha = new OwnLabel("", skin, "hud");
         focusMuDelta = new OwnLabel("", skin, "hud");
         focusRadVel = new OwnLabel("", skin, "hud");
-        focusAppMag = new OwnLabel("", skin, "hud");
+        focusAppMagEarth = new OwnLabel("", skin, "hud");
+        focusAppMagCamera = new OwnLabel("", skin, "hud");
         focusAbsMag = new OwnLabel("", skin, "hud");
         focusAngle = new OwnLabel("", skin, "hud");
         focusDistSol = new OwnLabel("", skin, "hud");
@@ -118,8 +117,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusRadius = new OwnLabel("", skin, "hud");
 
         // Labels
-        appmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.appmag"), skin, "hud");
-        absmagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud");
+        appMagEarthLabel = new OwnLabel(I18n.txt("gui.focusinfo.appmag.earth"), skin, "hud");
+        appMagCameraLabel = new OwnLabel(I18n.txt("gui.focusinfo.appmag.camera"), skin, "hud");
+        absMagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud");
 
         // Pointer
         pointerName = new OwnLabel(I18n.txt("gui.pointer"), skin, "hud-header");
@@ -243,7 +243,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusDistCam.setWidth(w);
         camVel.setWidth(w);
 
-        /** FOCUS INFO **/
+        // FOCUS INFO
         focusInfo.add(focusNameGroup).left().colspan(2).padBottom(pad5);
         focusInfo.row();
         focusInfo.add(focusType).left().padBottom(pad5).colspan(2);
@@ -270,10 +270,14 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud")).left();
             focusInfo.add(focusRadVel).left().padLeft(pad15);
             focusInfo.row();
-            focusInfo.add(appmagLabel).left();
-            focusInfo.add(focusAppMag).left().padLeft(pad15);
+            focusInfo.add(appMagEarthLabel).left();
+            focusInfo.add(focusAppMagEarth).left().padLeft(pad15);
             focusInfo.row();
-            focusInfo.add(absmagLabel).left();
+            focusInfo.row();
+            focusInfo.add(appMagCameraLabel).left();
+            focusInfo.add(focusAppMagCamera).left().padLeft(pad15);
+            focusInfo.row();
+            focusInfo.add(absMagLabel).left();
             focusInfo.add(focusAbsMag).left().padLeft(pad15);
             focusInfo.row();
         }
@@ -291,7 +295,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusInfo.row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
 
-        /** POINTER INFO **/
+        // POINTER INFO
         if (!vr) {
             pointerInfo.add(pointerName).left().colspan(3);
             pointerInfo.row();
@@ -308,7 +312,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             pointerInfo.add(viewRADEC).left().padLeft(pad15);
         }
 
-        /** CAMERA INFO **/
+        // CAMERA INFO
         cameraInfo.add(camName).left().colspan(2);
         cameraInfo.row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud")).left();
@@ -316,7 +320,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         cameraInfo.row();
         cameraInfo.add(camPos).left().colspan(2);
 
-        /** RULER INFO **/
+        // RULER INFO
         rulerInfo.add(rulerName).left();
         rulerInfo.row();
         rulerInfo.add(rulerNameGroup).left();
@@ -497,19 +501,63 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 focusRadVel.setText("-");
             }
 
-            if (!(focus instanceof StarCluster)) {
-                appmagLabel.setText(I18n.txt("gui.focusinfo.appmag"));
-                Float appmag = focus.getAppmag();
-                focusAppMag.setText(nf.format(appmag));
-                absmagLabel.setText(I18n.txt("gui.focusinfo.absmag"));
-                Float absmag = focus.getAbsmag();
-                focusAbsMag.setText(nf.format(absmag));
-            } else {
-                appmagLabel.setText("# " + I18n.txt("element.stars"));
+            if (focus instanceof StarCluster) {
+                // Some star clusters have the number of stars
+                // Magnitudes make not sense
                 StarCluster sc = (StarCluster) focus;
-                focusAppMag.setText(Integer.toString(sc.getNStars()));
-                absmagLabel.setText("");
+                if (sc.getNStars() > 0) {
+                    appMagEarthLabel.setText("# " + I18n.txt("element.stars"));
+                    focusAppMagEarth.setText(Integer.toString(sc.getNStars()));
+                } else {
+                    appMagEarthLabel.setText("");
+                    focusAppMagEarth.setText("");
+                }
+                focusAppMagCamera.setText("");
+                appMagCameraLabel.setText("");
                 focusAbsMag.setText("");
+                absMagLabel.setText("");
+
+            } else if (focus instanceof CelestialBody) {
+                // Planets, satellites, etc.
+                // Apparent magnitude depends on absolute magnitude
+                // We need to compute the apparent magnitude from earth and camera
+
+                // Apparent magnitude (earth)
+                appMagEarthLabel.setText(I18n.txt("gui.focusinfo.appmag.earth"));
+                appMagCameraLabel.setText(I18n.txt("gui.focusinfo.appmag.camera"));
+
+                // Absolute magnitude
+                absMagLabel.setText(I18n.txt("gui.focusinfo.absmag"));
+                focusAbsMag.setText(nf.format(focus.getAbsmag()));
+
+                appMagEarthLabel.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.earth.tooltip"), skin));
+                focusAppMagEarth.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.earth.tooltip"), skin));
+                appMagCameraLabel.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.camera.tooltip"), skin));
+                focusAppMagCamera.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.camera.tooltip"), skin));
+                absMagLabel.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.absmag.tooltip"), skin));
+                focusAbsMag.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.absmag.tooltip"), skin));
+            } else {
+                // Stars, apparent magnitude form Earth is fixed, from camera not so much.
+
+                // Apparent magnitude (earth)
+                appMagEarthLabel.setText(I18n.txt("gui.focusinfo.appmag.earth"));
+                float appMag = focus.getAppmag();
+                focusAppMagEarth.setText(nf.format(appMag));
+
+                // Apparent magnitude (cam)
+                appMagCameraLabel.setText(I18n.txt("gui.focusinfo.appmag.camera"));
+
+                // Absolute magnitude
+                absMagLabel.setText(I18n.txt("gui.focusinfo.absmag"));
+                focusAbsMag.setText(nf.format(focus.getAbsmag()));
+
+                // Tooltips
+                appMagEarthLabel.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.earth.tooltip"), skin));
+                focusAppMagEarth.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.earth.tooltip"), skin));
+                appMagCameraLabel.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.camera.tooltip"), skin));
+                focusAppMagCamera.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.appmag.camera.tooltip"), skin));
+                absMagLabel.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.absmag.tooltip"), skin));
+                focusAbsMag.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.absmag.tooltip"), skin));
             }
 
             if (ComponentType.values()[focus.getCt().getFirstOrdinal()] == ComponentType.Stars) {
@@ -534,6 +582,15 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             if (data.length > 4) {
                 Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4]);
                 focusDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
+            }
+
+            // Apparent magnitude from camera
+            focusAppMagCamera.setText(nf.format((double) data[5]));
+
+            // Apparent magnitude from Earth (for planets, etc.)
+            if (data.length > 6 && Double.isFinite((double) data[6])) {
+                // Apparent magnitude from Earth
+                focusAppMagEarth.setText(nf.format((double) data[6]));
             }
 
             focusRA.setText(nf.format((double) data[2] % 360) + "°");

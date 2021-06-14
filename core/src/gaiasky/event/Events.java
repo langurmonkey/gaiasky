@@ -387,7 +387,8 @@ public enum Events {
 
     /**
      * Contains the distance to the camera [0], the viewing angle [1], right
-     * ascension in deg [2], declination in deg [3] and the distance to Sol [4]
+     * ascension in deg [2], declination in deg [3], the distance to Sol [4]
+     * and the absolute magnitude from the camera [5] (and from earth [6], optional)
      **/
     FOCUS_INFO_UPDATED,
 

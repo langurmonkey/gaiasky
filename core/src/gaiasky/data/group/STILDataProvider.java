@@ -266,6 +266,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double magscl = (dops != null && dops.type == DatasetOptions.DatasetLoadType.STARS) ? dops.magnitudeScale : 0f;
                             appmag -= magscl;
 
+                            //
                             double absmag = appmag - 5 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5;
                             // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
                             double pseudoL = Math.pow(10, -0.4 * absmag);
