@@ -54,9 +54,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     public STILDataProvider() {
         super();
-        // Disable logging
+        // Logging level to WARN
         try {
-            java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.OFF);
+            java.util.logging.Logger.getLogger("uk.ac.starlink").setLevel(Level.WARNING);
+            java.util.logging.Logger.getLogger("org.astrogrid").setLevel(Level.WARNING);
             factory = new StarTableFactory();
             countsPerMag = new long[22];
             initLists();
