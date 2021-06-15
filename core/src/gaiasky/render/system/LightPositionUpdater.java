@@ -17,6 +17,7 @@ import gaiasky.render.IRenderable;
 import gaiasky.render.PostProcessorFactory;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scenegraph.Particle;
+import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
@@ -92,8 +93,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                 float angleEdgeDeg = camera.getAngleEdge() * MathUtils.radDeg;
                 for (int i = size - 1; i >= 0; i--) {
                     IRenderable s = renderables.get(i);
-                    if (s instanceof Particle) {
-                        Particle p = (Particle) s;
+                    if (s instanceof Star) {
+                        Star p = (Star) s;
                         if (lightIndex < nLights && (GlobalConf.program.CUBEMAP_MODE || GlobalConf.runtime.OPENVR || GaiaSky.instance.cam.getDirection().angle(p.translation) < angleEdgeDeg)) {
                             Vector3d pos3d = p.translation.put(auxD);
 

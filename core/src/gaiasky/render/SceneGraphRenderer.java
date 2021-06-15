@@ -856,13 +856,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
         if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && frameBuffer != null) {
             // Get all billboard stars
-            Array<IRenderable> bbStars = renderLists.get(BILLBOARD_STAR.ordinal());
+            Array<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
 
             stars.clear();
-            for (IRenderable st : bbStars) {
+            for (IRenderable st : billboardStars) {
                 if (st instanceof Star) {
                     stars.add(st);
-                    break;
                 }
             }
 
