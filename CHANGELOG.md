@@ -2,6 +2,12 @@
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.1...HEAD)
 
+### Bug Fixes
+- set logging level of STIL and jsamp to WARN
+
+### Features
+- add apparent magnitude from camera
+
 
 <a name="3.1.1"></a>
 ## [3.1.1](https://gitlab.com/langurmonkey/gaiasky/tree/3.1.0) (2021-06-11)

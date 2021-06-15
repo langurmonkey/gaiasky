@@ -45,6 +45,16 @@ options:
             - Type
             - Subject
 
+    merges:
+        pattern: "^Merge branch '(\\S+)'$"
+        pattern_maps:
+            - Source
+
+    reverts:
+        pattern: "^Revert \"([\\s\\S]*)\"$"
+        pattern_maps:
+            - Header
+
     notes:
         keywords:
             - BREAKING CHANGE
