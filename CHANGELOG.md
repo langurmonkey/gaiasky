@@ -1,12 +1,22 @@
 <a name="unreleased"></a>
 ## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
-[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.1...HEAD)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.2...HEAD)
+
+
+<a name="3.1.2"></a>
+## [3.1.2](https://gitlab.com/langurmonkey/gaiasky/tree/3.1.1) (2021-06-16)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.1...3.1.2)
 
 ### Bug Fixes
-- set logging level of STIL and jsamp to WARN
+- broken visibility of datasets (star/particle groups) [#369](https://gitlab.com/langurmonkey/gaiasky/issues/369) 
+- enable more than one light glow effect at a time 
+- set logging level of STIL and jsamp to WARN [#367](https://gitlab.com/langurmonkey/gaiasky/issues/367) 
+
+### Build System
+- fix git-chglog configuration so that merge requests are correctly captured 
 
 ### Features
-- add apparent magnitude from camera
+- add apparent magnitude from camera [#368](https://gitlab.com/langurmonkey/gaiasky/issues/368) 
 
 
 <a name="3.1.1"></a>
