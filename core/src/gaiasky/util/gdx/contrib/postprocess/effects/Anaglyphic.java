@@ -24,17 +24,17 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.filters.AnaglyphicFilter;
+import gaiasky.util.gdx.contrib.postprocess.filters.AnaglyphFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
  * Anaglyphic 3D red-cyan effect
  */
 public final class Anaglyphic extends PostProcessorEffect {
-    private final AnaglyphicFilter anaglyphic;
+    private final AnaglyphFilter anaglyphic;
 
     public Anaglyphic() {
-        anaglyphic = new AnaglyphicFilter();
+        anaglyphic = new AnaglyphFilter();
     }
 
     @Override

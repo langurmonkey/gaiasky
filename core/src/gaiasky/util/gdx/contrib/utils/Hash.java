@@ -21,7 +21,6 @@ package gaiasky.util.gdx.contrib.utils;
  * *
  * *************************************************************************
  */
-
 public final class Hash {
 
     private Hash() {

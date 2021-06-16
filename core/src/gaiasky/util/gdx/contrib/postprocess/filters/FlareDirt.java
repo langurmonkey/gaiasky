@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 /*******************************************************************************
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -25,8 +20,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * This adds the lens dirt and starburst effects to the lens flare.
- *
- 
  * @see <a href=
  * "http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html">http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html</a>
  **/

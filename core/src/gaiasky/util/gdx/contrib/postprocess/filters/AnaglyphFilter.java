@@ -3,18 +3,15 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-/**
- * Anaglyphic 3D red-cyan filter
- *
- 
- */
-
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
-public final class AnaglyphicFilter extends Filter<AnaglyphicFilter> {
+/**
+ * Anaglyph 3D red-cyan filter
+ */
+public final class AnaglyphFilter extends Filter<AnaglyphFilter> {
 
     private Texture textureLeft, textureRight;
 
@@ -43,7 +40,7 @@ public final class AnaglyphicFilter extends Filter<AnaglyphicFilter> {
         }
     }
 
-    public AnaglyphicFilter() {
+    public AnaglyphFilter() {
         super(ShaderLoader.fromFile("screenspace", "anaglyphic"));
         rebind();
     }

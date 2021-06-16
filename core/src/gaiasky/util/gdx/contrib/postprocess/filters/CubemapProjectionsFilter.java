@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 /*******************************************************************************
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,8 +26,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Cubemap projections (spherical, cylindrical, hammer, fisheye) filter.
- *
- 
  */
 public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFilter> {
 

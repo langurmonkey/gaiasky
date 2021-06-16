@@ -3,12 +3,6 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-/**
- * Fisheye effect
- *
- 
- */
-
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
@@ -16,6 +10,9 @@ import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.FisheyeDistortion;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
+/**
+ * Fisheye effect
+ */
 public final class Fisheye extends PostProcessorEffect {
     private final FisheyeDistortion fisheye;
 

@@ -3,17 +3,14 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-/**
- * Fisheye distortion filter
- *
- 
- */
-
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.math.Vector2;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
+/**
+ * Fisheye distortion filter
+ */
 public final class FisheyeDistortion extends Filter<FisheyeDistortion> {
     private final Vector2 viewport;
     private float fov;

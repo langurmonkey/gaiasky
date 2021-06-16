@@ -3,12 +3,6 @@
  * See the file LICENSE.md in the project root for full license details.
  */
 
-/**
- * Fisheye distortion filter
- *
- 
- */
-
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;

@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 /*******************************************************************************
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +20,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Scattering Light effect.
- *
-
  * @see <a href="https://medium.com/community-play-3d/god-rays-whats-that-5a67f26aeac2">https://medium.com/community-play-3d/god-
  * rays-whats-that-5a67f26aeac2</a>
  **/

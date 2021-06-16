@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 /*******************************************************************************
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +20,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Controls levels of brightness and contrast
- *
- 
  */
 public final class LevelsFilter extends Filter<LevelsFilter> {
     private float brightness = 0.0f;

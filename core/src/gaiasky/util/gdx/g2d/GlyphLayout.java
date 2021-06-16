@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
  *
@@ -39,10 +34,10 @@ import static gaiasky.util.gdx.g2d.BitmapFont.BitmapFontData;
  * @author Alexander Dorokhov
  */
 public class GlyphLayout implements Poolable {
-    public final Array<GlyphRun> runs = new Array();
+    public final Array<GlyphRun> runs = new Array<>();
     public float width, height;
 
-    private final Array<Color> colorStack = new Array(4);
+    private final Array<Color> colorStack = new Array<>(4);
 
     /** Creates an empty GlyphLayout. */
     public GlyphLayout() {

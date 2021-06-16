@@ -1,8 +1,3 @@
-/*
- * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
- * See the file LICENSE.md in the project root for full license details.
- */
-
 /*******************************************************************************
  * Copyright 2012 bmanuel
  *
@@ -27,8 +22,6 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Camera blur that relies on a precomputed velocity map for the scene
- *
- 
  */
 public final class CameraBlur extends Filter<CameraBlur> {
 
