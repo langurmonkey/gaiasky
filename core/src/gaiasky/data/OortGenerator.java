@@ -23,6 +23,9 @@ import gaiasky.util.math.Vector3d;
 
 import java.io.*;
 
+/**
+ * Generates particles that make up the Oort cloud.
+ */
 public class OortGenerator {
 
     /** Whether to write the results to disk **/
@@ -59,10 +62,6 @@ public class OortGenerator {
                 writeToDisk(oort, "/tmp/");
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,10 +69,8 @@ public class OortGenerator {
 
     /**
      * Generates random Oort cloud particles
-     * 
-     * @throws IOException
      */
-    private static Array<double[]> generateOort() throws IOException, RuntimeException {
+    private static Array<double[]> generateOort() throws RuntimeException {
         StdRandom.setSeed(100l);
 
         Array<double[]> particles = new Array<>(false, N);

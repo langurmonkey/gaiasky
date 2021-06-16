@@ -28,6 +28,9 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Loads Gaia Sky JSON files.
+ */
 public class SceneGraphJsonLoader {
     private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 

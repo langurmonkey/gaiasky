@@ -29,7 +29,7 @@ import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * Contains the infrastructure common to all multifile octree loaders which
+ * Contains the infrastructure common to all multi-file octree loaders which
  * streams data on-demand from disk and unloads unused data.
  */
 public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoader {
@@ -312,7 +312,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @param lod           The level of detail to load.
      * @param octreeWrapper The octree wrapper.
-     * @throws IOException
+     * @throws IOException  When any of the level's files fails to load.
      */
     public void loadLod(final Integer lod, final AbstractOctreeWrapper octreeWrapper) throws IOException {
         loadOctant(octreeWrapper.root, octreeWrapper, lod);
@@ -324,8 +324,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
-     * @param level         The depth to load
-     * @throws IOException
+     * @param level         The depth to load.
+     * @throws IOException  When the octant's file fails to load.
      */
     public void loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, Integer level) throws IOException {
         if (level >= 0) {
@@ -345,8 +345,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octants       The list holding the octants to load.
      * @param octreeWrapper The octree wrapper.
      * @param abort         State variable that will be set to true if an abort is called.
-     * @return The actual number of loaded octants
-     * @throws IOException
+     * @return The actual number of loaded octants.
+     * @throws IOException When any of the octants' files fail to load.
      */
     public int loadOctants(final Array<OctreeNode> octants, final AbstractOctreeWrapper octreeWrapper, final AtomicBoolean abort) throws IOException {
         int loaded = 0;
@@ -410,12 +410,12 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
-     * @param fullinit      Whether to fully initialise the objects (on-demand load) or
+     * @param fullInit      Whether to fully initialise the objects (on-demand load) or
      *                      not (startup)
      * @return True if the octant was loaded, false otherwise
-     * @throws IOException
+     * @throws IOException When the octant file could not be read.
      */
-    public abstract boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullinit) throws IOException;
+    public abstract boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullInit) throws IOException;
 
     /**
      * The daemon loader thread.
@@ -523,23 +523,23 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case PAUSE_BACKGROUND_LOADING:
-                loadingPaused = true;
-                clearQueue();
-                logger.info("Background data loading thread paused");
-                break;
-            case RESUME_BACKGROUND_LOADING:
-                loadingPaused = false;
-                clearQueue();
-                logger.info("Background data loading thread resumed");
-                break;
-            case DISPOSE:
-                if (daemon != null) {
-                    daemon.stopDaemon();
-                }
-                break;
-            default:
-                break;
+        case PAUSE_BACKGROUND_LOADING:
+            loadingPaused = true;
+            clearQueue();
+            logger.info("Background data loading thread paused");
+            break;
+        case RESUME_BACKGROUND_LOADING:
+            loadingPaused = false;
+            clearQueue();
+            logger.info("Background data loading thread resumed");
+            break;
+        case DISPOSE:
+            if (daemon != null) {
+                daemon.stopDaemon();
+            }
+            break;
+        default:
+            break;
         }
 
     }

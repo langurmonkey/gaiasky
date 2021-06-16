@@ -12,6 +12,9 @@ import uk.ac.starlink.util.DataSource;
 import java.io.FileNotFoundException;
 import java.util.Map;
 
+/**
+ * Defines the interface for scene graph loaders.
+ */
 public interface ISceneGraphLoader {
 
     Array<? extends SceneGraphNode> loadData() throws FileNotFoundException;

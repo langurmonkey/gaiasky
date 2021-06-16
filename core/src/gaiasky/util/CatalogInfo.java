@@ -74,13 +74,13 @@ public class CatalogInfo {
 
     public void setVisibility(boolean visibility) {
         if (this.object != null) {
-            this.object.setVisible(visibility);
+            this.object.setVisibleGroup(visibility);
         }
     }
 
     public boolean isVisible() {
         if (this.object != null) {
-            return this.object.isVisible();
+            return this.object.isVisibleGroup();
         }
         return true;
     }

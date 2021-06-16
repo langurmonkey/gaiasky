@@ -36,8 +36,8 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter, boolean newmethod) {
-        if (newmethod) {
+    public void load(String file, OrbitDataLoaderParameter parameter, boolean newMethod) {
+        if (newMethod) {
             OrbitComponent params = parameter.orbitalParamaters;
             try {
                 // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf

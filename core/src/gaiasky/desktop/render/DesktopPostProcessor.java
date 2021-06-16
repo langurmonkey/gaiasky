@@ -47,7 +47,6 @@ import java.util.Map;
 
 public class DesktopPostProcessor implements IPostProcessor, IObserver {
     private static final Log logger = Logger.getLogger(DesktopPostProcessor.class);
-    public static DesktopPostProcessor instance;
 
     private AssetManager manager;
     private PostProcessBean[] pps;
@@ -85,7 +84,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public DesktopPostProcessor() {
         ShaderLoader.BasePath = "shader/postprocess/";
-        instance = this;
 
         auxb = new Vector3b();
         auxf = new Vector3();

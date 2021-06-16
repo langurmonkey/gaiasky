@@ -23,9 +23,9 @@ public interface IOrbitDataProvider {
      * units.
      * @param file The file path
      * @param source The parameters
-     * @param newmethod Use new method (for orbital elements only)
+     * @param newMethod Use new method (for orbital elements only)
      */
-    void load(String file, OrbitDataLoaderParameter source, boolean newmethod);
+    void load(String file, OrbitDataLoaderParameter source, boolean newMethod);
 
     PointCloudData getData();
 

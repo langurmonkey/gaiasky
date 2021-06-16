@@ -428,6 +428,14 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
+    public boolean isVisibleGroup(){
+        return super.isVisible();
+    }
+
+    public void setVisibleGroup(boolean visibility) {
+        super.setVisible(visibility);
+    }
+
     /**
      * Regenerates the name index
      */

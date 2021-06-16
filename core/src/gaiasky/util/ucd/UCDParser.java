@@ -38,7 +38,7 @@ public class UCDParser {
     public static String[] teffcolnames = new String[] { "teff", "t_eff", "temperature", "effective_temperature" };
     public static String[] pmracolnames = new String[] { "pmra", "pmalpha", "pm_ra", "mualpha" };
     public static String[] pmdeccolnames = new String[] { "pmdec", "pmdelta", "pm_dec", "pm_de", "mudelta" };
-    public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv" };
+    public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
     public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
 

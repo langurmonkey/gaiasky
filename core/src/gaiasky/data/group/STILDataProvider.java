@@ -27,6 +27,7 @@ import gaiasky.util.units.Quantity.Angle.AngleUnit;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
+import uk.ac.starlink.table.TableBuilder;
 import uk.ac.starlink.table.formats.AsciiTableBuilder;
 import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
@@ -45,9 +46,9 @@ import java.util.logging.Level;
 public class STILDataProvider extends AbstractStarGroupDataProvider {
     private static final Log logger = Logger.getLogger(STILDataProvider.class);
     private StarTableFactory factory;
-    private long starid = 10000000;
+    private long starId = 10000000;
     // Dataset options, may be null
-    private DatasetOptions dops;
+    private DatasetOptions datasetOptions;
 
     // These names are not allowed
     private static final String[] forbiddenNameValues = { "-", "...", "nop", "nan", "?", "_", "x", "n/a" };
@@ -67,8 +68,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         }
     }
 
-    public void setDatasetOptions(DatasetOptions dops) {
-        this.dops = dops;
+    public void setDatasetOptions(DatasetOptions datasetOptions) {
+        this.datasetOptions = datasetOptions;
     }
 
     @Override
@@ -92,12 +93,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     /**
      * Gets the first ucd that can be translated to a double from the set.
      *
-     * @param ucds The array of UCDs. The UCDs which coincide with the names should be first.
+     * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
      * @return Pair of <UCD,Double>
      */
-    private Pair<UCD, Double> getDoubleUcd(Array<UCD> ucds, Object[] row) {
-        for (UCD ucd : ucds) {
+    private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs, Object[] row) {
+        for (UCD ucd : UCDs) {
             try {
                 double num = ((Number) row[ucd.index]).doubleValue();
                 if (Double.isNaN(num)) {
@@ -114,12 +115,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     /**
      * Gets the first ucd as a string from the set.
      *
-     * @param ucds The set of UCD objects
+     * @param UCDs The set of UCD objects
      * @param row  The row
-     * @return
+     * @return A pair with the UCD and the string
      */
-    private Pair<UCD, String> getStringUcd(Array<UCD> ucds, Object[] row) {
-        for (UCD ucd : ucds) {
+    private Pair<UCD, String> getStringUcd(Array<UCD> UCDs, Object[] row) {
+        for (UCD ucd : UCDs) {
             try {
                 String str = row[ucd.index].toString().strip();
                 return new Pair<>(ucd, str);
@@ -130,19 +131,19 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return null;
     }
 
-    private Pair<UCD, String>[] getAllStringsUcd(Array<UCD> ucds, Object[] row) {
-        Array<Pair<UCD, String>> strs = new Array<>(false, 2);
-        for (UCD ucd : ucds) {
+    private Pair<UCD, String>[] getAllStringsUcd(Array<UCD> UCDs, Object[] row) {
+        Array<Pair<UCD, String>> strings = new Array<>(false, 2);
+        for (UCD ucd : UCDs) {
             try {
                 String str = row[ucd.index].toString().strip();
-                strs.add(new Pair<>(ucd, str));
+                strings.add(new Pair<>(ucd, str));
             } catch (Exception e) {
                 // not working, try next
             }
         }
-        Pair<UCD, String>[] result = new Pair[strs.size];
+        Pair<UCD, String>[] result = new Pair[strings.size];
         int i = 0;
-        for (Pair<UCD, String> value : strs) {
+        for (Pair<UCD, String> value : strings) {
             result[i++] = value;
         }
         return result;
@@ -160,14 +161,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
-     * @return
+     * @return The list of particle records.
      */
     public List<IParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
             if (factory != null) {
 
                 // Add extra builders
-                List builders = factory.getDefaultBuilders();
+                List<TableBuilder> builders = factory.getDefaultBuilders();
                 builders.add(new CsvTableBuilder());
                 builders.add(new AsciiTableBuilder());
 
@@ -263,7 +264,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 appmag = 15;
                             }
                             // Scale magnitude if needed
-                            double magscl = (dops != null && dops.type == DatasetOptions.DatasetLoadType.STARS) ? dops.magnitudeScale : 0f;
+                            double magscl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) ? datasetOptions.magnitudeScale : 0f;
                             appmag -= magscl;
 
                             //
@@ -318,11 +319,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                         hip = Integer.valueOf(namePair.getSecond());
                                         id = (long) hip;
                                     } else {
-                                        id = ++starid;
+                                        id = ++starId;
                                     }
                                 } else {
                                     // Emtpy ID
-                                    id = ++starid;
+                                    id = ++starId;
                                     names = new String[] { id.toString() };
                                 }
                             } else {
@@ -353,10 +354,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                         hip = Integer.valueOf(idpair.getSecond());
                                         id = (long) hip;
                                     } else {
-                                        id = ++starid;
+                                        id = ++starId;
                                     }
                                 } else {
-                                    id = ++starid;
+                                    id = ++starId;
                                 }
                             }
 
@@ -374,7 +375,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             colors.put(id, rgb);
                             sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
-                            if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
+                            if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) {
                                 double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
                                 float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
                                 dataD[ParticleRecord.I_X] = p.gsposition.x;
@@ -409,7 +410,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                                 int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
                                 countsPerMag[appclmp] += 1;
-                            } else if (dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
+                            } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                                 double[] point = new double[3];
                                 point[ParticleRecord.I_X] = p.gsposition.x;
                                 point[ParticleRecord.I_Y] = p.gsposition.y;

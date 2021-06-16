@@ -994,8 +994,8 @@ public class GlobalConf {
         // Flag to mark whether safe mode is activated via command line argument
         public boolean SAFE_GRAPHICS_MODE_FLAG = false;
 
-        // Update checker
-        public static long VERSION_CHECK_INTERVAL_MS = 1 * 24 * 60 * 60 * 1000;
+        // Update checker time, in ms
+        public static long VERSION_CHECK_INTERVAL_MS = 86400000L;
         public Instant VERSION_LAST_TIME;
         public String VERSION_LAST_VERSION;
         public String VERSION_CHECK_URL;

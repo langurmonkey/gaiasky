@@ -1233,6 +1233,14 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             return this.isVisible();
     }
 
+    public boolean isVisibleGroup(){
+        return isVisible();
+    }
+
+    public void setVisibleGroup(boolean visibility) {
+        setVisible(visibility);
+    }
+
     protected long msSinceStateChange() {
         return (long) (GaiaSky.instance.getT() * 1000f) - this.lastStateChangeTimeMs;
     }

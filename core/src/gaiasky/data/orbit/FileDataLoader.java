@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.sql.Timestamp;
 
 public class FileDataLoader {
-    int count = 0;
 
     public FileDataLoader() {
         super();
@@ -25,8 +24,6 @@ public class FileDataLoader {
 
     /**
      * Loads the data in the input stream into an OrbitData object.
-     * @param data
-     * @throws Exception
      */
     public PointCloudData load(InputStream data) throws Exception {
         PointCloudData orbitData = new PointCloudData();

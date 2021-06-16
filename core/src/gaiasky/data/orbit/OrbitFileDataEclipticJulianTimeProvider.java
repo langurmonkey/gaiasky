@@ -32,7 +32,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
     }
 
     @Override
-    public void load(String file, OrbitDataLoaderParameter parameter, boolean newmethod) {
+    public void load(String file, OrbitDataLoaderParameter parameter, boolean newMethod) {
         load(file, parameter);
     }
 
