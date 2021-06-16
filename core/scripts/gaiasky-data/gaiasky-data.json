@@ -448,22 +448,40 @@
       "file": "@mirror-url@catalog/gcns/v02_20201216/catalog-gcns.tar.gz"
     },
     {
-      "name": "catalog-whitedwarfs",
+      "name": "catalog-whitedwarfs-dr2",
       "type": "catalog-gaia",
-      "version": 1,
-      "size": 34471681,
+      "version": 2,
+      "size": 32715467,
       "nobjects": 256082,
-      "check": "catalog-wd.json",
+      "check": "catalog-wd-dr2.json",
       "data": [
-        "catalog-wd.json",
-        "particles-wd.json",
-        "catalog/wd"
+        "catalog-wd-dr2.json",
+        "particles-wd-dr2.json",
+        "catalog/wd/dr2"
       ],
-      "description": "GDR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag",
+      "description": "DR2 white dwarfs - White dwarfs catalog based on GDR2 by Gentile Fusillo et al. 2018, MNRAS 482, 4579 - Brightnesses increased by 10 mag",
       "link": "https://adsabs.harvard.edu/abs/2019MNRAS.482.4570G",
-      "releasenotes" : "Add type to catalog descriptor file",
-      "sha256": "161b964e8ba9c5319d9a087b5804088ce985f1f014aa938f2dfa2cb068a35935",
-      "file": "@mirror-url@catalog/whitedwarfs/v01_20201216/catalog-wd.tar.gz"
+      "releasenotes" : "Reorganise folder structure",
+      "sha256": "f4fdfbecca3c017ef1610ebd852ae3823676951cdbdb8d2fdf6f6eb4fdd8a346",
+      "file": "@mirror-url@catalog/wd/dr2/v02_20210616/catalog-wd-dr2.tar.gz"
+    },
+    {
+      "name": "catalog-whitedwarfs-edr3",
+      "type": "catalog-gaia",
+      "version": 0,
+      "size": 32715468,
+      "nobjects": 359073,
+      "check": "catalog-wd-edr3.json",
+      "data": [
+        "catalog-wd-edr3.json",
+        "particles-wd-edr3.json",
+        "catalog/wd/edr3"
+      ],
+      "description": "eDR3 white dwarfs - White dwarfs catalog based on Gaia eDR3 data, by Gentile Fusillo et al. 2021, MNRAS. Contains 359073 high-confidence white dwarf candidates (Pwd>0.75).",
+      "link": "https://arxiv.org/abs/2106.07669",
+      "releasenotes" : "First version",
+      "sha256": "da851c1daf1b873cd32e760720f1f70280d9e3ec1747cc177068b231c9385065",
+      "file": "@mirror-url@catalog/wd/edr3/v00_20210616/catalog-wd-edr3.tar.gz"
     },
     {
       "name": "catalog-gd1",
