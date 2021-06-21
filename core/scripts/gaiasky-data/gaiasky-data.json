@@ -730,9 +730,9 @@
     {
       "name": "gargantua-blackhole",
       "type": "catalog-other",
-      "version": 1,
+      "version": 2,
       "mingsversion": 30000,
-      "size": 3144,
+      "size": 3124,
       "nobjects": 1,
       "check": "catalog-gargantua.json",
       "data": [
@@ -741,10 +741,10 @@
         "shader/postprocess/raymarching/blackhole.fragment"
       ],
       "description": "Gargantua Black Hole - The black hole from Interstellar, somewhere in the galaxy...",
-      "releasenotes" : "Add type to catalog descriptor file",
+      "releasenotes" : "Shader code cleanup, should work with intel UHD",
       "link": "https://www.shadertoy.com/view/tsBXW3",
-      "sha256": "545a02d1cf11a22bf028526217665f3c25ac007a5bca8d87b759d30b811f175d",
-      "file": "@mirror-url@extra/blackhole/v01_20201216/gargantua-blackhole.tar.gz"
+      "sha256": "a7c8f334b7c53204358ae623bfec27ec1c5c832a20618ce860e7c0cb23791cf2",
+      "file": "@mirror-url@extra/blackhole/v02_20210621/gargantua-blackhole.tar.gz"
     },
     {
       "name": "mesh-dr2-dust",
