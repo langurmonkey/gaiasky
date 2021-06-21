@@ -516,7 +516,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // D: dist to Earth [au]
                     // g: term for phase effects (~0)
                     double distCamAu = pos.put(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
-                    double distStarAu = focus.getFirstStarAncestor().getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+                    SceneGraphNode starAncestor = focus.getFirstStarAncestor();
+                    double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
                     appMagCamera = 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
 
                 } else {
@@ -541,7 +542,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     // D: dist to Earth [au]
                     // g: term for phase effects (~0)
                     double distEarthAu = earth.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
-                    double distStarAu = focus.getFirstStarAncestor().getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+                    SceneGraphNode starAncestor = focus.getFirstStarAncestor();
+                    double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
                     appMagEarth = 5d * Math.log10(distStarAu * distEarthAu) + focus.getAbsmag();
                 } else {
                     appMagEarth = Double.NaN;
