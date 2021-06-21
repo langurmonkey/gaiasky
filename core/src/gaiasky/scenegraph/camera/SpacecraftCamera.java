@@ -100,7 +100,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         dirup = new Pair<>(scdir, scup);
 
         // init camera
-        camera = new PerspectiveCamera(20, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera = new PerspectiveCamera(40, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
 
@@ -215,20 +215,16 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     /**
      * Updates the position and direction of the camera using a hard analytical algorithm.
-     *
-     * @param dt
      */
     public void updateHard(double dt) {
         if (sc != null) {
-            double sdt = dt;
-
             // POSITION
             double tDistOverFov = targetDistance / fovFactor;
             desired.set(scdir).nor().scl(-tDistOverFov);
-            aux1b.set(scup).nor().scl(tDistOverFov * 0.25d);
+            aux1b.set(scup).nor().scl(tDistOverFov * 0.125d);
             desired.add(aux1b);
             todesired.set(desired).sub(relpos);
-            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-6d);
+            todesired.scl(dt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(3e-6d);
             relpos.add(todesired);
             pos.set(scpos).add(relpos);
 
@@ -241,7 +237,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             // UP
             desired.set(scup);
             todesired.set(desired).sub(up);
-            todesired.scl(sdt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-6d);
+            todesired.scl(dt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-8d);
             up.add(todesired).nor();
         }
     }
