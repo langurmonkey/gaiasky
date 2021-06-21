@@ -34,7 +34,7 @@ import java.util.Map;
 public class SceneGraphJsonLoader {
     private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
-    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException, NoSuchMethodException {
+    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
         ISceneGraph sg = null;
         try {
             logger.info(I18n.txt("notif.loading", "JSON data descriptor files:"));
@@ -58,7 +58,7 @@ public class SceneGraphJsonLoader {
                     Long size = model.get("size") != null ? model.get("size").asLong() : -1;
                     Long nObjects = model.get("nobjects") != null ? model.get("nobjects").asLong() : -1;
 
-                    Map<String, Object> params = new HashMap();
+                    Map<String, Object> params = new HashMap<>();
                     params.put("size", size);
                     params.put("nobjects", nObjects);
 

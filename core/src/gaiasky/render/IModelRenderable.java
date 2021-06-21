@@ -5,6 +5,7 @@
 
 package gaiasky.render;
 
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.util.gdx.IntModelBatch;
 
 /**
@@ -12,7 +13,7 @@ import gaiasky.util.gdx.IntModelBatch;
  */
 public interface IModelRenderable extends IRenderable {
 
-    void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc);
+    void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group);
 
     boolean hasAtmosphere();
 

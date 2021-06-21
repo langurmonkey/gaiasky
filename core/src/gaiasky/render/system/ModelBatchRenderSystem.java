@@ -36,13 +36,10 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
      *            The alphas list.
      * @param batch
      *            The model batch.
-     * @param type
-     *            The model render type
      */
-    public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch, ModelRenderType type) {
+    public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
         super(rg, alphas, null);
         this.batch = batch;
-        this.type = type;
         comp = new ModelComparator<>();
 
         this.ctAtm = new ComponentTypes(ComponentType.Atmospheres);
@@ -55,18 +52,7 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
             batch.begin(camera.getCamera());
             renderables.forEach(r -> {
                 IModelRenderable s = (IModelRenderable) r;
-                // Route to correct interface
-                switch (type) {
-                    case NORMAL:
-                        s.render(batch, getAlpha(s), t, rc);
-                        break;
-                    case ATMOSPHERE:
-                        ((IAtmosphereRenderable) s).renderAtmosphere(batch, getAlpha(ctAtm), t, rc.vrOffset);
-                        break;
-                    case CLOUD:
-                        ((ICloudRenderable) s).renderClouds(batch, getAlpha(ctClouds), t);
-                        break;
-                }
+                        s.render(batch, getAlpha(s), t, rc, getRenderGroup());
             });
             batch.end();
 

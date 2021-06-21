@@ -284,9 +284,6 @@ public class Constants {
     public final static float MIN_TESS_QUALITY = 1f;
     public final static float MAX_TESS_QUALITY = 10f;
 
-    public final static float MIN_PROFILE_DECAY = 0.1f;
-    public final static float MAX_PROFILE_DECAY = 200f;
-
     public final static float MIN_PARTICLE_SIZE = 0.5f;
     public final static float MAX_PARTICLE_SIZE = 50f;
 
@@ -295,9 +292,6 @@ public class Constants {
 
     public final static float MIN_POINTER_GUIDES_WIDTH = 0.5f;
     public final static float MAX_POINTER_GUIDES_WIDTH = 20f;
-
-    public final static float MIN_AXIS_SENSITIVITY = 0.1f;
-    public final static float MAX_AXIS_SENSITIVITY = 10f;
 
     public static final float UI_SCALE_INTERNAL_MIN = 0.4f;
     public static final float UI_SCALE_INTERNAL_MAX = 1.7f;
@@ -331,7 +325,7 @@ public class Constants {
     public static final String nameSeparatorRegex = "\\|";
     public static final String nameSeparator = "|";
 
-    // Asterisks must be substituted becasue windows does not allow them in paths
+    // Asterisks must be substituted because windows does not allow them in paths
     public static final String STAR_SUBSTITUTE = "%#QUAL#%";
 
     // URLS for external queries

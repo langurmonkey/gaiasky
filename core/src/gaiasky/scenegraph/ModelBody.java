@@ -204,10 +204,8 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     private void addToRenderModel() {
-        if (this.shouldRender()) {
             RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
             addToRender(this, rg);
-        }
     }
 
     public boolean renderTessellated() {
@@ -257,12 +255,12 @@ public abstract class ModelBody extends CelestialBody {
 
     /** Model rendering **/
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        render(modelBatch, alpha, t, true);
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
+        render(modelBatch, group, alpha, t, true);
     }
 
     /** Model opaque rendering. Disable shadow mapping **/
-    public void render(IntModelBatch modelBatch, float alpha, double t, boolean shadowEnv) {
+    public void render(IntModelBatch modelBatch, RenderGroup group, float alpha, double t, boolean shadowEnv) {
         if (shadowEnv)
             prepareShadowEnvironment();
 

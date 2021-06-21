@@ -245,7 +245,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
      * Model rendering
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         mc.update(null, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);

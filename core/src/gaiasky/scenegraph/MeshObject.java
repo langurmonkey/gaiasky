@@ -174,7 +174,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
      * Model rendering
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         if (mc != null) {
             if (additiveBlending) {
                 mc.update(localTransform, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);

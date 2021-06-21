@@ -135,11 +135,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         MODEL_VERT_BEAM(14),
         /**
-         * Particle grup
+         * Particle group
          **/
         PARTICLE_GROUP(15),
         /**
-         * Star grup
+         * Star group
          **/
         STAR_GROUP(16),
         /**
@@ -194,6 +194,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          * Recursive grid
          */
         MODEL_VERT_RECGRID(29),
+        /**
+         * Thrusters
+         */
+        MODEL_VERT_THRUSTER(30),
         /**
          * None
          **/
@@ -372,6 +376,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("per-vertex-lighting-recgrid", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/default.gridrec.fragment.glsl"));
         manager.load("per-vertex-lighting-starsurface", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/starsurface.vertex.glsl", "shader/starsurface.fragment.glsl"));
         manager.load("per-vertex-lighting-beam", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/default.vertex.glsl", "shader/beam.fragment.glsl"));
+        manager.load("per-vertex-lighting-thruster", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/thruster.fragment.glsl"));
 
         manager.load("per-pixel-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/normal.vertex.glsl", "shader/normal.fragment.glsl"));
         manager.load("per-pixel-lighting-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.normal.vertex.glsl", "shader/tessellation/tess.normal.control.glsl", "shader/tessellation/tess.normal.eval.glsl", "shader/tessellation/tess.normal.fragment.glsl"));
@@ -549,6 +554,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         IntShaderProvider perVertexLightingRecGrid = manager.get("per-vertex-lighting-recgrid");
         IntShaderProvider perVertexLightingStarSurface = manager.get("per-vertex-lighting-starsurface");
         IntShaderProvider perVertexLightingBeam = manager.get("per-vertex-lighting-beam");
+        IntShaderProvider perVertexLightingThruster = manager.get("per-vertex-lighting-thruster");
 
         // Per-pixel lighting shaders
         IntShaderProvider perPixelLighting = manager.get("per-pixel-lighting");
@@ -574,6 +580,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         IntModelBatch mbVertexDiffuse = new IntModelBatch(perVertexDiffuse, noSorter);
         IntModelBatch mbVertexLightingStarSurface = new IntModelBatch(perVertexLightingStarSurface, noSorter);
         IntModelBatch mbVertexLightingBeam = new IntModelBatch(perVertexLightingBeam, noSorter);
+        IntModelBatch mbVertexLightingThruster = new IntModelBatch(perVertexLightingThruster, noSorter);
         IntModelBatch mbVertexLightingGrid = new IntModelBatch(perVertexLightingGrid, noSorter);
         IntModelBatch mbVertexLightingRecGrid = new IntModelBatch(perVertexLightingRecGrid, noSorter);
 
@@ -645,14 +652,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
-        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_VERT, alphas, mbVertexLighting, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_VERT, alphas, mbVertexLighting);
         modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
-        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(MODEL_VERT_GRID, alphas, mbVertexLightingGrid, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(MODEL_VERT_GRID, alphas, mbVertexLightingGrid);
         modelGridsProc.addPostRunnables(clearDepthR);
         // RECURSIVE GRID
-        AbstractRenderSystem modelRecGridProc = new ModelBatchRenderSystem(MODEL_VERT_RECGRID, alphas, mbVertexLightingRecGrid, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelRecGridProc = new ModelBatchRenderSystem(MODEL_VERT_RECGRID, alphas, mbVertexLightingRecGrid);
         modelRecGridProc.addPreRunnables(regularBlendR, depthTestR);
 
         // ANNOTATIONS - (grids)
@@ -689,21 +696,24 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         pointGpuProc.addPreRunnables(regularBlendR, depthTestR);
 
         // MODELS DUST AND MESH
-        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(MODEL_PIX_DUST, alphas, mbPixelLightingDust, ModelRenderType.NORMAL);
-        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(MODEL_PIX_DUST, alphas, mbPixelLightingDust);
+        AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive);
 
         // MODEL DIFFUSE
-        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(MODEL_DIFFUSE, alphas, mbVertexDiffuse, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(MODEL_DIFFUSE, alphas, mbVertexDiffuse);
 
         // MODEL PER-PIXEL-LIGHTING
-        AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(MODEL_PIX, alphas, mbPixelLighting, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelPerPixelLighting = new ModelBatchRenderSystem(MODEL_PIX, alphas, mbPixelLighting);
 
         // MODEL PER-PIXEL-LIGHTING-TESSELLATION
         AbstractRenderSystem modelPerPixelLightingTess = new ModelBatchTessellationRenderSystem(MODEL_PIX_TESS, alphas, mbPixelLightingTessellation);
         modelPerPixelLightingTess.addPreRunnables(regularBlendR, depthTestR);
 
         // MODEL BEAM
-        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(MODEL_VERT_BEAM, alphas, mbVertexLightingBeam, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelBeamProc = new ModelBatchRenderSystem(MODEL_VERT_BEAM, alphas, mbVertexLightingBeam);
+
+        // MODEL THRUSTER
+        AbstractRenderSystem modelThrusterProc = new ModelBatchRenderSystem(MODEL_VERT_THRUSTER, alphas, mbVertexLightingThruster);
 
         // GALAXY
         MWModelRenderSystem milkyWayRenderSystem = new MWModelRenderSystem(GALAXY, alphas, galaxyPointShaders);
@@ -729,7 +739,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         orbitElemProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // MODEL STARS
-        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(MODEL_VERT_STAR, alphas, mbVertexLightingStarSurface, ModelRenderType.NORMAL);
+        AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(MODEL_VERT_STAR, alphas, mbVertexLightingStarSurface);
 
         // LABELS
         AbstractRenderSystem labelsProc = new FontRenderSystem(FONT_LABEL, alphas, fontBatch, distanceFieldFontShader, font3d, font2d, fontTitles);
@@ -739,7 +749,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         billboardSSOProc.addPreRunnables(additiveBlendR, depthTestR);
 
         // MODEL ATMOSPHERE
-        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(MODEL_ATM, alphas, mbAtmosphere, ModelRenderType.ATMOSPHERE) {
+        AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(MODEL_ATM, alphas, mbAtmosphere) {
             @Override
             public float getAlpha(IRenderable s) {
                 return alphas[ComponentType.Atmospheres.ordinal()] * (float) Math.pow(alphas[s.getComponentType().getFirstOrdinal()], 2);
@@ -752,7 +762,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         };
 
         // MODEL CLOUDS
-        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, mbCloud, ModelRenderType.CLOUD);
+        AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, mbCloud);
 
         // SHAPES
         AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas);
@@ -787,6 +797,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(modelPerPixelLighting);
         addRenderSystem(modelPerPixelLightingTess);
         addRenderSystem(modelBeamProc);
+        addRenderSystem(modelThrusterProc);
 
         // Labels
         addRenderSystem(labelsProc);
@@ -893,7 +904,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             for (IRenderable model : models) {
                 if (model instanceof ModelBody) {
                     ModelBody mb = (ModelBody) model;
-                    mb.render(mbPixelLightingOpaque, 1, 0, false);
+                    mb.render(mbPixelLightingOpaque, RenderGroup.MODEL_PIX, 1, 0, false);
                 }
             }
             mbPixelLightingOpaque.end();
@@ -904,7 +915,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 for (IRenderable model : modelsTess) {
                     if (model instanceof ModelBody) {
                         ModelBody mb = (ModelBody) model;
-                        mb.render(mbPixelLightingOpaqueTessellation, 1, 0, false);
+                        mb.render(mbPixelLightingOpaqueTessellation, RenderGroup.MODEL_PIX, 1, 0, false);
                     }
                 }
                 mbPixelLightingOpaqueTessellation.end();
@@ -979,7 +990,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
             // No tessellation
             mbPixelLightingDepth.begin(cameraLight);
-            candidate.render(mbPixelLightingDepth, 1, 0, null);
+            candidate.render(mbPixelLightingDepth, 1, 0, null, RenderGroup.MODEL_PIX);
             mbPixelLightingDepth.end();
 
             // Save frame buffer and combined matrix
@@ -1049,7 +1060,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
                 // Tessellation
                 mbPixelLightingDepthTessellation.begin(cameraLight);
-                candidate.render(mbPixelLightingDepthTessellation, 1, 0, rc);
+                candidate.render(mbPixelLightingDepthTessellation, 1, 0, rc, RenderGroup.MODEL_PIX);
                 mbPixelLightingDepthTessellation.end();
 
                 // Save frame buffer and combined matrix

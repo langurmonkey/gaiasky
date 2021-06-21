@@ -38,7 +38,7 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
             batch.begin(camera.getCamera());
             renderables.forEach(r ->{
                 IModelRenderable s = (IModelRenderable) r;
-                s.render(batch, getAlpha(s), t, rc);
+                s.render(batch, getAlpha(s), t, rc, getRenderGroup());
             });
             batch.end();
 

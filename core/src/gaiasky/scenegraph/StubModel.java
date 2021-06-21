@@ -67,7 +67,7 @@ public class StubModel extends SceneGraphNode implements IModelRenderable, ILine
     }
 
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         setTransparency(alpha);
         modelBatch.render(instance, env);
     }

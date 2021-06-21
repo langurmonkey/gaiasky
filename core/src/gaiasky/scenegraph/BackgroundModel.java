@@ -114,7 +114,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
      * Model rendering.
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         mc.update(alpha * cc[3] * opacity);
         modelBatch.render(mc.instance, mc.env);
     }

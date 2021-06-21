@@ -9,10 +9,20 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.g3d.Environment;
+import com.badlogic.gdx.graphics.g3d.Material;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -26,17 +36,19 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Pair;
 import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.model.IntModel;
+import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * The spacecraft
@@ -109,6 +121,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     private final Quaternion qf;
 
+    private ModelComponent thruster;
+    private Matrix4 thrusterTransform;
+
     private boolean render;
 
     public Spacecraft() {
@@ -144,12 +159,48 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         qf = new Quaternion();
     }
 
+    public void initialize() {
+        super.initialize();
+        // Load thruster
+        GaiaSky.instance.manager.load(GlobalConf.data.dataFile("tex/base/thruster.png"), Texture.class);
+    }
+
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (mc != null) {
             mc.doneLoading(manager, localTransform, null);
         }
+
+        // Initialize thruster
+        Texture tex = manager.get(GlobalConf.data.dataFile("tex/base/thruster.png"));
+        tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+        Map<String, Object> params = new TreeMap<>();
+        params.put("width", 1d);
+        params.put("height", 3d);
+        params.put("depth", 1d);
+        params.put("divisions", 8L);
+
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("cone", params, Usage.Position | Usage.TextureCoordinates);
+        IntModel model = pair.getFirst();
+        Material mat = pair.getSecond().get("base");
+        mat.clear();
+        mat.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
+        mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+        // Only to activate view vector (camera position)
+        mat.set(new BlendingAttribute(true, 1));
+        thrusterTransform = new Matrix4();
+        thruster = new ModelComponent();
+        thruster.initialize();
+        thruster.env = new Environment();
+        thruster.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        thruster.env.set(new ColorAttribute(ColorAttribute.Diffuse, 1f, 1f, 1f, 1f));
+        thruster.instance = new IntModelInstance(model, thrusterTransform);
+        // Relativistic effects
+        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+            thruster.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
+
         // Broadcast me
         EventManager.instance.post(Events.SPACECRAFT_LOADED, this);
 
@@ -188,6 +239,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
 
+        // Time in shader
+        if (this.thruster != null && this.thruster.instance != null) {
+            double t = (TimeUtils.millis() / 1000d) % 10d;
+            ((FloatAttribute) thruster.instance.materials.get(0).get(FloatAttribute.Shininess)).value = (float) t;
+        }
+
         if (render) {
             EventManager.instance.post(Events.SPACECRAFT_INFO, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], enginePower, yawp, pitchp, rollp);
         }
@@ -196,12 +253,20 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     protected void updateLocalTransform() {
         // Local transform
         try {
+
+            // Spacecraft
             localTransform.idt().setToLookAt(posf, directionf.add(posf), upf).inv();
             localTransform.scale(size, size, size);
 
             // Rotation for attitude indicator
             rotationMatrix.idt().setToLookAt(directionf, upf);
             rotationMatrix.getRotation(qf);
+
+            // Thruster
+            //float thSize = size * 0.3f;
+            //Vector3 thPos = aux3f1.get().set(posf).add((float) (4.5f * Constants.M_TO_U), (float) (0 * Constants.M_TO_U), (float) (-1f * Constants.M_TO_U));
+            //thrusterTransform.idt().rotate(upf, (float) -yaw).translate(thPos).scale(thSize, thSize, thSize);
+
         } catch (Exception e) {
         }
     }
@@ -230,9 +295,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
                 force.set(thrust);
             }
 
-            Vector3d nextvel = aux3d3.get().set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
+            Vector3d nextVel = aux3d3.get().set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
 
-            if (vel.angle(nextvel) > 90) {
+            if (vel.angle(nextVel) > 90) {
                 setEnginePower(0);
                 force.scl(0);
                 vel.scl(0);
@@ -248,29 +313,29 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         Vector3d acc = aux3d1.get().set(accel).scl(Constants.M_TO_U);
 
         if (GlobalConf.spacecraft.SC_VEL_TO_DIRECTION) {
-            double vellen = vel.len();
-            vel.set(direction).nor().scl(vellen);
+            double velocityLength = vel.len();
+            vel.set(direction).nor().scl(velocityLength);
         }
         vel.add(acc.scl(dt));
 
-        Vector3b velo = aux3b2.get().set(vel);
-        Vector3b position = aux3b3.get().set(posb).add(velo.scl(dt));
+        Vector3b velocity = aux3b2.get().set(vel);
+        Vector3b position = aux3b3.get().set(posb).add(velocity.scl(dt));
         Vector3b pos = posb.put(aux3b4.get());
         // Check collision!
         if (closest != null && closest != this && !this.copy) {
-            double twoRadiuses = closest.getRadius() + this.getRadius();
+            double twoRadii = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadiuses) {
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadii) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadiuses);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadii);
 
                 if (intersections.size >= 1) {
                     posb.set(intersections.get(0));
                 }
 
                 stopAllMovement();
-            } else if (posb.dstd(closest.getPos()) < twoRadiuses) {
+            } else if (posb.dstd(closest.getPos()) < twoRadii) {
                 posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos())));
             } else {
                 posb.set(position);
@@ -305,25 +370,25 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         rollv += rolla * dt;
 
         // pos
-        double yawdiff = (yawv * dt) % 360d;
-        double pitchdiff = (pitchv * dt) % 360d;
-        double rolldiff = (rollv * dt) % 360d;
+        double yawDiff = (yawv * dt) % 360d;
+        double pitchDiff = (pitchv * dt) % 360d;
+        double rollDiff = (rollv * dt) % 360d;
 
         Vector3d direction = pair.getFirst();
         Vector3d up = pair.getSecond();
 
         // apply yaw
-        direction.rotate(up, yawdiff);
+        direction.rotate(up, yawDiff);
 
         // apply pitch
         Vector3d aux1 = aux3d1.get().set(direction).crs(up);
-        direction.rotate(aux1, pitchdiff);
-        up.rotate(aux1, pitchdiff);
+        direction.rotate(aux1, pitchDiff);
+        up.rotate(aux1, pitchDiff);
 
         // apply roll
-        up.rotate(direction, -rolldiff);
+        up.rotate(direction, -rollDiff);
 
-        return rolldiff;
+        return rollDiff;
     }
 
     @Override
@@ -335,7 +400,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             if (camera.getMode().isSpacecraft())
                 pollKeys(Gdx.graphics.getDeltaTime());
 
-            /** POSITION **/
+            // POSITION
             pos = computePosition(dt, camera.getSecondClosestBody(), enginePower, thrust, direction, force, accel, vel, pos);
 
             if (leveling) {
@@ -361,12 +426,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
                 }
             }
 
-            double rolldiff = computeDirectionUp(dt, dirup);
+            double rollDiff = computeDirectionUp(dt, dirup);
 
             double len = direction.len();
             pitch = Math.asin(direction.y / len);
             yaw = Math.atan2(direction.z, direction.x);
-            roll += rolldiff;
+            roll += rollDiff;
 
             pitch = Math.toDegrees(pitch);
             yaw = Math.toDegrees(yaw);
@@ -488,6 +553,10 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             super.addToRenderLists(camera);
             if (GlobalConf.spacecraft.SC_SHOW_AXES)
                 addToRender(this, RenderGroup.LINE);
+
+            // Thrusters
+            //if (isInRender(this, RenderGroup.MODEL_PIX))
+            //    addToRender(this, RenderGroup.MODEL_VERT_THRUSTER);
         }
     }
 
@@ -497,8 +566,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /**
      * Sets the absolute size of this entity
-     *
-     * @param size
      */
     public void setSize(Double size) {
         this.size = size.floatValue() * (float) Constants.KM_TO_U;
@@ -540,8 +607,14 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /** Model rendering. SPACECRAFT_MODE in spacecraft mode is not affected by the relativistic aberration **/
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        render(modelBatch, alpha, t, true);
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
+        if (group == RenderGroup.MODEL_PIX) {
+            render(modelBatch, alpha, t, true);
+        } else if (group == RenderGroup.MODEL_VERT_THRUSTER) {
+            thruster.touch();
+            thruster.setTransparency(alpha * fadeOpacity);
+            modelBatch.render(thruster.instance, thruster.env);
+        }
     }
 
     /** Model opaque rendering for light glow pass. Do not render shadows **/

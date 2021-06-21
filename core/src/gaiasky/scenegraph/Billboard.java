@@ -128,8 +128,8 @@ public class Billboard extends ModelBody {
 
     /** Model rendering **/
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
-        render(modelBatch, alpha, t, false);
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
+        render(modelBatch, group, alpha, t, false);
     }
 
     @Override

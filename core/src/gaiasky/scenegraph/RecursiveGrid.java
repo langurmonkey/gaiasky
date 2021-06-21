@@ -378,7 +378,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
      * Model rendering.
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         mc.update(alpha * cc[3] * opacity);
         if (regime == 1)
             mc.setDepthTest(GL20.GL_LEQUAL, false);

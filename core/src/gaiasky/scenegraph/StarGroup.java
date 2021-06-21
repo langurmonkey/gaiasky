@@ -346,7 +346,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * Model rendering
      */
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         mc.touch();
         float opacity = (float) MathUtilsd.lint(proximity.updating[0].distToCamera, modelDist / 50f, modelDist, 1f, 0f);
         if (alpha * opacity > 0) {

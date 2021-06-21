@@ -45,17 +45,17 @@ public final class ShaderLoader {
         return program;
     }
 
-    private static String loadShaderCode(String file){
+    private static String loadShaderCode(String file) {
         try {
             String src = Gdx.files.internal(BasePath + file).readString();
             return src;
-        }catch(Exception e0){
+        } catch (Exception e0) {
             // Try to load from data
             Path path = GlobalConf.data.dataPath(file);
-            if(Files.exists(path) && Files.isReadable(path)){
+            if (Files.exists(path) && Files.isReadable(path)) {
                 try {
                     return Files.readString(path);
-                }catch(Exception e1){
+                } catch (Exception e1) {
                     logger.error(e1);
                     return null;
                 }
@@ -90,7 +90,7 @@ public final class ShaderLoader {
             StringBuilder sb = new StringBuilder();
             for (String line : lines) {
                 sb.append(line).append("\n");
-                if(line.trim().startsWith("#version ")){
+                if (line.trim().startsWith("#version ")) {
                     sb.append(defines).append("\n");
                 }
             }

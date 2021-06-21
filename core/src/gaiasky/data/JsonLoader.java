@@ -93,13 +93,6 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
      * @param json  The {@link JsonValue} for the object to convert.
      * @param clazz The class of the object.
      * @return The java object of the given class.
-     * @throws ReflectionException
-     * @throws SecurityException
-     * @throws NoSuchMethodException
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
      */
     private Object convertJsonToObject(JsonValue json, Class<?> clazz) throws ReflectionException {
         Object instance;
@@ -288,9 +281,9 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
      * with the classe's interfaces and superclasses recursively.
      *
-     * @param methodName
-     * @param clazz
-     * @return
+     * @param methodName The method name.
+     * @param clazz The class.
+     * @return The method, if found. Null otherwise.
      */
     private Method searchMethod(String methodName, Class<?> clazz, Class<?> source) {
         Method m = null;

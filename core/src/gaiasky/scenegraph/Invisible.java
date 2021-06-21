@@ -12,6 +12,8 @@ import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
+import gaiasky.render.SceneGraphRenderer;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
@@ -60,7 +62,7 @@ public class Invisible extends CelestialBody {
     }
 
     @Override
-    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc) {
+    public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
     }
 
     @Override
