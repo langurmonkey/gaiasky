@@ -923,7 +923,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Displays the loading GUI
      **/
     private final Runnable runnableLoadingGui = () -> {
-        if (manager.update()) {
+        boolean finished = false;
+        try{
+            finished = manager.update();
+        } catch(GdxRuntimeException e){
+            // Resource failed to load
+            logger.warn(e.getLocalizedMessage());
+        }
+        if (finished) {
             doneLoading();
             renderProcess = runnableRender;
         } else {

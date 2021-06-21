@@ -9,15 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
@@ -36,19 +28,17 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.GlobalConf;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Pair;
 import gaiasky.util.gdx.IntModelBatch;
-import gaiasky.util.gdx.model.IntModel;
-import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * The spacecraft
@@ -162,7 +152,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void initialize() {
         super.initialize();
         // Load thruster
-        GaiaSky.instance.manager.load(GlobalConf.data.dataFile("tex/base/thruster.png"), Texture.class);
+        //GaiaSky.instance.manager.load(GlobalConf.data.dataFile("tex/base/thruster.png"), Texture.class);
     }
 
     @Override
@@ -173,33 +163,37 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
 
         // Initialize thruster
-        Texture tex = manager.get(GlobalConf.data.dataFile("tex/base/thruster.png"));
-        tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-        Map<String, Object> params = new TreeMap<>();
-        params.put("width", 1d);
-        params.put("height", 3d);
-        params.put("depth", 1d);
-        params.put("divisions", 8L);
-
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("cone", params, Usage.Position | Usage.TextureCoordinates);
-        IntModel model = pair.getFirst();
-        Material mat = pair.getSecond().get("base");
-        mat.clear();
-        mat.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
-        mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-        // Only to activate view vector (camera position)
-        mat.set(new BlendingAttribute(true, 1));
-        thrusterTransform = new Matrix4();
-        thruster = new ModelComponent();
-        thruster.initialize();
-        thruster.env = new Environment();
-        thruster.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        thruster.env.set(new ColorAttribute(ColorAttribute.Diffuse, 1f, 1f, 1f, 1f));
-        thruster.instance = new IntModelInstance(model, thrusterTransform);
-        // Relativistic effects
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
-            thruster.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
+        //        try {
+        //            Texture tex = manager.get(GlobalConf.data.dataFile("tex/base/thruster.png"));
+        //            tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        //
+        //            Map<String, Object> params = new TreeMap<>();
+        //            params.put("width", 1d);
+        //            params.put("height", 3d);
+        //            params.put("depth", 1d);
+        //            params.put("divisions", 8L);
+        //
+        //            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("cone", params, Usage.Position | Usage.TextureCoordinates);
+        //            IntModel model = pair.getFirst();
+        //            Material mat = pair.getSecond().get("base");
+        //            mat.clear();
+        //            mat.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
+        //            mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+        //            // Only to activate view vector (camera position)
+        //            mat.set(new BlendingAttribute(true, 1));
+        //            thrusterTransform = new Matrix4();
+        //            thruster = new ModelComponent();
+        //            thruster.initialize();
+        //            thruster.env = new Environment();
+        //            thruster.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        //            thruster.env.set(new ColorAttribute(ColorAttribute.Diffuse, 1f, 1f, 1f, 1f));
+        //            thruster.instance = new IntModelInstance(model, thrusterTransform);
+        //            // Relativistic effects
+        //            if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+        //                thruster.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
+        //        } catch (GdxRuntimeException e) {
+        //            logger.debug("Skipping thruster initialization");
+        //        }
 
         // Broadcast me
         EventManager.instance.post(Events.SPACECRAFT_LOADED, this);
