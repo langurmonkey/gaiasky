@@ -5,7 +5,7 @@ stages:
 
 before_script:
     - pacman -Sy
-    - pacman -S --noconfirm glibc git jdk15-openjdk
+    - pacman -S --noconfirm glibc git jdk-openjdk
     - ./gradlew init
 
 compile:
