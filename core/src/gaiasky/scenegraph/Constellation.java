@@ -43,9 +43,9 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         }
     }
 
-    float alpha = .2f;
-    float constalpha;
-    boolean allLoaded = false;
+    private float alpha = .2f;
+    private boolean allLoaded = false;
+    private Vector3d posd;
 
     /** List of pairs of HIP identifiers **/
     public Array<int[]> ids;
@@ -57,6 +57,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     public Constellation() {
         super();
         cc = new float[] { .5f, 1f, .5f, alpha };
+        this.posd = new Vector3d();
     }
 
     public Constellation(String name, String parentName) {
@@ -76,19 +77,20 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Recompute mean position
-        pos.setZero();
-        Vector3b p = aux3b1.get();
+        posd.setZero();
+        Vector3d p = aux3d1.get();
         int nStars = 0;
         for (IPosition[] line : lines) {
             if (line != null) {
                 p.set(line[0].getPosition()).add(camera.getInversePos());
-                pos.add(p);
+                posd.add(p);
                 nStars++;
             }
         }
         if (nStars > 0) {
-            pos.scl(1d / nStars);
-            pos.nor().scl(100d * Constants.PC_TO_U);
+            posd.scl(1d / nStars);
+            posd.nor().scl(100d * Constants.PC_TO_U);
+            pos.set(posd);
 
             super.update(time, parentTransform, camera, opacity);
 
@@ -127,7 +129,6 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        constalpha = alpha;
         alpha *= this.alpha * opacity;
 
         Vector3d p1 = aux3d1.get();
@@ -150,7 +151,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         if (posBean.getVelocity() != null && !posBean.getVelocity().hasNaN()) {
             vel.set(posBean.getVelocity()).scl(deltaYears);
         }
-        out.set(aux3b1.get().set(posBean.getPosition()).sub(camPos)).add(vel);
+        out.set(posBean.getPosition()).sub(camPos).add(vel);
     }
 
     /**

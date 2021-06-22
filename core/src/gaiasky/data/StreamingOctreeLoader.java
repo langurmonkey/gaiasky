@@ -472,7 +472,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                                 loader.loadOctants(toLoad, octreeWrapper, abort);
                             } catch (Exception e) {
                                 // This will happen when the queue has been cleared during processing.
-                                logger.warn(I18n.txt("notif.loadingoctants.fail"));
+                                logger.debug(I18n.txt("notif.loadingoctants.queue.clear"));
                             }
                         }
 
@@ -496,10 +496,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                                 }
                             }
 
-                        GaiaSky.postRunnable(() -> {
-                            // Update constellations :S
-                            Constellation.updateConstellations();
-                        });
+                        // Update constellations :S
+                        GaiaSky.postRunnable(Constellation::updateConstellations);
 
                     }
 

@@ -330,7 +330,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
                 stopAllMovement();
             } else if (posb.dstd(closest.getPos()) < twoRadii) {
-                posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos())));
+                posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), aux3b2.get())));
             } else {
                 posb.set(position);
             }

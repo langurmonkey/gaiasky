@@ -1718,7 +1718,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (focus != null && !(focus instanceof Star) && !(focus instanceof ParticleGroup)) {
             // Move camera if too close to focus
             this.focus.getAbsolutePosition(aux1b);
-            if (pos.dst(aux1b).doubleValue() < this.focus.getRadius()) {
+            if (pos.dstd(aux1b, aux2b) < this.focus.getRadius()) {
                 // Position camera near focus
                 stopTotalMovement();
 

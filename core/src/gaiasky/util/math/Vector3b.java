@@ -461,14 +461,18 @@ public class Vector3b implements Serializable {
 
     /**
      * @param vec The other vector
-     * @return Wether this and the other vector are equal
+     * @return Whether this and the other vector are equal
      */
     public boolean idt(final Vector3b vec) {
-        return x == vec.x && y == vec.y && z == vec.z;
+        return x.equals(vec.x) && y.equals(vec.y) && z.equals(vec.z);
     }
 
     public double dstd(final Vector3b vec) {
         return dst(vec).doubleValue();
+    }
+
+    public double dstd(final Vector3b vec, final Vector3b aux) {
+        return dst(vec, aux).doubleValue();
     }
 
     public Apfloat dst(final Vector3b vec) {
@@ -477,11 +481,32 @@ public class Vector3b implements Serializable {
         Apfloat c = vec.z.subtract(this.z);
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
     }
+
+    /**
+     * Faster version of {@link Vector3b#dst(Vector3b)}, using an auxiliary vector.
+     * @param vec The vector to compute the distance to.
+     * @param aux The auxiliary vector.
+     * @return The distance between the two points.
+     */
+    public Apfloat dst(final Vector3b vec, final Vector3b aux) {
+        return aux.set(this).sub(vec).len();
+    }
+
     public Apfloat dst(final Vector3d vec) {
         Apfloat a = new Apfloat(vec.x, prec).subtract(this.x);
         Apfloat b = new Apfloat(vec.y, prec).subtract(this.y);
         Apfloat c = new Apfloat(vec.z, prec).subtract(this.z);
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
+    }
+
+    /**
+     * Faster version of {@link Vector3b#dst(Vector3d)}, using an auxiliary vector.
+     * @param vec The vector to compute the distance to.
+     * @param aux The auxiliary vector.
+     * @return The distance between the two points.
+     */
+    public Apfloat dst(final Vector3d vec, final Vector3b aux) {
+        return aux.set(this).sub(vec).len();
     }
 
     public double dstd(double x, double y, double z) {
@@ -494,6 +519,11 @@ public class Vector3b implements Serializable {
         Apfloat b = new Apfloat(y, prec).subtract(this.y);
         Apfloat c = new Apfloat(z, prec).subtract(this.z);
         return ApfloatMath.sqrt(a.multiply(a).add(b.multiply(b)).add(c.multiply(c)));
+    }
+
+    /** @return the distance between this point and the given point */
+    public Apfloat dst(double x, double y, double z, Vector3b aux) {
+        return aux.set(this).sub(x, y, z).len();
     }
 
     public double dst2d(Vector3b vec) {

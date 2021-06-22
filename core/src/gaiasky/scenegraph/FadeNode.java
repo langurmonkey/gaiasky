@@ -140,7 +140,7 @@ public class FadeNode extends SceneGraphNode {
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-        this.distToCamera = this.position == null ? pos.dst(camera.getPos()).doubleValue() : this.position.distToCamera;
+        this.distToCamera = this.position == null ? pos.dst(camera.getPos(), aux3b1.get()).doubleValue() : this.position.distToCamera;
 
         // Opacity
         updateOpacity();
