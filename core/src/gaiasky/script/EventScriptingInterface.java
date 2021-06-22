@@ -1230,18 +1230,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 /*
                  * FOCUS
                  */
-
                 changeFocus(object, cam, waitTimeSeconds);
 
                 /* target distance */
                 double target = 100 * Constants.M_TO_U;
 
-                object.getAbsolutePosition(aux3b1).add(cam.posinv).nor();
+                Vector3b camObj = aux3b1;
+                object.getAbsolutePosition(camObj).add(cam.posinv).nor();
                 Vector3d dir = cam.direction;
 
                 // Add forward movement while distance > target distance
                 boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
-                boolean viewNotMet = Math.abs(dir.angle(aux3b1)) < 90;
+                boolean viewNotMet = Math.abs(dir.angle(camObj)) < 90;
 
                 long prevtime = TimeUtils.millis();
                 while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
@@ -1269,7 +1269,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
 
                     // focus.transform.getTranslation(aux);
-                    viewNotMet = Math.abs(dir.angle(aux3d1)) < 90;
+                    viewNotMet = Math.abs(dir.angle(camObj)) < 90;
                     distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
                 }
 
@@ -1279,22 +1279,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Roll till done
                 Vector3d up = cam.up;
                 // aux1 <- camera-object
-                Vector3b camObj = object.getAbsolutePosition(aux3b1).sub(cam.pos);
+                camObj = object.
+                        getAbsolutePosition(aux3b1).sub(cam.pos);
                 double ang1 = up.angle(camObj);
                 double ang2 = up.cpy().rotate(cam.direction, 1).angle(camObj);
-                double rollsign = ang1 < ang2 ? -1d : 1d;
+                double rollSign = ang1 < ang2 ? -1d : 1d;
 
                 if (ang1 < 170) {
+                    rollAndWait(rollSign * 0.02d, 170d, 50L, cam, camObj, stop);
 
-                    rollAndWait(rollsign * 0.02d, 170d, 50L, cam, camObj, stop);
                     // STOP
                     cam.stopMovement();
 
-                    rollAndWait(rollsign * 0.006d, 176d, 50L, cam, camObj, stop);
+                    rollAndWait(rollSign * 0.006d, 176d, 50L, cam, camObj, stop);
                     // STOP
                     cam.stopMovement();
 
-                    rollAndWait(rollsign * 0.003d, 178d, 50L, cam, camObj, stop);
+                    rollAndWait(rollSign * 0.003d, 178d, 50L, cam, camObj, stop);
                 }
                 /*
                  * RESTORE
@@ -1515,7 +1516,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
             obj.getAbsolutePosition(name.toLowerCase(), aux3b1);
-            return new double[] { aux3d1.x, aux3d1.y, aux3d1.z };
+            return new double[] { aux3b1.x.doubleValue(), aux3b1.y.doubleValue(), aux3b1.z.doubleValue() };
         }
         return null;
     }
