@@ -77,10 +77,9 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Recompute mean position
         pos.setZero();
-        Vector3d p = aux3d1.get();
+        Vector3b p = aux3b1.get();
         int nStars = 0;
-        for (int i = 0; i < lines.length; i++) {
-            IPosition[] line = lines[i];
+        for (IPosition[] line : lines) {
             if (line != null) {
                 p.set(line[0].getPosition()).add(camera.getInversePos());
                 pos.add(p);
@@ -103,13 +102,13 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     @Override
     public void setUp() {
         if (!allLoaded) {
-            int npairs = ids.size;
+            int nPairs = ids.size;
             if (lines == null) {
-                lines = new IPosition[npairs][];
+                lines = new IPosition[nPairs][];
             }
             ObjectMap<Integer, IPosition> hipMap = sg.getStarMap();
             allLoaded = true;
-            for (int i = 0; i < npairs; i++) {
+            for (int i = 0; i < nPairs; i++) {
                 int[] pair = ids.get(i);
                 IPosition s1, s2;
                 s1 = hipMap.get(pair[0]);
@@ -133,7 +132,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
         Vector3d p1 = aux3d1.get();
         Vector3d p2 = aux3d2.get();
-        Vector3d campos = camera.getPos().tov3d(aux3d3.get());
+        Vector3b campos = camera.getPos();
 
         for (IPosition[] pair : lines) {
             if (pair != null) {
@@ -146,12 +145,12 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     }
 
-    private void getPosition(IPosition posbean, Vector3d campos, Vector3d out) {
+    private void getPosition(IPosition posBean, Vector3b camPos, Vector3d out) {
         Vector3d vel = aux3d3.get().setZero();
-        if (posbean.getVelocity() != null && !posbean.getVelocity().hasNaN()) {
-            vel.set(posbean.getVelocity()).scl(deltaYears);
+        if (posBean.getVelocity() != null && !posBean.getVelocity().hasNaN()) {
+            vel.set(posBean.getVelocity()).scl(deltaYears);
         }
-        out.set(posbean.getPosition()).sub(campos).add(vel);
+        out.set(aux3b1.get().set(posBean.getPosition()).sub(camPos)).add(vel);
     }
 
     /**
