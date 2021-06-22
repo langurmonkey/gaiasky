@@ -395,22 +395,26 @@ public class CameraManager implements ICamera, IObserver {
         // Pointer
         vec.set(pointerX, pointerY, 0.5f);
         camera.getCamera().unproject(vec);
-        inb.set(vec);
-        Coordinates.cartesianToSpherical(inb, out);
+        try {
+            inb.set(vec);
+            Coordinates.cartesianToSpherical(inb, out);
 
-        double pointerRA = out.x * Nature.TO_DEG;
-        double pointerDEC = out.y * Nature.TO_DEG;
+            double pointerRA = out.x * Nature.TO_DEG;
+            double pointerDEC = out.y * Nature.TO_DEG;
 
-        // View
-        vec.set(viewX, viewY, 0.5f);
-        camera.getCamera().unproject(vec);
-        inb.set(vec);
-        Coordinates.cartesianToSpherical(inb, out);
+            // View
+            vec.set(viewX, viewY, 0.5f);
+            camera.getCamera().unproject(vec);
+            inb.set(vec);
+            Coordinates.cartesianToSpherical(inb, out);
 
-        double viewRA = out.x * Nature.TO_DEG;
-        double viewDEC = out.y * Nature.TO_DEG;
+            double viewRA = out.x * Nature.TO_DEG;
+            double viewDEC = out.y * Nature.TO_DEG;
 
-        EventManager.instance.post(Events.RA_DEC_UPDATED, pointerRA, pointerDEC, viewRA, viewDEC, pointerX, pointerY);
+            EventManager.instance.post(Events.RA_DEC_UPDATED, pointerRA, pointerDEC, viewRA, viewDEC, pointerX, pointerY);
+        }catch(NumberFormatException e) {
+            // Something fishy with the pointer coordinates
+        }
 
     }
 

@@ -861,6 +861,10 @@ public class Vector3b implements Serializable {
     public double anglePrecise(Vector3b v) {
         return MathUtilsd.radiansToDegrees * Math.acos(this.dotd(v) / (this.lend() * v.lend()));
     }
+    /** Gets the angle in degrees between the two vectors **/
+    public double anglePrecise(Vector3d v) {
+        return MathUtilsd.radiansToDegrees * Math.acos(this.dot(v) / (this.lend() * v.len()));
+    }
 
     @Override
     public int hashCode() {

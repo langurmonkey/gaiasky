@@ -64,10 +64,12 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * The force acting on the entity and the friction
      **/
-    private final Vector3d force;
-    private Vector3d friction;
+    private final Vector3b force;
+    private Vector3b friction;
 
-    public Vector3d direction, up, focusDirection;
+    public Vector3d direction, up;
+    private Vector3b focusDirection;
+
     /**
      * Indicates whether the camera is facing the focus or not
      **/
@@ -245,7 +247,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         vrOffset = new Vector3d();
         vel = new Vector3d();
         accel = new Vector3d();
-        force = new Vector3d();
+        force = new Vector3b();
         posBak = new Vector3d();
         orip = new Matrix4d();
         this.vr = vr;
@@ -270,7 +272,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         up = new Vector3d(1, 0, 0);
         direction = new Vector3d(0, 1, 0);
-        focusDirection = new Vector3d();
+        focusDirection = new Vector3b();
         desired = new Vector3b();
         pitch = new Vector3d(0.0f, 0.0f, -3.0291599E-6f);
         yaw = new Vector3d(0.0f, 0.0f, -7.9807205E-6f);
@@ -278,7 +280,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         horizontal = new Vector3d();
         vertical = new Vector3d();
 
-        friction = new Vector3d();
+        friction = new Vector3b();
         lastVel = new Vector3d();
         focusPos = new Vector3b();
         freeTargetPos = new Vector3b();
@@ -553,11 +555,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case GAME_MODE:
-            if (gravity && (closestBody != null) && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
+            if (gravity && (closestBody != null) && closestBody instanceof Planet && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
                 // Add gravity to force, pulling to closest body
                 Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
                 double dist = camObj.lend();
-                // Gravity adds only at twice the radius
+                // Gravity acts only at twice the radius, in planets
                 if (dist < closestBody.getRadius() * 2d) {
                     force.add(camObj.nor().scl(0.002d));
                     fullStop = false;
@@ -717,17 +719,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera.update();
 
         posinv.set(pos).scl(-1);
-    }
-
-    /**
-     * Gets the effective direction to use for the perspective camera. Takes into account planetarium down angle in free mode
-     *
-     * @return The effective direction
-     */
-    public Vector3d getEffectiveDirection() {
-        if (getMode().isFree() && GlobalConf.program.isPlanetarium())
-            return focusDirection;
-        return direction;
     }
 
     /**
@@ -1043,9 +1034,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Updates the position of this entity using the current force
-     *
-     * @param dt
-     * @param multiplier
      */
     protected void updatePosition(double dt, double multiplier, double transUnits) {
         boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
@@ -1063,7 +1051,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             vel.add(aux1);
         }
 
-        double forceLen = force.len();
+        double forceLen = force.lend();
         double velocity = vel.len();
 
         // Half a second after we have stopped zooming, real friction kicks in
@@ -1074,8 +1062,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 counterAmount *= factor / ((focus.getDistToCamera() - focus.getRadius()) / focus.getRadius());
             }
             friction.set(vel).nor().scl(-velocity * counterAmount * dt);
-        } else
+        } else {
             friction.set(force).nor().scl(-forceLen * dt);
+        }
 
         force.add(friction);
 
@@ -1111,9 +1100,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             vel.clamp(0, multiplier);
             // Aux1 is the step to take
-            aux1.set(vel).scl(dt);
+            aux1b.set(vel).scl(dt);
             // Aux2 contains the new position
-            pos.add(aux1);
+            pos.add(aux1b);
 
             accel.setZero();
 
@@ -1642,11 +1631,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Applies the given force to this entity's acceleration
+     * Applies the given force to this entity's acceleration.
      *
-     * @param force
+     * @param force The force.
      */
-    protected void applyForce(Vector3d force) {
+    protected void applyForce(Vector3b force) {
         if (force != null) {
             accel.add(force);
         }
@@ -1967,18 +1956,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     /**
-     * Projects to screen
+     * Projects to screen.
      *
-     * @param vec
-     * @param out
-     * @param rw
-     * @param rh
-     * @param chw
-     * @param chh
-     * @param chw2
-     * @param chh2
      * @return False if projected point falls outside the screen bounds, true
-     * otherwise
+     * otherwise.
      */
     private boolean projectToScreen(Vector3d vec, Vector3 out, int rw, int rh, float chw, float chh, float chw2, float chh2) {
         vec.put(out);

@@ -119,17 +119,17 @@ public class MasterManager implements IObserver {
         // Initialize http client
         http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
-        // Subscribe to events that need to be broadcasted
+        // Subscribe to events that need to be broadcast
         EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_POINT_SIZE_CMD, Events.DISPOSE);
     }
 
     /**
-     * Broadcasts the given camera state and time to all the slaves
+     * Broadcasts the given camera state and time to all the slaves.
      *
-     * @param pos  Camera position
-     * @param dir  Camera direction
-     * @param up   Camera up
-     * @param time Current time
+     * @param pos  Camera position.
+     * @param dir  Camera direction.
+     * @param up   Camera up.
+     * @param time Current time.
      */
     public void boardcastCameraAndTime(Vector3b pos, Vector3d dir, Vector3d up, ITimeFrameProvider time) {
         String spos = TextUtils.surround(pos.toString(), "[", "]");
