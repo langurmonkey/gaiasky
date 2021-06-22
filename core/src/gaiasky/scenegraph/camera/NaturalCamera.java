@@ -433,25 +433,23 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         RotationComponent rc = focus.getRotationComponent();
                         if (rc != null) {
                             // Rotation component present - planets, etc
-                            Double angleBak = rc.angle;
-                            if (angleBak != null) {
-                                Double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
-                                // aux5 <- focus (future) position
-                                focus.getAbsolutePosition(aux5b);
-                                // aux3 <- focus to camera vector
-                                aux3b.set(pos).sub(aux5b);
-                                // aux2 <- spin axis
-                                aux2.set(0, 1, 0).mul(focus.getOrientation());
-                                // rotate aux3 around focus spin axis
-                                aux3b.rotate(aux2, angle);
-                                // aux3 <- camera pos after rotating
-                                aux3b.add(aux5b);
-                                // pos <- aux3
-                                pos.set(aux3b);
-                                direction.rotate(aux2, angle);
-                                up.rotate(aux2, angle);
-                                previousOrientationAngle = angleBak;
-                            }
+                            double angleBak = rc.angle;
+                            double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
+                            // aux5 <- focus (future) position
+                            focus.getAbsolutePosition(aux5b);
+                            // aux3 <- focus to camera vector
+                            aux3b.set(pos).sub(aux5b);
+                            // aux2 <- spin axis
+                            aux2.set(0, 1, 0).mul(focus.getOrientation());
+                            // rotate aux3 around focus spin axis
+                            aux3b.rotate(aux2, angle);
+                            // aux3 <- camera pos after rotating
+                            aux3b.add(aux5b);
+                            // pos <- aux3
+                            pos.set(aux3b);
+                            direction.rotate(aux2, angle);
+                            up.rotate(aux2, angle);
+                            previousOrientationAngle = angleBak;
                         } else if (focus.getOrientationQuaternion() != null) {
                             Matrix4d ori = focus.getOrientation();
                             // aux5 <- focus (future) position
@@ -466,7 +464,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                             pos.set(aux3b);
                             direction.mul(ori).mul(orip);
                             up.mul(ori).mul(orip);
-                            // Set orip to this frame's inv(ori)
+                            // Set ori to this frame's inv(ori)
                             orip.set(ori).inv();
                         }
 
@@ -508,7 +506,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                 // Apparent magnitude from camera
                 double appMagCamera;
-                if(focus instanceof CelestialBody) {
+                if (focus instanceof CelestialBody) {
                     // m - H = 5 * log10(r * D) + g
                     // m: apparent magnitude
                     // H: absolute magnitude
@@ -693,9 +691,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             // Update scales
             for (int i = 0; i < hudScales.length; i++) {
-                double distpart = dist / hud_scl_dist;
+                double distPart = dist / hud_scl_dist;
 
-                hudScales[i] = hudScales[i] + (HUD_SCALE_MAX - HUD_SCALE_MIN) * distpart;
+                hudScales[i] = hudScales[i] + (HUD_SCALE_MAX - HUD_SCALE_MIN) * distPart;
                 if (dist > 0 && hudScales[i] > HUD_SCALE_MAX) {
                     hudScales[i] = HUD_SCALE_MIN;
                 }

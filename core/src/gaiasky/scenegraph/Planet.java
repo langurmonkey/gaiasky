@@ -148,6 +148,7 @@ public class Planet extends ModelBody implements ILineRenderable {
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
+
         if (group == RenderGroup.MODEL_ATM) {
             // Atmosphere
             renderAtmosphere(modelBatch, SceneGraphRenderer.alphas[ComponentType.Atmospheres.ordinal()], rc);
@@ -155,6 +156,15 @@ public class Planet extends ModelBody implements ILineRenderable {
             // Clouds
             renderClouds(modelBatch, SceneGraphRenderer.alphas[ComponentType.Clouds.ordinal()], t);
         } else {
+            // If atmosphere ground params are present, set them
+            if (ac != null) {
+                float atmOpacity = (float) MathUtilsd.lint(viewAngle, 0.00745329f, 0.02490659f, 0f, 1f);
+                if (GlobalConf.scene.VISIBILITY[ComponentType.Atmospheres.ordinal()] && atmOpacity > 0) {
+                    ac.updateAtmosphericScatteringParams(mc.instance.materials.first(), alpha * atmOpacity, true, this, rc.vrOffset);
+                } else {
+                    ac.removeAtmosphericScattering(mc.instance.materials.first());
+                }
+            }
             // Regular planet, render model normally
             compalpha = alpha;
             prepareShadowEnvironment();
@@ -169,19 +179,8 @@ public class Planet extends ModelBody implements ILineRenderable {
     public void renderAtmosphere(IntModelBatch modelBatch, float alpha, RenderingContext rc) {
         // Atmosphere fades in between 1 and 2 degrees of view angle apparent
         ICamera cam = GaiaSky.instance.getICamera();
-        // We are an atmosphere :_D
-        float near = cam.getCamera().near;
-        float nearOpacity = 1f;
-        if (near < 1e-3f && cam.getClosestBody() != this) {
-            nearOpacity = MathUtilsd.lint(near, 1e-5f, 1e-3f, 0f, 1f);
-        }
         float atmOpacity = (float) MathUtilsd.lint(viewAngle, 0.00745329f, 0.02490659f, 0f, 1f);
-        if(atmOpacity > 0) {
-            ac.updateAtmosphericScatteringParams(mc.instance.materials.first(), alpha * atmOpacity, true, this, rc.vrOffset);
-        } else {
-            ac.removeAtmosphericScattering(mc.instance.materials.first());
-        }
-        if (alpha * atmOpacity * nearOpacity > 0) {
+        if (atmOpacity > 0) {
             ac.updateAtmosphericScatteringParams(ac.mc.instance.materials.first(), alpha * atmOpacity, false, this, rc.vrOffset);
             ac.mc.updateRelativisticEffects(cam);
             modelBatch.render(ac.mc.instance, mc.env);
