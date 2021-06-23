@@ -1036,30 +1036,35 @@ public enum Events {
      */
     SPACECRAFT_NEAREST_INFO,
     /**
-     * Level spacecraft command, contains boolean with state
+     * Level spacecraft command, contains boolean with state.
      **/
     SPACECRAFT_STABILISE_CMD,
     /**
-     * Stop spacecraft, contains boolean with state
+     * Stop spacecraft, contains boolean with state.
      **/
     SPACECRAFT_STOP_CMD,
     /**
-     * Decreases thrust
+     * Decreases thrust.
      **/
     SPACECRAFT_THRUST_DECREASE_CMD,
 
     /**
-     * Increases thrust
+     * Increases thrust.
      **/
     SPACECRAFT_THRUST_INCREASE_CMD,
     /**
-     * Broadcasts the new thrust index
+     * Broadcasts the new thrust index.
      **/
     SPACECRAFT_THRUST_INFO,
     /**
-     * Contains the integer index of the new thrust
+     * Contains the integer index of the new thrust.
      **/
     SPACECRAFT_THRUST_SET_CMD,
+
+    /**
+     * Contains the integer index of the new machine.
+     */
+    SPACECRAFT_MACHINE_SELECTION_CMD,
 
     /**
      * Contains the speed limit index as in:

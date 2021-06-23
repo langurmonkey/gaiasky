@@ -40,6 +40,8 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.util.stream.Stream;
+
 /**
  * The spacecraft
  */
@@ -53,7 +55,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
 
     /**
-     * Factor (adapt to be able to navigate small and large scale structures
+     * Factor (adapt to be able to navigate small and large scale structures)
      **/
     public static final double[] thrustFactor = new double[14];
 
@@ -64,8 +66,11 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
     }
 
+    /** The current name of this spacecraft **/
+    private String machineName;
+
     /** Seconds to reach full power **/
-    public double fullPowerTime = 0.5;
+    public double fullPowerTime;
 
     /** Force, acceleration and velocity **/
     public Vector3d force, accel, vel;
@@ -81,7 +86,15 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public Vector3d thrust;
 
     /** Mass in kg **/
-    public double mass;
+    private double mass;
+
+    /** Instantaneous engine power **/
+    public double enginePower;
+
+    /** Responsiveness in [{@link Constants#MIN_SC_RESPONSIVENESS}, {@link Constants#MAX_SC_RESPONSIVENESS}] **/
+    private double responsiveness;
+    /** Responsiveness in [0, 1] **/
+    private double drag;
 
     /** Only the rotation matrix **/
     public Matrix4 rotationMatrix;
@@ -90,9 +103,6 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
      * Index of the current engine power setting
      */
     public int thrustFactorIndex = 0;
-
-    /** Instantaneous engine power, this is in [0..1] **/
-    public double enginePower;
 
     /** Yaw, pitch and roll **/
     // power in each angle in [0..1]
@@ -114,6 +124,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     private ModelComponent thruster;
     private Matrix4 thrusterTransform;
 
+    private int currentMachine = 0;
+    private MachineDefinition[] machines;
+
     private boolean render;
 
     public Spacecraft() {
@@ -132,7 +145,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         pos.set(1e7 * Constants.KM_TO_U, 0, 1e8 * Constants.KM_TO_U);
         direction = new Vector3d(1, 0, 0);
         up = new Vector3d(0, 1, 0);
-        dirup = new Pair<Vector3d, Vector3d>(direction, up);
+        dirup = new Pair<>(direction, up);
 
         posf = new Vector3();
         directionf = new Vector3(1, 0, 0);
@@ -150,7 +163,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     }
 
     public void initialize() {
+        // Use first model
+        setToMachine(machines[currentMachine], false);
+
+        // Initialize model
         super.initialize();
+
         // Load thruster
         //GaiaSky.instance.manager.load(GlobalConf.data.dataFile("tex/base/thruster.png"), Texture.class);
     }
@@ -198,7 +216,30 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         // Broadcast me
         EventManager.instance.post(Events.SPACECRAFT_LOADED, this);
 
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_THRUST_DECREASE_CMD, Events.SPACECRAFT_THRUST_INCREASE_CMD, Events.SPACECRAFT_THRUST_SET_CMD);
+        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_THRUST_DECREASE_CMD, Events.SPACECRAFT_THRUST_INCREASE_CMD, Events.SPACECRAFT_THRUST_SET_CMD, Events.SPACECRAFT_MACHINE_SELECTION_CMD);
+    }
+
+    /**
+     * Sets this spacecraft to the given machine definition.
+     *
+     * @param machine The machine definition.
+     */
+    private void setToMachine(final MachineDefinition machine, final boolean initialize) {
+        this.mc = machine.getModel();
+        this.enginePower = machine.getPower();
+        this.fullPowerTime = machine.getFullpowertime();
+        this.mass = machine.getMass();
+        this.shadowMapValues = machine.getShadowvalues();
+        this.drag = machine.getDrag();
+        this.responsiveness = MathUtilsd.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
+        this.machineName = machine.getName();
+
+        if (initialize) {
+            // Neither loading nor initialized
+            if (!this.mc.isModelLoading() && !this.mc.isModelInitialised()) {
+                this.mc.initialize();
+            }
+        }
     }
 
     @Override
@@ -223,6 +264,13 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         case SPACECRAFT_THRUST_SET_CMD:
             setThrustFactorIndex((Integer) data[0], false);
             break;
+        case SPACECRAFT_MACHINE_SELECTION_CMD:
+            int newMachineIndex = (Integer) data[0];
+            // Update machine
+            GaiaSky.postRunnable(() -> {
+                this.setToMachine(machines[newMachineIndex], true);
+                this.currentMachine = newMachineIndex;
+            });
         default:
             break;
         }
@@ -278,7 +326,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             force.scl(scale);
         }
 
-        double friction = (GlobalConf.spacecraft.SC_HANDLING_FRICTION * 2e16) * dt;
+        double friction = (drag * 2e16) * dt;
         force.add(aux3d1.get().set(vel).scl(-friction));
 
         if (stopping) {
@@ -343,12 +391,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     public double computeDirectionUp(double dt, Pair<Vector3d, Vector3d> pair) {
         // Yaw, pitch and roll
-        yawf = yawp * GlobalConf.spacecraft.SC_RESPONSIVENESS;
-        pitchf = pitchp * GlobalConf.spacecraft.SC_RESPONSIVENESS;
-        rollf = rollp * GlobalConf.spacecraft.SC_RESPONSIVENESS;
+        yawf = yawp * responsiveness;
+        pitchf = pitchp * responsiveness;
+        rollf = rollp * responsiveness;
 
         // Friction
-        double friction = (GlobalConf.spacecraft.SC_HANDLING_FRICTION * 2e7) * dt;
+        double friction = (drag * 2e7) * dt;
         yawf -= yawv * friction;
         pitchf -= pitchv * friction;
         rollf -= rollv * friction;
@@ -389,7 +437,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         if (yawv != 0 || pitchv != 0 || rollv != 0 || vel.len2() != 0 || render) {
             // We use the simulation time for the integration
-            double dt = Gdx.graphics.getDeltaTime();
+            double dt = Math.min(Gdx.graphics.getDeltaTime(), 0.2);
             // Poll keys
             if (camera.getMode().isSpacecraft())
                 pollKeys(Gdx.graphics.getDeltaTime());
@@ -463,15 +511,10 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     public void stopAllMovement() {
         setEnginePower(0);
-        //vel.set(0, 0, 0);
 
         setYawPower(0);
         setPitchPower(0);
         setRollPower(0);
-
-        //yawv = 0;
-        //pitchv = 0;
-        //rollv = 0;
 
         leveling = false;
         stopping = false;
@@ -611,20 +654,26 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
     }
 
-    /** Model opaque rendering for light glow pass. Do not render shadows **/
+    /** Default model rendering. **/
     public void render(IntModelBatch modelBatch, float alpha, double t, boolean shadowEnv) {
         ICamera cam = GaiaSky.instance.getICamera();
-        if (shadowEnv)
-            prepareShadowEnvironment();
-        mc.touch();
-        mc.setTransparency(alpha * fadeOpacity);
-        if (cam.getMode().isSpacecraft())
-            // In SPACECRAFT_MODE mode, we are not affected by relativistic aberration or Doppler shift
-            mc.updateRelativisticEffects(cam, 0);
-        else
-            mc.updateRelativisticEffects(cam);
-        mc.updateVelocityBufferUniforms(cam);
-        modelBatch.render(mc.instance, mc.env);
+
+        if (mc.isModelInitialised()) {
+            // Good, render
+            if (shadowEnv)
+                prepareShadowEnvironment();
+            mc.setTransparency(alpha * fadeOpacity);
+            if (cam.getMode().isSpacecraft())
+                // In SPACECRAFT_MODE mode, we are not affected by relativistic aberration or Doppler shift
+                mc.updateRelativisticEffects(cam, 0);
+            else
+                mc.updateRelativisticEffects(cam);
+            mc.updateVelocityBufferUniforms(cam);
+            modelBatch.render(mc.instance, mc.env);
+        } else {
+            // Keep loading
+            mc.load(localTransform);
+        }
     }
 
     @Override
@@ -706,4 +755,23 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         return GL20.GL_LINES;
     }
 
+    public double getResponsiveness() {
+        return responsiveness;
+    }
+
+    public double getDrag() {
+        return drag;
+    }
+
+    public MachineDefinition[] getMachines() {
+        return machines;
+    }
+
+    public void setMachines(Object[] machines) {
+        this.machines = Stream.of(machines).toArray(MachineDefinition[]::new);
+    }
+
+    public int getCurrentMachine() {
+        return currentMachine;
+    }
 }

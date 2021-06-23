@@ -122,7 +122,6 @@ public abstract class ModelBody extends CelestialBody {
                         Proximity.NearbyRecord nr = (Proximity.NearbyRecord) lightSource;
                         if (nr.isStar() || nr.isStarGroup()) {
                             float[] col = nr.getColor();
-                            double closestSize = nr.getSize();
                             double closestDist = nr.getClosestDistToCamera();
                             float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
                             mc.directional(i).direction.sub(nr.pos.put(aux3f1.get()));
@@ -204,8 +203,8 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     private void addToRenderModel() {
-            RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
-            addToRender(this, rg);
+        RenderGroup rg = renderTessellated() ? RenderGroup.MODEL_PIX_TESS : RenderGroup.MODEL_PIX;
+        addToRender(this, rg);
     }
 
     public boolean renderTessellated() {
@@ -214,12 +213,14 @@ public abstract class ModelBody extends CelestialBody {
 
     @Override
     public float getInnerRad() {
-        return .2f;
+        return 0.2f;
     }
 
     public void dispose() {
         super.dispose();
-        mc.dispose();
+        if (mc != null) {
+            mc.dispose();
+        }
     }
 
     /**
@@ -261,11 +262,13 @@ public abstract class ModelBody extends CelestialBody {
 
     /** Model opaque rendering. Disable shadow mapping **/
     public void render(IntModelBatch modelBatch, RenderGroup group, float alpha, double t, boolean shadowEnv) {
-        if (shadowEnv)
-            prepareShadowEnvironment();
+        if(mc.isModelInitialised()) {
+            if (shadowEnv)
+                prepareShadowEnvironment();
 
-        mc.update(alpha * fadeOpacity);
-        modelBatch.render(mc.instance, mc.env);
+            mc.update(alpha * fadeOpacity);
+            modelBatch.render(mc.instance, mc.env);
+        }
     }
 
     @Override

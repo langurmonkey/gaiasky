@@ -37,6 +37,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
@@ -47,7 +48,6 @@ import gaiasky.util.gdx.IntModelBuilder;
 import gaiasky.util.gdx.g3d.decals.CameraGroupStrategy;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.*;
 
@@ -59,11 +59,12 @@ public class SpacecraftGui extends AbstractGui {
     private VerticalGroup thrustGroup;
     private Table main, motionGroup, nearestGroup, controlsGroup;
     private OwnImageButton stabilise, stop, exit, enginePlus, engineMinus;
-    private Slider enginePower, drag, responsiveness;
+    private Slider enginePower;
     private Slider thrustv, thrusty, thrustp, thrustr;
     private Slider thrustvm, thrustym, thrustpm, thrustrm;
     private OwnLabel mainvel, yawvel, pitchvel, rollvel, closestname, closestdist, thrustfactor;
     private CheckBox velToDir;
+    private SelectBox<MachineDefinition> machineSelector;
 
     // The spacecraft object
     private Spacecraft sc;
@@ -309,28 +310,20 @@ public class SpacecraftGui extends AbstractGui {
         controlsGroup = new Table(skin);
         controlsGroup.align(Align.topLeft);
 
-        responsiveness = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
-        responsiveness.setName("sc responsiveness");
-        responsiveness.setValue(MathUtilsd.lint(GlobalConf.spacecraft.SC_RESPONSIVENESS, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER));
-        responsiveness.addListener(event -> {
+        // Spaceship selector
+        machineSelector = new OwnSelectBox<>(skin);
+        machineSelector.setItems(sc.getMachines());
+        machineSelector.setSelected(sc.getMachines()[sc.getCurrentMachine()]);
+        machineSelector.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                GlobalConf.spacecraft.SC_RESPONSIVENESS = MathUtilsd.lint(responsiveness.getValue(), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
+                int machineIndex = machineSelector.getSelectedIndex();
+                EventManager.instance.post(Events.SPACECRAFT_MACHINE_SELECTION_CMD, machineIndex);
                 return true;
             }
             return false;
         });
 
-        drag = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER, 1, skin);
-        drag.setName("sc drag");
-        drag.setValue(GlobalConf.spacecraft.SC_HANDLING_FRICTION * Constants.MAX_SLIDER);
-        drag.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                GlobalConf.spacecraft.SC_HANDLING_FRICTION = drag.getValue() / Constants.MAX_SLIDER;
-                return true;
-            }
-            return false;
-        });
-
+        // Whether to keep the velocity pointing in the direction vector
         velToDir = new OwnCheckBox(I18n.txt("gui.sc.veltodir"), skin, 16f);
         velToDir.setName("sc veltodir");
         velToDir.setChecked(GlobalConf.spacecraft.SC_VEL_TO_DIRECTION);
@@ -341,11 +334,9 @@ public class SpacecraftGui extends AbstractGui {
             return false;
         });
 
-        controlsGroup.add(new OwnLabel(I18n.txt("gui.sc.responsiveness"), skin, "sc-header")).left().padRight(16f).padBottom(8f);
-        controlsGroup.add(responsiveness).left().padBottom(8f).row();
-        controlsGroup.add(new OwnLabel(I18n.txt("gui.sc.drag"), skin, "sc-header")).left().padRight(16f).padBottom(8f);
-        controlsGroup.add(drag).left().padBottom(8f).row();
-        controlsGroup.add(velToDir).left().colspan(2).row();
+        controlsGroup.add(new OwnLabel(I18n.txt("gui.sc.spaceship"), skin, "sc-header")).left().padRight(16f).padBottom(8f);
+        controlsGroup.add(machineSelector).left().padBottom(8f).row();
+        controlsGroup.add(velToDir).left().colspan(2);
         controlsGroup.pack();
 
         // INFORMATION
@@ -388,7 +379,6 @@ public class SpacecraftGui extends AbstractGui {
         roll.setWidth(labelWidth);
         rvg.addActor(roll);
         rvg.addActor(rollvel);
-
 
         motionGroup = new Table(skin);
         motionGroup.align(Align.topLeft);
@@ -497,7 +487,7 @@ public class SpacecraftGui extends AbstractGui {
         main = new Table(skin);
         main.setBackground("table-bg");
         main.setWidth(410f);
-        main.setHeight(580f);
+        main.setHeight(560f);
         main.setFillParent(false);
         main.bottom().left();
         main.pad(0, 20, 20, 0);
@@ -617,69 +607,68 @@ public class SpacecraftGui extends AbstractGui {
         rebuildGui();
     }
 
-
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case SPACECRAFT_LOADED:
-                this.sc = (Spacecraft) data[0];
-                this.qf = sc.getRotationQuaternion();
-                this.vel = sc.vel;
-                break;
-            case SPACECRAFT_STABILISE_CMD:
-                Boolean state = (Boolean) data[0];
-                stabilise.setChecked(state);
-                break;
-            case SPACECRAFT_STOP_CMD:
-                state = (Boolean) data[0];
-                stop.setChecked(state);
-                break;
-            case SPACECRAFT_INFO:
-                double y = -(Double) data[0];
-                double p = -(Double) data[1];
-                double r = (Double) data[2];
-                double v = (Double) data[3];
-                double thf = (Double) data[4];
-                double epow = (Double) data[5];
-                double ypow = (Double) data[6];
-                double ppow = (Double) data[7];
-                double rpow = (Double) data[8];
+        case SPACECRAFT_LOADED:
+            this.sc = (Spacecraft) data[0];
+            this.qf = sc.getRotationQuaternion();
+            this.vel = sc.vel;
+            break;
+        case SPACECRAFT_STABILISE_CMD:
+            Boolean state = (Boolean) data[0];
+            stabilise.setChecked(state);
+            break;
+        case SPACECRAFT_STOP_CMD:
+            state = (Boolean) data[0];
+            stop.setChecked(state);
+            break;
+        case SPACECRAFT_INFO:
+            double y = -(Double) data[0];
+            double p = -(Double) data[1];
+            double r = (Double) data[2];
+            double v = (Double) data[3];
+            double thf = (Double) data[4];
+            double epow = (Double) data[5];
+            double ypow = (Double) data[6];
+            double ppow = (Double) data[7];
+            double rpow = (Double) data[8];
 
-                yawvel.setText(nf.format(y) + "°");
-                pitchvel.setText(nf.format(p) + "°");
-                rollvel.setText(nf.format(r) + "°");
+            yawvel.setText(nf.format(y) + "°");
+            pitchvel.setText(nf.format(p) + "°");
+            rollvel.setText(nf.format(r) + "°");
 
-                Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v);
-                mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
+            Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v);
+            mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
 
-                thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
+            thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
 
-                setPowerValuesSlider(thrustv, thrustvm, epow);
-                setPowerValuesSlider(thrusty, thrustym, ypow);
-                setPowerValuesSlider(thrustp, thrustpm, ppow);
-                setPowerValuesSlider(thrustr, thrustrm, rpow);
+            setPowerValuesSlider(thrustv, thrustvm, epow);
+            setPowerValuesSlider(thrusty, thrustym, ypow);
+            setPowerValuesSlider(thrustp, thrustpm, ppow);
+            setPowerValuesSlider(thrustr, thrustrm, rpow);
 
-                break;
-            case SPACECRAFT_NEAREST_INFO:
-                if (data[0] != null) {
-                    closestname.setText((String) data[0]);
-                    Pair<Double, String> cldist = GlobalResources.doubleToDistanceString((Double) data[1]);
-                    closestdist.setText(sf.format(cldist.getFirst()) + " " + cldist.getSecond());
-                } else {
-                    closestname.setText("");
-                    closestdist.setText("");
-                }
+            break;
+        case SPACECRAFT_NEAREST_INFO:
+            if (data[0] != null) {
+                closestname.setText((String) data[0]);
+                Pair<Double, String> cldist = GlobalResources.doubleToDistanceString((Double) data[1]);
+                closestdist.setText(sf.format(cldist.getFirst()) + " " + cldist.getSecond());
+            } else {
+                closestname.setText("");
+                closestdist.setText("");
+            }
 
-                break;
-            case SPACECRAFT_THRUST_INFO:
-                thrustEvents = false;
+            break;
+        case SPACECRAFT_THRUST_INFO:
+            thrustEvents = false;
 
-                enginePower.setValue((Integer) data[0]);
+            enginePower.setValue((Integer) data[0]);
 
-                thrustEvents = true;
-                break;
-            default:
-                break;
+            thrustEvents = true;
+            break;
+        default:
+            break;
         }
 
     }

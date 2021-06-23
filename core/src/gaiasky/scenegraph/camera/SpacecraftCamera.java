@@ -224,7 +224,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             aux1b.set(scup).nor().scl(tDistOverFov * 0.125d);
             desired.add(aux1b);
             todesired.set(desired).sub(relpos);
-            todesired.scl(dt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(3e-6d);
+            todesired.scl(dt * sc.getResponsiveness()).scl(3e-6d);
             relpos.add(todesired);
             pos.set(scpos).add(relpos);
 
@@ -237,7 +237,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
             // UP
             desired.set(scup);
             todesired.set(desired).sub(up);
-            todesired.scl(dt * GlobalConf.spacecraft.SC_RESPONSIVENESS).scl(1e-8d);
+            todesired.scl(dt * sc.getResponsiveness()).scl(1e-8d);
             up.add(todesired).nor();
         }
     }

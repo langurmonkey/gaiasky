@@ -668,8 +668,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     /**
      * Adds all the children that are focusable objects to the list.
-     *
-     * @param list
      */
     public void addFocusableObjects(Array<IFocus> list) {
         if (children != null) {

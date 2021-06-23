@@ -32,6 +32,7 @@ import gaiasky.util.gdx.shader.FloatExtAttribute;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class ModelComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -106,7 +107,7 @@ public class ModelComponent implements Disposable, IObserver {
             env = new Environment();
             env.set(ambient);
             // Directional lights
-            for(int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
+            for (int i = 0; i < Constants.N_DIR_LIGHTS; i++) {
                 DirectionalLight dLight = new DirectionalLight();
                 dLight.color.set(0f, 0f, 0f, 1f);
                 env.add(dLight);
@@ -116,6 +117,7 @@ public class ModelComponent implements Disposable, IObserver {
 
     /**
      * Returns the given directional light
+     *
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
      * @return The directional light with index i
      */
@@ -126,11 +128,11 @@ public class ModelComponent implements Disposable, IObserver {
     /**
      * Turns off all directional lights
      */
-    public void clearDirectionals(){
-       Array<DirectionalLight> lights = ((DirectionalLightsAttribute) env.get(DirectionalLightsAttribute.Type)).lights;
-       for(DirectionalLight light: lights){
-           light.color.set(0f, 0f, 0f, 1f);
-       }
+    public void clearDirectionals() {
+        Array<DirectionalLight> lights = ((DirectionalLightsAttribute) env.get(DirectionalLightsAttribute.Type)).lights;
+        for (DirectionalLight light : lights) {
+            light.color.set(0f, 0f, 0f, 1f);
+        }
     }
 
     public void initialize() {
@@ -180,14 +182,12 @@ public class ModelComponent implements Disposable, IObserver {
             updateStaticLight = GlobalConf.scene.LAZY_TEXTURE_INIT;
         }
 
+        // CREATE MAIN MODEL INSTANCE
         if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
             Pair<IntModel, Map<String, Material>> modmat = initModelFile();
             model = modmat.getFirst();
-        }
-
-        // CREATE MAIN MODEL INSTANCE
-        if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
             instance = new IntModelInstance(model, localTransform);
+            this.modelInitialised = true;
         }
 
         // INITIALIZE MATERIAL
@@ -204,8 +204,8 @@ public class ModelComponent implements Disposable, IObserver {
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
 
-        modelInitialised = !GlobalConf.scene.LAZY_MESH_INIT;
-        modelLoading = false;
+        this.modelInitialised = this.modelInitialised || !GlobalConf.scene.LAZY_MESH_INIT;
+        this.modelLoading = false;
     }
 
     private Pair<IntModel, Map<String, Material>> initModelFile() {
@@ -249,6 +249,16 @@ public class ModelComponent implements Disposable, IObserver {
             materials.get("base").clear();
 
         return new Pair<>(model, materials);
+    }
+
+    public void load(Matrix4 localTransform) {
+        AssetManager mgr = AssetBean.manager();
+        mgr.update();
+        if (mgr.isLoaded(GlobalConf.data.dataFile(modelFile))) {
+            this.doneLoading(mgr, localTransform, null);
+            this.modelLoading = false;
+            this.modelInitialised = true;
+        }
     }
 
     public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
@@ -318,8 +328,8 @@ public class ModelComponent implements Disposable, IObserver {
                     addColorToMat();
                 }
 
-                modelInitialised = true;
-                modelLoading = false;
+                this.modelInitialised = true;
+                this.modelLoading = false;
             }
         }
     }
@@ -559,27 +569,30 @@ public class ModelComponent implements Disposable, IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case GRAPHICS_QUALITY_UPDATED:
-                GaiaSky.postRunnable(() -> {
-                    if (mtc != null && mtc.texInitialised) {
-                        // Remove current textures
-                        if (mtc != null)
-                            mtc.disposeTextures(this.manager);
-                    }
-                });
-                break;
-            default:
-                break;
+        case GRAPHICS_QUALITY_UPDATED:
+            GaiaSky.postRunnable(() -> {
+                if (mtc != null && mtc.texInitialised) {
+                    // Remove current textures
+                    if (mtc != null)
+                        mtc.disposeTextures(this.manager);
+                }
+            });
+            break;
+        default:
+            break;
         }
     }
 
+    public boolean isModelInitialised() {
+        return modelInitialised;
+    }
+
+    public boolean isModelLoading() {
+        return modelLoading;
+    }
+
     public String toString() {
-        String desc;
-        if (modelFile != null)
-            desc = modelFile;
-        else
-            desc = "{" + type + ", params: " + params.toString() + "}";
-        return desc;
+        return Objects.requireNonNullElseGet(modelFile, () -> "{" + type + ", params: " + params.toString() + "}");
     }
 
 }

@@ -402,12 +402,10 @@ public class DesktopConfInit extends ConfInit {
 
         // SPACECRAFT CONF
         SpacecraftConf spacecraftConf = new SpacecraftConf();
-        float sC_RESPONSIVENESS = MathUtilsd.lint(Parser.parseFloat(p.getProperty("spacecraft.responsiveness", "0.1")), 0, 1, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         boolean sC_VEL_TO_DIRECTION = Parser.parseBoolean(p.getProperty("spacecraft.velocity.direction", "false"));
-        float sC_HANDLING_FRICTION = Parser.parseFloat(p.getProperty("spacecraft.handling.friction", "0.37"));
         boolean sC_SHOW_AXES = Parser.parseBoolean(p.getProperty("spacecraft.show.axes", "false"));
 
-        spacecraftConf.initialize(sC_RESPONSIVENESS, sC_VEL_TO_DIRECTION, sC_HANDLING_FRICTION, sC_SHOW_AXES);
+        spacecraftConf.initialize(sC_VEL_TO_DIRECTION, sC_SHOW_AXES);
 
         // INIT GLOBAL CONF
         GlobalConf.initialize(versionConf, programConf, sceneConf, dataConf, runtimeConf, postprocessConf, performanceConf, frameConf, screenConf, screenshotConf, controlsConf, spacecraftConf);
@@ -605,9 +603,7 @@ public class DesktopConfInit extends ConfInit {
             p.setProperty("controls.blacklist", GlobalResources.toWhitespaceSeparatedList(GlobalConf.controls.CONTROLLER_BLACKLIST));
 
         // SPACECRAFT
-        p.setProperty("spacecraft.responsiveness", Float.toString(MathUtilsd.lint(GlobalConf.spacecraft.SC_RESPONSIVENESS, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS, 0, 1)));
         p.setProperty("spacecraft.velocity.direction", Boolean.toString(GlobalConf.spacecraft.SC_VEL_TO_DIRECTION));
-        p.setProperty("spacecraft.handling.friction", Float.toString(GlobalConf.spacecraft.SC_HANDLING_FRICTION));
         p.setProperty("spacecraft.show.axes", Boolean.toString(GlobalConf.spacecraft.SC_SHOW_AXES));
 
         try {

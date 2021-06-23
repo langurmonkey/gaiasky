@@ -1277,15 +1277,11 @@ public class GlobalConf {
     }
 
     public static class SpacecraftConf implements IConf {
-        public float SC_RESPONSIVENESS;
         public boolean SC_VEL_TO_DIRECTION;
-        public float SC_HANDLING_FRICTION;
         public boolean SC_SHOW_AXES;
 
-        public void initialize(float sC_RESPONSIVENESS, boolean sC_VEL_TO_DIRECTION, float sC_HANDLING_FRICTION, boolean sC_SHOW_AXES) {
-            this.SC_RESPONSIVENESS = sC_RESPONSIVENESS;
+        public void initialize(boolean sC_VEL_TO_DIRECTION, boolean sC_SHOW_AXES) {
             this.SC_VEL_TO_DIRECTION = sC_VEL_TO_DIRECTION;
-            this.SC_HANDLING_FRICTION = sC_HANDLING_FRICTION;
             this.SC_SHOW_AXES = sC_SHOW_AXES;
         }
     }

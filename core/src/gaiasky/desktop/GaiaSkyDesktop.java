@@ -53,7 +53,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * Main class for the desktop launcher
+ * Main class for the desktop launcher.
  */
 public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);
@@ -68,7 +68,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static int SOURCE_VERSION = 30101;
+    public static int SOURCE_VERSION = 30104;
     private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
