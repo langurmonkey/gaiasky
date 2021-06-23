@@ -62,9 +62,7 @@ import java.util.TreeMap;
  */
 public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFocus, IQuadRenderable, IModelRenderable, IObserver {
 
-    /**
-     * Star model
-     **/
+    // Star model
     private static ModelComponent mc;
     // Model transform
     private static Matrix4 modelTransform;

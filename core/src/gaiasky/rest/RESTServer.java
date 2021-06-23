@@ -6,8 +6,7 @@
 package gaiasky.rest;
 
 import com.badlogic.gdx.utils.Array;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.badlogic.gdx.utils.Json;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.util.GlobalConf;
@@ -20,7 +19,7 @@ import java.util.*;
 
 import static spark.Spark.*;
 
-/**
+/*
  * REST API for remote procedure calls
  *
  * @author Volker Gaibler, HITS
@@ -168,8 +167,8 @@ public class RESTServer {
         // response.header("FOO", "bar");
 
         /* request body */
-        Gson gson = new GsonBuilder().serializeNulls().create();
-        responseString = gson.toJson(ret);
+        Json json = new Json();
+        responseString = json.toJson(ret);
         logger.debug("HTTP response body: {}.", responseString);
         return responseString;
     }

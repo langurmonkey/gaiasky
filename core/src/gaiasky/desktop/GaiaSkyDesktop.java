@@ -569,7 +569,6 @@ public class GaiaSkyDesktop implements IObserver {
      */
     private static boolean checkRestDepsInClasspath() {
         try {
-            Class.forName("com.google.gson.Gson");
             Class.forName("spark.Spark");
             Class.forName("gaiasky.rest.RESTServer");
             return true;

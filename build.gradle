@@ -155,7 +155,6 @@ project(":core") {
         // ****************
         api "org.slf4j:slf4j-nop:$slf4jVersion"
         api "com.sparkjava:spark-core:$sparkjavaVersion"
-        api "com.google.code.gson:gson:$gsonVersion"
 
         // *************
         // INTERNAL DEPS

@@ -544,7 +544,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             super.update(time, parentTransform, camera, opacity);
 
             if (focusIndex >= 0) {
-                updateFocus(time, camera);
+                updateFocus(camera);
             }
         }
     }
@@ -557,10 +557,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Updates the parameters of the focus, if the focus is active in this group
      *
-     * @param time   The time frame provider
      * @param camera The current camera
      */
-    public void updateFocus(ITimeFrameProvider time, ICamera camera) {
+    public void updateFocus(ICamera camera) {
         Vector3d aux = aux3d1.get().set(this.focusPosition);
         this.focusDistToCamera = aux.sub(camera.getPos()).len();
         this.focusSize = getFocusSize();
@@ -1039,8 +1038,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         } else {
             focus = pointData.get(focusIndex);
             focusPosition.set(focus.x(), focus.y(), focus.z());
-            Vector3d possph = Coordinates.cartesianToSpherical(focusPosition, aux3d1.get());
-            focusPositionSph.set((float) (MathUtilsd.radDeg * possph.x), (float) (MathUtilsd.radDeg * possph.y));
+            Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, aux3d1.get());
+            focusPositionSph.set((float) (MathUtilsd.radDeg * posSph.x), (float) (MathUtilsd.radDeg * posSph.y));
+            updateFocus(GaiaSky.instance.getICamera());
         }
     }
 
