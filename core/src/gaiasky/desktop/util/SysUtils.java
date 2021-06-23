@@ -7,7 +7,6 @@ package gaiasky.desktop.util;
 
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -47,10 +46,6 @@ public class SysUtils {
         } catch (IOException e) {
             logger.error(e);
         }
-    }
-
-    public static void rmdir(Path dir) {
-        FileUtils.deleteQuietly(dir.toFile());
     }
 
     private static final String OS;

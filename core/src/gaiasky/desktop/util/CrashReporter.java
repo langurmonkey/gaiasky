@@ -22,16 +22,22 @@ import gaiasky.util.MemInfo;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
+import oshi.software.os.OperatingSystem;
+import oshi.util.FormatUtil;
 
 import java.io.*;
 import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Creates a report whenever Gaia Sky crashes and saves it to disk.
+ */
 public class CrashReporter {
 
     public static void reportCrash(Throwable t, Log logger) {
@@ -68,8 +74,7 @@ public class CrashReporter {
         Path logFile = writeLog(logger, crashDir, dateString);
 
         // Output crash info
-        for (String str : crashInfo)
-            print(logger, str);
+        crashInfo.forEach(str -> print(logger, str));
 
         // CRASH FILE
         Path crashReportFile = writeCrash(logger, crashDir, dateString, crashInfo);
@@ -114,8 +119,11 @@ public class CrashReporter {
         } finally {
             try {
                 // Close the writer regardless of what happens...
-                writer.close();
+                if (writer != null)
+                    writer.close();
             } catch (Exception e) {
+                if (logger != null)
+                    logger.error("Closing writer crashed (inception level 2 achieved!)", e);
             }
         }
         return logFile;
@@ -123,26 +131,35 @@ public class CrashReporter {
 
     private static Path writeCrash(Log logger, Path crashDir, String dateString, Array<String> crashInfo) {
         Path crashReportFile = crashDir.resolve("gaiasky_crash_" + dateString + ".txt");
-        BufferedWriter writer = null;
+        final BufferedWriter writer;
         try {
             writer = new BufferedWriter(new FileWriter(crashReportFile.toFile()));
-            for (String str : crashInfo) {
-                writer.write(str);
-                writer.newLine();
-            }
-        } catch (Exception e) {
-            if (logger != null) {
-                logger.error("Writing crash report crashed... Inception level 1 achieved! :_D", e);
-            } else {
-                System.err.println("Writing crash report crashed... Inception level 1 achieved! :_D");
-                e.printStackTrace(System.err);
-            }
-        } finally {
+            crashInfo.forEach(str -> {
+                try {
+                    writer.write(str);
+                    writer.newLine();
+                } catch (Exception e) {
+                    if (logger != null) {
+                        logger.error("Writing crash report crashed (inception level 1 achieved!)", e);
+                    } else {
+                        System.err.println("Writing crash report crashed (inception level 1 achieved!)");
+                        e.printStackTrace(System.err);
+                    }
+                }
+            });
             try {
                 // Close the writer regardless of what happens...
                 writer.close();
             } catch (Exception e) {
-
+                if (logger != null)
+                    logger.error("Closing writer crashed (inception level 2 achieved!)", e);
+            }
+        } catch (Exception e) {
+            if (logger != null) {
+                logger.error("Creating crash writer crashed (inception level 1 achieved!)", e);
+            } else {
+                System.err.println("Creating crash writer crashed (inception level 1 achieved!)");
+                e.printStackTrace(System.err);
             }
         }
         return crashReportFile;
@@ -184,13 +201,18 @@ public class CrashReporter {
             SystemInfo si = new SystemInfo();
             HardwareAbstractionLayer hal = si.getHardware();
             CentralProcessor cp = hal.getProcessor();
-            strArray.add("CPU: " + cp.getName());
-            strArray.add("CPU arch: " + (cp.isCpu64bit() ? "64-bit" : "32-bit"));
+            strArray.add("CPU: " + cp.getProcessorIdentifier().getName());
+            strArray.add(cp.getProcessorIdentifier().getIdentifier());
+            strArray.add("Proc ID: " + cp.getProcessorIdentifier().getProcessorID());
+            strArray.add("CPU Family: " + cp.getProcessorIdentifier().getFamily());
+            strArray.add(cp.getPhysicalPackageCount() + " physical CPU package(s)");
+            strArray.add(cp.getPhysicalProcessorCount() + " physical CPU core(s)");
+            int nLp = cp.getLogicalProcessorCount();
+            strArray.add(nLp + " logical CPU(s)");
         } catch (Error e) {
             strArray.add("Could not get CPU information!");
         }
 
-        strArray.add("Available processors (cores): " + Runtime.getRuntime().availableProcessors());
         String mbUnits = " " + I18n.txt("gui.debug.ram.unit");
         strArray.add("Java used memory: " + MemInfo.getUsedMemory() + mbUnits);
         strArray.add("Java free memory: " + MemInfo.getFreeMemory() + mbUnits);
@@ -201,7 +223,7 @@ public class CrashReporter {
         File[] roots = File.listRoots();
         for (File root : roots) {
             strArray.add(" # File system root: " + root.getAbsolutePath());
-            strArray.add("   Total space: " + (root.getTotalSpace() * Constants.BYTE_TO_MB) + mbUnits );
+            strArray.add("   Total space: " + (root.getTotalSpace() * Constants.BYTE_TO_MB) + mbUnits);
             strArray.add("   Free space: " + (root.getFreeSpace() * Constants.BYTE_TO_MB) + mbUnits);
             strArray.add("   Usable space: " + (root.getUsableSpace() * Constants.BYTE_TO_MB) + mbUnits);
         }
@@ -209,9 +231,19 @@ public class CrashReporter {
         /* OS info */
         strArray.add("");
         strArray.add("## OS INFORMATION");
-        strArray.add("OS name: " + System.getProperty("os.name"));
-        strArray.add("OS version: " + System.getProperty("os.version"));
-        strArray.add("OS architecture: " + System.getProperty("os.arch"));
+        try {
+            SystemInfo si = new SystemInfo();
+            OperatingSystem os = si.getOperatingSystem();
+            strArray.add("OS name: " + os.toString());
+            strArray.add("OS version: " + System.getProperty("os.version"));
+            strArray.add("OS architecture: " + System.getProperty("os.arch"));
+            strArray.add("Booted: " + Instant.ofEpochSecond(os.getSystemBootTime()));
+            strArray.add("Uptime: " + FormatUtil.formatElapsedSecs(si.getOperatingSystem().getSystemUptime()));
+        } catch (Exception e) {
+            strArray.add("OS name: " + System.getProperty("os.name"));
+            strArray.add("OS version: " + System.getProperty("os.version"));
+            strArray.add("OS architecture: " + System.getProperty("os.arch"));
+        }
 
         try {
             /* GL info */

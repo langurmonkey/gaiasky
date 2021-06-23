@@ -5,13 +5,13 @@
 
 package gaiasky.util.coord;
 
-import cds.healpix.common.math.FastMath;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.Constants;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
+import net.jafama.FastMath;
 import org.apfloat.Apfloat;
 import org.apfloat.ApfloatMath;
 

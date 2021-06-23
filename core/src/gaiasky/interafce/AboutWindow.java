@@ -315,7 +315,14 @@ public class AboutWindow extends GenericDialog {
         Label sysinfo = new OwnLabel(I18n.txt("gui.help.sysinfo"), skin, "header");
 
         Label sysostitle = new OwnLabel(I18n.txt("gui.help.os"), skin);
-        Label sysos = new OwnLabel(System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), skin);
+        Label sysos;
+
+        try {
+            SystemInfo si = new SystemInfo();
+            sysos = new OwnLabel(si.getOperatingSystem().toString() + "\n" + "Arch: " + System.getProperty("os.arch"), skin);
+        } catch (Error e) {
+            sysos = new OwnLabel(System.getProperty("os.name") + " " + System.getProperty("os.version") + " " + System.getProperty("os.arch"), skin);
+        }
 
         Label glrenderertitle = new OwnLabel(I18n.txt("gui.help.graphicsdevice"), skin);
         Label glrenderer = new OwnLabel(Gdx.gl.glGetString(GL20.GL_RENDERER), skin);
@@ -426,17 +433,10 @@ public class AboutWindow extends GenericDialog {
             CentralProcessor cp = hal.getProcessor();
 
             Label cputitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
-            Label cpu = new OwnLabel(cp.getName(), skin);
-
-            Label cpuarchtitle = new OwnLabel(I18n.txt("gui.help.cpuarch"), skin);
-            Label cpuarch = new OwnLabel(cp.isCpu64bit() ? "64-bit" : "32-bit", skin);
+            Label cpu = new OwnLabel(cp.toString(), skin);
 
             contentSystem.add(cputitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
             contentSystem.add(cpu).align(Align.left).padTop(pad5);
-            contentSystem.row();
-
-            contentSystem.add(cpuarchtitle).align(Align.topLeft).padRight(pad10).padTop(pad5).padBottom(pad5);
-            contentSystem.add(cpuarch).align(Align.left).padTop(pad5).padBottom(pad5);
             contentSystem.row();
         } catch (Error e) {
             contentSystem.add(new OwnLabel(I18n.txt("gui.help.cpu.no"), skin)).colspan(2).align(Align.left).padTop(pad10).padBottom(pad10).row();
