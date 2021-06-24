@@ -33,7 +33,6 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
-import gaiasky.render.system.ModelBatchRenderSystem.ModelRenderType;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.StubModel;
@@ -1388,8 +1387,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private void buildShadowMapData() {
         if (shadowMapFb != null) {
             for (FrameBuffer[] frameBufferArray : shadowMapFb)
-                for (FrameBuffer fb : frameBufferArray)
-                    fb.dispose();
+                for (FrameBuffer fb : frameBufferArray) {
+                    if (fb != null)
+                        fb.dispose();
+                }
             shadowMapFb = null;
         }
         shadowMapCombined = null;

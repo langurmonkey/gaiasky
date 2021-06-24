@@ -1062,9 +1062,15 @@ public enum Events {
     SPACECRAFT_THRUST_SET_CMD,
 
     /**
+     * Use new machine.
      * Contains the integer index of the new machine.
      */
     SPACECRAFT_MACHINE_SELECTION_CMD,
+
+    /**
+     * Informs a new machine is in place. Contains the machine.
+     */
+    SPACECRAFT_MACHINE_SELECTION_INFO,
 
     /**
      * Contains the speed limit index as in:

@@ -9,6 +9,9 @@ public class MachineDefinition {
 
     /** The name of the spacecraft **/
     private String name;
+
+    /** Rough size of the bounding box of the spacecraft in Km **/
+    private double size;
     /** Mass in Kg **/
     private double mass;
     /** Power multiplier factor **/
@@ -24,33 +27,10 @@ public class MachineDefinition {
     /** Drag in [0,1] **/
     private double drag;
 
-    public double getResponsiveness() {
-        return responsiveness;
-    }
-
-    public void setResponsiveness(Double responsiveness) {
-        this.responsiveness = responsiveness;
-    }
-
-    public double getDrag() {
-        return drag;
-    }
-
-    public double getPower() {
-        return power;
-    }
-
-    public void setPower(Double power) {
-        this.power = power;
-    }
-
-    public void setDrag(Double drag) {
-        this.drag = drag;
-    }
 
     public MachineDefinition(){
-
     }
+
 
     public String getName() {
         return name;
@@ -58,6 +38,14 @@ public class MachineDefinition {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public double getSize() {
+        return size;
+    }
+
+    public void setSize(Double size) {
+        this.size = size;
     }
 
     public double getMass() {
@@ -74,6 +62,30 @@ public class MachineDefinition {
 
     public void setFullpowertime(Double fullpowertime) {
         this.fullpowertime = fullpowertime;
+    }
+
+    public double getResponsiveness() {
+        return responsiveness;
+    }
+
+    public void setResponsiveness(Double responsiveness) {
+        this.responsiveness = responsiveness;
+    }
+
+    public double getPower() {
+        return power;
+    }
+
+    public void setPower(Double power) {
+        this.power = power;
+    }
+
+    public double getDrag() {
+        return drag;
+    }
+
+    public void setDrag(Double drag) {
+        this.drag = drag;
     }
 
     public ModelComponent getModel() {

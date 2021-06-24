@@ -153,7 +153,7 @@ public abstract class Satellite extends ModelBody {
 
     @Override
     public void setSize(Long size) {
-        super.setSize(size * (GlobalConf.runtime.OPENVR ? 4000l : 1l));
+        super.setSize(size * (GlobalConf.runtime.OPENVR ? 4000L : 1L));
     }
 
     @Override

@@ -54,6 +54,7 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeSet;
+import java.util.stream.IntStream;
 
 /**
  * The default preferences window.
@@ -505,7 +506,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // N SHADOWS
         OwnLabel nShadowsLabel = new OwnLabel("#" + I18n.txt("gui.graphics.shadows"), skin);
         nShadowsLabel.setDisabled(!GlobalConf.scene.SHADOW_MAPPING);
-        ComboBoxBean[] nsh = new ComboBoxBean[] { new ComboBoxBean("1", 1), new ComboBoxBean("2", 2), new ComboBoxBean("3", 3), new ComboBoxBean("4", 4) };
+
+        int nSh = 10;
+        ComboBoxBean[] nsh = new ComboBoxBean[nSh];
+        IntStream.rangeClosed(1, nSh).forEach(s -> nsh[s - 1] = new ComboBoxBean(String.valueOf(s), s));
+
         nshadows = new OwnSelectBox<>(skin);
         nshadows.setItems(nsh);
         nshadows.setWidth(textwidth * 3f);
@@ -1106,7 +1111,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.screenshots.directory.choose"), skin, stage, Paths.get(GlobalConf.screenshot.SCREENSHOT_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -1209,7 +1214,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.frameoutput.directory.choose"), skin, stage, Paths.get(GlobalConf.frame.RENDER_FOLDER), FileChooser.FileChooserTarget.DIRECTORIES);
                 fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         // do stuff with result
@@ -1954,7 +1959,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // UI scale
         float factor = uiScale.getMappedValue();
         EventManager.instance.post(Events.UI_SCALE_CMD, factor);
-
 
         boolean reloadUI = !GlobalConf.program.UI_THEME.equals(newTheme) || !lbean.locale.toLanguageTag().equals(GlobalConf.program.LOCALE) || GlobalConf.program.MINIMAP_SIZE != minimapSize.getValue();
         GlobalConf.program.LOCALE = lbean.locale.toLanguageTag();

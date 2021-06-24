@@ -121,7 +121,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         inputController = new SpacecraftInputController(new GestureAdapter());
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SPACECRAFT_LOADED);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SPACECRAFT_LOADED, Events.SPACECRAFT_MACHINE_SELECTION_INFO);
     }
 
     @Override
@@ -176,7 +176,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         scaccel.set(sc.accel);
         scvel.set(sc.vel);
         scpos.set(sc.pos);
-        scpos = sc.computePosition(sdt, secondClosest, sc.enginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
+        scpos = sc.computePosition(sdt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
         scdir.set(sc.direction);
         scup.set(sc.up);
         sc.computeDirectionUp(sdt, dirup);
@@ -319,12 +319,18 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         switch (event) {
         case SPACECRAFT_LOADED:
             this.sc = (Spacecraft) data[0];
-            this.targetDistance = sc.size * 3.5;
+            updateTargetDistance();
+            break;
+        case SPACECRAFT_MACHINE_SELECTION_INFO:
+            updateTargetDistance();
             break;
         default:
             break;
         }
+    }
 
+    private void updateTargetDistance(){
+        this.targetDistance = sc.size * 3.5;
     }
 
     @Override
@@ -333,8 +339,6 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
     /**
      * Input inputListener for the spacecraft camera
-     *
-     
      */
     private class SpacecraftInputController extends GestureDetector {
 
@@ -349,12 +353,12 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                 switch (keycode) {
                 case Keys.W:
                     // power 1
-                    sc.setEnginePower(sc.enginePower + step);
+                    sc.setCurrentEnginePower(sc.currentEnginePower + step);
                     EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
                     break;
                 case Keys.S:
                     // power -1
-                    sc.setEnginePower(sc.enginePower - step);
+                    sc.setCurrentEnginePower(sc.currentEnginePower - step);
                     EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
                     break;
                 case Keys.A:
@@ -402,7 +406,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                 case Keys.W:
                 case Keys.S:
                     // power 0
-                    sc.setEnginePower(0);
+                    sc.setCurrentEnginePower(0);
                     break;
                 case Keys.D:
                 case Keys.A:

@@ -106,7 +106,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "370c41bbd0cf4b2a1d846a46e385658fad9ed68b23547ca7f41770fe9bca065e",
+      "sha256": "46485b422a6c4bb3c55c1b3028b7cf8a6832f6964d3fbd3991f14ddc01a2cfca",
       "description": "Base data pack - Required, for Gaia Sky 3.1.4 and above. Contains the Solar System, constellations, the Milky Way, and more",
       "releasenotes": "Add multiple spaceships for spacecraft mode",
       "link": "@mirror-url@basedata",

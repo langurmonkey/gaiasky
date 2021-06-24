@@ -48,8 +48,6 @@ import java.util.stream.Stream;
 public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IObserver {
     private static final Log logger = Logger.getLogger(Spacecraft.class);
 
-    /** This is the power **/
-    public static final double thrustLength = 1e12d;
 
     /** Max speed in relativistic mode **/
     private static final double relativisticSpeedCap = Constants.C_US * 0.99999;
@@ -81,15 +79,20 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
     /** Float counterparts **/
     public Vector3 posf, directionf, upf;
+    /** Instantaneous engine power, do not set manually **/
+    public double currentEnginePower;
+
 
     /** Engine thrust vector **/
     public Vector3d thrust;
 
+    private static final double thrustBase = 1e12d;
+    /** This is the magnitude of the thrust **/
+    public double thrustMagnitude;
+
     /** Mass in kg **/
     private double mass;
 
-    /** Instantaneous engine power **/
-    public double enginePower;
 
     /** Responsiveness in [{@link Constants#MIN_SC_RESPONSIVENESS}, {@link Constants#MAX_SC_RESPONSIVENESS}] **/
     private double responsiveness;
@@ -153,8 +156,8 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
         // engine thrust direction
         // our spacecraft is a rigid solid so thrust is always the camera direction vector
-        thrust = new Vector3d(direction).scl(thrustLength);
-        enginePower = 0;
+        thrust = new Vector3d(direction).scl(thrustMagnitude);
+        currentEnginePower = 0;
 
         // not stabilising
         leveling = false;
@@ -226,13 +229,14 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
      */
     private void setToMachine(final MachineDefinition machine, final boolean initialize) {
         this.mc = machine.getModel();
-        this.enginePower = machine.getPower();
+        this.thrustMagnitude = machine.getPower() * thrustBase;
         this.fullPowerTime = machine.getFullpowertime();
         this.mass = machine.getMass();
         this.shadowMapValues = machine.getShadowvalues();
         this.drag = machine.getDrag();
         this.responsiveness = MathUtilsd.lint(machine.getResponsiveness(), 0d, 1d, Constants.MIN_SC_RESPONSIVENESS, Constants.MAX_SC_RESPONSIVENESS);
         this.machineName = machine.getName();
+        this.setSize(machine.getSize());
 
         if (initialize) {
             // Neither loading nor initialized
@@ -270,7 +274,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             GaiaSky.postRunnable(() -> {
                 this.setToMachine(machines[newMachineIndex], true);
                 this.currentMachine = newMachineIndex;
+                EventManager.instance.post(Events.SPACECRAFT_MACHINE_SELECTION_INFO, machines[newMachineIndex]);
             });
+            break;
         default:
             break;
         }
@@ -288,7 +294,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
 
         if (render) {
-            EventManager.instance.post(Events.SPACECRAFT_INFO, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], enginePower, yawp, pitchp, rollp);
+            EventManager.instance.post(Events.SPACECRAFT_INFO, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], currentEnginePower, yawp, pitchp, rollp);
         }
     }
 
@@ -313,10 +319,10 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
     }
 
-    public Vector3b computePosition(double dt, IFocus closest, double enginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
-        enginePower = Math.signum(enginePower);
+    public Vector3b computePosition(double dt, IFocus closest, double currentEnginePower, Vector3d thrust, Vector3d direction, Vector3d force, Vector3d accel, Vector3d vel, Vector3b posb) {
+        currentEnginePower = Math.signum(currentEnginePower);
         // Compute force from thrust
-        thrust.set(direction).scl(thrustLength * thrustFactor[thrustFactorIndex] * enginePower);
+        thrust.set(direction).scl(thrustMagnitude * thrustFactor[thrustFactorIndex] * currentEnginePower);
         force.set(thrust);
 
         // Scale force if relativistic effects are on
@@ -332,15 +338,15 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (stopping) {
             double speed = vel.len();
             if (speed != 0) {
-                enginePower = -1;
-                thrust.set(vel).nor().scl(thrustLength * thrustFactor[thrustFactorIndex] * enginePower);
+                currentEnginePower = -1;
+                thrust.set(vel).nor().scl(thrustMagnitude * thrustFactor[thrustFactorIndex] * currentEnginePower);
                 force.set(thrust);
             }
 
             Vector3d nextVel = aux3d3.get().set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
 
             if (vel.angle(nextVel) > 90) {
-                setEnginePower(0);
+                setCurrentEnginePower(0);
                 force.scl(0);
                 vel.scl(0);
                 EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
@@ -443,7 +449,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
                 pollKeys(Gdx.graphics.getDeltaTime());
 
             // POSITION
-            pos = computePosition(dt, camera.getSecondClosestBody(), enginePower, thrust, direction, force, accel, vel, pos);
+            pos = computePosition(dt, camera.getSecondClosestBody(), currentEnginePower, thrust, direction, force, accel, vel, pos);
 
             if (leveling) {
                 // No velocity, we just stop Euler angle motions
@@ -489,9 +495,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     private void pollKeys(double dt) {
         double powerStep = dt / fullPowerTime;
         if (Gdx.input.isKeyPressed(Keys.W))
-            setEnginePower(enginePower + powerStep);
+            setCurrentEnginePower(currentEnginePower + powerStep);
         if (Gdx.input.isKeyPressed(Keys.S))
-            setEnginePower(enginePower - powerStep);
+            setCurrentEnginePower(currentEnginePower - powerStep);
 
         if (Gdx.input.isKeyPressed(Keys.A))
             setRollPower(rollp + powerStep);
@@ -510,7 +516,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     }
 
     public void stopAllMovement() {
-        setEnginePower(0);
+        setCurrentEnginePower(0);
 
         setYawPower(0);
         setPitchPower(0);
@@ -524,10 +530,10 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     /**
      * Sets the current engine power
      *
-     * @param enginePower The power in [-1..1]
+     * @param currentEnginePower The power in [-1..1]
      */
-    public void setEnginePower(double enginePower) {
-        this.enginePower = MathUtilsd.clamp(enginePower, -1, 1);
+    public void setCurrentEnginePower(double currentEnginePower) {
+        this.currentEnginePower = MathUtilsd.clamp(currentEnginePower, -1, 1);
     }
 
     /**
@@ -605,11 +611,11 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
      * Sets the absolute size of this entity
      */
     public void setSize(Double size) {
-        this.size = size.floatValue() * (float) Constants.KM_TO_U;
+        this.size = (float) (size * Constants.KM_TO_U);
     }
 
     public void setSize(Long size) {
-        this.size = (float) size * (float) Constants.KM_TO_U;
+        this.size = (float) (size * Constants.KM_TO_U);
     }
 
     public void setMass(Double mass) {
@@ -712,7 +718,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
         copy.thrustFactorIndex = this.thrustFactorIndex;
 
-        copy.enginePower = this.enginePower;
+        copy.currentEnginePower = this.currentEnginePower;
 
         copy.yawp = this.yawp;
         copy.yawf = this.yawf;
