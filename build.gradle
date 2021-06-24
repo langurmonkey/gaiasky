@@ -27,7 +27,7 @@ allprojects {
         py4jVersion = "0.10.9.+"
         oshiVersion = "5.7.+"
         stilVersion = "4.0.+"
-        jsampVersion = "+"
+        jsampVersion = "1.3.+"
         sdl2gdxVersion = "1.0.+"
         jsoupVersion = "1.13.1"
         apfloatVersion = "1.10.0"
@@ -131,6 +131,8 @@ project(":core") {
 
         // STIL library to load datasets
         api group: "uk.ac.starlink", name: "stil", version: "$stilVersion"
+        // JSAMP for SAMP communication
+        api group: "uk.ac.starlink", name: "jsamp", version: "$jsampVersion"
         // Apfloat for arbitrary precision floating point numbers
         api group: "org.apfloat", name: "apfloat", version: "$apfloatVersion"
 
@@ -159,7 +161,6 @@ project(":core") {
         // *************
         // INTERNAL DEPS
         // *************
-        api files("lib/jsamp-1.3.7.jar")
         api files("../assets")
     }
 
