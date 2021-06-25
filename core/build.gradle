@@ -1,5 +1,6 @@
 apply plugin: "java"
 apply plugin: "com.install4j.gradle"
+apply plugin: "de.undercouch.download"
 
 
 import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
@@ -16,9 +17,12 @@ sourceSets {
 }
 
 project.ext.mainClassName = "gaiasky.desktop.GaiaSkyDesktop"
-project.ext.workDir = new File("../");
-project.ext.assetsDir = new File(project.ext.workDir, "assets");
+project.ext.workDir = new File("../")
+project.ext.assetsDir = new File(project.ext.workDir, "assets")
 project.ext.sourceSets = sourceSets
+project.ext.tmpDir = new File("/tmp/gaiasky-gradle/")
+project.ext.tmpDir.mkdirs()
+project.ext.jreArchive = "jdk16.tar.gz"
 
 task versionFile {
     doLast {
@@ -374,7 +378,32 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
     }
 }
 
-task createAppimage(dependsOn: createTar, description: "Creates the appimage package for Gaia Sky") {
+task downloadJRE(type: Download, description: "Downloads the JRE package into project.tmpDir") {
+    src "https://github.com/AdoptOpenJDK/openjdk16-binaries/releases/download/jdk-16.0.1%2B9/OpenJDK16U-jdk_x64_linux_hotspot_16.0.1_9.tar.gz"
+    dest new File("$tmpDir", "$jreArchive")
+    onlyIfModified true
+    overwrite false
+}
+task downloadAndExtractJRE(dependsOn: downloadJRE, description: "Extracts the downloaded JRE into project.tmpDir") {
+    doLast {
+        File jreArchivePath = new File("$tmpDir", "$jreArchive")
+        // Delete pre-existing jre
+        project.tmpDir.eachFile (groovy.io.FileType.DIRECTORIES) { dir ->
+            delete "$dir"
+        }
+        // Extract
+        copy {
+            from tarTree(resources.gzip(jreArchivePath))
+            into project.tmpDir
+        }
+
+        // Set location
+        String[] tmpfiles = project.tmpDir.listFiles()
+        project.ext.jreDir = tmpfiles[0]
+    }
+}
+
+task createAppimage(dependsOn: [createTar, downloadAndExtractJRE], description: "Creates the appimage package for Gaia Sky") {
     doLast{
         String gsId = "gaiasky"
         String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
@@ -389,9 +418,9 @@ task createAppimage(dependsOn: createTar, description: "Creates the appimage pac
         }
 
         // Package JRE
-        println("Packaging JRE ${System.env.JAVA_HOME} into Appimage")
+        println("Packaging JRE $jreDir into Appimage")
         exec {
-            executable "${System.env.JAVA_HOME}/bin/jlink"
+            executable "$jreDir/bin/jlink"
             args "--no-header-files", "--no-man-pages", "--compress=2", "--strip-debug", "--add-modules", "java.base,java.compiler,java.datatransfer,java.desktop,java.instrument,java.logging,java.management,java.management.rmi,java.naming,java.net.http,java.prefs,java.rmi,java.scripting,java.security.jgss,java.security.sasl,java.smartcardio,java.sql,java.sql.rowset,java.transaction.xa,java.xml,java.xml.crypto,jdk.accessibility,jdk.attach,jdk.charsets,jdk.compiler,jdk.crypto.cryptoki,jdk.crypto.ec,jdk.dynalink,jdk.editpad,jdk.httpserver,jdk.internal.ed,jdk.internal.jvmstat,jdk.internal.le,jdk.internal.opt,jdk.jartool,jdk.javadoc,jdk.jconsole,jdk.jdeps,jdk.jdi,jdk.jdwp.agent,jdk.jfr,jdk.jlink,jdk.jshell,jdk.jsobject,jdk.jstatd,jdk.localedata,jdk.management,jdk.management.agent,jdk.management.jfr,jdk.naming.dns,jdk.naming.rmi,jdk.net,jdk.nio.mapmode,jdk.sctp,jdk.security.auth,jdk.security.jgss,jdk.unsupported,jdk.unsupported.desktop,jdk.xml.dom,jdk.zipfs", "--output", "$appimgDir/usr"
         }
 
