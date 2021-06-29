@@ -596,37 +596,26 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean setObjectVisibility(String name, boolean visible) {
-        SceneGraphNode obj = getObject(name);
+        String nameLc = name.toLowerCase(Locale.ROOT).trim();
+        SceneGraphNode obj = getObject(nameLc);
         if (obj == null) {
             logger.error("No object found with name '" + name + "'");
             return false;
         }
 
-        if (obj instanceof IVisibilitySwitch) {
-            IVisibilitySwitch vs = obj;
-            vs.setVisible(visible);
-            return true;
-        } else {
-            logger.error("Can't set the visibility of '" + name + "', as it is not an instance of IVisibilitySwitch");
-            return false;
-        }
+        EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, nameLc, visible, this);
+        return true;
     }
 
     @Override
     public boolean getObjectVisibility(String name) {
-        SceneGraphNode obj = getObject(name);
+        SceneGraphNode obj = getObject(name.toLowerCase().trim());
         if (obj == null) {
             logger.error("No object found with name '" + name + "'");
             return false;
         }
 
-        if (obj instanceof IVisibilitySwitch) {
-            IVisibilitySwitch vs = obj;
-            return vs.isVisible(true);
-        } else {
-            logger.error("Can't set the visibility of '" + name + "', as it is not an instance of IVisibilitySwitch");
-            return false;
-        }
+        return ((IVisibilitySwitch) obj).isVisible(true);
     }
 
     @Override
@@ -1482,7 +1471,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (sgn instanceof IFocus) {
             IFocus obj = (IFocus) sgn;
             if (obj instanceof ParticleGroup) {
-                var pos = obj.getAbsolutePosition(name.toLowerCase(), aux3b1);
+                var pos = obj.getAbsolutePosition(name.toLowerCase().trim(), aux3b1);
                 return pos.sub(GaiaSky.instance.getICamera().getPos()).lend() * Constants.U_TO_KM;
             } else {
                 return (obj.getDistToCamera() - obj.getRadius()) * Constants.U_TO_KM;

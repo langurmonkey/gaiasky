@@ -12,7 +12,6 @@ import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -124,7 +123,7 @@ public class Invisible extends CelestialBody {
     }
 
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
-        if (time.getDt() != 0 || force) {
+        if (time.getHdiff() != 0 || force) {
             Vector3d aux3 = aux3d1.get();
             // Load this objects's equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;

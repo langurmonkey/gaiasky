@@ -208,7 +208,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         visibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, currentFocus, !visibility.isChecked(), false);
+                EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, currentFocus, currentFocus.getName(), !visibility.isChecked(), this);
                 return true;
             }
             return false;
@@ -647,11 +647,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             rulerDist.setText(I18n.txt("gui.sc.distance") + ": " + rd);
             break;
         case PER_OBJECT_VISIBILITY_CMD:
-            boolean ui = (boolean) data[2];
-            if (ui) {
+            Object source = data[3];
+            if (source != this) {
                 IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-                if (vs == currentFocus) {
-                    boolean visible = (boolean) data[1];
+                String name = (String) data[1];
+                if (vs == currentFocus && currentFocus.hasName(name)) {
+                    boolean visible = (boolean) data[2];
                     visibility.setCheckedNoFire(!visible);
                 }
             }

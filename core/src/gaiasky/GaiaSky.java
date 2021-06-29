@@ -1057,7 +1057,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         updateResize();
 
         Timer.instance();
-        // The current actual dt in seconds
+        // The actual frame time difference in seconds
         double dtGs;
         if (GlobalConf.frame.RENDER_OUTPUT) {
             // If RENDER_OUTPUT is active, we need to set our dt according to
@@ -1068,8 +1068,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // the fps
             dtGs = 1.0 / GlobalConf.frame.CAMERA_REC_TARGET_FPS;
         } else {
-            // Max time step is 0.1 seconds. Not in RENDER_OUTPUT MODE.
-            dtGs = Math.min(dt, 0.1);
+            // Max time step is 0.05 seconds. Not in RENDER_OUTPUT MODE.
+            dtGs = Math.min(dt, 0.05);
         }
 
         this.t += dtGs;
@@ -1079,7 +1079,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.UPDATE_GUI, dtGs);
 
         // Update clock
-        time.update(GlobalConf.runtime.TIME_ON ? dtGs : 0);
+        time.update(dtGs);
 
         // Update events
         EventManager.instance.dispatchDelayedMessages();
@@ -1381,8 +1381,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case PER_OBJECT_VISIBILITY_CMD:
             IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-            boolean state = (boolean) data[1];
-            vs.setVisible(state);
+            String name = (String) data[1];
+            boolean state = (boolean) data[2];
+            vs.setVisible(state, name);
             logger.info(I18n.txt("notif.visibility.object.set", vs.getName(), state));
             break;
         case PARK_RUNNABLE:

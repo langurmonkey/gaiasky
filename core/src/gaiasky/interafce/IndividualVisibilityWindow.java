@@ -169,7 +169,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
                 cb.addListener((event) -> {
                     if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
-                        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, cb.isChecked(), true));
+                        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, obj.getName(), cb.isChecked(), this));
                         return true;
                     }
                     return false;
@@ -262,12 +262,13 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     public void notify(Events event, Object... data) {
         if (event == Events.PER_OBJECT_VISIBILITY_CMD) {
             IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
-            boolean checked = (Boolean) data[1];
-            boolean ui = (Boolean) data[2];
-            if (!ui) {
+            String name = (String) data[1];
+            boolean checked = (Boolean) data[2];
+            Object source = data[3];
+            if (source != this) {
                 // Update checkbox if necessary
                 if (currentCt != null && obj.hasCt(currentCt)) {
-                    CheckBox cb = cbMap.get(obj.getName());
+                    CheckBox cb = cbMap.get(name);
                     if (cb != null) {
                         cb.setProgrammaticChangeEvents(false);
                         cb.setChecked(checked);

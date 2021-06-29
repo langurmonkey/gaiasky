@@ -979,8 +979,8 @@ public enum Events {
 
     SHOW_PER_OBJECT_VISIBILITY_ACTION,
     /**
-     * Contains the object (instance of {@link gaiasky.scenegraph.IVisibilitySwitch}), a boolean with the new visibility state, and a
-     * boolean indicating if it comes from the UI.
+     * Contains the object (instance of {@link gaiasky.scenegraph.IVisibilitySwitch}), the name of the object, a boolean with the new visibility state, and the
+     * source object.
      */
     PER_OBJECT_VISIBILITY_CMD,
 

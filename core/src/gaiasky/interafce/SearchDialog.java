@@ -38,11 +38,11 @@ public class SearchDialog extends GenericDialog {
 
     private OwnTextField searchInput;
     private String currentInputText = "";
-    private Cell<OwnLabel> infoCell;
+    private Cell<?> infoCell;
     private OwnLabel infoMessage;
     private final ISceneGraph sg;
     // Matching nodes
-    private Array<String> matching;
+    private final Array<String> matching;
     private Array<OwnLabel> matchingLabels;
     private Table candidates;
     private int cIdx = -1;
@@ -58,7 +58,7 @@ public class SearchDialog extends GenericDialog {
         setModal(false);
         setAcceptText(I18n.txt("gui.close"));
 
-        this.addListener(new InputListener(){
+        this.addListener(new InputListener() {
 
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -95,24 +95,24 @@ public class SearchDialog extends GenericDialog {
                 int code = ie.getKeyCode();
                 if (ie.getType() == Type.keyUp) {
                     if (code == Keys.ESCAPE || code == Keys.ENTER) {
-                        if(cIdx >= 0){
+                        if (cIdx >= 0) {
                             checkString(searchInput.getText(), sg);
                         }
                         removeCandidates();
                         me.remove();
                         return true;
-                    } else if (code == Keys.UP){
+                    } else if (code == Keys.UP) {
                         cIdx = cIdx - 1 < 0 ? matching.size - 1 : cIdx - 1;
                         selectMatch();
-                    } else if(code == Keys.DOWN) {
+                    } else if (code == Keys.DOWN) {
                         cIdx = (cIdx + 1) % matching.size;
                         selectMatch();
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
                         currentInputText = searchInput.getText();
                         String name = currentInputText.toLowerCase().trim();
-                        matchingNodes(name, sg);
                         synchronized (matching) {
+                            matchingNodes(name, sg);
                             if (!matching.isEmpty()) {
                                 cIdx = -1;
                                 candidates.clear();
@@ -121,9 +121,9 @@ public class SearchDialog extends GenericDialog {
                                     String match = matching.get(i);
                                     OwnLabel m = new OwnLabel(match, skin);
                                     m.addListener((evt) -> {
-                                        if(evt instanceof InputEvent){
+                                        if (evt instanceof InputEvent) {
                                             InputEvent ievt = (InputEvent) evt;
-                                            if(ievt.getType() == Type.touchDown){
+                                            if (ievt.getType() == Type.touchDown) {
                                                 checkString(match, sg);
                                                 searchInput.setText(match);
                                                 accept();
@@ -134,7 +134,7 @@ public class SearchDialog extends GenericDialog {
                                     });
                                     matchingLabels.add(m);
                                     m.setWidth(searchInput.getWidth());
-                                    Cell c = candidates.add(m).left().padBottom(pad5);
+                                    Cell<?> c = candidates.add(m).left().padBottom(pad5);
                                     if (i > 0) {
                                         c.row();
                                     }
@@ -189,32 +189,30 @@ public class SearchDialog extends GenericDialog {
         info(null);
     }
 
-    private void removeCandidates(){
-        if(candidates != null){
+    private void removeCandidates() {
+        if (candidates != null) {
             candidates.clear();
             candidates.remove();
         }
         cIdx = -1;
     }
 
-    private void selectMatch(){
-       for(int i =0; i < matchingLabels.size; i++){
-           OwnLabel l = matchingLabels.get(i);
-           if(i == cIdx){
-              l.setColor(ColorUtils.gYellowC);
-              searchInput.setText(l.getText().toString());
-           } else {
-               l.setColor(ColorUtils.gWhiteC);
-           }
-       }
+    private void selectMatch() {
+        for (int i = 0; i < matchingLabels.size; i++) {
+            OwnLabel l = matchingLabels.get(i);
+            if (i == cIdx) {
+                l.setColor(ColorUtils.gYellowC);
+                searchInput.setText(l.getText().toString());
+            } else {
+                l.setColor(ColorUtils.gWhiteC);
+            }
+        }
     }
 
     private void matchingNodes(String text, ISceneGraph sg) {
-        synchronized (matching) {
-            matching.clear();
-            matchingLabels.clear();
-            sg.matchingFocusableNodes(text, matching, 10);
-        }
+        matching.clear();
+        matchingLabels.clear();
+        sg.matchingFocusableNodes(text, matching, 10);
     }
 
     private boolean checkString(String text, ISceneGraph sg) {

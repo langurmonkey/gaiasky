@@ -28,30 +28,34 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     long lastTime;
     /** Target time to stop the clock, if any **/
     private Instant targetTime;
-    /** The hour difference from the last frame **/
-    public double hdiff;
+
+    /** The simulation time difference in hours **/
+    private double hDiff;
+
+    /** The frame time difference in seconds **/
+    private double dt;
 
     /** Represents the time wrap multiplier. Scales the real time **/
-    public double timeWarp = 1;
+    private double timeWarp = 1;
 
     // Seconds since last event POST
     private float lastUpdate = 1;
     /**
-    	 * The fixed frame rate when not in real time. Set negative to use real time
-    	 **/
+     * The fixed frame rate when not in real time. Set negative to use real time
+     **/
     public float fps = -1;
 
     /**
-    	 * Creates a new GlobalClock
-    	 * 
-    	 * @param timeWrap The time wrap multiplier
-    	 * @param instant  The instant with which to initialise the clock
-    	 */
+     * Creates a new GlobalClock
+     *
+     * @param timeWrap The time wrap multiplier
+     * @param instant  The instant with which to initialise the clock
+     */
     public GlobalClock(double timeWrap, Instant instant) {
         super();
         // Now
         this.timeWarp = timeWrap;
-        hdiff = 0d;
+        hDiff = 0d;
         time = instant;
         targetTime = null;
         lastTime = time.toEpochMilli();
@@ -59,11 +63,14 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     }
 
     /**
-    	 * Update function
-    	 * 
-    	 * @param dt Delta time in seconds
-    	 */
+     * Update function
+     *
+     * @param dt Delta time in seconds
+     */
     public void update(double dt) {
+        this.dt = dt;
+        dt = GlobalConf.runtime.TIME_ON ? this.dt : 0;
+
         if (dt != 0) {
             // In case we are in constant rate mode
             if (fps > 0) {
@@ -72,7 +79,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
 
             int sign = (int) Math.signum(timeWarp);
             double h = Math.abs(dt * timeWarp * Nature.S_TO_H);
-            hdiff = h * sign;
+            hDiff = h * sign;
 
             double ms = sign * h * Nature.H_TO_MS;
 
@@ -83,8 +90,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             // Check target time
             if (targetTime != null) {
                 long target = targetTime.toEpochMilli();
-                if ((timeWarp > 0 && currentTime <= target && newTime > target)
-                        || (timeWarp < 0 && currentTime >= target && newTime < target)) {
+                if ((timeWarp > 0 && currentTime <= target && newTime > target) || (timeWarp < 0 && currentTime >= target && newTime < target)) {
                     newTime = target;
                     // Unset target time
                     targetTime = null;
@@ -124,10 +130,10 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 lastUpdate = 0;
             }
         } else if (time.toEpochMilli() - lastTime != 0) {
-            hdiff = (time.toEpochMilli() - lastTime) * Nature.MS_TO_H;
+            hDiff = (time.toEpochMilli() - lastTime) * Nature.MS_TO_H;
             lastTime = time.toEpochMilli();
         } else {
-            hdiff = 0d;
+            hDiff = 0d;
         }
     }
 
@@ -218,16 +224,21 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     }
 
     /**
-    	 * Provides the time difference in hours
-    	 */
+     * Provides the time difference in hours
+     */
+    @Override
+    public double getHdiff() {
+        return this.hDiff;
+    }
+
     @Override
     public double getDt() {
-        return hdiff;
+        return this.dt;
     }
 
     @Override
     public double getWarpFactor() {
-        return timeWarp;
+        return this.timeWarp;
     }
 
     public boolean isFixedRateMode() {

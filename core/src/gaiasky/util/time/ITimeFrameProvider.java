@@ -13,9 +13,15 @@ import java.time.Instant;
 public interface ITimeFrameProvider {
 
     /**
-     * Gets the difference from the last time frame in hours
+     * The simulation time difference in hours.
      *
-     * @return The time difference
+     * @return The simulation time difference in hours.
+     */
+    double getHdiff();
+
+    /**
+     * The frame time difference in seconds.
+     * @return The frame time difference in seconds.
      */
     double getDt();
 

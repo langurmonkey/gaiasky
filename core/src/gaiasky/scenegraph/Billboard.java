@@ -87,7 +87,7 @@ public class Billboard extends ModelBody {
      * @param force Whether to force the update
      */
     protected void forceUpdatePosition(ITimeFrameProvider time, boolean force) {
-        if (time.getDt() != 0 || force) {
+        if (time.getHdiff() != 0 || force) {
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
             // Convert to cartesian coordinates and put them in aux3 vector
             Vector3d aux3 = aux3d1.get();

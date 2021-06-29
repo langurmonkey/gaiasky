@@ -18,9 +18,10 @@ import java.time.Instant;
 public class RealTimeClock implements ITimeFrameProvider {
     private static final double SEC_TO_HOUR = 1d / 3600d;
 
-    long time;
-    double dtHours;
-    double lastUpdate = 0;
+    private double dt;
+    private long time;
+    private double dtHours;
+    private double lastUpdate = 0;
 
     public RealTimeClock() {
         time = Instant.now().toEpochMilli();
@@ -30,8 +31,13 @@ public class RealTimeClock implements ITimeFrameProvider {
      * The dt in hours
      */
     @Override
-    public double getDt() {
+    public double getHdiff() {
         return SEC_TO_HOUR;
+    }
+
+    @Override
+    public double getDt() {
+        return this.dt;
     }
 
     @Override
@@ -41,7 +47,8 @@ public class RealTimeClock implements ITimeFrameProvider {
 
     @Override
     public void update(double dt) {
-        dtHours = dt * SEC_TO_HOUR;
+        this.dt = dt;
+        this.dtHours = dt * SEC_TO_HOUR;
         time = TimeUtils.millis();
 
         // Post event each 1/2 second

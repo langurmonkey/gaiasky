@@ -219,8 +219,7 @@ public class Orbit extends Polyline {
                 float angleLimit = SOLID_ANGLE_THRESHOLD * camera.getFovFactor();
                 if (viewAngle > angleLimit) {
                     if (viewAngle < angleLimit * SHADER_MODEL_OVERLAP_FACTOR) {
-                        double alpha = MathUtilsd.lint(viewAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, cc[3]);
-                        this.alpha = alpha;
+                        this.alpha = MathUtilsd.lint(viewAngle, angleLimit, angleLimit * SHADER_MODEL_OVERLAP_FACTOR, 0, cc[3]);
                     } else {
                         this.alpha = cc[3];
                     }

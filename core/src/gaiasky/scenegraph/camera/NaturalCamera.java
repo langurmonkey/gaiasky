@@ -431,7 +431,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                     // Lock orientation - FOR NOW THIS ONLY WORKS WITH
                     // PLANETS and MOONS
-                    if (GlobalConf.scene.FOCUS_LOCK_ORIENTATION && time.getDt() > 0 && focus.getOrientation() != null) {
+                    if (GlobalConf.scene.FOCUS_LOCK_ORIENTATION && time.getHdiff() > 0 && focus.getOrientation() != null) {
                         RotationComponent rc = focus.getRotationComponent();
                         if (rc != null) {
                             // Rotation component present - planets, etc

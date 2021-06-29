@@ -129,7 +129,7 @@ public class Planet extends ModelBody implements ILineRenderable {
     }
 
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
-        if (time.getDt() != 0 || force) {
+        if (time.getHdiff() != 0 || force) {
             Vector3d aux3 = aux3d1.get();
             // Load this objects's equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;

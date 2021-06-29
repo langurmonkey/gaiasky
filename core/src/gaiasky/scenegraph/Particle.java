@@ -350,7 +350,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
-        if (coordinates != null && (time.getDt() != 0 || force)) {
+        if (coordinates != null && (time.getHdiff() != 0 || force)) {
             Vector3d aux3 = aux3d1.get();
             // Load this objects's equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;

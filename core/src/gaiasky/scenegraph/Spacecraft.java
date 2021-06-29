@@ -443,10 +443,11 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         if (yawv != 0 || pitchv != 0 || rollv != 0 || vel.len2() != 0 || render) {
             // We use the simulation time for the integration
-            double dt = Math.min(Gdx.graphics.getDeltaTime(), 0.2);
             // Poll keys
             if (camera.getMode().isSpacecraft())
                 pollKeys(Gdx.graphics.getDeltaTime());
+
+            double dt = time.getDt();
 
             // POSITION
             pos = computePosition(dt, camera.getSecondClosestBody(), currentEnginePower, thrust, direction, force, accel, vel, pos);

@@ -417,6 +417,19 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
+    public void setVisible(boolean visible, String name) {
+        if(index.containsKey(name)){
+            this.setVisible(index.get(name), visible);
+        }
+    }
+
+    public boolean isVisible(String name) {
+        if(index.containsKey(name)){
+            return this.isVisible(index.get(name));
+        }
+        return false;
+    }
+
     /**
      * Overrides the setVisible() method and uses the current focus index, if any.
      *
@@ -848,6 +861,29 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             return focus.names();
         else
             return super.getNames();
+    }
+
+    public boolean hasName(String candidate) {
+        return hasName(candidate, false);
+    }
+
+    public boolean hasName(String candidate, boolean matchCase) {
+        String[] names = getNames();
+        if (names == null) {
+            return false;
+        } else {
+
+            for (String name : names) {
+                if (matchCase) {
+                    if (name.equals(candidate))
+                        return true;
+                } else {
+                    if (name.equalsIgnoreCase(candidate))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

@@ -238,7 +238,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * the position using the proper motion and the given time.
      */
     public Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force) {
-        if (time.getDt() == 0 && !force) {
+        if (time.getHdiff() == 0 && !force) {
             return getAbsolutePosition(aux);
         } else {
             double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;

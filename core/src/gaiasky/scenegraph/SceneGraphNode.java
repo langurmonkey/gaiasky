@@ -425,7 +425,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return list;
     }
 
-
     public SceneGraphNode getNode(String name) {
         if (this.names != null && this.names[0].equals(name)) {
             return this;
@@ -716,8 +715,8 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return ct;
     }
 
-    public boolean hasCt(ComponentType ct){
-       return ct != null && this.ct.isEnabled(ct);
+    public boolean hasCt(ComponentType ct) {
+        return ct != null && this.ct.isEnabled(ct);
     }
 
     /**
@@ -996,7 +995,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {
-        return time.getDt() != 0;
+        return time.getHdiff() != 0;
     }
 
     /**
@@ -1224,14 +1223,22 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
     }
 
-    public boolean isVisible(boolean attributeValue){
-        if(attributeValue)
+    public boolean isVisible(boolean attributeValue) {
+        if (attributeValue)
             return this.visible;
         else
             return this.isVisible();
     }
 
-    public boolean isVisibleGroup(){
+    public void setVisible(boolean visible, String name) {
+        this.setVisible(visible);
+    }
+
+    public boolean isVisible(String name) {
+        return this.isVisible();
+    }
+
+    public boolean isVisibleGroup() {
         return isVisible();
     }
 
@@ -1262,7 +1269,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < GlobalConf.scene.OBJECT_FADE_MS);
     }
 
-    public float[] getColor(){
+    public float[] getColor() {
         return cc;
     }
 }
