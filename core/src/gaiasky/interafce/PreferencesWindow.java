@@ -641,7 +641,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         /* Tone Mapping */
         OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
-        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.tonemapping.auto"), ToneMapping.AUTO.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.exposure"), ToneMapping.EXPOSURE.ordinal()), new ComboBoxBean("Filmic", ToneMapping.FILMIC.ordinal()), new ComboBoxBean("Uncharted", ToneMapping.UNCHARTED.ordinal()), new ComboBoxBean("ACES", ToneMapping.ACES.ordinal()), new ComboBoxBean(I18n.txt("gui.tonemapping.none"), ToneMapping.NONE.ordinal()) };
+        int nToneMapping = ToneMapping.values().length;
+        ComboBoxBean[] toneMappingTypes = new ComboBoxBean[nToneMapping];
+        for(int itm = 0; itm < nToneMapping; itm++){
+            ToneMapping tm = ToneMapping.values()[itm];
+            toneMappingTypes[itm] = new ComboBoxBean(I18n.txt("gui.tonemapping." + tm.name().toLowerCase(Locale.ROOT)), tm.ordinal());
+        }
+
         OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(textwidth * 3f);

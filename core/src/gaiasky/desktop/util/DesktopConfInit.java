@@ -453,7 +453,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("postprocess.hue", Float.toString(GlobalConf.postprocess.POSTPROCESS_HUE));
         p.setProperty("postprocess.saturation", Float.toString(GlobalConf.postprocess.POSTPROCESS_SATURATION));
         p.setProperty("postprocess.gamma", Float.toString(GlobalConf.postprocess.POSTPROCESS_GAMMA));
-        p.setProperty("postprocess.tonemapping.type", GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE.toString());
+        p.setProperty("postprocess.tonemapping.type", GlobalConf.postprocess.POSTPROCESS_TONEMAPPING_TYPE.toString().toLowerCase());
         p.setProperty("postprocess.exposure", Float.toString(GlobalConf.postprocess.POSTPROCESS_EXPOSURE));
         p.setProperty("postprocess.fisheye", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_FISHEYE));
 
