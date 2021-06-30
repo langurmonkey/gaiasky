@@ -69,8 +69,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private final Array<Actor> contents;
     private final Array<OwnLabel> labels;
 
-    private IValidator widthValidator, heightValidator, screenshotsSizeValidator, frameoutputSizeValidator, limitfpsValidator;
-
     private final INumberFormat nf3;
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
@@ -86,7 +84,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private ColorPicker pointerGuidesColor;
     private DatasetsWidget dw;
     private OwnLabel tessQualityLabel;
-    private Cell noticeHiResCell;
+    private Cell<?> noticeHiResCell;
     private Table controllersTable;
 
     // Backup values
@@ -129,7 +127,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float controlsscrollw = 880f;
         float controlsscrollh = 560f;
         float sliderWidth = textwidth * 3f;
-        float buttonw = 240f;
         float buttonh = 40f;
 
         // Create the tab buttons
@@ -201,10 +198,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Get current resolution
         Table windowedResolutions = new Table(skin);
-        widthValidator = new IntValidator(100, 10000);
+        IValidator widthValidator = new IntValidator(100, 10000);
         widthField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_WIDTH, 100, 10000)), skin, widthValidator);
         widthField.setWidth(textwidth);
-        heightValidator = new IntValidator(100, 10000);
+        IValidator heightValidator = new IntValidator(100, 10000);
         heightField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screen.SCREEN_HEIGHT, 100, 10000)), skin, heightValidator);
         heightField.setWidth(textwidth);
         final OwnLabel widthLabel = new OwnLabel(I18n.txt("gui.width") + ":", skin);
@@ -244,7 +241,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         vsync.setChecked(GlobalConf.screen.VSYNC);
 
         // LIMIT FPS
-        limitfpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
+        IValidator limitfpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
         double lfps = GlobalConf.screen.LIMIT_FPS == 0 ? 60 : GlobalConf.screen.LIMIT_FPS;
         limitFps = new OwnTextField(nf3.format(MathUtilsd.clamp(lfps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitfpsValidator);
         limitFps.setDisabled(GlobalConf.screen.LIMIT_FPS == 0);
@@ -710,6 +707,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         File i18nfolder = new File(GlobalConf.ASSETS_LOC + File.separator + "i18n");
         String i18nname = "gsbundle";
         String[] files = i18nfolder.list();
+        assert files != null;
         LangComboBoxBean[] langs = new LangComboBoxBean[files.length];
         i = 0;
         for (String file : files) {
@@ -1136,7 +1134,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel screenshotsSizeLabel = new OwnLabel(I18n.txt("gui.screenshots.size"), skin);
         screenshotsSizeLabel.setDisabled(GlobalConf.screenshot.isSimpleMode());
         final OwnLabel xLabel = new OwnLabel("x", skin);
-        screenshotsSizeValidator = new IntValidator(GlobalConf.ScreenshotConf.MIN_SCREENSHOT_SIZE, GlobalConf.ScreenshotConf.MAX_SCREENSHOT_SIZE);
+        IValidator screenshotsSizeValidator = new IntValidator(GlobalConf.ScreenshotConf.MIN_SCREENSHOT_SIZE, GlobalConf.ScreenshotConf.MAX_SCREENSHOT_SIZE);
         sswidthField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.ScreenshotConf.MIN_SCREENSHOT_SIZE, GlobalConf.ScreenshotConf.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
         sswidthField.setWidth(textwidth);
         sswidthField.setDisabled(GlobalConf.screenshot.isSimpleMode());
@@ -1249,7 +1247,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel frameoutputSizeLabel = new OwnLabel(I18n.txt("gui.frameoutput.size"), skin);
         frameoutputSizeLabel.setDisabled(GlobalConf.frame.isSimpleMode());
         final OwnLabel xLabelfo = new OwnLabel("x", skin);
-        frameoutputSizeValidator = new IntValidator(GlobalConf.FrameConf.MIN_FRAME_SIZE, GlobalConf.FrameConf.MAX_FRAME_SIZE);
+        IValidator frameoutputSizeValidator = new IntValidator(GlobalConf.FrameConf.MIN_FRAME_SIZE, GlobalConf.FrameConf.MAX_FRAME_SIZE);
         fowidthField = new OwnTextField(Integer.toString(MathUtils.clamp(GlobalConf.frame.RENDER_WIDTH, GlobalConf.FrameConf.MIN_FRAME_SIZE, GlobalConf.FrameConf.MAX_FRAME_SIZE)), skin, frameoutputSizeValidator);
         fowidthField.setWidth(textwidth);
         fowidthField.setDisabled(GlobalConf.frame.isSimpleMode());
@@ -1857,6 +1855,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         unsubscribe();
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     private void reloadDefaultPreferences() {
         // User config file
         Path userFolder = SysUtils.getConfigDir();
@@ -2102,9 +2105,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         if (reloadLineRenderer) {
-            GaiaSky.postRunnable(() -> {
-                EventManager.instance.post(Events.LINE_RENDERER_UPDATE);
-            });
+            GaiaSky.postRunnable(() -> EventManager.instance.post(Events.LINE_RENDERER_UPDATE));
         }
 
         if (reloadShadows) {
@@ -2185,29 +2186,27 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     }
 
     private String keysToString(TreeSet<Integer> keys) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
 
         int i = 0;
         int n = keys.size();
         for (Integer key : keys) {
-            s += keyToString(key).toUpperCase().replace(' ', '_');
+            s.append(keyToString(key).toUpperCase().replace(' ', '_'));
             if (i < n - 1) {
-                s += "+";
+                s.append("+");
             }
 
             i++;
         }
 
-        return s;
+        return s.toString();
     }
 
     private String keyToString(int key) {
-        switch (key) {
-        case Keys.PLUS:
+        if (key == Keys.PLUS) {
             return "+";
-        default:
-            return Keys.toString(key);
         }
+        return Keys.toString(key);
     }
 
     @Override

@@ -889,6 +889,11 @@ public class DownloadDataWindow extends GenericDialog {
     protected void cancel() {
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     private void backupScrollValues() {
         if (datasetsScroll != null) {
             this.scrollY = datasetsScroll.getScrollY();

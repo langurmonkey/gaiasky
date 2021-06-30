@@ -94,4 +94,9 @@ public class CatalogSelectionWindow extends GenericDialog {
     protected void cancel() {
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
 }

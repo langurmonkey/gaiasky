@@ -59,4 +59,9 @@ public class NewBookmarkFolderDialog extends GenericDialog {
         return gd;
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
 }

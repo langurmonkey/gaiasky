@@ -11,9 +11,9 @@ import gaiasky.scenegraph.SceneGraph;
 public class DesktopSceneGraphImplementationProvider extends SceneGraphImplementationProvider {
 
     @Override
-    public ISceneGraph getImplementation(boolean multithreading, boolean hasOctree, boolean hasStarGroup, int maxThreads) {
+    public ISceneGraph getImplementation(boolean multithreading, boolean hasOctree, boolean hasStarGroup, int maxThreads, int numNodes) {
         // Scene graph concurrent has been deprecated, now all stars are in GPU
-        return new SceneGraph();
+        return new SceneGraph(numNodes);
     }
 
 }

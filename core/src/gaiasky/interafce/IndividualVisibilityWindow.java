@@ -28,7 +28,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
     protected float space8, space4, space2;
     protected ISceneGraph sg;
-    protected Cell elementsCell;
+    protected Cell<?> elementsCell;
     // Component type currently selected
     protected String currentComponentType = null;
     protected ComponentType currentCt = null;
@@ -64,9 +64,8 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         float buttonPadHor = 6f;
         int visTableCols = 7;
         Table buttonTable = new Table(skin);
-        Map<String, Button> buttonMap = new HashMap<>();
         // Always one button checked
-        ButtonGroup buttonGroup = new ButtonGroup();
+        ButtonGroup<Button> buttonGroup = new ButtonGroup<>();
         buttonGroup.setMinCheckCount(1);
         buttonGroup.setMaxCheckCount(1);
 
@@ -74,57 +73,51 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         elementsCell = content.add().top().left();
 
         ComponentType[] visibilityEntities = ComponentType.values();
-        if (visibilityEntities != null) {
-            for (int i = 0; i < visibilityEntities.length; i++) {
-                final ComponentType ct = visibilityEntities[i];
-                final String name = ct.getName();
-                if (name != null) {
-                    Button button;
-                    if (ct.style != null) {
-                        Image icon = new Image(skin.getDrawable(ct.style));
-                        button = new OwnTextIconButton("", icon, skin, "toggle");
-                    } else {
-                        button = new OwnTextButton(name, skin, "toggle");
-                    }
-                    // Name is the key
-                    button.setName(ct.key);
-                    // Tooltip (with or without hotkey)
-                    String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
-                    if (hk != null) {
-                        button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
-                    } else {
-                        button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
-                    }
-
-                    buttonMap.put(name, button);
-                    if (!ct.key.equals(name))
-                        buttonMap.put(ct.key, button);
-
-                    button.addListener(event -> {
-                        if (event instanceof ChangeListener.ChangeEvent && button.isChecked()) {
-                            // Change content only when button is checked!
-                            Group elementsList = visibilitySwitcher(ct, TextUtils.capitalise(ct.getName()), ct.getName());
-                            elementsCell.clearActor();
-                            elementsCell.setActor(elementsList);
-                            content.pack();
-                            currentComponentType = name;
-                            currentCt = ct;
-                            return true;
-                        }
-                        return false;
-                    });
-
-                    if (cct != null && name.equals(cct)) {
-                        button.setChecked(true);
-                    }
-                    Cell c = buttonTable.add(button);
-                    if ((i + 1) % visTableCols == 0) {
-                        buttonTable.row();
-                    } else {
-                        c.padRight(buttonPadHor);
-                    }
-                    buttonGroup.add(button);
+        for (int i = 0; i < visibilityEntities.length; i++) {
+            final ComponentType ct = visibilityEntities[i];
+            final String name = ct.getName();
+            if (name != null) {
+                Button button;
+                if (ct.style != null) {
+                    Image icon = new Image(skin.getDrawable(ct.style));
+                    button = new OwnTextIconButton("", icon, skin, "toggle");
+                } else {
+                    button = new OwnTextButton(name, skin, "toggle");
                 }
+                // Name is the key
+                button.setName(ct.key);
+                // Tooltip (with or without hotkey)
+                String hk = KeyBindings.instance.getStringKeys("action.toggle/" + ct.key);
+                if (hk != null) {
+                    button.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(ct.getName()), hk, skin));
+                } else {
+                    button.addListener(new OwnTextTooltip(TextUtils.capitalise(ct.getName()), skin));
+                }
+
+                button.addListener(event -> {
+                    if (event instanceof ChangeListener.ChangeEvent && button.isChecked()) {
+                        // Change content only when button is checked!
+                        Group elementsList = visibilitySwitcher(ct, TextUtils.capitalise(ct.getName()), ct.getName());
+                        elementsCell.clearActor();
+                        elementsCell.setActor(elementsList);
+                        content.pack();
+                        currentComponentType = name;
+                        currentCt = ct;
+                        return true;
+                    }
+                    return false;
+                });
+
+                if (name.equals(cct)) {
+                    button.setChecked(true);
+                }
+                Cell<?> c = buttonTable.add(button);
+                if ((i + 1) % visTableCols == 0) {
+                    buttonTable.row();
+                } else {
+                    c.padRight(buttonPadHor);
+                }
+                buttonGroup.add(button);
             }
         }
         if (cct != null)
@@ -205,7 +198,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         selAll.pad(space2);
         selAll.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
-                GaiaSky.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(true)));
+                GaiaSky.postRunnable(() -> cbs.forEach((i) -> i.setChecked(true)));
                 return true;
             }
             return false;
@@ -215,7 +208,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         selNone.pad(space2);
         selNone.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
-                GaiaSky.postRunnable(() -> cbs.stream().forEach((i) -> i.setChecked(false)));
+                GaiaSky.postRunnable(() -> cbs.forEach((i) -> i.setChecked(false)));
                 return true;
             }
             return false;
@@ -255,6 +248,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
     @Override
     protected void cancel() {
+
+    }
+
+    @Override
+    public void dispose() {
 
     }
 

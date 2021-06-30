@@ -18,8 +18,6 @@ import java.lang.management.MemoryPoolMXBean;
 
 public class MemInfoWindow extends GenericDialog {
 
-    private OwnScrollPane meminfoscroll;
-
     public MemInfoWindow(Stage stg, Skin skin) {
         super(I18n.txt("gui.help.meminfo"), skin, stg);
 
@@ -33,26 +31,26 @@ public class MemInfoWindow extends GenericDialog {
     @Override
     protected void build() {
         float pad = 8f;
-        float tawidth = 800f;
+        float taWidth = 800f;
 
-        String meminfostr = "";
+        StringBuilder memInfoStr = new StringBuilder();
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
-            meminfostr += I18n.txt("gui.help.name") + ": " + mpBean.getName() + ": " + mpBean.getUsage() + "\n";
+            memInfoStr.append(I18n.txt("gui.help.name")).append(": ").append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n");
         }
 
-        TextArea meminfo = new OwnTextArea(meminfostr, skin, "no-disabled");
+        TextArea meminfo = new OwnTextArea(memInfoStr.toString(), skin, "no-disabled");
         meminfo.setDisabled(true);
         meminfo.setPrefRows(10);
-        meminfo.setWidth(tawidth);
+        meminfo.setWidth(taWidth);
         meminfo.clearListeners();
 
-        meminfoscroll = new OwnScrollPane(meminfo, skin, "minimalist-nobg");
-        meminfoscroll.setWidth(tawidth);
-        meminfoscroll.setForceScroll(false, true);
-        meminfoscroll.setSmoothScrolling(true);
-        meminfoscroll.setFadeScrollBars(false);
+        OwnScrollPane memInfoScroll = new OwnScrollPane(meminfo, skin, "minimalist-nobg");
+        memInfoScroll.setWidth(taWidth);
+        memInfoScroll.setForceScroll(false, true);
+        memInfoScroll.setSmoothScrolling(true);
+        memInfoScroll.setFadeScrollBars(false);
 
-        content.add(meminfoscroll).padBottom(pad).row();
+        content.add(memInfoScroll).padBottom(pad).row();
 
     }
 
@@ -62,6 +60,11 @@ public class MemInfoWindow extends GenericDialog {
 
     @Override
     protected void cancel() {
+    }
+
+    @Override
+    public void dispose() {
+
     }
 
 }

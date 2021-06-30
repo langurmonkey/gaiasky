@@ -315,6 +315,11 @@ public class ColorPicker extends ColorPickerAbstract {
             color = null;
         }
 
+        @Override
+        public void dispose() {
+
+        }
+
         public void setColor(float[] color) {
             setColor(color[0], color[1], color[2], color[3]);
         }

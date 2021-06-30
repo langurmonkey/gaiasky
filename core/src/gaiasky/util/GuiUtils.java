@@ -44,6 +44,10 @@ public class GuiUtils {
             protected void cancel() {
             }
 
+            @Override
+            public void dispose() {
+            }
+
         };
 
         exitw.setAcceptText(I18n.txt("gui.ok"));
@@ -73,6 +77,10 @@ public class GuiUtils {
             @Override
             protected void cancel() {
                 Gdx.app.exit();
+            }
+
+            @Override
+            public void dispose() {
             }
 
         };
@@ -105,6 +113,10 @@ public class GuiUtils {
                 Gdx.app.exit();
             }
 
+            @Override
+            public void dispose() {
+            }
+
         };
         exitw.setAcceptText(I18n.txt("gui.exit"));
         exitw.setCancelText(null);
@@ -133,6 +145,10 @@ public class GuiUtils {
             @Override
             protected void cancel() {
                 Gdx.app.exit();
+            }
+
+            @Override
+            public void dispose() {
             }
 
         };

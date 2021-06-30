@@ -414,4 +414,9 @@ public class DatasetLoadDialog extends GenericDialog {
     protected void cancel() {
 
     }
+
+    @Override
+    public void dispose() {
+
+    }
 }

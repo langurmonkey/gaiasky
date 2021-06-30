@@ -59,6 +59,11 @@ public class MinimapWindow extends GenericDialog {
     protected void cancel() {
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     private void updateMapName(String mapName){
         if(this.mapName != null)
             this.mapName.setText(mapName);

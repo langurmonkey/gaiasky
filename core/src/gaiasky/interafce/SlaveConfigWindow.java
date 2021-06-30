@@ -252,6 +252,11 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
+    public void dispose() {
+
+    }
+
+    @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
         case SLAVE_CONNECTION_EVENT:

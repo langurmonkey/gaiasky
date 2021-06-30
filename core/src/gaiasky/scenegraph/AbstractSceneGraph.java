@@ -19,6 +19,7 @@ import gaiasky.util.tree.IPosition;
 
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class AbstractSceneGraph implements ISceneGraph {
     private static final Log logger = Logger.getLogger(AbstractSceneGraph.class);
@@ -26,7 +27,7 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
-    protected ObjectMap<String, SceneGraphNode> stringToNode;
+    protected final ObjectMap<String, SceneGraphNode> stringToNode;
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations
@@ -41,13 +42,16 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
 
     private final Vector3b aux3b1;
 
-    public AbstractSceneGraph() {
+    public AbstractSceneGraph(int numNodes) {
         // Id = -1 for root
         root = new SceneGraphNode(-1);
         root.names = new String[] { SceneGraphNode.ROOT_NAME };
 
         // Objects per thread
         objectsPerThread = new int[1];
+
+        // String-to-node map
+        stringToNode = new ObjectMap<>(numNodes);
 
         aux3b1 = new Vector3b();
     }
@@ -73,7 +77,6 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode = new ObjectMap<>(nodes.size);
         stringToNode.put(root.names[0].toLowerCase().trim(), root);
         hipMap = new ObjectMap<>();
         for (SceneGraphNode node : nodes) {
@@ -244,10 +247,10 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
     }
 
     public void matchingFocusableNodes(String name, Array<String> results) {
-        matchingFocusableNodes(name, results, 10);
+        matchingFocusableNodes(name, results, 10, null);
     }
 
-    public void matchingFocusableNodes(String name, Array<String> results, int maxResults) {
+    public void matchingFocusableNodes(String name, Array<String> results, int maxResults, AtomicBoolean abort) {
         synchronized (stringToNode) {
             ObjectMap.Keys<String> keys = new ObjectMap.Keys<>(stringToNode);
             name = name.toLowerCase().trim();
@@ -255,6 +258,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             int i = 0;
             // Starts with
             for (String key : keys) {
+                if(abort != null && abort.get())
+                    return;
                 SceneGraphNode sgn = stringToNode.get(key);
                 if (sgn instanceof IFocus && key.startsWith(name)) {
                     results.add(key);
@@ -265,6 +270,8 @@ public abstract class AbstractSceneGraph implements ISceneGraph {
             }
             // Contains
             for (String key : keys) {
+                if(abort != null && abort.get())
+                    return;
                 SceneGraphNode sgn = stringToNode.get(key);
                 if (sgn instanceof IFocus && key.contains(name)) {
                     results.add(key);

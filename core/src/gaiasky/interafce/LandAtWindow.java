@@ -124,6 +124,11 @@ public class LandAtWindow extends GenericDialog {
         }
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     public void setKeyboardFocus() {
         stage.setKeyboardFocus(location);
     }

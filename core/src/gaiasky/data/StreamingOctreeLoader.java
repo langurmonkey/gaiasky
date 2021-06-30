@@ -18,6 +18,7 @@ import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 import uk.ac.starlink.util.DataSource;
@@ -54,9 +55,6 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     protected static final int MAX_LOAD_CHUNK = 5;
 
     public static StreamingOctreeLoader instance;
-
-    /** Octree loader thread lock. **/
-    private static final Object threadLock = new Object();
 
     /**
      * Current number of stars that are loaded.
@@ -291,10 +289,10 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * Tells the loader to start loading the octants in the queue.
      */
     public void flushLoadQueue() {
-        if (!daemon.awake && !toLoadQueue.isEmpty() && !loadingPaused) {
-            synchronized (threadLock) {
+        if (!daemon.isAwake() && !toLoadQueue.isEmpty() && !loadingPaused) {
+            synchronized (daemon.getThreadLock()) {
                 EventManager.instance.post(Events.BACKGROUND_LOADING_INFO);
-                threadLock.notifyAll();
+                daemon.getThreadLock().notifyAll();
             }
         }
     }
@@ -312,7 +310,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @param lod           The level of detail to load.
      * @param octreeWrapper The octree wrapper.
-     * @throws IOException  When any of the level's files fails to load.
+     * @throws IOException When any of the level's files fails to load.
      */
     public void loadLod(final Integer lod, final AbstractOctreeWrapper octreeWrapper) throws IOException {
         loadOctant(octreeWrapper.root, octreeWrapper, lod);
@@ -325,7 +323,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
      * @param level         The depth to load.
-     * @throws IOException  When the octant's file fails to load.
+     * @throws IOException When the octant's file fails to load.
      */
     public void loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, Integer level) throws IOException {
         if (level >= 0) {
@@ -420,98 +418,69 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     /**
      * The daemon loader thread.
      */
-    protected static class OctreeLoaderThread extends Thread {
-        private boolean awake;
-        private boolean running;
-        private final AtomicBoolean abort;
-
-        private final StreamingOctreeLoader loader;
+    protected static class OctreeLoaderThread extends ServiceThread {
         private final AbstractOctreeWrapper octreeWrapper;
         private final Array<OctreeNode> toLoad;
+        private final AtomicBoolean abort;
 
         public OctreeLoaderThread(AbstractOctreeWrapper aow, StreamingOctreeLoader loader) {
-            this.awake = false;
-            this.running = true;
-            this.abort = new AtomicBoolean(false);
-            this.loader = loader;
+            super();
             this.octreeWrapper = aow;
             this.toLoad = new Array<>();
-        }
+            this.abort = new AtomicBoolean(false);
 
-        /**
-         * Stops the daemon iterations when.
-         */
-        public void stopDaemon() {
-            running = false;
-        }
 
-        /**
-         * Aborts only the current iteration.
-         */
-        public void abort() {
-            abort.set(true);
-        }
-
-        @Override
-        public void run() {
-            while (running) {
-                synchronized (threadLock) {
-                    /** ----------- PROCESS OCTANTS ----------- **/
-                    while (!instance.toLoadQueue.isEmpty()) {
-                        toLoad.clear();
-                        int i = 0;
-                        while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
-                            OctreeNode octant = instance.toLoadQueue.poll();
-                            toLoad.add(octant);
-                            i++;
-                        }
-
-                        // Load octants, if any.
-                        if (toLoad.size > 0) {
-                            try {
-                                loader.loadOctants(toLoad, octreeWrapper, abort);
-                            } catch (Exception e) {
-                                // This will happen when the queue has been cleared during processing.
-                                logger.debug(I18n.txt("notif.loadingoctants.queue.clear"));
-                            }
-                        }
-
-                        // Release resources if needed.
-                        int nUnloaded = 0;
-                        int nStars = loader.nLoadedStars;
-                        if (running && nStars >= loader.maxLoadedStars) //-V6007
-                            while (true) {
-                                // Get first in queue (non-accessed for the longest time)
-                                // and release it.
-                                OctreeNode octant = loader.toUnloadQueue.poll();
-                                if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
-                                    loader.unloadOctant(octant, octreeWrapper);
-                                }
-                                if (octant != null && octant.objects != null && octant.objects.size() > 0) {
-                                    SceneGraphNode sg = octant.objects.get(0);
-                                    nUnloaded += sg.getStarCount();
-                                    if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
-                                        break;
-                                    }
-                                }
-                            }
-
-                        // Update constellations :S
-                        GaiaSky.postRunnable(Constellation::updateConstellations);
-
+            this.task = () -> {
+                /* ----------- PROCESS OCTANTS ----------- */
+                while (!instance.toLoadQueue.isEmpty()) {
+                    toLoad.clear();
+                    int i = 0;
+                    while (instance.toLoadQueue.peek() != null && i <= MAX_LOAD_CHUNK) {
+                        OctreeNode octant = instance.toLoadQueue.poll();
+                        toLoad.add(octant);
+                        i++;
                     }
 
-                    /* ----------- WAIT FOR NOTIFY ----------- */
-                    try {
-                        awake = false;
-                        abort.set(false);
-                        threadLock.wait(Long.MAX_VALUE - 8);
-                    } catch (InterruptedException e) {
-                        // New data!
-                        awake = true;
+                    // Load octants, if any.
+                    if (toLoad.size > 0) {
+                        try {
+                            loader.loadOctants(toLoad, octreeWrapper, abort);
+                        } catch (Exception e) {
+                            // This will happen when the queue has been cleared during processing.
+                            logger.debug(I18n.txt("notif.loadingoctants.queue.clear"));
+                        }
                     }
+
+                    // Release resources if needed.
+                    int nUnloaded = 0;
+                    int nStars = loader.nLoadedStars;
+                    if (running && nStars >= loader.maxLoadedStars) //-V6007
+                        while (true) {
+                            // Get first in queue (non-accessed for the longest time)
+                            // and release it.
+                            OctreeNode octant = loader.toUnloadQueue.poll();
+                            if (octant != null && octant.getStatus() == LoadStatus.LOADED) {
+                                loader.unloadOctant(octant, octreeWrapper);
+                            }
+                            if (octant != null && octant.objects != null && octant.objects.size() > 0) {
+                                SceneGraphNode sg = octant.objects.get(0);
+                                nUnloaded += sg.getStarCount();
+                                if (nStars - nUnloaded < loader.maxLoadedStars * 0.85) {
+                                    break;
+                                }
+                            }
+                        }
+
+                    // Update constellations :S
+                    GaiaSky.postRunnable(Constellation::updateConstellations);
+
                 }
-            }
+                this.abort.set(false);
+            };
+        }
+
+        public void abort(){
+            this.abort.set(true);
         }
 
     }

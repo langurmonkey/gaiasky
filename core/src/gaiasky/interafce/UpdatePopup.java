@@ -55,4 +55,9 @@ public class UpdatePopup extends GenericDialog {
     protected void cancel() {
         // Do nothing
     }
+
+    @Override
+    public void dispose() {
+
+    }
 }

@@ -36,40 +36,49 @@ import java.nio.file.Paths;
  */
 public class GuiRegistry implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(GuiRegistry.class);
+
     /**
      * Registered GUI array
      **/
-    private static final Array<IGui> guis;
-
-    static {
-        guis = new Array<>(true, 2);
-    }
+    private final Array<IGui> guis;
 
     /**
      * Render lock object
      */
-    public static Object guirenderlock = new Object();
+    private final Object renderLock = new Object();
 
     /**
      * Current GUI object
      **/
-    public static IGui current;
+    public IGui current;
     /**
      * Previous GUI object, if any
      **/
-    public static IGui previous;
+    public IGui previous;
 
     /**
      * Global input multiplexer
      **/
-    private static InputMultiplexer im = null;
+    private InputMultiplexer im = null;
 
-    public static void setInputMultiplexer(InputMultiplexer im) {
-        GuiRegistry.im = im;
+    /**
+     * Create new GUI registry object.
+     */
+    public GuiRegistry(Skin skin, ISceneGraph sg) {
+        super();
+        this.skin = skin;
+        this.sg = sg;
+        this.guis = new Array<>(true, 2);
+        // Windows which are visible from any GUI
+        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
     }
 
-    public static InputMultiplexer getInputMultiplexer() {
-        return GuiRegistry.im;
+    public void setInputMultiplexer(InputMultiplexer im) {
+        this.im = im;
+    }
+
+    public InputMultiplexer getInputMultiplexer() {
+        return this.im;
     }
 
     /**
@@ -79,7 +88,7 @@ public class GuiRegistry implements IObserver {
      * @param gui      The new GUI
      * @param previous The new previous GUI
      */
-    public static void change(IGui gui, IGui previous) {
+    public void change(IGui gui, IGui previous) {
         if (current != gui) {
             unset(previous);
             set(gui);
@@ -91,7 +100,7 @@ public class GuiRegistry implements IObserver {
      *
      * @param gui The new gui
      */
-    public static void change(IGui gui) {
+    public void change(IGui gui) {
         if (current != gui) {
             unset();
             set(gui);
@@ -101,7 +110,7 @@ public class GuiRegistry implements IObserver {
     /**
      * Unsets the current GUI and sets it as previous
      */
-    public static void unset() {
+    public void unset() {
         unset(current);
     }
 
@@ -110,7 +119,7 @@ public class GuiRegistry implements IObserver {
      *
      * @param gui The GUI
      */
-    public static void unset(IGui gui) {
+    public void unset(IGui gui) {
         if (gui != null) {
             unregisterGui(gui);
             im.removeProcessor(gui.getGuiStage());
@@ -123,7 +132,7 @@ public class GuiRegistry implements IObserver {
      *
      * @param gui The new GUI
      */
-    public static void set(IGui gui) {
+    public void set(IGui gui) {
         if (gui != null) {
             registerGui(gui);
             im.addProcessor(0, gui.getGuiStage());
@@ -136,7 +145,7 @@ public class GuiRegistry implements IObserver {
      *
      * @param gui The new previous GUI
      */
-    public static void setPrevious(IGui gui) {
+    public void setPrevious(IGui gui) {
         previous = gui;
     }
 
@@ -145,7 +154,7 @@ public class GuiRegistry implements IObserver {
      *
      * @param gui The GUI to register
      */
-    public static void registerGui(IGui gui) {
+    public void registerGui(IGui gui) {
         if (!guis.contains(gui, true)) {
             guis.add(gui);
         }
@@ -157,7 +166,7 @@ public class GuiRegistry implements IObserver {
      * @param gui The GUI to unregister
      * @return True if the GUI was unregistered
      */
-    public static boolean unregisterGui(IGui gui) {
+    public boolean unregisterGui(IGui gui) {
         return guis.removeValue(gui, true);
     }
 
@@ -166,7 +175,7 @@ public class GuiRegistry implements IObserver {
      *
      * @return True if operation succeeded
      */
-    public static boolean unregisterAll() {
+    public boolean unregisterAll() {
         guis.clear();
         return true;
     }
@@ -177,9 +186,9 @@ public class GuiRegistry implements IObserver {
      * @param rw The render width
      * @param rh The render height
      */
-    public static void render(int rw, int rh) {
+    public void render(int rw, int rh) {
         if (GlobalConf.runtime.DISPLAY_GUI) {
-            synchronized (guirenderlock) {
+            synchronized (renderLock) {
                 for (int i = 0; i < guis.size; i++) {
                     guis.get(i).getGuiStage().getViewport().apply();
                     try {
@@ -198,12 +207,12 @@ public class GuiRegistry implements IObserver {
      *
      * @param gui The gui
      */
-    public static void addProcessor(IGui gui) {
+    public void addProcessor(IGui gui) {
         if (im != null && gui != null)
             im.addProcessor(gui.getGuiStage());
     }
 
-    public static void removeProcessor(IGui gui) {
+    public void removeProcessor(IGui gui) {
         if (im != null && gui != null)
             im.removeProcessor(gui.getGuiStage());
     }
@@ -213,7 +222,7 @@ public class GuiRegistry implements IObserver {
      *
      * @param dt The delta time in seconds
      */
-    public static void update(double dt) {
+    public void update(double dt) {
         for (IGui gui : guis)
             gui.update(dt);
     }
@@ -252,19 +261,11 @@ public class GuiRegistry implements IObserver {
     // Scene Graph
     protected ISceneGraph sg;
 
-    /**
-     * One object to handle observer pattern
-     */
-    public GuiRegistry(Skin skin, ISceneGraph sg) {
-        super();
-        this.skin = skin;
-        this.sg = sg;
-        // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
-    }
 
     public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
+        if(searchDialog != null)
+            searchDialog.dispose();
     }
 
     @Override
@@ -275,7 +276,7 @@ public class GuiRegistry implements IObserver {
             switch (event) {
             case SHOW_SEARCH_ACTION:
                 if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, ui, sg);
+                    searchDialog = new SearchDialog(skin, ui, sg, true);
                 } else {
                     searchDialog.clearText();
                 }
@@ -362,7 +363,7 @@ public class GuiRegistry implements IObserver {
 
                 FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
                 fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
                 fc.setAcceptText(I18n.txt("gui.loadcatalog"));
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits"));
                 fc.setAcceptedFiles("*.vot, *.csv, *.fits");

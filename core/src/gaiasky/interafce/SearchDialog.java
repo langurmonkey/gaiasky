@@ -17,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -33,6 +35,10 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 
+/**
+ * The dialog to search objects. It optionally presents the user with a list of suggestions as the
+ * user types in the name of the object.
+ */
 public class SearchDialog extends GenericDialog {
     private static final Log logger = Logger.getLogger(SearchDialog.class);
 
@@ -47,13 +53,17 @@ public class SearchDialog extends GenericDialog {
     private Table candidates;
     private int cIdx = -1;
     private Vector2 aux;
+    private boolean suggestions;
 
-    public SearchDialog(Skin skin, Stage ui, final ISceneGraph sg) {
+    private final Array<Task> tasks;
+
+    public SearchDialog(Skin skin, Stage ui, final ISceneGraph sg, boolean suggestions) {
         super(I18n.txt("gui.objects.search"), skin, ui);
         this.sg = sg;
         this.aux = new Vector2();
         this.matching = new Array<>(10);
         this.matchingLabels = new Array<>(10);
+        this.tasks = new Array<>(20);
 
         setModal(false);
         setAcceptText(I18n.txt("gui.close"));
@@ -78,6 +88,8 @@ public class SearchDialog extends GenericDialog {
 
         // Pack
         pack();
+
+        this.suggestions = suggestions;
     }
 
     public void build() {
@@ -109,51 +121,75 @@ public class SearchDialog extends GenericDialog {
                         selectMatch();
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
-                        currentInputText = searchInput.getText();
-                        String name = currentInputText.toLowerCase().trim();
-                        synchronized (matching) {
-                            matchingNodes(name, sg);
-                            if (!matching.isEmpty()) {
-                                cIdx = -1;
-                                candidates.clear();
-                                int n = matching.size;
-                                for (int i = n - 1; i >= 0; i--) {
-                                    String match = matching.get(i);
-                                    OwnLabel m = new OwnLabel(match, skin);
-                                    m.addListener((evt) -> {
-                                        if (evt instanceof InputEvent) {
-                                            InputEvent ievt = (InputEvent) evt;
-                                            if (ievt.getType() == Type.touchDown) {
-                                                checkString(match, sg);
-                                                searchInput.setText(match);
-                                                accept();
-                                                return true;
+                        if (suggestions) {
+                            currentInputText = searchInput.getText();
+                            String name = currentInputText.toLowerCase().trim();
+
+                            // New task
+                            Task task = new Task() {
+                                public void run() {
+                                    synchronized (matching) {
+                                        matchingNodes(name, sg);
+                                        if (!matching.isEmpty()) {
+                                            cIdx = -1;
+                                            candidates.clear();
+                                            int n = matching.size;
+                                            for (int i = n - 1; i >= 0; i--) {
+                                                String match = matching.get(i);
+                                                OwnLabel m = new OwnLabel(match, skin);
+                                                m.addListener((evt) -> {
+                                                    if (evt instanceof InputEvent) {
+                                                        InputEvent iEvt = (InputEvent) evt;
+                                                        if (iEvt.getType() == Type.touchDown) {
+                                                            checkString(match, sg);
+                                                            searchInput.setText(match);
+                                                            accept();
+                                                            return true;
+                                                        }
+                                                    }
+                                                    return false;
+                                                });
+                                                matchingLabels.add(m);
+                                                m.setWidth(searchInput.getWidth());
+                                                Cell<?> c = candidates.add(m).left().padBottom(pad5);
+                                                if (i > 0) {
+                                                    c.row();
+                                                }
                                             }
+                                            candidates.pack();
+                                            searchInput.localToStageCoordinates(aux.set(0, 0));
+                                            candidates.setPosition(aux.x, aux.y, Align.topLeft);
+                                            stage.addActor(candidates);
+                                        } else {
+                                            removeCandidates();
                                         }
-                                        return false;
-                                    });
-                                    matchingLabels.add(m);
-                                    m.setWidth(searchInput.getWidth());
-                                    Cell<?> c = candidates.add(m).left().padBottom(pad5);
-                                    if (i > 0) {
-                                        c.row();
                                     }
                                 }
-                                candidates.pack();
-                                searchInput.localToStageCoordinates(aux.set(0, 0));
-                                candidates.setPosition(aux.x, aux.y, Align.topLeft);
-                                stage.addActor(candidates);
+                            };
+                            // Cancel others
+                            cancelTasks();
+                            tasks.add(task);
+                            // Schedule with delay
+                            Timer.schedule(task, 0.5f);
+
+                            // Actually check and select
+                            if (!checkString(name, sg)) {
+                                if (name.matches("[0-9]+")) {
+                                    // Check with 'HIP '
+                                    if (checkString("hip " + name, sg)) {
+                                        cancelTasks();
+                                        removeCandidates();
+                                    }
+                                } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
+                                    // Check without 'HIP '
+                                    if (checkString(name.substring(4), sg)) {
+                                        cancelTasks();
+                                        removeCandidates();
+                                    }
+                                }
                             } else {
+                                cancelTasks();
                                 removeCandidates();
-                            }
-                        }
-                        if (!checkString(name, sg)) {
-                            if (name.matches("[0-9]+")) {
-                                // Check with 'HIP '
-                                checkString("hip " + name, sg);
-                            } else if (name.matches("hip [0-9]+") || name.matches("HIP [0-9]+")) {
-                                // Check without 'HIP '
-                                checkString(name.substring(4), sg);
                             }
                         }
                     } else {
@@ -177,6 +213,7 @@ public class SearchDialog extends GenericDialog {
 
     @Override
     public void accept() {
+        cancelTasks();
         removeCandidates();
         stage.unfocusAll();
         info(null);
@@ -184,9 +221,20 @@ public class SearchDialog extends GenericDialog {
 
     @Override
     public void cancel() {
+        cancelTasks();
         removeCandidates();
         stage.unfocusAll();
         info(null);
+    }
+
+    private void cancelTasks() {
+        // Cancel tasks
+        if (!tasks.isEmpty()) {
+            for (Task t : tasks) {
+                t.cancel();
+            }
+        }
+        tasks.clear();
     }
 
     private void removeCandidates() {
@@ -212,7 +260,7 @@ public class SearchDialog extends GenericDialog {
     private void matchingNodes(String text, ISceneGraph sg) {
         matching.clear();
         matchingLabels.clear();
-        sg.matchingFocusableNodes(text, matching, 10);
+        sg.matchingFocusableNodes(text, matching, 10, null);
     }
 
     private boolean checkString(String text, ISceneGraph sg) {
@@ -278,6 +326,10 @@ public class SearchDialog extends GenericDialog {
         // FOCUS_MODE to input
         stage.setKeyboardFocus(searchInput);
         return gd;
+    }
+
+    @Override
+    public void dispose() {
     }
 
 }

@@ -152,6 +152,11 @@ public class CrashGui extends AbstractGui {
             GaiaSky.postRunnable(() -> Gdx.app.exit());
         }
 
+        @Override
+        public void dispose() {
+
+        }
+
     }
 
 }

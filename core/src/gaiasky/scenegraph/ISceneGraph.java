@@ -12,6 +12,8 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 /**
  * Defines the interface for any scene graph implementation
  */
@@ -60,12 +62,13 @@ public interface ISceneGraph extends Disposable {
 
     /**
      * Returns focusable nodes matching the given string, to a maximum
-     * of <code>maxResults</code>
-     * @param str The name
-     * @param results The results
-     * @param maxResults The maximum number of results
+     * of <code>maxResults</code>.
+     * @param str The name.
+     * @param results The results.
+     * @param maxResults The maximum number of results.
+     * @param abort To enable abortion mid-computation.
      */
-    void matchingFocusableNodes(String str, Array<String> results, int maxResults);
+    void matchingFocusableNodes(String str, Array<String> results, int maxResults, AtomicBoolean abort);
     /**
      * Whether this scene graphs contains a node with the given name
      *

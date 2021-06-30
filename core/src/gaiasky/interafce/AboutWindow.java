@@ -550,6 +550,11 @@ public class AboutWindow extends GenericDialog {
     protected void cancel() {
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
     private SpriteDrawable getSpriteDrawable(FileHandle fh) {
         Texture tex = new Texture(fh);
         return new SpriteDrawable(new Sprite(tex));

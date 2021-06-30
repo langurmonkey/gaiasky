@@ -164,7 +164,7 @@ public class KeyBindings {
          */
 
         // Condition which checks the current GUI is the FullGui
-        BooleanRunnable fullGuiCondition = () -> GuiRegistry.current instanceof FullGui;
+        BooleanRunnable fullGuiCondition = () -> GaiaSky.instance.getGuiRegistry().current instanceof FullGui;
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)
@@ -176,7 +176,7 @@ public class KeyBindings {
         // Condition that checks that we are not a slave with a special projection
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
         // Condition that checks that we are a master and have slaves
-        BooleanRunnable masterWithSlaves = () -> MasterManager.hasSlaves();
+        BooleanRunnable masterWithSlaves = MasterManager::hasSlaves;
 
         // about action
         final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);

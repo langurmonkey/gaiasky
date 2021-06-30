@@ -566,8 +566,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise input multiplexer to handle various input processors
         // The input multiplexer
+        guiRegistry = new GuiRegistry(GlobalResources.skin, sg);
         inputMultiplexer = new InputMultiplexer();
-        GuiRegistry.setInputMultiplexer(inputMultiplexer);
+        guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         // Stop updating log list
@@ -728,9 +729,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (guiRegistry != null)
             guiRegistry.dispose();
         guiRegistry = new GuiRegistry(GlobalResources.skin, sg);
+        guiRegistry.setInputMultiplexer(inputMultiplexer);
 
         // Unregister all current GUIs
-        GuiRegistry.unregisterAll();
+        guiRegistry.unregisterAll();
 
         // Only for the Full GUI
         ((FullGui) mainGui).setSceneGraph(sg);
@@ -740,17 +742,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             gui.doneLoading(manager);
 
         if (GlobalConf.program.STEREOSCOPIC_MODE) {
-            GuiRegistry.set(stereoGui);
-            GuiRegistry.setPrevious(mainGui);
+            guiRegistry.set(stereoGui);
+            guiRegistry.setPrevious(mainGui);
         } else {
-            GuiRegistry.set(mainGui);
-            GuiRegistry.setPrevious(null);
+            guiRegistry.set(mainGui);
+            guiRegistry.setPrevious(null);
         }
-        GuiRegistry.registerGui(debugGui);
-        GuiRegistry.addProcessor(debugGui);
+        guiRegistry.registerGui(debugGui);
+        guiRegistry.addProcessor(debugGui);
 
-        GuiRegistry.registerGui(controllerGui);
-        GuiRegistry.addProcessor(controllerGui);
+        guiRegistry.registerGui(controllerGui);
+        guiRegistry.addProcessor(controllerGui);
     }
 
     @Override
@@ -866,9 +868,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 // Render the GUI, setting the viewport
                 if (GlobalConf.runtime.OPENVR) {
-                    GuiRegistry.render(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
+                    guiRegistry.render(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
                 } else {
-                    GuiRegistry.render(tw, th);
+                    guiRegistry.render(tw, th);
                 }
             }
         }
@@ -1075,7 +1077,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.t += dtGs;
 
         // Update GUI 
-        GuiRegistry.update(dtGs);
+        guiRegistry.update(dtGs);
         EventManager.instance.post(Events.UPDATE_GUI, dtGs);
 
         // Update clock
@@ -1209,6 +1211,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return vrDeviceToModel;
     }
 
+    public GuiRegistry getGuiRegistry(){
+        return this.guiRegistry;
+    }
+
     public ICamera getICamera() {
         return cam.current;
     }
@@ -1291,20 +1297,20 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // Register/unregister GUI
             CameraMode mode = (CameraMode) data[0];
             if (GlobalConf.program.isStereoHalfViewport()) {
-                GuiRegistry.change(stereoGui);
+                guiRegistry.change(stereoGui);
             } else if (mode == CameraMode.SPACECRAFT_MODE) {
-                GuiRegistry.change(spacecraftGui);
+                guiRegistry.change(spacecraftGui);
             } else {
-                GuiRegistry.change(mainGui);
+                guiRegistry.change(mainGui);
             }
             break;
         case STEREOSCOPIC_CMD:
             boolean stereoMode = (Boolean) data[0];
-            if (stereoMode && GuiRegistry.current != stereoGui) {
-                GuiRegistry.change(stereoGui);
-            } else if (!stereoMode && GuiRegistry.previous != stereoGui) {
-                IGui prev = GuiRegistry.current != null ? GuiRegistry.current : mainGui;
-                GuiRegistry.change(GuiRegistry.previous, prev);
+            if (stereoMode && guiRegistry.current != stereoGui) {
+                guiRegistry.change(stereoGui);
+            } else if (!stereoMode && guiRegistry.previous != stereoGui) {
+                IGui prev = guiRegistry.current != null ? guiRegistry.current : mainGui;
+                guiRegistry.change(guiRegistry.previous, prev);
             }
 
             // Post a message to the screen

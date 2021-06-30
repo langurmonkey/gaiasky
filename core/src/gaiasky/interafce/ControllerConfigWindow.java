@@ -599,6 +599,11 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
+    public void dispose() {
+
+    }
+
+    @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
             default:

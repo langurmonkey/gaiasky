@@ -57,4 +57,9 @@ public class QuitWindow extends GenericDialog {
         // Do nothing
     }
 
+    @Override
+    public void dispose() {
+
+    }
+
 }

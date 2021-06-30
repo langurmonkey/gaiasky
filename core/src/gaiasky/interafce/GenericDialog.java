@@ -371,10 +371,10 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
-     * Sets the enabled property on the given components
+     * Sets the enabled property on the given components.
      *
-     * @param enabled
-     * @param components
+     * @param enabled The state to set.
+     * @param components The components to enable or disable.
      */
     protected void enableComponents(boolean enabled, Disableable... components) {
         for (Disableable c : components) {
@@ -382,5 +382,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
                 c.setDisabled(!enabled);
         }
     }
+
+    public abstract void dispose();
 
 }

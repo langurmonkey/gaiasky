@@ -20,17 +20,14 @@ public abstract class SceneGraphImplementationProvider {
     /**
      * Gets the right scene graph implementation for the given information about
      * it.
-     * 
-     * @param multithreading
-     *            Multithreading on?
-     * @param hasOctree
-     *            Does it have an octree?
-     * @param hasStarGroup
-     *            Does it contain a star gorup?
-     * @param maxThreads
-     *            Max number of threads.
+     *
+     * @param multithreading Multithreading on?
+     * @param hasOctree      Does it have an octree?
+     * @param hasStarGroup   Does it contain a star group?
+     * @param maxThreads     Max number of threads.
+     * @param numNodes       Initial number of nodes.
      * @return The scene graph.
      */
-    public abstract ISceneGraph getImplementation(boolean multithreading, boolean hasOctree, boolean hasStarGroup, int maxThreads);
+    public abstract ISceneGraph getImplementation(boolean multithreading, boolean hasOctree, boolean hasStarGroup, int maxThreads, int numNodes);
 
 }

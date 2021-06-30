@@ -17,8 +17,8 @@ public class SceneGraph extends AbstractSceneGraph {
 
     int nObjects = -1;
 
-    public SceneGraph() {
-        super();
+    public SceneGraph(int numNodes) {
+        super(numNodes);
     }
 
     public void update(ITimeFrameProvider time, ICamera camera) {

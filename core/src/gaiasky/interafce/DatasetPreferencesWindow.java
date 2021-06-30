@@ -456,4 +456,9 @@ public class DatasetPreferencesWindow extends GenericDialog {
     @Override
     protected void cancel() {
     }
+
+    @Override
+    public void dispose() {
+
+    }
 }

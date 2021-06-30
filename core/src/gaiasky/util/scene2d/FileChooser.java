@@ -53,14 +53,12 @@ public class FileChooser extends GenericDialog {
     final private FileChooserTarget target;
     private boolean fileNameEnabled;
     private TextField fileNameInput;
-    private Label fileNameLabel, acceptedFiles;
+    private Label acceptedFiles;
     private final Path baseDir;
     private OwnTextField location;
     private List<FileListItem> fileList;
-    private Table controlsTable;
-    private HorizontalGroup driveButtonsList;
-    private Array<TextButton> driveButtons;
-    private float scrollPaneWidth, scrollPanelHeight, maxPathLength;
+    private float scrollPaneWidth;
+    private float maxPathLength;
     private ScrollPane scrollPane;
     private CheckBox hidden;
     private Consumer<Boolean> hiddenConsumer;
@@ -68,6 +66,7 @@ public class FileChooser extends GenericDialog {
     private Path currentDir, previousDir, nextDir;
     protected String result;
 
+    private long lastClick = 0L;
     private boolean showHidden = false;
 
     protected ResultListener resultListener;
@@ -121,7 +120,7 @@ public class FileChooser extends GenericDialog {
     @Override
     public void build() {
         scrollPaneWidth = 960f;
-        scrollPanelHeight = 720f;
+        float scrollPanelHeight = 720f;
         maxPathLength = 9.5f;
 
         content.top().left();
@@ -130,7 +129,7 @@ public class FileChooser extends GenericDialog {
         this.padRight(16f);
 
         // Controls
-        controlsTable = new Table(skin);
+        Table controlsTable = new Table(skin);
         OwnTextIconButton home = new OwnTextIconButton("", skin, "home");
         home.addListener(new OwnTextTooltip(I18n.txt("gui.fc.home"), skin));
         home.addListener(event -> {
@@ -229,11 +228,11 @@ public class FileChooser extends GenericDialog {
         controlsTable.add(location).left().pad(pad10);
 
         // In windows, we need to be able to change drives
-        driveButtonsList = new HorizontalGroup();
+        HorizontalGroup driveButtonsList = new HorizontalGroup();
         driveButtonsList.left().space(16f);
         driveButtonsList.addActor(new OwnLabel(I18n.txt("gui.fc.drives") + ":", skin));
         Iterable<Path> drives = FileSystems.getDefault().getRootDirectories();
-        driveButtons = new Array<>();
+        Array<TextButton> driveButtons = new Array<>();
         for (Path drive : drives) {
             TextButton driveButton = new OwnTextIconButton(drive.toString(), skin, "drive");
             driveButton.addListener(new OwnTextTooltip(I18n.txt("gui.fc.drive", drive.toString()), skin));
@@ -335,7 +334,7 @@ public class FileChooser extends GenericDialog {
         });
 
         fileNameInput = new TextField("", skin);
-        fileNameLabel = new Label(I18n.txt("gui.fc.filename") + ":", skin);
+        Label fileNameLabel = new Label(I18n.txt("gui.fc.filename") + ":", skin);
         fileNameInput.setTextFieldListener((textField, c) -> result = textField.getText());
 
         hidden = new OwnCheckBox(I18n.txt("gui.fc.showhidden"), skin, 8f);
@@ -437,14 +436,11 @@ public class FileChooser extends GenericDialog {
     }
 
     private boolean isTargetOk(Path file) {
-        switch (target) {
-        case FILES:
-            return Files.isRegularFile(file);
-        case DIRECTORIES:
-            return Files.isDirectory(file);
-        default:
-            return true;
-        }
+        return switch (target) {
+            case FILES -> Files.isRegularFile(file);
+            case DIRECTORIES -> Files.isDirectory(file);
+            default -> true;
+        };
     }
 
     private void setTargetListener() {
@@ -453,7 +449,7 @@ public class FileChooser extends GenericDialog {
                 List<FileChooser.FileListItem> list = (List<FileChooser.FileListItem>) event1.getListenerActor();
                 if (list != null) {
                     ArraySelection<FileListItem> as = list.getSelection();
-                    if (as != null && as.hasItems()) {
+                    if (as != null && as.notEmpty()) {
                         FileChooser.FileListItem selected = as.getLastSelected();
                         acceptButton.setDisabled(!isTargetOk(selected.file));
                     }
@@ -481,14 +477,12 @@ public class FileChooser extends GenericDialog {
     }
 
     public Path getResult() {
-        String path = currentDir.toAbsolutePath().toString() + "/";
+        String path = currentDir.toAbsolutePath() + "/";
         if (result != null && result.length() > 0) {
             String folder = currentDir.getFileName().toString();
             if (folder.equals(result)) {
                 if (Files.exists(Paths.get(path, result))) {
                     path += result;
-                } else {
-                    // Nothing
                 }
             } else {
                 path += result;
@@ -499,7 +493,7 @@ public class FileChooser extends GenericDialog {
 
     /**
      * Overrides the default filter. If you use this, the attributes {@link FileChooser#directoryBrowsingEnabled} and
-     * {@file FileChooser#fileBrowsingEnabled} won't have effect anymore. To set additional filters on the
+     * {@link FileChooser#fileBrowsingEnabled} won't have effect anymore. To set additional filters on the
      * path names, use {@link FileChooser#setFileFilter(PathnameFilter)} instead.
      *
      * @param filter The new file filter
@@ -511,12 +505,12 @@ public class FileChooser extends GenericDialog {
     }
 
     /**
-     * Sets the file filter. This filter will be used to check whether file pathnames are accepted or not. It works
-     * in conjunction with {@file FileChooser#fileBrowsingEnabled},
+     * Sets the file filter. This filter will be used to check whether file path names are accepted or not. It works
+     * in conjunction with {@link FileChooser#fileBrowsingEnabled},
      * so you do not need to check whether the pathname is a file.
      *
-     * @param f The file filter
-     * @return This file chooser
+     * @param f The file filter.
+     * @return This file chooser.
      */
     public FileChooser setFileFilter(PathnameFilter f) {
         this.pathnameFilter = f;
@@ -534,9 +528,8 @@ public class FileChooser extends GenericDialog {
      * some text, disable items, etc.
      *
      * @param listener The listener
-     * @return This file chooser
      */
-    private FileChooser setSelectionListener(EventListener listener) {
+    private void setSelectionListener(EventListener listener) {
         if (listener != null) {
             if (this.selectionListener != null)
                 fileList.removeListener(this.selectionListener);
@@ -546,7 +539,6 @@ public class FileChooser extends GenericDialog {
                 fileList.addListener(selectionListener);
             }
         }
-        return this;
     }
 
     public FileChooser setFileNameEnabled(boolean fileNameEnabled) {
@@ -554,12 +546,10 @@ public class FileChooser extends GenericDialog {
         return this;
     }
 
-    public FileChooser setResultListener(ResultListener result) {
+    public void setResultListener(ResultListener result) {
         this.resultListener = result;
-        return this;
     }
 
-    long lastClick = 0l;
 
     @Override
     public void accept() {
@@ -575,7 +565,12 @@ public class FileChooser extends GenericDialog {
         }
     }
 
-    public class FileListItem {
+    @Override
+    public void dispose() {
+
+    }
+
+    public static class FileListItem {
 
         public Path file;
         public String name;

@@ -105,6 +105,10 @@ public class ArchiveViewWindow extends GenericDialog {
         // Nothing
     }
 
+    @Override
+    public void dispose() {
+
+    }
 
     private void requestData(GaiaDataListener listener) {
         if (st.getCatalogSource() > 0) {
