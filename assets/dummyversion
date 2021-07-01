@@ -2,7 +2,7 @@
 # It is used for running the app during development
 
 buildtime=01/12/2050 10:00 AM
-build=devvers
+build=master-dev
 builder=tsagrista
-version=[dev]
+version=[master-dev]
 system=Linux linteum 5.5.0-00-generic Arch Oct 23 09:16:58 UTC 2050 x86_64 GNU/Linux
