@@ -568,7 +568,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
             // Update more info table
             moreInfo.clear();
-            externalInfoUpdater.update(focus);
+            if (externalInfoUpdater != null)
+                externalInfoUpdater.update(focus);
 
             break;
         case FOCUS_INFO_UPDATED:

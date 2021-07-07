@@ -363,7 +363,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Init timer if needed
         Timer.instance();
 
-
         // Initialise Cameras
         cam = new CameraManager(manager, CameraMode.FOCUS_MODE, vr);
 
@@ -650,7 +649,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Timer.schedule(debugTask10, 2, 10);
 
         // Start capturing locations
-        Task startCapturing = new Task(){
+        Task startCapturing = new Task() {
             @Override
             public void run() {
                 LocationLogManager.instance().startCapturing();
@@ -676,7 +675,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
             if (GlobalConf.runtime.OPENVR) {
                 // Free mode by default in VR
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                Task freeMode = new Task(){
+
+                    public void run() {
+                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                    }};
+                Timer.schedule(freeMode, 1f);
             }
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
@@ -926,9 +930,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      **/
     private final Runnable runnableLoadingGui = () -> {
         boolean finished = false;
-        try{
+        try {
             finished = manager.update();
-        } catch(GdxRuntimeException e){
+        } catch (GdxRuntimeException e) {
             // Resource failed to load
             logger.warn(e.getLocalizedMessage());
         }
@@ -1211,7 +1215,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return vrDeviceToModel;
     }
 
-    public GuiRegistry getGuiRegistry(){
+    public GuiRegistry getGuiRegistry() {
         return this.guiRegistry;
     }
 

@@ -379,11 +379,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     /**
-     * Line renderer. Renders proper motion
-     *
-     * @param renderer
-     * @param camera
-     * @param alpha
+     * Line renderer. Renders proper motions
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {

@@ -200,7 +200,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 }
             }
 
-            /** LEFT EYE **/
+            /* LEFT EYE */
 
             // Camera to left
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
@@ -228,7 +228,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             sendOrientationUpdate(camera.getCamera(), rw, rh);
             postProcessRender(ppb, fbLeft, postProcess, camera, rw, rh);
 
-            /** RIGHT EYE **/
+            /* RIGHT EYE */
 
             // Camera to right
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
@@ -258,11 +258,11 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             sendOrientationUpdate(camera.getCamera(), rw, rh);
             postProcessRender(ppb, fbRight, postProcess, camera, rw, rh);
 
-            /** SUBMIT TO VR COMPOSITOR **/
+            /* SUBMIT TO VR COMPOSITOR */
             VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, texLeft, null, VR.EVRSubmitFlags_Submit_Default);
             VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, texRight, null, VR.EVRSubmitFlags_Submit_Default);
 
-            /** Render to screen **/
+            /* Render to screen */
             RenderUtils.renderKeepAspect(fbLeft, sbScreen, Gdx.graphics, lastSize);
 
         }

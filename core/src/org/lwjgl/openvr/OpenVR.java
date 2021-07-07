@@ -19,8 +19,12 @@ import static org.lwjgl.system.MemoryStack.stackPush;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memPointerBuffer;
 
-/** The OpenVR function tables. */
-public final class GaiaSkyOpenVR {
+/**
+ * Rewrite the {@link org.lwjgl.openvr.OpenVR} main class to exclude the initialization of
+ * some modules (chaperone, overlay, resources, render models, etc.) that do not
+ * play well with OpenComposite.
+ */
+public final class OpenVR {
 
     @Nullable public static IVRSystem VRSystem;
     @Nullable public static IVRChaperone VRChaperone;
@@ -47,13 +51,13 @@ public final class GaiaSkyOpenVR {
         String libName = Platform.mapLibraryNameBundled("lwjgl_openvr");
 
         // lwjgl 3.2.3
-        Library.loadSystem(System::load, System::loadLibrary, GaiaSkyOpenVR.class, "org.lwjgl.openvr", libName);
+        Library.loadSystem(System::load, System::loadLibrary, org.lwjgl.openvr.OpenVR.class, "org.lwjgl.openvr", libName);
 
         // lwjgl 3.2.2
         //Library.loadSystem(System::load, System::loadLibrary, OpenVR.class, libName);
     }
 
-    private GaiaSkyOpenVR() {
+    private OpenVR() {
     }
 
     static void initialize() {
@@ -61,7 +65,7 @@ public final class GaiaSkyOpenVR {
     }
 
     public static void create(int token) {
-        GaiaSkyOpenVR.token = token;
+        OpenVR.token = token;
 
         VRSystem = getGenericInterface(IVRSystem_Version, IVRSystem::new);
         //VRChaperone = getGenericInterface(IVRChaperone_Version, IVRChaperone::new);

@@ -50,46 +50,14 @@ import java.util.TreeMap;
 public class Star extends Particle {
 
     /** Has the model used to represent the star **/
-    private static ModelComponent mc;
-    private static Matrix4 modelTransform;
+    private ModelComponent mc;
+    private Matrix4 modelTransform;
 
     /** HIP number, negative if non existent **/
     public int hip = -1;
     /** TYCHO2 identifier string **/
     public String tycho = null;
 
-    public static void initModel() {
-        if (mc == null) {
-            Texture tex = new Texture(GlobalConf.data.dataFile("tex/base/star.jpg"));
-            Texture lut = new Texture(GlobalConf.data.dataFile("tex/base/lut.jpg"));
-            tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-
-            Map<String, Object> params = new TreeMap<>();
-            params.put("quality", 120l);
-            params.put("diameter", 1d);
-            params.put("flip", false);
-
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
-            IntModel model = pair.getFirst();
-            Material mat = pair.getSecond().get("base");
-            mat.clear();
-            mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-            mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
-            // Only to activate view vector (camera position)
-            mat.set(new TextureAttribute(TextureAttribute.Specular, lut));
-            mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
-            modelTransform = new Matrix4();
-            mc = new ModelComponent(false);
-            mc.initialize();
-            mc.env = new Environment();
-            mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-            mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
-            mc.instance = new IntModelInstance(model, modelTransform);
-            // Relativistic effects
-            if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
-                mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
-        }
-    }
 
     double modelDistance;
 
@@ -103,23 +71,15 @@ public class Star extends Particle {
 
     /**
      * Creates a new Star object
-     * 
-     * @param pos
-     *            The position of the star in equatorial cartesian coordinates
-     * @param appmag
-     *            The apparent magnitude
-     * @param absmag
-     *            The absolute magnitude
-     * @param colorbv
-     *            The B-V color index
-     * @param names
-     *            The proper names of the star, if any
-     * @param ra
-     *            in degrees
-     * @param dec
-     *            in degrees
-     * @param starid
-     *            The star id
+     *
+     * @param pos     The position of the star in equatorial cartesian coordinates
+     * @param appmag  The apparent magnitude
+     * @param absmag  The absolute magnitude
+     * @param colorbv The B-V color index
+     * @param names   The proper names of the star, if any
+     * @param ra      in degrees
+     * @param dec     in degrees
+     * @param starid  The star id
      */
     public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
         super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
@@ -127,27 +87,17 @@ public class Star extends Particle {
 
     /**
      * Creates a new Star object
-     * 
-     * @param pos
-     *            The position of the star in equatorial cartesian coordinates
-     * @param appmag
-     *            The apparent magnitude
-     * @param absmag
-     *            The absolute magnitude
-     * @param colorbv
-     *            The B-V color index
-     * @param names
-     *            The proper names of the star, if any
-     * @param ra
-     *            in degrees
-     * @param dec
-     *            in degrees
-     * @param starid
-     *            The star id
-     * @param hip
-     *            The HIP identifier
-     * @param source
-     *            Catalog source. 1: Gaia, 2: HIP, 3: TYC, -1: Unknown
+     *
+     * @param pos     The position of the star in equatorial cartesian coordinates
+     * @param appmag  The apparent magnitude
+     * @param absmag  The absolute magnitude
+     * @param colorbv The B-V color index
+     * @param names   The proper names of the star, if any
+     * @param ra      in degrees
+     * @param dec     in degrees
+     * @param starid  The star id
+     * @param hip     The HIP identifier
+     * @param source  Catalog source. 1: Gaia, 2: HIP, 3: TYC, -1: Unknown
      */
     public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, byte source) {
         super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
@@ -157,32 +107,20 @@ public class Star extends Particle {
 
     /**
      * Creates a new Star object
-     * 
-     * @param pos
-     *            The position of the star in equatorial cartesian coordinates
-     * @param pm
-     *            The proper motion of the star in equatorial cartesian
-     *            coordinates.
-     * @param pmSph
-     *            The proper motion with mualpha, mudelta, radvel.
-     * @param appmag
-     *            The apparent magnitude
-     * @param absmag
-     *            The absolute magnitude
-     * @param colorbv
-     *            The B-V color index
-     * @param names
-     *            The proper names of the star, if any
-     * @param ra
-     *            in degrees
-     * @param dec
-     *            in degrees
-     * @param starid
-     *            The star id
-     * @param hip
-     *            The HIP identifier
-     * @param source
-     *            Catalog source. See {#Particle}
+     *
+     * @param pos     The position of the star in equatorial cartesian coordinates
+     * @param pm      The proper motion of the star in equatorial cartesian
+     *                coordinates.
+     * @param pmSph   The proper motion with mualpha, mudelta, radvel.
+     * @param appmag  The apparent magnitude
+     * @param absmag  The absolute magnitude
+     * @param colorbv The B-V color index
+     * @param names   The proper names of the star, if any
+     * @param ra      in degrees
+     * @param dec     in degrees
+     * @param starid  The star id
+     * @param hip     The HIP identifier
+     * @param source  Catalog source. See {#Particle}
      */
     public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, String tycho, byte source) {
         super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
@@ -193,29 +131,18 @@ public class Star extends Particle {
 
     /**
      * Creates a new Star object
-     * 
-     * @param pos
-     *            The position of the star in equatorial cartesian coordinates
-     * @param appmag
-     *            The apparent magnitude
-     * @param absmag
-     *            The absolute magnitude
-     * @param colorbv
-     *            The B-V color index
-     * @param names
-     *            The proper names of the star, if any
-     * @param ra
-     *            in degrees
-     * @param dec
-     *            in degrees
-     * @param starid
-     *            The star id
-     * @param hip
-     *            The HIP identifier
-     * @param tycho
-     *            The TYC identifier
-     * @param source
-     *            Catalog source. See {#Particle}
+     *
+     * @param pos     The position of the star in equatorial cartesian coordinates
+     * @param appmag  The apparent magnitude
+     * @param absmag  The absolute magnitude
+     * @param colorbv The B-V color index
+     * @param names   The proper names of the star, if any
+     * @param ra      in degrees
+     * @param dec     in degrees
+     * @param starid  The star id
+     * @param hip     The HIP identifier
+     * @param tycho   The TYC identifier
+     * @param source  Catalog source. See {#Particle}
      */
     public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, String tycho, byte source) {
         this(pos, appmag, absmag, colorbv, names, ra, dec, starid, hip, source);
@@ -224,28 +151,18 @@ public class Star extends Particle {
 
     /**
      * Creates a new Star object
-     * 
-     * @param pos
-     *            The position of the star in equatorial cartesian coordinates
-     * @param pm
-     *            The proper motion of the star in equatorial cartesian
-     *            coordinates
-     * @param pmSph
-     *            The proper motion with mualpha, mudelta, radvel.
-     * @param appmag
-     *            The apparent magnitude
-     * @param absmag
-     *            The absolute magnitude
-     * @param colorbv
-     *            The B-V color index
-     * @param names
-     *            The proper names of the star, if any
-     * @param ra
-     *            in degrees
-     * @param dec
-     *            in degrees
-     * @param starid
-     *            The star id
+     *
+     * @param pos     The position of the star in equatorial cartesian coordinates
+     * @param pm      The proper motion of the star in equatorial cartesian
+     *                coordinates
+     * @param pmSph   The proper motion with mualpha, mudelta, radvel.
+     * @param appmag  The apparent magnitude
+     * @param absmag  The absolute magnitude
+     * @param colorbv The B-V color index
+     * @param names   The proper names of the star, if any
+     * @param ra      in degrees
+     * @param dec     in degrees
+     * @param starid  The star id
      */
     public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
         super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
@@ -259,8 +176,44 @@ public class Star extends Particle {
     }
 
     @Override
+    public void doneLoading(AssetManager manager) {
+        initModel();
+    }
+
+    private void initModel() {
+        Texture tex = new Texture(GlobalConf.data.dataFile("tex/base/star.jpg"));
+        Texture lut = new Texture(GlobalConf.data.dataFile("tex/base/lut.jpg"));
+        tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+        Map<String, Object> params = new TreeMap<>();
+        params.put("quality", 120l);
+        params.put("diameter", 1d);
+        params.put("flip", false);
+
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+        IntModel model = pair.getFirst();
+        Material mat = pair.getSecond().get("base");
+        mat.clear();
+        mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+        mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
+        // Only to activate view vector (camera position)
+        mat.set(new TextureAttribute(TextureAttribute.Specular, lut));
+        mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+        modelTransform = new Matrix4();
+        mc = new ModelComponent(false);
+        mc.initialize();
+        mc.env = new Environment();
+        mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
+        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
+        mc.instance = new IntModelInstance(model, modelTransform);
+        // Relativistic effects
+        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+            mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
+    }
+
+    @Override
     protected void addToRenderLists(ICamera camera) {
-        if(this.shouldRender()) {
+        if (this.shouldRender()) {
             camera.checkClosestParticle(this);
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
@@ -334,11 +287,6 @@ public class Star extends Particle {
                 }
             }
         }
-    }
-
-    @Override
-    public void doneLoading(AssetManager manager) {
-        initModel();
     }
 
     public String toString() {
