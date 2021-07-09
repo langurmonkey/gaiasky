@@ -28,6 +28,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * {@link AssetLoader} for all the {@link SceneGraphNode} instances. Loads all
@@ -53,20 +54,19 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
         // Add autoload files to the mix
         Array<String> filePaths = new Array<>(parameter.files);
         Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
-        File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> {
-            return name != null && name.startsWith("autoload-") && name.endsWith(".json");
-        });
+        File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> name != null && name.startsWith("autoload-") && name.endsWith(".json"));
+        Objects.requireNonNull(autoloadFiles, "Your data folder does not point to a valid directory: " + dataFolder) ;
         for (File autoloadFile : autoloadFiles) {
             filePaths.add(autoloadFile.getAbsolutePath().replace("\\\\", "/"));
         }
 
-        FileHandle[] filehandles = new FileHandle[filePaths.size];
+        FileHandle[] fileHandles = new FileHandle[filePaths.size];
         for (int i = 0; i < filePaths.size; i++) {
-            filehandles[i] = this.resolve(filePaths.get(i));
+            fileHandles[i] = this.resolve(filePaths.get(i));
         }
 
         try {
-            sg = SceneGraphJsonLoader.loadSceneGraph(filehandles, parameter.time, parameter.multithreading, parameter.maxThreads);
+            sg = SceneGraphJsonLoader.loadSceneGraph(fileHandles, parameter.time, parameter.multithreading, parameter.maxThreads);
         } catch (Exception e) {
             GaiaSky.postRunnable(() -> {
                 CrashReporter.reportCrash(e, logger);

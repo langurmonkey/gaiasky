@@ -73,8 +73,6 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
                 double z = Parser.parseDouble(tokens[2]);
                 if (z >= 0) {
                     // Dist in MPC
-                    // double dist = redshiftToDistance(0.272, 0.0000812,
-                    // 0.728, 70.4, z);
                     double dist = ((z * 299792.46) / 71);
                     if (dist > 16) {
                         // Convert position

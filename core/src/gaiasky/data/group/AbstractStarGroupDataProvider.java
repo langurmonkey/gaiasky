@@ -33,6 +33,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
+    /**
+     * Represents a column type.
+     */
     public enum ColId {
         sourceid,
         hip,
@@ -64,89 +67,33 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     }
 
     public ColId colIdFromStr(final String name) {
-        switch (name) {
-        case "source_id":
-        case "sourceid":
-            return ColId.sourceid;
-        case "hip":
-            return ColId.hip;
-        case "names":
-        case "name":
-            return ColId.names;
-        case "ra":
-            return ColId.ra;
-        case "dec":
-        case "de":
-            return ColId.dec;
-        case "plx":
-        case "pllx":
-        case "parallax":
-            return ColId.pllx;
-        case "ra_e":
-        case "ra_err":
-        case "ra_error":
-            return ColId.ra_err;
-        case "dec_e":
-        case "dec_err":
-        case "dec_error":
-        case "de_e":
-        case "de_err":
-        case "de_error":
-            return ColId.dec_err;
-        case "plx_e":
-        case "plx_err":
-        case "plx_error":
-        case "pllx_e":
-        case "pllx_err":
-        case "pllx_error":
-            return ColId.pllx_err;
-        case "pmra":
-            return ColId.pmra;
-        case "pmdec":
-        case "pmde":
-            return ColId.pmdec;
-        case "radvel":
-        case "rv":
-            return ColId.radvel;
-        case "radvel_err":
-        case "radvel_e":
-        case "rv_err":
-        case "rv_e":
-            return ColId.radvel_err;
-        case "gmag":
-        case "appmag":
-            return ColId.gmag;
-        case "bpmag":
-        case "bp":
-            return ColId.bpmag;
-        case "rpmag":
-        case "rp":
-            return ColId.rpmag;
-        case "bp-rp":
-        case "bp_rp":
-            return ColId.bp_rp;
-        case "col_idx":
-        case "b_v":
-        case "b-v":
-            return ColId.col_idx;
-        case "ref_epoch":
-            return ColId.ref_epoch;
-        case "ruwe":
-            return ColId.ruwe;
-        case "teff":
-        case "t_eff":
-        case "T_eff":
-            return ColId.teff;
-        case "ag":
-            return ColId.ag;
-        case "ebp_min_rp":
-            return ColId.ebp_min_rp;
-        case "geodist":
-            return ColId.geodist;
-        default:
-            return null;
-
-        }
+        return switch (name) {
+            case "source_id", "sourceid" -> ColId.sourceid;
+            case "hip" -> ColId.hip;
+            case "names", "name" -> ColId.names;
+            case "ra" -> ColId.ra;
+            case "dec", "de" -> ColId.dec;
+            case "plx", "pllx", "parallax" -> ColId.pllx;
+            case "ra_e", "ra_err", "ra_error" -> ColId.ra_err;
+            case "dec_e", "dec_err", "dec_error", "de_e", "de_err", "de_error" -> ColId.dec_err;
+            case "plx_e", "plx_err", "plx_error", "pllx_e", "pllx_err", "pllx_error" -> ColId.pllx_err;
+            case "pmra" -> ColId.pmra;
+            case "pmdec", "pmde" -> ColId.pmdec;
+            case "radvel", "rv" -> ColId.radvel;
+            case "radvel_err", "radvel_e", "rv_err", "rv_e" -> ColId.radvel_err;
+            case "gmag", "appmag" -> ColId.gmag;
+            case "bpmag", "bp" -> ColId.bpmag;
+            case "rpmag", "rp" -> ColId.rpmag;
+            case "bp-rp", "bp_rp" -> ColId.bp_rp;
+            case "col_idx", "b_v", "b-v" -> ColId.col_idx;
+            case "ref_epoch" -> ColId.ref_epoch;
+            case "ruwe" -> ColId.ruwe;
+            case "teff", "t_eff", "T_eff" -> ColId.teff;
+            case "ag" -> ColId.ag;
+            case "ebp_min_rp" -> ColId.ebp_min_rp;
+            case "geodist" -> ColId.geodist;
+            default -> null;
+        };
     }
 
     protected Map<ColId, Integer> indexMap;
@@ -223,10 +170,9 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
 
     /**
      * Files or folders with optionally gzipped CSVs containing additional columns to be matched by sourceid with the main catalog. Column names must comport
-     * to {@link ColId}
+     * to {@link ColId}.
      */
     protected String[] additionalFiles = null;
-    private String additionalSplit = ",|\\s+";
 
     /**
      * RUWE cap value. Will accept all stars with star_ruwe <= ruwe
@@ -598,12 +544,11 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     /**
      * Loads a single file, optionally gzipped into the given {@link AdditionalCols}
      *
-     * @param f     The path
-     * @param addit The {@link AdditionalCols} instance
-     * @throws IOException
-     * @throws RuntimeException
+     * @param f     The path.
+     * @param additionalCols The {@link AdditionalCols} instance.
+     * @throws RuntimeException If the format of <code>additionalCols</code> is not correct.
      */
-    private void loadAdditionalFile(Path f, AdditionalCols addit) throws IOException, RuntimeException {
+    private void loadAdditionalFile(Path f, AdditionalCols additionalCols) throws RuntimeException {
         FileChannel fc = null;
         InputStream data = null;
         try {
@@ -614,6 +559,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                 data = new GZIPInputStream(data);
             BufferedReader br = new BufferedReader(new InputStreamReader(data));
             // Read header
+            String additionalSplit = ",|\\s+";
             String[] header = br.readLine().strip().split(additionalSplit);
             int i = 0;
             for (String col : header) {
@@ -622,19 +568,19 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                     logger.error("First column: " + col + ", should be: " + ColId.sourceid.name());
                     throw new RuntimeException("Additional columns file must contain a sourceid in the first column");
                 }
-                if (i > 0 && !addit.indices.containsKey(col)) {
-                    addit.indices.put(col, i - 1);
+                if (i > 0 && !additionalCols.indices.containsKey(col)) {
+                    additionalCols.indices.put(col, i - 1);
                 }
                 i++;
             }
-            int ncols = header.length - 1;
+            int nCols = header.length - 1;
             String line;
             i = 0;
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(additionalSplit);
                 Long sourceId = Parser.parseLong(tokens[0].trim());
-                double[] vals = new double[ncols];
-                for (int j = 1; j <= ncols; j++) {
+                double[] vals = new double[nCols];
+                for (int j = 1; j <= nCols; j++) {
                     if (tokens[j] != null && !tokens[j].strip().isBlank()) {
                         Double val = Parser.parseDouble(tokens[j].strip());
                         vals[j - 1] = val;
@@ -643,7 +589,7 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
                         vals[j - 1] = Double.NaN;
                     }
                 }
-                addit.values.put(sourceId, vals);
+                additionalCols.values.put(sourceId, vals);
                 i++;
             }
             br.close();

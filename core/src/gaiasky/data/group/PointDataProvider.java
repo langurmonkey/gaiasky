@@ -41,7 +41,6 @@ public class PointDataProvider implements IParticleGroupDataProvider {
             }
         }
 
-        @SuppressWarnings("unchecked")
         List<IParticleRecord> pointData = loadData(is, factor);
 
         if (pointData != null)
@@ -53,8 +52,8 @@ public class PointDataProvider implements IParticleGroupDataProvider {
     @Override
     public List<IParticleRecord> loadData(InputStream is, double factor) {
         List<IParticleRecord> pointData = new ArrayList<>();
-        try {
-            int tokenslen;
+        try (is) {
+            int tokensLength;
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line;
             while ((line = br.readLine()) != null) {
@@ -62,14 +61,14 @@ public class PointDataProvider implements IParticleGroupDataProvider {
                     try {
                         // Read line
                         String[] tokens = line.split("\\s+");
-                        tokenslen = tokens.length;
-                        double[] point = new double[tokenslen];
-                        for (int j = 0; j < tokenslen; j++) {
+                        tokensLength = tokens.length;
+                        double[] point = new double[tokensLength];
+                        for (int j = 0; j < tokensLength; j++) {
                             // We use regular parser because of scientific notation
                             point[j] = Double.parseDouble(tokens[j]) * factor;
                         }
                         pointData.add(new PointParticleRecord(point));
-                    }catch(NumberFormatException e){
+                    } catch (NumberFormatException e) {
                         // Skip line
                     }
                 }
@@ -77,17 +76,11 @@ public class PointDataProvider implements IParticleGroupDataProvider {
 
             br.close();
 
-
         } catch (Exception e) {
             logger.error(e);
             return null;
-        }finally{
-            try {
-                is.close();
-            }catch(Exception e){
-                // Nothing
-            }
         }
+        // Nothing
 
         return pointData;
     }

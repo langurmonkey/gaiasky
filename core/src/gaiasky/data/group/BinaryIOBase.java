@@ -32,14 +32,11 @@ public abstract class BinaryIOBase implements BinaryIO {
             if (i < ParticleRecord.STAR_SIZE_D) {
                 // Goes to double array
                 dataD[i] = mem.getDouble();
-                if (i < 3)
-                    dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
+                dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
                 int idx = i - ParticleRecord.STAR_SIZE_D;
                 dataF[idx] = (float) mem.getDouble();
-                if (i < 3)
-                    dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
                 floatOffset = idx + 1;
             }
         }
@@ -90,14 +87,11 @@ public abstract class BinaryIOBase implements BinaryIO {
             if (i < ParticleRecord.STAR_SIZE_D) {
                 // Goes to double array
                 dataD[i] = in.readDouble();
-                if (i < 3)
-                    dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
+                dataD[i] *= factor * Constants.DISTANCE_SCALE_FACTOR;
             } else {
                 // Goes to float array
                 int idx = i - ParticleRecord.STAR_SIZE_D;
                 dataF[idx] = (float) in.readDouble();
-                if (i < 3)
-                    dataF[idx] *= Constants.DISTANCE_SCALE_FACTOR;
                 floatOffset = idx + 1;
             }
         }

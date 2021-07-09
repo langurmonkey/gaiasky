@@ -41,10 +41,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
             int n = l.size();
             initLists(n);
 
-            for (int i = 0; i < n; i++) {
-                IParticleRecord point = l.get(i);
-                list.add(point);
-            }
+            list.addAll(l);
 
             return list;
         } catch (Exception e) {
