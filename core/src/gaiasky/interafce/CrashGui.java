@@ -51,7 +51,7 @@ public class CrashGui extends AbstractGui {
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
         } else {
-            vp.update(GaiaSky.graphics.getWidth(), GaiaSky.graphics.getHeight(), true);
+            vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
 
         skin = GlobalResources.skin;
@@ -93,7 +93,6 @@ public class CrashGui extends AbstractGui {
         @Override
         protected void build() {
             content.clear();
-
 
             // Crash image
             Image img = new Image(new Texture(Gdx.files.internal("img/crash.png")));

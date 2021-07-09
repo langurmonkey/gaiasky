@@ -59,7 +59,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
 
     @Override
     protected AbstractOctreeWrapper loadOctreeData() {
-        /**
+        /*
          * LOAD METADATA
          */
         logger.info(I18n.txt("notif.loading", metadata));
@@ -71,7 +71,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             logger.info(I18n.txt("notif.nodeloader", root.numNodesRec(), metadata));
             logger.info(I18n.txt("notif.loading", particles));
 
-            /**
+            /*
              * CREATE OCTREE WRAPPER WITH ROOT NODE - particle group is by default
              * parallel, so we never use OctreeWrapperConcurrent
              */
@@ -87,7 +87,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
 
             dataVersionHint = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
 
-            /**
+            /*
              * LOAD LOD LEVELS - LOAD PARTICLE DATA
              */
             try {
@@ -110,7 +110,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
         if (!octantFile.exists() || octantFile.isDirectory()) {
             return false;
         }
-        @SuppressWarnings("unchecked") List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
+        List<IParticleRecord> data = particleReader.loadDataMapped(octantFile.path(), 1.0, dataVersionHint);
         StarGroup sg = StarGroup.getDefaultStarGroup("stargroup-%%SGID%%", data, fullInit);
         sg.setEpoch(epoch);
         sg.setCatalogInfoBare(octreeWrapper.getCatalogInfo());

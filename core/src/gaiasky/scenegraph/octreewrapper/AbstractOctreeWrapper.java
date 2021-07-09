@@ -7,6 +7,7 @@ package gaiasky.scenegraph.octreewrapper;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
@@ -241,7 +242,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     @Override
     public void dispose() {
-        sg.remove(this, true);
+        GaiaSky.instance.sg.remove(this, true);
         root.dispose();
         parenthood.clear();
         roulette.clear();

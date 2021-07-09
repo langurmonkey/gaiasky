@@ -740,7 +740,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void dispose() {
         this.disposed = true;
-        sg.remove(this, true);
+        GaiaSky.instance.sg.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Dispose of GPU datOLO

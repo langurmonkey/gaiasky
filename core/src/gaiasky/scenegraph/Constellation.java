@@ -37,9 +37,9 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     private static final Array<Constellation> allConstellations = new Array<>(false, 88);
     private double deltaYears;
 
-    public static void updateConstellations() {
+    public static void updateConstellations(ISceneGraph sceneGraph) {
         for (Constellation c : allConstellations) {
-            c.setUp();
+            c.setUp(sceneGraph);
         }
     }
 
@@ -102,13 +102,13 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     }
 
     @Override
-    public void setUp() {
+    public void setUp(ISceneGraph sceneGraph) {
         if (!allLoaded) {
             int nPairs = ids.size;
             if (lines == null) {
                 lines = new IPosition[nPairs][];
             }
-            ObjectMap<Integer, IPosition> hipMap = sg.getStarMap();
+            ObjectMap<Integer, IPosition> hipMap = sceneGraph.getStarMap();
             allLoaded = true;
             for (int i = 0; i < nPairs; i++) {
                 int[] pair = ids.get(i);

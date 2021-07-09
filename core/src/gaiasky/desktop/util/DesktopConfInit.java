@@ -413,14 +413,14 @@ public class DesktopConfInit extends ConfInit {
     }
 
     private int getValidWidth() {
-        int w = GaiaSky.graphics != null ? GaiaSky.graphics.getWidth() : 0;
+        int w = GaiaSky.instance.graphics != null ? GaiaSky.instance.graphics.getWidth() : 0;
         if (w <= 0)
             return 1280;
         return w;
     }
 
     private int getValidHeight() {
-        int h = GaiaSky.graphics != null ? GaiaSky.graphics.getHeight() : 0;
+        int h = GaiaSky.instance.graphics != null ? GaiaSky.instance.graphics.getHeight() : 0;
         if (h <= 0)
             return 720;
         return h;

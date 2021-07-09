@@ -77,8 +77,8 @@ import java.time.Instant;
 import java.util.*;
 
 /**
- * The main class. Holds all the entities manages the update/draw cycle as well
- * as the image rendering.
+ * The main class. Holds all the entities manages the update/draw cycle and all
+ * other top-level functions of Gaia Sky.
  */
 public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private static final Log logger = Logger.getLogger(GaiaSky.class);
@@ -102,11 +102,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Window
      **/
-    public static Lwjgl3Window window;
+    public Lwjgl3Window window;
     /**
      * Graphics
      **/
-    public static Lwjgl3Graphics graphics;
+    public Lwjgl3Graphics graphics;
 
     /**
      * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
@@ -137,8 +137,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // Data load string
     private String dataLoadString;
 
+    // Reference to the scene graph
     public ISceneGraph sg;
+    // Scene graph renderer
     private SceneGraphRenderer sgr;
+    // Main post processor
     private IPostProcessor pp;
 
     // Start time
@@ -414,7 +417,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
         if (GlobalConf.runtime.OPENVR) {
-            welcomeGuiVR = new VRGui(WelcomeGuiVR.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
+            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
             welcomeGuiVR.initialize(manager, GlobalResources.spriteBatch);
         }
 
@@ -668,31 +671,45 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
      */
     private void goHome() {
-        if (sg.containsNode(GlobalConf.scene.STARTUP_OBJECT) && !GlobalConf.program.NET_SLAVE && isOn(ComponentType.Planets.ordinal())) {
+        IFocus homeObject = sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
+        boolean isOn = true;
+        if (homeObject != null && (isOn = GaiaSky.instance.isOn(homeObject.getCt())) && !GlobalConf.program.NET_SLAVE) {
             // Set focus to Earth
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sg.findFocus(GlobalConf.scene.STARTUP_OBJECT), true);
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, homeObject, true);
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
             if (GlobalConf.runtime.OPENVR) {
                 // Free mode by default in VR
-                Task freeMode = new Task(){
+                Task freeMode = new Task() {
 
                     public void run() {
                         EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-                    }};
+                    }
+                };
                 Timer.schedule(freeMode, 1f);
             }
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0, 5 * Constants.AU_TO_U, 0 });
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0, -1, 0 });
-            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0, 0, 1 });
+            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
+            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0d, -1d, 0d });
+            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0d, 0d, 1d });
+        }
+
+        if (!isOn) {
+            Task t = new Task(){
+
+                @Override
+                public void run() {
+                    logger.info("The home object '" + GlobalConf.scene.STARTUP_OBJECT + "' is invisible due to its type(s): " + homeObject.getCt());
+                }
+            };
+            Timer.schedule(t, 1);
         }
     }
 
     /**
-     * Reinitialises all the GUI (step 1)
+     * Re-initialises all the GUI (step 1)
      */
     public void reinitialiseGUI1() {
         if (guis != null && !guis.isEmpty()) {
@@ -965,7 +982,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         renderGui((vrGui).right());
         vrLoadingRightFb.end();
 
-        /** SUBMIT TO VR COMPOSITOR **/
+        /* SUBMIT TO VR COMPOSITOR */
         VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Left, vrLoadingLeftTex, null, VR.EVRSubmitFlags_Submit_Default);
         VRCompositor.VRCompositor_Submit(VR.EVREye_Eye_Right, vrLoadingRightTex, null, VR.EVRSubmitFlags_Submit_Default);
     }
@@ -1133,7 +1150,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     private void updateResize() {
         long currResizeTime = System.currentTimeMillis();
-        if (currResizeTime - lastResizeTime > 100l) {
+        if (currResizeTime - lastResizeTime > 100L) {
             resizeImmediate(resizeWidth, resizeHeight, !GlobalConf.runtime.OPENVR, !GlobalConf.runtime.OPENVR, true, true);
             lastResizeTime = Long.MAX_VALUE;
         }
@@ -1179,14 +1196,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param gui The GUI to render
      */
     private void renderGui(IGui gui) {
-        gui.update(graphics.getDeltaTime());
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-        Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-        gui.render(graphics.getWidth(), graphics.getHeight());
-    }
-
-    private void renderGui(IGui gui, int w, int h) {
         gui.update(graphics.getDeltaTime());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -1263,7 +1272,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Also VR
             if (GlobalConf.runtime.OPENVR) {
-                loadingGuiVR = new VRGui(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
+                loadingGuiVR = new VRGui<>(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
                 loadingGuiVR.initialize(manager, GlobalResources.spriteBatch);
             }
 
@@ -1373,9 +1382,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             final SceneGraphNode nodeToRemove = aux;
             final boolean removeFromIndex = data.length == 1 || (Boolean) data[1];
             if (sg != null) {
-                postRunnable(() -> {
-                    sg.remove(nodeToRemove, removeFromIndex);
-                });
+                postRunnable(() -> sg.remove(nodeToRemove, removeFromIndex));
             }
             break;
         case UI_SCALE_CMD:
@@ -1421,10 +1428,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     /**
      * Parks a runnable that will run every frame right the update() method (before render)
-     * until it is unparked
+     * until it is unparked.
      *
-     * @param key      The key to identify the runnable
-     * @param runnable The runnable
+     * @param key      The key to identify the runnable.
+     * @param runnable The runnable.
      */
     public void parkRunnable(String key, Runnable runnable) {
         parkedRunnablesMap.put(key, runnable);
@@ -1432,9 +1439,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     /**
-     * Unparks a previously parked runnable
+     * Unparks a previously parked runnable.
      *
-     * @param key The key of the runnable to unpark
+     * @param key The key of the runnable to unpark.
      */
     public void unparkRunnable(String key) {
         Runnable r = parkedRunnablesMap.get(key);
@@ -1444,9 +1451,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
     }
 
+    /**
+     * Posts a runnable that will run once after the current frame.
+     *
+     * @param r The runnable to post.
+     */
     public static void postRunnable(Runnable r) {
-        if (window != null)
-            window.postRunnable(r);
+        if (instance != null && instance.window != null)
+            instance.window.postRunnable(r);
         else
             Gdx.app.postRunnable(r);
     }

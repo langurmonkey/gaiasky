@@ -46,7 +46,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
-        /** Star brightness **/
+        /* Star brightness */
         starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.setName("star brightness");
         starBrightness.setWidth(contentWidth);
@@ -59,7 +59,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Star brightness power **/
+        /* Star brightness power */
         starBrightnessPower = new OwnSliderPlus(I18n.txt("gui.starbrightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
         starBrightnessPower.setName("star brightness power");
         starBrightnessPower.setWidth(contentWidth);
@@ -72,7 +72,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Star size **/
+        /* Star size */
         starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
         starSize.setName("star size");
         starSize.setWidth(contentWidth);
@@ -85,7 +85,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Star min opacity **/
+        /* Star min opacity */
         starMinOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
         starMinOpacity.setName("star min opacity");
         starMinOpacity.setWidth(contentWidth);
@@ -98,7 +98,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Ambient light **/
+        /* Ambient light */
         ambientLight = new OwnSliderPlus(I18n.txt("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
         ambientLight.setName("ambient light");
         ambientLight.setWidth(contentWidth);
@@ -111,7 +111,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Label size **/
+        /* Label size */
         labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
         labelSize.setName("label size");
         labelSize.setWidth(contentWidth);
@@ -125,7 +125,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Line width **/
+        /* Line width */
         lineWidth = new OwnSliderPlus(I18n.txt("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setName("line width");
         lineWidth.setWidth(contentWidth);
@@ -139,7 +139,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Elevation multiplier **/
+        /* Elevation multiplier */
         elevMult = new OwnSliderPlus(I18n.txt("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
         elevMult.setName("elevation mult");
         elevMult.setWidth(contentWidth);
@@ -153,7 +153,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Reset defaults **/
+        /* Reset defaults */
         resetDefaults = new OwnTextIconButton(I18n.txt("gui.resetdefaults"), skin, "reset");
         resetDefaults.align(Align.center);
         resetDefaults.setWidth(contentWidth);
@@ -196,7 +196,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Add to group **/
+        /* Add to group */
         VerticalGroup lightingGroup = new VerticalGroup().align(Align.left).columnAlign(Align.left);
         lightingGroup.space(pad9);
         lightingGroup.addActor(starBrightness);

@@ -63,7 +63,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         for (int i = 0; i < N_PARTICLES * 2; i++) {
             if (i % 2 == 0) {
                 // First in the pair
-                positions[i] = new Vector3((float) (rand.nextFloat() * Constants.AU_TO_U), 0f, (float) (rand.nextFloat() * Constants.AU_TO_U));
+                positions[i] = new Vector3((float) (rand.nextFloat() * Constants.PC_TO_U), 0f, (float) (rand.nextFloat() * Constants.PC_TO_U));
                 additional[i] = new Vector3(Color.toFloatBits(1f, 1f, 1f, 1f), 3 + rand.nextInt() % 8, ctm);
                 camPositions[i / 2] = new Vector3d();
             } else {

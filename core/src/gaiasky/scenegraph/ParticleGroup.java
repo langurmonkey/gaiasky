@@ -1207,7 +1207,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void dispose() {
         this.disposed = true;
-        sg.remove(this, true);
+        GaiaSky.instance.sg.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Dispose of GPU data

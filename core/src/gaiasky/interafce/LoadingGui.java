@@ -73,7 +73,7 @@ public class LoadingGui extends AbstractGui {
         if (vr) {
             vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
         } else {
-            vp.update(GaiaSky.graphics.getWidth(), GaiaSky.graphics.getHeight(), true);
+            vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
 
         skin = GlobalResources.skin;

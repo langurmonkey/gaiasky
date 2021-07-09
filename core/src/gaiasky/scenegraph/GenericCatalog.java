@@ -2,6 +2,7 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.data.ISceneGraphLoader;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -10,8 +11,8 @@ import gaiasky.util.Logger;
 import uk.ac.starlink.util.DataSource;
 
 /**
- * Represents a generic catalog of entities.
- * This entity loads catalog data given a provider and a file, initializes them
+ * Represents a generic catalog of objects.
+ * This entity loads catalog data given a provider and a file, initializes the objects
  * and adds them as children.
  */
 public class GenericCatalog extends FadeNode {
@@ -33,7 +34,7 @@ public class GenericCatalog extends FadeNode {
      */
     protected DataSource ds;
 
-    protected Array<? extends SceneGraphNode> clusters;
+    protected Array<? extends SceneGraphNode> objects;
 
     public GenericCatalog() {
         super();
@@ -47,7 +48,7 @@ public class GenericCatalog extends FadeNode {
 
     public void initialize(boolean dataLoad, boolean createCatalogInfo) {
         super.initialize();
-        /** Load data **/
+        // Load data
         try {
             String dsName = this.getName();
 
@@ -61,13 +62,12 @@ public class GenericCatalog extends FadeNode {
                     provider.initialize(ds);
 
                 provider.setName(dsName);
-                clusters = provider.loadData();
-                clusters.forEach(object -> {
-                    SceneGraphNode ape = object;
-                    ape.setParent(dsName);
-                    ape.setColor(this.cc);
-                    ape.setLabelcolor(this.labelcolor != null ? this.labelcolor.clone() : this.cc.clone());
-                    ape.initialize();
+                objects = provider.loadData();
+                objects.forEach(object -> {
+                    object.setParent(dsName);
+                    object.setColor(this.cc);
+                    object.setLabelcolor(this.labelcolor != null ? this.labelcolor.clone() : this.cc.clone());
+                    object.initialize();
                 });
             }
 
@@ -89,14 +89,14 @@ public class GenericCatalog extends FadeNode {
     }
 
     @Override
-    public void setUp() {
-        super.setUp();
-        if (clusters != null) {
-            clusters.forEach(object -> {
-                sg.insert(object, true);
+    public void setUp(ISceneGraph sceneGraph) {
+        super.setUp(sceneGraph);
+        if (objects != null) {
+            objects.forEach(object -> {
+                sceneGraph.insert(object, true);
             });
-            clusters.clear();
-            clusters = null;
+            objects.clear();
+            objects = null;
         }
     }
 
