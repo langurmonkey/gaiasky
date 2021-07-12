@@ -123,17 +123,17 @@ public class ConsoleLogger implements IObserver {
         case POST_NOTIFICATION:
             LoggerLevel level = (LoggerLevel) data[0];
             Object[] dat = (Object[]) data[1];
-            String message = "";
+            StringBuilder message = new StringBuilder();
             for (int i = 0; i < dat.length; i++) {
                 if (i == dat.length - 1 && dat[i] instanceof Boolean) {
                 } else {
-                    message += dat[i].toString();
+                    message.append(dat[i].toString());
                     if (i < dat.length - 1 && !(i == dat.length - 2 && dat[data.length - 1] instanceof Boolean)) {
-                        message += TAG_SEPARATOR;
+                        message.append(TAG_SEPARATOR);
                     }
                 }
             }
-            addMessage(message, level);
+            addMessage(message.toString(), level);
             break;
         case FOCUS_CHANGED:
             if (data[0] != null) {
