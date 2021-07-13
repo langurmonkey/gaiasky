@@ -5,6 +5,9 @@
 
 package gaiasky.event;
 
+/**
+ * A delayed message used internally by the {@link EventManager}.
+ */
 public class Telegram implements Comparable<Telegram> {
 
     /** Time in ms at which this telegram must be served **/

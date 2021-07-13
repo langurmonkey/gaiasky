@@ -53,7 +53,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 
 /**
- * Main class for the desktop launcher.
+ * Main class for the Gaia Sky desktop and VR launcher.
  */
 public class GaiaSkyDesktop implements IObserver {
     private static final Log logger = Logger.getLogger(GaiaSkyDesktop.class);

@@ -680,13 +680,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
             if (GlobalConf.runtime.OPENVR) {
                 // Free mode by default in VR
-                Task freeMode = new Task() {
-
-                    public void run() {
-                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-                    }
-                };
-                Timer.schedule(freeMode, 1f);
+                EventManager.instance.postDelayed(Events.CAMERA_MODE_CMD, 1000L, CameraMode.FREE_MODE);
             }
         } else {
             // At 5 AU in Y looking towards origin (top-down look)

@@ -125,8 +125,7 @@ public class ConsoleLogger implements IObserver {
             Object[] dat = (Object[]) data[1];
             StringBuilder message = new StringBuilder();
             for (int i = 0; i < dat.length; i++) {
-                if (i == dat.length - 1 && dat[i] instanceof Boolean) {
-                } else {
+                if (i != dat.length - 1 || !(dat[i] instanceof Boolean)) {
                     message.append(dat[i].toString());
                     if (i < dat.length - 1 && !(i == dat.length - 2 && dat[data.length - 1] instanceof Boolean)) {
                         message.append(TAG_SEPARATOR);
