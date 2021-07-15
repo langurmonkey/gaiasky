@@ -50,7 +50,7 @@ public class ColormapPicker extends ColorPickerAbstract {
 
     private final CatalogInfo catalogInfo;
     private int cmapIndex;
-    private IAttribute<?> cmapAttrib;
+    private IAttribute cmapAttrib;
     private double cmapMin, cmapMax;
 
     public static Array<Pair<String, Integer>> cmapList;

@@ -186,7 +186,8 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     /**
      * Updates the local transform matrix.
      *
-     * @param time
+     * @param time   The time frame provider.
+     * @param camera The camera.
      */
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
@@ -370,7 +371,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     /**
      * Adds all the children that are focusable objects to the list.
      *
-     * @param list
+     * @param list The list of focusable objects.
      */
     public void addFocusableObjects(Array<IFocus> list) {
         list.add(this);
@@ -420,11 +421,10 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
                 if (GlobalConf.program.STEREOSCOPIC_MODE) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
                         pcamera = camera.getCameraStereoLeft();
-                        pcamera.update();
                     } else {
                         pcamera = camera.getCameraStereoRight();
-                        pcamera.update();
                     }
+                    pcamera.update();
                 } else {
                     pcamera = camera.camera;
                 }

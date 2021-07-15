@@ -195,15 +195,15 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             }
             current.add(kf.pos);
 
-            kfPositions[i * 3 + 0] = kf.pos.x;
+            kfPositions[i * 3] = kf.pos.x;
             kfPositions[i * 3 + 1] = kf.pos.y;
             kfPositions[i * 3 + 2] = kf.pos.z;
 
-            kfDirections[i * 3 + 0] = kf.dir.x;
+            kfDirections[i * 3] = kf.dir.x;
             kfDirections[i * 3 + 1] = kf.dir.y;
             kfDirections[i * 3 + 2] = kf.dir.z;
 
-            kfUps[i * 3 + 0] = kf.up.x;
+            kfUps[i * 3] = kf.up.x;
             kfUps[i * 3 + 1] = kf.up.y;
             kfUps[i * 3 + 2] = kf.up.z;
 
@@ -269,7 +269,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 }
                 current.add(kf.pos);
 
-                kfPositions[i * 3 + 0] = kf.pos.x;
+                kfPositions[i * 3] = kf.pos.x;
                 kfPositions[i * 3 + 1] = kf.pos.y;
                 kfPositions[i * 3 + 2] = kf.pos.z;
                 i++;
@@ -284,8 +284,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void setPathKnots(double[] kts, double[] dirs, double[] ups, boolean[] seams) {
         // Points - distribute seams and no seams
         int nSeams = 0, nNoSeams = 0;
-        for (int i = 0; i < seams.length; i++) {
-            if (seams[i])
+        for (boolean seam : seams) {
+            if (seam)
                 nSeams++;
             else
                 nNoSeams++;
@@ -413,11 +413,10 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 if (GlobalConf.program.STEREOSCOPIC_MODE) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
                         pcamera = camera.getCameraStereoLeft();
-                        pcamera.update();
                     } else {
                         pcamera = camera.getCameraStereoRight();
-                        pcamera.update();
                     }
+                    pcamera.update();
                 } else {
                     pcamera = camera.camera;
                 }

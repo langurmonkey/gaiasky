@@ -65,8 +65,6 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
             } catch (ReflectionException e) {
                 Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
-        } else {
-            // Equatorial, nothing
         }
 
     }
@@ -113,7 +111,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
 
         }
         // North-south line
-        stepAngle = 180 / divisionsV;
+        stepAngle = 180f / divisionsV;
         for (int angle = -90; angle <= 90; angle += stepAngle) {
             if (angle != 0) {
                 auxf.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), 1f, auxd).valuesf()).mul(annotTransform).nor();

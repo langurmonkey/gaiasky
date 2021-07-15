@@ -334,6 +334,10 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
+    public void setModelInitialized(boolean initialized) {
+        this.modelInitialised = initialized;
+    }
+
     private void updateStaticLight() {
         GaiaSky.postRunnable(() -> {
             updateStaticLightImmediate();

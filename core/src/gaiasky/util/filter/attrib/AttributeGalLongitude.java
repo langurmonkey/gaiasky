@@ -7,7 +7,7 @@ package gaiasky.util.filter.attrib;
 
 import gaiasky.scenegraph.particle.IParticleRecord;
 
-public class AttributeGalLongitude extends AttributeAbstract implements IAttribute<IParticleRecord> {
+public class AttributeGalLongitude extends AttributeAbstract implements IAttribute {
     @Override
     public double get(IParticleRecord bean) {
         return bean.l();

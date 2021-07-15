@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -49,9 +50,8 @@ import java.util.TreeMap;
 @Deprecated
 public class Star extends Particle {
 
-    /** Has the model used to represent the star **/
+    /** Model used to represent the star **/
     private ModelComponent mc;
-    private Matrix4 modelTransform;
 
     /** HIP number, negative if non existent **/
     public int hip = -1;
@@ -176,17 +176,17 @@ public class Star extends Particle {
     }
 
     @Override
-    public void doneLoading(AssetManager manager) {
-        initModel();
+    public void doneLoading(final AssetManager manager) {
+        initModel(manager);
     }
 
-    private void initModel() {
-        Texture tex = new Texture(GlobalConf.data.dataFile("tex/base/star.jpg"));
-        Texture lut = new Texture(GlobalConf.data.dataFile("tex/base/lut.jpg"));
+    private void initModel(final AssetManager manager) {
+        Texture tex = manager.get(GlobalConf.data.dataFile("tex/base/star.jpg"), Texture.class);
+        Texture lut = manager.get(GlobalConf.data.dataFile("tex/base/lut.jpg"), Texture.class);
         tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         Map<String, Object> params = new TreeMap<>();
-        params.put("quality", 120l);
+        params.put("quality", 120L);
         params.put("diameter", 1d);
         params.put("flip", false);
 
@@ -199,7 +199,7 @@ public class Star extends Particle {
         // Only to activate view vector (camera position)
         mat.set(new TextureAttribute(TextureAttribute.Specular, lut));
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
-        modelTransform = new Matrix4();
+        Matrix4 modelTransform = new Matrix4();
         mc = new ModelComponent(false);
         mc.initialize();
         mc.env = new Environment();
@@ -209,6 +209,7 @@ public class Star extends Particle {
         // Relativistic effects
         if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
             mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
+        mc.setModelInitialized(true);
     }
 
     @Override
@@ -260,28 +261,27 @@ public class Star extends Particle {
                 // The object is in front of us
                 double angle = computeViewAngle(camera.getFovFactor()) * GlobalConf.scene.STAR_BRIGHTNESS * 1e3f;
 
-                PerspectiveCamera pcamera;
+                PerspectiveCamera perspectiveCamera;
                 if (GlobalConf.program.STEREOSCOPIC_MODE) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
-                        pcamera = camera.getCameraStereoLeft();
-                        pcamera.update();
+                        perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
-                        pcamera = camera.getCameraStereoRight();
-                        pcamera.update();
+                        perspectiveCamera = camera.getCameraStereoRight();
                     }
+                    perspectiveCamera.update();
                 } else {
-                    pcamera = camera.camera;
+                    perspectiveCamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pcamera.fieldOfView);
-                double pixelSize = Math.max(minPixDist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
-                pcamera.project(pos);
-                pos.y = pcamera.viewportHeight - pos.y;
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = Math.max(minPixDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                perspectiveCamera.project(pos);
+                pos.y = perspectiveCamera.viewportHeight - pos.y;
                 if (GlobalConf.program.STEREOSCOPIC_MODE) {
                     pos.x /= 2;
                 }
                 // Check click distance
-                if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
+                if (checkClickDistance(screenX, screenY, pos, camera, perspectiveCamera, pixelSize)) {
                     //Hit
                     hits.add(this);
                 }

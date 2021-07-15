@@ -103,7 +103,7 @@ public class Invisible extends CelestialBody {
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        forceUpdateLocalValues(time, false);
+        forceUpdateLocalValues(time);
         if (raymarchingShader != null) {
             // Check enable/disable
             if (viewAngleApparent > Math.toRadians(0.001)) {
@@ -122,10 +122,10 @@ public class Invisible extends CelestialBody {
         }
     }
 
-    protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
-        if (time.getHdiff() != 0 || force) {
+    protected void forceUpdateLocalValues(ITimeFrameProvider time) {
+        if (time.getHdiff() != 0) {
             Vector3d aux3 = aux3d1.get();
-            // Load this objects's equatorial cartesian coordinates into pos
+            // Load the equatorial cartesian coordinates of the object into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
             // Convert to cartesian coordinates and put them in aux3 vector

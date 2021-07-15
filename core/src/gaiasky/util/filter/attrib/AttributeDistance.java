@@ -5,12 +5,12 @@
 
 package gaiasky.util.filter.attrib;
 
-import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 
-public class AttributeDistance extends AttributeAbstract implements IAttribute<ParticleRecord> {
+public class AttributeDistance extends AttributeAbstract implements IAttribute {
     @Override
-    public double get(ParticleRecord bean) {
+    public double get(IParticleRecord bean) {
         return Math.sqrt(bean.x() * bean.x() + bean.y() * bean.y() + bean.z() * bean.z()) * Constants.U_TO_PC;
     }
     public String getUnit(){

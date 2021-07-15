@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -56,15 +57,19 @@ public class GlobalResources {
 
     public static ShaderProgram shapeShader;
     public static ShaderProgram spriteShader;
-    /** Global all-purpose sprite batch **/
+
+    // Global all-purpose sprite batch
     public static SpriteBatch spriteBatch, spriteBatchVR;
 
     public static ExtShaderProgram extSpriteShader;
-    /** Sprite batch using int indices **/
+
+    // Sprite batch using int indices
     public static ExtSpriteBatch extSpriteBatch;
-    /** Cursors **/
+
+    // Cursors
     public static Cursor linkCursor, resizeXCursor, resizeYCursor, emptyCursor;
-    /** The global skin **/
+
+    // The global skin
     public static Skin skin;
 
     private static final Vector3d aux = new Vector3d();
@@ -90,6 +95,10 @@ public class GlobalResources {
         }
         // Sprite batch
         extSpriteBatch = new ExtSpriteBatch(1000, extSpriteShader);
+
+        // Star group textures
+        manager.load(GlobalConf.data.dataFile("tex/base/star.jpg"), Texture.class);
+        manager.load(GlobalConf.data.dataFile("tex/base/lut.jpg"), Texture.class);
 
         updateSkin();
 

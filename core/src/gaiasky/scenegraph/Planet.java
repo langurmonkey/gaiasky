@@ -8,7 +8,6 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -36,7 +35,6 @@ public class Planet extends ModelBody implements ILineRenderable {
     private static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 2f;
 
     private final Vector3d endLine = new Vector3d();
-    static Texture auxTex;
 
     @Override
     public double THRESHOLD_NONE() {
@@ -52,8 +50,6 @@ public class Planet extends ModelBody implements ILineRenderable {
     public double THRESHOLD_QUAD() {
         return TH_ANGLE_QUAD;
     }
-
-    private static AssetManager manager;
 
     ICamera camera;
 
@@ -83,13 +79,6 @@ public class Planet extends ModelBody implements ILineRenderable {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-
-        if (Planet.manager == null) {
-            Planet.manager = manager;
-        }
-        if (auxTex == null) {
-            auxTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/base/star.jpg"));
-        }
 
         // INITIALIZE ATMOSPHERE
         if (ac != null) {
@@ -125,22 +114,23 @@ public class Planet extends ModelBody implements ILineRenderable {
 
     @Override
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
-        forceUpdateLocalValues(time, false);
+        forceUpdateLocalValues(time);
     }
 
-    protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
-        if (time.getHdiff() != 0 || force) {
-            Vector3d aux3 = aux3d1.get();
-            // Load this objects's equatorial cartesian coordinates into pos
-            coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
-
-            // Convert to cartesian coordinates and put them in aux3 vector
-            //Coordinates.cartesianToSpherical(pos, aux3);
-            posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
-            // Update angle
-            if (rc != null)
-                rc.update(time);
+    protected void forceUpdateLocalValues(ITimeFrameProvider time) {
+        if (time.getHdiff() == 0) {
+            return;
         }
+        Vector3d aux3 = aux3d1.get();
+        // Load this object's equatorial cartesian coordinates into pos
+        coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
+
+        // Convert to cartesian coordinates and put them in aux3 vector
+        //Coordinates.cartesianToSpherical(pos, aux3);
+        posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+        // Update angle
+        if (rc != null)
+            rc.update(time);
     }
 
     /**

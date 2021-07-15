@@ -19,11 +19,11 @@ public class LightBeam extends ModelBody {
     protected static final double TH_ANGLE_POINT = ModelBody.TH_ANGLE_POINT / 1e9;
     protected static final double TH_ANGLE_QUAD = ModelBody.TH_ANGLE_POINT / 8;
 
-    Matrix4 orientationf;
+    private Matrix4 orientationf;
 
-    Vector3 rotation3axis;
-    float angle;
-    Vector3 translation3;
+    private Vector3 rotation3axis;
+    private float angle;
+    private Vector3 translation3;
 
     public LightBeam() {
         orientationf = new Matrix4();

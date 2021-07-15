@@ -3,7 +3,7 @@ package gaiasky.util.filter.attrib;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.I18n;
 
-public class AttributeColorGreen extends AttributeAbstract implements IAttribute<IParticleRecord> {
+public class AttributeColorGreen extends AttributeAbstract implements IAttribute {
 
     @Override
     public double get(IParticleRecord bean) {

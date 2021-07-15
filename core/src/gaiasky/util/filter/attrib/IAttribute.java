@@ -11,24 +11,28 @@ import gaiasky.util.math.Vector3d;
 /**
  * Represents an attribute
  */
-public interface IAttribute<T extends IParticleRecord> {
+public interface IAttribute {
     Vector3d aux1 = new Vector3d();
     Vector3d aux2 = new Vector3d();
+
     /**
      * Gets the value of this attribute
-     * @bean The particle or star bean
+     *
+     * @param bean The particle or star bean
      * @return The value
      */
-    double get(T bean);
+    double get(IParticleRecord bean);
 
     /**
      * Gets the unit in string
+     *
      * @return The unit of this attribute
      */
     String getUnit();
 
     /**
      * Gets the name
+     *
      * @return The name
      */
     String toString();
