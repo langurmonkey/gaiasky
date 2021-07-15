@@ -81,7 +81,7 @@ public class ColorPicker extends ColorPickerAbstract {
                         cpd.show(stage);
 
                     } else if (type == Type.enter) {
-                        Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                        Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
                     } else if (type == Type.exit) {
                         Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
                     }

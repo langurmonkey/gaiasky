@@ -55,7 +55,7 @@ public class SlaveManager {
         if (projectionActive()) {
             instance.loadAssets(manager);
             // Mute cursor
-            Gdx.graphics.setCursor(GlobalResources.emptyCursor);
+            Gdx.graphics.setCursor(GlobalResources.getEmptyCursor());
         }
     }
 

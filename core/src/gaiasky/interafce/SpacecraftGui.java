@@ -153,7 +153,7 @@ public class SpacecraftGui extends AbstractGui {
      * Constructs the interface
      */
     public void doneLoading(AssetManager assetManager) {
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         aiTexture = assetManager.get(GlobalConf.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
         aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);

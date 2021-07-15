@@ -595,7 +595,7 @@ public class GuiRegistry implements IObserver {
             // Update names with new language
             GaiaSky.instance.sg.getRoot().updateNamesRec();
             // UI theme reload broadcast
-            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, GlobalResources.skin);
+            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, GlobalResources.getSkin());
         });
     }
 

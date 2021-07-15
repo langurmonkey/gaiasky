@@ -197,7 +197,7 @@ public class ScreenshotsManager implements IObserver {
         // Lazy initialised
         if (renderGui == null) {
             renderGui = new RenderGui((Lwjgl3Graphics) Gdx.graphics, GlobalConf.program.UI_SCALE);
-            renderGui.initialize(null, GlobalResources.spriteBatch);
+            renderGui.initialize(null, GlobalResources.getSpriteBatch());
             renderGui.doneLoading(null);
         }
         return renderGui;

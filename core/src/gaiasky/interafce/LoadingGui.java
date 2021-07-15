@@ -76,7 +76,7 @@ public class LoadingGui extends AbstractGui {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
 
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
 
         center = new Table(skin);

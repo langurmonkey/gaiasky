@@ -71,7 +71,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         // INIT VIEWPORT
         stretchViewport = new StretchViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        sb = GlobalResources.spriteBatch;
+        sb = GlobalResources.getSpriteBatch();
 
         // INIT FRAME BUFFER FOR 3D MODE
         fb3D = new HashMap<>();

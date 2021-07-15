@@ -104,7 +104,7 @@ public class FullGui extends AbstractGui {
     public void doneLoading(AssetManager assetManager) {
         logger.info(I18n.txt("notif.gui.init"));
 
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
         interfaces = new Array<>();
 
         buildGui();

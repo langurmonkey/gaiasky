@@ -50,7 +50,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
 
     public GaiaSkyView() {
         super();
-        this.skin = GlobalResources.skin;
+        this.skin = GlobalResources.getSkin();
         this.lastTexSize = new Vector2(-1, -1);
         EventManager.instance.subscribe(this, Events.INITIALIZED_INFO);
     }
@@ -61,7 +61,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
 
     @Override
     public void create() {
-        sb = new SpriteBatch(100, GlobalResources.spriteShader);
+        sb = new SpriteBatch(100, GlobalResources.getSpriteShader());
     }
 
     private void createInitGui() {

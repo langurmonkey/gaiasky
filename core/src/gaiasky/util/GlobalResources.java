@@ -55,19 +55,23 @@ import java.util.stream.Stream;
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
 
-    public static ShaderProgram shapeShader;
-    public static ShaderProgram spriteShader;
+    private static ShaderProgram shapeShader;
+    private static ShaderProgram spriteShader;
 
     // Global all-purpose sprite batch
-    public static SpriteBatch spriteBatch, spriteBatchVR;
+    private static SpriteBatch spriteBatch;
+    private static SpriteBatch spriteBatchVR;
 
-    public static ExtShaderProgram extSpriteShader;
+    private static ExtShaderProgram extSpriteShader;
 
     // Sprite batch using int indices
-    public static ExtSpriteBatch extSpriteBatch;
+    private static ExtSpriteBatch extSpriteBatch;
 
     // Cursors
-    public static Cursor linkCursor, resizeXCursor, resizeYCursor, emptyCursor;
+    private static Cursor linkCursor;
+    private static Cursor resizeXCursor;
+    private static Cursor resizeYCursor;
+    private static Cursor emptyCursor;
 
     // The global skin
     public static Skin skin;
@@ -76,25 +80,25 @@ public class GlobalResources {
 
     public static void initialize(AssetManager manager) {
         // Shape shader
-        shapeShader = new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl"));
-        if (!shapeShader.isCompiled()) {
-            logger.info("ShapeRenderer shader compilation failed: " + shapeShader.getLog());
+        setShapeShader(new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl")));
+        if (!getShapeShader().isCompiled()) {
+            logger.info("ShapeRenderer shader compilation failed: " + getShapeShader().getLog());
         }
         // Sprite shader
-        spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
-        if (!spriteShader.isCompiled()) {
-            logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
+        setSpriteShader(new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
+        if (!getSpriteShader().isCompiled()) {
+            logger.info("SpriteBatch shader compilation failed: " + getSpriteShader().getLog());
         }
         // Sprite batch - uses screen resolution
-        spriteBatch = new SpriteBatch(500, spriteShader);
+        setSpriteBatch(new SpriteBatch(500, getSpriteShader()));
 
         // ExtSprite shader
-        extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
-        if (!extSpriteShader.isCompiled()) {
-            logger.info("ExtSpriteBatch shader compilation failed: " + spriteShader.getLog());
+        setExtSpriteShader(new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
+        if (!getExtSpriteShader().isCompiled()) {
+            logger.info("ExtSpriteBatch shader compilation failed: " + getSpriteShader().getLog());
         }
         // Sprite batch
-        extSpriteBatch = new ExtSpriteBatch(1000, extSpriteShader);
+        setExtSpriteBatch(new ExtSpriteBatch(1000, getExtSpriteShader()));
 
         // Star group textures
         manager.load(GlobalConf.data.dataFile("tex/base/star.jpg"), Texture.class);
@@ -113,8 +117,8 @@ public class GlobalResources {
             GlobalConf.program.UI_THEME = "dark-green";
             fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
         }
-        skin = new Skin(fh);
-        ObjectMap<String, BitmapFont> fonts = skin.getAll(BitmapFont.class);
+        setSkin(new Skin(fh));
+        ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
         for(String key : fonts.keys()){
             fonts.get(key).getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
         }
@@ -123,15 +127,15 @@ public class GlobalResources {
     private static void initCursors() {
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_SCALE > 0.8) {
-            linkCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0);
-            resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16);
-            resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16);
+            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0));
+            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16));
+            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16));
         } else {
-            linkCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0);
-            resizeXCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8);
-            resizeYCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8);
+            setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link.png")), 4, 0));
+            setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex.png")), 8, 8));
+            setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey.png")), 8, 8));
         }
-        emptyCursor = Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-empty.png")), 0, 5);
+        setEmptyCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-empty.png")), 0, 5));
 
     }
 
@@ -457,7 +461,7 @@ public class GlobalResources {
         int height = tex.getRegionWidth();
 
         //Create a SpriteBatch to handle the drawing.
-        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.spriteShader);
+        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.getSpriteShader());
 
         //Set the projection matrix for the SpriteBatch.
         Matrix4 projectionMatrix = new Matrix4();
@@ -865,5 +869,93 @@ public class GlobalResources {
             return String.format("%.0f", years) + " y";
         }
 
+    }
+
+    public static ShaderProgram getShapeShader() {
+        return shapeShader;
+    }
+
+    public static void setShapeShader(ShaderProgram shapeShader) {
+        GlobalResources.shapeShader = shapeShader;
+    }
+
+    public static ShaderProgram getSpriteShader() {
+        return spriteShader;
+    }
+
+    public static void setSpriteShader(ShaderProgram spriteShader) {
+        GlobalResources.spriteShader = spriteShader;
+    }
+
+    public static SpriteBatch getSpriteBatch() {
+        return spriteBatch;
+    }
+
+    public static void setSpriteBatch(SpriteBatch spriteBatch) {
+        GlobalResources.spriteBatch = spriteBatch;
+    }
+
+    public static SpriteBatch getSpriteBatchVR() {
+        return spriteBatchVR;
+    }
+
+    public static void setSpriteBatchVR(SpriteBatch spriteBatchVR) {
+        GlobalResources.spriteBatchVR = spriteBatchVR;
+    }
+
+    public static ExtShaderProgram getExtSpriteShader() {
+        return extSpriteShader;
+    }
+
+    public static void setExtSpriteShader(ExtShaderProgram extSpriteShader) {
+        GlobalResources.extSpriteShader = extSpriteShader;
+    }
+
+    public static ExtSpriteBatch getExtSpriteBatch() {
+        return extSpriteBatch;
+    }
+
+    public static void setExtSpriteBatch(ExtSpriteBatch extSpriteBatch) {
+        GlobalResources.extSpriteBatch = extSpriteBatch;
+    }
+
+    public static Cursor getLinkCursor() {
+        return linkCursor;
+    }
+
+    public static void setLinkCursor(Cursor linkCursor) {
+        GlobalResources.linkCursor = linkCursor;
+    }
+
+    public static Skin getSkin() {
+        return skin;
+    }
+
+    public static void setSkin(Skin skin) {
+        GlobalResources.skin = skin;
+    }
+
+    public static Cursor getResizeXCursor() {
+        return resizeXCursor;
+    }
+
+    public static void setResizeXCursor(Cursor resizeXCursor) {
+        GlobalResources.resizeXCursor = resizeXCursor;
+    }
+
+    public static Cursor getResizeYCursor() {
+        return resizeYCursor;
+    }
+
+    public static void setResizeYCursor(Cursor resizeYCursor) {
+        GlobalResources.resizeYCursor = resizeYCursor;
+    }
+
+    public static Cursor getEmptyCursor() {
+        return emptyCursor;
+    }
+
+    public static void setEmptyCursor(Cursor emptyCursor) {
+        GlobalResources.emptyCursor = emptyCursor;
     }
 }

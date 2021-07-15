@@ -22,7 +22,7 @@ public class WelcomeGuiVR extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         center = new Table();
         center.setFillParent(true);

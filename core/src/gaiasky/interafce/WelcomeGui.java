@@ -86,7 +86,7 @@ public class WelcomeGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))

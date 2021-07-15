@@ -34,7 +34,7 @@ public class DebugGui extends AbstractGui {
     @Override
     public void doneLoading(AssetManager assetManager) {
         float pad = 16f;
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         // DEBUG INFO - TOP RIGHT
         debugInterface = new DebugInterface(skin, lock);

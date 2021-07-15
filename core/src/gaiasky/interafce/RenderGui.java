@@ -46,7 +46,7 @@ public class RenderGui extends AbstractGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         mainTable = new Table(skin);
         time = new OwnLabel("", skin, "ui-17");

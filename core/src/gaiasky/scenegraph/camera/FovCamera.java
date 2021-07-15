@@ -125,21 +125,21 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
         fpstages = new Stage[3];
 
-        Stage fov12 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.spriteBatch);
+        Stage fov12 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.getSpriteBatch());
         Image i = new Image(fp);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov12.addActor(i);
 
-        Stage fov1 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.spriteBatch);
+        Stage fov1 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.getSpriteBatch());
         i = new Image(fp_fov1);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov1.addActor(i);
 
-        Stage fov2 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.spriteBatch);
+        Stage fov2 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.getSpriteBatch());
         i = new Image(fp_fov2);
         i.setFillParent(true);
         i.setAlign(Align.center);

@@ -226,7 +226,7 @@ public class SAMPClient implements IObserver {
             DataSource ds = new URLDataSource(new URL(url));
             Stage ui = GaiaSky.instance.mainGui.getGuiStage();
             String fileName = ds.getName();
-            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, GlobalResources.skin, ui);
+            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, GlobalResources.getSkin(), ui);
             Runnable doLoad = () -> {
                 try {
                     DatasetOptions dops = dld.generateDatasetOptions();

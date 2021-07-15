@@ -33,7 +33,7 @@ public class VRControllerInfoGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         container = new Container<>();
         container.setFillParent(true);

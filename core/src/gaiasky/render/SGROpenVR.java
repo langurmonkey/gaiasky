@@ -99,7 +99,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             lastSize = new Vector2();
 
             // Sprite batch
-            this.sb = GlobalResources.spriteBatchVR;
+            this.sb = GlobalResources.getSpriteBatchVR();
             sb.getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE, GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE);
 
             // Controllers

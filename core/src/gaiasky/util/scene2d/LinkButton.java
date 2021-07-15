@@ -44,7 +44,7 @@ public class LinkButton  extends OwnImageButton {
                 if (type == InputEvent.Type.touchUp && ((InputEvent) event).getButton() == Input.Buttons.LEFT) {
                     Gdx.net.openURI(linkURL);
                 } else if (type == InputEvent.Type.enter) {
-                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                    Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
                 } else if (type == InputEvent.Type.exit) {
                     Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
                 }

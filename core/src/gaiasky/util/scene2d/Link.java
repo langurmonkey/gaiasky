@@ -71,7 +71,7 @@ public class Link extends Label {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();
                 if (type == Type.enter) {
-                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                    Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }

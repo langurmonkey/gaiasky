@@ -601,7 +601,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         BitmapFont fontTitles = manager.get("font/font-titles.fnt");
 
         // Sprites
-        ExtSpriteBatch spriteBatch = GlobalResources.extSpriteBatch;
+        ExtSpriteBatch spriteBatch = GlobalResources.getExtSpriteBatch();
         spriteBatch.enableBlending();
 
         // Font batch - additive, no depth writes

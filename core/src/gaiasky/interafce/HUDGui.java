@@ -60,7 +60,7 @@ public class HUDGui implements IGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
         interfaces = new Array<>();
         buildGui();
     }

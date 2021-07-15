@@ -46,7 +46,7 @@ public class OwnImageButton extends ImageButton {
     }
 
     private void initialize() {
-        cursor = GlobalResources.linkCursor;
+        cursor = GlobalResources.getLinkCursor();
         this.addListener(event -> {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();

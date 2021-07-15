@@ -26,7 +26,7 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
 
     public ShapeRenderSystem(RenderGroup rg, float[] alphas) {
         super(rg, alphas, null);
-        this.shapeRenderer = new ShapeRenderer(5000, GlobalResources.spriteShader);
+        this.shapeRenderer = new ShapeRenderer(5000, GlobalResources.getSpriteShader());
 
     }
 

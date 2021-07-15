@@ -408,17 +408,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             ab.load(manager);
         }
 
-        renderBatch = GlobalResources.spriteBatch;
+        renderBatch = GlobalResources.getSpriteBatch();
 
         EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
 
         welcomeGui = new WelcomeGui(graphics, 1f / GlobalConf.program.UI_SCALE, skipWelcome, vrStatus);
-        welcomeGui.initialize(manager, GlobalResources.spriteBatch);
+        welcomeGui.initialize(manager, GlobalResources.getSpriteBatch());
         Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
         if (GlobalConf.runtime.OPENVR) {
             welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
-            welcomeGuiVR.initialize(manager, GlobalResources.spriteBatch);
+            welcomeGuiVR.initialize(manager, GlobalResources.getSpriteBatch());
         }
 
         // GL clear state
@@ -474,8 +474,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 vrLoadingRightTex.set(vrLoadingRightFb.getColorBufferTexture().getTextureObjectHandle(), VR.ETextureType_TextureType_OpenGL, VR.EColorSpace_ColorSpace_Gamma);
 
                 // Sprite batch for VR - uses backbuffer resolution
-                GlobalResources.spriteBatchVR = new SpriteBatch(500, GlobalResources.spriteShader);
-                GlobalResources.spriteBatchVR.getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
+                GlobalResources.setSpriteBatchVR(new SpriteBatch(500, GlobalResources.getSpriteShader()));
+                GlobalResources.getSpriteBatchVR().getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
 
                 // Enable visibility of 'Others' if off (for VR controllers)
                 if (!GlobalConf.scene.VISIBILITY[ComponentType.Others.ordinal()]) {
@@ -568,7 +568,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Initialise input multiplexer to handle various input processors
         // The input multiplexer
-        guiRegistry = new GuiRegistry(GlobalResources.skin, sg);
+        guiRegistry = new GuiRegistry(GlobalResources.getSkin(), sg);
         inputMultiplexer = new InputMultiplexer();
         guiRegistry.setInputMultiplexer(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -713,19 +713,19 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         mainGui = new FullGui(graphics, 1f / GlobalConf.program.UI_SCALE);
-        mainGui.initialize(manager, GlobalResources.spriteBatch);
+        mainGui.initialize(manager, GlobalResources.getSpriteBatch());
 
         debugGui = new DebugGui(graphics, 1f / GlobalConf.program.UI_SCALE);
-        debugGui.initialize(manager, GlobalResources.spriteBatch);
+        debugGui.initialize(manager, GlobalResources.getSpriteBatch());
 
         spacecraftGui = new SpacecraftGui(graphics, 1f / GlobalConf.program.UI_SCALE);
-        spacecraftGui.initialize(manager, GlobalResources.spriteBatch);
+        spacecraftGui.initialize(manager, GlobalResources.getSpriteBatch());
 
         stereoGui = new StereoGui(graphics, 1f / GlobalConf.program.UI_SCALE);
-        stereoGui.initialize(manager, GlobalResources.spriteBatch);
+        stereoGui.initialize(manager, GlobalResources.getSpriteBatch());
 
         controllerGui = new ControllerGui(graphics, 1f / GlobalConf.program.UI_SCALE);
-        controllerGui.initialize(manager, GlobalResources.spriteBatch);
+        controllerGui.initialize(manager, GlobalResources.getSpriteBatch());
 
         if (guis != null) {
             guis.add(mainGui);
@@ -743,7 +743,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Reinitialise registry to listen to relevant events
         if (guiRegistry != null)
             guiRegistry.dispose();
-        guiRegistry = new GuiRegistry(GlobalResources.skin, sg);
+        guiRegistry = new GuiRegistry(GlobalResources.getSkin(), sg);
         guiRegistry.setInputMultiplexer(inputMultiplexer);
 
         // Unregister all current GUIs
@@ -1024,7 +1024,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             CrashReporter.reportCrash(t, logger);
             // Set up crash window
             crashGui = new CrashGui(graphics, 1f / GlobalConf.program.UI_SCALE, t);
-            crashGui.initialize(manager, GlobalResources.spriteBatch);
+            crashGui.initialize(manager, GlobalResources.getSpriteBatch());
             Gdx.input.setInputProcessor(crashGui.getGuiStage());
             // Flag up
             crashed = true;
@@ -1156,7 +1156,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             int renderHeight = (int) Math.round(height * GlobalConf.screen.BACKBUFFER_SCALE);
 
             // Resize global UI sprite batch
-            GlobalResources.spriteBatch.getProjectionMatrix().setToOrtho2D(0, 0, renderWidth, renderHeight);
+            GlobalResources.getSpriteBatch().getProjectionMatrix().setToOrtho2D(0, 0, renderWidth, renderHeight);
 
             if (!initialized) {
                 if (welcomeGui != null)
@@ -1260,14 +1260,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Initialise loading screen
             loadingGui = new LoadingGui(graphics, 1f / GlobalConf.program.UI_SCALE, false);
-            loadingGui.initialize(manager, GlobalResources.spriteBatch);
+            loadingGui.initialize(manager, GlobalResources.getSpriteBatch());
 
             Gdx.input.setInputProcessor(loadingGui.getGuiStage());
 
             // Also VR
             if (GlobalConf.runtime.OPENVR) {
                 loadingGuiVR = new VRGui<>(LoadingGui.class, (int) (GlobalConf.screen.BACKBUFFER_WIDTH / 4f), graphics, 1f / GlobalConf.program.UI_SCALE);
-                loadingGuiVR.initialize(manager, GlobalResources.spriteBatch);
+                loadingGuiVR.initialize(manager, GlobalResources.getSpriteBatch());
             }
 
             this.renderProcess = runnableLoadingGui;

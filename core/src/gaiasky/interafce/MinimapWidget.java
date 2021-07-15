@@ -44,10 +44,10 @@ public class MinimapWidget implements Disposable {
 
         OrthographicCamera ortho = new OrthographicCamera();
 
-        ShapeRenderer sr = new ShapeRenderer(100, GlobalResources.shapeShader);
+        ShapeRenderer sr = new ShapeRenderer(100, GlobalResources.getShapeShader());
         sr.setAutoShapeType(true);
 
-        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.spriteShader);
+        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.getSpriteShader());
 
         BitmapFont font = skin.getFont("ui-20");
 

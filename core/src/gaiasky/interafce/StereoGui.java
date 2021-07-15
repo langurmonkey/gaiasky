@@ -53,7 +53,7 @@ public class StereoGui extends AbstractGui {
 
         interfaces = new Array<>();
 
-        skin = GlobalResources.skin;
+        skin = GlobalResources.getSkin();
 
         buildGui();
 

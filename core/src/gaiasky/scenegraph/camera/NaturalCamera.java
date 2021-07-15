@@ -318,11 +318,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             openVRListener = new OpenVRListener(this);
 
         // Shape renderer (pointer guide lines)
-        shapeRenderer = new ShapeRenderer(10, GlobalResources.spriteShader);
+        shapeRenderer = new ShapeRenderer(10, GlobalResources.getSpriteShader());
         shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
 
         // Init sprite batch for crosshair
-        spriteBatch = new SpriteBatch(50, GlobalResources.spriteShader);
+        spriteBatch = new SpriteBatch(50, GlobalResources.getSpriteShader());
 
         // Focus crosshair
         crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));

@@ -120,7 +120,7 @@ public class CollapsibleWindow extends OwnWindow {
                 Type type = ((InputEvent) event).getType();
                 // Click
                 if (type == Type.mouseMoved) {
-                    Gdx.graphics.setCursor(GlobalResources.linkCursor);
+                    Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }
@@ -135,9 +135,9 @@ public class CollapsibleWindow extends OwnWindow {
                     Type type = ((InputEvent) event).getType();
                     if (type == Type.mouseMoved) {
                         if ((edge & Align.bottom) != 0 && maxHeight == -1f) {
-                            Gdx.graphics.setCursor(GlobalResources.resizeYCursor);
+                            Gdx.graphics.setCursor(GlobalResources.getResizeYCursor());
                         } else if ((edge & Align.right) != 0 && maxWidth == -1f) {
-                            Gdx.graphics.setCursor(GlobalResources.resizeXCursor);
+                            Gdx.graphics.setCursor(GlobalResources.getResizeXCursor());
                         }
                     } else if (type == Type.exit) {
                         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
