@@ -245,12 +245,12 @@ public class GlobalResources {
      * @return True if any of the points is in the camera view cone
      */
     public static boolean isAnyInView(Vector3d[] points, float coneAngle, Vector3d dir) {
-        boolean inview = false;
+        boolean inView = false;
         int size = points.length;
-        for (int i = 0; i < size; i++) {
-            inview = inview || FastMath.acos(points[i].dot(dir) / points[i].len()) < coneAngle;
+        for (Vector3d point : points) {
+            inView = inView || FastMath.acos(point.dot(dir) / point.len()) < coneAngle;
         }
-        return inview;
+        return inView;
     }
 
     /**
@@ -346,8 +346,8 @@ public class GlobalResources {
 
     /**
      * Deletes recursively all non-partial files from the path.
-     * @param path The path to delete.
-     * @throws IOException
+     * @param path the path to delete.
+     * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static void deleteRecursively(Path path) throws IOException {
         Files.walk(path)
@@ -389,7 +389,7 @@ public class GlobalResources {
      *
      * @param dir The directory
      * @return The number of files
-     * @throws IOException
+     * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir) throws IOException {
         return fileCount(dir, null);
@@ -400,7 +400,7 @@ public class GlobalResources {
      *
      * @param dir The directory
      * @return The number of files
-     * @throws IOException
+     * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir, String[] extensions) throws IOException {
         return Files.walk(dir).parallel().filter(p -> (!p.toFile().isDirectory() && endsWith(p.toFile().getName(), extensions))).count();
@@ -498,12 +498,12 @@ public class GlobalResources {
     }
 
     /**
-     * Inverts a map
+     * Inverts a map.
      *
-     * @param map The map to invert
-     * @return The inverted map
+     * @param map The map to invert.
+     * @return The inverted map.
      */
-    public static final <T, U> Map<U, List<T>> invertMap(Map<T, U> map) {
+    public static <T, U> Map<U, List<T>> invertMap(Map<T, U> map) {
         HashMap<U, List<T>> invertedMap = new HashMap<>();
 
         for (T key : map.keySet()) {

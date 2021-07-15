@@ -245,6 +245,7 @@ public class ModelComponent implements Disposable, IObserver {
             logger.error(new RuntimeException("The 'model' element must contain either a 'type' or a 'model' attribute"));
         }
         // Clear base material
+        assert materials != null;
         if (materials.containsKey("base"))
             materials.get("base").clear();
 
@@ -287,26 +288,18 @@ public class ModelComponent implements Disposable, IObserver {
      */
     public void touch(Matrix4 localTransform) {
         if (GlobalConf.scene.LAZY_TEXTURE_INIT && mtc != null && !mtc.texInitialised) {
-            if (mtc != null) {
-                if (!mtc.texLoading) {
-                    mtc.initialize(manager);
-                    mtc.texLoading = true;
-                } else if (mtc.isFinishedLoading(manager)) {
-                    GaiaSky.postRunnable(() -> {
-                        mtc.initMaterial(manager, instance, cc, culling);
-                        // Set to initialised
-                        updateStaticLightImmediate();
-                    });
-                    mtc.texLoading = false;
-                    mtc.texInitialised = true;
-                }
-            } else if (localTransform == null) {
-                // Use color if necessary
-                addColorToMat();
-                // Set to initialised
-                updateStaticLightImmediate();
+            if (!mtc.texLoading) {
+                mtc.initialize(manager);
+                mtc.texLoading = true;
+            } else if (mtc.isFinishedLoading(manager)) {
+                GaiaSky.postRunnable(() -> {
+                    mtc.initMaterial(manager, instance, cc, culling);
+                    // Set to initialised
+                    updateStaticLightImmediate();
+                });
+                mtc.texLoading = false;
+                mtc.texInitialised = true;
             }
-
         }
 
         if (localTransform != null && GlobalConf.scene.LAZY_MESH_INIT && !modelInitialised) {
@@ -336,12 +329,6 @@ public class ModelComponent implements Disposable, IObserver {
 
     public void setModelInitialized(boolean initialized) {
         this.modelInitialised = initialized;
-    }
-
-    private void updateStaticLight() {
-        GaiaSky.postRunnable(() -> {
-            updateStaticLightImmediate();
-        });
     }
 
     private void updateStaticLightImmediate() {
@@ -468,7 +455,7 @@ public class ModelComponent implements Disposable, IObserver {
     /**
      * Sets the model file path (this must be a .g3db, .g3dj or .obj).
      *
-     * @param model
+     * @param model The model file name.
      */
     public void setModel(String model) {
         this.modelFile = model;
@@ -502,7 +489,7 @@ public class ModelComponent implements Disposable, IObserver {
     public void setCulling(String culling) {
         try {
             this.culling = Boolean.parseBoolean(culling);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -513,14 +500,14 @@ public class ModelComponent implements Disposable, IObserver {
     public void setUsecolor(String usecolor) {
         try {
             this.useColor = Boolean.parseBoolean(usecolor);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
     public void setUsecolor(Boolean usecolor) {
         try {
             this.useColor = usecolor;
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -572,18 +559,13 @@ public class ModelComponent implements Disposable, IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case GRAPHICS_QUALITY_UPDATED:
+        if (event == Events.GRAPHICS_QUALITY_UPDATED) {
             GaiaSky.postRunnable(() -> {
                 if (mtc != null && mtc.texInitialised) {
                     // Remove current textures
-                    if (mtc != null)
-                        mtc.disposeTextures(this.manager);
+                    mtc.disposeTextures(this.manager);
                 }
             });
-            break;
-        default:
-            break;
         }
     }
 
