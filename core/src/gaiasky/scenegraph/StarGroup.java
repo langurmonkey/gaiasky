@@ -220,10 +220,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /**
      * Updates the parameters of the focus, if the focus is active in this group
      *
-     * @param time   The time frame provider
      * @param camera The current camera
      */
-    public void updateFocus(ITimeFrameProvider time, ICamera camera) {
+    public void updateFocus(ICamera camera) {
         IParticleRecord focus = pointData.get(focusIndex);
         Vector3d aux = this.fetchPosition(focus, cPosD, aux3d1.get(), currDeltaYears);
 

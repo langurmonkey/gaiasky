@@ -248,7 +248,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void initialize(boolean dataLoad, boolean createCatalogInfo) {
-        /** Load data **/
+        // Load data
         try {
             if (factor == null)
                 factor = 1d;
@@ -1014,7 +1014,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                         double value = distToLine / dist;
 
                         if (value < 0.01) {
-                            temporalHits.add(new Pair<Integer, Double>(i, angle));
+                            temporalHits.add(new Pair<>(i, angle));
                         }
                     }
                 }
