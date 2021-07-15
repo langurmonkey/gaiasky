@@ -102,7 +102,7 @@ public class SAMPClient implements IObserver {
         conn.addMessageHandler(new AbstractMessageHandler("table.highlight.row") {
             public Map processCall(HubConnection c, String senderId, Message msg) {
                 // do stuff
-                Long row = Parser.parseLong((String) msg.getParam("row"));
+                long row = Parser.parseLong((String) msg.getParam("row"));
                 String id = (String) msg.getParam("table-id");
 
                 // First, fetch table if not here
@@ -116,16 +116,16 @@ public class SAMPClient implements IObserver {
                         if (idToNode.getForward(id) instanceof ParticleGroup) {
                             // Stars or particles
                             ParticleGroup pg = (ParticleGroup) idToNode.getForward(id);
-                            pg.setFocusIndex(row.intValue());
+                            pg.setFocusIndex((int) row);
                             preventProgrammaticEvents = true;
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg);
                             preventProgrammaticEvents = false;
-                        } else if (idToNode.getForward(id) instanceof FadeNode) {
+                        } else if (idToNode.getForward(id) != null) {
                             // Star cluster
                             FadeNode fn = idToNode.getForward(id);
-                            if (fn.children != null && fn.children.size > row.intValue()) {
-                                SceneGraphNode sgn = fn.children.get(row.intValue());
+                            if (fn.children != null && fn.children.size > (int) row) {
+                                SceneGraphNode sgn = fn.children.get((int) row);
                                 preventProgrammaticEvents = true;
                                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
                                 EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sgn);
