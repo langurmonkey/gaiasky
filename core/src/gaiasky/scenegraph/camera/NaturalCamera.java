@@ -17,6 +17,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
@@ -242,7 +243,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private Texture crosshairFocus, crosshairClosest, crosshairHome, crosshairArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
     private Sprite[] hudSprites;
 
-    public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr) {
+    public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr, ShaderProgram spriteShader) {
         super(parent);
         vrOffset = new Vector3d();
         vel = new Vector3d();
@@ -251,11 +252,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         posBak = new Vector3d();
         orip = new Matrix4d();
         this.vr = vr;
-        initialize(assetManager);
+        initialize(spriteShader);
 
     }
 
-    public void initialize(AssetManager assetManager) {
+    public void initialize(ShaderProgram spriteShader) {
         if (vr) {
             camera = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT);
         } else {
@@ -318,11 +319,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             openVRListener = new OpenVRListener(this);
 
         // Shape renderer (pointer guide lines)
-        shapeRenderer = new ShapeRenderer(10, GlobalResources.getSpriteShader());
+        shapeRenderer = new ShapeRenderer(10, spriteShader);
         shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
 
         // Init sprite batch for crosshair
-        spriteBatch = new SpriteBatch(50, GlobalResources.getSpriteShader());
+        spriteBatch = new SpriteBatch(50, spriteShader);
 
         // Focus crosshair
         crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));

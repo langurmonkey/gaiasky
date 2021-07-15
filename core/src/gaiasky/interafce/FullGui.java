@@ -11,10 +11,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
-import com.badlogic.gdx.scenes.scene2d.ui.Container;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
@@ -81,14 +78,18 @@ public class FullGui extends AbstractGui {
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
 
+    private GlobalResources globalResources;
+
     private List<Actor> invisibleInStereoMode;
 
-    public FullGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public FullGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
+        this.globalResources = globalResources;
     }
 
     @Override
-    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+    public void initialize(final AssetManager assetManager, final SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
@@ -104,7 +105,6 @@ public class FullGui extends AbstractGui {
     public void doneLoading(AssetManager assetManager) {
         logger.info(I18n.txt("notif.gui.init"));
 
-        skin = GlobalResources.getSkin();
         interfaces = new Array<>();
 
         buildGui();
@@ -181,7 +181,7 @@ public class FullGui extends AbstractGui {
         pointerYCoord.setAlignment(Align.right | Align.center);
         pointerYCoord.setVisible(GlobalConf.program.DISPLAY_POINTER_COORDS);
 
-        /** ADD TO UI **/
+        /* ADD TO UI */
         rebuildGui();
 
         // INVISIBLE IN STEREOSCOPIC MODE
@@ -195,7 +195,7 @@ public class FullGui extends AbstractGui {
         invisibleInStereoMode.add(pointerXCoord);
         invisibleInStereoMode.add(pointerYCoord);
 
-        /** VERSION CHECK **/
+        /* VERSION CHECK */
         if (GlobalConf.program.VERSION_LAST_TIME == null || Instant.now().toEpochMilli() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
             // Start version check
             VersionChecker vc = new VersionChecker(GlobalConf.program.VERSION_CHECK_URL);
@@ -290,7 +290,7 @@ public class FullGui extends AbstractGui {
                 customInterface.reAddObjects();
             }
 
-            /** CAPTURE SCROLL FOCUS **/
+            /* CAPTURE SCROLL FOCUS */
             ui.addListener(new EventListener() {
 
                 @Override
@@ -321,7 +321,7 @@ public class FullGui extends AbstractGui {
 
             });
 
-            /** KEYBOARD FOCUS **/
+            /* KEYBOARD FOCUS */
             ui.addListener((event) -> {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
@@ -575,7 +575,7 @@ public class FullGui extends AbstractGui {
                 showMinimapWindow(ui, true);
             } else {
                 if (minimapInterface == null) {
-                    minimapInterface = new MinimapInterface(skin);
+                    minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader());
                     minimapInterface.setFillParent(true);
                     minimapInterface.right().top();
                     minimapInterface.pad(pad, 0f, 0f, pad);
@@ -587,7 +587,7 @@ public class FullGui extends AbstractGui {
 
     public void showMinimapInterface(Stage ui, boolean show) {
         if (minimapInterface == null) {
-            minimapInterface = new MinimapInterface(skin);
+            minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader());
             minimapInterface.setFillParent(true);
             minimapInterface.right().top();
             minimapInterface.pad(pad, 0f, 0f, pad);
@@ -629,7 +629,7 @@ public class FullGui extends AbstractGui {
 
     public void showMinimapWindow(Stage ui, boolean show) {
         if (minimapWindow == null)
-            minimapWindow = new MinimapWindow(ui, skin);
+            minimapWindow = new MinimapWindow(ui, skin, globalResources.getShapeShader());
         if (show)
             minimapWindow.show(ui, graphics.getWidth() - minimapWindow.getWidth(), graphics.getHeight() - minimapWindow.getHeight());
         else

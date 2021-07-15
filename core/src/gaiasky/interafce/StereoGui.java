@@ -34,11 +34,12 @@ public class StereoGui extends AbstractGui {
 
     protected INumberFormat nf;
 
-    public StereoGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public StereoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
     }
 
-    public void initialize(AssetManager assetManager, SpriteBatch sb) {
+    public void initialize(final AssetManager assetManager, final SpriteBatch sb) {
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
@@ -52,8 +53,6 @@ public class StereoGui extends AbstractGui {
         Logger.getLogger(this.getClass()).info(I18n.txt("notif.gui.init"));
 
         interfaces = new Array<>();
-
-        skin = GlobalResources.getSkin();
 
         buildGui();
 

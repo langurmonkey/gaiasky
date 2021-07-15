@@ -17,14 +17,13 @@ import gaiasky.util.validator.FloatValidator;
 import gaiasky.util.validator.IValidator;
 import gaiasky.util.validator.IntValidator;
 
-import static gaiasky.util.GlobalResources.skin;
-
 /**
  * TextButton in which the cursor changes when the mouse rolls over.
  * It also fixes the size issue.
  */
 public class OwnTextField extends TextField {
 
+    private Skin skin;
     private float ownWidth = 0f, ownHeight = 0f;
     private IValidator validator = null;
     private String lastCorrectText = "";
@@ -33,6 +32,7 @@ public class OwnTextField extends TextField {
 
     public OwnTextField(String text, Skin skin) {
         super(text, skin);
+        this.skin = skin;
     }
 
     public OwnTextField(String text, Skin skin, IValidator validator) {
@@ -43,20 +43,11 @@ public class OwnTextField extends TextField {
 
     public OwnTextField(String text, Skin skin, String styleName) {
         super(text, skin, styleName);
+        this.skin = skin;
     }
 
     public OwnTextField(String text, Skin skin, String styleName, IValidator validator) {
         this(text, skin, styleName);
-        this.validator = validator;
-        initValidator();
-    }
-
-    public OwnTextField(String text, TextFieldStyle style) {
-        super(text, style);
-    }
-
-    public OwnTextField(String text, TextFieldStyle style, IValidator validator) {
-        this(text, style);
         this.validator = validator;
         initValidator();
     }

@@ -14,16 +14,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
-import com.badlogic.gdx.utils.ScreenUtils;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.Logger.Log;
@@ -55,60 +51,59 @@ import java.util.stream.Stream;
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
 
-    private static ShaderProgram shapeShader;
-    private static ShaderProgram spriteShader;
+    private ShaderProgram shapeShader;
+    private ShaderProgram spriteShader;
 
     // Global all-purpose sprite batch
-    private static SpriteBatch spriteBatch;
-    private static SpriteBatch spriteBatchVR;
+    private final SpriteBatch spriteBatch;
+    private SpriteBatch spriteBatchVR;
 
-    private static ExtShaderProgram extSpriteShader;
+    private final ExtShaderProgram extSpriteShader;
 
     // Sprite batch using int indices
-    private static ExtSpriteBatch extSpriteBatch;
+    private final ExtSpriteBatch extSpriteBatch;
 
     // Cursors
-    private static Cursor linkCursor;
-    private static Cursor resizeXCursor;
-    private static Cursor resizeYCursor;
-    private static Cursor emptyCursor;
+    private Cursor linkCursor;
+    private Cursor resizeXCursor;
+    private Cursor resizeYCursor;
+    private Cursor emptyCursor;
 
     // The global skin
-    public static Skin skin;
+    private Skin skin;
 
     private static final Vector3d aux = new Vector3d();
 
-    public static void initialize(AssetManager manager) {
+    public GlobalResources(AssetManager manager) {
         // Shape shader
-        setShapeShader(new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl")));
-        if (!getShapeShader().isCompiled()) {
-            logger.info("ShapeRenderer shader compilation failed: " + getShapeShader().getLog());
+        this.shapeShader = new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl"));
+        if (!shapeShader.isCompiled()) {
+            logger.info("ShapeRenderer shader compilation failed: " + shapeShader.getLog());
         }
         // Sprite shader
-        setSpriteShader(new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
-        if (!getSpriteShader().isCompiled()) {
-            logger.info("SpriteBatch shader compilation failed: " + getSpriteShader().getLog());
+        this.spriteShader = new ShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        if (!spriteShader.isCompiled()) {
+            logger.info("SpriteBatch shader compilation failed: " + spriteShader.getLog());
         }
         // Sprite batch - uses screen resolution
-        setSpriteBatch(new SpriteBatch(500, getSpriteShader()));
+        this.spriteBatch = new SpriteBatch(500, getSpriteShader());
 
         // ExtSprite shader
-        setExtSpriteShader(new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl")));
-        if (!getExtSpriteShader().isCompiled()) {
-            logger.info("ExtSpriteBatch shader compilation failed: " + getSpriteShader().getLog());
+        this.extSpriteShader = new ExtShaderProgram(Gdx.files.internal("shader/2d/spritebatch.vertex.glsl"), Gdx.files.internal("shader/2d/spritebatch.fragment.glsl"));
+        if (!extSpriteShader.isCompiled()) {
+            logger.info("ExtSpriteBatch shader compilation failed: " + extSpriteShader.getLog());
         }
         // Sprite batch
-        setExtSpriteBatch(new ExtSpriteBatch(1000, getExtSpriteShader()));
+        this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
 
         // Star group textures
         manager.load(GlobalConf.data.dataFile("tex/base/star.jpg"), Texture.class);
         manager.load(GlobalConf.data.dataFile("tex/base/lut.jpg"), Texture.class);
 
         updateSkin();
-
     }
 
-    public static void updateSkin() {
+    public void updateSkin() {
         initCursors();
         FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
         if (!fh.exists()) {
@@ -119,12 +114,12 @@ public class GlobalResources {
         }
         setSkin(new Skin(fh));
         ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
-        for(String key : fonts.keys()){
+        for (String key : fonts.keys()) {
             fonts.get(key).getRegion().getTexture().setFilter(TextureFilter.Linear, TextureFilter.Linear);
         }
     }
 
-    private static void initCursors() {
+    private void initCursors() {
         // Create skin right now, it is needed.
         if (GlobalConf.program.UI_SCALE > 0.8) {
             setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0));
@@ -143,12 +138,14 @@ public class GlobalResources {
     }
 
     public static Pair<Double, String> doubleToDistanceString(Apfloat d) {
-       return doubleToDistanceString(d.doubleValue());
+        return doubleToDistanceString(d.doubleValue());
     }
+
     /**
      * Converts this double to the string representation of a distance
      *
      * @param d In internal units
+     *
      * @return An array containing the float number and the string units
      */
     public static Pair<Double, String> doubleToDistanceString(double d) {
@@ -160,7 +157,7 @@ public class GlobalResources {
         if (Math.abs(d) < 0.1 * Nature.AU_TO_KM) {
             // km
             return new Pair<>(d, "km");
-        } else if (Math.abs(d) <  0.1 * Nature.PC_TO_KM) {
+        } else if (Math.abs(d) < 0.1 * Nature.PC_TO_KM) {
             // AU
             return new Pair<>(d * Nature.KM_TO_AU, "AU");
         } else {
@@ -174,6 +171,7 @@ public class GlobalResources {
      * seconds)
      *
      * @param d In internal units
+     *
      * @return Array containing the number and the units
      */
     public static Pair<Double, String> doubleToVelocityString(double d) {
@@ -186,6 +184,7 @@ public class GlobalResources {
      * Converts this float to the string representation of a distance
      *
      * @param f In internal units
+     *
      * @return An array containing the float number and the string units
      */
     public static Pair<Float, String> floatToDistanceString(float f) {
@@ -198,6 +197,7 @@ public class GlobalResources {
      * its numbers
      *
      * @param array The array of doubles
+     *
      * @return The array of floats
      */
     public static float[] toFloatArray(double[] array) {
@@ -217,11 +217,13 @@ public class GlobalResources {
      * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
+     *
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3b point, double len, float coneAngle, Vector3d dir) {
         return FastMath.acos(point.tov3d().dot(dir) / len) < coneAngle;
     }
+
     /**
      * Computes whether a body with the given position is visible by a camera
      * with the given direction and angle. Coordinates are assumed to be in the
@@ -232,6 +234,7 @@ public class GlobalResources {
      * @param len       The point length
      * @param coneAngle The cone angle of the camera
      * @param dir       The direction
+     *
      * @return True if the body is visible
      */
     public static boolean isInView(Vector3d point, double len, float coneAngle, Vector3d dir) {
@@ -246,6 +249,7 @@ public class GlobalResources {
      * @param points    The array of points to check
      * @param coneAngle The cone angle of the camera (field of view)
      * @param dir       The direction
+     *
      * @return True if any of the points is in the camera view cone
      */
     public static boolean isAnyInView(Vector3d[] points, float coneAngle, Vector3d dir) {
@@ -263,6 +267,7 @@ public class GlobalResources {
      * @param buf       Buffer to compare against
      * @param compareTo Buffer to compare to (content should be ASCII lowercase if
      *                  possible)
+     *
      * @return True if the buffers compare favourably, false otherwise
      */
     public static boolean equal(String buf, char[] compareTo, boolean ignoreCase) {
@@ -300,32 +305,21 @@ public class GlobalResources {
         return count;
     }
 
-    public static int nthIndexOf(String text, char needle, int n) {
-        for (int i = 0; i < text.length(); i++) {
-            if (text.charAt(i) == needle) {
-                n--;
-                if (n == 0) {
-                    return i;
-                }
-            }
-        }
-        return -1;
-    }
-
     /**
      * Gets all the files with the given extension in the given path f.
      *
      * @param f          The directory to get all the files
      * @param l          The list with the results
      * @param extensions The allowed extensions
+     *
      * @return The list l
      */
-    public static Array<Path> listRec(Path f, final Array<Path> l, String... extensions) {
+    public static Array<Path> listRecursive(Path f, final Array<Path> l, String... extensions) {
         if (Files.exists(f)) {
             if (Files.isDirectory(f)) {
                 try {
                     Stream<Path> partial = Files.list(f);
-                    partial.forEachOrdered(p -> listRec(p, l, extensions));
+                    partial.forEachOrdered(p -> listRecursive(p, l, extensions));
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -350,15 +344,13 @@ public class GlobalResources {
 
     /**
      * Deletes recursively all non-partial files from the path.
+     *
      * @param path the path to delete.
+     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static void deleteRecursively(Path path) throws IOException {
-        Files.walk(path)
-                .sorted(Comparator.reverseOrder())
-                .filter(p -> !p.toString().endsWith(".part") && !Files.isDirectory(p))
-                .map(Path::toFile)
-                .forEach(java.io.File::delete);
+        Files.walk(path).sorted(Comparator.reverseOrder()).filter(p -> !p.toString().endsWith(".part") && !Files.isDirectory(p)).map(Path::toFile).forEach(java.io.File::delete);
     }
 
     public static void copyFile(Path sourceFile, Path destFile, boolean ow) throws IOException {
@@ -366,12 +358,12 @@ public class GlobalResources {
             Files.copy(sourceFile, destFile, StandardCopyOption.REPLACE_EXISTING);
     }
 
-    public static Array<Path> listRec(Path f, final Array<Path> l, DirectoryStream.Filter<Path> filter) {
+    public static Array<Path> listRecursive(Path f, final Array<Path> l, DirectoryStream.Filter<Path> filter) {
         if (Files.exists(f)) {
             if (Files.isDirectory(f)) {
                 try {
                     Stream<Path> partial = Files.list(f);
-                    partial.forEachOrdered(p -> listRec(p, l, filter));
+                    partial.forEachOrdered(p -> listRecursive(p, l, filter));
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -392,7 +384,9 @@ public class GlobalResources {
      * Recursively count files in a directory
      *
      * @param dir The directory
+     *
      * @return The number of files
+     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir) throws IOException {
@@ -403,7 +397,9 @@ public class GlobalResources {
      * Count files matching a certain ending in a directory, recursively
      *
      * @param dir The directory
+     *
      * @return The number of files
+     *
      * @throws IOException if an I/O error is thrown when accessing the starting file.
      */
     public static long fileCount(Path dir, String[] extensions) throws IOException {
@@ -415,6 +411,7 @@ public class GlobalResources {
      *
      * @param s       The string
      * @param endings The endings
+     *
      * @return True if the string ends with any of the endings
      */
     public static boolean endsWith(String s, String[] endings) {
@@ -445,80 +442,6 @@ public class GlobalResources {
             result.put(entry.getKey(), entry.getValue());
         }
         return result;
-    }
-
-    /**
-     * Converts a texture to a pixmap by drawing it to a frame buffer and
-     * getting the data
-     *
-     * @param tex The texture to convert
-     * @return The resulting pixmap
-     */
-    public static Pixmap textureToPixmap(TextureRegion tex) {
-
-        //width and height in pixels
-        int width = tex.getRegionWidth();
-        int height = tex.getRegionWidth();
-
-        //Create a SpriteBatch to handle the drawing.
-        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.getSpriteShader());
-
-        //Set the projection matrix for the SpriteBatch.
-        Matrix4 projectionMatrix = new Matrix4();
-
-        //because Pixmap has its origin on the topleft and everything else in LibGDX has the origin left bottom
-        //we flip the projection matrix on y and move it -height. So it will end up side up in the .png
-        projectionMatrix.setToOrtho2D(0, -height, width, height).scale(1, -1, 1);
-
-        //Set the projection matrix on the SpriteBatch
-        sb.setProjectionMatrix(projectionMatrix);
-
-        //Create a frame buffer.
-        FrameBuffer fb = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, false);
-
-        //Call begin(). So all next drawing will go to the new FrameBuffer.
-        fb.begin();
-
-        //Set up the SpriteBatch for drawing.
-        sb.begin();
-
-        //Draw all the tiles.
-        sb.draw(tex, 0, 0, width, height);
-
-        //End drawing on the SpriteBatch. This will flush() any sprites remaining to be drawn as well.
-        sb.end();
-
-        //Then retrieve the Pixmap from the buffer.
-        Pixmap pm = ScreenUtils.getFrameBufferPixmap(0, 0, width, height);
-
-        //Close the FrameBuffer. Rendering will resume to the normal buffer.
-        fb.end();
-
-        //Dispose of the resources.
-        fb.dispose();
-        sb.dispose();
-
-        return pm;
-    }
-
-    /**
-     * Inverts a map.
-     *
-     * @param map The map to invert.
-     * @return The inverted map.
-     */
-    public static <T, U> Map<U, List<T>> invertMap(Map<T, U> map) {
-        HashMap<U, List<T>> invertedMap = new HashMap<>();
-
-        for (T key : map.keySet()) {
-            U newKey = map.get(key);
-
-            invertedMap.computeIfAbsent(newKey, k -> new ArrayList<>());
-            invertedMap.get(newKey).add(key);
-
-        }
-
-        return invertedMap;
     }
 
     /** Gets the angle in degrees between the two vectors **/
@@ -555,6 +478,7 @@ public class GlobalResources {
      *
      * @param bytes The bytes
      * @param si    Whether to use SI units (1000-multiples) or binary (1024-multiples)
+     *
      * @return The size in a human readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
@@ -640,6 +564,7 @@ public class GlobalResources {
      * str = '"a" "bc" "d" "efghi"'
      *
      * @param str The string
+     *
      * @return The resulting array
      */
     public static String[] parseWhitespaceSeparatedList(String str) {
@@ -673,6 +598,7 @@ public class GlobalResources {
      * where each element is double quoted.
      *
      * @param l The string array
+     *
      * @return The resulting string
      */
     public static String toWhitespaceSeparatedList(String[] l) {
@@ -686,6 +612,7 @@ public class GlobalResources {
      * @param l         The list
      * @param quote     The quote string to use
      * @param separator The separator
+     *
      * @return The resulting string
      */
     public static String toString(String[] l, String quote, String separator) {
@@ -778,6 +705,7 @@ public class GlobalResources {
      * Generates all combinations of all sizes of all the strings given in values
      *
      * @param values The input strings to combine
+     *
      * @return The combinations
      */
     public static String[] combinations(String[] values) {
@@ -807,6 +735,7 @@ public class GlobalResources {
      * @param values The elements to combine
      * @param size   The size of the combinations
      * @param <T>    The type
+     *
      * @return The combinations
      */
     public static <T> List<List<T>> combination(List<T> values, int size) {
@@ -851,13 +780,13 @@ public class GlobalResources {
         }
     }
 
-    public static String msToTimeString(long ms){
+    public static String msToTimeString(long ms) {
         double seconds = ms / 1000d;
         double minutes = seconds / 60d;
         double hours = minutes / 60d;
         double days = hours / 24d;
         double years = days / 365.25d;
-        if(seconds < 60 ){
+        if (seconds < 60) {
             return String.format("%.0f", seconds) + " s";
         } else if (minutes < 60) {
             return String.format("%.0f", minutes) + " m";
@@ -871,91 +800,75 @@ public class GlobalResources {
 
     }
 
-    public static ShaderProgram getShapeShader() {
+    public ShaderProgram getShapeShader() {
         return shapeShader;
     }
 
-    public static void setShapeShader(ShaderProgram shapeShader) {
-        GlobalResources.shapeShader = shapeShader;
+    public void setShapeShader(ShaderProgram shapeShader) {
+        this.shapeShader = shapeShader;
     }
 
-    public static ShaderProgram getSpriteShader() {
+    public ShaderProgram getSpriteShader() {
         return spriteShader;
     }
 
-    public static void setSpriteShader(ShaderProgram spriteShader) {
-        GlobalResources.spriteShader = spriteShader;
-    }
-
-    public static SpriteBatch getSpriteBatch() {
+    public SpriteBatch getSpriteBatch() {
         return spriteBatch;
     }
 
-    public static void setSpriteBatch(SpriteBatch spriteBatch) {
-        GlobalResources.spriteBatch = spriteBatch;
-    }
-
-    public static SpriteBatch getSpriteBatchVR() {
+    public SpriteBatch getSpriteBatchVR() {
         return spriteBatchVR;
     }
 
-    public static void setSpriteBatchVR(SpriteBatch spriteBatchVR) {
-        GlobalResources.spriteBatchVR = spriteBatchVR;
+    public void setSpriteBatchVR(SpriteBatch sb) {
+        spriteBatchVR = sb;
     }
 
-    public static ExtShaderProgram getExtSpriteShader() {
+    public ExtShaderProgram getExtSpriteShader() {
         return extSpriteShader;
     }
 
-    public static void setExtSpriteShader(ExtShaderProgram extSpriteShader) {
-        GlobalResources.extSpriteShader = extSpriteShader;
-    }
-
-    public static ExtSpriteBatch getExtSpriteBatch() {
+    public ExtSpriteBatch getExtSpriteBatch() {
         return extSpriteBatch;
     }
 
-    public static void setExtSpriteBatch(ExtSpriteBatch extSpriteBatch) {
-        GlobalResources.extSpriteBatch = extSpriteBatch;
-    }
-
-    public static Cursor getLinkCursor() {
+    public Cursor getLinkCursor() {
         return linkCursor;
     }
 
-    public static void setLinkCursor(Cursor linkCursor) {
-        GlobalResources.linkCursor = linkCursor;
+    public void setLinkCursor(Cursor linkCursor) {
+        this.linkCursor = linkCursor;
     }
 
-    public static Skin getSkin() {
-        return skin;
-    }
-
-    public static void setSkin(Skin skin) {
-        GlobalResources.skin = skin;
-    }
-
-    public static Cursor getResizeXCursor() {
+    public Cursor getResizeXCursor() {
         return resizeXCursor;
     }
 
-    public static void setResizeXCursor(Cursor resizeXCursor) {
-        GlobalResources.resizeXCursor = resizeXCursor;
+    public void setResizeXCursor(Cursor resizeXCursor) {
+        this.resizeXCursor = resizeXCursor;
     }
 
-    public static Cursor getResizeYCursor() {
+    public Cursor getResizeYCursor() {
         return resizeYCursor;
     }
 
-    public static void setResizeYCursor(Cursor resizeYCursor) {
-        GlobalResources.resizeYCursor = resizeYCursor;
+    public void setResizeYCursor(Cursor resizeYCursor) {
+        this.resizeYCursor = resizeYCursor;
     }
 
-    public static Cursor getEmptyCursor() {
+    public Cursor getEmptyCursor() {
         return emptyCursor;
     }
 
-    public static void setEmptyCursor(Cursor emptyCursor) {
-        GlobalResources.emptyCursor = emptyCursor;
+    public void setEmptyCursor(Cursor emptyCursor) {
+        this.emptyCursor = emptyCursor;
+    }
+
+    public Skin getSkin() {
+        return skin;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
     }
 }

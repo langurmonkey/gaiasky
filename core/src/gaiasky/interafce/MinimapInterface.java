@@ -5,6 +5,7 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import gaiasky.util.I18n;
@@ -14,10 +15,10 @@ public class MinimapInterface extends TableGuiInterface {
     private final MinimapWidget minimap;
     private final OwnLabel mapName;
 
-    public MinimapInterface(Skin skin) {
+    public MinimapInterface(final Skin skin, final ShaderProgram shapeShader) {
         super(skin);
         float pad = 5f;
-        minimap = new MinimapWidget(skin);
+        minimap = new MinimapWidget(skin, shapeShader);
 
         Table side = new Table(skin);
         side.setBackground("table-bg");

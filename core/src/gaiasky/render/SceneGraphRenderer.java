@@ -217,6 +217,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          *
          * @param renderGroupMask The bit mask
          * @param rgs             The render groups
+         *
          * @return The bits instance
          */
         public static Bits add(Bits renderGroupMask, RenderGroup... rgs) {
@@ -231,6 +232,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          *
          * @param renderGroupMask The bit mask
          * @param rgs             The render groups
+         *
          * @return The bits instance
          */
         public static Bits set(Bits renderGroupMask, RenderGroup... rgs) {
@@ -243,8 +245,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
     public static SceneGraphRenderer instance;
 
-    public static void initialise(AssetManager manager, VRContext vrContext) {
-        instance = new SceneGraphRenderer(vrContext);
+    public static void initialise(final AssetManager manager, final VRContext vrContext, final GlobalResources globalResources) {
+        instance = new SceneGraphRenderer(vrContext, globalResources);
         instance.initialize(manager);
     }
 
@@ -310,14 +312,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     // VRContext, may be null
     private final VRContext vrContext;
+    private final GlobalResources globalResources;
 
     private Array<IRenderable> stars;
 
     private AbstractRenderSystem billboardStarsProc;
 
-    public SceneGraphRenderer(VRContext vrContext) {
+    public SceneGraphRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
         this.vrContext = vrContext;
+        this.globalResources = globalResources;
     }
 
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager, String vertexShader, String fragmentShader, String[] names, String[] prepend) {
@@ -445,7 +449,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    private ExtShaderProgram[] fetchShaderProgram(AssetManager manager, AssetDescriptor<ExtShaderProgram>[] descriptors, String... names) {
+    private ExtShaderProgram[] fetchShaderProgram(final AssetManager manager, final AssetDescriptor<ExtShaderProgram>[] descriptors, final String... names) {
         int n = descriptors.length;
         ExtShaderProgram[] shaders = new ExtShaderProgram[n];
 
@@ -458,7 +462,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         return shaders;
     }
 
-    public void doneLoading(AssetManager manager) {
+    public void doneLoading(final AssetManager manager) {
         IntBuffer intBuffer = BufferUtils.newIntBuffer(16);
         Gdx.gl20.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, intBuffer);
         int maxTexSize = intBuffer.get();
@@ -601,7 +605,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         BitmapFont fontTitles = manager.get("font/font-titles.fnt");
 
         // Sprites
-        ExtSpriteBatch spriteBatch = GlobalResources.getExtSpriteBatch();
+        ExtSpriteBatch spriteBatch = globalResources.getExtSpriteBatch();
         spriteBatch.enableBlending();
 
         // Font batch - additive, no depth writes
@@ -634,10 +638,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
         sgrList = new ISGR[5];
         sgrList[SGR_DEFAULT_IDX] = new SGR();
-        sgrList[SGR_STEREO_IDX] = new SGRStereoscopic();
+        sgrList[SGR_STEREO_IDX] = new SGRStereoscopic(globalResources.getSpriteBatch());
         sgrList[SGR_FOV_IDX] = new SGRFov();
         sgrList[SGR_CUBEMAP_IDX] = new SGRCubemapProjections();
-        sgrList[SGR_OPENVR_IDX] = new SGROpenVR(vrContext);
+        sgrList[SGR_OPENVR_IDX] = new SGROpenVR(vrContext, globalResources.getSpriteBatchVR());
         sgr = null;
 
         /*
@@ -764,7 +768,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem modelCloudProc = new ModelBatchRenderSystem(MODEL_CLOUD, alphas, mbCloud);
 
         // SHAPES
-        AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas);
+        AbstractRenderSystem shapeProc = new ShapeRenderSystem(SHAPE, alphas, globalResources.getSpriteShader());
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
         // Add components to set
@@ -1213,6 +1217,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * Checks if a given component type is on
      *
      * @param comp The component
+     *
      * @return Whether the component is on
      */
     public boolean isOn(ComponentType comp) {
@@ -1223,6 +1228,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * Checks if the component types are all on
      *
      * @param comp The components
+     *
      * @return Whether the components are all on
      */
     public boolean allOn(ComponentTypes comp) {
@@ -1337,6 +1343,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      *
      * @param type The component type.
      * @param t    The current time in seconds.
+     *
      * @return The alpha value.
      */
     private float calculateAlpha(ComponentType type, double t) {

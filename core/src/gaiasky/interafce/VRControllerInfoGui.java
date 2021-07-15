@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
@@ -21,8 +22,9 @@ public class VRControllerInfoGui extends AbstractGui {
     protected Container<Table> container;
     protected Table contents;
 
-    public VRControllerInfoGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public VRControllerInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
     }
 
     @Override
@@ -33,7 +35,6 @@ public class VRControllerInfoGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.getSkin();
 
         container = new Container<>();
         container.setFillParent(true);

@@ -23,6 +23,7 @@ package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
@@ -77,7 +78,7 @@ public class CollapsibleWindow extends OwnWindow {
         initWindow(skin, collapseSpeed);
     }
 
-    private void initWindow(Skin skin, float collapseSpeed){
+    private void initWindow(final Skin skin, final float collapseSpeed){
         this.me = this;
         this.skin = skin;
         this.collapseSpeed = collapseSpeed;
@@ -120,7 +121,7 @@ public class CollapsibleWindow extends OwnWindow {
                 Type type = ((InputEvent) event).getType();
                 // Click
                 if (type == Type.mouseMoved) {
-                    Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
+                    Gdx.graphics.setSystemCursor(SystemCursor.Hand);
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }
@@ -135,9 +136,9 @@ public class CollapsibleWindow extends OwnWindow {
                     Type type = ((InputEvent) event).getType();
                     if (type == Type.mouseMoved) {
                         if ((edge & Align.bottom) != 0 && maxHeight == -1f) {
-                            Gdx.graphics.setCursor(GlobalResources.getResizeYCursor());
+                            Gdx.graphics.setSystemCursor(SystemCursor.VerticalResize);
                         } else if ((edge & Align.right) != 0 && maxWidth == -1f) {
-                            Gdx.graphics.setCursor(GlobalResources.getResizeXCursor());
+                            Gdx.graphics.setSystemCursor(SystemCursor.HorizontalResize);
                         }
                     } else if (type == Type.exit) {
                         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);

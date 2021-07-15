@@ -54,7 +54,7 @@ public class MusicManager implements IObserver {
             musicFiles = new Array<>();
 
             for (Path folder : folders) {
-                GlobalResources.listRec(folder, musicFiles, new MusicFileFilter());
+                GlobalResources.listRecursive(folder, musicFiles, new MusicFileFilter());
             }
             logger.debug(I18n.txt("gui.music.load", musicFiles.size));
         } else {

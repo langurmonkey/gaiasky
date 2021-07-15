@@ -8,6 +8,7 @@ package gaiasky.util.scene2d;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -44,9 +45,9 @@ public class LinkButton  extends OwnImageButton {
                 if (type == InputEvent.Type.touchUp && ((InputEvent) event).getButton() == Input.Buttons.LEFT) {
                     Gdx.net.openURI(linkURL);
                 } else if (type == InputEvent.Type.enter) {
-                    Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
+                    Gdx.graphics.setSystemCursor(SystemCursor.Hand);
                 } else if (type == InputEvent.Type.exit) {
-                    Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }
                 return true;
             }

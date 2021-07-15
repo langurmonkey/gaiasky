@@ -73,9 +73,9 @@ public class ControllerGui extends AbstractGui {
     private int selectedTab = 0;
     private int fi = 0, fj = 0;
 
-    public ControllerGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public ControllerGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
-        this.skin = GlobalResources.getSkin();
+        this.skin = skin;
         this.em = EventManager.instance;
         model = new ArrayList<>();
         content = new Table(skin);

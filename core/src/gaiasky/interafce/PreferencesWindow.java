@@ -87,16 +87,19 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
 
+    private GlobalResources globalResources;
+
     // Backup values
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
     private boolean lensflareBak, lightglowBak, debugInfoBak, motionblurBak;
 
-    public PreferencesWindow(Stage stage, Skin skin) {
+    public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
         super(I18n.txt("gui.settings") + " - " + GlobalConf.version.version + " - " + I18n.txt("gui.build", GlobalConf.version.build), skin, stage);
 
         this.contents = new Array<>();
         this.labels = new Array<>();
+        this.globalResources = globalResources;
 
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
@@ -1770,8 +1773,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Path mappingsAssets = Path.of(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName());
         Path mappingsData = SysUtils.getDefaultMappingsDir();
         Array<Path> mappingFiles = new Array<>();
-        GlobalResources.listRec(mappingsAssets, mappingFiles, ".inputListener", ".controller");
-        GlobalResources.listRec(mappingsData, mappingFiles, ".inputListener", ".controller");
+        GlobalResources.listRecursive(mappingsAssets, mappingFiles, ".inputListener", ".controller");
+        GlobalResources.listRecursive(mappingsData, mappingFiles, ".inputListener", ".controller");
         FileComboBoxBean selected = null;
         for (Path path : mappingFiles) {
             FileComboBoxBean fcbb = new MappingFileComboBoxBean(path);
@@ -2118,7 +2121,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         if (reloadUI) {
-            reloadUI();
+            reloadUI(globalResources);
         }
 
     }
@@ -2146,8 +2149,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.instance.post(Events.SHOW_DEBUG_CMD, debugInfoBak);
     }
 
-    private void reloadUI() {
-        EventManager.instance.post(Events.UI_RELOAD_CMD);
+    private void reloadUI(final GlobalResources globalResources) {
+        EventManager.instance.post(Events.UI_RELOAD_CMD, globalResources);
     }
 
     private void selectFullscreen(boolean fullscreen, OwnTextField widthField, OwnTextField heightField, SelectBox<DisplayMode> fullScreenResolutions, OwnLabel widthLabel, OwnLabel heightLabel) {

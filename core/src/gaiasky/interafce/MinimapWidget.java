@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
@@ -36,7 +37,7 @@ public class MinimapWidget implements Disposable {
     private final Array<IMinimapScale> scales;
     private IMinimapScale current;
 
-    public MinimapWidget(Skin skin) {
+    public MinimapWidget(final Skin skin, final ShaderProgram shapeShader) {
         side = (int) (1.4f * GlobalConf.program.MINIMAP_SIZE);
         side2 = side / 2;
         sideshort = (int) (0.7f * GlobalConf.program.MINIMAP_SIZE);
@@ -44,10 +45,10 @@ public class MinimapWidget implements Disposable {
 
         OrthographicCamera ortho = new OrthographicCamera();
 
-        ShapeRenderer sr = new ShapeRenderer(100, GlobalResources.getShapeShader());
+        ShapeRenderer sr = new ShapeRenderer(100, shapeShader);
         sr.setAutoShapeType(true);
 
-        SpriteBatch sb = new SpriteBatch(1000, GlobalResources.getSpriteShader());
+        SpriteBatch sb = new SpriteBatch(1000, shapeShader);
 
         BitmapFont font = skin.getFont("ui-20");
 

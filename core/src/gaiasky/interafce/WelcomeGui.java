@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -65,17 +66,16 @@ public class WelcomeGui extends AbstractGui {
     private DatasetsWidget dw;
     private DataDescriptor dd;
 
-    /** Lock object for synchronisation **/
-
     /**
      * Creates an initial GUI
      *
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(Lwjgl3Graphics graphics, Float unitsPerPixel, boolean skipWelcome, VRStatus vrStatus) {
+    public WelcomeGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final boolean skipWelcome, final VRStatus vrStatus) {
         super(graphics, unitsPerPixel);
-        lock = new Object();
+        this.skin = skin;
+        this.lock = new Object();
         this.skipWelcome = skipWelcome;
         this.vrStatus = vrStatus;
     }
@@ -86,7 +86,6 @@ public class WelcomeGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.getSkin();
 
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))

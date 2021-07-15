@@ -10,6 +10,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.util.GlobalResources;
 
@@ -20,8 +21,9 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container di;
 
-    public DebugGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public DebugGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
     }
 
     @Override
@@ -34,7 +36,6 @@ public class DebugGui extends AbstractGui {
     @Override
     public void doneLoading(AssetManager assetManager) {
         float pad = 16f;
-        skin = GlobalResources.getSkin();
 
         // DEBUG INFO - TOP RIGHT
         debugInterface = new DebugInterface(skin, lock);

@@ -7,7 +7,7 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Buttons;
-import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -81,9 +81,9 @@ public class ColorPicker extends ColorPickerAbstract {
                         cpd.show(stage);
 
                     } else if (type == Type.enter) {
-                        Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
+                        Gdx.graphics.setSystemCursor(SystemCursor.Hand);
                     } else if (type == Type.exit) {
-                        Gdx.graphics.setSystemCursor(Cursor.SystemCursor.Arrow);
+                        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                     }
                 }
             }

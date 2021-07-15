@@ -5,6 +5,7 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -17,9 +18,9 @@ public class MinimapWindow extends GenericDialog {
     private final MinimapWidget minimap;
 
 
-    public MinimapWindow(Stage stage, Skin skin) {
+    public MinimapWindow(final Stage stage, final Skin skin, final ShaderProgram shapeShader) {
         super(I18n.txt("gui.minimap.title"), skin, stage);
-        minimap = new MinimapWidget(skin);
+        minimap = new MinimapWidget(skin, shapeShader);
 
         setModal(false);
         setCancelText(I18n.txt("gui.close"));

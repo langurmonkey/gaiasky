@@ -317,7 +317,7 @@ public class GuiRegistry implements IObserver {
                 Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
                 if (prefs.isEmpty()) {
                     if (preferencesWindow == null) {
-                        preferencesWindow = new PreferencesWindow(ui, skin);
+                        preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources());
                     }
                     if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent())
                         preferencesWindow.show(ui);
@@ -525,7 +525,7 @@ public class GuiRegistry implements IObserver {
                 }
                 break;
             case UI_RELOAD_CMD:
-                reloadUI();
+                reloadUI((GlobalResources) data[0]);
                 break;
             default:
                 break;
@@ -578,11 +578,11 @@ public class GuiRegistry implements IObserver {
         removeActorThread.start();
     }
 
-    private void reloadUI() {
+    private void reloadUI(GlobalResources globalResources) {
         // Reinitialise user interface
         GaiaSky.postRunnable(() -> {
             // Reinitialise GUI system
-            GlobalResources.updateSkin();
+            globalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
             EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
@@ -595,7 +595,7 @@ public class GuiRegistry implements IObserver {
             // Update names with new language
             GaiaSky.instance.sg.getRoot().updateNamesRec();
             // UI theme reload broadcast
-            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, GlobalResources.getSkin());
+            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, globalResources.getSkin());
         });
     }
 

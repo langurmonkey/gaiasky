@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.util.GlobalResources;
@@ -13,8 +14,9 @@ public class WelcomeGuiVR extends AbstractGui {
 
     private Table center;
 
-    public WelcomeGuiVR(Lwjgl3Graphics graphics, Float unitsPerPixel){
+    public WelcomeGuiVR(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel){
         super(graphics, unitsPerPixel);
+        this.skin = skin;
     }
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
@@ -22,7 +24,6 @@ public class WelcomeGuiVR extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.getSkin();
 
         center = new Table();
         center.setFillParent(true);

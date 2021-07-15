@@ -5,6 +5,7 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Array;
@@ -24,9 +25,9 @@ public class ShapeRenderSystem extends AbstractRenderSystem {
      */
     private final ShapeRenderer shapeRenderer;
 
-    public ShapeRenderSystem(RenderGroup rg, float[] alphas) {
+    public ShapeRenderSystem(final RenderGroup rg, final float[] alphas, final ShaderProgram spriteShader) {
         super(rg, alphas, null);
-        this.shapeRenderer = new ShapeRenderer(5000, GlobalResources.getSpriteShader());
+        this.shapeRenderer = new ShapeRenderer(5000, spriteShader);
 
     }
 

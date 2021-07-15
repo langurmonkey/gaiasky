@@ -1273,11 +1273,11 @@ public enum Events {
     TRANSIT_COLOUR_CMD,
 
     /**
-     * Contains the new turning speed
+     * Contains the new turning speed.
      **/
     TURNING_SPEED_CMD,
     /**
-     * Issues the command to reload the UI
+     * Issues the command to reload the UI, contains the {@link gaiasky.util.GlobalResources} instance.
      */
     UI_RELOAD_CMD,
     /**

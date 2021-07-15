@@ -19,7 +19,7 @@ import gaiasky.util.GlobalResources;
  */
 public class OwnImageButton extends ImageButton {
     OwnImageButton me;
-    Cursor cursor;
+    SystemCursor cursor;
 
     public OwnImageButton(Skin skin) {
         super(skin);
@@ -46,13 +46,13 @@ public class OwnImageButton extends ImageButton {
     }
 
     private void initialize() {
-        cursor = GlobalResources.getLinkCursor();
+        cursor = SystemCursor.Hand;
         this.addListener(event -> {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();
                 if (type == Type.enter) {
                     if (!me.isDisabled())
-                        Gdx.graphics.setCursor(cursor);
+                        Gdx.graphics.setSystemCursor(cursor);
                     return true;
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);

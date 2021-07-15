@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -76,27 +77,25 @@ public class FovCamera extends AbstractCamera implements IObserver {
     private final Vector3d dir2;
     private final Matrix4d matrix;
 
-    Viewport viewport, viewport2;
+    private Stage[] fpstages;
+    private Drawable fp, fp_fov1, fp_fov2;
 
-    Stage[] fpstages;
-    Drawable fp, fp_fov1, fp_fov2;
-
-    public FovCamera(AssetManager assetManager, CameraManager parent) {
+    public FovCamera(final AssetManager assetManager, final CameraManager parent, final SpriteBatch spriteBatch) {
         super(parent);
-        initialize(assetManager);
+        initialize(spriteBatch);
         directions = new Vector3d[] { new Vector3d(), new Vector3d() };
-        interpolatedDirections = new ArrayList<Vector3d[]>();
+        interpolatedDirections = new ArrayList<>();
         dirMiddle = new Vector3d();
         up = new Vector3d();
 
-        currentTime = 0l;
-        lastTime = 0l;
+        currentTime = 0L;
+        lastTime = 0L;
         dir1 = new Vector3d();
         dir2 = new Vector3d();
         matrix = new Matrix4d();
     }
 
-    public void initialize(AssetManager assetManager) {
+    public void initialize(final SpriteBatch spriteBatch) {
         camera = new PerspectiveCamera(FOV, (float) (Gdx.graphics.getHeight() * GAIA_ASPECT_RATIO), Gdx.graphics.getHeight());
         camera.near = (float) CAM_NEAR;
         camera.far = (float) CAM_FAR;
@@ -109,37 +108,28 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
         fovFactor = FOV / 5f;
 
-        /**
-         * Fit viewport ensures a fixed aspect ratio. We set the camera field of
-         * view equal to the satelltie's AC FOV and calculate the satellite
-         * aspect ratio as FOV_AL/FOV_AC. With it we set the width of the
-         * viewport to ensure we have the same vision as Gaia.
-         */
-        viewport = new FitViewport((float) (Gdx.graphics.getHeight() * GAIA_ASPECT_RATIO), Gdx.graphics.getHeight(), camera);
-        viewport2 = new FitViewport((float) (Gdx.graphics.getHeight() * GAIA_ASPECT_RATIO), Gdx.graphics.getHeight(), camera2);
-
-        /** Prepare stage with FP image **/
+        /* Prepare stage with FP image */
         fp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane.png"))));
         fp_fov1 = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane-fov1.png"))));
         fp_fov2 = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane-fov2.png"))));
 
         fpstages = new Stage[3];
 
-        Stage fov12 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.getSpriteBatch());
+        Stage fov12 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), spriteBatch);
         Image i = new Image(fp);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov12.addActor(i);
 
-        Stage fov1 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.getSpriteBatch());
+        Stage fov1 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), spriteBatch);
         i = new Image(fp_fov1);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov1.addActor(i);
 
-        Stage fov2 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), GlobalResources.getSpriteBatch());
+        Stage fov2 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), spriteBatch);
         i = new Image(fp_fov2);
         i.setFillParent(true);
         i.setAlign(Align.center);

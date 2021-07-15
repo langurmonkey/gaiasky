@@ -102,8 +102,9 @@ public class SpacecraftGui extends AbstractGui {
 
     private boolean thrustEvents = true;
 
-    public SpacecraftGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public SpacecraftGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
         aux3f1 = new Vector3();
         aux3f2 = new Vector3();
 
@@ -153,8 +154,6 @@ public class SpacecraftGui extends AbstractGui {
      * Constructs the interface
      */
     public void doneLoading(AssetManager assetManager) {
-        skin = GlobalResources.getSkin();
-
         aiTexture = assetManager.get(GlobalConf.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
         aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         aiPointerTexture = assetManager.get("img/ai-pointer.png", Texture.class);

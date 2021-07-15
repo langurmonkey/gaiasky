@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
@@ -22,8 +23,9 @@ public class VRSelectionGui extends AbstractGui {
     private boolean selectionState = false;
     private double selectionCompletion = 0d;
 
-    public VRSelectionGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public VRSelectionGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
     }
 
     @Override
@@ -34,7 +36,6 @@ public class VRSelectionGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
-        skin = GlobalResources.getSkin();
 
         container = new Container<>();
         container.setFillParent(true);

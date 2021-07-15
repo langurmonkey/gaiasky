@@ -36,7 +36,7 @@ public class DatasetLoadDialog extends GenericDialog {
     private final float cpSize;
     private final float taWidth;
 
-    public DatasetLoadDialog(String title, String fileName, Skin skin, Stage ui) {
+    public DatasetLoadDialog(final String title, final String fileName, final Skin skin, final Stage ui) {
         super(title, skin, ui);
 
         this.fileName = fileName;
@@ -50,10 +50,6 @@ public class DatasetLoadDialog extends GenericDialog {
         setCancelText(I18n.txt("gui.cancel"));
 
         buildSuper();
-    }
-
-    public DatasetLoadDialog(Skin skin, Stage ui) {
-        this(I18n.txt("gui.dsload.title"), "", skin, ui);
     }
 
     @Override

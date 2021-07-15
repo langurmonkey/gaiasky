@@ -16,6 +16,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
@@ -40,17 +41,18 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
 
     private final Skin skin;
     private Stage ui;
+    private final ShaderProgram spriteShader;
 
     private SpriteBatch sb;
-    private FrameBuffer renderBuffer;
     private boolean initGui = false;
     private boolean initializing = true;
 
     private final Vector2 lastTexSize;
 
-    public GaiaSkyView() {
+    public GaiaSkyView(final Skin skin, final ShaderProgram spriteShader) {
         super();
-        this.skin = GlobalResources.getSkin();
+        this.skin = skin;
+        this.spriteShader = spriteShader;
         this.lastTexSize = new Vector2(-1, -1);
         EventManager.instance.subscribe(this, Events.INITIALIZED_INFO);
     }
@@ -61,7 +63,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
 
     @Override
     public void create() {
-        sb = new SpriteBatch(100, GlobalResources.getSpriteShader());
+        sb = new SpriteBatch(100, this.spriteShader);
     }
 
     private void createInitGui() {
@@ -108,7 +110,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
             ui.getViewport().apply();
             ui.draw();
         } else {
-            renderBuffer = GaiaSky.instance.getBackRenderBuffer();
+            FrameBuffer renderBuffer = GaiaSky.instance.getBackRenderBuffer();
             if (renderBuffer != null) {
                 RenderUtils.renderKeepAspect(renderBuffer, sb, graphics, lastTexSize);
             }

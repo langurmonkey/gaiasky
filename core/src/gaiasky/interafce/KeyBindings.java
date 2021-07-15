@@ -393,7 +393,7 @@ public class KeyBindings {
         addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)));
 
         // Reload UI (debugging)
-        addAction(new ProgramAction("action.ui.reload", () -> EventManager.instance.post(Events.UI_RELOAD_CMD)));
+        addAction(new ProgramAction("action.ui.reload", () -> EventManager.instance.post(Events.UI_RELOAD_CMD, GaiaSky.instance.getGlobalResources())));
 
         // Configure slave
         addAction(new ProgramAction("action.slave.configure", () -> EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION), masterWithSlaves));
@@ -412,7 +412,6 @@ public class KeyBindings {
         // Check if keyboard.mappings file exists in data folder, otherwise copy it there
         Path customMappings = SysUtils.getDefaultMappingsDir().resolve(mappingsFileName);
         Path defaultMappings = Paths.get(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
-        Path mappingsFile = customMappings;
         if (!Files.exists(customMappings)) {
             try {
                 Files.copy(defaultMappings, customMappings, StandardCopyOption.REPLACE_EXISTING);
@@ -420,10 +419,10 @@ public class KeyBindings {
                 logger.error(e);
             }
         }
-        logger.info(I18n.txt("notif.kbd.mappings.file.use", mappingsFile));
+        logger.info(I18n.txt("notif.kbd.mappings.file.use", customMappings));
 
         try {
-            Array<Pair<String, String>> mappings = readMappingsFile(mappingsFile);
+            Array<Pair<String, String>> mappings = readMappingsFile(customMappings);
 
             for (Pair<String, String> mapping : mappings) {
                 String key = mapping.getFirst();
@@ -444,7 +443,7 @@ public class KeyBindings {
             }
 
         } catch (Exception e) {
-            logger.error(e, I18n.txt("notif.kbd.mappings.error", mappingsFile));
+            logger.error(e, I18n.txt("notif.kbd.mappings.error", customMappings));
         }
 
     }

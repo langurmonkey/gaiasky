@@ -31,12 +31,13 @@ public class CrashGui extends AbstractGui {
     protected Throwable crash;
     protected CrashWindow crashWindow;
 
-    public CrashGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Throwable crash) {
-        this(graphics, unitsPerPixel, crash, 0, false);
+    public CrashGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Throwable crash) {
+        this(skin, graphics, unitsPerPixel, crash, 0, false);
     }
 
-    public CrashGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Throwable crash, Integer hoffset, Boolean vr) {
+    public CrashGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Throwable crash, final Integer hoffset, final Boolean vr) {
         super(graphics, unitsPerPixel);
+        this.skin = skin;
         this.crash = crash;
         this.vr = vr;
         this.hoffset = hoffset;
@@ -53,8 +54,6 @@ public class CrashGui extends AbstractGui {
         } else {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
-
-        skin = GlobalResources.getSkin();
 
         // Dialog
         crashWindow = new CrashWindow(ui, skin, crash);

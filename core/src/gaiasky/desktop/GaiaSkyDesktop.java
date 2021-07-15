@@ -279,9 +279,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Scene graph implementation provider
             SceneGraphImplementationProvider.initialize(new DesktopSceneGraphImplementationProvider());
 
-            // Initialize screenshots manager
-            ScreenshotsManager.initialize();
-
             // Math
             MathManager.initialize();
 

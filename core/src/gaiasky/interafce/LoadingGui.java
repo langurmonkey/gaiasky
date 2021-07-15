@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -47,18 +48,15 @@ public class LoadingGui extends AbstractGui {
     private long lastFunnyTime;
     private long lastTipTime;
 
-    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
-        this(graphics, unitsPerPixel, 0, false);
+    public LoadingGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
+        this(skin, graphics, unitsPerPixel, 0, vr);
     }
 
-    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Boolean vr) {
-        this(graphics, unitsPerPixel, 0, vr);
-    }
-
-    public LoadingGui(Lwjgl3Graphics graphics, Float unitsPerPixel, Integer hoffset, Boolean vr) {
+    public LoadingGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Integer hoffset, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
         this.hoffset = hoffset;
+        this.skin = skin;
     }
 
     @Override
@@ -75,8 +73,6 @@ public class LoadingGui extends AbstractGui {
         } else {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
-
-        skin = GlobalResources.getSkin();
 
 
         center = new Table(skin);

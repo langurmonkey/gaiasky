@@ -46,7 +46,7 @@ public class OwnTextButton extends TextButton {
                 Type type = ((InputEvent) event).getType();
                 if (type == Type.enter) {
                     if (!me.isDisabled())
-                        Gdx.graphics.setCursor(GlobalResources.getLinkCursor());
+                        Gdx.graphics.setSystemCursor(SystemCursor.Hand);
                 } else if (type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }

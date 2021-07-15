@@ -43,8 +43,9 @@ public class HUDGui implements IGui {
     private Lwjgl3Graphics graphics;
     private float unitsPerPixel;
 
-    public HUDGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public HUDGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super();
+        this.skin = skin;
         this.graphics = graphics;
         this.unitsPerPixel = unitsPerPixel;
     }
@@ -60,7 +61,6 @@ public class HUDGui implements IGui {
 
     @Override
     public void doneLoading(AssetManager assetManager) {
-        skin = GlobalResources.getSkin();
         interfaces = new Array<>();
         buildGui();
     }

@@ -6,6 +6,7 @@
 package gaiasky.util.samp;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.event.EventManager;
@@ -55,7 +56,7 @@ public class SAMPClient implements IObserver {
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CATALOG_REMOVE, Events.DISPOSE);
     }
 
-    public void initialize() {
+    public void initialize(final Skin skin) {
         // Disable logging
         java.util.logging.Logger.getLogger("org.astrogrid.samp").setLevel(Level.OFF);
 
@@ -88,7 +89,7 @@ public class SAMPClient implements IObserver {
                 String id = (String) msg.getParam("table-id");
                 String url = (String) msg.getParam("url");
 
-                boolean loaded = loadVOTable(url, id, name);
+                boolean loaded = loadVOTable(url, id, name, skin);
 
                 if (!loaded) {
                     logger.info("Error loading VOTable " + name);
@@ -219,14 +220,14 @@ public class SAMPClient implements IObserver {
      * @param name The table name
      * @return Boolean indicating whether loading succeeded or not
      */
-    private boolean loadVOTable(String url, String id, String name) {
+    private boolean loadVOTable(final String url, final String id, final String name, final Skin skin) {
         logger.info("Loading VOTable: " + name + " from " + url);
         // Load selected file
         try {
             DataSource ds = new URLDataSource(new URL(url));
             Stage ui = GaiaSky.instance.mainGui.getGuiStage();
             String fileName = ds.getName();
-            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, GlobalResources.getSkin(), ui);
+            final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
             Runnable doLoad = () -> {
                 try {
                     DatasetOptions dops = dld.generateDatasetOptions();
