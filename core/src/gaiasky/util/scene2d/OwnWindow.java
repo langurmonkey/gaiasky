@@ -100,19 +100,19 @@ public class OwnWindow extends Table {
 			private void updateEdge (float x, float y) {
 				float border = resizeBorder / 2f;
 				float width = getWidth(), height = getHeight();
-				float padTop = getPadTop(), padLeft = getPadLeft(), padBottom = getPadBottom(), padRight = getPadRight();
-				float left = padLeft, right = width - padRight, bottom = padBottom;
+				float padTop = getPadTop(), padRight = getPadRight();
+				float right = width - padRight;
 				edge = 0;
-				if (isResizable && x >= left - border && x <= right + border && y >= bottom - border) {
-					if (x < left + border) edge |= Align.left;
+				if (isResizable && x >= getPadLeft() - border && x <= right + border && y >= getPadBottom() - border) {
+					if (x < getPadLeft() + border) edge |= Align.left;
 					if (x > right - border) edge |= Align.right;
-					if (y < bottom + border) edge |= Align.bottom;
+					if (y < getPadBottom() + border) edge |= Align.bottom;
 					if (edge != 0) border += 25;
-					if (x < left + border) edge |= Align.left;
+					if (x < getPadLeft() + border) edge |= Align.left;
 					if (x > right - border) edge |= Align.right;
-					if (y < bottom + border) edge |= Align.bottom;
+					if (y < getPadBottom() + border) edge |= Align.bottom;
 				}
-				if (isMovable && edge == 0 && y <= height && y >= height - padTop && x >= left && x <= right) edge = MOVE;
+				if (isMovable && edge == 0 && y <= height && y >= height - padTop && x >= getPadLeft() && x <= right) edge = MOVE;
 			}
 
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
@@ -136,8 +136,8 @@ public class OwnWindow extends Table {
 				float width = getWidth(), height = getHeight();
 				float windowX = getX(), windowY = getY();
 
-				float minWidth = getMinWidth(), maxWidth = getMaxWidth();
-				float minHeight = getMinHeight(), maxHeight = getMaxHeight();
+				float minWidth = getMinWidth();
+				float minHeight = getMinHeight();
 				Stage stage = getStage();
 				boolean clampPosition = keepWithinStage && stage != null && getParent() == stage.getRoot();
 

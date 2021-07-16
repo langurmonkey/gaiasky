@@ -243,16 +243,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
-    public static SceneGraphRenderer instance;
 
-    public static void initialise(final AssetManager manager, final VRContext vrContext, final GlobalResources globalResources) {
-        instance = new SceneGraphRenderer(vrContext, globalResources);
-        instance.initialize(manager);
-    }
-
-    public static Array<Array<IRenderable>> renderLists() {
-        return instance.renderLists;
-    }
 
     /**
      * Contains the flags representing each type's visibility
@@ -835,6 +826,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
 
+    }
+
+    public Array<Array<IRenderable>> renderLists() {
+        return renderLists;
     }
 
     private void addRenderSystem(IRenderSystem renderSystem) {

@@ -254,7 +254,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             if (GlobalConf.scene.STAR_GROUP_BILLBOARD_FLAG) {
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
             }
-            if (SceneGraphRenderer.instance.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
+            if (GaiaSky.instance.sgr.isOn(ComponentTypes.ComponentType.VelocityVectors)) {
                 //addToRender(this, RenderGroup.LINE);
                 addToRender(this, RenderGroup.LINE);
             }

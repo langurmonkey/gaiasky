@@ -26,18 +26,21 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.RenderUtils;
 import gaiasky.util.scene2d.OwnLabel;
 
+/**
+ * This application implements the external view of Gaia Sky, which renders the main back render
+ * buffer into a different window.
+ */
 public class GaiaSkyView implements ApplicationListener, IObserver {
 
-    /** Window **/
-    public static Lwjgl3Window window;
-    /** Graphics **/
-    public static Lwjgl3Graphics graphics;
-    /** Input **/
-    public static Lwjgl3Input input;
+    /* Window */
+    public Lwjgl3Window window;
+    /* Graphics */
+    public Lwjgl3Graphics graphics;
+    /* Input */
+    public Lwjgl3Input input;
 
     private final Skin skin;
     private Stage ui;
@@ -58,7 +61,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     }
 
     public void setWindow(Lwjgl3Window window) {
-        GaiaSkyView.window = window;
+        this.window = window;
     }
 
     @Override
@@ -117,16 +120,6 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
         }
     }
 
-    private Vector2 maintainRatio(float ar, float w, float h) {
-        float nar = w / h;
-        if (nar == ar) {
-            return lastTexSize.set(w, h);
-        } else {
-
-            return lastTexSize.set(w, h);
-        }
-    }
-
     private void updateGlobals() {
         if (graphics == null)
             graphics = (Lwjgl3Graphics) Gdx.graphics;
@@ -152,18 +145,13 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case INITIALIZED_INFO:
-            // Initialize full gui
-            postRunnable(() -> removeGui());
-            break;
-        default:
-            break;
+        if (event == Events.INITIALIZED_INFO) {// Initialize full gui
+            postRunnable(this::removeGui);
         }
 
     }
 
-    public static void postRunnable(Runnable r) {
+    public void postRunnable(Runnable r) {
         if (window != null)
             window.postRunnable(r);
         else

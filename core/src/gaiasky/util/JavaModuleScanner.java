@@ -6,21 +6,14 @@ import java.lang.module.ResolvedModule;
 import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.*;
 import java.util.stream.Stream;
 import java.lang.StackWalker;
 import java.lang.StackWalker.Option;
 import java.lang.StackWalker.StackFrame;
 import java.lang.module.ModuleReference;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * Prints used modules
@@ -32,8 +25,8 @@ public class JavaModuleScanner {
             Set<ModuleLayer> visited, Deque<ModuleLayer> layersOut) {
         if (visited.add(layer)) {
             List<ModuleLayer> parents = layer.parents();
-            for (int i = 0; i < parents.size(); i++) {
-                findLayerOrder(parents.get(i), visited, layersOut);
+            for (ModuleLayer parent : parents) {
+                findLayerOrder(parent, visited, layersOut);
             }
             layersOut.push(layer);
         }
@@ -44,9 +37,9 @@ public class JavaModuleScanner {
             Class<?>[] callStack) {
         Deque<ModuleLayer> layerOrder = new ArrayDeque<>();
         Set<ModuleLayer> visited = new HashSet<>();
-        for (int i = 0; i < callStack.length; i++) {
-            ModuleLayer layer = callStack[i].getModule().getLayer();
-            if(layer != null) {
+        for (Class<?> aClass : callStack) {
+            ModuleLayer layer = aClass.getModule().getLayer();
+            if (layer != null) {
                 findLayerOrder(layer, visited, layerOrder);
             }
         }
@@ -62,9 +55,7 @@ public class JavaModuleScanner {
                         .add(new SimpleEntry<>(module.reference(), layer));
             }
             // Sort modules in layer by name for consistency
-            Collections.sort(modulesInLayer,
-                    (e1, e2) -> e1.getKey().descriptor().name()
-                            .compareTo(e2.getKey().descriptor().name()));
+            modulesInLayer.sort(Comparator.comparing(e -> e.getKey().descriptor().name()));
             // To be safe, dedup ModuleReferences, in case a module occurs in multiple
             // layers and reuses its ModuleReference (no idea if this can happen)
             for (Entry<ModuleReference, ModuleLayer> m : modulesInLayer) {
@@ -79,44 +70,42 @@ public class JavaModuleScanner {
     /** Get the classes in the call stack. */
     private static Class<?>[] getCallStack() {
         // Try StackWalker (JDK 9+)
-        PrivilegedAction<Class<?>[]> stackWalkerAction =
-                (PrivilegedAction<Class<?>[]>) () ->
-                        StackWalker.getInstance(
-                                Option.RETAIN_CLASS_REFERENCE)
-                                .walk(s -> s.map(
-                                        StackFrame::getDeclaringClass)
-                                        .toArray(Class[]::new));
+        PrivilegedAction<Class<?>[]> stackWalkerAction = () ->
+                StackWalker.getInstance(
+                        Option.RETAIN_CLASS_REFERENCE)
+                        .walk(s -> s.map(
+                                StackFrame::getDeclaringClass)
+                                .toArray(Class[]::new));
         try {
             // Try with doPrivileged()
             return AccessController
                     .doPrivileged(stackWalkerAction);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         try {
             // Try without doPrivileged()
             return stackWalkerAction.run();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         // Try SecurityManager
-        PrivilegedAction<Class<?>[]> callerResolverAction =
-                (PrivilegedAction<Class<?>[]>) () ->
-                        new SecurityManager() {
-                            @Override
-                            public Class<?>[] getClassContext() {
-                                return super.getClassContext();
-                            }
-                        }.getClassContext();
+        PrivilegedAction<Class<?>[]> callerResolverAction = () ->
+                new SecurityManager() {
+                    @Override
+                    public Class<?>[] getClassContext() {
+                        return super.getClassContext();
+                    }
+                }.getClassContext();
         try {
             // Try with doPrivileged()
             return AccessController
                     .doPrivileged(callerResolverAction);
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         try {
             // Try without doPrivileged()
             return callerResolverAction.run();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         // As a fallback, use getStackTrace() to try to get the call stack
@@ -188,9 +177,7 @@ public class JavaModuleScanner {
             System.out.println("    ClassLoader: "
                     + layer.findLoader(ref.descriptor().name()));
             Optional<URI> location = ref.location();
-            if (location.isPresent()) {
-                System.out.println("    Location: " + location.get());
-            }
+            location.ifPresent(uri -> System.out.println("    Location: " + uri));
             try (ModuleReader moduleReader = ref.open()) {
                 Stream<String> stream = moduleReader.list();
                 stream.forEach(s -> System.out.println("      File: " + s));

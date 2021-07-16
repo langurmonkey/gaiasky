@@ -14,6 +14,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import gaiasky.util.GlobalConf;
 
+/**
+ * This application displays an error in a window.
+ */
 public class ErrorDialog implements ApplicationListener {
 
     private Exception cause;

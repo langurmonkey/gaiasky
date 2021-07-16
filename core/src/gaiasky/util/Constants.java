@@ -337,6 +337,11 @@ public class Constants {
     public static final String URL_WIKIPEDIA = "https://en.wikipedia.org/wiki/";
     public static final String URL_WIKI_API_SUMMARY = "https://en.wikipedia.org/api/rest_v1/page/summary/";
 
+
+    /**
+     * Attitude folder
+     **/
+    public static final String ATTITUDE_FOLDER = "data/attitudexml/";
     /**
      * Checks whether the given time is within the acceptable bounds of VSOP87
      * algorithms.

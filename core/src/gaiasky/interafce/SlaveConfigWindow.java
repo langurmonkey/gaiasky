@@ -35,7 +35,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
     private static final Map<String, Map<String, String>> parametersMap;
 
     static {
-        parametersMap = new HashMap();
+        parametersMap = new HashMap<>();
     }
 
     private OwnTextField yaw, pitch, roll, fov;
@@ -258,20 +258,15 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case SLAVE_CONNECTION_EVENT:
+        if (event == Events.SLAVE_CONNECTION_EVENT) {
             int idx = (Integer) data[0];
-            String slaveURL = (String) data[1];
             boolean status = (Boolean) data[2];
             if (slaveStatuses != null && slaveStatuses.length > idx && idx >= 0) {
                 slaveStatuses[idx].setColor(status ? Color.GREEN : Color.RED);
             }
-            if(slaveSelect.getSelectedIndex() == idx){
+            if (slaveSelect.getSelectedIndex() == idx) {
                 updateSlaveStatusText(status);
             }
-            break;
-        default:
-            break;
         }
     }
 }

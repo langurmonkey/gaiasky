@@ -114,7 +114,7 @@ public class NBGalaxy extends Particle {
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        SceneGraphRenderer.renderLists().get(rg.ordinal()).add(renderable);
+        GaiaSky.instance.sgr.renderLists().get(rg.ordinal()).add(renderable);
         return true;
     }
 
@@ -123,9 +123,7 @@ public class NBGalaxy extends Particle {
         if (this.shouldRender() && this.opacity > 0) {
             camera.checkClosestBody(this);
 
-            if (camera.getCurrent() instanceof FovCamera) {
-                // Render as point, do nothing
-            } else {
+            if (!(camera.getCurrent() instanceof FovCamera)) {
                 addToRender(this, RenderGroup.BILLBOARD_GAL);
             }
             if (renderText() && camera.isVisible(this)) {

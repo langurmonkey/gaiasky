@@ -91,11 +91,6 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private Runnable renderProcess;
 
     /**
-     * Attitude folder
-     **/
-    private static final String ATTITUDE_FOLDER = "data/attitudexml/";
-
-    /**
      * Singleton instance
      **/
     public static GaiaSky instance;
@@ -116,7 +111,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public VRContext vrContext;
 
     /**
-     * Loading fb
+     * Loading frame buffers
      **/
     public FrameBuffer vrLoadingLeftFb, vrLoadingRightFb;
     /**
@@ -141,7 +136,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // Reference to the scene graph
     public ISceneGraph sg;
     // Scene graph renderer
-    private SceneGraphRenderer sgr;
+    public SceneGraphRenderer sgr;
     // Main post processor
     private IPostProcessor pp;
 
@@ -155,7 +150,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public long frames;
 
     // Frame buffer map
-    private Map<String, FrameBuffer> fbmap;
+    private Map<String, FrameBuffer> frameBufferMap;
 
     // Registry
     private GuiRegistry guiRegistry;
@@ -167,7 +162,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Provisional console logger
      */
-    private ConsoleLogger clogger;
+    private ConsoleLogger consoleLogger;
 
     public InputMultiplexer inputMultiplexer;
 
@@ -237,7 +232,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * External UI window
      */
-    public GaiaSkyView gaiaskyUI = null;
+    public GaiaSkyView gaiaSkyView = null;
 
     /**
      * Global resources holder
@@ -285,7 +280,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.app.setLogLevel(debugMode ? Application.LOG_DEBUG : Application.LOG_INFO);
         Logger.level = debugMode ? Logger.LoggerLevel.DEBUG : Logger.LoggerLevel.INFO;
 
-        clogger = new ConsoleLogger();
+        consoleLogger = new ConsoleLogger();
 
         if (debugMode)
             logger.debug("Logging level set to DEBUG");
@@ -303,7 +298,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         logger.info(I18n.txt("notif.javaversion", System.getProperty("java.version"), System.getProperty("java.vendor")));
 
         // Frame buffer map
-        fbmap = new HashMap<>();
+        frameBufferMap = new HashMap<>();
 
         // Disable all kinds of input
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
@@ -373,7 +368,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Load slave assets
         SlaveManager.load(manager);
 
-        // Init timer if needed
+        // Init timer thread
         Timer.instance();
 
         // Initialise Cameras
@@ -390,7 +385,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         TooltipManager.getInstance().initialTime = 1f;
 
         // Initialise Gaia attitudes
-        manager.load(ATTITUDE_FOLDER, GaiaAttitudeServer.class, new GaiaAttitudeLoaderParameter());
+        manager.load(Constants.ATTITUDE_FOLDER, GaiaAttitudeServer.class, new GaiaAttitudeLoaderParameter());
 
         // Initialise hidden helper user
         HiddenHelperUser.initialize();
@@ -405,8 +400,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         pp = PostProcessorFactory.instance.getPostProcessor();
 
         // Scene graph renderer
-        SceneGraphRenderer.initialise(manager, vrContext, globalResources);
-        sgr = SceneGraphRenderer.instance;
+        sgr = new SceneGraphRenderer(vrContext, globalResources);
+        sgr.initialize(manager);
 
         // Initialise scripting gateway server
         if (!noScripting)
@@ -540,12 +535,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         // Get attitude
-        if (manager.isLoaded(ATTITUDE_FOLDER)) {
-            GaiaAttitudeServer.instance = manager.get(ATTITUDE_FOLDER);
+        if (manager.isLoaded(Constants.ATTITUDE_FOLDER)) {
+            GaiaAttitudeServer.instance = manager.get(Constants.ATTITUDE_FOLDER);
         }
 
         /*
-         * SAMP
+         * SAMP client
          */
         SAMPClient.getInstance().initialize(globalResources.getSkin());
 
@@ -584,7 +579,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         // Stop updating log list
-        clogger.setUseHistorical(false);
+        consoleLogger.setUseHistorical(false);
 
         // Init GUIs, step 2
         reinitialiseGUI2();
@@ -695,9 +690,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, new double[] { 0d, -1d, 0d });
-            EventManager.instance.post(Events.CAMERA_UP_CMD, new double[] { 0d, 0d, 1d });
+            EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
+            EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) new double[] { 0d, -1d, 0d });
+            EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) new double[] { 0d, 0d, 1d });
         }
 
         if (!isOn) {
@@ -1041,7 +1036,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         // Create UI window if needed
-        if (externalView && gaiaskyUI == null) {
+        if (externalView && gaiaSkyView == null) {
             postRunnable(() -> {
                 // Create window
                 Lwjgl3Application app = (Lwjgl3Application) Gdx.app;
@@ -1051,9 +1046,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 config.setTitle(GlobalConf.APPLICATION_NAME + " - External view");
                 config.useVsync(false);
                 config.setWindowIcon(Files.FileType.Internal, "icon/gs_icon.png");
-                gaiaskyUI = new GaiaSkyView(globalResources.getSkin(), globalResources.getSpriteShader());
-                Lwjgl3Window newWindow = app.newWindow(gaiaskyUI, config);
-                gaiaskyUI.setWindow(newWindow);
+                gaiaSkyView = new GaiaSkyView(globalResources.getSkin(), globalResources.getSpriteShader());
+                Lwjgl3Window newWindow = app.newWindow(gaiaSkyView, config);
+                gaiaSkyView.setWindow(newWindow);
             });
         }
     }
@@ -1213,11 +1208,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public FrameBuffer getFrameBuffer(int w, int h) {
         String key = getKey(w, h);
-        if (!fbmap.containsKey(key)) {
+        if (!frameBufferMap.containsKey(key)) {
             FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, Format.RGB888, true);
-            fbmap.put(key, fb);
+            frameBufferMap.put(key, fb);
         }
-        return fbmap.get(key);
+        return frameBufferMap.get(key);
     }
 
     private String getKey(int w, int h) {

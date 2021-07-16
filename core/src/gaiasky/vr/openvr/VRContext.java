@@ -258,9 +258,7 @@ public class VRContext implements Disposable {
         }
     }
 
-    // couple of scratch buffers
-    private final IntBuffer error = BufferUtils.newIntBuffer(1);
-    private final IntBuffer scratch = BufferUtils.newIntBuffer(1), scratch2 = BufferUtils.newIntBuffer(1);
+    private final IntBuffer scratch = BufferUtils.newIntBuffer(1);
 
     // internal native objects to get device poses 
     private final TrackedDevicePose.Buffer trackedDevicePoses = TrackedDevicePose.create(VR.k_unMaxTrackedDeviceCount);
@@ -302,9 +300,10 @@ public class VRContext implements Disposable {
      * @param renderTargetMultiplier multiplier to scale the render surface dimensions as a
      *                               replacement for multisampling
      * @param hasStencil             whether the rendering surfaces should have a stencil buffer
-     * @throws {@link GdxRuntimeException} if the system could not be initialized
      */
     public VRContext(float renderTargetMultiplier, boolean hasStencil) {
+        // couple of scratch buffers
+        IntBuffer error = BufferUtils.newIntBuffer(1);
         int token = VR.VR_InitInternal(error, VR.EVRApplicationType_VRApplication_Scene);
         checkInitError(error);
         OpenVR.create(token);
@@ -319,6 +318,7 @@ public class VRContext implements Disposable {
             devicePoses[i] = new VRDevicePose(i);
         }
 
+        IntBuffer scratch2 = BufferUtils.newIntBuffer(1);
         VRSystem.VRSystem_GetRecommendedRenderTargetSize(scratch, scratch2);
         width = (int) (scratch.get(0) * renderTargetMultiplier);
         height = (int) (scratch2.get(0) * renderTargetMultiplier);

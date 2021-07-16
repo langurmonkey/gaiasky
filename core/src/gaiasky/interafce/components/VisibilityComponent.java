@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -207,7 +208,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        velocityVectorsEnabled(SceneGraphRenderer.instance.isOn(ComponentType.VelocityVectors));
+        velocityVectorsEnabled(GaiaSky.instance.sgr.isOn(ComponentType.VelocityVectors));
 
         // INDIVIDUAL VISIBILITY
         OwnTextIconButton individualVisibility = new OwnTextIconButton(I18n.txt("gui.visibility.individual"), skin, "eye");
