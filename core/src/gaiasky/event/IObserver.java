@@ -5,8 +5,17 @@
 
 package gaiasky.event;
 
+/**
+ * Interface to be implemented by anyone willing to watch and be notified of events.
+ */
 public interface IObserver {
 
+    /**
+     * Event notification call.
+     *
+     * @param event The event type.
+     * @param data  The data associated with this event.
+     */
     void notify(final Events event, final Object... data);
 
 }

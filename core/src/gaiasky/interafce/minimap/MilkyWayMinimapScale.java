@@ -98,9 +98,9 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         sr.setColor(textbc);
         sr.getColor().a *= 0.2f;
         sr.circle(side2, sideshort2, side2);
-        sr.circle(side2, sideshort2, side2 / 2);
-        sr.circle(side2, sideshort2, side2 * 3 / 4);
-        sr.circle(side2, sideshort2, side2 / 4);
+        sr.circle(side2, sideshort2, side2 / 2f);
+        sr.circle(side2, sideshort2, side2 * 3f / 4f);
+        sr.circle(side2, sideshort2, side2 / 4f);
         sr.end();
 
         sr.begin(ShapeType.Filled);
@@ -153,9 +153,9 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         sr.setColor(textbc);
         sr.getColor().a *= 0.2f;
         sr.circle(side2, side2, side2);
-        sr.circle(side2, side2, side2 / 2);
-        sr.circle(side2, side2, side2 * 3 / 4);
-        sr.circle(side2, side2, side2 / 4);
+        sr.circle(side2, side2, side2 / 2f);
+        sr.circle(side2, side2, side2 * 3f / 4f);
+        sr.circle(side2, side2, side2 / 4f);
         sr.setColor(textyc);
         sr.getColor().a *= 0.6f;
         sr.line(side2, 0, side2, side);
@@ -183,7 +183,7 @@ public class MilkyWayMinimapScale extends AbstractMinimapScale {
         font.draw(sb, I18n.txt("gui.minimap.gc"), side2 + px(4), side2 - px(4));
         font.setColor(textmc);
         for (int i = 4000; i <= 16000; i += 4000) {
-            font.draw(sb, "" + (i / 1000) + "Kpc", side2 + px(4), (16000 + i) * side / 32000 - px(6));
+            font.draw(sb, "" + (i / 1000) + "Kpc", side2 + px(4), (16000f + i) * side / 32000f - px(6));
         }
 
         font.draw(sb, "0°", side2 - px(15), side - px(5));

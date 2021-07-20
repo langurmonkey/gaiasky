@@ -124,6 +124,7 @@ public class TextUtils {
      * -> ModelTextureBump
      *
      * @param property The property displayName
+     *
      * @return The method name
      */
     public static String propertyToMethodName(String property) {
@@ -139,6 +140,7 @@ public class TextUtils {
      * Returns the given string with the first letter capitalised
      *
      * @param line The input string
+     *
      * @return The string with its first letter capitalised
      */
     public static String capitalise(String line) {
@@ -150,6 +152,7 @@ public class TextUtils {
      * others in lower case
      *
      * @param line The input string
+     *
      * @return The string with its first letter capitalised and the others in
      * lower case
      */
@@ -162,6 +165,7 @@ public class TextUtils {
      *
      * @param split The split
      * @param strs  The strings
+     *
      * @return The concatenation
      */
     public static String concatenate(String split, String... strs) {
@@ -181,13 +185,14 @@ public class TextUtils {
     /**
      * Concatenates the strings using the given split
      *
-     * @param split The split
-     * @param strs  The strings
+     * @param split   The split
+     * @param strings The strings
+     *
      * @return The concatenation
      */
-    public static String concatenate(String split, Array<String> strs) {
+    public static String concatenate(final String split, final Array<String> strings) {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
-        for (String str : strs) {
+        for (String str : strings) {
             if (str != null && !str.isEmpty()) {
                 if (out.length() > 0)
                     out.append(split);
@@ -198,19 +203,19 @@ public class TextUtils {
     }
 
     public static String arrayToStr(String[] arr) {
-        String buff = "";
-        for (int i = 0; i < arr.length; i++) {
-            buff += arr[i] + '\n';
+        java.lang.StringBuilder buff = new java.lang.StringBuilder();
+        for (String s : arr) {
+            buff.append(s).append('\n');
         }
-        return buff;
+        return buff.toString();
     }
 
     public static String arrayToStr(String[] arr, String pre, String post, String sep) {
-        String buff = pre;
+        java.lang.StringBuilder buff = new java.lang.StringBuilder(pre);
         for (int i = 0; i < arr.length; i++) {
-            buff += arr[i];
+            buff.append(arr[i]);
             if (i < arr.length - 1) {
-                buff += sep;
+                buff.append(sep);
             }
         }
         return buff + post;
@@ -221,14 +226,14 @@ public class TextUtils {
     }
 
     public static String setToStr(Set<String> set, String pre, String post, String sep) {
-        String buff = pre;
+        java.lang.StringBuilder buff = new java.lang.StringBuilder(pre);
         if (set != null) {
             int n = set.size();
             int i = 0;
             for (String elem : set) {
-                buff += elem;
+                buff.append(elem);
                 if (i < n - 1) {
-                    buff += sep;
+                    buff.append(sep);
                 }
                 i++;
             }
@@ -269,6 +274,7 @@ public class TextUtils {
      *
      * @param base     The base string
      * @param suffixes All the suffixes
+     *
      * @return The result
      */
     public static String[] concatAll(String base, String[] suffixes) {

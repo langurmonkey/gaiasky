@@ -32,6 +32,6 @@ public abstract class ThreadIndexer {
      * 
      * @return The number of threads.
      */
-    public abstract int nthreads();
+    public abstract int nThreads();
 
 }

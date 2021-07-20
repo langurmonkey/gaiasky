@@ -116,7 +116,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UDPATE, Events.FRAME_SIZE_UDPATE, Events.BLOOM_CMD, Events.UNSHARP_MASK_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATE, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_ORIENTATION_UPDATE, Events.GRAPHICS_QUALITY_UPDATED, Events.STAR_TEXTURE_IDX_CMD, Events.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UPDATE, Events.FRAME_SIZE_UPDATE, Events.BLOOM_CMD, Events.UNSHARP_MASK_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATE, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_ORIENTATION_UPDATE, Events.GRAPHICS_QUALITY_UPDATED, Events.STAR_TEXTURE_IDX_CMD, Events.SCENE_GRAPH_LOADED);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -607,7 +607,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             });
             break;
-        case SCREENSHOT_SIZE_UDPATE:
+        case SCREENSHOT_SIZE_UPDATE:
             if (pps != null && GlobalConf.screenshot.isRedrawMode()) {
                 int neww = (Integer) data[0];
                 int newh = (Integer) data[1];
@@ -620,7 +620,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             break;
-        case FRAME_SIZE_UDPATE:
+        case FRAME_SIZE_UPDATE:
             if (pps != null && GlobalConf.frame.isRedrawMode()) {
                 int neww = (Integer) data[0];
                 int newh = (Integer) data[1];

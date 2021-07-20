@@ -32,7 +32,7 @@ public class GaiaSkyThreadFactory implements ThreadFactory {
         return t;
     }
 
-    public class GSThread extends Thread {
+    public static class GSThread extends Thread {
         public int index;
 
         public GSThread(ThreadGroup group, Runnable r, String name, int index) {

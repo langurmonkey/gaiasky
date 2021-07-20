@@ -51,10 +51,10 @@ public class UpdaterTask<T extends SceneGraphNode> implements Callable<Void> {
     }
 
     /**
-     * This must be called to prepare the updater task for execution
+     * This must be called to prepare the updater task for execution.
      * 
-     * @param camera
-     * @param time
+     * @param camera The camera to set.
+     * @param time The time frame provider to set.
      */
     public void setParameters(ICamera camera, ITimeFrameProvider time) {
         this.camera = camera;

@@ -57,11 +57,11 @@ public class SysUtils {
 
     static {
         OS = System.getProperty("os.name").toLowerCase();
-        linux = OS.indexOf("linux") >= 0;
-        mac = OS.indexOf("macos") >= 0 || OS.indexOf("mac os") >= 0;
-        windows = OS.indexOf("win") >= 0;
-        unix = OS.indexOf("unix") >= 0;
-        solaris = OS.indexOf("sunos") >= 0;
+        linux = OS.contains("linux");
+        mac = OS.contains("macos") || OS.contains("mac os");
+        windows = OS.contains("win");
+        unix = OS.contains("unix");
+        solaris = OS.contains("sunos");
     }
 
     public static String getXdgDesktop() {

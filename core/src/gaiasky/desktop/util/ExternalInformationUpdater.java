@@ -121,7 +121,7 @@ public class ExternalInformationUpdater {
                                     return false;
                                 });
                                 infoCell.setActor(infoButton).padRight(pad);
-                            } catch (Exception e) {
+                            } catch (Exception ignored) {
                             }
                         }
                     }
@@ -144,7 +144,7 @@ public class ExternalInformationUpdater {
                                 simbadLink.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.simbad"), skin));
                                 simbadLink.setLinkURL(link);
                                 simbadCell.setActor(simbadLink);
-                            } catch (Exception e) {
+                            } catch (Exception ignored) {
                             }
                         }
                     }
@@ -182,20 +182,20 @@ public class ExternalInformationUpdater {
     private void setWikiLink(String wikiname, IFocus focus, LinkListener listener) {
         try {
             String url = Constants.URL_WIKIPEDIA;
-            if (focus instanceof CelestialBody) {
+            if (focus instanceof NBGalaxy) {
+                urlCheck(url, wikiname, suffixes_gal, listener);
+            } else if (focus instanceof BillboardGalaxy) {
+                urlCheck(url, wikiname, suffixes_star, listener);
+            } else if (focus instanceof CelestialBody) {
                 CelestialBody f = (CelestialBody) focus;
                 if (f.wikiname != null) {
                     listener.ok(url + f.wikiname.replace(' ', '_'));
                 } else {
                     urlCheck(url, wikiname, suffixes_model, listener);
                 }
-            } else if (focus instanceof NBGalaxy) {
-                urlCheck(url, wikiname, suffixes_gal, listener);
             } else if (focus instanceof StarCluster) {
                 urlCheck(url, wikiname, suffixes_cluster, listener);
             } else if (focus instanceof IStarFocus) {
-                urlCheck(url, wikiname, suffixes_star, listener);
-            } else if (focus instanceof BillboardGalaxy) {
                 urlCheck(url, wikiname, suffixes_star, listener);
             } else {
                 urlCheck(url, wikiname, suffixes, listener);

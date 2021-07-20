@@ -36,7 +36,6 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.MusicActorsManager;
 import gaiasky.render.PostProcessorFactory;
 import gaiasky.rest.RESTServer;
-import gaiasky.screenshot.ScreenshotsManager;
 import gaiasky.util.*;
 import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.Logger.Log;
@@ -250,7 +249,7 @@ public class GaiaSkyDesktop implements IObserver {
             ConsoleLogger consoleLogger = new ConsoleLogger();
 
             // REST API server
-            REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDepsInClasspath();
+            REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDependenciesInClasspath();
             if (REST_ENABLED) {
                 RESTServer.initialize(GlobalConf.program.REST_PORT);
             }
@@ -307,22 +306,22 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setTitle(GlobalConf.APPLICATION_NAME);
         if (!gsArgs.vr) {
             if (GlobalConf.screen.FULLSCREEN) {
-                // Fullscreen mode
+                // Full screen mode
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
-                DisplayMode mymode = null;
+                DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
                     if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
-                        mymode = mode;
+                        myMode = mode;
                         break;
                     }
                 }
-                if (mymode == null) {
+                if (myMode == null) {
                     // Fall back to windowed
                     logger.warn(I18n.txt("error.fullscreen.notfound", GlobalConf.screen.FULLSCREEN_WIDTH, GlobalConf.screen.FULLSCREEN_HEIGHT));
                     cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
                     cfg.setResizable(GlobalConf.screen.RESIZABLE);
                 } else {
-                    cfg.setFullscreenMode(mymode);
+                    cfg.setFullscreenMode(myMode);
                 }
             } else {
                 // Windowed mode
@@ -509,11 +508,11 @@ public class GaiaSkyDesktop implements IObserver {
      * <code>$GS_CONFIG_DIR/global.properties</code>. Checks the
      * <code>properties.version</code> key and compares it with the version in
      * the default configuration file of this release
-     * to determine whether the config file must be overwritten
+     * to determine whether the config file must be overwritten.
      *
-     * @param ow Whether to force overwrite
-     * @return The path of the file used
-     * @throws IOException
+     * @param ow Whether to force overwrite.
+     * @return The path of the file used.
+     * @throws IOException If the file fails to be written successfully.
      */
     private static String initConfigFile(boolean ow, boolean vr) throws IOException {
         // Use user folder
@@ -564,7 +563,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * @return True if REST dependencies are loaded.
      */
-    private static boolean checkRestDepsInClasspath() {
+    private static boolean checkRestDependenciesInClasspath() {
         try {
             Class.forName("spark.Spark");
             Class.forName("gaiasky.rest.RESTServer");

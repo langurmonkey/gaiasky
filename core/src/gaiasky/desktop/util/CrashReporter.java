@@ -14,11 +14,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.I18n;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.MemInfo;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -84,7 +81,7 @@ public class CrashReporter {
         String crf4 = "Full log file saved to: " + logFile.toAbsolutePath();
         String crf2 = "Please attach these files to the bug report";
         String crf3 = "Create a bug report here: " + GlobalConf.REPO_ISSUES;
-        int len = Math.max(crf1.length(), Math.max(crf2.length(), Math.max(crf3.length(), crf4.length())));
+        int len = Math.max(crf1.length(), Math.max(crf3.length(), crf4.length()));
         char[] chars = new char[len];
         Arrays.fill(chars, '#');
         String separatorLine = new String(chars);
@@ -259,11 +256,11 @@ public class CrashReporter {
             if (extensions == null || extensions.isEmpty()) {
                 Gdx.gl.glGetIntegerv(GL30.GL_NUM_EXTENSIONS, buf);
                 int next = buf.get(0);
-                String[] extensionsstr = new String[next];
+                String[] extensionsString = new String[next];
                 for (int i = 0; i < next; i++) {
-                    extensionsstr[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
+                    extensionsString[i] = Gdx.gl30.glGetStringi(GL30.GL_EXTENSIONS, i);
                 }
-                extensions = arrayToStr(extensionsstr, " ");
+                extensions = TextUtils.arrayToStr(extensionsString, "", "", " ");
             }
             strArray.add("GL extensions: " + extensions);
 
@@ -274,14 +271,6 @@ public class CrashReporter {
             strArray.add("## GL INFORMATION not available");
         }
 
-    }
-
-    private static String arrayToStr(String[] arr, String sep) {
-        String buff = "";
-        for (int i = 0; i < arr.length; i++) {
-            buff += arr[i] + sep;
-        }
-        return buff;
     }
 
 }

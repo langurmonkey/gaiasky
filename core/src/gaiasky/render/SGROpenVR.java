@@ -147,7 +147,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 // Default
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
             }
-            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UDPATE, Events.SCREENSHOT_SIZE_UDPATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED, Events.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UPDATE, Events.SCREENSHOT_SIZE_UPDATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED, Events.UI_SCALE_CMD);
         }
     }
 

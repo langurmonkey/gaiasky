@@ -617,14 +617,14 @@ public class DesktopConfInit extends ConfInit {
 
     }
 
-    private String initConfigFile(boolean ow, boolean vr) throws IOException {
+    private String initConfigFile(boolean overwrite, boolean vr) throws IOException {
         // Use user folder
         Path userFolder = SysUtils.getConfigDir();
         Path userFolderConfFile = userFolder.resolve(getConfigFileName(vr));
 
-        if (ow || !Files.exists(userFolderConfFile)) {
+        if (overwrite || !Files.exists(userFolderConfFile)) {
             // Copy file
-            GlobalResources.copyFile(Path.of("conf", getConfigFileName(vr)), userFolderConfFile, ow);
+            GlobalResources.copyFile(Path.of("conf", getConfigFileName(vr)), userFolderConfFile, overwrite);
         }
         String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);

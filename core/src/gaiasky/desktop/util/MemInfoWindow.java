@@ -38,13 +38,13 @@ public class MemInfoWindow extends GenericDialog {
             memInfoStr.append(I18n.txt("gui.help.name")).append(": ").append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n");
         }
 
-        TextArea meminfo = new OwnTextArea(memInfoStr.toString(), skin, "no-disabled");
-        meminfo.setDisabled(true);
-        meminfo.setPrefRows(10);
-        meminfo.setWidth(taWidth);
-        meminfo.clearListeners();
+        TextArea memInfo = new OwnTextArea(memInfoStr.toString(), skin, "no-disabled");
+        memInfo.setDisabled(true);
+        memInfo.setPrefRows(10);
+        memInfo.setWidth(taWidth);
+        memInfo.clearListeners();
 
-        OwnScrollPane memInfoScroll = new OwnScrollPane(meminfo, skin, "minimalist-nobg");
+        OwnScrollPane memInfoScroll = new OwnScrollPane(memInfo, skin, "minimalist-nobg");
         memInfoScroll.setWidth(taWidth);
         memInfoScroll.setForceScroll(false, true);
         memInfoScroll.setSmoothScrolling(true);

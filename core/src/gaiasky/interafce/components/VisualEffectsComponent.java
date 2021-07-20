@@ -146,7 +146,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         elevMult.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 float val = elevMult.getValue();
-                EventManager.instance.post(Events.ELEVATION_MUTLIPLIER_CMD, val, true);
+                EventManager.instance.post(Events.ELEVATION_MULTIPLIER_CMD, val, true);
                 return true;
             }
             return false;
@@ -184,7 +184,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                     m.post(Events.AMBIENT_LIGHT_CMD, amb, false);
                     m.post(Events.LABEL_SIZE_CMD, ls, false);
                     m.post(Events.LINE_WIDTH_CMD, lw, false);
-                    m.post(Events.ELEVATION_MUTLIPLIER_CMD, em, false);
+                    m.post(Events.ELEVATION_MULTIPLIER_CMD, em, false);
 
                 }catch(IOException e){
                     logger.error(e, "Error loading default configuration file");

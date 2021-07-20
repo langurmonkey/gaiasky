@@ -87,7 +87,7 @@ public class PriorityQueue<E extends Comparable<E>> {
      * @param initialCapacity the initial capacity for this priority queue */
     public PriorityQueue(int initialCapacity) {
         this.queue = new Object[initialCapacity];
-        this.set = new ObjectSet<E>(initialCapacity);
+        this.set = new ObjectSet<>(initialCapacity);
     }
 
     /** Returns a value indicating whether only unique elements are allowed to be inserted. */

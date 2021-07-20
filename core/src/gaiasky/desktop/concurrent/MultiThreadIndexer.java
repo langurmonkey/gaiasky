@@ -22,7 +22,7 @@ public class MultiThreadIndexer extends ThreadIndexer {
     }
 
     @Override
-    public int nthreads() {
+    public int nThreads() {
         return Runtime.getRuntime().availableProcessors();
     }
 

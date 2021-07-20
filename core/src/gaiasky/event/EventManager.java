@@ -16,7 +16,8 @@ import java.util.Set;
 
 /**
  * Event manager that allows for subscription of observers to events (identified
- * by strings), and also for the creation of event objects by anyone.
+ * by strings), and also for the creation of event objects by anyone. Events can also
+ * be added to be processed with a delay.
  */
 public class EventManager implements IObserver {
 
@@ -84,19 +85,15 @@ public class EventManager implements IObserver {
 
     /**
      * Registers a listener for the specified message code. Messages without an
-     * explicit receiver are broadcasted to all its registered listeners.
+     * explicit receiver are broadcast to all its registered listeners.
      *
      * @param msg      the message code
      * @param listener the listener to add
      */
     public void subscribe(IObserver listener, Events msg) {
         synchronized (subscriptions) {
-            Set<IObserver> listeners = subscriptions.get(msg.ordinal());
-            if (listeners == null) {
-                // Associate an empty ordered array with the message code. Sometimes the order matters
-                listeners = new LinkedHashSet<IObserver>();
-                subscriptions.put(msg.ordinal(), listeners);
-            }
+            Set<IObserver> listeners = subscriptions.computeIfAbsent(msg.ordinal(), k -> new LinkedHashSet<>());
+            // Associate an empty ordered array with the message code. Sometimes the order matters
             listeners.add(listener);
         }
     }
@@ -291,12 +288,8 @@ public class EventManager implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case EVENT_TIME_FRAME_CMD:
+        if (event == Events.EVENT_TIME_FRAME_CMD) {
             defaultTimeFrame = (TimeFrame) data[0];
-            break;
-        default:
-            break;
         }
 
     }

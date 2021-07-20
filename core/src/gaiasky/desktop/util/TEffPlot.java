@@ -10,29 +10,29 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 /**
- * Produces a plot of ColorXP (BP-RP) vs log(Teff)).
+ * Produces a plot of ColorXP (BP-RP) vs log(tEff)).
  */
-public class TeffPlot {
+public class TEffPlot {
 
     public static void main(String[] args) {
         File f = new File("/tmp/teffcxp.dat");
 
-        double startxp = -1.5;
-        double endxp = 9.0;
-        int nsteps = 100;
-        double step = (endxp - startxp) / (double) nsteps;
+        double startXp = -1.5;
+        double endXp = 9.0;
+        int nSteps = 100;
+        double step = (endXp - startXp) / (double) nSteps;
 
         try {
             PrintWriter writer = new PrintWriter(f, StandardCharsets.UTF_8);
             writer.println("bp-rp,logteff,teff");
 
-            double currxp = startxp;
-            while (currxp < endxp) {
+            double currXp = startXp;
+            while (currXp < endXp) {
 
-                double logteff = 3.999 - 0.654 * currxp + 0.709 * currxp * currxp - 0.316 * currxp * currxp * currxp;
-                double teff = Math.pow(10, logteff);
-                writer.println(currxp + "," + logteff + "," + teff);
-                currxp += step;
+                double logTEff = 3.999 - 0.654 * currXp + 0.709 * currXp * currXp - 0.316 * currXp * currXp * currXp;
+                double tEff = Math.pow(10, logTEff);
+                writer.println(currXp + "," + logTEff + "," + tEff);
+                currXp += step;
             }
 
             writer.close();

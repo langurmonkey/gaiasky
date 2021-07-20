@@ -7,6 +7,7 @@ package gaiasky.desktop.util;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Properties;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ public class I18nFormatter {
         File f0 = new File(args[0]);
         File f1 = new File(args[1]);
 
-        if (!checkFile(f0) || !checkFile(f1)) {
+        if (checkFile(f0) || checkFile(f1)) {
             return;
         }
 
@@ -59,12 +60,10 @@ public class I18nFormatter {
             }
 
             // Store result
-            File outf = new File(args[1].substring(0, args[1].contains(".") ? args[1].lastIndexOf("."): args[1].length()) + ".mod.properties"); //-V6009
-            if(outf.exists()){
-                outf.delete();
-            }
+            File outFile = new File(args[1].substring(0, args[1].contains(".") ? args[1].lastIndexOf("."): args[1].length()) + ".mod.properties"); //-V6009
+            Files.deleteIfExists(outFile.toPath());
 
-            FileOutputStream fos1 = new FileOutputStream(outf, true);
+            FileOutputStream fos1 = new FileOutputStream(outFile, true);
             PrintStream ps = new PrintStream(fos1, true, StandardCharsets.UTF_8);
             op.store(ps, null, "UTF-8");
             ps.close();
@@ -76,16 +75,16 @@ public class I18nFormatter {
     private static boolean checkFile(File f) {
         if (!f.exists()) {
             System.out.println("File does not exist: " + f);
-            return false;
+            return true;
         }
         if (!f.isFile()) {
             System.out.println("Not a file: " + f);
-            return false;
+            return true;
         }
         if (!f.canRead()) {
             System.out.println("Can not read: " + f);
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }

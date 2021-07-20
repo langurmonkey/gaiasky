@@ -34,31 +34,30 @@ public class ScreenModeCmd implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case SCREEN_MODE_CMD:
-            boolean toFullscreen = GlobalConf.screen.FULLSCREEN;
-            if (toFullscreen) {
+        if (event == Events.SCREEN_MODE_CMD) {
+            boolean toFullScreen = GlobalConf.screen.FULLSCREEN;
+            if (toFullScreen) {
                 // TODO hack
                 Monitor m = Gdx.graphics.getPrimaryMonitor();
                 // Available modes for this monitor
                 DisplayMode[] modes = Gdx.graphics.getDisplayModes(m);
                 // Find best mode
-                DisplayMode mymode = null;
+                DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
                     if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
-                        mymode = mode;
+                        myMode = mode;
                         break;
                     }
                 }
                 // If no mode found, get default
-                if (mymode == null) {
-                    mymode = Gdx.graphics.getDisplayMode(m);
-                    GlobalConf.screen.FULLSCREEN_WIDTH = mymode.width;
-                    GlobalConf.screen.FULLSCREEN_HEIGHT = mymode.height;
+                if (myMode == null) {
+                    myMode = Gdx.graphics.getDisplayMode(m);
+                    GlobalConf.screen.FULLSCREEN_WIDTH = myMode.width;
+                    GlobalConf.screen.FULLSCREEN_HEIGHT = myMode.height;
                 }
 
-                // set the window to fullscreen mode
-                boolean good = Gdx.graphics.setFullscreenMode(mymode);
+                // set the window to full screen mode
+                boolean good = Gdx.graphics.setFullscreenMode(myMode);
                 if (!good) {
                     logger.error(I18n.txt("notif.error", I18n.txt("gui.fullscreen")));
                 }
@@ -74,10 +73,6 @@ public class ScreenModeCmd implements IObserver {
 
             }
             Gdx.graphics.setVSync(GlobalConf.screen.VSYNC);
-            break;
-        default:
-            break;
-
         }
     }
 }

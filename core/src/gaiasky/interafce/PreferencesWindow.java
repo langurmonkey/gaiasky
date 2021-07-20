@@ -2034,7 +2034,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         GlobalConf.screenshot.SCREENSHOT_WIDTH = ssw;
         GlobalConf.screenshot.SCREENSHOT_HEIGHT = ssh;
         if (ssupdate)
-            EventManager.instance.post(Events.SCREENSHOT_SIZE_UDPATE, GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT);
+            EventManager.instance.post(Events.SCREENSHOT_SIZE_UPDATE, GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT);
 
         // Frame output
         File fofile = new File(frameoutputLocation.getText().toString());
@@ -2053,7 +2053,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         GlobalConf.frame.RENDER_HEIGHT = foh;
         GlobalConf.frame.RENDER_TARGET_FPS = Parser.parseDouble(frameoutputFps.getText());
         if (foupdate)
-            EventManager.instance.post(Events.FRAME_SIZE_UDPATE, GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT);
+            EventManager.instance.post(Events.FRAME_SIZE_UPDATE, GlobalConf.frame.RENDER_WIDTH, GlobalConf.frame.RENDER_HEIGHT);
 
         // Camera recording
         EventManager.instance.post(Events.CAMRECORDER_FPS_CMD, Parser.parseDouble(camrecFps.getText()));

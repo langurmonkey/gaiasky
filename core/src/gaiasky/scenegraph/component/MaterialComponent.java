@@ -97,7 +97,7 @@ public class MaterialComponent implements IObserver {
 
     public MaterialComponent() {
         super();
-        EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MUTLIPLIER_CMD, Events.TESSELLATION_QUALITY_CMD);
+        EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.TESSELLATION_QUALITY_CMD);
     }
 
     public void initialize(AssetManager manager) {
@@ -459,7 +459,7 @@ public class MaterialComponent implements IObserver {
                 });
             }
             break;
-        case ELEVATION_MUTLIPLIER_CMD:
+        case ELEVATION_MULTIPLIER_CMD:
             if (this.hasHeight() && this.material != null) {
                 float newMultiplier = (Float) data[0];
                 GaiaSky.postRunnable(() -> this.material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * newMultiplier)));

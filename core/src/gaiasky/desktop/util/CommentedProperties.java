@@ -18,18 +18,17 @@ import java.util.Vector;
  * <p>
  * Written for Java version 1.4
  */
-@SuppressWarnings("serial")
 public class CommentedProperties extends java.util.Properties {
 
     /**
      * Use a Vector to keep a copy of lines that are a comment or 'blank'
      */
-    public Vector<String> lineData = new Vector<String>(0, 1);
+    public Vector<String> lineData = new Vector<>(0, 1);
 
     /**
      * Use a Vector to keep a copy of lines containing a key, i.e. they are a property.
      */
-    public Vector<String> keyData = new Vector<String>(0, 1);
+    public Vector<String> keyData = new Vector<>(0, 1);
 
     /**
      * Load properties from the specified InputStream.
@@ -112,12 +111,12 @@ public class CommentedProperties extends java.util.Properties {
                     key.append(c);
             }
 
-            boolean isDelim = (c == ':' || c == '=');
+            boolean isDelimiter = (c == ':' || c == '=');
 
             String keyString;
             if (needsEscape)
                 keyString = key.toString();
-            else if (isDelim || Character.isWhitespace(c))
+            else if (isDelimiter || Character.isWhitespace(c))
                 keyString = line.substring(start, pos - 1);
             else
                 keyString = line.substring(start, pos);
@@ -126,7 +125,7 @@ public class CommentedProperties extends java.util.Properties {
                     && Character.isWhitespace(c = line.charAt(pos)))
                 pos++;
 
-            if (!isDelim && (c == ':' || c == '=')) {
+            if (!isDelimiter && (c == ':' || c == '=')) {
                 pos++;
                 while (pos < line.length()
                         && Character.isWhitespace(c = line.charAt(pos)))
@@ -144,7 +143,7 @@ public class CommentedProperties extends java.util.Properties {
             }
 
             // Escape char found so iterate through the rest of the line.
-            StringBuffer element = new StringBuffer(line.length() - pos);
+            StringBuilder element = new StringBuilder(line.length() - pos);
             while (pos < line.length()) {
                 c = line.charAt(pos++);
                 if (c == '\\') {
@@ -160,7 +159,7 @@ public class CommentedProperties extends java.util.Properties {
 
                         pos = 0;
                         while (pos < line.length()
-                                && Character.isWhitespace(c = line.charAt(pos)))
+                                && Character.isWhitespace(line.charAt(pos)))
                             pos++;
                         element.ensureCapacity(line.length() - pos +
                                 element.length());
@@ -212,9 +211,9 @@ public class CommentedProperties extends java.util.Properties {
      * and blank lines.
      *
      * @param out      The OutputStream to write to.
-     * @param header   Ignored, here for compatability w/ Properties.
+     * @param header   Ignored, here for compatibility w/ Properties.
      * @param encoding The encoding of the file
-     * @throws IOException
+     * @throws IOException If the creation of the writer fails.
      */
     public void store(OutputStream out, String header, String encoding) throws IOException {
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(out, encoding));
@@ -273,7 +272,7 @@ public class CommentedProperties extends java.util.Properties {
             var5 = 2147483647;
         }
 
-        StringBuffer var6 = new StringBuffer(var5);
+        StringBuilder var6 = new StringBuilder(var5);
 
         for (int var7 = 0; var7 < var4; ++var7) {
             char var8 = var1.charAt(var7);
@@ -286,36 +285,38 @@ public class CommentedProperties extends java.util.Properties {
                 }
             } else {
                 switch (var8) {
-                    case '\t':
+                case '\t' -> {
+                    var6.append('\\');
+                    var6.append('t');
+                    continue;
+                }
+                case '\n' -> {
+                    var6.append('\\');
+                    var6.append('n');
+                    continue;
+                }
+                case '\f' -> {
+                    var6.append('\\');
+                    var6.append('f');
+                    continue;
+                }
+                case '\r' -> {
+                    var6.append('\\');
+                    var6.append('r');
+                    continue;
+                }
+                case ' ' -> {
+                    if (var7 == 0 || var2) {
                         var6.append('\\');
-                        var6.append('t');
-                        continue;
-                    case '\n':
-                        var6.append('\\');
-                        var6.append('n');
-                        continue;
-                    case '\f':
-                        var6.append('\\');
-                        var6.append('f');
-                        continue;
-                    case '\r':
-                        var6.append('\\');
-                        var6.append('r');
-                        continue;
-                    case ' ':
-                        if (var7 == 0 || var2) {
-                            var6.append('\\');
-                        }
-
-                        var6.append(' ');
-                        continue;
-                    case '!':
-                    case '#':
-                    case ':':
-                    case '=':
-                        var6.append('\\');
-                        var6.append(var8);
-                        continue;
+                    }
+                    var6.append(' ');
+                    continue;
+                }
+                case '!', '#', ':', '=' -> {
+                    var6.append('\\');
+                    var6.append(var8);
+                    continue;
+                }
                 }
 
                 if ((var8 < ' ' || var8 > '~') & var3) {

@@ -23,19 +23,18 @@ public class EqGalTest {
         double dist = 10;
         Vector3d pos = Coordinates.sphericalToCartesian(Math.toRadians(ra), Math.toRadians(dec), dist, new Vector3d());
 
-        Vector3d posgal = new Vector3d(pos);
-        posgal.mul(Coordinates.eqToGal());
-        Vector3d posgalsph = Coordinates.cartesianToSpherical(posgal, new Vector3d());
-        double l = posgalsph.x * MathUtilsd.radiansToDegrees;
-        double b = posgalsph.y * MathUtilsd.radiansToDegrees;
+        Vector3d posGal = new Vector3d(pos);
+        posGal.mul(Coordinates.eqToGal());
+        Vector3d posGalSph = Coordinates.cartesianToSpherical(posGal, new Vector3d());
+        double l = posGalSph.x * MathUtilsd.radiansToDegrees;
+        double b = posGalSph.y * MathUtilsd.radiansToDegrees;
 
         System.out.println("Galactic coordinates - l: " + l + ", b: " + b);
     }
 
     private static float readFloat(Scanner sc) {
         try {
-            float val = sc.nextFloat();
-            return val;
+            return sc.nextFloat();
         } catch (Exception e) {
             System.err.println("Input is not a valid float");
             System.exit(1);

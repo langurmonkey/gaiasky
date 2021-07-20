@@ -11,9 +11,6 @@ import gaiasky.util.GlobalConf;
  * Contains all the events that go through the event system.
  */
 public enum Events {
-    /**
-     * Event names
-     */
 
     /**
      * Adds or modifies a custom image. Contains:
@@ -223,7 +220,7 @@ public enum Events {
      */
     CATALOG_REMOVE,
     /**
-     * Sets the visibilty of a catalog given its name and an optional boolean if it comes from the UI
+     * Sets the visibility of a catalog given its name and an optional boolean if it comes from the UI
      */
     CATALOG_VISIBLE,
     /**
@@ -340,7 +337,7 @@ public enum Events {
     /**
      * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}]
      */
-    ELEVATION_MUTLIPLIER_CMD,
+    ELEVATION_MULTIPLIER_CMD,
 
     /**
      * Sets the elevation type
@@ -432,7 +429,7 @@ public enum Events {
     /**
      * Informs of the new size of the frame output system
      **/
-    FRAME_SIZE_UDPATE,
+    FRAME_SIZE_UPDATE,
 
     /**
      * Posts the coordinates of the free mode focus.
@@ -448,8 +445,8 @@ public enum Events {
     GAIA_LOADED,
     GAIA_POSITION,
     /**
-     * Issues command to chagne the galaxy appearance. Contains boolean, if true
-     * gaiaxy will be 3D, if false galaxy will be 2D
+     * Issues command to change the galaxy appearance. Contains boolean, if true
+     * galaxy will be 3D, if false galaxy will be 2D
      **/
     GALAXY_3D_CMD,
     /**
@@ -602,7 +599,7 @@ public enum Events {
      **/
     LINE_RENDERER_UPDATE,
     /**
-     * Dataset has been choosen, loading can start
+     * Dataset has been chosen, loading can start
      **/
     LOAD_DATA_CMD, // CAMERA
     /**
@@ -620,7 +617,7 @@ public enum Events {
      **/
     MOTION_BLUR_CMD,
     /**
-     * True to capture the mouse, false to uncapture
+     * True to capture the mouse, false to un-capture
      */
     MOUSE_CAPTURE_CMD,
     /**
@@ -719,9 +716,9 @@ public enum Events {
      * <ol start='0'>
      * <li>direction</li>
      * <li>length</li>
-     * <li>has radial velcotiy: blue=stars with RV, red=stars without RV</li>
-     * <li>redhsift (sun): blue=-50 Km/s, red=50 Kms/s</li>
-     * <li>redhsift (camera): blue=-50 Km/s, red=50 Kms/s</li>
+     * <li>has radial velocity: blue=stars with RV, red=stars without RV</li>
+     * <li>redshift (sun): blue=-50 Km/s, red=50 Kms/s</li>
+     * <li>redshift (camera): blue=-50 Km/s, red=50 Kms/s</li>
      * <li>unique color</li>
      * </ol>
      */
@@ -933,7 +930,7 @@ public enum Events {
     /**
      * Informs of the new size of the screenshot system
      **/
-    SCREENSHOT_SIZE_UDPATE,
+    SCREENSHOT_SIZE_UPDATE,
     /**
      * Updates the screen mode according to whats in the
      * {@link GlobalConf#screen} bean.
@@ -1285,7 +1282,7 @@ public enum Events {
      */
     UI_THEME_RELOAD_INFO,
     /**
-     * Unposts a runnable. Contains the identifier (String)
+     * Un-parks a runnable. Contains the identifier (String)
      **/
     UNPARK_RUNNABLE,
     /**

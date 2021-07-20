@@ -31,10 +31,10 @@ public class GaiaAttitudeWriter {
     public static void attitudeZAxisToFile(OutputType type) {
         Calendar iniCal = GregorianCalendar.getInstance();
         // 2014-01-15T15:43:04
-        iniCal.set(2014, 01, 15, 15, 43, 04);
+        iniCal.set(2014, Calendar.FEBRUARY, 15, 15, 43, 4);
         Date ini = iniCal.getTime();
         // 2019-06-20T06:20:05
-        iniCal.set(2019, 06, 20, 05, 40, 00);
+        iniCal.set(2019, Calendar.JULY, 20, 5, 40, 0);
         Date end = iniCal.getTime();
 
         long tini = ini.getTime();
@@ -76,12 +76,12 @@ public class GaiaAttitudeWriter {
                         // Equatorial
                         v1.rotateVectorByQuaternion(quat);
                         Coordinates.cartesianToSpherical(v1, sph1);
-                        writerEq.append(Math.toDegrees(sph1.x) + ", " + Math.toDegrees(sph1.y) + ", " + t + ", " + current + ", " + GaiaAttitudeServer.instance.getCurrentAttitudeName() + "\n");
+                        writerEq.append(String.valueOf(Math.toDegrees(sph1.x))).append(", ").append(String.valueOf(Math.toDegrees(sph1.y))).append(", ").append(String.valueOf(t)).append(", ").append(String.valueOf(current)).append(", ").append(GaiaAttitudeServer.instance.getCurrentAttitudeName()).append("\n");
 
                         //Ecliptic
                         v1.mul(Coordinates.eqToEcl());
                         Coordinates.cartesianToSpherical(v1, sph1);
-                        writerEcl.append(Math.toDegrees(sph1.x) + ", " + Math.toDegrees(sph1.y) + ", " + t + ", " + current + ", " + GaiaAttitudeServer.instance.getCurrentAttitudeName() + "\n");
+                        writerEcl.append(String.valueOf(Math.toDegrees(sph1.x))).append(", ").append(String.valueOf(Math.toDegrees(sph1.y))).append(", ").append(String.valueOf(t)).append(", ").append(String.valueOf(current)).append(", ").append(GaiaAttitudeServer.instance.getCurrentAttitudeName()).append("\n");
                     } else if (type.equals(OutputType.FOV_VECTORS)) {
                         // Fov 1 and Fov 2
                         v1.set(0, 0, 1).rotate(BAM_2, 0, 1, 0);
@@ -92,14 +92,14 @@ public class GaiaAttitudeWriter {
                         v2.rotateVectorByQuaternion(quat);
                         Coordinates.cartesianToSpherical(v1, sph1);
                         Coordinates.cartesianToSpherical(v2, sph2);
-                        writerEq.append(Math.toDegrees(sph1.x) + ", " + Math.toDegrees(sph1.y) + ", " + Math.toDegrees(sph2.x) + ", " + Math.toDegrees(sph2.y) + ", " + t + ", " + current + ", " + GaiaAttitudeServer.instance.getCurrentAttitudeName() + "\n");
+                        writerEq.append(String.valueOf(Math.toDegrees(sph1.x))).append(", ").append(String.valueOf(Math.toDegrees(sph1.y))).append(", ").append(String.valueOf(Math.toDegrees(sph2.x))).append(", ").append(String.valueOf(Math.toDegrees(sph2.y))).append(", ").append(String.valueOf(t)).append(", ").append(String.valueOf(current)).append(", ").append(GaiaAttitudeServer.instance.getCurrentAttitudeName()).append("\n");
 
                         //Ecliptic
                         v1.mul(Coordinates.eqToEcl());
                         v2.mul(Coordinates.eqToEcl());
                         Coordinates.cartesianToSpherical(v1, sph1);
                         Coordinates.cartesianToSpherical(v2, sph2);
-                        writerEcl.append(Math.toDegrees(sph1.x) + ", " + Math.toDegrees(sph1.y) + ", " + Math.toDegrees(sph2.x) + ", " + Math.toDegrees(sph2.y) + ", " + t + ", " + current + ", " + GaiaAttitudeServer.instance.getCurrentAttitudeName() + "\n");
+                        writerEcl.append(String.valueOf(Math.toDegrees(sph1.x))).append(", ").append(String.valueOf(Math.toDegrees(sph1.y))).append(", ").append(String.valueOf(Math.toDegrees(sph2.x))).append(", ").append(String.valueOf(Math.toDegrees(sph2.y))).append(", ").append(String.valueOf(t)).append(", ").append(String.valueOf(current)).append(", ").append(GaiaAttitudeServer.instance.getCurrentAttitudeName()).append("\n");
                     }
 
                 } catch (Exception e) {

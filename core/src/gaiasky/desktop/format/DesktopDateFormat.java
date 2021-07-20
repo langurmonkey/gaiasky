@@ -18,19 +18,19 @@ import java.util.Locale;
 public class DesktopDateFormat implements IDateFormat {
     private DateTimeFormatter df;
 
-    public DesktopDateFormat(String pattern) {
+    public DesktopDateFormat(final String pattern) {
         df = DateTimeFormatter.ofPattern(pattern).withLocale(Locale.US).withZone(ZoneOffset.UTC);
     }
 
-    public DesktopDateFormat(Locale loc, boolean date, boolean time) {
+    public DesktopDateFormat(Locale loc, final boolean date, final boolean time) {
         assert date || time : "Formatter must include date or time";
         if(loc == null)
             loc = Locale.US;
         if (date && !time) {
             df = DateTimeFormatter.ofPattern("MMM dd uuuu").withLocale(loc).withZone(ZoneOffset.UTC);
-        } else if (!date && time)
+        } else if (!date)
             df = DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM).withLocale(loc).withZone(ZoneOffset.UTC);
-        else if (date && time)
+        else
             df = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM).withLocale(loc).withZone(ZoneOffset.UTC);
     }
 

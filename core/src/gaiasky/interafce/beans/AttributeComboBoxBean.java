@@ -13,7 +13,6 @@ public class AttributeComboBoxBean {
 
     public AttributeComboBoxBean(IAttribute attr){
         this.attr = attr;
-        String className = attr.getClass().getSimpleName();
         this.name = attr.toString();
     }
 
