@@ -23,15 +23,11 @@ public abstract class DateFormatFactory {
     }
 
     public static IDateFormat getFormatter(Locale loc, DateType type) {
-        switch (type) {
-        case DATE:
-            return instance.getDateFormatter(loc);
-        case TIME:
-            return instance.getTimeFormatter(loc);
-        case DATETIME:
-            return instance.getDateTimeFormatter(loc);
-        }
-        return null;
+        return switch (type) {
+            case DATE -> instance.getDateFormatter(loc);
+            case TIME -> instance.getTimeFormatter(loc);
+            default -> instance.getDateTimeFormatter(loc);
+        };
     }
 
     protected abstract IDateFormat getDateFormatter(String pattern);

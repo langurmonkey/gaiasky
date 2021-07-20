@@ -26,16 +26,15 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.comp.CelestialBodyComparator;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextField;
 
+/**
+ * A component that shows a search box and some of the objects in Gaia Sky.
+ */
 public class ObjectsComponent extends GuiComponent implements IObserver {
-    private static final Log logger = Logger.getLogger(ObjectsComponent.class);
-
     protected ISceneGraph sg;
 
     protected Actor objectsList;
@@ -43,7 +42,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
     protected OwnScrollPane focusListScrollPane;
 
     protected Table infoTable;
-    protected Cell infoCell1, infoCell2;
+    protected Cell<?> infoCell1, infoCell2;
     protected OwnLabel infoMessage1, infoMessage2;
 
     public ObjectsComponent(Skin skin, Stage stage) {
@@ -222,9 +221,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case FOCUS_CHANGED:
-            // Update focus selection in focus list
+        if (event == Events.FOCUS_CHANGED) {// Update focus selection in focus list
             SceneGraphNode sgn = null;
             if (data[0] instanceof String) {
                 sgn = sg.getNode((String) data[0]);
@@ -234,7 +231,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
             // Select only if data[1] is true
             if (sgn != null) {
                 // Update focus selection in focus list
-                @SuppressWarnings("unchecked") com.badlogic.gdx.scenes.scene2d.ui.List<String> objList = (com.badlogic.gdx.scenes.scene2d.ui.List<String>) objectsList;
+                @SuppressWarnings("unchecked") List<String> objList = (List<String>) objectsList;
                 Array<String> items = objList.getItems();
                 SceneGraphNode node = (SceneGraphNode) data[0];
 
@@ -251,11 +248,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                     focusListScrollPane.setScrollY(itemIdx * itemHeight);
                 }
             }
-            break;
-        default:
-            break;
         }
-
     }
 
     @Override

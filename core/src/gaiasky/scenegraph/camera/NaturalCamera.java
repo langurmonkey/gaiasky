@@ -1743,8 +1743,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void setCamera(PerspectiveCamera cam) {
-        this.camera = cam;
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
+        this.camera = perspectiveCamera;
     }
 
     public void setThrust(double thrust, int direction) {

@@ -138,9 +138,8 @@ public abstract class AbstractCamera implements ICamera {
 
     public float getAngleEdge(int width, int height, float angle) {
         float ar = (float) width / (float) height;
-        float h = angle;
-        float w = h * ar;
-        return (float) (Math.toRadians(Math.sqrt(h * h + w * w))) / 2f;
+        float w = angle * ar;
+        return (float) (Math.toRadians(Math.sqrt(angle * angle + w * w))) / 2f;
     }
 
     @Override
@@ -328,7 +327,8 @@ public abstract class AbstractCamera implements ICamera {
     }
 
     public IFocus getCloseLightSource(int i){
-        assert proximity != null && i < proximity.effective.length : "Index out of bounds: i=" + i + ", length=" + proximity.effective.length;
+        assert proximity != null : "Proximity is null";
+        assert i < proximity.effective.length : "Index out of bounds: i=" + i + ", length=" + proximity.effective.length;
         return proximity.effective[i];
     }
 

@@ -129,7 +129,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         /*
          * OBJECTS
          */
-        bookmarksTree = new Tree(skin);
+        bookmarksTree = new Tree<>(skin);
         bookmarksTree.setName("bookmarks tree");
         reloadBookmarksTree();
         bookmarksTree.addListener(event -> {
@@ -178,14 +178,14 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 String parentName = "/" + (parent == null ? "" : parent.path.toString());
                                 MenuItem newFolder = new MenuItem(I18n.txt("gui.bookmark.context.newfolder", parentName), skin);
                                 newFolder.addListener(evt -> {
-                                    if (evt instanceof ChangeEvent) {
-                                        NewBookmarkFolderDialog nbfd = new NewBookmarkFolderDialog(parent.path.toString(), skin, stage);
-                                        nbfd.setAcceptRunnable(() -> {
-                                            String folderName = nbfd.input.getText();
+                                    if (evt instanceof ChangeEvent && parent != null) {
+                                        NewBookmarkFolderDialog newBookmarkFolderDialog = new NewBookmarkFolderDialog(parent.path.toString(), skin, stage);
+                                        newBookmarkFolderDialog.setAcceptRunnable(() -> {
+                                            String folderName = newBookmarkFolderDialog.input.getText();
                                             EventManager.instance.post(Events.BOOKMARKS_ADD, parent.path.resolve(folderName).toString(), true);
                                             reloadBookmarksTree();
                                         });
-                                        nbfd.show(stage);
+                                        newBookmarkFolderDialog.show(stage);
                                         return true;
                                     }
                                     return false;
@@ -322,7 +322,6 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     private void genSubtree(TreeNode parent, BNode bookmark) {
-        Drawable folderDrawable = skin.getDrawable("open");
         if (bookmark.children != null && !bookmark.children.isEmpty()) {
             for (BNode child : bookmark.children) {
                 TreeNode tn = new TreeNode(child, skin);
@@ -337,44 +336,46 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     public void selectBookmark(String bookmark, boolean fire) {
-        if (bookmark != null || bookmarksTree.getSelectedValue() != bookmark) {
-            boolean bkup = events;
-            events = fire;
-            // Select without firing events, do not use set()
-            TreeNode node = bookmarksTree.findNode(bookmark);
-            if (node != null) {
-                bookmarksTree.getSelection().set(node);
-                node.expandTo();
-                scrollTo(node);
-            }
-
-            events = bkup;
+        if (bookmark == null) {
+            bookmarksTree.getSelectedValue();
         }
+        boolean backup = events;
+        events = fire;
+        // Select without firing events, do not use set()
+        TreeNode node = bookmarksTree.findNode(bookmark);
+        if (node != null) {
+            bookmarksTree.getSelection().set(node);
+            node.expandTo();
+            scrollTo(node);
+        }
+
+        events = backup;
     }
 
     private void scrollTo(TreeNode node) {
-        float y = getYPosition(bookmarksTree.getNodes(), node, 0f);
+        float y = getYPosition(bookmarksTree.getRootNodes(), node);
         bookmarksScrollPane.setScrollY(y);
     }
 
-    private float getYPosition(Array<TreeNode> nodes, TreeNode node, float accumY) {
+    private float getYPosition(Array<TreeNode> nodes, TreeNode node) {
         if (nodes == null || nodes.isEmpty())
-            return accumY;
+            return 0;
 
+        float yPos = 0;
         for (TreeNode n : nodes) {
             if (n != node) {
-                accumY += n.getHeight() + bookmarksTree.getYSpacing();
+                yPos += n.getHeight() + bookmarksTree.getYSpacing();
                 if (n.isExpanded()) {
-                    accumY += getYPosition(n.getChildren(), node, 0f);
+                    yPos += getYPosition(n.getChildren(), node);
                 }
             } else {
                 // Found it!
-                return accumY;
+                return yPos;
             }
             if (n.isAscendantOf(node))
                 break;
         }
-        return accumY;
+        return yPos;
     }
 
     public void setSceneGraph(ISceneGraph sg) {

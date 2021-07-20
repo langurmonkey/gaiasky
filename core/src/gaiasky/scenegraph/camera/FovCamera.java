@@ -18,9 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -29,7 +27,6 @@ import gaiasky.scenegraph.Gaia;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
 import gaiasky.util.math.Frustumd;
@@ -71,14 +68,13 @@ public class FovCamera extends AbstractCamera implements IObserver {
     public long currentTime, lastTime;
 
     // Direction index for the render stage
-    public int dirindex;
+    public int dirIndex;
 
     private final Vector3d dir1;
     private final Vector3d dir2;
     private final Matrix4d matrix;
 
-    private Stage[] fpstages;
-    private Drawable fp, fp_fov1, fp_fov2;
+    private Stage[] fpStages;
 
     public FovCamera(final AssetManager assetManager, final CameraManager parent, final SpriteBatch spriteBatch) {
         super(parent);
@@ -109,36 +105,36 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fovFactor = FOV / 5f;
 
         /* Prepare stage with FP image */
-        fp = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane.png"))));
-        fp_fov1 = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane-fov1.png"))));
-        fp_fov2 = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane-fov2.png"))));
+        Drawable ccdArray = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane.png"))));
+        Drawable ccdArrayFov1 = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane-fov1.png"))));
+        Drawable ccdArrayFov2 = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("img/gaia-focalplane-fov2.png"))));
 
-        fpstages = new Stage[3];
+        fpStages = new Stage[3];
 
         Stage fov12 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), spriteBatch);
-        Image i = new Image(fp);
+        Image i = new Image(ccdArray);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov12.addActor(i);
 
         Stage fov1 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), spriteBatch);
-        i = new Image(fp_fov1);
+        i = new Image(ccdArrayFov1);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov1.addActor(i);
 
         Stage fov2 = new Stage(new ScalingViewport(Scaling.stretch, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), new OrthographicCamera()), spriteBatch);
-        i = new Image(fp_fov2);
+        i = new Image(ccdArrayFov2);
         i.setFillParent(true);
         i.setAlign(Align.center);
         i.setColor(0.3f, 0.8f, 0.3f, .9f);
         fov2.addActor(i);
 
-        fpstages[0] = fov1;
-        fpstages[1] = fov2;
-        fpstages[2] = fov12;
+        fpStages[0] = fov1;
+        fpStages[1] = fov2;
+        fpStages[2] = fov12;
 
         EventManager.instance.subscribe(this, Events.GAIA_LOADED);
     }
@@ -148,7 +144,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
         up.set(0, 1, 0);
 
-        /** POSITION **/
+        /* POSITION */
         SceneGraphNode fccopy = gaia.getLineCopy();
         fccopy.getRoot().translation.setZero();
         fccopy.getRoot().update(time, null, this);
@@ -156,7 +152,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fccopy.translation.put(this.pos);
         this.posinv.set(this.pos).scl(-1);
 
-        /** ORIENTATION - directions and up **/
+        /* ORIENTATION - directions and up */
         updateDirections(time);
         trf = matrix;
         up.mul(trf).nor();
@@ -181,7 +177,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     /**
      * Updates both FOVs' directions applying the right transformation.
      *
-     * @param time
+     * @param time The time frame provider.
      */
     public void updateDirections(ITimeFrameProvider time) {
         lastTime = currentTime;
@@ -193,7 +189,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         directions[0].set(0, 0, 1).rotate(BAM_2, 0, 1, 0).mul(trf).nor();
         directions[1].set(0, 0, 1).rotate(-BAM_2, 0, 1, 0).mul(trf).nor();
 
-        /** WORK OUT INTERPOLATED DIRECTIONS IN THE CASE OF FAST SCANNING **/
+        /* WORK OUT INTERPOLATED DIRECTIONS IN THE CASE OF FAST SCANNING */
         interpolatedDirections.clear();
     }
 
@@ -211,9 +207,9 @@ public class FovCamera extends AbstractCamera implements IObserver {
      * Updates the given camera using the given direction and up vectors. Sets
      * the position to zero.
      *
-     * @param dir
-     * @param up
-     * @param cam
+     * @param dir The direction vector.
+     * @param up The up vector.
+     * @param cam The perspective camera.
      */
     private void updateCamera(Vector3d dir, Vector3d up, PerspectiveCamera cam) {
         cam.position.set(0f, 0f, 0f);
@@ -224,26 +220,19 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public PerspectiveCamera[] getFrontCameras() {
-        switch (parent.mode) {
-        case GAIA_FOV1_MODE:
-        default:
-            return new PerspectiveCamera[] { camera };
-        case GAIA_FOV2_MODE:
-
-            return new PerspectiveCamera[] { camera2 };
-        case GAIA_FOVS_MODE:
-            return new PerspectiveCamera[] { camera, camera2 };
-        }
+        return switch (parent.mode) {
+            default -> new PerspectiveCamera[] { camera };
+            case GAIA_FOV2_MODE -> new PerspectiveCamera[] { camera2 };
+            case GAIA_FOVS_MODE -> new PerspectiveCamera[] { camera, camera2 };
+        };
     }
 
     @Override
     public PerspectiveCamera getCamera() {
-        switch (parent.mode) {
-        case GAIA_FOV2_MODE:
+        if (parent.mode == CameraMode.GAIA_FOV2_MODE) {
             return camera2;
-        default:
-            return camera;
         }
+        return camera;
     }
 
     @Override
@@ -277,14 +266,9 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case GAIA_LOADED:
+        if (event == Events.GAIA_LOADED) {
             this.gaia = (Gaia) data[0];
-            break;
-        default:
-            break;
         }
-
     }
 
     @Override
@@ -293,15 +277,11 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public int getNCameras() {
-        switch (parent.mode) {
-        case GAIA_FOV1_MODE:
-        case GAIA_FOV2_MODE:
-            return 1;
-        case GAIA_FOVS_MODE:
-            return 2;
-        default:
-            return 0;
-        }
+        return switch (parent.mode) {
+            case GAIA_FOV1_MODE, GAIA_FOV2_MODE -> 1;
+            case GAIA_FOVS_MODE -> 2;
+            default -> 0;
+        };
     }
 
     @Override
@@ -322,7 +302,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
     @Override
     public void render(int rw, int rh) {
         // Renders the focal plane CCDs
-        fpstages[parent.mode.ordinal() - CameraMode.GAIA_FOV1_MODE.ordinal()].draw();
+        fpStages[parent.mode.ordinal() - CameraMode.GAIA_FOV1_MODE.ordinal()].draw();
     }
 
     @Override
@@ -342,25 +322,21 @@ public class FovCamera extends AbstractCamera implements IObserver {
 
     @Override
     public boolean isVisible(CelestialBody cb) {
-        switch (parent.mode) {
-        case GAIA_FOV1_MODE:
-        case GAIA_FOV2_MODE:
-            return super.isVisible(cb);
-        case GAIA_FOVS_MODE:
-            return computeVisibleFovs(cb, this);
-        default:
-            return false;
-        }
+        return switch (parent.mode) {
+            case GAIA_FOV1_MODE, GAIA_FOV2_MODE -> super.isVisible(cb);
+            case GAIA_FOVS_MODE -> computeVisibleFovs(cb, this);
+            default -> false;
+        };
     }
 
     @Override
-    public void setCamera(PerspectiveCamera cam) {
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
         // Nothing to do
     }
 
     @Override
     public void resize(int width, int height) {
-        for (Stage stage : fpstages)
+        for (Stage stage : fpStages)
             stage.getViewport().update(width, height, true);
 
     }

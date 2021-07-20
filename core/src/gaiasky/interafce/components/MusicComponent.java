@@ -49,7 +49,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         nf = NumberFormatFactory.getFormatter("##0");
         intf = NumberFormatFactory.getFormatter("#00");
 
-        /** Previous track **/
+        /* Previous track */
         prev = new OwnImageButton(skin, "audio-bwd");
         prev.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -60,7 +60,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         });
         prev.addListener(new OwnTextTooltip(I18n.txt("gui.music.previous"), skin));
 
-        /** Play/pause **/
+        /* Play/pause */
         play = new OwnImageButton(skin, "audio-playpause");
         play.setChecked(false);
         play.addListener(event -> {
@@ -72,7 +72,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         });
         play.addListener(new OwnTextTooltip(I18n.txt("gui.music.playpause"), skin));
 
-        /** Next track **/
+        /* Next track */
         next = new OwnImageButton(skin, "audio-fwd");
         next.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -83,7 +83,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         });
         next.addListener(new OwnTextTooltip(I18n.txt("gui.music.next"), skin));
 
-        /** Volume **/
+        /* Volume */
         vol = new OwnLabel("VOL: " + nf.format(getVolumePercentage()) + "%", skin, "mono");
         vol.receiveScrollEvents();
         vol.addListener(event -> {
@@ -101,10 +101,10 @@ public class MusicComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        /** Position mm:ss **/
-        position = new OwnLabel(toMMSS(0f), skin, "mono");
+        /* Position mm:ss */
+        position = new OwnLabel(toMinutesSeconds(0f), skin, "mono");
 
-        /** Track name **/
+        /* Track name */
         track = new OwnLabel("", skin, "mono");
 
         float space3 = 4.8f;
@@ -134,7 +134,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         Task musicUpdater = new Task() {
             @Override
             public void run() {
-                position.setText(toMMSS(MusicManager.instance.getPosition()));
+                position.setText(toMinutesSeconds(MusicManager.instance.getPosition()));
                 slideTrackName();
             }
         };
@@ -142,10 +142,10 @@ public class MusicComponent extends GuiComponent implements IObserver {
 
     }
 
-    private String toMMSS(float seconds) {
-        int mins = (int) (seconds / 60);
+    private String toMinutesSeconds(float seconds) {
+        int minutes = (int) (seconds / 60);
         int secs = (int) (seconds % 60);
-        return intf.format(mins) + ":" + intf.format(secs);
+        return intf.format(minutes) + ":" + intf.format(secs);
     }
 
     private void slideTrackName() {
@@ -191,22 +191,11 @@ public class MusicComponent extends GuiComponent implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case MUSIC_TRACK_INFO:
-            // We changed the music track
+        if (event == Events.MUSIC_TRACK_INFO) {// We changed the music track
             currentTrack = (String) data[0];
             si = 0;
             sp = 1;
             track.setText(capStr(currentTrack, 0, w));
-            break;
-        case MUSIC_PLAYPAUSE_CMD:
-            break;
-        case MUSIC_NEXT_CMD:
-            break;
-        case MUSIC_PREVIOUS_CMD:
-            break;
-        default:
-            break;
         }
     }
 

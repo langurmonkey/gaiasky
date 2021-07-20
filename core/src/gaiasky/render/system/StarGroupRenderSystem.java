@@ -126,7 +126,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                 FovCamera cam = ((CameraManager) camera).fovCamera;
                 // Update combined
                 PerspectiveCamera[] cams = camera.getFrontCameras();
-                shaderProgram.setUniformMatrix("u_projModelView", cams[cam.dirindex].combined);
+                shaderProgram.setUniformMatrix("u_projModelView", cams[cam.dirIndex].combined);
             }
             alphaSizeFovBr[2] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
             alphaSizeFovBr[3] = rc.scaleFactor;

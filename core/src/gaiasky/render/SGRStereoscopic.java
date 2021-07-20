@@ -26,11 +26,9 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.gdx.contrib.postprocess.effects.Anaglyphic;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.math.Vector3d;
-import org.lwjgl.openvr.VR;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -155,7 +153,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoLeft(cam);
 
-            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
+            sgr.renderGlowPass(camera, null);
 
             FrameBuffer fb1 = getFrameBuffer(rw, rh, 1);
             boolean postProcess = postProcessCapture(ppb, fb1, tw, th);
@@ -174,7 +172,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoRight(cam);
 
-            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
+            sgr.renderGlowPass(camera, null);
 
             FrameBuffer fb2 = getFrameBuffer(rw, rh, 2);
             postProcess = postProcessCapture(ppb, fb2, tw, th);
@@ -247,7 +245,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoLeft(cam);
 
-            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Left);
+            sgr.renderGlowPass(camera, null);
 
             FrameBuffer fb3d = getFrameBuffer(boundsw, boundsh, 3);
             boolean postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh);
@@ -278,7 +276,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             }
             camera.setCameraStereoRight(cam);
 
-            sgr.renderGlowPass(camera, null, VR.EVREye_Eye_Right);
+            sgr.renderGlowPass(camera, null);
 
             postProcess = postProcessCapture(ppb, fb3d, boundsw, boundsh);
             sgr.renderScene(camera, t, rc);
@@ -317,16 +315,16 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
     private void moveCamera(ICamera camera, Vector3d sideRemainder, Vector3d side, Vector3d sideCapped, double angle, boolean switchSides) {
         PerspectiveCamera cam = camera.getCamera();
-        Vector3 sidef = sideCapped.put(aux1);
+        Vector3 sideFloat = sideCapped.put(aux1);
 
         if (switchSides) {
-            cam.position.add(sidef);
+            cam.position.add(sideFloat);
             cam.direction.rotate(cam.up, (float) -angle);
 
             // Uncomment to enable 3D in GPU points
             camera.getPos().add(sideRemainder);
         } else {
-            cam.position.sub(sidef);
+            cam.position.sub(sideFloat);
             cam.direction.rotate(cam.up, (float) angle);
 
             // Uncomment to enable 3D in GPU points
@@ -401,7 +399,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         switch (event) {
         case SCREENSHOT_SIZE_UDPATE:
         case FRAME_SIZE_UDPATE:
-            GaiaSky.postRunnable(() -> clearFrameBufferMap());
+            GaiaSky.postRunnable(this::clearFrameBufferMap);
             break;
         default:
             break;

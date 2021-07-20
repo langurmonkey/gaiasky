@@ -46,7 +46,7 @@ public class RelativisticCamera extends AbstractCamera {
     }
 
     @Override
-    public void setCamera(PerspectiveCamera cam) {
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
         // TODO Auto-generated method stub
 
     }

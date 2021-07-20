@@ -20,7 +20,7 @@ public class ShadowMapImpl implements ShadowMap {
     public ShadowMapImpl(Matrix4 trans, Texture tex) {
         super();
         this.trans = trans;
-        this.td = new TextureDescriptor<Texture>(tex);
+        this.td = new TextureDescriptor<>(tex);
     }
 
     @Override

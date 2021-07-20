@@ -32,8 +32,8 @@ import java.time.ZoneOffset;
 public class TimeComponent extends GuiComponent implements IObserver {
 
     /** Date format **/
-    private final IDateFormat dfdate;
-    private final IDateFormat dftime;
+    private final IDateFormat dfDate;
+    private final IDateFormat dfTime;
 
     protected OwnLabel date;
     protected OwnLabel time;
@@ -41,7 +41,6 @@ public class TimeComponent extends GuiComponent implements IObserver {
     protected OwnTextIconButton dateEdit;
     protected DateDialog dateDialog;
     protected OwnSliderPlus warp;
-    private OwnTextIconButton resetTime;
 
     // Warp steps per side + 0, 0.125, 0.250, 0.5
     private final int warpSteps = Constants.WARP_STEPS + 4;
@@ -52,8 +51,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
     public TimeComponent(Skin skin, Stage stage) {
         super(skin, stage);
 
-        dfdate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
-        dftime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
+        dfDate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
+        dfTime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
         EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.TIME_WARP_CMD);
     }
 
@@ -125,8 +124,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
         });
         minus.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.timewarpminus"), kb.getStringKeys("action.dividetime"), skin));
 
-        /** Reset time **/
-        resetTime = new OwnTextIconButton(I18n.txt("gui.resettime"), skin, "reset");
+        /* Reset time */
+        OwnTextIconButton resetTime = new OwnTextIconButton(I18n.txt("gui.resettime"), skin, "reset");
         resetTime.align(Align.center);
         resetTime.setWidth(contentWidth);
         resetTime.addListener(new OwnTextTooltip(I18n.txt("gui.resettime.tooltip"), skin));
@@ -223,8 +222,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
             // Update input time
             Instant datetime = (Instant) data[0];
             GaiaSky.postRunnable(() -> {
-                date.setText(dfdate.format(datetime));
-                time.setText(dftime.format(datetime) + " UTC");
+                date.setText(dfDate.format(datetime));
+                time.setText(dfTime.format(datetime) + " UTC");
             });
             break;
         case TIME_WARP_CHANGED_INFO:

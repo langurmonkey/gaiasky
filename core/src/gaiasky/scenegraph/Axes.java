@@ -66,8 +66,6 @@ public class Axes extends SceneGraphNode implements ILineRenderable {
             b0.mul(coordinateSystem);
             b1.mul(coordinateSystem);
             b2.mul(coordinateSystem);
-        } else {
-            // Equatorial, nothing
         }
 
         // Axes colors, RGB default

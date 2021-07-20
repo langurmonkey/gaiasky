@@ -130,8 +130,8 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void setCamera(PerspectiveCamera cam) {
-        this.camera = cam;
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
+        this.camera = perspectiveCamera;
     }
 
     @Override
@@ -169,17 +169,16 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         // We use the simulation time for the integration
         //double sdt = time.getDt() * Constants.H_TO_S;
-        double sdt = dt;
 
         scthrust.set(sc.thrust);
         scforce.set(sc.force);
         scaccel.set(sc.accel);
         scvel.set(sc.vel);
         scpos.set(sc.pos);
-        scpos = sc.computePosition(sdt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
+        scpos = sc.computePosition(dt, secondClosest, sc.currentEnginePower, scthrust, sc.direction, scforce, scaccel, scvel, scpos);
         scdir.set(sc.direction);
         scup.set(sc.up);
-        sc.computeDirectionUp(sdt, dirup);
+        sc.computeDirectionUp(dt, dirup);
 
         /* ACTUAL UPDATE */
         updateHard(dt);

@@ -859,7 +859,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     Array<StubModel> controllers = new Array<>();
 
-    public void renderGlowPass(ICamera camera, FrameBuffer frameBuffer, int eye) {
+    public void renderGlowPass(ICamera camera, FrameBuffer frameBuffer) {
         if (frameBuffer == null) {
             frameBuffer = glowFb;
         }
@@ -1123,7 +1123,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
         if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP_MODE && !GlobalConf.runtime.OPENVR) {
-            renderGlowPass(camera, glowFb, 0);
+            renderGlowPass(camera, glowFb);
         }
 
         sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
@@ -1138,11 +1138,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     /**
-     * Renders the scene
+     * Renders the scene.
      *
-     * @param camera The camera to use
-     * @param t      The time in seconds since the start
-     * @param rc     The render context
+     * @param camera The camera to use.
+     * @param t      The time in seconds since the start.
+     * @param rc     The render context.
      */
     public void renderScene(ICamera camera, double t, RenderingContext rc) {
         try {
@@ -1163,20 +1163,20 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     process.render(null, camera, t, rc);
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
     }
 
     /**
-     * Renders all the systems which are the same type of the given class
+     * Renders all the systems which are the same type of the given class.
      *
-     * @param camera        The camera to use
-     * @param t             The time in seconds since the start
-     * @param renderContext The render context
-     * @param clazz         The class
+     * @param camera        The camera to use.
+     * @param t             The time in seconds since the start.
+     * @param renderContext The render context.
+     * @param systemClass         The class.
      */
-    protected void renderSystem(ICamera camera, double t, RenderingContext renderContext, Class<? extends IRenderSystem> clazz) {
+    protected void renderSystem(ICamera camera, double t, RenderingContext renderContext, Class<? extends IRenderSystem> systemClass) {
         // Update time difference since last update
         for (ComponentType ct : ComponentType.values()) {
             alphas[ct.ordinal()] = calculateAlpha(ct, t);
@@ -1185,7 +1185,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int size = renderSystems.size;
         for (int i = 0; i < size; i++) {
             IRenderSystem process = renderSystems.get(i);
-            if (clazz.isInstance(process)) {
+            if (systemClass.isInstance(process)) {
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
@@ -1279,7 +1279,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             });
             break;
         case LINE_RENDERER_UPDATE:
-            GaiaSky.postRunnable(() -> updateLineRenderSystem());
+            GaiaSky.postRunnable(this::updateLineRenderSystem);
             break;
         case STEREOSCOPIC_CMD:
             boolean stereo = (Boolean) data[0];

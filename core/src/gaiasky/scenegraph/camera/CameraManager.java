@@ -41,8 +41,6 @@ public class CameraManager implements ICamera, IObserver {
          * GAME_MODE mode
          **/
         GAME_MODE,
-        /** Relativistic camera **/
-        //Relativistic,
         /**
          * Gaia Scene
          **/
@@ -75,7 +73,7 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         public String getKey() {
-            return "camera." + toString();
+            return "camera." + this;
         }
 
         public String toStringI18n() {
@@ -122,16 +120,12 @@ public class CameraManager implements ICamera, IObserver {
          * @return The current FOV mode of the camera as an integer
          */
         public int getGaiaFovMode() {
-            switch (this) {
-                case GAIA_FOV1_MODE:
-                    return 1;
-                case GAIA_FOV2_MODE:
-                    return 2;
-                case GAIA_FOVS_MODE:
-                    return 3;
-                default:
-                    return 0;
-            }
+            return switch (this) {
+                case GAIA_FOV1_MODE -> 1;
+                case GAIA_FOV2_MODE -> 2;
+                case GAIA_FOVS_MODE -> 3;
+                default -> 0;
+            };
         }
     }
 
@@ -173,7 +167,6 @@ public class CameraManager implements ICamera, IObserver {
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr, GlobalResources globalResources) {
         // Initialize
         // Initialize Cameras
-        CameraMode previousMode = this.mode;
         naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader());
         fovCamera = new FovCamera(manager, this, globalResources.getSpriteBatch());
         spacecraftCamera = new SpacecraftCamera(this);
@@ -194,7 +187,7 @@ public class CameraManager implements ICamera, IObserver {
         velocitynor = new Vector3d();
         localTransformInv = new Matrix4();
 
-        updateCurrentCamera(previousMode);
+        updateCurrentCamera();
 
         EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.FOV_CHANGE_NOTIFICATION);
     }
@@ -211,7 +204,7 @@ public class CameraManager implements ICamera, IObserver {
             cam.copyParamsFrom(copy);
     }
 
-    public void updateCurrentCamera(CameraMode previousMode) {
+    public void updateCurrentCamera() {
         AbstractCamera aux;
         // Update
         switch (mode) {
@@ -224,10 +217,6 @@ public class CameraManager implements ICamera, IObserver {
                 current = naturalCamera;
                 restoreCam(naturalCamera, aux);
                 break;
-            // case Relativistic:
-            //     aux = backupCam(current);
-            //     current = relativisticCamera;
-            //     restoreCam(relativisticCamera, aux);
             case SPACECRAFT_MODE:
                 aux = backupCam(current);
                 current = spacecraftCamera;
@@ -441,7 +430,7 @@ public class CameraManager implements ICamera, IObserver {
         previousMode = this.mode;
         previousCam = this.current;
         this.mode = mode;
-        updateCurrentCamera(previousMode);
+        updateCurrentCamera();
         for (ICamera cam : cameras) {
             cam.updateMode(previousCam, previousMode, mode, centerFocus, postEvent);
         }
@@ -552,8 +541,8 @@ public class CameraManager implements ICamera, IObserver {
     }
 
     @Override
-    public void setCamera(PerspectiveCamera cam) {
-        current.setCamera(cam);
+    public void setCamera(PerspectiveCamera perspectiveCamera) {
+        current.setCamera(perspectiveCamera);
     }
 
     @Override

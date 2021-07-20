@@ -494,7 +494,7 @@ public class AboutWindow extends GenericDialog {
             contentUpdates.add(checkTable).left().top().padTop(pad10 * 2f);
         }
 
-        /** ADD ALL CONTENT **/
+        /* ADD ALL CONTENT */
         tabContent.addActor(contentHelp);
         tabContent.addActor(contentAbout);
         tabContent.addActor(systemScroll);

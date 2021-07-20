@@ -26,14 +26,10 @@ public class Area extends SceneGraphNode implements ILineRenderable {
 
     private Vector3 aux3;
 
-    private int population;
-    private float gdp;
-    private int censusYear;
-
-    /** Max latitud/longitude and min latitude/longitude **/
+    /** Max latitude/longitude and min latitude/longitude **/
     private final Vector2 maxlonlat;
     private final Vector2 minlonlat;
-    /** Cartesian points correspoding to maximum lonlat and minimum lonlat **/
+    /** Cartesian points corresponding to maximum lonlat and minimum lonlat **/
     private final Vector3 cart0;
 
     public Area() {
@@ -58,14 +54,13 @@ public class Area extends SceneGraphNode implements ILineRenderable {
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         int n = loc3d.length;
-        for (int lineidx = 0; lineidx < n; lineidx++) {
-            float[][] linepoints = loc3d[lineidx];
-            int m = linepoints.length;
-            for (int pointidx = 1; pointidx < m; pointidx++) {
-                renderer.addLine(this, loc3d[lineidx][pointidx - 1][0], loc3d[lineidx][pointidx - 1][1], loc3d[lineidx][pointidx - 1][2], loc3d[lineidx][pointidx][0], loc3d[lineidx][pointidx][1], loc3d[lineidx][pointidx][2], cc[0], cc[1], cc[2], alpha * opacity);
+        for (float[][] linePoints : loc3d) {
+            int m = linePoints.length;
+            for (int pointIndex = 1; pointIndex < m; pointIndex++) {
+                renderer.addLine(this, linePoints[pointIndex - 1][0], linePoints[pointIndex - 1][1], linePoints[pointIndex - 1][2], linePoints[pointIndex][0], linePoints[pointIndex][1], linePoints[pointIndex][2], cc[0], cc[1], cc[2], alpha * opacity);
             }
             // Close line
-            renderer.addLine(this, loc3d[lineidx][m - 1][0], loc3d[lineidx][m - 1][1], loc3d[lineidx][m - 1][2], loc3d[lineidx][0][0], loc3d[lineidx][0][1], loc3d[lineidx][0][2], cc[0], cc[1], cc[2], alpha * opacity);
+            renderer.addLine(this, linePoints[m - 1][0], linePoints[m - 1][1], linePoints[m - 1][2], linePoints[0][0], linePoints[0][1], linePoints[0][2], cc[0], cc[1], cc[2], alpha * opacity);
         }
 
     }
@@ -115,25 +110,25 @@ public class Area extends SceneGraphNode implements ILineRenderable {
     public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
         ModelBody papa = (ModelBody) parent;
         papa.setToLocalTransform(1f, localTransform, false);
-        int lineidx = 0;
+        int lineIndex = 0;
         for (float[][] line : loc2d) {
-            int pointidx = 0;
+            int pointIndex = 0;
             for (float[] point : line) {
                 toCartesian(point[0], point[1], aux3, localTransform);
 
-                loc3d[lineidx][pointidx][0] = aux3.x;
-                loc3d[lineidx][pointidx][1] = aux3.y;
-                loc3d[lineidx][pointidx][2] = aux3.z;
+                loc3d[lineIndex][pointIndex][0] = aux3.x;
+                loc3d[lineIndex][pointIndex][1] = aux3.y;
+                loc3d[lineIndex][pointIndex][2] = aux3.z;
 
-                pointidx++;
+                pointIndex++;
             }
 
-            lineidx++;
+            lineIndex++;
         }
 
     }
 
-    private Vector3 toCartesian(float lon, float lat, Vector3 res, Matrix4 localTransform) {
+    private void toCartesian(float lon, float lat, Vector3 res, Matrix4 localTransform) {
         res.set(0, 0, -0.5015f);
         // Latitude [-90..90]
         res.rotate(lat, 1, 0, 0);
@@ -141,9 +136,6 @@ public class Area extends SceneGraphNode implements ILineRenderable {
         res.rotate(lon + 90, 0, 1, 0);
 
         res.mul(localTransform);
-
-        return res;
-
     }
 
     public void setPerimeter(double[][][] perimeter) {
@@ -176,18 +168,6 @@ public class Area extends SceneGraphNode implements ILineRenderable {
             }
             this.loc2d[i] = arr;
         }
-    }
-
-    public void setPopulation(Long population) {
-        this.population = population.intValue();
-    }
-
-    public void setGdp(Double gdp) {
-        this.gdp = gdp.floatValue();
-    }
-
-    public void setCensusYear(Long census) {
-        this.censusYear = census.intValue();
     }
 
     @Override

@@ -86,8 +86,6 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             } catch (ReflectionException e) {
                 Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
             }
-        } else {
-            // Equatorial, nothing
         }
 
         // Must rotate due to orientation of createCylinder

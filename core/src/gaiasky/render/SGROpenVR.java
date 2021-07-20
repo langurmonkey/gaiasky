@@ -69,9 +69,6 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private VRGui<VRControllerInfoGui> controllerHintGui;
     private VRGui<VRSelectionGui> selectionGui;
 
-    // Render parameters - fit
-    private int startX, startY, renderW, renderH;
-
     private Vector3 auxf1;
     private Vector3d auxd1;
 
@@ -137,8 +134,6 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             try {
                 double fovT = Math.toDegrees(Math.atan(fovt.get()));
                 double fovB = Math.toDegrees(Math.atan(fovb.get()));
-                double fovR = Math.toDegrees(Math.atan(fovr.get()));
-                double fovL = Math.toDegrees(Math.atan(fovl.get()));
                 float fov = (float) (fovB - fovT);
                 if (fov > 50) {
                     logger.info("Setting fov to HMD value: " + fov);
@@ -162,19 +157,19 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         // GUI
         if (infoGui != null)
             infoGui.dispose();
-        infoGui = new VRGui(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
+        infoGui = new VRGui<>(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         infoGui.initialize(null, sb);
         infoGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
 
         if (controllerHintGui != null)
             controllerHintGui.dispose();
-        controllerHintGui = new VRGui(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
+        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         controllerHintGui.initialize(null, sb);
         controllerHintGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
 
         if (selectionGui != null)
             selectionGui.dispose();
-        selectionGui = new VRGui(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
+        selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
         selectionGui.initialize(null, sb);
         selectionGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
     }
@@ -191,9 +186,9 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             // Add controllers
             for (StubModel controller : controllerObjects) {
-                Vector3 devicepos = controller.getDevice().getPosition(Space.Tracker);
+                Vector3 devicePos = controller.getDevice().getPosition(Space.Tracker);
                 // Length from headset to controller
-                auxd1.set(devicepos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
+                auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
                 double controllerDist = auxd1.len();
                 if (controller.instance != null) {
                     controller.addToRenderLists(SceneGraphRenderer.RenderGroup.MODEL_PIX);
@@ -205,7 +200,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // Camera to left
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Left, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Left);
+            sgr.renderGlowPass(camera, sgr.getGlowFb());
 
             boolean postProcess = postProcessCapture(ppb, fbLeft, rw, rh);
 
@@ -233,7 +228,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             // Camera to right
             updateCamera((NaturalCamera) camera.getCurrent(), camera.getCamera(), VR.EVREye_Eye_Right, false, rc);
 
-            sgr.renderGlowPass(camera, sgr.getGlowFb(), VR.EVREye_Eye_Right);
+            sgr.renderGlowPass(camera, sgr.getGlowFb());
 
             postProcess = postProcessCapture(ppb, fbRight, rw, rh);
 
@@ -354,17 +349,13 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
         case VR_DEVICE_CONNECTED:
             VRDevice device = (VRDevice) data[0];
             if (device.getType() == VRDeviceType.Controller) {
-                GaiaSky.postRunnable(() -> {
-                    addVRController(device);
-                });
+                GaiaSky.postRunnable(() -> addVRController(device));
             }
             break;
         case VR_DEVICE_DISCONNECTED:
             device = (VRDevice) data[0];
             if (device.getType() == VRDeviceType.Controller) {
-                GaiaSky.postRunnable(() -> {
-                    removeVRController(device);
-                });
+                GaiaSky.postRunnable(() -> removeVRController(device));
             }
             break;
         case UI_SCALE_CMD:

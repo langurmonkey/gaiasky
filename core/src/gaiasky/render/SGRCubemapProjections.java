@@ -49,22 +49,22 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         switch (projection) {
             case FISHEYE:
                 // In planetarium mode we only render back iff aperture > 180
-                xposFlag = true;
-                xnegFlag = true;
-                yposFlag = true;
-                ynegFlag = true;
-                zposFlag = true;
-                znegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
+                xPosFlag = true;
+                xNegFlag = true;
+                yPosFlag = true;
+                yNegFlag = true;
+                zPosFlag = true;
+                zNegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
                 setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
                 break;
             default:
                 // In 360 mode we always need all sides
-                xposFlag = true;
-                xnegFlag = true;
-                yposFlag = true;
-                ynegFlag = true;
-                zposFlag = true;
-                znegFlag = true;
+                xPosFlag = true;
+                xNegFlag = true;
+                yPosFlag = true;
+                yNegFlag = true;
+                zPosFlag = true;
+                zNegFlag = true;
                 setPlanetariumAngle(0);
                 break;
         }
@@ -92,7 +92,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         // Render to frame buffer
         resultBuffer = fb == null ? getFrameBuffer(rw, rh) : fb;
         cubemapEffect.setViewportSize(tw, th);
-        cubemapEffect.setSides(xposfb, xnegfb, yposfb, ynegfb, zposfb, znegfb);
+        cubemapEffect.setSides(xPosFb, xNegFb, yPosFb, yNegFb, zPosFb, zNegFb);
         cubemapEffect.render(null, resultBuffer, null);
 
         // To screen
@@ -110,9 +110,9 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
     @Override
     public void dispose() {
-        Set<Integer> keySet = fbcm.keySet();
+        Set<Integer> keySet = frameBufferCubeMap.keySet();
         for (Integer key : keySet) {
-            fbcm.get(key).dispose();
+            frameBufferCubeMap.get(key).dispose();
         }
     }
 
@@ -136,10 +136,10 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
                     int res = (Integer) data[0];
                     GaiaSky.postRunnable(() -> {
                         // Create new ones
-                        if (!fbcm.containsKey(getKey(res, res, 0))) {
+                        if (!frameBufferCubeMap.containsKey(getKey(res, res, 0))) {
                             // Clear
                             dispose();
-                            fbcm.clear();
+                            frameBufferCubeMap.clear();
                         } else {
                             // All good
                         }

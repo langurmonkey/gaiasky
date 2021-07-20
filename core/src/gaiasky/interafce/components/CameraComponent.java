@@ -21,8 +21,7 @@ import gaiasky.util.*;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.scene2d.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 public class CameraComponent extends GuiComponent implements IObserver {
 
@@ -58,7 +57,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         int cameraModes = CameraMode.values().length;
         CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
         for (int i = 0; i < cameraModes; i++) {
-            cameraOptions[i] = new CameraComboBoxBean(CameraMode.getMode(i).toStringI18n(), CameraMode.getMode(i));
+            cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
         }
         cameraMode = new OwnSelectBox<>(skin);
         cameraMode.setName("camera mode");
@@ -76,8 +75,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         if (!GlobalConf.runtime.OPENVR) {
-            List<Button> buttonList = new ArrayList<>();
-
             Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
@@ -158,12 +155,6 @@ public class CameraComponent extends GuiComponent implements IObserver {
                     return false;
                 });
             }
-
-            buttonList.add(button3d);
-            buttonList.add(buttonDome);
-            buttonList.add(buttonCubemap);
-            if (GlobalConf.program.isMaster())
-                buttonList.add(buttonMaster);
         }
 
         fieldOfView = new OwnSliderPlus(I18n.txt("gui.camera.fov"), Constants.MIN_FOV, Constants.MAX_FOV, Constants.SLIDER_STEP_SMALL, false, skin);

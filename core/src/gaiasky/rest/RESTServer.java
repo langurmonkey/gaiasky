@@ -155,7 +155,7 @@ public class RESTServer {
 
         /* success key and HTTP status code */
         ret.put("success", success);
-        if (success == true) {
+        if (success) {
             response.status(200); // 200 OK
             ret.putIfAbsent("text", "OK");
         } else {
@@ -212,34 +212,32 @@ public class RESTServer {
     private static String methodDeclarationString(Method method) {
         Parameter[] methodParams = method.getParameters();
 
-        String ret = method.getName();
+        StringBuilder ret = new StringBuilder(method.getName());
         for (int i = 0; i < methodParams.length; i++) {
             Parameter p = methodParams[i];
-            ret += String.format("%s%s=(%s)", ((i == 0) ? "?" : "&"), p.getName(), p.getType().getSimpleName());
+            ret.append(String.format("%s%s=(%s)", ((i == 0) ? "?" : "&"), p.getName(), p.getType().getSimpleName()));
         }
         // \u27F6 is "⟶"
-        ret += String.format(" \u27F6 %s", method.getReturnType().getSimpleName());
-        return ret;
+        ret.append(String.format(" \u27F6 %s", method.getReturnType().getSimpleName()));
+        return ret.toString();
     }
 
     /**
      * Returns a list of all matching method declaration strings. To get a list of
-     * all method declarations, use empty string for methodname.
+     * all method declarations, use empty string for <code>methodName</code>.
      */
-    private static String[] getMethodDeclarationStrings(String methodname, Class<?> clazz) {
-        Class<?> cisi = clazz;
-        Method[] allMethods = cisi.getDeclaredMethods();
+    private static String[] getMethodDeclarationStrings(String methodName) {
+        Method[] allMethods = IScriptingInterface.class.getDeclaredMethods();
 
-        List<String> matchMethodsDeclarations = new ArrayList<String>();
-        for (int i = 0; i < allMethods.length; i++) {
-            if (methodname.length() == 0 || methodname.equals(allMethods[i].getName())) {
-                String declaration = methodDeclarationString(allMethods[i]);
+        List<String> matchMethodsDeclarations = new ArrayList<>();
+        for (Method allMethod : allMethods) {
+            if (methodName.length() == 0 || methodName.equals(allMethod.getName())) {
+                String declaration = methodDeclarationString(allMethod);
                 matchMethodsDeclarations.add(declaration);
             }
         }
         Collections.sort(matchMethodsDeclarations);
-        String[] ret = matchMethodsDeclarations.toArray(new String[0]);
-        return ret;
+        return matchMethodsDeclarations.toArray(new String[0]);
     }
 
     /**
@@ -302,7 +300,7 @@ public class RESTServer {
         if ("help".equals(cmd)) {
             logger.debug("Help command received");
             ret.put("text", "Help: see 'cmd_syntax' for command reference. " + "Vectors are comma-separated.");
-            ret.put("cmd_syntax", getMethodDeclarationStrings("", IScriptingInterface.class));
+            ret.put("cmd_syntax", getMethodDeclarationStrings(""));
             return responseData(request, response, ret, true);
         } else if ("debugCall".equals(cmd)) {
             logger.debug("debugCall received. What to do now?");
@@ -320,7 +318,7 @@ public class RESTServer {
             logger.debug("No suitable method found.");
 
             String msg = String.format("Failed: command name '%s' not found. " + "See syntax in 'cmd_syntax'.", cmd);
-            ret.put("cmd_syntax", getMethodDeclarationStrings("", IScriptingInterface.class));
+            ret.put("cmd_syntax", getMethodDeclarationStrings(""));
             logger.warn(msg);
             ret.put("text", msg);
             return responseData(request, response, ret, false);
@@ -459,7 +457,7 @@ public class RESTServer {
                     String msg = String.format("Argument failure with parameter '%s'", p.getName());
                     logger.warn(msg);
                     ret.put("text", msg);
-                    ret.put("cmd_syntax", getMethodDeclarationStrings(cmd, IScriptingInterface.class));
+                    ret.put("cmd_syntax", getMethodDeclarationStrings(cmd));
                     return responseData(request, response, ret, false);
                 }
             }
@@ -468,13 +466,13 @@ public class RESTServer {
             try {
                 logger.debug("Invoking method...");
                 // note: invoke may return null explicitly or because is void type
-                Object retobj = matchMethod.invoke(EventScriptingInterface.instance(), arguments);
-                if (retobj == null) {
-                    logger.debug("Method returned: '{}', return type is {}", retobj, matchReturnType);
+                Object returnObject = matchMethod.invoke(EventScriptingInterface.instance(), arguments);
+                if (returnObject == null) {
+                    logger.debug("Method returned: '{}', return type is {}", returnObject, matchReturnType);
                 } else {
-                    logger.debug("Method returned: '{}', isArray={}", retobj, retobj.getClass().isArray());
+                    logger.debug("Method returned: '{}', isArray={}", returnObject, returnObject.getClass().isArray());
                 }
-                ret.put("value", retobj);
+                ret.put("value", returnObject);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -487,10 +485,10 @@ public class RESTServer {
             String msg;
             if (methodNameMatches) {
                 msg = String.format("Failed: command name '%s' found, " + "but arguments not compatible.See syntax in 'cmd_syntax'.", cmd);
-                ret.put("cmd_syntax", getMethodDeclarationStrings(cmd, IScriptingInterface.class));
+                ret.put("cmd_syntax", getMethodDeclarationStrings(cmd));
             } else {
                 msg = String.format("Failed: command name '%s' not found. " + "See syntax in 'cmd_syntax'.", cmd);
-                ret.put("cmd_syntax", getMethodDeclarationStrings("", IScriptingInterface.class));
+                ret.put("cmd_syntax", getMethodDeclarationStrings(""));
             }
             logger.warn(msg);
             ret.put("text", msg);
@@ -534,23 +532,23 @@ public class RESTServer {
                 return response;
             });
 
-            get("/api/:cmd", (request, response) -> handleApiCall(request, response));
+            get("/api/:cmd", RESTServer::handleApiCall);
 
             post("/api/:cmd", RESTServer::handleApiCall);
 
 
             /* Initialize method index */
             // get set of permitted API commands
-            Class<IScriptingInterface> cisi = IScriptingInterface.class;
-            Method[] allMethods = cisi.getDeclaredMethods();
+            Class<IScriptingInterface> iScriptingInterfaceClass = IScriptingInterface.class;
+            Method[] allMethods = iScriptingInterfaceClass.getDeclaredMethods();
 
-            methodMap = new HashMap();
+            methodMap = new HashMap<>();
             for (Method method : allMethods) {
                 Array<Method> matches;
                 if (methodMap.containsKey(method.getName())) {
                     matches = methodMap.get(method.getName());
                 } else {
-                    matches = new Array(false, 1);
+                    matches = new Array<>(false, 1);
                 }
                 if (!matches.contains(method, true))
                     matches.add(method);

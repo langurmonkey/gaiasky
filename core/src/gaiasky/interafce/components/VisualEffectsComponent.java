@@ -34,7 +34,6 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualEffectsComponent.class);
 
     private OwnSliderPlus starBrightness, starBrightnessPower, starSize, starMinOpacity, ambientLight, labelSize, lineWidth, elevMult;
-    private OwnTextIconButton resetDefaults;
 
     boolean flag = true;
 
@@ -154,7 +153,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         });
 
         /* Reset defaults */
-        resetDefaults = new OwnTextIconButton(I18n.txt("gui.resetdefaults"), skin, "reset");
+        OwnTextIconButton resetDefaults = new OwnTextIconButton(I18n.txt("gui.resetdefaults"), skin, "reset");
         resetDefaults.align(Align.center);
         resetDefaults.setWidth(contentWidth);
         resetDefaults.addListener(new OwnTextTooltip(I18n.txt("gui.resetdefaults.tooltip"), skin));

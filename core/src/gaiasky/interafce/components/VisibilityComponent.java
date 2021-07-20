@@ -17,7 +17,6 @@ import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
@@ -25,9 +24,7 @@ import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class VisibilityComponent extends GuiComponent implements IObserver {
     protected Map<String, Button> buttonMap;
@@ -40,7 +37,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     private OwnSliderPlus pmNumFactorSlider, pmLenFactorSlider;
     private SelectBox<ComboBoxBean> pmColorMode;
     private Button pmToggleButton;
-    private Label pmLabel, pmColorModeLabel;
+    private Label pmLabel;
     private VerticalGroup pmColorModeGroup;
     private VerticalGroup pmGroup;
     private boolean sendEvents = true;
@@ -67,7 +64,6 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         visibilityTable.setName("visibility table");
         visibilityTable.top().center();
         buttonMap = new HashMap<>();
-        Set<Button> buttons = new HashSet<>();
         if (visibilityEntities != null) {
             for (int i = 0; i < visibilityEntities.length; i++) {
                 final ComponentType ct = visibilityEntities[i];
@@ -102,19 +98,18 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                         }
                         return false;
                     });
-                    Cell c = visibilityTable.add(button).padBottom(buttonPadVert);
+                    Cell<Button> c = visibilityTable.add(button).padBottom(buttonPadVert);
 
                     if ((i + 1) % visTableCols == 0) {
                         visibilityTable.row();
                     } else {
                         c.padRight(buttonPadHor);
                     }
-                    buttons.add(button);
                 }
             }
         }
 
-        /** Proper motions **/
+        /* Proper motions */
 
         // LABEL
         pmLabel = new OwnLabel(I18n.txt("gui.velocityvectors"), skin, "header");
@@ -164,7 +159,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         });
 
         // PM COLOR MODE
-        pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
+        Label pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
 
         ComboBoxBean[] cms = new ComboBoxBean[]{
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.dir"), 0),

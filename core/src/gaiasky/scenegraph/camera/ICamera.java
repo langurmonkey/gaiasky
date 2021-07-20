@@ -14,6 +14,9 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
+/**
+ * Camera interface to be implemented by all cameras in Gaia Sky.
+ */
 public interface ICamera {
 
     /**
@@ -26,9 +29,9 @@ public interface ICamera {
     /**
      * Sets the active camera
      * 
-     * @param cam
+     * @param perspectiveCamera The perspective camera.
      */
-    void setCamera(PerspectiveCamera cam);
+    void setCamera(PerspectiveCamera perspectiveCamera);
 
     PerspectiveCamera getCameraStereoLeft();
 
@@ -126,9 +129,9 @@ public interface ICamera {
     double getDistance();
 
     /**
-     * Returns the foucs if any
+     * Returns the focus if any
      * 
-     * @return The foucs object if it is in focus mode. Null otherwise
+     * @return The focus object if it is in focus mode. Null otherwise
      */
     IFocus getFocus();
 

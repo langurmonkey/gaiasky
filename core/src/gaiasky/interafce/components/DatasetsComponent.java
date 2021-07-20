@@ -51,9 +51,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         Collection<CatalogInfo> cis = CatalogManager.instance().getCatalogInfos();
         if (cis != null) {
-            Iterator<CatalogInfo> it = cis.iterator();
-            while (it.hasNext()) {
-                CatalogInfo ci = it.next();
+            for (CatalogInfo ci : cis) {
                 addCatalogInfo(ci);
             }
         }
