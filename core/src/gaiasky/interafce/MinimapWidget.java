@@ -19,7 +19,6 @@ import gaiasky.GaiaSky;
 import gaiasky.interafce.minimap.*;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
@@ -99,7 +98,7 @@ public class MinimapWidget implements Disposable {
     }
 
     public void update() {
-        ICamera cam = GaiaSky.instance.cam;
+        ICamera cam = GaiaSky.instance.cameraManager;
         double distSun = cam.getPos().lend();
         for (IMinimapScale mms : scales) {
             if (mms.isActive(cam.getPos().tov3d(aux3d), distSun)) {

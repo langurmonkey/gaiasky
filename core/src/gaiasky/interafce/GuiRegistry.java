@@ -59,26 +59,32 @@ public class GuiRegistry implements IObserver {
     /**
      * Global input multiplexer
      **/
-    private InputMultiplexer im = null;
+    private InputMultiplexer inputMultiplexer = null;
+
+    /**
+     * The catalog manager
+     */
+    private final CatalogManager catalogManager;
 
     /**
      * Create new GUI registry object.
      */
-    public GuiRegistry(Skin skin, ISceneGraph sg) {
+    public GuiRegistry(final Skin skin, final ISceneGraph sceneGraph, final CatalogManager catalogManager) {
         super();
         this.skin = skin;
-        this.sg = sg;
+        this.sceneGraph = sceneGraph;
         this.guis = new Array<>(true, 2);
+        this.catalogManager = catalogManager;
         // Windows which are visible from any GUI
         EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
     }
 
-    public void setInputMultiplexer(InputMultiplexer im) {
-        this.im = im;
+    public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
+        this.inputMultiplexer = inputMultiplexer;
     }
 
     public InputMultiplexer getInputMultiplexer() {
-        return this.im;
+        return this.inputMultiplexer;
     }
 
     /**
@@ -122,7 +128,7 @@ public class GuiRegistry implements IObserver {
     public void unset(IGui gui) {
         if (gui != null) {
             unregisterGui(gui);
-            im.removeProcessor(gui.getGuiStage());
+            inputMultiplexer.removeProcessor(gui.getGuiStage());
         }
         previous = gui;
     }
@@ -135,7 +141,7 @@ public class GuiRegistry implements IObserver {
     public void set(IGui gui) {
         if (gui != null) {
             registerGui(gui);
-            im.addProcessor(0, gui.getGuiStage());
+            inputMultiplexer.addProcessor(0, gui.getGuiStage());
         }
         current = gui;
     }
@@ -208,13 +214,13 @@ public class GuiRegistry implements IObserver {
      * @param gui The gui
      */
     public void addProcessor(IGui gui) {
-        if (im != null && gui != null)
-            im.addProcessor(gui.getGuiStage());
+        if (inputMultiplexer != null && gui != null)
+            inputMultiplexer.addProcessor(gui.getGuiStage());
     }
 
     public void removeProcessor(IGui gui) {
-        if (im != null && gui != null)
-            im.removeProcessor(gui.getGuiStage());
+        if (inputMultiplexer != null && gui != null)
+            inputMultiplexer.removeProcessor(gui.getGuiStage());
     }
 
     /**
@@ -259,7 +265,7 @@ public class GuiRegistry implements IObserver {
     private SlaveConfigWindow slaveConfigWindow;
 
     // Scene Graph
-    protected ISceneGraph sg;
+    protected final ISceneGraph sceneGraph;
 
 
     public void dispose() {
@@ -276,7 +282,7 @@ public class GuiRegistry implements IObserver {
             switch (event) {
             case SHOW_SEARCH_ACTION:
                 if (searchDialog == null) {
-                    searchDialog = new SearchDialog(skin, ui, sg, true);
+                    searchDialog = new SearchDialog(skin, ui, sceneGraph, true);
                 } else {
                     searchDialog.clearText();
                 }
@@ -333,7 +339,7 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_PER_OBJECT_VISIBILITY_ACTION:
                 if (indVisWindow == null) {
-                    final ISceneGraph sg = GaiaSky.instance.sg;
+                    final ISceneGraph sg = GaiaSky.instance.sceneGraph;
                     indVisWindow = new IndividualVisibilityWindow(sg, ui, skin);
                 }
                 if (!indVisWindow.isVisible() || !indVisWindow.hasParent())
@@ -377,11 +383,11 @@ public class GuiRegistry implements IObserver {
                                 Runnable doLoad = () -> {
                                     try {
                                         Thread t = new Thread(() -> {
-                                            DatasetOptions dops = dld.generateDatasetOptions();
+                                            DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                             // Load dataset
-                                            EventScriptingInterface.instance().loadDataset(dops.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, dops, true);
+                                            GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, datasetOptions, true);
                                             // Select first
-                                            CatalogInfo ci = CatalogManager.instance().get(dops.catalogName);
+                                            CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
                                             if (ci != null && ci.object != null) {
                                                 if (ci.object instanceof ParticleGroup) {
                                                     ParticleGroup pg = (ParticleGroup) ci.object;
@@ -394,8 +400,8 @@ public class GuiRegistry implements IObserver {
                                                     EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
                                                 }
                                                 // Open UI datasets
-                                                EventScriptingInterface.instance().maximizeInterfaceWindow();
-                                                EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
+                                                GaiaSky.instance.scripting().maximizeInterfaceWindow();
+                                                GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
                                             } else {
                                                 logger.info("No data loaded (did the load crash?)");
                                             }
@@ -518,10 +524,10 @@ public class GuiRegistry implements IObserver {
                 boolean displayGui = (Boolean) data[0];
                 if (!displayGui) {
                     // Remove processor
-                    im.removeProcessor(current.getGuiStage());
+                    inputMultiplexer.removeProcessor(current.getGuiStage());
                 } else {
                     // Add processor
-                    im.addProcessor(0, current.getGuiStage());
+                    inputMultiplexer.addProcessor(0, current.getGuiStage());
                 }
                 break;
             case UI_RELOAD_CMD:
@@ -553,7 +559,7 @@ public class GuiRegistry implements IObserver {
             IGui gui = guis.get(i);
             if (gui instanceof ControllerGui) {
                 ControllerGui cgui = (ControllerGui) gui;
-                return cgui.removeControllerGui(GaiaSky.instance.cam.naturalCamera);
+                return cgui.removeControllerGui(GaiaSky.instance.cameraManager.naturalCamera);
             }
         }
         return false;
@@ -585,15 +591,15 @@ public class GuiRegistry implements IObserver {
             globalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
-            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sg.getNode("Spacecraft"));
+            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sceneGraph.getNode("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();
             // Time init
             EventManager.instance.post(Events.TIME_CHANGE_INFO, GaiaSky.instance.time.getTime());
-            if (GaiaSky.instance.cam.mode == CameraManager.CameraMode.FOCUS_MODE)
+            if (GaiaSky.instance.cameraManager.mode == CameraManager.CameraMode.FOCUS_MODE)
                 // Refocus
-                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GaiaSky.instance.cam.getFocus());
+                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GaiaSky.instance.cameraManager.getFocus());
             // Update names with new language
-            GaiaSky.instance.sg.getRoot().updateNamesRec();
+            GaiaSky.instance.sceneGraph.getRoot().updateNamesRec();
             // UI theme reload broadcast
             EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, globalResources.getSkin());
         });

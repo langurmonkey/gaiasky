@@ -49,18 +49,21 @@ public class GaiaSkyContextMenu extends ContextMenu {
     // Added items
     private int nItems = 0;
 
+    private final CatalogManager catalogManager;
+
     // Uncertainties disabled by default
     private final boolean uncertainties = false;
     // Rel effects off
     private final boolean releffects = false;
 
-    public GaiaSkyContextMenu(Skin skin, String styleName, int screenX, int screenY, IFocus candidate) {
+    public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final IFocus candidate, final CatalogManager catalogManager) {
         super(skin, styleName);
         this.skin = skin;
         this.screenX = (int) (screenX / GlobalConf.program.UI_SCALE);
         this.screenY = screenY;
-        this.sg = GaiaSky.instance.sg;
+        this.sg = GaiaSky.instance.sceneGraph;
         this.candidate = candidate;
+        this.catalogManager = catalogManager;
         this.pad = 8f;
         if (candidate != null) {
             this.cname = candidate.getCandidateName();
@@ -261,8 +264,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
         addItem(dsLoad);
 
         // Dataset highlight
-        CatalogManager cm = CatalogManager.instance();
-        Collection<CatalogInfo> cis = cm.getCatalogInfos();
+        Collection<CatalogInfo> cis = catalogManager.getCatalogInfos();
         if (cis != null && cis.size() > 0) {
             MenuItem dsHighlight = new MenuItem(I18n.txt("context.dataset.highlight"), skin, skin.getDrawable("highlight-on"));
             ContextMenu dsHighlightSubmenu = new ContextMenu(skin, "default");

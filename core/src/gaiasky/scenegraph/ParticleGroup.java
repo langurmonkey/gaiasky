@@ -34,7 +34,6 @@ import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.ds.DatasetUpdater;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -214,7 +213,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     // Updates the group
-    public class UpdaterTask implements Runnable {
+    public static class UpdaterTask implements Runnable {
 
         private final ParticleGroup pg;
 
@@ -376,6 +375,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Checks whether the particle with the given index is visible
      *
      * @param index The index of the particle
+     *
      * @return The visibility of the particle
      */
     public boolean isVisible(int index) {
@@ -393,6 +393,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Overrides the isVisible() method, and uses the current focus index, if any
      *
      * @param attributeValue Whether to use the visibility attribute directly
+     *
      * @return The visibility
      */
     public boolean isVisible(boolean attributeValue) {
@@ -418,13 +419,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public void setVisible(boolean visible, String name) {
-        if(index.containsKey(name)){
+        if (index.containsKey(name)) {
             this.setVisible(index.get(name), visible);
         }
     }
 
     public boolean isVisible(String name) {
-        if(index.containsKey(name)){
+        if (index.containsKey(name)) {
             return this.isVisible(index.get(name));
         }
         return false;
@@ -441,7 +442,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
-    public boolean isVisibleGroup(){
+    public boolean isVisibleGroup() {
         return super.isVisible();
     }
 
@@ -461,6 +462,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * and computes the geometric center of this group
      *
      * @param pointData The data
+     *
      * @return An map{string,int} mapping names to indices
      */
     public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
@@ -532,8 +534,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         if (pointData != null && (forceRecompute || geomCentre == null)) {
             geomCentre = new Vector3d(0, 0, 0);
             int n = pointData.size();
-            for (int i = 0; i < n; i++) {
-                IParticleRecord pb = pointData.get(i);
+            for (IParticleRecord pb : pointData) {
                 geomCentre.add(pb.x(), pb.y(), pb.z());
             }
             geomCentre.scl(1d / (double) n);
@@ -724,10 +725,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * FOCUS
-     */
-
-    /**
      * Default size if not in data, 1e5 km
      *
      * @return The size
@@ -740,7 +737,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Returns the id
      */
     public long getId() {
-        return 123l;
+        return 123L;
     }
 
     @Override
@@ -778,7 +775,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Adds all the children that are focusable objects to the list.
      *
-     * @param list
+     * @param list The list of focusable objects to add.
      */
     public void addFocusableObjects(Array<IFocus> list) {
         list.add(this);
@@ -890,6 +887,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Returns the size of the particle at index i
      *
      * @param i The index
+     *
      * @return The size
      */
     public double getSize(int i) {
@@ -1058,7 +1056,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 final Vector3b currentCameraPos = (Vector3b) data[0];
                 long t = TimeUtils.millis() - lastSortTime;
                 if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
-                    updating = DatasetUpdater.execute(updaterTask);
+                    updating = GaiaSky.instance.getDatasetUpdater().execute(updaterTask);
                 }
             }
             break;
@@ -1161,6 +1159,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      *                    reference system instead of the camera reference system.
      * @param destination The destination factor
      * @param deltaYears  The delta years
+     *
      * @return The vector for chaining
      */
     protected Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
@@ -1207,7 +1206,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void dispose() {
         this.disposed = true;
-        GaiaSky.instance.sg.remove(this, true);
+        GaiaSky.instance.sceneGraph.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Dispose of GPU data
@@ -1293,6 +1292,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Evaluates the filter of this dataset (if any) for the given particle index
      *
      * @param index The index to filter
+     *
      * @return The result of the filter evaluation, true if the particle passed the filtering, false otherwise
      */
     public boolean filter(int index) {
@@ -1303,23 +1303,24 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     /**
-     * Creates a default particle group with some parameters, given the name and data
+     * Creates a default particle group with some parameters, given the name and data.
      *
-     * @param name The name of the particle group. Any occurrence of '%%PGID%%' will be replaced with the id of the particle group
-     * @param data The data of the particle group
-     * @param dops The dataset options
-     * @return A new particle group with the given parameters
+     * @param name           The name of the particle group. Any occurrence of '%%PGID%%' will be replaced with the id of the particle group.
+     * @param data           The data of the particle group.
+     * @param datasetOptions The dataset options.
+     *
+     * @return A new particle group with the given parameters.
      */
-    public static ParticleGroup getParticleGroup(String name, List<IParticleRecord> data, DatasetOptions dops) {
-        double[] fadeIn = dops == null || dops.fadeIn == null ? null : dops.fadeIn;
-        double[] fadeOut = dops == null || dops.fadeOut == null ? null : dops.fadeOut;
-        double[] particleColor = dops == null || dops.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.particleColor;
-        double colorNoise = dops == null ? 0 : dops.particleColorNoise;
-        double[] labelColor = dops == null || dops.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : dops.labelColor;
-        double particleSize = dops == null ? 0 : dops.particleSize;
-        double[] minParticleSize = dops == null ? new double[] { 2d, 200d } : dops.particleSizeLimits;
-        double profileDecay = dops == null ? 1 : dops.profileDecay;
-        String ct = dops == null || dops.ct == null ? ComponentType.Galaxies.toString() : dops.ct.toString();
+    public static ParticleGroup getParticleGroup(String name, List<IParticleRecord> data, DatasetOptions datasetOptions) {
+        double[] fadeIn = datasetOptions == null || datasetOptions.fadeIn == null ? null : datasetOptions.fadeIn;
+        double[] fadeOut = datasetOptions == null || datasetOptions.fadeOut == null ? null : datasetOptions.fadeOut;
+        double[] particleColor = datasetOptions == null || datasetOptions.particleColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.particleColor;
+        double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
+        double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
+        double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
+        double[] minParticleSize = datasetOptions == null ? new double[] { 2d, 200d } : datasetOptions.particleSizeLimits;
+        double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
+        String ct = datasetOptions == null || datasetOptions.ct == null ? ComponentType.Galaxies.toString() : datasetOptions.ct.toString();
 
         ParticleGroup pg = new ParticleGroup();
         pg.setName(name.replace("%%PGID%%", Long.toString(pg.id)));
@@ -1343,8 +1344,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Updates the metadata information, to use for sorting. For particles, only the position (distance
      * from camera) is important.
      *
-     * @param time   The time frame provider
-     * @param camera The camera
+     * @param time   The time frame provider.
+     * @param camera The camera.
      */
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
         Vector3b camPos = camera.getPos();
@@ -1373,7 +1374,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     protected void swapBuffers() {
-        if (active == indices1) { //-V6013
+        if (active == indices1) {
             active = indices2;
             background = indices1;
         } else {

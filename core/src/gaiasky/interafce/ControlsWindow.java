@@ -22,6 +22,7 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ISceneGraph;
+import gaiasky.util.CatalogManager;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.MusicManager;
@@ -52,13 +53,15 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     protected VerticalGroup mainVertical;
     protected OwnScrollPane windowScroll;
     protected Table guiLayout;
-    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playstop = null;
+    protected OwnImageButton recCamera = null, recKeyframeCamera = null, playCamera = null, playStop = null;
     protected OwnTextIconButton map = null;
     protected TiledDrawable separator;
     /**
      * The scene graph
      */
     private ISceneGraph sg;
+
+    private final CatalogManager catalogManager;
 
     /**
      * Entities that will go in the visibility check boxes
@@ -71,24 +74,24 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
      **/
     private Map<String, CollapsiblePane> panes;
 
-    public ControlsWindow(String title, Skin skin, Stage ui) {
+    public ControlsWindow(final String title, final Skin skin, final Stage ui, final CatalogManager catalogManager) {
         super(title, skin);
         this.setName(title);
         this.skin = skin;
         this.ui = ui;
+        this.catalogManager = catalogManager;
 
-        /** Global resources **/
-        TextureRegion septexreg = ((TextureRegionDrawable) skin.newDrawable("separator")).getRegion();
-        septexreg.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
-        this.separator = new TiledDrawable(septexreg);
+        // Global resources
+        TextureRegion separatorTextureRegion = ((TextureRegionDrawable) skin.newDrawable("separator")).getRegion();
+        separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
+        this.separator = new TiledDrawable(separatorTextureRegion);
 
         EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.RECORD_CAMERA_CMD);
     }
 
     public void initialize() {
-        int maxTitleChars = 24;
 
-        /** Global layout **/
+        /* Global layout */
         guiLayout = new Table();
         guiLayout.pad(0);
         guiLayout.align(Align.left);
@@ -96,31 +99,31 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         List<Actor> mainActors = new ArrayList<>();
         panes = new HashMap<>();
 
-        /** ----TIME GROUP---- **/
-        playstop = new OwnImageButton(skin, "playstop");
-        playstop.setName("play stop");
-        playstop.setChecked(GlobalConf.runtime.TIME_ON);
-        playstop.addListener(event -> {
+        /* ----TIME GROUP---- */
+        playStop = new OwnImageButton(skin, "playstop");
+        playStop.setName("play stop");
+        playStop.setChecked(GlobalConf.runtime.TIME_ON);
+        playStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TIME_STATE_CMD, playstop.isChecked(), true);
+                EventManager.instance.post(Events.TIME_STATE_CMD, playStop.isChecked(), true);
                 return true;
             }
             return false;
         });
         String timeHotkey = KeyBindings.instance.getStringKeys("action.pauseresume");
-        playstop.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.playstop"), timeHotkey, skin));
+        playStop.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.playstop"), timeHotkey, skin));
 
         TimeComponent timeComponent = new TimeComponent(skin, ui);
         timeComponent.initialize();
 
         String shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.time");
 
-        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut, playstop);
+        CollapsiblePane time = new CollapsiblePane(ui, I18n.txt("gui.time"), timeComponent.getActor(), getContentWidth(), skin, true, shortcut, playStop);
         time.align(Align.left);
         mainActors.add(time);
         panes.put(timeComponent.getClass().getSimpleName(), time);
 
-        /** ----CAMERA---- **/
+        /* ----CAMERA---- */
         // Record camera button
         recCamera = new OwnImageButton(skin, "rec");
         recCamera.setName("recCam");
@@ -171,7 +174,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(camera);
         panes.put(cameraComponent.getClass().getSimpleName(), camera);
 
-        /** ----OBJECT TOGGLES GROUP---- **/
+        /* ----OBJECT TOGGLES GROUP---- */
         VisibilityComponent visibilityComponent = new VisibilityComponent(skin, ui);
         visibilityComponent.setVisibilityEntitites(visibilityEntities, visible);
         visibilityComponent.initialize();
@@ -183,7 +186,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(visibility);
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
 
-        /** ----LIGHTING GROUP---- **/
+        /* ----LIGHTING GROUP---- */
         VisualEffectsComponent visualEffectsComponent = new VisualEffectsComponent(skin, ui);
         visualEffectsComponent.initialize();
 
@@ -194,8 +197,8 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(visualEffects);
         panes.put(visualEffectsComponent.getClass().getSimpleName(), visualEffects);
 
-        /** ----DATASETS---- **/
-        DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui);
+        /* ----DATASETS---- */
+        DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui, catalogManager);
         datasetsComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.dataset.title");
@@ -205,7 +208,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(datasets);
         panes.put(datasetsComponent.getClass().getSimpleName(), datasets);
 
-        /** ----LOCATION LOG---- **/
+        /* ----LOCATION LOG---- */
         LocationLogComponent locationLogComponent = new LocationLogComponent(skin, ui);
         locationLogComponent.initialize();
 
@@ -214,7 +217,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(locationLog);
         panes.put(locationLogComponent.getClass().getSimpleName(), locationLog);
 
-        /** ----BOOKMARKS---- **/
+        /* ----BOOKMARKS---- */
         BookmarksComponent bookmarksComponent = new BookmarksComponent(skin, ui);
         bookmarksComponent.setSceneGraph(sg);
         bookmarksComponent.initialize();
@@ -226,7 +229,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainActors.add(bookmarks);
         panes.put(bookmarksComponent.getClass().getSimpleName(), bookmarks);
 
-        /** ----GAIA SCAN GROUP---- **/
+        /* ----GAIA SCAN GROUP---- */
         //	GaiaComponent gaiaComponent = new GaiaComponent(skin, ui);
         //	gaiaComponent.initialize();
         //
@@ -235,7 +238,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         //	mainActors.add(gaia);
         //	panes.put(gaiaComponent.getClass().getSimpleName(), gaia);
 
-        /** ----MUSIC GROUP---- **/
+        /* ----MUSIC GROUP---- */
         if(MusicManager.initialized()) {
             MusicComponent musicComponent = new MusicComponent(skin, ui);
             musicComponent.initialize();
@@ -251,7 +254,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         }
 
         Table buttonsTable;
-        /** BUTTONS **/
+        /* BUTTONS */
         float bw = 48f, bh = 48f;
         KeyBindings kb = KeyBindings.instance;
         Image icon = new Image(skin.getDrawable("map-icon"));
@@ -330,7 +333,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
 
         buttonsTable.pack();
 
-        /** ADD GROUPS TO VERTICAL LAYOUT **/
+        /* ADD GROUPS TO VERTICAL LAYOUT */
 
         int padBottom = Math.round(16f);
         int padSides = Math.round(8f);
@@ -367,7 +370,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         mainVertical.addActor(buttonsTable);
         mainVertical.pack();
 
-        /** ADD TO MAIN WINDOW **/
+        /* ADD TO MAIN WINDOW */
         add(mainVertical).top().left().expand();
         setPosition(0, Math.round(Gdx.graphics.getHeight() - getHeight()));
 
@@ -416,7 +419,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             // Pause has been toggled, update playstop button only if this does
             // not come from this interface
             if (!(Boolean) data[1]) {
-                playstop.setCheckedNoFire((Boolean) data[0]);
+                playStop.setCheckedNoFire((Boolean) data[0]);
             }
             break;
         case GUI_SCROLL_POSITION_CMD:

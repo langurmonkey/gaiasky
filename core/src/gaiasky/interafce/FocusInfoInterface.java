@@ -6,11 +6,9 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.SnapshotArray;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.ExternalInformationUpdater;
 import gaiasky.event.EventManager;
@@ -354,18 +352,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         return hg;
     }
 
-    private void scaleFonts(SnapshotArray<Actor> a, float scl) {
-        for (Actor actor : a) {
-            if (actor instanceof Group) {
-                Group g = (Group) actor;
-                scaleFonts(g.getChildren(), scl);
-            } else if (actor instanceof Label) {
-                Label l = (Label) actor;
-                l.setScale(scl);
-            }
-        }
-    }
-
     private void unsubscribe() {
         EventManager.instance.removeAllSubscriptions(this);
     }
@@ -376,7 +362,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         case FOCUS_CHANGED:
             IFocus focus;
             if (data[0] instanceof String) {
-                focus = (IFocus) GaiaSky.instance.sg.getNode((String) data[0]);
+                focus = (IFocus) GaiaSky.instance.sceneGraph.getNode((String) data[0]);
             } else {
                 focus = (IFocus) data[0];
             }
@@ -426,7 +412,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
             // Bookmark
             bookmark.setProgrammaticChangeEvents(false);
-            bookmark.setChecked(BookmarksManager.instance().containsName(currentFocus.getName()));
+            bookmark.setChecked(GaiaSky.instance.getBookmarksManager().containsName(currentFocus.getName()));
             bookmark.setProgrammaticChangeEvents(true);
 
             // Visible
@@ -629,12 +615,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             break;
         case RULER_ATTACH_0:
             String n0 = (String) data[0];
-            rulerName0.setText(capString(n0, MAX_RULER_NAME_LEN));
+            rulerName0.setText(TextUtils.capString(n0, MAX_RULER_NAME_LEN));
             displayInfo(rulerCell, rulerInfo);
             break;
         case RULER_ATTACH_1:
             String n1 = (String) data[0];
-            rulerName1.setText(capString(n1, MAX_RULER_NAME_LEN));
+            rulerName1.setText(TextUtils.capString(n1, MAX_RULER_NAME_LEN));
             displayInfo(rulerCell, rulerInfo);
             break;
         case RULER_CLEAR:
@@ -662,13 +648,6 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             break;
         }
 
-    }
-
-    private String capString(String in, int maxLen) {
-        if (in.length() > maxLen) {
-            return in.substring(0, maxLen) + "...";
-        }
-        return in;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

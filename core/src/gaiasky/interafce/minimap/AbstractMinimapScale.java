@@ -55,7 +55,7 @@ public abstract class AbstractMinimapScale implements IMinimapScale {
     }
 
     protected void initialize(OrthographicCamera ortho, SpriteBatch sb, ShapeRenderer sr, BitmapFont font, int side, int sideshort, double to, double from, double extentUp, double extentDown) {
-        this.cam = GaiaSky.instance.cam;
+        this.cam = GaiaSky.instance.cameraManager;
         this.ortho = ortho;
         this.sb = sb;
         this.sr = sr;

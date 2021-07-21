@@ -111,7 +111,7 @@ public class FadeNode extends SceneGraphNode {
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (positionObjectName != null) {
-            this.position = GaiaSky.instance.sg.getNode(positionObjectName);
+            this.position = GaiaSky.instance.sceneGraph.getNode(positionObjectName);
         }
     }
 

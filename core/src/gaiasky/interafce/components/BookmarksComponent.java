@@ -22,8 +22,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.interafce.BookmarksManager;
-import gaiasky.interafce.BookmarksManager.BNode;
+import gaiasky.interafce.BookmarksManager.BookmarkNode;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.NewBookmarkFolderDialog;
 import gaiasky.scenegraph.IFocus;
@@ -174,7 +173,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                             GaiaSky.postRunnable(() -> {
                                 ContextMenu cm = new ContextMenu(skin, "default");
                                 // New folder...
-                                BNode parent = target.node.getFirstFolderAncestor();
+                                BookmarkNode parent = target.node.getFirstFolderAncestor();
                                 String parentName = "/" + (parent == null ? "" : parent.path.toString());
                                 MenuItem newFolder = new MenuItem(I18n.txt("gui.bookmark.context.newfolder", parentName), skin);
                                 newFolder.addListener(evt -> {
@@ -215,8 +214,8 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                     return false;
                                 });
                                 cm.addItem(move);
-                                List<BNode> folders = BookmarksManager.instance.getFolders();
-                                for (BNode folder : folders) {
+                                List<BookmarkNode> folders = GaiaSky.instance.getBookmarksManager().getFolders();
+                                for (BookmarkNode folder : folders) {
                                     if (!target.node.isDescendantOf(folder)) {
                                         MenuItem mv = new MenuItem(I18n.txt("gui.bookmark.context.move", target.getValue(), "/" + folder.path.toString()), skin);
                                         mv.addListener(evt -> {
@@ -296,10 +295,10 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         contextMenus.add(cm);
     }
 
-    private class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
-        public BNode node;
+    private static class TreeNode extends Tree.Node<TreeNode, String, OwnLabel> {
+        public BookmarkNode node;
 
-        public TreeNode(BNode node, Skin skin) {
+        public TreeNode(BookmarkNode node, Skin skin) {
             super(new OwnLabel(node.name, skin));
             this.node = node;
             setValue(node.name);
@@ -307,9 +306,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
     }
 
     public void reloadBookmarksTree() {
-        java.util.List<BNode> bms = BookmarksManager.getBookmarks();
+        java.util.List<BookmarkNode> bookmarks = GaiaSky.instance.getBookmarksManager().getBookmarks();
         bookmarksTree.clearChildren();
-        for (BNode bookmark : bms) {
+        for (BookmarkNode bookmark : bookmarks) {
             TreeNode node = new TreeNode(bookmark, skin);
             if (bookmark.folder)
                 node.setIcon(folderIcon);
@@ -321,9 +320,9 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
         bookmarksTree.pack();
     }
 
-    private void genSubtree(TreeNode parent, BNode bookmark) {
+    private void genSubtree(TreeNode parent, BookmarkNode bookmark) {
         if (bookmark.children != null && !bookmark.children.isEmpty()) {
-            for (BNode child : bookmark.children) {
+            for (BookmarkNode child : bookmark.children) {
                 TreeNode tn = new TreeNode(child, skin);
                 if (child.folder)
                     tn.setIcon(folderIcon);

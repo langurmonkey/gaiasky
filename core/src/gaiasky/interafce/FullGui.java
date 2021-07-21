@@ -78,14 +78,14 @@ public class FullGui extends AbstractGui {
     private ComponentType[] visibilityEntities;
     private boolean[] visible;
 
-    private GlobalResources globalResources;
+    private final GlobalResources globalResources;
+    private final CatalogManager catalogManager;
 
-    private List<Actor> invisibleInStereoMode;
-
-    public FullGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources) {
+    public FullGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources, final CatalogManager catalogManager) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.globalResources = globalResources;
+        this.catalogManager = catalogManager;
     }
 
     @Override
@@ -183,17 +183,6 @@ public class FullGui extends AbstractGui {
 
         /* ADD TO UI */
         rebuildGui();
-
-        // INVISIBLE IN STEREOSCOPIC MODE
-        invisibleInStereoMode = new ArrayList<>();
-        invisibleInStereoMode.add(controlsWindow);
-        invisibleInStereoMode.add(fi);
-        invisibleInStereoMode.add(ti);
-        invisibleInStereoMode.add(messagesInterface);
-        invisibleInStereoMode.add(runStateInterface);
-        // invisibleInStereoMode.add(customInterface);
-        invisibleInStereoMode.add(pointerXCoord);
-        invisibleInStereoMode.add(pointerYCoord);
 
         /* VERSION CHECK */
         if (GlobalConf.program.VERSION_LAST_TIME == null || Instant.now().toEpochMilli() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
@@ -500,7 +489,7 @@ public class FullGui extends AbstractGui {
             int screenX = Gdx.input.getX();
             int screenY = Gdx.input.getY();
 
-            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate);
+            GaiaSkyContextMenu popup = new GaiaSkyContextMenu(skin, "default", screenX, screenY, candidate, catalogManager);
 
             int h = (int) getGuiStage().getHeight();
 
@@ -554,7 +543,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(GlobalConf.getSuperShortApplicationName(), skin, ui);
+        controlsWindow = new ControlsWindow(GlobalConf.getSuperShortApplicationName(), skin, ui, catalogManager);
         controlsWindow.setSceneGraph(sg);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();

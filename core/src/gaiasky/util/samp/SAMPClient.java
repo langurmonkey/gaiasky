@@ -35,24 +35,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
+/**
+ * Implements the SAMP client, which attempts the connection to a hub and handles
+ * SAMP messages over that connection.
+ */
 public class SAMPClient implements IObserver {
     private static final Log logger = Logger.getLogger(SAMPClient.class);
-
-    private static SAMPClient instance;
-
-    public static SAMPClient getInstance() {
-        if (instance == null)
-            instance = new SAMPClient();
-        return instance;
-    }
 
     private HubConnector conn;
     private TwoWayHashmap<String, FadeNode> idToNode;
     private Map<String, String> idToUrl;
     private boolean preventProgrammaticEvents = false;
+    private final CatalogManager catalogManager;
 
-    public SAMPClient() {
+    public SAMPClient(final CatalogManager catalogManager) {
         super();
+        this.catalogManager = catalogManager;
         EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CATALOG_REMOVE, Events.DISPOSE);
     }
 
@@ -83,7 +81,7 @@ public class SAMPClient implements IObserver {
 
         // Load table
         conn.addMessageHandler(new AbstractMessageHandler("table.load.votable") {
-            public Map processCall(HubConnection c, String senderId, Message msg) {
+            public Map<Object, Object> processCall(HubConnection c, String senderId, Message msg) {
                 // do stuff
                 String name = (String) msg.getParam("name");
                 String id = (String) msg.getParam("table-id");
@@ -101,7 +99,7 @@ public class SAMPClient implements IObserver {
 
         // Select one row
         conn.addMessageHandler(new AbstractMessageHandler("table.highlight.row") {
-            public Map processCall(HubConnection c, String senderId, Message msg) {
+            public Map<Object, Object> processCall(HubConnection c, String senderId, Message msg) {
                 // do stuff
                 long row = Parser.parseLong((String) msg.getParam("row"));
                 String id = (String) msg.getParam("table-id");
@@ -143,7 +141,7 @@ public class SAMPClient implements IObserver {
 
         // Select multiple rows
         conn.addMessageHandler(new AbstractMessageHandler("table.select.rowList") {
-            public Map processCall(HubConnection c, String senderId, Message msg) {
+            public Map<Object, Object> processCall(HubConnection c, String senderId, Message msg) {
                 // do stuff
                 ArrayList<String> rows = (ArrayList<String>) msg.getParam("row-list");
                 String id = (String) msg.getParam("table-id");
@@ -175,7 +173,7 @@ public class SAMPClient implements IObserver {
 
         // Point in sky
         conn.addMessageHandler(new AbstractMessageHandler("coord.pointAt.sky") {
-            public Map processCall(HubConnection c, String senderId, Message msg) {
+            public Map<Object, Object> processCall(HubConnection c, String senderId, Message msg) {
                 // do stuff
                 double ra = Parser.parseDouble((String) msg.getParam("ra"));
                 double dec = Parser.parseDouble((String) msg.getParam("dec"));
@@ -218,39 +216,42 @@ public class SAMPClient implements IObserver {
      * @param url  The URL to fetch the table
      * @param id   The table id
      * @param name The table name
+     *
      * @return Boolean indicating whether loading succeeded or not
      */
     private boolean loadVOTable(final String url, final String id, final String name, final Skin skin) {
         logger.info("Loading VOTable: " + name + " from " + url);
         // Load selected file
         try {
-            DataSource ds = new URLDataSource(new URL(url));
+            DataSource dataSource = new URLDataSource(new URL(url));
             Stage ui = GaiaSky.instance.mainGui.getGuiStage();
-            String fileName = ds.getName();
+            String fileName = dataSource.getName();
             final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
             Runnable doLoad = () -> {
                 try {
-                    DatasetOptions dops = dld.generateDatasetOptions();
+                    DatasetOptions datasetOptions = dld.generateDatasetOptions();
                     // Load dataset
-                    EventScriptingInterface.instance().loadDataset(id, ds, CatalogInfo.CatalogInfoType.SAMP, dops, true);
-                    // Select first
-                    CatalogInfo ci = CatalogManager.instance().get(id);
-                    if (ci.object != null) {
-                        if (ci.object instanceof ParticleGroup) {
-                            ParticleGroup pg = (ParticleGroup) ci.object;
-                            if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
+                    boolean loaded = ((EventScriptingInterface) GaiaSky.instance.scripting()).loadDataset(id, dataSource, CatalogInfo.CatalogInfoType.SAMP, datasetOptions, true);
+                    if (loaded) {
+                        // Select first
+                        CatalogInfo ci = catalogManager.get(id);
+                        if (ci.object != null) {
+                            if (ci.object instanceof ParticleGroup) {
+                                ParticleGroup pg = (ParticleGroup) ci.object;
+                                if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
+                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
+                                }
+                            } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
                                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
+                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
                             }
-                        } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
-                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
+                            // Open UI datasets
+                            GaiaSky.instance.scripting().maximizeInterfaceWindow();
+                            GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
+                            idToNode.add(id, ci.object);
+                            idToUrl.put(id, url);
                         }
-                        // Open UI datasets
-                        EventScriptingInterface.instance().maximizeInterfaceWindow();
-                        EventScriptingInterface.instance().expandGuiComponent("DatasetsComponent");
-                        idToNode.add(id, ci.object);
-                        idToUrl.put(id, url);
                     }
                 } catch (Exception e) {
                     logger.error(I18n.txt("notif.error", fileName), e);
@@ -272,15 +273,36 @@ public class SAMPClient implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case FOCUS_CHANGED:
-                if (!preventProgrammaticEvents) {
-                    if (conn != null && conn.isConnected()) {
-                        if (data[0] instanceof ParticleGroup) {
-                            ParticleGroup pg = (ParticleGroup) data[0];
-                            if (idToNode.containsValue(pg)) {
-                                String id = idToNode.getBackward(pg);
+        case FOCUS_CHANGED:
+            if (!preventProgrammaticEvents) {
+                if (conn != null && conn.isConnected()) {
+                    if (data[0] instanceof ParticleGroup) {
+                        ParticleGroup pg = (ParticleGroup) data[0];
+                        if (idToNode.containsValue(pg)) {
+                            String id = idToNode.getBackward(pg);
+                            String url = idToUrl.get(id);
+                            int row = pg.getCandidateIndex();
+
+                            Message msg = new Message("table.highlight.row");
+                            msg.addParam("row", Integer.toString(row));
+                            msg.addParam("table-id", id);
+                            msg.addParam("url", url);
+
+                            try {
+                                conn.getConnection().notifyAll(msg);
+                            } catch (SampException e) {
+                                logger.error(e);
+                            }
+                        }
+                    } else if (data[0] instanceof StarCluster) {
+                        StarCluster sc = (StarCluster) data[0];
+                        if (sc.parent instanceof FadeNode) {
+                            // Comes from a catalog
+                            FadeNode parent = (FadeNode) sc.parent;
+                            if (idToNode.containsValue(parent)) {
+                                String id = idToNode.getBackward(parent);
                                 String url = idToUrl.get(id);
-                                int row = pg.getCandidateIndex();
+                                int row = parent.children.indexOf(sc, true);
 
                                 Message msg = new Message("table.highlight.row");
                                 msg.addParam("row", Integer.toString(row));
@@ -293,45 +315,24 @@ public class SAMPClient implements IObserver {
                                     logger.error(e);
                                 }
                             }
-                        } else if (data[0] instanceof StarCluster) {
-                            StarCluster sc = (StarCluster) data[0];
-                            if (sc.parent != null && sc.parent instanceof FadeNode) {
-                                // Comes from a catalog
-                                FadeNode parent = (FadeNode) sc.parent;
-                                if (idToNode.containsValue(parent)) {
-                                    String id = idToNode.getBackward(parent);
-                                    String url = idToUrl.get(id);
-                                    int row = parent.children.indexOf(sc, true);
 
-                                    Message msg = new Message("table.highlight.row");
-                                    msg.addParam("row", Integer.toString(row));
-                                    msg.addParam("table-id", id);
-                                    msg.addParam("url", url);
-
-                                    try {
-                                        conn.getConnection().notifyAll(msg);
-                                    } catch (SampException e) {
-                                        logger.error(e);
-                                    }
-                                }
-
-                            }
                         }
                     }
                 }
-                break;
-            case CATALOG_REMOVE:
-                String dsName = (String) data[0];
-                if (idToNode.containsKey(dsName)) {
-                    idToNode.removeKey(dsName);
-                }
-                idToUrl.remove(dsName);
-                break;
-            case DISPOSE:
-                if (conn != null) {
-                    conn.setActive(false);
-                }
-                break;
+            }
+            break;
+        case CATALOG_REMOVE:
+            String dsName = (String) data[0];
+            if (idToNode.containsKey(dsName)) {
+                idToNode.removeKey(dsName);
+            }
+            idToUrl.remove(dsName);
+            break;
+        case DISPOSE:
+            if (conn != null) {
+                conn.setActive(false);
+            }
+            break;
         }
 
     }

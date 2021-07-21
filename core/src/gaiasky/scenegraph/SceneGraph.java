@@ -369,7 +369,7 @@ public  class SceneGraph implements ISceneGraph {
     public double[] getObjectPosition(String name, double[] out) {
         if (out.length >= 3 && name != null) {
             name = name.toLowerCase().trim();
-            ISceneGraph sg = GaiaSky.instance.sg;
+            ISceneGraph sg = GaiaSky.instance.sceneGraph;
             if (sg.containsNode(name)) {
                 SceneGraphNode object = sg.getNode(name);
                 if (object instanceof IFocus) {

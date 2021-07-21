@@ -100,7 +100,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
 
         // Textures
-        AssetManager manager = GaiaSky.instance.manager;
+        AssetManager manager = GaiaSky.instance.assetManager;
         manager.load(GlobalConf.data.dataFile("tex/base/star.jpg"), Texture.class);
         manager.load(GlobalConf.data.dataFile("tex/base/lut.jpg"), Texture.class);
 
@@ -736,7 +736,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void dispose() {
         this.disposed = true;
-        GaiaSky.instance.sg.remove(this, true);
+        GaiaSky.instance.sceneGraph.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Dispose of GPU datOLO
@@ -813,7 +813,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         sg.setCt("Stars");
         sg.setData(data);
         if (fullInit) {
-            sg.doneLoading(GaiaSky.instance.manager);
+            sg.doneLoading(GaiaSky.instance.assetManager);
         }
         return sg;
     }

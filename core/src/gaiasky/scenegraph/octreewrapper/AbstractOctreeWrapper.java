@@ -242,7 +242,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     @Override
     public void dispose() {
-        GaiaSky.instance.sg.remove(this, true);
+        GaiaSky.instance.sceneGraph.remove(this, true);
         root.dispose();
         parenthood.clear();
         roulette.clear();

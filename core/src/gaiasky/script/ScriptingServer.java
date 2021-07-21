@@ -43,7 +43,7 @@ public class ScriptingServer {
             }
             if (gatewayServer == null) {
                 try {
-                    gatewayServer = new ClientServer(EventScriptingInterface.instance());
+                    gatewayServer = new ClientServer(GaiaSky.instance.scripting());
                     listener = new DefaultGatewayServerListener() {
 
                         @Override

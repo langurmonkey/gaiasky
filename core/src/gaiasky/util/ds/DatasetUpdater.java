@@ -15,6 +15,7 @@ import java.util.concurrent.*;
  * Contains the infrastructure to run tasks that sort and update the dataset metadata.
  */
 public class DatasetUpdater {
+    private static final Logger.Log logger = Logger.getLogger(DatasetUpdater.class);
 
     private static class DaemonThreadFactory implements ThreadFactory {
         private int sequence = 0;
@@ -32,17 +33,22 @@ public class DatasetUpdater {
     /**
      * Thread pool executor
      */
-    private static ThreadPoolExecutor pool;
-    private static BlockingQueue<Runnable> workQueue;
+    private ThreadPoolExecutor pool;
+    private BlockingQueue<Runnable> workQueue;
 
-    public static void initialize() {
+    public DatasetUpdater() {
+        super();
+        initialize();
+    }
+
+    public void initialize() {
         workQueue = new LinkedBlockingQueue<>();
         int nThreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
         pool = new ThreadPoolExecutor(nThreads, nThreads, 5, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());
     }
 
-    public static boolean execute(Runnable r) {
+    public boolean execute(Runnable r) {
         if (pool != null && !pool.isShutdown() && !inQueue(r)) {
             pool.execute(r);
             return true;
@@ -50,25 +56,23 @@ public class DatasetUpdater {
         return false;
     }
 
-    public static ThreadPoolExecutor pool() {
+    public ThreadPoolExecutor pool() {
         return pool;
     }
 
-    public static BlockingQueue<Runnable> workQueue() {
-        return workQueue;
-    }
-
-    public static boolean inQueue(Runnable task) {
+    public boolean inQueue(Runnable task) {
         return workQueue != null && workQueue.contains(task);
     }
 
-    public static void shutDownThreadPool() {
+    public void shutDownThreadPool() {
         // Shut down pool
         if (pool != null && !pool.isShutdown()) {
             pool.shutdown();
             try {
                 // Wait for task to end before proceeding
-                pool.awaitTermination(500, TimeUnit.MILLISECONDS);
+                if (!pool.awaitTermination(500, TimeUnit.MILLISECONDS)) {
+                    logger.debug("Timeout elapsed while waiting for the pool to shut down");
+                }
             } catch (Exception e) {
                 Logger.getLogger(StarGroup.class.getSimpleName()).error(e);
             }

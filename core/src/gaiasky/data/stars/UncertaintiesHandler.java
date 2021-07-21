@@ -56,7 +56,7 @@ public class UncertaintiesHandler implements IObserver {
 
                     if (PRELOAD) {
                         ParticleGroup pg = load(id);
-                        GaiaSky.instance.sg.getRoot().addChild(pg, true);
+                        GaiaSky.instance.sceneGraph.getRoot().addChild(pg, true);
                         particleGroups.add(pg);
                     }
                 }
@@ -90,7 +90,7 @@ public class UncertaintiesHandler implements IObserver {
                     public void run() {
                         ParticleGroup pg = load(s.getCandidateId());
 
-                        GaiaSky.instance.sg.getRoot().addChild(pg, true);
+                        GaiaSky.instance.sceneGraph.getRoot().addChild(pg, true);
                         particleGroups.add(pg);
                     }
 
@@ -103,7 +103,7 @@ public class UncertaintiesHandler implements IObserver {
                 @Override
                 public void run() {
                     for (ParticleGroup pg : particleGroups) {
-                        GaiaSky.instance.sg.getRoot().removeChild(pg, true);
+                        GaiaSky.instance.sceneGraph.getRoot().removeChild(pg, true);
                     }
                     particleGroups.clear();
                 }

@@ -385,8 +385,8 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                             object.octant = null;
                             octreeWrapper.removeParenthood(object);
                             // Aux info
-                            if (GaiaSky.instance != null && GaiaSky.instance.sg != null)
-                                GaiaSky.instance.sg.removeNodeAuxiliaryInfo(object);
+                            if (GaiaSky.instance != null && GaiaSky.instance.sceneGraph != null)
+                                GaiaSky.instance.sceneGraph.removeNodeAuxiliaryInfo(object);
 
                             nLoadedStars -= count;
                             unloaded += count;
@@ -472,7 +472,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         }
 
                     // Update constellations :S
-                    GaiaSky.postRunnable(() -> Constellation.updateConstellations(GaiaSky.instance.sg));
+                    GaiaSky.postRunnable(() -> Constellation.updateConstellations(GaiaSky.instance.sceneGraph));
 
                 }
                 this.abort.set(false);

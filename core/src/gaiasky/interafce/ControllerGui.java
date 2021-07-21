@@ -664,7 +664,7 @@ public class ControllerGui extends AbstractGui {
         updateFocused(true);
 
         if (sg == null)
-            sg = GaiaSky.instance.sg;
+            sg = GaiaSky.instance.sceneGraph;
     }
 
     private void addTextKey(String text, Actor[][] m, int i, int j, boolean nl) {
@@ -978,7 +978,7 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void back() {
-        EventManager.instance.post(Events.SHOW_CONTROLLER_GUI_ACTION, GaiaSky.instance.cam.naturalCamera);
+        EventManager.instance.post(Events.SHOW_CONTROLLER_GUI_ACTION, GaiaSky.instance.cameraManager.naturalCamera);
         updateFocused();
         ui.setKeyboardFocus(null);
     }

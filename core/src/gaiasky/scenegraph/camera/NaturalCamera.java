@@ -530,7 +530,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
 
                 // Apparent magnitude from Earth (planets, etc)
-                ISceneGraph sg = GaiaSky.instance.sg;
+                ISceneGraph sg = GaiaSky.instance.sceneGraph;
                 SceneGraphNode earth = sg.getNode("Earth");
                 double appMagEarth;
                 if (focus instanceof CelestialBody && earth != null) {
@@ -590,9 +590,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             break;
         case GAIA_SCENE_MODE:
             if (entity1 == null || entity2 == null) {
-                entity1 = (CelestialBody) GaiaSky.instance.sg.getNode("Gaia");
-                entity2 = (CelestialBody) GaiaSky.instance.sg.getNode("Earth");
-                entity3 = (CelestialBody) GaiaSky.instance.sg.getNode("Mars");
+                entity1 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Gaia");
+                entity2 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Earth");
+                entity3 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Mars");
             }
             SceneGraphNode fccopy = entity1.getLineCopy();
             fccopy.getRoot().translation.set(0, 0, 0);
@@ -1407,7 +1407,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             }
             if (data[0] instanceof String) {
-                SceneGraphNode sgn = GaiaSky.instance.sg.getNode((String) data[0]);
+                SceneGraphNode sgn = GaiaSky.instance.sceneGraph.getNode((String) data[0]);
                 if (sgn instanceof IFocus) {
                     focus = (IFocus) sgn;
                     diverted = !centerFocus;
@@ -1437,14 +1437,14 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             boolean state = (boolean) data[0];
             CubemapProjection p = (CubemapProjection) data[1];
             if (p.isPlanetarium() && state && !GlobalConf.runtime.OPENVR) {
-                fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
+                fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
             }
             break;
         case PLANETARIUM_CMD:
             state = (boolean) data[0];
             EventManager.instance.post(Events.FISHEYE_CMD, state);
             if (state) {
-                fovBackup = GaiaSky.instance.cam.getCamera().fieldOfView;
+                fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, 140f, false);
             } else {
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBackup);
@@ -1776,8 +1776,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         if (draw) {
             // Mark home in ORANGE
             if (GlobalConf.scene.CROSSHAIR_HOME) {
-                if (home == null && GaiaSky.instance.sg != null)
-                    home = GaiaSky.instance.sg.findFocus(GlobalConf.scene.STARTUP_OBJECT);
+                if (home == null && GaiaSky.instance.sceneGraph != null)
+                    home = GaiaSky.instance.sceneGraph.findFocus(GlobalConf.scene.STARTUP_OBJECT);
                 if (home != null) {
                     drawCrosshair(home, false, crosshairHome, crosshairArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
                 }

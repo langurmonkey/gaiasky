@@ -14,25 +14,13 @@ import java.util.*;
 public class CatalogManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(CatalogManager.class);
 
-    private static CatalogManager instance;
-
-    public static void initialize() {
-        instance();
-    }
-
-    public static CatalogManager instance() {
-        if (instance == null)
-            instance = new CatalogManager();
-        return instance;
-    }
-
     private final Map<String, CatalogInfo> ciMap;
     private final List<CatalogInfo> cis;
 
-    CatalogManager() {
+    public CatalogManager() {
         super();
         ciMap = new HashMap<>();
-        cis = new ArrayList(5);
+        cis = new ArrayList<>(5);
         EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
     }
 

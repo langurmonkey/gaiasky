@@ -48,10 +48,10 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
     @Override
     public void updateLocal() {
         if (sat == null) {
-            sat = (Planet) GaiaSky.instance.sg.getNode("Saturn");
-            ura = (Planet) GaiaSky.instance.sg.getNode("Uranus");
-            nep = (Planet) GaiaSky.instance.sg.getNode("Neptune");
-            jup = (Planet) GaiaSky.instance.sg.getNode("Jupiter");
+            sat = (Planet) GaiaSky.instance.sceneGraph.getNode("Saturn");
+            ura = (Planet) GaiaSky.instance.sceneGraph.getNode("Uranus");
+            nep = (Planet) GaiaSky.instance.sceneGraph.getNode("Neptune");
+            jup = (Planet) GaiaSky.instance.sceneGraph.getNode("Jupiter");
         }
         if (sat != null)
             position(sat.getAbsolutePosition(aux3b1).tov3d(aux3d1), satf);
@@ -61,7 +61,7 @@ public class OuterSolarSystemMinimapScale extends AbstractMinimapScale {
             position(nep.getAbsolutePosition(aux3b1).tov3d(aux3d1), nepf);
         if (jup != null)
             position(jup.getAbsolutePosition(aux3b1).tov3d(aux3d1), jupf);
-        position(GaiaSky.instance.cam.getPos().tov3d(aux3d1), camp);
+        position(GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1), camp);
     }
 
     @Override

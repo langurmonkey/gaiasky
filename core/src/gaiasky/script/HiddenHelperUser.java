@@ -51,7 +51,7 @@ public class HiddenHelperUser implements IObserver {
         case NAVIGATE_TO_OBJECT:
             IFocus body;
             if (data[0] instanceof String)
-                body = GaiaSky.instance.sg.findFocus((String) data[0]);
+                body = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
             else
                 body = ((IFocus) data[0]);
 
@@ -63,7 +63,7 @@ public class HiddenHelperUser implements IObserver {
             break;
         case LAND_ON_OBJECT:
             if (data[0] instanceof String)
-                body = GaiaSky.instance.sg.findFocus((String) data[0]);
+                body = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
             else
                 body = ((CelestialBody) data[0]);
 
@@ -76,7 +76,7 @@ public class HiddenHelperUser implements IObserver {
             break;
         case LAND_AT_LOCATION_OF_OBJECT:
             if (data[0] instanceof String)
-                body = GaiaSky.instance.sg.findFocus((String) data[0]);
+                body = GaiaSky.instance.sceneGraph.findFocus((String) data[0]);
             else
                 body = ((CelestialBody) data[0]);
 
@@ -137,7 +137,7 @@ public class HiddenHelperUser implements IObserver {
 
         @Override
         public void run() {
-            EventScriptingInterface.instance().goToObject(body, 20, 1, stop);
+            ((EventScriptingInterface) GaiaSky.instance.scripting()).goToObject(body, 20, 1, stop);
             currentTasks.removeValue(this, true);
         }
 
@@ -153,7 +153,7 @@ public class HiddenHelperUser implements IObserver {
 
         @Override
         public void run() {
-            EventScriptingInterface.instance().landOnObject(body, stop);
+            ((EventScriptingInterface) GaiaSky.instance.scripting()).landOnObject(body, stop);
             currentTasks.removeValue(this, true);
         }
 
@@ -180,9 +180,9 @@ public class HiddenHelperUser implements IObserver {
         @Override
         public void run() {
             if (locName == null)
-                EventScriptingInterface.instance().landAtObjectLocation(body, lon, lat, stop);
+                ((EventScriptingInterface) GaiaSky.instance.scripting()).landAtObjectLocation(body, lon, lat, stop);
             else
-                EventScriptingInterface.instance().landAtObjectLocation(body, locName, stop);
+                ((EventScriptingInterface) GaiaSky.instance.scripting()).landAtObjectLocation(body, locName, stop);
             currentTasks.removeValue(this, true);
         }
 

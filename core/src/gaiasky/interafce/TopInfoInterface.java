@@ -144,7 +144,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         case FOCUS_CHANGE_CMD:
             IFocus f = null;
             if (data[0] instanceof String) {
-                SceneGraphNode sgn = GaiaSky.instance.sg.getNode((String) data[0]);
+                SceneGraphNode sgn = GaiaSky.instance.sceneGraph.getNode((String) data[0]);
                 if (sgn instanceof IFocus)
                     f = (IFocus) sgn;
             } else {

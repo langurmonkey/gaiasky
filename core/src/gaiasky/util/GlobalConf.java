@@ -1203,7 +1203,7 @@ public class GlobalConf {
         public void notify(final Events event, final Object... data) {
             switch (event) {
             case STEREOSCOPIC_CMD:
-                if (!GaiaSky.instance.cam.mode.isGaiaFov()) {
+                if (!GaiaSky.instance.cameraManager.mode.isGaiaFov()) {
                     boolean stereomode = (Boolean) data[0];
                     STEREOSCOPIC_MODE = stereomode;
                     if (STEREOSCOPIC_MODE && CUBEMAP_MODE) {

@@ -67,31 +67,29 @@ import java.util.concurrent.atomic.AtomicReference;
 public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private static final Log logger = Logger.getLogger(EventScriptingInterface.class);
 
+    // Reference to the event manager
     private final EventManager em;
+    // Reference to asset manager
     private final AssetManager manager;
+    // Reference to the catalog manager
+    private final CatalogManager catalogManager;
     private LruCache<String, Texture> textures;
 
-    private static EventScriptingInterface instance = null;
-
-    public static EventScriptingInterface instance() {
-        if (instance == null) {
-            instance = new EventScriptingInterface();
-        }
-        return instance;
-    }
-
+    // Auxiliary vectors
     private final Vector3d aux3d1, aux3d2, aux3d3, aux3d4, aux3d5, aux3d6;
-    private final Vector3b aux3b1, aux3b2, aux3b3, aux3b4, aux3b5, aux3b6;
+    private final Vector3b aux3b1, aux3b2, aux3b3;
     private final Vector2d aux2d1;
 
     private final Set<AtomicBoolean> stops;
 
-    private EventScriptingInterface() {
-        em = EventManager.instance;
-        manager = GaiaSky.instance.manager;
+    public EventScriptingInterface(final AssetManager manager, final CatalogManager catalogManager) {
+        this.em = EventManager.instance;
+        this.manager = manager;
+        this.catalogManager = catalogManager;
 
         stops = new HashSet<>();
 
+        // Auxiliary vectors
         aux3d1 = new Vector3d();
         aux3d2 = new Vector3d();
         aux3d3 = new Vector3d();
@@ -101,9 +99,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3b1 = new Vector3b();
         aux3b2 = new Vector3b();
         aux3b3 = new Vector3b();
-        aux3b4 = new Vector3b();
-        aux3b5 = new Vector3b();
-        aux3b6 = new Vector3b();
         aux2d1 = new Vector2d();
 
         em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
@@ -115,7 +110,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    private double[] dArray(List l) {
+    private double[] dArray(List<?> l) {
         if (l == null)
             return null;
         double[] res = new double[l.size()];
@@ -126,7 +121,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return res;
     }
 
-    private int[] iArray(List l) {
+    private int[] iArray(List<?> l) {
         if (l == null)
             return null;
         int[] res = new int[l.size()];
@@ -199,7 +194,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
                 focus = focus.getFocus(focusName);
-                NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+                NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
                 changeFocus(focus, cam, waitTimeSeconds);
             } else {
                 logger.error("FOCUS_MODE object does not exist: " + focusName);
@@ -223,7 +218,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 GaiaSky.postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
-                    double[] campos = GaiaSky.instance.cam.getPos().valuesd();
+                    double[] campos = GaiaSky.instance.cameraManager.getPos().valuesd();
                     Vector3b dir = new Vector3b();
                     focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
                     Apfloat[] b = dir.nor().values();
@@ -303,7 +298,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             vec[1] = vec[1] * Constants.KM_TO_U;
             vec[2] = vec[2] * Constants.KM_TO_U;
             // Send event
-            em.post(Events.CAMERA_POS_CMD, vec);
+            em.post(Events.CAMERA_POS_CMD, (Object) vec);
         });
     }
 
@@ -312,57 +307,57 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setCameraPosition(new double[] { x, y, z });
     }
 
-    public void setCameraPosition(final List vec) {
+    public void setCameraPosition(final List<?> vec) {
         setCameraPosition(dArray(vec));
     }
 
     @Override
     public double[] getCameraPosition() {
-        Vector3d campos = GaiaSky.instance.cam.getPos().tov3d(aux3d1);
+        Vector3d campos = GaiaSky.instance.cameraManager.getPos().tov3d(aux3d1);
         return new double[] { campos.x * Constants.U_TO_KM, campos.y * Constants.U_TO_KM, campos.z * Constants.U_TO_KM };
     }
 
     @Override
     public void setCameraDirection(final double[] dir) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, dir));
+        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, (Object) dir));
     }
 
-    public void setCameraDirection(final List dir) {
+    public void setCameraDirection(final List<?> dir) {
         setCameraDirection(dArray(dir));
     }
 
     @Override
     public double[] getCameraDirection() {
-        Vector3d camdir = GaiaSky.instance.cam.getDirection();
+        Vector3d camdir = GaiaSky.instance.cameraManager.getDirection();
         return new double[] { camdir.x, camdir.y, camdir.z };
     }
 
     @Override
     public void setCameraUp(final double[] up) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, up));
+        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, (Object) up));
 
     }
 
-    public void setCameraUp(final List up) {
+    public void setCameraUp(final List<?> up) {
         setCameraUp(dArray(up));
     }
 
     @Override
     public double[] getCameraUp() {
-        Vector3d camup = GaiaSky.instance.cam.getUp();
-        return new double[] { camup.x, camup.y, camup.z };
+        Vector3d camUp = GaiaSky.instance.cameraManager.getUp();
+        return new double[] { camUp.x, camUp.y, camUp.z };
     }
 
     @Override
     public void setCameraPositionAndFocus(String focus, String other, double rotation, double viewAngle) {
         if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
-            String focuslc = focus.toLowerCase();
-            String otherlc = other.toLowerCase();
-            ISceneGraph sg = GaiaSky.instance.sg;
-            if (sg.containsNode(focuslc) && sg.containsNode(otherlc)) {
-                IFocus focusObj = sg.findFocus(focuslc);
-                IFocus otherObj = sg.findFocus(otherlc);
+            String focusLowerCase = focus.toLowerCase();
+            String otherLowerCase = other.toLowerCase();
+            ISceneGraph sceneGraph = GaiaSky.instance.sceneGraph;
+            if (sceneGraph.containsNode(focusLowerCase) && sceneGraph.containsNode(otherLowerCase)) {
+                IFocus focusObj = sceneGraph.findFocus(focusLowerCase);
+                IFocus otherObj = sceneGraph.findFocus(otherLowerCase);
                 setCameraPositionAndFocus(focusObj, otherObj, rotation, viewAngle);
             }
         }
@@ -429,7 +424,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getCameraSpeed() {
-        return GaiaSky.instance.cam.getSpeed();
+        return GaiaSky.instance.cameraManager.getSpeed();
     }
 
     @Override
@@ -548,7 +543,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public IFocus getClosestObjectToCamera() {
-        return GaiaSky.instance.cam.getClosestBody();
+        return GaiaSky.instance.cameraManager.getClosestBody();
     }
 
     @Override
@@ -570,7 +565,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setComponentTypeVisibility(String key, boolean visible) {
-        if (!checkComponentTypeKey(key)) {
+        if (checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentType[] cts = ComponentType.values();
             for (ComponentType ct : cts)
@@ -582,7 +577,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean getComponentTypeVisibility(String key) {
-        if (!checkComponentTypeKey(key)) {
+        if (checkCtKeyNull(key)) {
             logger.error("Element '" + key + "' does not exist. Possible values are:");
             ComponentType[] cts = ComponentType.values();
             for (ComponentType ct : cts)
@@ -640,9 +635,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         setLineWidthFactor((float) factor);
     }
 
-    private boolean checkComponentTypeKey(String key) {
+    private boolean checkCtKeyNull(String key) {
         ComponentType ct = ComponentType.getFromKey(key);
-        return ct != null;
+        return ct == null;
     }
 
     @Override
@@ -1000,7 +995,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public SceneGraphNode getObject(String name, double timeOutSeconds) {
-        ISceneGraph sg = GaiaSky.instance.sg;
+        ISceneGraph sg = GaiaSky.instance.sceneGraph;
         SceneGraphNode obj = sg.getNode(name);
         if (obj == null) {
             if (name.matches("[0-9]+")) {
@@ -1055,7 +1050,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void refreshAllOrbits() {
-        ISceneGraph sg = GaiaSky.instance.sg;
+        ISceneGraph sg = GaiaSky.instance.sceneGraph;
         GaiaSky.postRunnable(() -> {
             Array<SceneGraphNode> l = new Array<>();
             sg.getRoot().getChildrenByType(Orbit.class, l);
@@ -1068,7 +1063,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getObjectRadius(String name) {
-        ISceneGraph sg = GaiaSky.instance.sg;
+        ISceneGraph sg = GaiaSky.instance.sceneGraph;
         IFocus obj = sg.findFocus(name.toLowerCase().trim());
         if (obj == null)
             return -1;
@@ -1109,10 +1104,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private void goToObject(String name, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkString(name, "name")) {
-            String namelc = name.toLowerCase().trim();
-            ISceneGraph sg = GaiaSky.instance.sg;
-            if (sg.containsNode(namelc)) {
-                IFocus focus = sg.findFocus(namelc);
+            String nameLowerCase = name.toLowerCase().trim();
+            ISceneGraph sg = GaiaSky.instance.sceneGraph;
+            if (sg.containsNode(nameLowerCase)) {
+                IFocus focus = sg.findFocus(nameLowerCase);
                 goToObject(focus, viewAngle, waitTimeSeconds, stop);
             } else {
                 logger.info("FOCUS_MODE object does not exist: " + name);
@@ -1128,7 +1123,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkNotNull(object, "object") && checkNum(viewAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "viewAngle")) {
 
             stops.add(stop);
-            NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+            NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
             changeFocus(object, cam, waitTimeSeconds);
 
@@ -1137,31 +1132,33 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (target < 0)
                 target = Math.toRadians(20d);
 
-            long prevtime = TimeUtils.millis();
+            long prevTime = TimeUtils.millis();
             if (object.getViewAngleApparent() < target) {
+                System.out.println("TO");
                 // Add forward movement while distance > target distance
                 while (object.getViewAngleApparent() < target && (stop == null || !stop.get())) {
                     // dt in ms
-                    long dt = TimeUtils.timeSinceMillis(prevtime);
-                    prevtime = TimeUtils.millis();
+                    long dt = TimeUtils.timeSinceMillis(prevTime);
+                    prevTime = TimeUtils.millis();
 
                     em.post(Events.CAMERA_FWD, 1d * dt);
                     try {
-                        sleep(0.2f);
+                        sleep(0.1f);
                     } catch (Exception e) {
                         logger.error(e);
                     }
                 }
             } else {
+                System.out.println("AWAY");
                 // Add backward movement while distance > target distance
                 while (object.getViewAngleApparent() > target && (stop == null || !stop.get())) {
                     // dt in ms
-                    long dt = TimeUtils.timeSinceMillis(prevtime);
-                    prevtime = TimeUtils.millis();
+                    long dt = TimeUtils.timeSinceMillis(prevTime);
+                    prevTime = TimeUtils.millis();
 
                     em.post(Events.CAMERA_FWD, -1d * dt);
                     try {
-                        sleepFrames(1);
+                        sleep(0.1f);
                     } catch (Exception e) {
                         logger.error(e);
                     }
@@ -1196,7 +1193,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             stops.add(stop);
             if (object instanceof Planet) {
-                NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+                NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
                 // FOCUS_MODE wait - 2 seconds
                 float waitTimeSeconds = -1;
 
@@ -1349,7 +1346,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     void landAtObjectLocation(IFocus object, double longitude, double latitude, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(latitude, -90d, 90d, "latitude") && checkNum(longitude, 0d, 360d, "longitude")) {
             stops.add(stop);
-            ISceneGraph sg = GaiaSky.instance.sg;
+            ISceneGraph sg = GaiaSky.instance.sceneGraph;
             String nameStub = object.getCandidateName() + " [loc]";
 
             if (!sg.containsNode(nameStub)) {
@@ -1360,7 +1357,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             if (object instanceof Planet) {
                 Planet planet = (Planet) object;
-                NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+                NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
                 double targetAngle = 35 * MathUtilsd.degRad;
                 if (planet.viewAngle > targetAngle) {
@@ -1487,12 +1484,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (sgn instanceof StarGroup) {
             // This star group contains the star
             StarGroup sg = (StarGroup) sgn;
-            if (sg != null) {
-                IParticleRecord sb = sg.getCandidateBean();
-                if (sb != null) {
-                    double[] rgb = sb.rgb();
-                    return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
-                }
+            IParticleRecord sb = sg.getCandidateBean();
+            if (sb != null) {
+                double[] rgb = sb.rgb();
+                return new double[] { sb.ra(), sb.dec(), sb.parallax(), sb.mualpha(), sb.mudelta(), sb.radvel(), sb.appmag(), rgb[0], rgb[1], rgb[2] };
             }
         }
 
@@ -1576,7 +1571,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void displayImageObject(final int id, final String path, final double x, final double y, final List color) {
+    public void displayImageObject(final int id, final String path, final double x, final double y, final List<?> color) {
         displayImageObject(id, path, x, y, dArray(color));
     }
 
@@ -1595,15 +1590,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeObject(final int id) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, new int[] { id }));
+        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) new int[] { id }));
     }
 
     @Override
     public void removeObjects(final int[] ids) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, ids));
+        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) ids));
     }
 
-    public void removeObjects(final List ids) {
+    public void removeObjects(final List<?> ids) {
         removeObjects(iArray(ids));
     }
 
@@ -1714,7 +1709,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean waitFocus(String name, long timeoutMs) {
         long iniTime = TimeUtils.millis();
-        NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+        NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
         while (cam.focus == null || !cam.focus.getName().equalsIgnoreCase(name)) {
             sleepFrames(1);
             long spent = TimeUtils.millis() - iniTime;
@@ -1855,7 +1850,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             this.end = end;
             this.lock = new Object();
 
-            // Set up interpolators
+            // Set up interpolation
             posl = getPathd(cam.getPos().tov3d(aux3d3), pos);
             dirl = getPathd(cam.getDirection(), dir);
             upl = getPathd(cam.getUp(), up);
@@ -1901,11 +1896,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         cameraTransition(internalUnitsToKilometres(camPos), camDir, camUp, seconds, true);
     }
 
-    public void cameraTransitionKm(List camPos, List camDir, List camUp, double seconds) {
+    public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
         cameraTransitionKm(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
     }
 
-    public void cameraTransitionKm(List camPos, List camDir, List camUp, long seconds) {
+    public void cameraTransitionKm(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
         cameraTransitionKm(camPos, camDir, camUp, (double) seconds);
     }
 
@@ -1918,11 +1913,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         cameraTransition(camPos, camDir, camUp, (double) seconds);
     }
 
-    public void cameraTransition(List camPos, List camDir, List camUp, double seconds) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds) {
         cameraTransition(dArray(camPos), dArray(camDir), dArray(camUp), seconds);
     }
 
-    public void cameraTransition(List camPos, List camDir, List camUp, long seconds) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds) {
         cameraTransition(camPos, camDir, camUp, (double) seconds);
     }
 
@@ -1930,7 +1925,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraTransition(double[] camPos, double[] camDir, double[] camUp, double seconds, boolean sync) {
-        NaturalCamera cam = GaiaSky.instance.cam.naturalCamera;
+        NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
         // Put in focus mode
         em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
@@ -1960,11 +1955,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public void cameraTransition(List camPos, List camDir, List camUp, double seconds, boolean sync) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, double seconds, boolean sync) {
         cameraTransition(dArray(camPos), dArray(camDir), dArray(camUp), seconds, sync);
     }
 
-    public void cameraTransition(List camPos, List camDir, List camUp, long seconds, boolean sync) {
+    public void cameraTransition(List<?> camPos, List<?> camDir, List<?> camUp, long seconds, boolean sync) {
         cameraTransition(camPos, camDir, camUp, (double) seconds, sync);
     }
 
@@ -2068,7 +2063,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return new double[] { aux3d1.y, aux3d1.z, aux3d1.x };
     }
 
-    public double[] equatorialCartesianToInternalCartesian(final List eq, double kmFactor) {
+    public double[] equatorialCartesianToInternalCartesian(final List<?> eq, double kmFactor) {
         return equatorialCartesianToInternalCartesian(dArray(eq), kmFactor);
     }
 
@@ -2078,7 +2073,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.values();
     }
 
-    public double[] equatorialToGalactic(List eq) {
+    public double[] equatorialToGalactic(List<?> eq) {
         return equatorialToGalactic(dArray(eq));
     }
 
@@ -2088,7 +2083,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.values();
     }
 
-    public double[] equatorialToEcliptic(List eq) {
+    public double[] equatorialToEcliptic(List<?> eq) {
         return equatorialToEcliptic(dArray(eq));
     }
 
@@ -2098,7 +2093,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.values();
     }
 
-    public double[] galacticToEquatorial(List gal) {
+    public double[] galacticToEquatorial(List<?> gal) {
         return galacticToEquatorial(dArray(gal));
     }
 
@@ -2108,7 +2103,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.values();
     }
 
-    public double[] eclipticToEquatorial(List ecl) {
+    public double[] eclipticToEquatorial(List<?> ecl) {
         return eclipticToEquatorial(dArray(ecl));
     }
 
@@ -2265,11 +2260,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return rotate3(vector, axis, (double) angle);
     }
 
-    public double[] rotate3(List vector, List axis, double angle) {
+    public double[] rotate3(List<?> vector, List<?> axis, double angle) {
         return rotate3(dArray(vector), dArray(axis), angle);
     }
 
-    public double[] rotate3(List vector, List axis, long angle) {
+    public double[] rotate3(List<?> vector, List<?> axis, long angle) {
         return rotate3(vector, axis, (double) angle);
     }
 
@@ -2283,11 +2278,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return rotate2(vector, (double) angle);
     }
 
-    public double[] rotate2(List vector, double angle) {
+    public double[] rotate2(List<?> vector, double angle) {
         return rotate2(dArray(vector), angle);
     }
 
-    public double[] rotate2(List vector, long angle) {
+    public double[] rotate2(List<?> vector, long angle) {
         return rotate2(vector, (double) angle);
     }
 
@@ -2296,7 +2291,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.set(vec1).crs(aux3d2.set(vec2)).values();
     }
 
-    public double[] cross3(List vec1, List vec2) {
+    public double[] cross3(List<?> vec1, List<?> vec2) {
         return cross3(dArray(vec1), dArray(vec2));
     }
 
@@ -2305,7 +2300,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return aux3d1.set(vec1).dot(aux3d2.set(vec2));
     }
 
-    public double dot3(List vec1, List vec2) {
+    public double dot3(List<?> vec1, List<?> vec2) {
         return dot3(dArray(vec1), dArray(vec2));
     }
 
@@ -2314,7 +2309,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         addPolyline(name, points, color, 1f);
     }
 
-    public void addPolyline(String name, List points, List color) {
+    public void addPolyline(String name, List<?> points, List<?> color) {
         addPolyline(name, points, color, 1f);
     }
 
@@ -2358,35 +2353,35 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void addPolyline(String name, List points, List color, float lineWidth) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth) {
         addPolyline(name, dArray(points), dArray(color), lineWidth);
     }
 
-    public void addPolyline(String name, List points, List color, float lineWidth, boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, boolean arrowCaps) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, arrowCaps);
     }
 
-    public void addPolyline(String name, List points, List color, float lineWidth, int primitive) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, int primitive) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive);
     }
 
-    public void addPolyline(String name, List points, List color, float lineWidth, int primitive, boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, float lineWidth, int primitive, boolean arrowCaps) {
         addPolyline(name, dArray(points), dArray(color), lineWidth, primitive, arrowCaps);
     }
 
-    public void addPolyline(String name, List points, List color, int lineWidth) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth) {
         addPolyline(name, points, color, (float) lineWidth);
     }
 
-    public void addPolyline(String name, List points, List color, int lineWidth, boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, boolean arrowCaps) {
         addPolyline(name, points, color, (float) lineWidth, arrowCaps);
     }
 
-    public void addPolyline(String name, List points, List color, int lineWidth, int primitive) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, int primitive) {
         addPolyline(name, points, color, (float) lineWidth, primitive);
     }
 
-    public void addPolyline(String name, List points, List color, int lineWidth, int primitive, boolean arrowCaps) {
+    public void addPolyline(String name, List<?> points, List<?> color, int lineWidth, int primitive, boolean arrowCaps) {
         addPolyline(name, points, color, (float) lineWidth, primitive, arrowCaps);
     }
 
@@ -2416,13 +2411,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraState(double[] pos, double[] dir, double[] up) {
         GaiaSky.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, pos);
-            em.post(Events.CAMERA_DIR_CMD, dir);
-            em.post(Events.CAMERA_UP_CMD, up);
+            em.post(Events.CAMERA_POS_CMD, (Object) pos);
+            em.post(Events.CAMERA_DIR_CMD, (Object) dir);
+            em.post(Events.CAMERA_UP_CMD, (Object) up);
         });
     }
 
-    public void setCameraState(List pos, List dir, List up) {
+    public void setCameraState(List<?> pos, List<?> dir, List<?> up) {
         setCameraState(dArray(pos), dArray(dir), dArray(up));
     }
 
@@ -2434,7 +2429,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
-    public void setCameraStateAndTime(List pos, List dir, List up, long time) {
+    public void setCameraStateAndTime(List<?> pos, List<?> dir, List<?> up, long time) {
         setCameraStateAndTime(dArray(pos), dArray(dir), dArray(up), time);
     }
 
@@ -2463,21 +2458,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
-            return loadDatasetImmediate(dsName, path, type, dops, true);
+            return loadDatasetImmediate(dsName, path, type, datasetOptions, true);
         } else {
-            Thread t = new Thread(() -> loadDatasetImmediate(dsName, path, type, dops, false));
+            Thread t = new Thread(() -> loadDatasetImmediate(dsName, path, type, datasetOptions, false));
             t.start();
             return true;
         }
     }
 
-    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
-            return loadDatasetImmediate(dsName, ds, type, dops, true);
+            return loadDatasetImmediate(dsName, ds, type, datasetOptions, true);
         } else {
-            Thread t = new Thread(() -> loadDatasetImmediate(dsName, ds, type, dops, false));
+            Thread t = new Thread(() -> loadDatasetImmediate(dsName, ds, type, datasetOptions, false));
             t.start();
             return true;
         }
@@ -2488,7 +2483,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List labelColor, final List fadeIn, final List fadeOut, boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
         return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
@@ -2512,7 +2507,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, compType, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List particleColor, double colorNoise, final List labelColor, double particleSize, String ct, final List fadeIn, final List fadeOut, boolean sync) {
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
@@ -2530,7 +2525,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadStarClusterDataset(dsName, path, particleColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List fadeIn, List fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> fadeIn, List<?> fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
@@ -2539,7 +2534,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadStarClusterDataset(dsName, path, particleColor, labelColor, ComponentType.Clusters.toString(), fadeIn, fadeOut, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List labelColor, List fadeIn, List fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> labelColor, List<?> fadeIn, List<?> fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
@@ -2550,18 +2545,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, String ct, List fadeIn, List fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, String ct, List<?> fadeIn, List<?> fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     @Override
     public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
-        DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, labelColor, compType, fadeIn, fadeOut);
-        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
+        DatasetOptions datasetOptions = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, labelColor, compType, fadeIn, fadeOut);
+        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, datasetOptions, sync);
     }
 
-    public boolean loadStarClusterDataset(String dsName, String path, List particleColor, List labelColor, String ct, List fadeIn, List fadeOut, boolean sync) {
+    public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> labelColor, String ct, List<?> fadeIn, List<?> fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
@@ -2586,7 +2581,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions dops) {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(dops);
-        @SuppressWarnings("unchecked") List<IParticleRecord> data = provider.loadData(ds, 1.0f, () -> {
+        return provider.loadData(ds, 1.0f, () -> {
             // Show progress bar
             EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
             // Reset
@@ -2600,22 +2595,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             // Hide progress bar
             EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
         });
-        return data;
     }
 
-    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", dsName));
 
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
-                if (dops == null || dops.type == DatasetOptions.DatasetLoadType.STARS) {
-                    List<IParticleRecord> data = loadParticleBeans(ds, dops);
+                if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) {
+                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP
                         AtomicReference<StarGroup> starGroup = new AtomicReference<>();
                         GaiaSky.postRunnable(() -> {
-                            starGroup.set(StarGroup.getStarGroup(dsName, data, dops));
+                            starGroup.set(StarGroup.getStarGroup(dsName, data, datasetOptions));
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
@@ -2628,13 +2622,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             sleepFrames(1);
                         }
                     }
-                } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.PARTICLES) {
+                } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
-                    List<IParticleRecord> data = loadParticleBeans(ds, dops);
+                    List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {
                         AtomicReference<ParticleGroup> particleGroup = new AtomicReference<>();
                         GaiaSky.postRunnable(() -> {
-                            particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, dops));
+                            particleGroup.set(ParticleGroup.getParticleGroup(dsName, data, datasetOptions));
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
@@ -2647,17 +2641,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             sleepFrames(1);
                         }
                     }
-                } else if (dops == null || dops.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
+                } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
                     GenericCatalog scc = new GenericCatalog();
                     scc.setName(dsName);
                     scc.setDescription(ds instanceof FileDataSource ? ((FileDataSource) ds).getFile().getAbsolutePath() : dsName);
                     scc.setParent("Universe");
-                    scc.setFadein(dops.fadeIn);
-                    scc.setFadeout(dops.fadeOut);
-                    scc.setColor(dops.particleColor);
-                    scc.setLabelcolor(dops.labelColor);
-                    scc.setCt(dops.ct.toString());
+                    scc.setFadein(datasetOptions.fadeIn);
+                    scc.setFadeout(datasetOptions.fadeOut);
+                    scc.setColor(datasetOptions.particleColor);
+                    scc.setLabelcolor(datasetOptions.labelColor);
+                    scc.setCt(datasetOptions.ct.toString());
                     scc.setPosition(new double[] { 0, 0, 0 });
                     scc.setDataSource(ds);
                     scc.setProvider(StarClusterLoader.class.getName());
@@ -2690,7 +2684,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean hasDataset(String dsName) {
         if (checkString(dsName, "datasetName")) {
-            return CatalogManager.instance().contains(dsName);
+            return this.catalogManager.contains(dsName);
         }
         return false;
     }
@@ -2698,7 +2692,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean removeDataset(String dsName) {
         if (checkString(dsName, "datasetName")) {
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists)
                 GaiaSky.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
             else
@@ -2711,7 +2705,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean hideDataset(String dsName) {
         if (checkString(dsName, "datasetName")) {
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
             else
@@ -2724,7 +2718,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean showDataset(String dsName) {
         if (checkString(dsName, "datasetName")) {
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists)
                 EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
             else
@@ -2737,9 +2731,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean highlightDataset(String dsName, boolean highlight) {
         if (checkString(dsName, "datasetName")) {
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                CatalogInfo ci = this.catalogManager.get(dsName);
                 EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
@@ -2758,9 +2752,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean highlightDataset(String dsName, float r, float g, float b, float a, boolean highlight) {
         if (checkString(dsName, "datasetName")) {
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                CatalogInfo ci = this.catalogManager.get(dsName);
                 ci.plainColor = true;
                 ci.hlColor[0] = r;
                 ci.hlColor[1] = g;
@@ -2778,9 +2772,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public boolean highlightDataset(String dsName, String attributeName, String colorMap, double minMap, double maxMap, boolean highlight) {
         if (checkString(dsName, "datasetName")) {
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                CatalogInfo ci = this.catalogManager.get(dsName);
                 IAttribute attribute = getAttributeByName(attributeName, ci);
                 int cmapIndex = getCmapIndexByName(colorMap);
                 if (attribute != null && cmapIndex >= 0) {
@@ -2835,9 +2829,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean setDatasetHighlightSizeFactor(String dsName, float sizeFactor) {
         if (checkString(dsName, "datasetName") && checkNum(sizeFactor, Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR, "sizeFactor")) {
 
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                CatalogInfo ci = this.catalogManager.get(dsName);
                 ci.setHlSizeFactor(sizeFactor);
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
@@ -2851,9 +2845,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible) {
         if (checkString(dsName, "datasetName")) {
 
-            boolean exists = CatalogManager.instance().contains(dsName);
+            boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
-                CatalogInfo ci = CatalogManager.instance().get(dsName);
+                CatalogInfo ci = this.catalogManager.get(dsName);
                 ci.setHlAllVisible(allVisible);
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
@@ -2919,7 +2913,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return result;
     }
 
-    public double[] internalUnitsToKilometres(List internalUnits) {
+    public double[] internalUnitsToKilometres(List<?> internalUnits) {
         double[] result = new double[internalUnits.size()];
         for (int i = 0; i < internalUnits.size(); i++) {
             result[i] = internalUnitsToKilometres((double) internalUnits.get(i));
@@ -2933,13 +2927,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public double kilometrestointernalunits(double kilometres) {
+    public double kilometresToInternalUnits(double kilometres) {
+        return kilometres * Constants.KM_TO_U;
+    }
+
+    public double kilometersToInternalUnits(double kilometres) {
         return kilometres * Constants.KM_TO_U;
     }
 
     @Override
     public List<String> listDatasets() {
-        Set<String> names = CatalogManager.instance().getDatasetNames();
+        Set<String> names = this.catalogManager.getDatasetNames();
         if (names != null)
             return new ArrayList<>(names);
         else
@@ -3128,19 +3126,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     private <T extends Enum<T>> boolean checkStringEnum(String value, Class<T> clazz, String name) {
         if (checkString(value, name)) {
-            for (Enum en : EnumSet.allOf(clazz)) {
+            for (Enum<T> en : EnumSet.allOf(clazz)) {
                 if (value.equalsIgnoreCase(en.toString())) {
                     return true;
                 }
             }
             logger.error(name + " value not valid: " + value + ". Must be a value in the enum " + clazz.getSimpleName() + ":");
-            for (Enum en : EnumSet.allOf(clazz)) {
+            for (Enum<T> en : EnumSet.allOf(clazz)) {
                 logger.error(en.toString());
             }
-            return false;
-        } else {
-            return false;
         }
+        return false;
     }
 
     private boolean checkNotNull(Object o, String name) {

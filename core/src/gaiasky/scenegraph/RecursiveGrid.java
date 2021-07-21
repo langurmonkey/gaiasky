@@ -219,7 +219,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         super.doneLoading(manager);
 
         // Model
-        mc.doneLoading(GaiaSky.instance.manager, localTransform, cc);
+        mc.doneLoading(GaiaSky.instance.assetManager, localTransform, cc);
         mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
 
         // Listen

@@ -189,8 +189,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         glow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         LightGlow lightGlow = new LightGlow(5, 5);
         lightGlow.setLightGlowTexture(glow);
-        lightGlow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-        lightGlow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+        lightGlow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+        lightGlow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackbufferScale(GlobalConf.runtime.OPENVR ? (float) GlobalConf.screen.BACKBUFFER_SCALE : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
         ppb.set(lightGlow);
@@ -262,7 +262,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // FISHEYE DISTORTION (DOME)
         Fisheye fisheye = new Fisheye(width, height);
-        fisheye.setFov(GaiaSky.instance.cam.getCamera().fieldOfView);
+        fisheye.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
         fisheye.setMode(0);
         fisheye.setEnabled(GlobalConf.postprocess.POSTPROCESS_FISHEYE);
         ppb.set(fisheye);
@@ -535,8 +535,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         PostProcessBean ppb = pps[i];
                         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-                            lightglow.setSpiralScale(getGlowSpiralScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                            lightglow.setTextureScale(getGlowTextureScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                            lightglow.setSpiralScale(getGlowSpiralScale(brightness, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor()));
                         }
                     }
                 }
@@ -550,8 +550,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         PostProcessBean ppb = pps[i];
                         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-                            lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cam.getFovFactor()));
+                            lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cameraManager.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                            lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, size, GaiaSky.instance.cameraManager.getFovFactor()));
                         }
                     }
                 }
@@ -597,8 +597,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                         PostProcessBean ppb = pps[i];
                         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                         if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
-                            lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor()));
+                            lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                            lightglow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor()));
                         }
                         Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
                         if (fisheye != null)
@@ -757,7 +757,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                     if (lightglow != null) {
                         lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);
-                        lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cam.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
+                        lightglow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
                     }
                 }
             }

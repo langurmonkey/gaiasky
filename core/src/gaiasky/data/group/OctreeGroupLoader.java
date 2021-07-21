@@ -121,8 +121,8 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             // Add objects to octree wrapper node
             octreeWrapper.add(sg, octant);
             // Aux info
-            if (GaiaSky.instance != null && GaiaSky.instance.sg != null)
-                GaiaSky.instance.sg.addNodeAuxiliaryInfo(sg);
+            if (GaiaSky.instance != null && GaiaSky.instance.sceneGraph != null)
+                GaiaSky.instance.sceneGraph.addNodeAuxiliaryInfo(sg);
 
             nLoadedStars += sg.size();
             octant.add(sg);

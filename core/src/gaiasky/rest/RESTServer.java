@@ -7,7 +7,7 @@ package gaiasky.rest;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
-import gaiasky.script.EventScriptingInterface;
+import gaiasky.GaiaSky;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
@@ -466,7 +466,7 @@ public class RESTServer {
             try {
                 logger.debug("Invoking method...");
                 // note: invoke may return null explicitly or because is void type
-                Object returnObject = matchMethod.invoke(EventScriptingInterface.instance(), arguments);
+                Object returnObject = matchMethod.invoke(GaiaSky.instance.scripting(), arguments);
                 if (returnObject == null) {
                     logger.debug("Method returned: '{}', return type is {}", returnObject, matchReturnType);
                 } else {

@@ -33,9 +33,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
     private final Map<String, ColormapPicker> colorMap;
+    private final CatalogManager catalogManager;
 
-    public DatasetsComponent(Skin skin, Stage stage) {
+    public DatasetsComponent(final Skin skin, final Stage stage, final CatalogManager catalogManager) {
         super(skin, stage);
+        this.catalogManager = catalogManager;
         groupMap = new HashMap<>();
         imageMap = new HashMap<>();
         colorMap = new HashMap<>();
@@ -49,7 +51,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         group.space(pad * 3f);
         group.align(Align.left);
 
-        Collection<CatalogInfo> cis = CatalogManager.instance().getCatalogInfos();
+        Collection<CatalogInfo> cis = this.catalogManager.getCatalogInfos();
         if (cis != null) {
             for (CatalogInfo ci : cis) {
                 addCatalogInfo(ci);

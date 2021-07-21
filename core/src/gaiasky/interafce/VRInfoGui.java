@@ -14,7 +14,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class VRInfoGui extends AbstractGui {
@@ -69,9 +68,9 @@ public class VRInfoGui extends AbstractGui {
         infoFree.add(new OwnLabel("pointing at it and pressing", skin, "msg-21")).left().row();
         infoFree.add(new OwnLabel("the trigger", skin, "msg-21")).left().row();
 
-        if (GaiaSky.instance.cam.mode.isFocus()) {
+        if (GaiaSky.instance.cameraManager.mode.isFocus()) {
             infoCell.setActor(infoFocus);
-        } else if (GaiaSky.instance.cam.mode.isFree()) {
+        } else if (GaiaSky.instance.cameraManager.mode.isFree()) {
             infoCell.setActor(infoFree);
         }
 

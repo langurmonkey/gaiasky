@@ -5,8 +5,10 @@
 
 package gaiasky.script;
 
+import gaiasky.data.group.DatasetOptions;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
@@ -1944,7 +1946,7 @@ public interface IScriptingInterface {
     void unparkRunnable(String id);
 
     /**
-     * Loads a VOTable file (<code>.vot</code>) of stars with a given name.
+     * Loads a VOTable, FITS or CSV dataset file with the given name.
      * In this version, the loading happens synchronously, so the catalog is available to Gaia Sky immediately after
      * this call returns.
      * The actual loading process is carried out
@@ -1960,7 +1962,7 @@ public interface IScriptingInterface {
     boolean loadDataset(String dsName, String path);
 
     /**
-     * Loads a VOTable file (<code>.vot</code>) of stars with a given name.
+     * Loads a VOTable, FITS or CSV dataset file with the given name.
      * The call can be made synchronous or asynchronous.<br/>
      * If <code>sync</code> is true, the call acts exactly like
      * {@link IScriptingInterface#loadDataset(String, String)}.<br/>
@@ -1977,7 +1979,30 @@ public interface IScriptingInterface {
      * @param sync   Whether the load must happen synchronously or asynchronously.
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadDataset(String dsName, String path, boolean sync);
+    boolean loadDataset(final String dsName, final String path, final boolean sync);
+
+    /**
+     * Loads a VOTable, FITS or CSV dataset file with the given name.
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call acts exactly like
+     * {@link IScriptingInterface#loadDataset(String, String, boolean)}.<br/>
+     * If <code>sync</code> is false, the loading happens
+     * in a new thread and the call returns immediately. In this case, you can use {@link IScriptingInterface#hasDataset(String)}
+     * to check whether the dataset is already loaded and available.
+     * The actual loading process is carried out making educated guesses about semantics using UCDs and column names.
+     * Please check <a href="https://gaia.ari.uni-heidelberg.de/gaiasky/docs/SAMP.html#stil-data-provider">the
+     * official documentation</a> for a complete reference on what can and what can't be loaded.
+     * This version includes the catalog info type.
+     *
+     * @param dsName The name of the dataset, used to identify the subsequent operations on the
+     *               dataset.
+     * @param path   Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param type   The {@link gaiasky.util.CatalogInfo.CatalogInfoType} object to use as the dataset type.
+     * @param options The {@link DatasetOptions} object holding the options for this dataset.
+     * @param sync   Whether the load must happen synchronously or asynchronously.
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadDataset(final String dsName, final String path, final CatalogInfo.CatalogInfoType type, final DatasetOptions options, final boolean sync);
 
     /**
      * Loads a star dataset from a VOTable file (<code>.vot</code>).
@@ -2317,7 +2342,7 @@ public interface IScriptingInterface {
      * @param kilometres The value in kilometers.
      * @return The value in internal units.
      */
-    double kilometrestointernalunits(double kilometres);
+    double kilometresToInternalUnits(double kilometres);
 
     /**
      * Gets the current frame number. The number begins at 0 for the first frame produced

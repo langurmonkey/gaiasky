@@ -51,7 +51,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         this.p0 = new Vector3d();
         this.p1 = new Vector3d();
         this.m = new Vector3d();
-        this.sg = GaiaSky.instance.sg;
+        this.sg = GaiaSky.instance.sceneGraph;
         this.setName("Cosmicruler");
         this.cc = new float[] { 1f, 1f, 0f };
         this.nf = new DesktopNumberFormat("0.#########E0");

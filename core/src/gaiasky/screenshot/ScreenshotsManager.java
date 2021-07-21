@@ -26,11 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class ScreenshotsManager implements IObserver {
-    public static ScreenshotsManager system;
-
-    public static void initialize(final GlobalResources globalResources) {
-        system = new ScreenshotsManager(globalResources);
-    }
 
     /** Command to take screenshot **/
     private static class ScreenshotCmd {

@@ -19,49 +19,26 @@ import java.util.stream.Stream;
 public class BookmarksManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(BookmarksManager.class);
 
-    public static BookmarksManager instance;
 
-    public static void initialize() {
-        if (instance == null) {
-            instance = new BookmarksManager();
-        }
-    }
-
-    public static BookmarksManager instance() {
-        initialize();
-        return instance;
-    }
-
-    public static List<BNode> getBookmarks() {
-        initialize();
-        return instance.bookmarks;
-    }
-
-    public class BNode {
+    public static class BookmarkNode {
         // The name of this node
         public String name;
         // The full path
         public Path path;
         // The parent of this node, null if root
-        public BNode parent;
+        public BookmarkNode parent;
         // Children, if any
-        public List<BNode> children;
+        public List<BookmarkNode> children;
         // Is it a folder?
         public boolean folder;
 
-        public BNode(String path, boolean folder) {
-            this.path = Path.of(path);
-            this.name = this.path.getFileName().toString();
-            this.folder = folder;
-        }
-
-        public BNode(Path path, boolean folder) {
+        public BookmarkNode(Path path, boolean folder) {
             this.path = path;
             this.name = this.path.getFileName().toString();
             this.folder = folder;
         }
 
-        public void insert(BNode node) {
+        public void insert(BookmarkNode node) {
             if (node != null) {
                 initChildren();
                 if(!children.contains(node)) {
@@ -81,7 +58,7 @@ public class BookmarksManager implements IObserver {
             return path.toString();
         }
 
-        public BNode getFirstFolderAncestor(){
+        public BookmarkNode getFirstFolderAncestor(){
             if(folder)
                 return this;
             else if (parent != null)
@@ -90,8 +67,8 @@ public class BookmarksManager implements IObserver {
                 return null;
         }
 
-        public boolean isDescendantOf(BNode other) {
-            BNode current = this;
+        public boolean isDescendantOf(BookmarkNode other) {
+            BookmarkNode current = this;
             while (current != null) {
                 if (current == other) {
                     return true;
@@ -103,10 +80,10 @@ public class BookmarksManager implements IObserver {
     }
 
     private Path bookmarksFile;
-    private List<BNode> bookmarks;
-    private Map<Path, BNode> nodes;
+    private List<BookmarkNode> bookmarks;
+    private Map<Path, BookmarkNode> nodes;
 
-    private BookmarksManager() {
+    public BookmarksManager() {
         initDefault();
         EventManager.instance.subscribe(this, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL, Events.BOOKMARKS_MOVE);
     }
@@ -134,22 +111,23 @@ public class BookmarksManager implements IObserver {
     }
 
     /**
-     * @return A list with all folder bookmarks
+     * Returns the internal list of bookmark nodes.
+     * @return The list of {@link BookmarkNode} objects.
      */
-    public List<BNode> getFolders() {
-        return getBookmarksByType(bookmarks, new ArrayList<>(), true);
+    public List<BookmarkNode> getBookmarks() {
+        return bookmarks;
     }
 
     /**
-     * @return A list with all non-folder bookmarks
+     * @return A list with all folder bookmarks
      */
-    public List<BNode> getLeafBookmarks() {
-        return getBookmarksByType(bookmarks, new ArrayList<>(), false);
+    public List<BookmarkNode> getFolders() {
+        return getBookmarksByType(bookmarks, new ArrayList<>(), true);
     }
 
-    public List<BNode> getBookmarksByType(List<BNode> bookmarks, List<BNode> result, boolean folder) {
+    public List<BookmarkNode> getBookmarksByType(List<BookmarkNode> bookmarks, List<BookmarkNode> result, boolean folder) {
         if (bookmarks != null) {
-            for (BNode bookmark : bookmarks) {
+            for (BookmarkNode bookmark : bookmarks) {
                 if (bookmark.folder == folder)
                     result.add(bookmark);
                 getBookmarksByType(bookmark.children, result, folder);
@@ -158,19 +136,19 @@ public class BookmarksManager implements IObserver {
         return result;
     }
 
-    private List<BNode> loadBookmarks(Path file) {
+    private List<BookmarkNode> loadBookmarks(Path file) {
         try (Stream<String> lines = Files.lines(file)) {
-            List<String> bmks = lines.filter(line -> !line.strip().startsWith("#"))
+            List<String> bookmarks = lines.filter(line -> !line.strip().startsWith("#"))
                     .filter(line -> !line.isBlank())
-                    .map(line -> line.strip())
+                    .map(String::strip)
                     .collect(Collectors.toList());
 
             nodes = new HashMap<>();
-            bookmarks = new ArrayList<>();
-            for (String bookmark : bmks) {
+            this.bookmarks = new ArrayList<>();
+            for (String bookmark : bookmarks) {
                 insertBookmark(bookmark, false);
             }
-            return bookmarks;
+            return this.bookmarks;
         } catch (IOException e) {
             logger.error(e);
         }
@@ -179,27 +157,23 @@ public class BookmarksManager implements IObserver {
 
     public boolean containsName(String name) {
         boolean contains = false;
-        for (BNode bookmark : bookmarks) {
+        for (BookmarkNode bookmark : bookmarks) {
             contains = contains || containsNameRec(name, bookmark);
         }
         return contains;
     }
 
-    public boolean containsNameRec(String name, BNode node) {
+    public boolean containsNameRec(String name, BookmarkNode node) {
         if (node.name.equals(name)) {
             return true;
         } else if (node.children != null) {
             boolean contains = false;
-            for (BNode child : node.children) {
+            for (BookmarkNode child : node.children) {
                 contains = contains | containsNameRec(name, child);
             }
             return contains;
         }
         return false;
-    }
-
-    public boolean containsPath(String path) {
-        return containsPath(Path.of(path));
     }
 
     public boolean containsPath(Path path) {
@@ -214,7 +188,7 @@ public class BookmarksManager implements IObserver {
     private synchronized void persistBookmarks(Path file) {
         if (bookmarks != null) {
             String content = "# Bookmarks file for Gaia Sky, one bookmark per line, folder separator: '/', comments: '#'";
-            content += buildContent(bookmarks, "");
+            content += buildContent(bookmarks);
 
             try {
                 Files.delete(file);
@@ -225,17 +199,18 @@ public class BookmarksManager implements IObserver {
         }
     }
 
-    private String buildContent(List<BNode> bmks, String content) {
-        for (BNode b : bmks) {
+    private String buildContent(List<BookmarkNode> bookmarks) {
+        StringBuilder contentBuilder = new StringBuilder();
+        for (BookmarkNode b : bookmarks) {
             if (b.children == null || b.children.isEmpty()) {
                 // Write
-                content += "\n" + b.path.toString();
+                contentBuilder.append("\n").append(b.path.toString());
             } else {
                 // Down one level
-                content += buildContent(b.children, "");
+                contentBuilder.append(buildContent(b.children));
             }
         }
-        return content;
+        return contentBuilder.toString();
     }
 
     /**
@@ -255,18 +230,18 @@ public class BookmarksManager implements IObserver {
     private synchronized boolean insertBookmark(String path, boolean folder) {
         Path p = Path.of(path);
         if (!nodes.containsKey(p)) {
-            BNode bnode = new BNode(p, folder);
+            BookmarkNode bnode = new BookmarkNode(p, folder);
             nodes.put(p, bnode);
-            BNode curr = bnode;
+            BookmarkNode curr = bnode;
             while (true) {
                 if (curr.path.getParent() != null) {
                     if (!nodes.containsKey(curr.path.getParent())) {
                         // Add
-                        BNode pnode = new BNode(curr.path.getParent(), true);
+                        BookmarkNode pnode = new BookmarkNode(curr.path.getParent(), true);
                         nodes.put(pnode.path, pnode);
                     }
                     // Insert
-                    BNode parentNode = nodes.get(curr.path.getParent());
+                    BookmarkNode parentNode = nodes.get(curr.path.getParent());
                     parentNode.insert(curr);
                     curr = parentNode;
                 } else {
@@ -289,7 +264,7 @@ public class BookmarksManager implements IObserver {
     public synchronized boolean removeBookmark(String path) {
         Path p = Path.of(path);
         if (nodes != null && nodes.containsKey(p)) {
-            BNode n = nodes.get(p);
+            BookmarkNode n = nodes.get(p);
             if (n.parent != null) {
                 n.parent.children.remove(n);
                 n.parent = null;
@@ -311,9 +286,9 @@ public class BookmarksManager implements IObserver {
     public synchronized int removeBookmarksByName(String name) {
         int nRemoved = 0;
         if (bookmarks != null && !bookmarks.isEmpty()) {
-            Iterator<BNode> it = bookmarks.iterator();
+            Iterator<BookmarkNode> it = bookmarks.iterator();
             while (it.hasNext()) {
-                BNode bookmark = it.next();
+                BookmarkNode bookmark = it.next();
                 if (bookmark.name.equals(name)) {
                     // Remove from root
                     it.remove();
@@ -329,7 +304,7 @@ public class BookmarksManager implements IObserver {
         return 0;
     }
 
-    private synchronized int removeBookmarksByNameRec(String name, BNode bookmark, Iterator<BNode> itr) {
+    private synchronized int removeBookmarksByNameRec(String name, BookmarkNode bookmark, Iterator<BookmarkNode> itr) {
         int nRemoved = 0;
         if (bookmark.name.equals(name)) {
             // Remove from parent
@@ -338,9 +313,9 @@ public class BookmarksManager implements IObserver {
             nodes.remove(bookmark.path);
             nRemoved++;
         } else if (bookmark.children != null) {
-            Iterator<BNode> it = bookmark.children.iterator();
+            Iterator<BookmarkNode> it = bookmark.children.iterator();
             while (it.hasNext()) {
-                BNode child = it.next();
+                BookmarkNode child = it.next();
                 nRemoved += removeBookmarksByNameRec(name, child, it);
             }
         }
@@ -367,8 +342,8 @@ public class BookmarksManager implements IObserver {
                 logger.info(removed + " bookmarks with name " + name + " removed");
                 break;
             case BOOKMARKS_MOVE:
-                BNode src = (BNode) data[0];
-                BNode dest = (BNode) data[1];
+                BookmarkNode src = (BookmarkNode) data[0];
+                BookmarkNode dest = (BookmarkNode) data[1];
                 if(dest == null){
                     // Move to root
                     removeBookmark(src.path.toString());

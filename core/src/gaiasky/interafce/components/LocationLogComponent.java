@@ -96,7 +96,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             goToObj.setSize(30f, 30f);
             goToObj.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    GaiaSky.postRunnable(() -> EventScriptingInterface.instance().setCameraFocusInstantAndGo(lr.name, false));
+                    GaiaSky.postRunnable(() -> ((EventScriptingInterface) GaiaSky.instance.scripting()).setCameraFocusInstantAndGo(lr.name, false));
                     return true;
                 }
                 return false;

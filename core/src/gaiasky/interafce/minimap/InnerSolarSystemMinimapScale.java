@@ -48,10 +48,10 @@ public class InnerSolarSystemMinimapScale extends AbstractMinimapScale {
     @Override
     public void updateLocal() {
         if (mer == null) {
-            mer = (Planet) GaiaSky.instance.sg.getNode("Mercury");
-            ven = (Planet) GaiaSky.instance.sg.getNode("Venus");
-            ear = (Planet) GaiaSky.instance.sg.getNode("Earth");
-            mar = (Planet) GaiaSky.instance.sg.getNode("Mars");
+            mer = (Planet) GaiaSky.instance.sceneGraph.getNode("Mercury");
+            ven = (Planet) GaiaSky.instance.sceneGraph.getNode("Venus");
+            ear = (Planet) GaiaSky.instance.sceneGraph.getNode("Earth");
+            mar = (Planet) GaiaSky.instance.sceneGraph.getNode("Mars");
         }
         if (mer != null)
             position(mer.getAbsolutePosition(aux3b1).tov3d(aux3d1), merp);

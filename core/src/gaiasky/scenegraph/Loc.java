@@ -123,7 +123,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
         Vector3d aux = aux3d1.get();
         translation.put(aux).scl(-1);
 
-        double cosalpha = aux.add(location3d.x, location3d.y, location3d.z).nor().dot(GaiaSky.instance.cam.getDirection().nor());
+        double cosalpha = aux.add(location3d.x, location3d.y, location3d.z).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor());
         return cosalpha < -0.3f;
     }
 

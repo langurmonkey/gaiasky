@@ -30,7 +30,6 @@ import gaiasky.util.tree.OctreeNode;
 import net.jafama.FastMath;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -51,8 +50,8 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @return True if it was inserted, false otherwise
      */
     public static boolean insert(SceneGraphNode node, boolean addToIndex) {
-        if (GaiaSky.instance.sg != null) {
-            GaiaSky.instance.sg.insert(node, addToIndex);
+        if (GaiaSky.instance.sceneGraph != null) {
+            GaiaSky.instance.sceneGraph.insert(node, addToIndex);
             return true;
         }
         return false;
@@ -481,7 +480,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public void doneLoading(AssetManager manager) {
         if (coordinates != null)
-            coordinates.doneLoading(GaiaSky.instance.sg, this);
+            coordinates.doneLoading(GaiaSky.instance.sceneGraph, this);
     }
 
     public Vector3b getPos() {
