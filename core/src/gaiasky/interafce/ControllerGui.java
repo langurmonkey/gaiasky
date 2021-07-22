@@ -505,7 +505,7 @@ public class ControllerGui extends AbstractGui {
         starGlowButton = new OwnTextButton(I18n.txt("gui.lightscattering"), skin, "toggle-big");
         optionsModel[0][2] = starGlowButton;
         starGlowButton.setWidth(ww);
-        starGlowButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        starGlowButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW);
         starGlowButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, starGlowButton.isChecked(), false);

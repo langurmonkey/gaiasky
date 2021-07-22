@@ -1,0 +1,508 @@
+# Gaia Sky configuration file
+
+# Configuration version number
+version: 30100
+
+#
+# Data configuration
+#
+data:
+  # Location of the data folder.
+  # Windows and macOS: in your user directory: $HOME/.gaiasky/data
+  # Linux: ~/.local/share/gaiasky/data
+  location:
+  # Selected catalogs to load at startup
+  catalogFiles: []
+  # List of object files to load.
+  # Additionally to the files defined here, any file in the data folder with the format
+  # "autoload-*.json" will also be loaded using the JsonLoader
+  objectFiles: [data/data-main.json]
+  # Location of the skybox within the data folder (data/tex/skybox/[...]/)
+  skyboxLocation: data/tex/skybox/gaiasky/
+  # Use all terms in position algorithms (VSOP87 and moon coordinates)
+  highAccuracy: no
+  # Use real attitude or NSL for Gaia
+  realGaiaAttitude: no
+
+#
+# Performance configuration
+#
+performance:
+  # Is multithreading enabled?
+  multithreading: yes
+  # Number of worker threads to use for background
+  # metadata updates. Set to 0 to default to the number
+  # of logical processors.
+  numberThreads: 0
+
+#
+# Graphics configuration
+#
+graphics:
+  # Graphics quality setting in [low|normal|high|ultra]
+  quality: normal
+  # Resolution in windowed mode, use 0 for default
+  resolution: [0, 0]
+  # Make the window resizable, in windowed mode
+  resizable: yes
+  # Full screen configuration
+  fullScreen:
+    # Is fullscreen active?
+    active: no
+    # Resolution in full screen mode
+    resolution: [1920, 1080]
+  # Enable VSYNC
+  vsync: yes
+  # Limit frame rate, set to 0 to disable frame limiter
+  fpsLimit: 0
+  # Here be dragons! This is just for testing. Unstable!
+  # Back buffer scaling factor - just leave it at 1
+  backBufferScale: 1.0
+  # Here be dragons! This is just for testing. Unstable!
+  # Enable dynamic resolution  - kicks in during low FPS by reducing the backbuffer size
+  dynamicResolution: no
+  # This activates output to the default monitor. Deactivate only to enable headless mode.
+  screenOutput: yes
+
+#
+# Scene configuration
+#
+scene:
+  # Name of the home object
+  homeObject: Earth
+  # Object fade time in ms
+  fadeMs: 2500
+  # Camera configuration
+  camera:
+    # Camera speed limit
+    # 0 - 100 km/h
+    # 1 - 0.5c
+    # 2 - 0.8c
+    # 3 - 0.9c
+    # 4 - 0.99c
+    # 5 - 0.99999c
+    # 6 - c (3e8 m/s)
+    # 7 - 2*c
+    # 8 - 10*c
+    # 9 - 1000*c
+    # 10 - 1 AU/s
+    # 11 - 10 AU/s
+    # 12 - 1000 AU/s
+    # 13 - 10000 AU/s
+    # 14 - 1 pc/s
+    # 15 - 2 pc/s
+    # 16 - 10 pc/s
+    # 17 - 1000 pc/s
+    # 18 - No limit
+    speedLimit: 18
+    # Camera speed multiplier
+    speed: 10.0
+    # Camera turn velocity
+    turn: 3000.0
+    # Camera rotation
+    rotate: 5000.0
+    # Field of view in degrees
+    fov: 45.0
+    # Cinematic camera
+    cinematic: no
+    # Target on in free mode. This scales the velocity of the camera according
+    # to the distance to the closest object
+    targetMode: yes
+    # Focus lock configuration, when camera is in focus mode
+    focusLock:
+      # Lock camera position to focus position
+      position: yes
+      # Lock camera position to focus orientation
+      orientation: no
+  # Star settings
+  star:
+    # Star brightness factor
+    brightness: 2.0
+    # Modulate the brightness of stars with this power
+    power: 0.75
+    # Size scaling of stars
+    pointSize: 8.2
+    # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
+    # 1 - horizontal spike
+    # 2 - god rays
+    # 3 - horizontal and vertical spikes
+    # 4 - simple radial profile
+    textureIndex: 4
+    # Star opacity mapping, as in [min, max]
+    opacity: [0.0, 1.0]
+    # Star groups
+    group:
+      # Enable or disable the star billboards when stars are close
+      billboard: yes
+      # Maximum number of star billboards per group
+      numBillboard: 30
+      # Maximum number of labels per star group
+      numLabel: 50
+      # Maximum number of velocity vectors per star group
+      numVelocityVector: 500
+    # Star threshold values
+    threshold:
+      # Threshold radius/distance for stars. This controls the threshold to render stars as points or as quads
+      # radius/distance limit for rendering as quad. If angle is any bigger, we render as a model.
+      quad: 0.0
+      # radius/distance limit for rendering as point. If angle is any bigger, we render as quad.
+      point: 1.7e-8
+      # radius/distance limit for rendering at all. If angle is smaller than this quantity, no rendering happens.
+      none: 0.0
+  # Label settings
+  label:
+    # Label size factor
+    size: 0.85
+    # Controls the number of labels to render
+    number: 1.3
+  # Line width factor
+  lineWidth: 1.0
+  # Proper motion arrow settings
+  properMotion:
+    # Length factor of proper motion vectors [500.0 - 50000.0]
+    length: 25000.0
+    # Scale factor of proper motion vectors [1.0 - 10.0]
+    number: 5.0
+    # Color mode for velocity vectors
+    # 0 - direction
+    # 1 - length (speed)
+    # 2 - has radial velocity
+    # 3 - redshift
+    # 4 - single color
+    colorMode: 0
+    # Whether to show arrowheads or not
+    arrowHeads: yes
+  # Octree settings
+  octree:
+    # In the case of multifile LOD datasets (such as DR2+), this setting contains
+    # the maximum number of stars loaded at a time. If the number of loaded stars
+    # exceeds this setting, the system will start looking for the best candidates
+    # to be unloaded and start unloading data. Should not be set too low, and this should
+    # be balanced with the dataset and the draw distance.
+    # 6.0 M is calibrated to use 6 GB heap space with the default dataset
+    maxStars: 7000000
+    # The octant thersholds:
+    # - radius/distance above which we start painting stars in octant with fade in. Angle in radians.
+    # - radius/distance below which we paint stars in octant with fade out. Above this angle, inner stars are painted with full brightness. Angle in radians.
+    threshold: [1.4, 1.8]
+    # If on, particles fade in and out between levels of detail
+    fade: yes
+  # Renderer settings
+  renderer:
+    # Line renderer type: 0 - performance (GL LINES), 1 - polyline quadstrips (quality)
+    line: 1
+    # Orbit renderer
+    # 0 - use the line renderer setting (see below) - slower, looks better
+    # 1 - use GPU VBOs - faster, looks worse
+    orbit: 0
+    # Ambient light value
+    ambient: 0.0
+    # Shadow settings
+    shadow:
+      # Enable shadows
+      active: yes
+      # Shadow map resolution
+      resolution: 1024
+      # Maximum number of shadows
+      number: 4
+    # Elevation representation settings
+    elevation:
+      # Elevation type [tessellation|parallax_mapping|none]
+      type: tessellation
+      # Elevation multiplier, in [0.0, 10.0]
+      multiplier: 2.5
+      # Tessellation quality, in [1.0, 7.0]
+      quality: 4.0
+  # Crosshair settings
+  crosshair:
+    # Show crosshair on focus object
+    focus: yes
+    # Show crosshair on closest object
+    closest: yes
+    # Show crosshair on home object
+    home: yes
+  # Initialization configuration
+  initialization:
+    # Lazy initalization of textures
+    lazyTexture: yes
+    # Lazy initialization of meshes
+    lazyMesh: yes
+  # Visibility of components
+  visibility:
+    Atmospheres: yes
+    Planets: yes
+    Labels: yes
+    Boundaries: no
+    Moons: yes
+    Equatorial: no
+    Orbits: yes
+    Constellations: no
+    Galactic: no
+    Ecliptic: no
+    RecursiveGrid: no
+    Satellites: yes
+    Stars: yes
+    MilkyWay: yes
+    Asteroids: no
+    Clusters: no
+    Locations: no
+    Countries: no
+    Galaxies: yes
+    Nebulae: yes
+    Meshes: no
+    Titles: no
+    Effects: no
+    Clouds: yes
+    Ruler: yes
+    VelocityVectors: no
+    Axes: yes
+    Others: yes
+
+#
+# Program configuration
+#
+program:
+  # Enable safe mode, which disables advanced graphics features.
+  # For instance, it disables float buffers and creates no velocity buffer (no motion blur)
+  safeMode: no
+  # Print debug information to the terminal
+  debugInfo: no
+  # Whether to display the HUD
+  hud: no
+  # Minimap settings
+  minimap:
+    # Display the minimap
+    active: no
+    # Minimap side size in [150,350]
+    size: 200
+  # File chooser dialog configuration
+  fileChooser:
+    # Show hidden files
+    showHidden: no
+  # Pointer configuration
+  pointer:
+    # Display the coordinates of the pointer projected on the sides of the window
+    coordinates: yes
+    # Pointer guides configuraiton
+    guides:
+      # Display pointer guides
+      active: no
+      # Color of pointer guides in RGBA
+      color: [1.0, 1.0, 1.0, 0.3]
+      # Width of pointer guide lines
+      width: 1.5
+  # Recursive grid configuration
+  recursiveGrid:
+    # Origin of the recursive grid in [focus|refsys]
+    origin: refsys
+    # If origin is refsys, this option adds projection lines to the current focus
+    projectionLines: yes
+  # Stereoscopic mode (3D)
+  modeStereo:
+    # Start in 3D mode
+    active: no
+    # The stereoscopic profile.
+    # 0 - VR headsets
+    # 1 - 3DTV (left-right)
+    # 2 - 3DTV (top-bottom)
+    # 3 - Cross-eye
+    # 4 - Parallel view
+    # 5 - Anaglyph red-cyan
+    profile: 2
+  # Cubemap mode
+  modeCubemap:
+    # Start in cubemap mode
+    active: no
+    # Projection to use for the cubemap mode, in [equirectangular|cylindrical|hammer|fisheye]
+    # Set to 'fisheye' for planetarium mode
+    projection: equirectangular
+    # The resolution at which to render each side of the cubemap
+    faceResolution: 1500
+    # Planetarium mode configuration
+    planetarium:
+      # Aperture angle, in degrees
+      aperture: 180.0
+      # Devaition angle of the focus mode from the zenith, in degrees
+      angle: 50.0
+  # Gaia Sky instance connection (master-slave)
+  net:
+    # Enable the REST API on this TCP port (negative to disable)
+    restPort: -1
+    # Master configuraiton
+    master:
+      # Is master instance
+      # This means that the status is sent over the network to the slaves
+      # Incompatible with slave>is
+      active: no
+      # List of URLs of the slave instances
+      # Example: [http\://localhost\:13900/api/,http\://localhost\:13901/api]
+      slaves: []
+    # Slave configuration
+    slave:
+      # In a client-server configuration, this makes this instance act as a slave
+      # which receives input events over the network
+      # Incompatible with master>is
+      active: no
+      # Location of the .mpcdi configuration file for this instance
+      # Only needed if program.net.slave is true
+      configFile:
+      # Warp pfm file
+      warpFile:
+      # Blend png file
+      blendFile:
+      # Yaw angle (turn head right)
+      yaw:
+      # Pitch angle (turn head up)
+      pitch:
+      # Roll angle (rotate head cw)
+      roll:
+  # Default location of script files, leave empty for default
+  scriptsLocation:
+  # User interface configuraiton
+  ui:
+    # The UI theme, in [dark-green|dark-blue|dark-orange|night-red]
+    theme: dark-green
+    # The UI scale factor
+    scale: 1.0
+  # Ask for confirmation on exit
+  exitConfirmation: yes
+  # Set to 'default' to use the system default locale, set to
+  # language tag (see java.util.Locale#forLanguageTag(), java 7+) to change
+  # the locale (en_GB, en_US, es_ES, de_DE, fr, etc.)
+  # Leave empty to use default locale
+  locale:
+  # Update configuration
+  update:
+    # Last update check date
+    lastCheck:
+    # Server version of the last check
+    lastVersion:
+  # Pointers to some resources
+  url:
+    # URL to check for new versions
+    versionCheck: https\://gitlab.com/api/v4/projects/langurmonkey%2Fgaiasky/repository/tags
+    # Data repository location
+    dataMirror: https\://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
+    # Data descriptor file location
+    dataDescriptor: https\://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030000.json
+
+#
+# Controls configuration
+#
+controls:
+  # Gamepad configuration
+  gamepad:
+    # Controller mappings file
+    mappingsFile: mappings/SDL_Controller.controller
+    # Invert look X axis
+    invertX: no
+    # Invert look Y axis
+    invertY: yes
+    # Blacklist of controller names. All controllers here will not be
+    # processed by Gaia Sky. Find the connected controller names in the Preferences
+    # window, Controls tab.
+    # Example: blacklist: [Microsoft Xbox 360 pad, Playstation 4 dualshock]
+    blacklist: []
+
+#
+# Frame output configuration
+#
+frame:
+  # Output directory of still frames
+  location:
+  # File name prefix for still frames
+  prefix: gaiasky
+  # Stamp frames with current simulation time
+  time: no
+  # Either jpg or png
+  format: jpg
+  # Quality of jpg, in [0,1]
+  quality: 0.93
+  # The frame mode: [simple|redraw]
+  # simple - the current openGL buffer is written to a file. Screenshot will look exactly like the screen
+  # redraw - the image is redrawn with optionally different effects and resolution, and then it is written to a file.
+  mode: simple
+  # Still frame image resolution, only in redraw mode
+  resolution: [1280,720]
+  targetFps: 60
+
+#
+# Screenshots configuration
+#
+screenshot:
+  # Output directory of screenshots
+  location:
+  # Either jpg or png
+  format: jpg
+  # Quality of jpg, in [0,1]
+  quality: 0.93
+  # The screenshot mode: [simple|redraw]
+  # simple - the current openGL buffer is written to a file. Screenshot will look exactly like the screen
+  # redraw - the image is redrawn with optionally different effects and resolution, and then it is written to a file.
+  mode: simple
+  # Screenshot image resolution, only in redraw mode
+  resolution: [1280,720]
+
+#
+# Camrecorder configuration
+#
+camrecorder:
+  # Target frame rate of the camrecorder system
+  targetFps: 60
+  # Keyframe configruation
+  keyframe:
+    # Interpolation method for the camera position, in [spline|linear]
+    position: spline
+    # Interpolation method for the camera orientation, in [spline|linear]
+    orientation: spline
+  # Automatically activate frame output system when playing a camera path
+  auto: no
+
+#
+# Post-processing configuration
+#
+postprocess:
+  # Antialiasing mode, one of [none,fxaa,nfaa]
+  antialias: fxaa
+  # Bloom settings
+  bloom:
+    # Intensity of bloom
+    intensity: 0.1
+  # Unsharp mask effect
+  unsharpMask:
+    # Sharpen factor, in [0,3]
+    factor: 1.0
+  # Activate/deactivate motion blur effect
+  motionBlur: no
+  # Activate/deactivate lens flare effect
+  lensFlare: yes
+  # Activate/deactivate light glow effect
+  lightGlow: yes
+  # Activate/deactivate fisheye transformation
+  fisheye: no
+  # Image levels configuraiton
+  levels:
+    # Brightness level in [-1,1] (default=0)
+    brightness: 0.0
+    # Contrast level in [0,2] (default=1)
+    contrast: 1.0
+    # Hue level in [0,1] (default=1)
+    hue: 1.0
+    # Saturation level in [0,2] (default=1)
+    saturation: 1.0
+    # Gamma correction value in [0,3] (default=1)
+    gamma: 1.0
+  # Tone mapping algorhtims
+  toneMapping:
+    # Alrogrithm to use, one of [auto,exposure,aces,uncharted,filmic,none]
+    type: none
+    # When type=exposure, set the exposure here, in [0,n]
+    exposure: 0.0
+#
+# Spacecraft configuration
+#
+spacecraft:
+  # Velocity vector always aligned with spacecraft direction vector
+  velocityDirection: no
+  # Whether to show the direction and up axes of the spacecraft
+  showAxes: no

@@ -23,10 +23,7 @@ import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
 import gaiasky.desktop.render.DesktopPostProcessorFactory;
 import gaiasky.desktop.render.ScreenModeCmd;
-import gaiasky.desktop.util.CrashReporter;
-import gaiasky.desktop.util.DesktopConfInit;
-import gaiasky.desktop.util.DesktopMusicActors;
-import gaiasky.desktop.util.SysUtils;
+import gaiasky.desktop.util.*;
 import gaiasky.desktop.util.camera.CamRecorder;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -42,6 +39,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
+import org.yaml.snakeyaml.Yaml;
 
 import java.awt.*;
 import java.io.*;
@@ -49,6 +47,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -198,19 +197,21 @@ public class GaiaSkyDesktop implements IObserver {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            // Init gaiasky directories
+            // Init Gaia Sky directories
             SysUtils.mkdirs();
 
             // Init properties file
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                initConfigFile(false, gsArgs.vr);
+                initConfigFileNew(gsArgs.vr);
+                initConfigFile(gsArgs.vr);
             }
 
             // Initialize i18n (only for global config logging)
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
 
             // Init global configuration
+            SettingsManager.initialize(gsArgs.vr);
             ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
 
             // Safe mode
@@ -510,11 +511,9 @@ public class GaiaSkyDesktop implements IObserver {
      * the default configuration file of this release
      * to determine whether the config file must be overwritten.
      *
-     * @param ow Whether to force overwrite.
-     * @return The path of the file used.
      * @throws IOException If the file fails to be written successfully.
      */
-    private static String initConfigFile(boolean ow, boolean vr) throws IOException {
+    private static void initConfigFile(boolean vr) throws IOException {
         // Use user folder
         Path userFolderConfFile = SysUtils.getConfigDir().resolve(DesktopConfInit.getConfigFileName(vr));
 
@@ -522,7 +521,7 @@ public class GaiaSkyDesktop implements IObserver {
         Path confFolder = GlobalConf.assetsPath("conf");
         Path internalFolderConfFile = confFolder.resolve(DesktopConfInit.getConfigFileName(vr));
 
-        boolean overwrite = ow;
+        boolean overwrite = false;
         boolean userConfExists = Files.exists(userFolderConfFile);
         if (userConfExists) {
             Properties userProps = new Properties();
@@ -550,12 +549,63 @@ public class GaiaSkyDesktop implements IObserver {
                 // Running released package
                 GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
             } else {
-                logger.warn("Configuration folder does not exist: " + confFolder.toString());
+                logger.warn("Configuration folder does not exist: " + confFolder);
             }
         }
         String props = userFolderConfFile.toAbsolutePath().toString();
         System.setProperty("properties.file", props);
-        return props;
+    }
+    /**
+     * Initialises the configuration file. Tries to load first the file in
+     * <code>$GS_CONFIG_DIR/config.yaml</code>. Checks the
+     * <code>version</code> key and compares it with the version in
+     * the default configuration file of this release
+     * to determine whether the config file must be overwritten.
+     *
+     * @throws IOException If the file fails to be written successfully.
+     */
+    private static void initConfigFileNew(boolean vr) throws IOException {
+        // Use user folder
+        Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
+
+        // Internal config
+        Path confFolder = GlobalConf.assetsPath("conf");
+        Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(vr));
+
+        boolean overwrite = false;
+        boolean userConfExists = Files.exists(userFolderConfFile);
+        if (userConfExists) {
+            Yaml yaml = new Yaml();
+            Map<String, Object> userProps = yaml.load(Files.newInputStream(userFolderConfFile));
+            int internalVersion = 0;
+            if (Files.exists(internalFolderConfFile)) {
+                Map<String, Object> internalProps = yaml.load(Files.newInputStream(internalFolderConfFile));
+                internalVersion = (Integer) internalProps.get("version");
+            }
+
+            // Check latest version
+            if (!userProps.containsKey("version")) {
+                out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
+                overwrite = true;
+            } else if ((Integer) userProps.get("version") < internalVersion) {
+                out.println("Properties file version mismatch, overwriting with new version: found " + userProps.get("version") + ", required " + internalVersion);
+                overwrite = true;
+            }
+        }
+
+        // TODO update configuration?
+
+        if (overwrite || !userConfExists) {
+            // Copy file
+            if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
+                // Running released package
+                GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
+            } else {
+                logger.warn("Configuration folder does not exist: " + confFolder);
+            }
+        }
+        String props = userFolderConfFile.toAbsolutePath().toString();
+        System.setProperty("properties.file", props);
     }
 
     /**

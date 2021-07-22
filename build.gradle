@@ -32,6 +32,7 @@ allprojects {
         sdl2gdxVersion = "1.0.+"
         jsoupVersion = "1.13.1"
         apfloatVersion = "1.10.0"
+        jacksonVersion = "2.12.+"
     }
 
     repositories {
@@ -152,6 +153,10 @@ project(":core") {
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
         // Screenshots and frames
         api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
+        // Yaml
+        api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
+        api group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
+
 
         // ****************
         // REST SERVER DEPS

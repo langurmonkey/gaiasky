@@ -179,18 +179,13 @@ public class GlobalConf {
         }
 
         public Antialias getAntialias(int code) {
-            switch (code) {
-            case 0:
-                return Antialias.NONE;
-            case -1:
-                return Antialias.FXAA;
-            case -2:
-                return Antialias.NFAA;
-            case 1:
-                return Antialias.SSAA;
-            default:
-                return Antialias.NONE;
-            }
+            return switch (code) {
+                case 0 -> Antialias.NONE;
+                case -1 -> Antialias.FXAA;
+                case -2 -> Antialias.NFAA;
+                case 1 -> Antialias.SSAA;
+                default -> Antialias.NONE;
+            };
         }
 
         public Antialias POSTPROCESS_ANTIALIAS;
@@ -198,7 +193,7 @@ public class GlobalConf {
         public float POSTPROCESS_UNSHARPMASK_FACTOR;
         public boolean POSTPROCESS_MOTION_BLUR;
         public boolean POSTPROCESS_LENS_FLARE;
-        public boolean POSTPROCESS_LIGHT_SCATTERING;
+        public boolean POSTPROCESS_LIGHT_GLOW;
         public boolean POSTPROCESS_FISHEYE;
         /**
          * Brightness level in [-1..1]. Default is 0.
@@ -249,7 +244,7 @@ public class GlobalConf {
             this.POSTPROCESS_UNSHARPMASK_FACTOR = POSTPROCESS_UNSHARPMASK_FACTOR;
             this.POSTPROCESS_MOTION_BLUR = POSTPROCESS_MOTION_BLUR;
             this.POSTPROCESS_LENS_FLARE = POSTPROCESS_LENS_FLARE;
-            this.POSTPROCESS_LIGHT_SCATTERING = POSTPROCESS_LIGHT_SCATTERING;
+            this.POSTPROCESS_LIGHT_GLOW = POSTPROCESS_LIGHT_SCATTERING;
             this.POSTPROCESS_FISHEYE = POSTPROCESS_FISHEYE;
             this.POSTPROCESS_BRIGHTNESS = POSTPROCESS_BRIGHTNESS;
             this.POSTPROCESS_CONTRAST = POSTPROCESS_CONTRAST;
@@ -273,7 +268,7 @@ public class GlobalConf {
                 POSTPROCESS_LENS_FLARE = (Boolean) data[0];
                 break;
             case LIGHT_SCATTERING_CMD:
-                POSTPROCESS_LIGHT_SCATTERING = (Boolean) data[0];
+                POSTPROCESS_LIGHT_GLOW = (Boolean) data[0];
                 break;
             case MOTION_BLUR_CMD:
                 POSTPROCESS_MOTION_BLUR = (Boolean) data[0];
@@ -467,7 +462,7 @@ public class GlobalConf {
         public boolean DISPLAY_VR_GUI = false;
 
         // Max clock time, 5 Myr by default
-        public long MAX_TIME_MS = 5000000l * (long) Nature.Y_TO_MS;
+        public long MAX_TIME_MS = 5000000L * (long) Nature.Y_TO_MS;
         // Min clock time, -5 Myr by default
         public long MIN_TIME_MS = -MAX_TIME_MS;
 
@@ -536,11 +531,7 @@ public class GlobalConf {
          * Toggles the time
          */
         public void toggleTimeOn(Boolean timeOn) {
-            if (timeOn != null) {
-                TIME_ON = timeOn;
-            } else {
-                TIME_ON = !TIME_ON;
-            }
+            TIME_ON = Objects.requireNonNullElseGet(timeOn, () -> !TIME_ON);
         }
 
         /**
@@ -549,11 +540,7 @@ public class GlobalConf {
         private double backupLimitFps = 0;
 
         public void toggleRecord(Boolean rec) {
-            if (rec != null) {
-                RECORD_CAMERA = rec;
-            } else {
-                RECORD_CAMERA = !RECORD_CAMERA;
-            }
+            RECORD_CAMERA = Objects.requireNonNullElseGet(rec, () -> !RECORD_CAMERA);
 
             if (RECORD_CAMERA) {
                 // Activation, set limit FPS
@@ -1204,8 +1191,7 @@ public class GlobalConf {
             switch (event) {
             case STEREOSCOPIC_CMD:
                 if (!GaiaSky.instance.cameraManager.mode.isGaiaFov()) {
-                    boolean stereomode = (Boolean) data[0];
-                    STEREOSCOPIC_MODE = stereomode;
+                    STEREOSCOPIC_MODE = (boolean) (Boolean) data[0];
                     if (STEREOSCOPIC_MODE && CUBEMAP_MODE) {
                         CUBEMAP_MODE = false;
                         EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.txt("notif.cleanmode"));
@@ -1679,70 +1665,37 @@ public class GlobalConf {
 
         public void updateSpeedLimit() {
             switch (CAMERA_SPEED_LIMIT_IDX) {
-            case 0:
-                // 100 km/h is 0.027 km/s
-                CAMERA_SPEED_LIMIT = 0.0277777778 * Constants.KM_TO_U;
-                break;
-            case 1:
-                CAMERA_SPEED_LIMIT = 0.5 * Constants.C * Constants.M_TO_U;
-                break;
-            case 2:
-                CAMERA_SPEED_LIMIT = 0.8 * Constants.C * Constants.M_TO_U;
-                break;
-            case 3:
-                CAMERA_SPEED_LIMIT = 0.9 * Constants.C * Constants.M_TO_U;
-                break;
-            case 4:
-                CAMERA_SPEED_LIMIT = 0.99 * Constants.C * Constants.M_TO_U;
-                break;
-            case 5:
-                CAMERA_SPEED_LIMIT = 0.99999 * Constants.C * Constants.M_TO_U;
-                break;
-            case 6:
-                CAMERA_SPEED_LIMIT = Constants.C * Constants.M_TO_U;
-                break;
-            case 7:
-                CAMERA_SPEED_LIMIT = 2.0 * Constants.C * Constants.M_TO_U;
-                break;
-            case 8:
-                // 10 c
-                CAMERA_SPEED_LIMIT = 10.0 * Constants.C * Constants.M_TO_U;
-                break;
-            case 9:
-                // 1000 c
-                CAMERA_SPEED_LIMIT = 1000.0 * Constants.C * Constants.M_TO_U;
-                break;
-            case 10:
-                CAMERA_SPEED_LIMIT = 1.0 * Constants.AU_TO_U;
-                break;
-            case 11:
-                CAMERA_SPEED_LIMIT = 10.0 * Constants.AU_TO_U;
-                break;
-            case 12:
-                CAMERA_SPEED_LIMIT = 1000.0 * Constants.AU_TO_U;
-                break;
-            case 13:
-                CAMERA_SPEED_LIMIT = 10000.0 * Constants.AU_TO_U;
-                break;
-            case 14:
-                CAMERA_SPEED_LIMIT = Constants.PC_TO_U;
-                break;
-            case 15:
-                CAMERA_SPEED_LIMIT = 2.0 * Constants.PC_TO_U;
-                break;
-            case 16:
-                // 10 pc/s
-                CAMERA_SPEED_LIMIT = 10.0 * Constants.PC_TO_U;
-                break;
-            case 17:
-                // 1000 pc/s
-                CAMERA_SPEED_LIMIT = 1000.0 * Constants.PC_TO_U;
-                break;
-            case 18:
-                // No limit
-                CAMERA_SPEED_LIMIT = -1;
-                break;
-
+            case 0 ->
+                    // 100 km/h is 0.027 km/s
+                    CAMERA_SPEED_LIMIT = 0.0277777778 * Constants.KM_TO_U;
+            case 1 -> CAMERA_SPEED_LIMIT = 0.5 * Constants.C * Constants.M_TO_U;
+            case 2 -> CAMERA_SPEED_LIMIT = 0.8 * Constants.C * Constants.M_TO_U;
+            case 3 -> CAMERA_SPEED_LIMIT = 0.9 * Constants.C * Constants.M_TO_U;
+            case 4 -> CAMERA_SPEED_LIMIT = 0.99 * Constants.C * Constants.M_TO_U;
+            case 5 -> CAMERA_SPEED_LIMIT = 0.99999 * Constants.C * Constants.M_TO_U;
+            case 6 -> CAMERA_SPEED_LIMIT = Constants.C * Constants.M_TO_U;
+            case 7 -> CAMERA_SPEED_LIMIT = 2.0 * Constants.C * Constants.M_TO_U;
+            case 8 ->
+                    // 10 c
+                    CAMERA_SPEED_LIMIT = 10.0 * Constants.C * Constants.M_TO_U;
+            case 9 ->
+                    // 1000 c
+                    CAMERA_SPEED_LIMIT = 1000.0 * Constants.C * Constants.M_TO_U;
+            case 10 -> CAMERA_SPEED_LIMIT = 1.0 * Constants.AU_TO_U;
+            case 11 -> CAMERA_SPEED_LIMIT = 10.0 * Constants.AU_TO_U;
+            case 12 -> CAMERA_SPEED_LIMIT = 1000.0 * Constants.AU_TO_U;
+            case 13 -> CAMERA_SPEED_LIMIT = 10000.0 * Constants.AU_TO_U;
+            case 14 -> CAMERA_SPEED_LIMIT = Constants.PC_TO_U;
+            case 15 -> CAMERA_SPEED_LIMIT = 2.0 * Constants.PC_TO_U;
+            case 16 ->
+                    // 10 pc/s
+                    CAMERA_SPEED_LIMIT = 10.0 * Constants.PC_TO_U;
+            case 17 ->
+                    // 1000 pc/s
+                    CAMERA_SPEED_LIMIT = 1000.0 * Constants.PC_TO_U;
+            case 18 ->
+                    // No limit
+                    CAMERA_SPEED_LIMIT = -1;
             }
         }
 

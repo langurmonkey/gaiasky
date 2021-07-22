@@ -395,10 +395,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lensFlare.setChecked(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE);
 
         // LIGHT GLOW
-        lightglowBak = GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING;
+        lightglowBak = GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW;
         CheckBox lightGlow = new OwnCheckBox(I18n.txt("gui.lightscattering"), skin, pad5);
         lightGlow.setName("light scattering");
-        lightGlow.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        lightGlow.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW);
         lightGlow.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightGlow.isChecked(), true);

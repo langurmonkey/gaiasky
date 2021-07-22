@@ -90,16 +90,6 @@ public class DesktopConfInit extends ConfInit {
         }
     }
 
-    public void initialiseProperties(File confFile) {
-        try {
-            InputStream fis = new FileInputStream(confFile);
-            p = new CommentedProperties();
-            p.load(fis);
-        } catch (Exception e) {
-            logger.error(e);
-        }
-    }
-
     @Override
     public void initGlobalConf() throws Exception {
         String ARCH = System.getProperty("sun.arch.data.model");
@@ -108,18 +98,18 @@ public class DesktopConfInit extends ConfInit {
         VersionConf versionConf = new VersionConf();
         String versionStr = vp.getProperty("version");
         DateTimeFormatter mydf = DateTimeFormatter.ofPattern("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
-        Instant buildtime = null;
+        Instant buildTime = null;
         try {
-            buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), mydf).toInstant(ZoneOffset.UTC);
+            buildTime = LocalDateTime.parse(vp.getProperty("buildtime"), mydf).toInstant(ZoneOffset.UTC);
         } catch (DateTimeParseException e) {
             mydf = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a", Locale.ENGLISH);
             try {
-                buildtime = LocalDateTime.parse(vp.getProperty("buildtime"), mydf).toInstant(ZoneOffset.UTC);
+                buildTime = LocalDateTime.parse(vp.getProperty("buildtime"), mydf).toInstant(ZoneOffset.UTC);
             } catch (DateTimeParseException e1) {
                 logger.error(e1);
             }
         }
-        versionConf.initialize(versionStr, buildtime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
+        versionConf.initialize(versionStr, buildTime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
 
         // PERFORMANCE CONF
         PerformanceConf performanceConf = new PerformanceConf();
@@ -427,7 +417,7 @@ public class DesktopConfInit extends ConfInit {
     }
 
     @Override
-    public void persistGlobalConf(File propsFile) {
+    public void persistGlobalConf(final File propsFile) {
 
         // SCREENSHOT
         p.setProperty("screenshot.folder", GlobalConf.screenshot.SCREENSHOT_FOLDER);
@@ -447,7 +437,7 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("postprocess.unsharpmask.factor", Float.toString(GlobalConf.postprocess.POSTPROCESS_UNSHARPMASK_FACTOR));
         p.setProperty("postprocess.motionblur", GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR ? "1.0" : "0.0");
         p.setProperty("postprocess.lensflare", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE));
-        p.setProperty("postprocess.lightscattering", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING));
+        p.setProperty("postprocess.lightscattering", Boolean.toString(GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW));
         p.setProperty("postprocess.brightness", Float.toString(GlobalConf.postprocess.POSTPROCESS_BRIGHTNESS));
         p.setProperty("postprocess.contrast", Float.toString(GlobalConf.postprocess.POSTPROCESS_CONTRAST));
         p.setProperty("postprocess.hue", Float.toString(GlobalConf.postprocess.POSTPROCESS_HUE));

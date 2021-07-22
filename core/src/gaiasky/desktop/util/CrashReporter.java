@@ -210,7 +210,7 @@ public class CrashReporter {
             strArray.add("Could not get CPU information!");
         }
 
-        String mbUnits = " " + I18n.txt("gui.debug.ram.unit");
+        String mbUnits = " MB";
         strArray.add("Java used memory: " + MemInfo.getUsedMemory() + mbUnits);
         strArray.add("Java free memory: " + MemInfo.getFreeMemory() + mbUnits);
         strArray.add("Java total memory: " + MemInfo.getTotalMemory() + mbUnits);

@@ -435,7 +435,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             buildShadowMapData();
         }
 
-        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING) {
+        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW) {
             buildGlowData();
         }
     }
@@ -863,7 +863,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (frameBuffer == null) {
             frameBuffer = glowFb;
         }
-        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && frameBuffer != null) {
+        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW && frameBuffer != null) {
             // Get all billboard stars
             Array<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
 

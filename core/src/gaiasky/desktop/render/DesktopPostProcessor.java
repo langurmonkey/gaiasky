@@ -192,7 +192,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setTextureScale(getGlowTextureScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor(), GlobalConf.program.CUBEMAP_MODE));
         lightGlow.setSpiralScale(getGlowSpiralScale(GlobalConf.scene.STAR_BRIGHTNESS, GlobalConf.scene.STAR_POINT_SIZE, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackbufferScale(GlobalConf.runtime.OPENVR ? (float) GlobalConf.screen.BACKBUFFER_SCALE : 1);
-        lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+        lightGlow.setEnabled(!SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW);
         ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
@@ -203,12 +203,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             the activation of the light glow effect is
             not delayed. No time to get to the bottom of this.
          */
-        if (SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING) {
+        if (SysUtils.isMac() && GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW) {
             Task enableLG = new Task() {
                 @Override
                 public void run() {
                     logger.info("Enabling light glow effect...");
-                    ppb.get(LightGlow.class).setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING);
+                    ppb.get(LightGlow.class).setEnabled(GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW);
                 }
             };
             Timer.schedule(enableLG, 5);
