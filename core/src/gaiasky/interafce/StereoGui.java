@@ -17,7 +17,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.format.INumberFormat;
@@ -130,7 +129,7 @@ public class StereoGui extends AbstractGui {
         switch (event) {
         case STEREO_PROFILE_CMD:
             StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
-            notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPHIC);
+            notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPH);
             break;
         default:
             break;

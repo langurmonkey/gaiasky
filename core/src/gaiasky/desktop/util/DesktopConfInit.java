@@ -283,7 +283,6 @@ public class DesktopConfInit extends ConfInit {
         float PM_LEN_FACTOR = Parser.parseFloat(p.getProperty("scene.propermotion.lenfactor", "1E1"));
         int PM_COLOR_MODE = Parser.parseInt(p.getProperty("scene.propermotion.colormode", "0"));
         boolean PM_ARROWHEADS = Parser.parseBoolean(p.getProperty("scene.propermotion.arrowheads", "true"));
-        boolean GALAXY_3D = Parser.parseBoolean(p.getProperty("scene.galaxy.3d", "true"));
         boolean CROSSHAIR_FOCUS = Parser.parseBoolean(p.getProperty("scene.crosshair.focus", "true"));
         boolean CROSSHAIR_CLOSEST = Parser.parseBoolean(p.getProperty("scene.crosshair.closest", "true"));
         boolean CROSSHAIR_HOME = Parser.parseBoolean(p.getProperty("scene.crosshair.home", "true"));
@@ -318,7 +317,7 @@ public class DesktopConfInit extends ConfInit {
         double DIST_SCALE_VR = 1e4d;
 
         SceneConf sceneConf = new SceneConf();
-        sceneConf.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, STAR_BRIGHTNESS_POWER, STAR_TEX_INDEX, STAR_GROUP_BILLBOARD_FLAG, STAR_GROUP_N_BILLBOARDS, STAR_GROUP_N_LABELS, STAR_GROUP_N_VELVECS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, LINE_WIDTH_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, STAR_MIN_OPACITY, STAR_MAX_OPACITY, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, GALAXY_3D, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, LAZY_MESH_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
+        sceneConf.initialize(STARTUP_OBJECT, GRAPHICS_QUALITY, OBJECT_FADE_MS, STAR_BRIGHTNESS, STAR_BRIGHTNESS_POWER, STAR_TEX_INDEX, STAR_GROUP_BILLBOARD_FLAG, STAR_GROUP_N_BILLBOARDS, STAR_GROUP_N_LABELS, STAR_GROUP_N_VELVECS, AMBIENT_LIGHT, CAMERA_FOV, CAMERA_SPEED, TURNING_SPEED, ROTATION_SPEED, CAMERA_SPEED_LIMIT_IDX, FOCUS_LOCK, FOCUS_LOCK_ORIENTATION, LABEL_SIZE_FACTOR, LABEL_NUMBER_FACTOR, LINE_WIDTH_FACTOR, VISIBILITY, ORBIT_RENDERER, LINE_RENDERER, STAR_TH_ANGLE_NONE, STAR_TH_ANGLE_POINT, STAR_TH_ANGLE_QUAD, STAR_MIN_OPACITY, STAR_MAX_OPACITY, OCTREE_PARTICLE_FADE, OCTANT_THRESHOLD_0, OCTANT_THRESHOLD_1, PM_NUM_FACTOR, PM_LEN_FACTOR, PM_COLOR_MODE, PM_ARROWHEADS, STAR_POINT_SIZE, CROSSHAIR_FOCUS, CROSSHAIR_CLOSEST, CROSSHAIR_HOME, CINEMATIC_CAMERA, LAZY_TEXTURE_INIT, LAZY_MESH_INIT, FREE_CAMERA_TARGET_MODE_ON, SHADOW_MAPPING, SHADOW_MAPPING_N_SHADOWS, SHADOW_MAPPING_RESOLUTION, MAX_LOADED_STARS, ELEVATION_TYPE, ELEVATION_MULTIPLIER, TESSELLATION_QUALITY, DIST_SCALE_DESKTOP, DIST_SCALE_VR);
 
         // FRAME CONF
         String renderFolder;
@@ -338,7 +337,7 @@ public class DesktopConfInit extends ConfInit {
         boolean AUTO_FRAME_OUTPUT_CAMERA_PLAY = Parser.parseBoolean(p.getProperty("graphics.camera.recording.frameoutputauto", "false"));
         boolean RENDER_SCREENSHOT_TIME = Parser.parseBoolean(p.getProperty("graphics.render.time"));
 
-        ScreenshotMode FRAME_MODE = ScreenshotMode.valueOf(p.getProperty("graphics.render.mode"));
+        ScreenshotMode FRAME_MODE = ScreenshotMode.valueOf(p.getProperty("graphics.render.mode").toUpperCase());
         ImageFormat FRAME_FORMAT = ImageFormat.valueOf(p.getProperty("graphics.render.format", "jpg").toUpperCase());
         float FRAME_QUALITY = Parser.parseFloat(p.getProperty("graphics.render.quality", "0.93"));
 
@@ -375,7 +374,7 @@ public class DesktopConfInit extends ConfInit {
         String SCREENSHOT_FOLDER = screenshotFolder.replaceAll("\\\\", "/");
         int SCREENSHOT_WIDTH = Parser.parseInt(p.getProperty("screenshot.width"));
         int SCREENSHOT_HEIGHT = Parser.parseInt(p.getProperty("screenshot.height"));
-        ScreenshotMode SCREENSHOT_MODE = ScreenshotMode.valueOf(p.getProperty("screenshot.mode"));
+        ScreenshotMode SCREENSHOT_MODE = ScreenshotMode.valueOf(p.getProperty("screenshot.mode").toUpperCase());
         ImageFormat SCREENSHOT_FORMAT = ImageFormat.valueOf(p.getProperty("screenshot.format", "jpg").toUpperCase());
         float SCREENSHOT_QUALITY = Parser.parseFloat(p.getProperty("screenshot.quality", "0.93"));
         ScreenshotConf screenshotConf = new ScreenshotConf();
@@ -555,7 +554,6 @@ public class DesktopConfInit extends ConfInit {
         p.setProperty("scene.propermotion.lenfactor", Float.toString(GlobalConf.scene.PM_LEN_FACTOR));
         p.setProperty("scene.propermotion.colormode", Integer.toString(GlobalConf.scene.PM_COLOR_MODE));
         p.setProperty("scene.propermotion.arrowheads", Boolean.toString(GlobalConf.scene.PM_ARROWHEADS));
-        p.setProperty("scene.galaxy.3d", Boolean.toString(GlobalConf.scene.GALAXY_3D));
         p.setProperty("scene.crosshair.focus", Boolean.toString(GlobalConf.scene.CROSSHAIR_FOCUS));
         p.setProperty("scene.crosshair.closest", Boolean.toString(GlobalConf.scene.CROSSHAIR_CLOSEST));
         p.setProperty("scene.crosshair.home", Boolean.toString(GlobalConf.scene.CROSSHAIR_HOME));

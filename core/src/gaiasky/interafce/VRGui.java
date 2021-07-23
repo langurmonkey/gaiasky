@@ -13,15 +13,15 @@ public class VRGui<T extends IGui> implements IGui {
     private T right;
     private T left;
 
-    public VRGui(Class<T> clazz, int hoffset, Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public VRGui(Class<T> clazz, int hOffset, Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super();
         try {
             right = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
             right.setVr(true);
-            right.setHoffset(-hoffset);
+            right.setHoffset(-hOffset);
             left = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
             left.setVr(true);
-            left.setHoffset(hoffset);
+            left.setHoffset(hOffset);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }

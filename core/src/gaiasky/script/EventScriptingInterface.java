@@ -947,7 +947,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix) {
         if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
-            em.post(Events.FRAME_OUTPUT_MODE_CMD, GlobalConf.ScreenshotMode.redraw);
+            em.post(Events.FRAME_OUTPUT_MODE_CMD, GlobalConf.ScreenshotMode.REDRAW);
             em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, folder, namePrefix);
         }
     }

@@ -197,7 +197,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             int srw, srh, boundsw, boundsh, start2w, start2h;
 
-            boolean stretch = GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV_HORIZONTAL || GlobalConf.program.STEREO_PROFILE == StereoProfile.HD_3DTV_VERTICAL;
+            boolean stretch = GlobalConf.program.STEREO_PROFILE == StereoProfile.HORIZONTAL_3DTV || GlobalConf.program.STEREO_PROFILE == StereoProfile.VERTICAL_3DTV;
             boolean changeSides = GlobalConf.program.STEREO_PROFILE == StereoProfile.CROSSEYE;
 
             if (GlobalConf.program.STEREO_PROFILE.isHorizontal()) {

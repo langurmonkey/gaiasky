@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-version: 30100
+configVersion: 30100
 
 #
 # Data configuration
@@ -10,7 +10,7 @@ data:
   # Location of the data folder.
   # Windows and macOS: in your user directory: $HOME/.gaiasky/data
   # Linux: ~/.local/share/gaiasky/data
-  location:
+  location: null
   # Selected catalogs to load at startup
   catalogFiles: []
   # List of object files to load.
@@ -20,16 +20,16 @@ data:
   # Location of the skybox within the data folder (data/tex/skybox/[...]/)
   skyboxLocation: data/tex/skybox/gaiasky/
   # Use all terms in position algorithms (VSOP87 and moon coordinates)
-  highAccuracy: no
+  highAccuracy: false
   # Use real attitude or NSL for Gaia
-  realGaiaAttitude: no
+  realGaiaAttitude: false
 
 #
 # Performance configuration
 #
 performance:
   # Is multithreading enabled?
-  multithreading: yes
+  multithreading: true
   # Number of worker threads to use for background
   # metadata updates. Set to 0 to default to the number
   # of logical processors.
@@ -39,30 +39,30 @@ performance:
 # Graphics configuration
 #
 graphics:
-  # Graphics quality setting in [low|normal|high|ultra]
-  quality: normal
+  # Graphics quality setting in [LOW|NORMAL|HIGH|ULTRA]
+  quality: NORMAL
   # Resolution in windowed mode, use 0 for default
   resolution: [0, 0]
   # Make the window resizable, in windowed mode
-  resizable: yes
+  resizable: true
   # Full screen configuration
   fullScreen:
     # Is fullscreen active?
-    active: no
+    active: false
     # Resolution in full screen mode
     resolution: [1920, 1080]
   # Enable VSYNC
-  vsync: yes
+  vsync: true
   # Limit frame rate, set to 0 to disable frame limiter
-  fpsLimit: 0
+  fpsLimit: 0.0
   # Here be dragons! This is just for testing. Unstable!
   # Back buffer scaling factor - just leave it at 1
   backBufferScale: 1.0
   # Here be dragons! This is just for testing. Unstable!
   # Enable dynamic resolution  - kicks in during low FPS by reducing the backbuffer size
-  dynamicResolution: no
+  dynamicResolution: false
   # This activates output to the default monitor. Deactivate only to enable headless mode.
-  screenOutput: yes
+  screenOutput: true
 
 #
 # Scene configuration
@@ -104,16 +104,16 @@ scene:
     # Field of view in degrees
     fov: 45.0
     # Cinematic camera
-    cinematic: no
+    cinematic: false
     # Target on in free mode. This scales the velocity of the camera according
     # to the distance to the closest object
-    targetMode: yes
+    targetMode: true
     # Focus lock configuration, when camera is in focus mode
     focusLock:
       # Lock camera position to focus position
-      position: yes
+      position: true
       # Lock camera position to focus orientation
-      orientation: no
+      orientation: false
   # Star settings
   star:
     # Star brightness factor
@@ -133,7 +133,7 @@ scene:
     # Star groups
     group:
       # Enable or disable the star billboards when stars are close
-      billboard: yes
+      billboard: true
       # Maximum number of star billboards per group
       numBillboard: 30
       # Maximum number of labels per star group
@@ -171,7 +171,7 @@ scene:
     # 4 - single color
     colorMode: 0
     # Whether to show arrowheads or not
-    arrowHeads: yes
+    arrowHeads: true
   # Octree settings
   octree:
     # In the case of multifile LOD datasets (such as DR2+), this setting contains
@@ -186,7 +186,7 @@ scene:
     # - radius/distance below which we paint stars in octant with fade out. Above this angle, inner stars are painted with full brightness. Angle in radians.
     threshold: [1.4, 1.8]
     # If on, particles fade in and out between levels of detail
-    fade: yes
+    fade: true
   # Renderer settings
   renderer:
     # Line renderer type: 0 - performance (GL LINES), 1 - polyline quadstrips (quality)
@@ -200,15 +200,15 @@ scene:
     # Shadow settings
     shadow:
       # Enable shadows
-      active: yes
+      active: true
       # Shadow map resolution
       resolution: 1024
       # Maximum number of shadows
       number: 4
     # Elevation representation settings
     elevation:
-      # Elevation type [tessellation|parallax_mapping|none]
-      type: tessellation
+      # Elevation type [TESSELLATION|PARALLAX_MAPPING|NONE]
+      type: TESSELLATION
       # Elevation multiplier, in [0.0, 10.0]
       multiplier: 2.5
       # Tessellation quality, in [1.0, 7.0]
@@ -216,47 +216,47 @@ scene:
   # Crosshair settings
   crosshair:
     # Show crosshair on focus object
-    focus: yes
+    focus: true
     # Show crosshair on closest object
-    closest: yes
+    closest: true
     # Show crosshair on home object
-    home: yes
+    home: true
   # Initialization configuration
   initialization:
     # Lazy initalization of textures
-    lazyTexture: yes
+    lazyTexture: true
     # Lazy initialization of meshes
-    lazyMesh: yes
+    lazyMesh: true
   # Visibility of components
   visibility:
-    Atmospheres: yes
-    Planets: yes
-    Labels: yes
-    Boundaries: no
-    Moons: yes
-    Equatorial: no
-    Orbits: yes
-    Constellations: no
-    Galactic: no
-    Ecliptic: no
-    RecursiveGrid: no
-    Satellites: yes
-    Stars: yes
-    MilkyWay: yes
-    Asteroids: no
-    Clusters: no
-    Locations: no
-    Countries: no
-    Galaxies: yes
-    Nebulae: yes
-    Meshes: no
-    Titles: no
-    Effects: no
-    Clouds: yes
-    Ruler: yes
-    VelocityVectors: no
-    Axes: yes
-    Others: yes
+    Stars: true
+    Planets: true
+    Moons: true
+    Satellites: true
+    Asteroids: false
+    Clusters: false
+    MilkyWay: true
+    Galaxies: true
+    Nebulae: true
+    Meshes: false
+    Equatorial: false
+    Ecliptic: false
+    Galactic: false
+    RecursiveGrid: false
+    Labels: true
+    Orbits: true
+    Locations: false
+    Countries: false
+    Constellations: false
+    Boundaries: false
+    Ruler: true
+    Effects: false
+    Atmospheres: true
+    Clouds: true
+    Axes: true
+    VelocityVectors: false
+    Titles: false
+    Others: true
 
 #
 # Program configuration
@@ -264,58 +264,54 @@ scene:
 program:
   # Enable safe mode, which disables advanced graphics features.
   # For instance, it disables float buffers and creates no velocity buffer (no motion blur)
-  safeMode: no
+  safeMode: false
   # Print debug information to the terminal
-  debugInfo: no
+  debugInfo: false
   # Whether to display the HUD
-  hud: no
+  hud: false
   # Minimap settings
   minimap:
     # Display the minimap
-    active: no
+    active: false
     # Minimap side size in [150,350]
-    size: 200
+    size: 200.0
+    # Put minimap in a window
+    inWindow: false
   # File chooser dialog configuration
   fileChooser:
     # Show hidden files
-    showHidden: no
+    showHidden: false
   # Pointer configuration
   pointer:
     # Display the coordinates of the pointer projected on the sides of the window
-    coordinates: yes
+    coordinates: true
     # Pointer guides configuraiton
     guides:
       # Display pointer guides
-      active: no
+      active: false
       # Color of pointer guides in RGBA
       color: [1.0, 1.0, 1.0, 0.3]
       # Width of pointer guide lines
       width: 1.5
   # Recursive grid configuration
   recursiveGrid:
-    # Origin of the recursive grid in [focus|refsys]
-    origin: refsys
+    # Origin of the recursive grid in [FOCUS|REFSYS]
+    origin: REFSYS
     # If origin is refsys, this option adds projection lines to the current focus
-    projectionLines: yes
+    projectionLines: true
   # Stereoscopic mode (3D)
   modeStereo:
     # Start in 3D mode
-    active: no
-    # The stereoscopic profile.
-    # 0 - VR headsets
-    # 1 - 3DTV (left-right)
-    # 2 - 3DTV (top-bottom)
-    # 3 - Cross-eye
-    # 4 - Parallel view
-    # 5 - Anaglyph red-cyan
-    profile: 2
+    active: false
+    # The stereoscopic profile, one of [VR_HEADSET|HORIZONTAL_3DTV|VERTICAL_3DTV|CROSSEYE|PARALLEL_VIEW|ANAGLYPH]
+    profile: CROSSEYE
   # Cubemap mode
   modeCubemap:
     # Start in cubemap mode
-    active: no
-    # Projection to use for the cubemap mode, in [equirectangular|cylindrical|hammer|fisheye]
+    active: false
+    # Projection to use for the cubemap mode, in [EQUIRECTANGULAR|CYLINDRICAL|HAMMER|FISHEYE]
     # Set to 'fisheye' for planetarium mode
-    projection: equirectangular
+    projection: EQUIRECTANGULAR
     # The resolution at which to render each side of the cubemap
     faceResolution: 1500
     # Planetarium mode configuration
@@ -333,7 +329,7 @@ program:
       # Is master instance
       # This means that the status is sent over the network to the slaves
       # Incompatible with slave>is
-      active: no
+      active: false
       # List of URLs of the slave instances
       # Example: [http\://localhost\:13900/api/,http\://localhost\:13901/api]
       slaves: []
@@ -342,22 +338,22 @@ program:
       # In a client-server configuration, this makes this instance act as a slave
       # which receives input events over the network
       # Incompatible with master>is
-      active: no
+      active: false
       # Location of the .mpcdi configuration file for this instance
       # Only needed if program.net.slave is true
-      configFile:
+      configFile: null
       # Warp pfm file
-      warpFile:
+      warpFile: null
       # Blend png file
-      blendFile:
+      blendFile: null
       # Yaw angle (turn head right)
-      yaw:
+      yaw: 0.0
       # Pitch angle (turn head up)
-      pitch:
+      pitch: 0.0
       # Roll angle (rotate head cw)
-      roll:
+      roll: 0.0
   # Default location of script files, leave empty for default
-  scriptsLocation:
+  scriptsLocation: null
   # User interface configuraiton
   ui:
     # The UI theme, in [dark-green|dark-blue|dark-orange|night-red]
@@ -365,18 +361,18 @@ program:
     # The UI scale factor
     scale: 1.0
   # Ask for confirmation on exit
-  exitConfirmation: yes
+  exitConfirmation: true
   # Set to 'default' to use the system default locale, set to
   # language tag (see java.util.Locale#forLanguageTag(), java 7+) to change
   # the locale (en_GB, en_US, es_ES, de_DE, fr, etc.)
-  # Leave empty to use default locale
-  locale:
+  # Leave null to use default locale
+  locale: null
   # Update configuration
   update:
     # Last update check date
-    lastCheck:
+    lastCheck: null
     # Server version of the last check
-    lastVersion:
+    lastVersion: null
   # Pointers to some resources
   url:
     # URL to check for new versions
@@ -395,9 +391,9 @@ controls:
     # Controller mappings file
     mappingsFile: mappings/SDL_Controller.controller
     # Invert look X axis
-    invertX: no
+    invertX: false
     # Invert look Y axis
-    invertY: yes
+    invertY: true
     # Blacklist of controller names. All controllers here will not be
     # processed by Gaia Sky. Find the connected controller names in the Preferences
     # window, Controls tab.
@@ -409,21 +405,22 @@ controls:
 #
 frame:
   # Output directory of still frames
-  location:
+  location: null
+  # Either JPG or PNG
+  format: JPG
+  # Quality of jpg, in [0,1]
+  quality: 0.93
+  # The frame mode: [SIMPLE|REDRAW]
+  # simple - the current openGL buffer is written to a file. Screenshot will look exactly like the screen
+  # redraw - the image is redrawn with optionally different effects and resolution, and then it is written to a file.
+  mode: SIMPLE
+  # Still frame image resolution, only in redraw mode
+  resolution: [1280,720]
   # File name prefix for still frames
   prefix: gaiasky
   # Stamp frames with current simulation time
-  time: no
-  # Either jpg or png
-  format: jpg
-  # Quality of jpg, in [0,1]
-  quality: 0.93
-  # The frame mode: [simple|redraw]
-  # simple - the current openGL buffer is written to a file. Screenshot will look exactly like the screen
-  # redraw - the image is redrawn with optionally different effects and resolution, and then it is written to a file.
-  mode: simple
-  # Still frame image resolution, only in redraw mode
-  resolution: [1280,720]
+  time: false
+  # The target frame rate of the render system
   targetFps: 60
 
 #
@@ -432,14 +429,14 @@ frame:
 screenshot:
   # Output directory of screenshots
   location:
-  # Either jpg or png
-  format: jpg
+  # Either JPG or PNG
+  format: JPG
   # Quality of jpg, in [0,1]
   quality: 0.93
-  # The screenshot mode: [simple|redraw]
+  # The screenshot mode: [SIMPLE|REDRAW]
   # simple - the current openGL buffer is written to a file. Screenshot will look exactly like the screen
   # redraw - the image is redrawn with optionally different effects and resolution, and then it is written to a file.
-  mode: simple
+  mode: SIMPLE
   # Screenshot image resolution, only in redraw mode
   resolution: [1280,720]
 
@@ -451,19 +448,19 @@ camrecorder:
   targetFps: 60
   # Keyframe configruation
   keyframe:
-    # Interpolation method for the camera position, in [spline|linear]
-    position: spline
-    # Interpolation method for the camera orientation, in [spline|linear]
-    orientation: spline
+    # Interpolation method for the camera position, in [SPLINE|LINEAR]
+    position: SPLINE
+    # Interpolation method for the camera orientation, in [SPLINE|LINEAR]
+    orientation: SPLINE
   # Automatically activate frame output system when playing a camera path
-  auto: no
+  auto: false
 
 #
 # Post-processing configuration
 #
 postprocess:
-  # Antialiasing mode, one of [none,fxaa,nfaa]
-  antialias: fxaa
+  # Antialiasing mode, one of [NONE|FXAA|NFAA]
+  antialias: FXAA
   # Bloom settings
   bloom:
     # Intensity of bloom
@@ -473,13 +470,13 @@ postprocess:
     # Sharpen factor, in [0,3]
     factor: 1.0
   # Activate/deactivate motion blur effect
-  motionBlur: no
+  motionBlur: false
   # Activate/deactivate lens flare effect
-  lensFlare: yes
+  lensFlare: true
   # Activate/deactivate light glow effect
-  lightGlow: yes
+  lightGlow: true
   # Activate/deactivate fisheye transformation
-  fisheye: no
+  fisheye: false
   # Image levels configuraiton
   levels:
     # Brightness level in [-1,1] (default=0)
@@ -494,8 +491,8 @@ postprocess:
     gamma: 1.0
   # Tone mapping algorhtims
   toneMapping:
-    # Alrogrithm to use, one of [auto,exposure,aces,uncharted,filmic,none]
-    type: none
+    # Alrogrithm to use, one of [AUTO|EXPOSURE|ACES|UNCHARTED|FILMIC|NONE]
+    type: NONE
     # When type=exposure, set the exposure here, in [0,n]
     exposure: 0.0
 #
@@ -503,6 +500,6 @@ postprocess:
 #
 spacecraft:
   # Velocity vector always aligned with spacecraft direction vector
-  velocityDirection: no
+  velocityDirection: false
   # Whether to show the direction and up axes of the spacecraft
-  showAxes: no
+  showAxes: false

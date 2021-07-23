@@ -34,8 +34,8 @@ import gaiasky.interafce.MusicActorsManager;
 import gaiasky.render.PostProcessorFactory;
 import gaiasky.rest.RESTServer;
 import gaiasky.util.*;
-import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
@@ -48,7 +48,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Properties;
 
 /**
  * Main class for the Gaia Sky desktop and VR launcher.
@@ -67,7 +66,6 @@ public class GaiaSkyDesktop implements IObserver {
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
     public static int SOURCE_VERSION = 30105;
-    private static GaiaSkyDesktop gsd;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
 
@@ -184,10 +182,10 @@ public class GaiaSkyDesktop implements IObserver {
             }
 
             if (gsArgs.vr) {
-                GlobalConf.APPLICATION_NAME += " VR";
+                Settings.APPLICATION_NAME += " VR";
             }
 
-            gsd = new GaiaSkyDesktop();
+            GaiaSkyDesktop gaiaSkyDesktop = new GaiaSkyDesktop();
 
             Gdx.files = new Lwjgl3Files();
 
@@ -203,7 +201,6 @@ public class GaiaSkyDesktop implements IObserver {
             // Init properties file
             String props = System.getProperty("properties.file");
             if (props == null || props.isEmpty()) {
-                initConfigFileNew(gsArgs.vr);
                 initConfigFile(gsArgs.vr);
             }
 
@@ -212,19 +209,18 @@ public class GaiaSkyDesktop implements IObserver {
 
             // Init global configuration
             SettingsManager.initialize(gsArgs.vr);
-            ConfInit.initialize(new DesktopConfInit(gsArgs.vr));
 
             // Safe mode
-            if (gsArgs.safeMode && !GlobalConf.program.SAFE_GRAPHICS_MODE) {
-                GlobalConf.program.SAFE_GRAPHICS_MODE = true;
-                GlobalConf.program.SAFE_GRAPHICS_MODE_FLAG = true;
+            if (gsArgs.safeMode && !Settings.settings.program.safeMode) {
+                Settings.settings.program.safeMode = true;
+                Settings.settings.program.safeModeFlag = true;
             }
 
             // Reinitialize with user-defined locale
-            I18n.initialize(Gdx.files.absolute(GlobalConf.ASSETS_LOC + File.separator + "i18n/gsbundle"));
+            I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
             if (gsArgs.version) {
-                out.println(GlobalConf.getShortApplicationName());
+                out.println(Settings.getShortApplicationName());
                 if (gsArgs.asciiart) {
                     BufferedReader ascii = new BufferedReader(new InputStreamReader(Gdx.files.internal("icon/gsascii.txt").read()));
                     out.println();
@@ -235,13 +231,13 @@ public class GaiaSkyDesktop implements IObserver {
                 }
                 out.println();
                 out.println("License MPL 2.0: Mozilla Public License 2.0 <https://www.mozilla.org/en-US/MPL/2.0/>");
-                out.println("Written by " + GlobalConf.AUTHOR_NAME + " <" + GlobalConf.AUTHOR_EMAIL + ">");
+                out.println("Written by " + Settings.AUTHOR_NAME + " <" + Settings.AUTHOR_EMAIL + ">");
                 out.println();
                 out.println(I18n.txt("gui.help.javaversion").toLowerCase() + ": " + System.getProperty("java.vm.version"));
                 out.println(I18n.txt("gui.help.javavmname").toLowerCase() + ": " + System.getProperty("java.vm.name"));
                 out.println();
-                out.println("gaiasky homepage  <" + GlobalConf.WEBPAGE + ">");
-                out.println("docs              <" + GlobalConf.DOCUMENTATION + ">");
+                out.println("gaiasky homepage  <" + Settings.WEBPAGE + ">");
+                out.println("docs              <" + Settings.DOCUMENTATION + ">");
                 out.println();
                 out.println("ZAH/DLR/BWT/DPAC");
                 return;
@@ -250,15 +246,15 @@ public class GaiaSkyDesktop implements IObserver {
             ConsoleLogger consoleLogger = new ConsoleLogger();
 
             // REST API server
-            REST_ENABLED = GlobalConf.program.REST_PORT >= 0 && checkRestDependenciesInClasspath();
+            REST_ENABLED = Settings.settings.program.net.restPort >= 0 && checkRestDependenciesInClasspath();
             if (REST_ENABLED) {
-                RESTServer.initialize(GlobalConf.program.REST_PORT);
+                RESTServer.initialize(Settings.settings.program.net.restPort);
             }
 
             // Slave manager
             SlaveManager.initialize();
 
-            // Fullscreen command
+            // Full screen command
             ScreenModeCmd.initialize();
 
             // Init cam recorder
@@ -268,7 +264,7 @@ public class GaiaSkyDesktop implements IObserver {
             MusicActorsManager.initialize(new DesktopMusicActors());
 
             // Init music manager
-            MusicManager.initialize(Paths.get(GlobalConf.ASSETS_LOC, "music"), SysUtils.getDefaultMusicDir());
+            MusicManager.initialize(Paths.get(Settings.ASSETS_LOC, "music"), SysUtils.getDefaultMusicDir());
 
             // Initialize post processor factory
             PostProcessorFactory.initialize(new DesktopPostProcessorFactory());
@@ -284,7 +280,7 @@ public class GaiaSkyDesktop implements IObserver {
 
             consoleLogger.dispose();
 
-            gsd.init();
+            gaiaSkyDesktop.init();
         } catch (Exception e) {
             CrashReporter.reportCrash(e, logger);
         }
@@ -304,32 +300,34 @@ public class GaiaSkyDesktop implements IObserver {
     public void launchMainApp() {
         ConsoleLogger consoleLogger = new ConsoleLogger();
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
-        cfg.setTitle(GlobalConf.APPLICATION_NAME);
+        Settings s = Settings.settings;
+        cfg.setTitle(Settings.APPLICATION_NAME);
         if (!gsArgs.vr) {
-            if (GlobalConf.screen.FULLSCREEN) {
+            if (s.graphics.fullScreen.active) {
+                int[] fullScreenResolution = s.graphics.fullScreen.resolution;
                 // Full screen mode
                 DisplayMode[] modes = Lwjgl3ApplicationConfiguration.getDisplayModes();
                 DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
-                    if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
+                    if (mode.height == fullScreenResolution[1] && mode.width == fullScreenResolution[0]) {
                         myMode = mode;
                         break;
                     }
                 }
                 if (myMode == null) {
                     // Fall back to windowed
-                    logger.warn(I18n.txt("error.fullscreen.notfound", GlobalConf.screen.FULLSCREEN_WIDTH, GlobalConf.screen.FULLSCREEN_HEIGHT));
-                    cfg.setWindowedMode(GlobalConf.screen.getScreenWidth(), GlobalConf.screen.getScreenHeight());
-                    cfg.setResizable(GlobalConf.screen.RESIZABLE);
+                    logger.warn(I18n.txt("error.fullscreen.notfound", fullScreenResolution[0], fullScreenResolution[1]));
+                    cfg.setWindowedMode(s.graphics.getScreenWidth(), s.graphics.getScreenHeight());
+                    cfg.setResizable(s.graphics.resizable);
                 } else {
                     cfg.setFullscreenMode(myMode);
                 }
             } else {
                 // Windowed mode
                 configureWindowSize(cfg);
-                cfg.setResizable(GlobalConf.screen.RESIZABLE);
+                cfg.setResizable(s.graphics.resizable);
             }
-            cfg.useVsync(GlobalConf.screen.VSYNC);
+            cfg.useVsync(s.graphics.vsync);
         } else {
             // Note that we disable VSync! The VRContext manages vsync with respect to the HMD
             cfg.useVsync(false);
@@ -354,7 +352,7 @@ public class GaiaSkyDesktop implements IObserver {
 
         // Launch app
         try {
-            if (GlobalConf.program.SAFE_GRAPHICS_MODE) {
+            if (s.program.safeMode) {
                 setSafeMode(cfg);
             }
             consoleLogger.unsubscribe();
@@ -385,8 +383,8 @@ public class GaiaSkyDesktop implements IObserver {
                         showDialogOGL(e, I18n.txt("dialog.opengl.title"), I18n.txt("dialog.opengl.message", MIN_OPENGL, MIN_GLSL));
                     }
                 } else {
-                    logger.error(I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
-                    showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash", GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    logger.error(I18n.txt("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+                    showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash", Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
                 }
             } else {
                 logger.error(I18n.txt("error.java", REQUIRED_JAVA_VERSION));
@@ -394,13 +392,13 @@ public class GaiaSkyDesktop implements IObserver {
             }
         } catch (Exception e) {
             logger.error(e);
-            showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, GlobalConf.REPO_ISSUES, SysUtils.getCrashReportsDir()));
+            showDialogOGL(e, I18n.txt("error.crash.title"), I18n.txt("error.crash.exception", e, Settings.REPO_ISSUES, SysUtils.getCrashReportsDir()));
         }
     }
 
     private void configureWindowSize(Lwjgl3ApplicationConfiguration cfg) {
-        int w = GlobalConf.screen.getScreenWidth();
-        int h = GlobalConf.screen.getScreenHeight();
+        int w = Settings.settings.graphics.getScreenWidth();
+        int h = Settings.settings.graphics.getScreenHeight();
         if (!SysUtils.isMac()) {
             // Graphics device method
             if (w <= 0 || h <= 0) {
@@ -409,8 +407,8 @@ public class GaiaSkyDesktop implements IObserver {
                     GraphicsConfiguration gc = gd.getDefaultConfiguration();
                     w = (int) (gc.getBounds().getWidth() * 0.85f);
                     h = (int) (gc.getBounds().getHeight() * 0.85f);
-                    GlobalConf.screen.SCREEN_WIDTH = w;
-                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                    Settings.settings.graphics.resolution[0] = w;
+                    Settings.settings.graphics.resolution[1] = h;
                 } catch (HeadlessException he) {
                     logger.error(I18n.txt("error.screensize.gd"));
                     logger.debug(he);
@@ -422,14 +420,14 @@ public class GaiaSkyDesktop implements IObserver {
                     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
                     w = (int) (screenSize.width * 0.85f);
                     h = (int) (screenSize.height * 0.85f);
-                    GlobalConf.screen.SCREEN_WIDTH = w;
-                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                    Settings.settings.graphics.resolution[0] = w;
+                    Settings.settings.graphics.resolution[1] = h;
                 } catch (Exception e) {
                     // Default
                     w = 1600;
                     h = 900;
-                    GlobalConf.screen.SCREEN_WIDTH = w;
-                    GlobalConf.screen.SCREEN_HEIGHT = h;
+                    Settings.settings.graphics.resolution[0] = w;
+                    Settings.settings.graphics.resolution[1] = h;
                     logger.error(I18n.txt("error.screensize.toolkit", w, h));
                     logger.debug(e);
                 }
@@ -438,8 +436,8 @@ public class GaiaSkyDesktop implements IObserver {
             // macOS is retarded and only likes headless mode, using default
             w = 1600;
             h = 900;
-            GlobalConf.screen.SCREEN_WIDTH = w;
-            GlobalConf.screen.SCREEN_HEIGHT = h;
+            Settings.settings.graphics.resolution[0] = w;
+            Settings.settings.graphics.resolution[1] = h;
         }
         cfg.setWindowedMode(w, h);
     }
@@ -451,8 +449,8 @@ public class GaiaSkyDesktop implements IObserver {
 
     private void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
         logger.info(I18n.txt("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
-        GlobalConf.scene.ELEVATION_TYPE = ElevationType.NONE;
-        GlobalConf.program.SAFE_GRAPHICS_MODE = true;
+        Settings.settings.scene.renderer.elevation.type = ElevationType.NONE;
+        Settings.settings.program.safeMode = true;
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
@@ -506,57 +504,6 @@ public class GaiaSkyDesktop implements IObserver {
 
     /**
      * Initialises the configuration file. Tries to load first the file in
-     * <code>$GS_CONFIG_DIR/global.properties</code>. Checks the
-     * <code>properties.version</code> key and compares it with the version in
-     * the default configuration file of this release
-     * to determine whether the config file must be overwritten.
-     *
-     * @throws IOException If the file fails to be written successfully.
-     */
-    private static void initConfigFile(boolean vr) throws IOException {
-        // Use user folder
-        Path userFolderConfFile = SysUtils.getConfigDir().resolve(DesktopConfInit.getConfigFileName(vr));
-
-        // Internal config
-        Path confFolder = GlobalConf.assetsPath("conf");
-        Path internalFolderConfFile = confFolder.resolve(DesktopConfInit.getConfigFileName(vr));
-
-        boolean overwrite = false;
-        boolean userConfExists = Files.exists(userFolderConfFile);
-        if (userConfExists) {
-            Properties userProps = new Properties();
-            userProps.load(Files.newInputStream(userFolderConfFile));
-            int internalVersion = 0;
-            if (Files.exists(internalFolderConfFile)) {
-                Properties internalProps = new Properties();
-                internalProps.load(Files.newInputStream(internalFolderConfFile));
-                internalVersion = Integer.parseInt(internalProps.getProperty("properties.version"));
-            }
-
-            // Check latest version
-            if (!userProps.containsKey("properties.version")) {
-                out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
-                overwrite = true;
-            } else if (Integer.parseInt(userProps.getProperty("properties.version")) < internalVersion) {
-                out.println("Properties file version mismatch, overwriting with new version: found " + Integer.parseInt(userProps.getProperty("properties.version")) + ", required " + internalVersion);
-                overwrite = true;
-            }
-        }
-
-        if (overwrite || !userConfExists) {
-            // Copy file
-            if (Files.exists(confFolder) && Files.isDirectory(confFolder)) {
-                // Running released package
-                GlobalResources.copyFile(internalFolderConfFile, userFolderConfFile, overwrite);
-            } else {
-                logger.warn("Configuration folder does not exist: " + confFolder);
-            }
-        }
-        String props = userFolderConfFile.toAbsolutePath().toString();
-        System.setProperty("properties.file", props);
-    }
-    /**
-     * Initialises the configuration file. Tries to load first the file in
      * <code>$GS_CONFIG_DIR/config.yaml</code>. Checks the
      * <code>version</code> key and compares it with the version in
      * the default configuration file of this release
@@ -564,12 +511,12 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * @throws IOException If the file fails to be written successfully.
      */
-    private static void initConfigFileNew(boolean vr) throws IOException {
+    private static void initConfigFile(boolean vr) throws IOException {
         // Use user folder
         Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
 
         // Internal config
-        Path confFolder = GlobalConf.assetsPath("conf");
+        Path confFolder = Settings.assetsPath("conf");
         Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(vr));
 
         boolean overwrite = false;
@@ -580,14 +527,14 @@ public class GaiaSkyDesktop implements IObserver {
             int internalVersion = 0;
             if (Files.exists(internalFolderConfFile)) {
                 Map<String, Object> internalProps = yaml.load(Files.newInputStream(internalFolderConfFile));
-                internalVersion = (Integer) internalProps.get("version");
+                internalVersion = (Integer) internalProps.get("configVersion");
             }
 
             // Check latest version
-            if (!userProps.containsKey("version")) {
+            if (!userProps.containsKey("configVersion")) {
                 out.println("Properties file version not found, overwriting with new version (" + internalVersion + ")");
                 overwrite = true;
-            } else if ((Integer) userProps.get("version") < internalVersion) {
+            } else if ((Integer) userProps.get("configVersion") < internalVersion) {
                 out.println("Properties file version mismatch, overwriting with new version: found " + userProps.get("version") + ", required " + internalVersion);
                 overwrite = true;
             }

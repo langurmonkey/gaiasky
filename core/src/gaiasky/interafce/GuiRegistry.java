@@ -21,7 +21,6 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;

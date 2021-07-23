@@ -445,11 +445,6 @@ public enum Events {
     GAIA_LOADED,
     GAIA_POSITION,
     /**
-     * Issues command to change the galaxy appearance. Contains boolean, if true
-     * galaxy will be 3D, if false galaxy will be 2D
-     **/
-    GALAXY_3D_CMD,
-    /**
      * Contains the gamma level (float) in [0..3] and an optional boolean
      * indicating whether this comes from the interface
      */

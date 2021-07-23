@@ -89,8 +89,8 @@ public class GlobalConf {
     }
 
     public enum ScreenshotMode {
-        simple,
-        redraw
+        SIMPLE,
+        REDRAW
     }
 
     public enum ImageFormat {
@@ -120,11 +120,11 @@ public class GlobalConf {
         }
 
         public boolean isSimpleMode() {
-            return SCREENSHOT_MODE.equals(ScreenshotMode.simple);
+            return SCREENSHOT_MODE.equals(ScreenshotMode.SIMPLE);
         }
 
         public boolean isRedrawMode() {
-            return SCREENSHOT_MODE.equals(ScreenshotMode.redraw);
+            return SCREENSHOT_MODE.equals(ScreenshotMode.REDRAW);
         }
 
     }
@@ -627,11 +627,11 @@ public class GlobalConf {
         }
 
         public boolean isSimpleMode() {
-            return FRAME_MODE.equals(ScreenshotMode.simple);
+            return FRAME_MODE.equals(ScreenshotMode.SIMPLE);
         }
 
         public boolean isRedrawMode() {
-            return FRAME_MODE.equals(ScreenshotMode.redraw);
+            return FRAME_MODE.equals(ScreenshotMode.REDRAW);
         }
 
         public void initialize(int rENDER_WIDTH, int rENDER_HEIGHT, double rENDER_TARGET_FPS, double cAMERA_REC_TARGET_FPS, boolean aUTO_FRAME_OUTPUT_CAMERA_PLAY, String rENDER_FOLDER, String rENDER_FILE_NAME, boolean rENDER_SCREENSHOT_TIME, boolean rENDER_OUTPUT, ScreenshotMode fRAME_MODE, ImageFormat fRAME_FORMAT, float fRAME_QUALITY, CameraKeyframeManager.PathType kF_PATH_TYPE_POSITION, CameraKeyframeManager.PathType kF_PATH_TYPE_ORIENTATION) {
@@ -864,12 +864,8 @@ public class GlobalConf {
 
         @Override
         public void notify(final Events event, final Object... data) {
-            switch (event) {
-            case LIMIT_FPS_CMD:
+            if (event == Events.LIMIT_FPS_CMD) {
                 LIMIT_FPS = (Double) data[0];
-                break;
-            default:
-                break;
             }
         }
     }
@@ -884,11 +880,11 @@ public class GlobalConf {
             /**
              * Left image -> left eye, distortion
              **/
-            HD_3DTV_HORIZONTAL,
+            HORIZONTAL_3DTV,
             /**
              * Top-bottom
              **/
-            HD_3DTV_VERTICAL,
+            VERTICAL_3DTV,
             /**
              * Left image -> right eye, no distortion
              **/
@@ -898,24 +894,24 @@ public class GlobalConf {
              **/
             PARALLEL_VIEW,
             /**
-             * Red-cyan anaglyphic 3D mode
+             * Red-cyan anaglyph 3D mode
              **/
-            ANAGLYPHIC;
+            ANAGLYPH;
 
             public boolean isHorizontal() {
-                return this.equals(VR_HEADSET) || this.equals(HD_3DTV_HORIZONTAL) || this.equals(CROSSEYE) || this.equals(PARALLEL_VIEW);
+                return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSSEYE) || this.equals(PARALLEL_VIEW);
             }
 
             public boolean isVertical() {
-                return this.equals(HD_3DTV_VERTICAL);
+                return this.equals(VERTICAL_3DTV);
             }
 
             public boolean isAnaglyphic() {
-                return this.equals(ANAGLYPHIC);
+                return this.equals(ANAGLYPH);
             }
 
             public boolean correctAspect() {
-                return !this.equals(HD_3DTV_HORIZONTAL) && !this.equals(ANAGLYPHIC);
+                return !this.equals(HORIZONTAL_3DTV) && !this.equals(ANAGLYPH);
             }
         }
 
@@ -1095,7 +1091,7 @@ public class GlobalConf {
         }
 
         public boolean isStereoHalfViewport() {
-            return STEREOSCOPIC_MODE && STEREO_PROFILE != StereoProfile.ANAGLYPHIC;
+            return STEREOSCOPIC_MODE && STEREO_PROFILE != StereoProfile.ANAGLYPH;
         }
 
         /**
@@ -1410,11 +1406,6 @@ public class GlobalConf {
         public boolean[] VISIBILITY;
 
         /**
-         * Display galaxy as 3D object or as a 2D texture
-         **/
-        public boolean GALAXY_3D;
-
-        /**
          * Shadows enabled or disabled
          **/
         public boolean SHADOW_MAPPING;
@@ -1532,7 +1523,7 @@ public class GlobalConf {
         /**
          * Fallback value
          **/
-        public float STAR_POINT_SIZE_BAK;
+        private float STAR_POINT_SIZE_BAK;
         /**
          * Brightness of stars
          */
@@ -1599,11 +1590,11 @@ public class GlobalConf {
         public double DIST_SCALE_VR;
 
         public SceneConf() {
-            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.GALAXY_3D_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
+            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.AMBIENT_LIGHT_CMD, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD, Events.CAMERA_CINEMATIC_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
         }
 
         public void initialize(String sTARTUP_OBJECT, GraphicsQuality gRAPHICS_QUALITY, long oBJECT_FADE_MS, float sTAR_BRIGHTNESS, float sTAR_BRIGHTNESS_POWER, int sTAR_TEX_INDEX, boolean sTAR_GROUP_BILLBOARD_FLAG, int sTAR_GROUP_N_BILLBOARDS, int sTAR_GROUP_N_LABELS, int sTAR_GROUP_N_VELVECS, float aMBIENT_LIGHT, float cAMERA_FOV, float cAMERA_SPEED, float tURNING_SPEED, float rOTATION_SPEED, int cAMERA_SPEED_LIMIT_IDX, boolean fOCUS_LOCK, boolean fOCUS_LOCK_ORIENTATION, float lABEL_SIZE_FACTOR, float lABEL_NUMBER_FACTOR, float lINE_WIDTH_FACTOR,
-                boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean gALAXY_3D, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST,
+                boolean[] vISIBILITY, int oRBIT_RENDERER, int lINE_RENDERER, double sTAR_TH_ANGLE_NONE, double sTAR_TH_ANGLE_POINT, double sTAR_TH_ANGLE_QUAD, float sTAR_MIN_OPACITY, float sTAR_MAX_OPACITY, boolean oCTREE_PARTICLE_FADE, float oCTANT_TH_ANGLE_0, float oCTANT_TH_ANGLE_1, float pM_NUM_FACTOR, float pM_LEN_FACTOR, int pM_COLOR_MODE, boolean pM_ARROWHEADS, float sTAR_POINT_SIZE, boolean cROSSHAIR_FOCUS, boolean cROSSHAIR_CLOSEST,
                 boolean cROSSHAIR_HOME, boolean cINEMATIC_CAMERA, boolean lAZY_TEXTURE_INIT, boolean lAZY_MESH_INIT, boolean fREE_CAMERA_TARGET_MODE_ON, boolean sHADOW_MAPPING, int sHADOW_MAPPING_N_SHADOWS, int sHADOW_MAPPING_RESOLUTION, long mAX_LOADED_STARS, ElevationType eLEVATION_TYPE, double eLEVATION_MULTIPLIER, double tESSELLATION_QUALITY, double dIST_SCALE_DESKTOP, double dIST_SCALE_VR) {
             STARTUP_OBJECT = sTARTUP_OBJECT;
             GRAPHICS_QUALITY = gRAPHICS_QUALITY;
@@ -1645,7 +1636,6 @@ public class GlobalConf {
             STAR_GROUP_N_BILLBOARDS = sTAR_GROUP_N_BILLBOARDS;
             STAR_GROUP_N_LABELS = sTAR_GROUP_N_LABELS;
             STAR_GROUP_N_VELVECS = sTAR_GROUP_N_VELVECS;
-            GALAXY_3D = gALAXY_3D;
             CROSSHAIR_FOCUS = cROSSHAIR_FOCUS;
             CROSSHAIR_CLOSEST = cROSSHAIR_CLOSEST;
             CROSSHAIR_HOME = cROSSHAIR_HOME;
@@ -1797,9 +1787,6 @@ public class GlobalConf {
             case STAR_TEXTURE_IDX_CMD:
                 STAR_TEX_INDEX = (int) data[0];
                 break;
-            case GALAXY_3D_CMD:
-                GALAXY_3D = (boolean) data[0];
-                break;
             case CROSSHAIR_FOCUS_CMD:
                 CROSSHAIR_FOCUS = (boolean) data[0];
                 break;
@@ -1912,7 +1899,7 @@ public class GlobalConf {
     public static void initialize(VersionConf vc, ProgramConf pc, SceneConf sc, DataConf dc, RuntimeConf rc, PostprocessConf ppc, PerformanceConf pfc, FrameConf fc, ScreenConf scrc, ScreenshotConf shc, ControlsConf cc, SpacecraftConf scc) throws Exception {
         if (!initialized) {
             if (configurations == null) {
-                configurations = new ArrayList<IConf>();
+                configurations = new ArrayList<>();
             }
 
             version = vc;

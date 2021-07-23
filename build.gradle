@@ -154,8 +154,9 @@ project(":core") {
         // Screenshots and frames
         api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
         // Yaml
-        api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
         api group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
+        api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"
+        api group: "com.fasterxml.jackson.datatype", name: "jackson-datatype-jsr310", version: "$jacksonVersion"
 
 
         // ****************
