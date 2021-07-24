@@ -410,12 +410,12 @@ public class Settings {
             @JsonIgnore
             public String getStarTexture() {
                 String starTexIdx = String.format("%02d", textureIndex);
-                String texture = GlobalConf.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                String texture = settings.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                 if (!Files.exists(Path.of(texture))) {
                     // Fall back to whatever available
                     for (int i = 1; i < 9; i++) {
                         starTexIdx = String.format("%02d", i);
-                        texture = GlobalConf.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
+                        texture = settings.data.dataFile(GlobalResources.unpackAssetPath("data/tex/base/star-tex-" + starTexIdx + Constants.STAR_SUBSTITUTE + ".png"));
                         if (Files.exists(Path.of(texture)))
                             return texture;
                     }
@@ -923,7 +923,7 @@ public class Settings {
                 modeStereo.profile = StereoProfile.values()[(Integer) data[0]];
                 break;
             case CUBEMAP_CMD:
-                modeCubemap.active = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
+                modeCubemap.active = (Boolean) data[0] && !Settings.settings.runtime.openVr;
                 if (modeCubemap.active) {
                     modeCubemap.projection = (CubemapProjections.CubemapProjection) data[1];
 
@@ -1224,11 +1224,11 @@ public class Settings {
         }
 
         public static class ToneMappingSettings {
-            public GlobalConf.PostprocessConf.ToneMapping type;
+            public ToneMapping type;
             public double exposure;
 
             public void setType(final String typeString) {
-                type = GlobalConf.PostprocessConf.ToneMapping.valueOf(typeString.toUpperCase());
+                type = ToneMapping.valueOf(typeString.toUpperCase());
             }
         }
 
@@ -1292,11 +1292,11 @@ public class Settings {
                 levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
                 break;
             case TONEMAPPING_TYPE_CMD:
-                GlobalConf.PostprocessConf.ToneMapping newTM;
+                ToneMapping newTM;
                 if (data[0] instanceof String) {
-                    newTM = GlobalConf.PostprocessConf.ToneMapping.valueOf(((String) data[0]).toUpperCase());
+                    newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
                 } else {
-                    newTM = (GlobalConf.PostprocessConf.ToneMapping) data[0];
+                    newTM = (ToneMapping) data[0];
                 }
                 toneMapping.type = newTM;
                 break;
@@ -1511,11 +1511,11 @@ public class Settings {
             this.texHeightTarget = texHeightTarget;
         }
 
-        public boolean isAtLeast(GlobalConf.SceneConf.GraphicsQuality gq) {
+        public boolean isAtLeast(GraphicsQuality gq) {
             return this.ordinal() >= gq.ordinal();
         }
 
-        public boolean isAtMost(GlobalConf.SceneConf.GraphicsQuality gq) {
+        public boolean isAtMost(GraphicsQuality gq) {
             return this.ordinal() <= gq.ordinal();
         }
 

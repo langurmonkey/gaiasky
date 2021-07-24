@@ -6,10 +6,10 @@
 package gaiasky.data.octreegen;
 
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
+import gaiasky.util.Settings;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
 
@@ -147,7 +147,7 @@ public class MetadataBinaryIO {
         nodesMap = new HashMap<>();
 
         try {
-            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(Settings.settings.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 

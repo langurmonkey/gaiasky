@@ -13,9 +13,9 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.parse.Parser;
 import uk.ac.starlink.util.DataSource;
 
@@ -53,7 +53,7 @@ public class ConstellationsLoader<T extends SceneGraphNode> implements ISceneGra
                 constellations.add(constellationsFadeNode);
 
                 // load constellations
-                FileHandle file = GlobalConf.data.dataFileHandle(f);
+                FileHandle file = Settings.settings.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
 
                 try {

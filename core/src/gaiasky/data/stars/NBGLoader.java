@@ -12,10 +12,10 @@ import gaiasky.scenegraph.BillboardGalaxy;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.NBGalaxy;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.parse.Parser;
@@ -61,7 +61,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
         long offset = 0;
         if (active)
             for (String file : files) {
-                FileHandle f = GlobalConf.data.dataFileHandle(file);
+                FileHandle f = Settings.settings.data.dataFileHandle(file);
                 InputStream data = f.read();
                 BufferedReader br = new BufferedReader(new InputStreamReader(data));
 

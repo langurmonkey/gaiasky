@@ -6,7 +6,7 @@
 package gaiasky.util.gaia;
 
 import gaiasky.util.BinarySearchTree;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -37,7 +37,7 @@ public class GaiaAttitudeServer {
     Date initialDate;
 
     public GaiaAttitudeServer(String folder) {
-        if (GlobalConf.data.REAL_GAIA_ATTITUDE) {
+        if (Settings.settings.data.realGaiaAttitude) {
             attitudes = AttitudeXmlParser.parseFolder(folder);
             if(attitudes != null) {
                 initialDate = ((AttitudeIntervalBean) attitudes.findMin()).activationTime;
@@ -61,7 +61,7 @@ public class GaiaAttitudeServer {
      */
     public synchronized Attitude getAttitude(Date date) {
         Attitude result;
-        if (GlobalConf.data.REAL_GAIA_ATTITUDE) {
+        if (Settings.settings.data.realGaiaAttitude) {
             // Find AttitudeType in timeSlots
             if (date.before(initialDate)) {
                 result = dummyAttitude;

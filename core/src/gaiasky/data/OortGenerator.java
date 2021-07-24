@@ -11,11 +11,10 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.util.ConfInit;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.SettingsManager;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.StdRandom;
@@ -47,7 +46,7 @@ public class OortGenerator {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File("../assets/conf/global.properties")), new FileInputStream(new File("../assets/data/dummyversion"))));
+            SettingsManager.initialize(new FileInputStream("../assets/conf/global.properties"), new FileInputStream("../assets/data/dummyversion"));
 
             I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/android/assets/i18n/gsbundle"));
 

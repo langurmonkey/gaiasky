@@ -5,7 +5,7 @@
 
 package gaiasky.screenshot;
 
-import gaiasky.util.GlobalConf.ImageFormat;
+import gaiasky.util.Settings.ImageFormat;
 
 public interface IFileImageRenderer {
 

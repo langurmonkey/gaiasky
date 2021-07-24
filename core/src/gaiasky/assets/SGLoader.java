@@ -19,7 +19,7 @@ import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.desktop.util.CrashReporter;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -53,7 +53,7 @@ public class SGLoader extends AsynchronousAssetLoader<ISceneGraph, SGLoader.SGLo
     public void loadAsync(AssetManager manager, String files, FileHandle file, SGLoaderParameter parameter) {
         // Add autoload files to the mix
         Array<String> filePaths = new Array<>(parameter.files);
-        Path dataFolder = Paths.get(GlobalConf.data.DATA_LOCATION);
+        Path dataFolder = Paths.get(Settings.settings.data.location);
         File[] autoloadFiles = dataFolder.toFile().listFiles((dir, name) -> name != null && name.startsWith("autoload-") && name.endsWith(".json"));
         Objects.requireNonNull(autoloadFiles, "Your data folder does not point to a valid directory: " + dataFolder) ;
         for (File autoloadFile : autoloadFiles) {

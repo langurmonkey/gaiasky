@@ -9,7 +9,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import gaiasky.GaiaSky;
 import gaiasky.script.IScriptingInterface;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 
@@ -115,7 +115,7 @@ public class RESTServer {
     /**
      * REST server static files location.
      */
-    private static final String rest_static_location = GlobalConf.ASSETS_LOC + "/rest-static";
+    private static final String rest_static_location = Settings.ASSETS_LOC + "/rest-static";
 
     /**
      * Logger
