@@ -95,10 +95,8 @@ public class Settings {
 
     // The configuration version
     public int configVersion;
-    @JsonIgnore
-    public boolean initialized = false;
-    @JsonIgnore
-    public VersionSettings version;
+    @JsonIgnore public boolean initialized = false;
+    @JsonIgnore public VersionSettings version;
     public DataSettings data;
     public PerformanceSettings performance;
     public GraphicsSettings graphics;
@@ -110,8 +108,7 @@ public class Settings {
     public CamrecorderSettings camrecorder;
     public PostprocessSettings postprocess;
     public SpacecraftSettings spacecraft;
-    @JsonIgnore
-    public RuntimeSettings runtime;
+    @JsonIgnore public RuntimeSettings runtime;
 
     public static class VersionSettings {
         public String version;
@@ -177,7 +174,6 @@ public class Settings {
          * Adds the given catalog descriptor file to the list of JSON selected files.
          *
          * @param catalog The catalog descriptor file pointer.
-         *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not readable, or it is already in the list.
          */
         public boolean addSelectedCatalog(Path catalog) {
@@ -228,8 +224,7 @@ public class Settings {
         public boolean vsync;
         public double fpsLimit;
         public double backBufferScale;
-        @JsonIgnore
-        public int[] backBufferResolution;
+        @JsonIgnore public int[] backBufferResolution;
         public boolean dynamicResolution;
         public boolean screenOutput;
 
@@ -283,10 +278,8 @@ public class Settings {
         public CrosshairSettings crosshair;
         public InitializationSettings initialization;
         public Map<String, Boolean> visibility;
-        @JsonIgnore
-        public double distanceScaleDesktop = 1d;
-        @JsonIgnore
-        public double distanceScaleVr = 1e4d;
+        @JsonIgnore public double distanceScaleDesktop = 1d;
+        @JsonIgnore public double distanceScaleVr = 1e4d;
 
         public SceneSettings() {
             EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.LINE_WIDTH_CMD);
@@ -392,16 +385,13 @@ public class Settings {
             public double brightness;
             public double power;
             public float pointSize;
-            @JsonIgnore
-            private float pointSizeBak;
+            @JsonIgnore private float pointSizeBak;
             public int textureIndex;
-            public double[] opacity;
+            public float[] opacity;
             public GroupSettings group;
             public ThresholdSettings threshold;
-            @JsonIgnore
-            public boolean colorTransit;
-            @JsonIgnore
-            public boolean onlyObserved;
+            @JsonIgnore public boolean colorTransit;
+            @JsonIgnore public boolean onlyObserved;
 
             public StarSettings() {
                 EventManager.instance.subscribe(this, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
@@ -563,7 +553,7 @@ public class Settings {
             public double[] threshold;
             public boolean fade;
 
-            public OctreeSettings(){
+            public OctreeSettings() {
                 EventManager.instance.subscribe(this, Events.OCTREE_PARTICLE_FADE_CMD);
             }
 
@@ -682,8 +672,7 @@ public class Settings {
     public static class ProgramSettings implements IObserver {
         public boolean safeMode;
         // Flag to mark whether safe mode is activated via command line argument
-        @JsonIgnore
-        public boolean safeModeFlag;
+        @JsonIgnore public boolean safeModeFlag;
         public boolean debugInfo;
         public boolean hud;
         public MinimapSettings minimap;
@@ -874,7 +863,7 @@ public class Settings {
             /**
              * Never use this method to get the scale, use the field itself, it is public.
              */
-            public float getScale(){
+            public float getScale() {
                 return MathUtilsd.lint(scale, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX);
             }
 
@@ -1107,8 +1096,7 @@ public class Settings {
     }
 
     public static class FrameSettings extends ScreenshotSettings implements IObserver {
-        @JsonIgnore
-        public boolean active;
+        @JsonIgnore public boolean active;
         public String prefix;
         public boolean time;
         public double targetFps;
@@ -1337,6 +1325,11 @@ public class Settings {
 
         public RuntimeSettings() {
             EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
+        }
+
+        public void setMaxTime(long years) {
+            maxTimeMs = years * (long) Nature.Y_TO_MS;
+            minTimeMs = -maxTimeMs;
         }
 
         /**
