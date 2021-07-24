@@ -303,7 +303,7 @@ public class Settings {
             public double speed;
             public double turn;
             public double rotate;
-            public double fov;
+            public float fov;
             public boolean cinematic;
             public boolean targetMode;
             public FocusSettings focusLock;
@@ -517,7 +517,7 @@ public class Settings {
         }
 
         public static class ProperMotionSettings implements IObserver {
-            public double length;
+            public float length;
             public double number;
             /**
              * Color mode for velocity vectors
@@ -688,6 +688,7 @@ public class Settings {
         public String locale;
         public UpdateSettings update;
         public UrlSettings url;
+
 
         public ProgramSettings() {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
@@ -880,6 +881,9 @@ public class Settings {
         }
 
         public static class UpdateSettings {
+            // Update checker time, in ms
+            @JsonIgnore
+            public static long VERSION_CHECK_INTERVAL_MS = 86400000L;
             public Instant lastCheck;
             public String lastVersion;
 
@@ -1196,24 +1200,24 @@ public class Settings {
         }
 
         public static class BloomSettings {
-            public double intensity;
+            public float intensity;
         }
 
         public static class UnsharpMaskSettings {
-            public double factor;
+            public float factor;
         }
 
         public static class LevelsSettings {
-            public double brightness;
-            public double contrast;
-            public double hue;
-            public double saturation;
-            public double gamma;
+            public float brightness;
+            public float contrast;
+            public float hue;
+            public float saturation;
+            public float gamma;
         }
 
         public static class ToneMappingSettings {
             public ToneMapping type;
-            public double exposure;
+            public float exposure;
 
             public void setType(final String typeString) {
                 type = ToneMapping.valueOf(typeString.toUpperCase());

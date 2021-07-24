@@ -15,9 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
@@ -50,7 +49,7 @@ public class CrashGui extends AbstractGui {
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
         if (vr) {
-            vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+            vp.update(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
         } else {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
@@ -99,8 +98,8 @@ public class CrashGui extends AbstractGui {
 
             // Delete data folder and try again
             content.add(new OwnLabel(I18n.txt("gui.crash.info.1"), skin)).left().padBottom(pad5).row();
-            OwnLabel dloc = new OwnLabel(TextUtils.capString(GlobalConf.data.DATA_LOCATION, 50), skin, "hud-subheader");
-            dloc.addListener(new OwnTextTooltip(GlobalConf.data.DATA_LOCATION, skin));
+            OwnLabel dloc = new OwnLabel(TextUtils.capString(Settings.settings.data.location, 50), skin, "hud-subheader");
+            dloc.addListener(new OwnTextTooltip(Settings.settings.data.location, skin));
             content.add(dloc).left().padBottom(pad10 * 3f).row();
 
             // Crash log
@@ -109,7 +108,7 @@ public class CrashGui extends AbstractGui {
             cloc.addListener(new OwnTextTooltip(SysUtils.getCrashReportsDir().toString(), skin));
             content.add(cloc).left().padBottom(pad5).row();
             content.add(new OwnLabel(I18n.txt("gui.crash.info.3"), skin)).left().padBottom(pad5).row();
-            content.add(new Link(GlobalConf.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), GlobalConf.REPO_ISSUES)).left().padBottom(pad10 * 3f).row();
+            content.add(new Link(Settings.settings.REPO_ISSUES, skin.get("link", Label.LabelStyle.class), Settings.settings.REPO_ISSUES)).left().padBottom(pad10 * 3f).row();
 
             // Stack trace
             float taw = 720f;

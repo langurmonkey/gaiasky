@@ -5,7 +5,7 @@
 
 package gaiasky.event;
 
-import gaiasky.util.GlobalConf;
+import static gaiasky.util.Settings.*;
 
 /**
  * Contains all the events that go through the event system.
@@ -422,7 +422,7 @@ public enum Events {
     FRAME_OUTPUT_CMD,
 
     /**
-     * Sets the frame output mode, either simple or redraw. Gets a string or a {@link GlobalConf.ScreenshotMode} object.
+     * Sets the frame output mode, either simple or redraw. Gets a string or a {@link ScreenshotSettings} object.
      */
     FRAME_OUTPUT_MODE_CMD,
 
@@ -454,7 +454,7 @@ public enum Events {
      **/
     GO_TO_OBJECT_CMD,
     /**
-     * Graphics quality updated, contains the new {@link GlobalConf.SceneConf.GraphicsQuality} object.
+     * Graphics quality updated, contains the new {@link GraphicsQuality} object.
      **/
     GRAPHICS_QUALITY_UPDATED,
     /**
@@ -928,7 +928,7 @@ public enum Events {
     SCREENSHOT_SIZE_UPDATE,
     /**
      * Updates the screen mode according to whats in the
-     * {@link GlobalConf#screen} bean.
+     * {@link gaiasky.util.Settings#graphics} bean.
      **/
     SCREEN_MODE_CMD,
 
@@ -1248,7 +1248,7 @@ public enum Events {
     UPDATE_LOAD_PROGRESS,
 
     /**
-     * Contains the tone mapping type as an {@link GlobalConf.PostprocessConf.ToneMapping} or a
+     * Contains the tone mapping type as an {@link ToneMapping} or a
      * string in [AUTO|EXPOSURE|NONE].
      */
     TONEMAPPING_TYPE_CMD,

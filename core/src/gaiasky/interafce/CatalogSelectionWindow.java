@@ -13,15 +13,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
 /**
  * GUI window to choose the catalogs to load at startup.
- * This is shown at startup if no catalogs are selected and {@link GlobalConf#program#SKIP_CATALOG_CHOOSER} is false.
  */
 public class CatalogSelectionWindow extends GenericDialog {
 
@@ -77,12 +76,12 @@ public class CatalogSelectionWindow extends GenericDialog {
     protected void accept() {
         // Update setting
         if (dw != null && dw.cbs != null) {
-            GlobalConf.data.CATALOG_JSON_FILES.clear();
+            Settings.settings.data.catalogFiles.clear();
             for (Button b : dw.cbs) {
                 if (b.isChecked()) {
                     // Add all selected to list
                     String candidate = dw.candidates.get(b);
-                    GlobalConf.data.CATALOG_JSON_FILES.add(candidate);
+                    Settings.settings.data.catalogFiles.add(candidate);
                 }
             }
         }
