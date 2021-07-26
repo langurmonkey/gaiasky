@@ -94,7 +94,7 @@ scene:
     # 16 - 10 pc/s
     # 17 - 1000 pc/s
     # 18 - No limit
-    speedLimit: 18
+    speedLimitIndex: 18
     # Camera speed multiplier
     speed: 10.0
     # Camera turn velocity

@@ -120,13 +120,21 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         absMagLabel = new OwnLabel(I18n.txt("gui.focusinfo.absmag"), skin, "hud");
 
         // Pointer
+        float pointerWidth = 100f;
         pointerName = new OwnLabel(I18n.txt("gui.pointer"), skin, "hud-header");
         pointerRADEC = new OwnLabel("", skin, "hud");
+        pointerRADEC.setWidth(pointerWidth);
         pointerLonLat = new OwnLabel("", skin, "hud");
+        pointerLonLat.setWidth(pointerWidth);
         viewRADEC = new OwnLabel("", skin, "hud");
+        viewRADEC.setWidth(pointerWidth);
+        float labelWidth = 80f;
         lonLatLabel = new OwnLabel("Lat/Lon", skin, "hud");
+        lonLatLabel.setWidth(labelWidth);
         RADECPointerLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud");
+        RADECPointerLabel.setWidth(labelWidth);
         RADECViewLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud");
+        RADECViewLabel.setWidth(labelWidth);
         Button pointerImgBtn1 = new OwnTextIconButton("", skin, "pointer");
         pointerImgBtn1.setSize(imgSize, imgSize);
         pointerImgBtn1.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.pointer"), skin));

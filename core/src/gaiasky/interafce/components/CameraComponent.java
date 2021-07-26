@@ -206,7 +206,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimit);
+        cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimitIndex);
 
         // CAMERA SPEED
         cameraSpeed = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);

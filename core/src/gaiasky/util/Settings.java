@@ -299,7 +299,9 @@ public class Settings {
         }
 
         public static class CameraSettings implements IObserver {
-            public int speedLimit;
+            public int speedLimitIndex;
+            @JsonIgnore
+            public double speedLimit;
             public double speed;
             public double turn;
             public double rotate;
@@ -312,8 +314,8 @@ public class Settings {
                 EventManager.instance.subscribe(this, Events.CAMERA_CINEMATIC_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD);
             }
 
-            public void setSpeedLimit(int index) {
-                this.speedLimit = index;
+            public void setSpeedLimitIndex(int index) {
+                this.speedLimitIndex = index;
                 updateSpeedLimit();
             }
 
@@ -332,7 +334,7 @@ public class Settings {
                 case ROTATION_SPEED_CMD -> rotate = (float) data[0];
                 case TURNING_SPEED_CMD -> turn = (float) data[0];
                 case SPEED_LIMIT_CMD -> {
-                    speedLimit = (Integer) data[0];
+                    speedLimitIndex = (Integer) data[0];
                     updateSpeedLimit();
                 }
                 case CAMERA_CINEMATIC_CMD -> cinematic = (boolean) data[0];
@@ -345,38 +347,38 @@ public class Settings {
             }
 
             public void updateSpeedLimit() {
-                switch (speedLimit) {
+                switch (speedLimitIndex) {
                 case 0 ->
                         // 100 km/h is 0.027 km/s
-                        speed = 0.0277777778 * Constants.KM_TO_U;
-                case 1 -> speed = 0.5 * Constants.C * Constants.M_TO_U;
-                case 2 -> speed = 0.8 * Constants.C * Constants.M_TO_U;
-                case 3 -> speed = 0.9 * Constants.C * Constants.M_TO_U;
-                case 4 -> speed = 0.99 * Constants.C * Constants.M_TO_U;
-                case 5 -> speed = 0.99999 * Constants.C * Constants.M_TO_U;
-                case 6 -> speed = Constants.C * Constants.M_TO_U;
-                case 7 -> speed = 2.0 * Constants.C * Constants.M_TO_U;
+                        speedLimit = 0.0277777778 * Constants.KM_TO_U;
+                case 1 -> speedLimit = 0.5 * Constants.C * Constants.M_TO_U;
+                case 2 -> speedLimit = 0.8 * Constants.C * Constants.M_TO_U;
+                case 3 -> speedLimit = 0.9 * Constants.C * Constants.M_TO_U;
+                case 4 -> speedLimit = 0.99 * Constants.C * Constants.M_TO_U;
+                case 5 -> speedLimit = 0.99999 * Constants.C * Constants.M_TO_U;
+                case 6 -> speedLimit = Constants.C * Constants.M_TO_U;
+                case 7 -> speedLimit = 2.0 * Constants.C * Constants.M_TO_U;
                 case 8 ->
                         // 10 c
-                        speed = 10.0 * Constants.C * Constants.M_TO_U;
+                        speedLimit = 10.0 * Constants.C * Constants.M_TO_U;
                 case 9 ->
                         // 1000 c
-                        speed = 1000.0 * Constants.C * Constants.M_TO_U;
-                case 10 -> speed = Constants.AU_TO_U;
-                case 11 -> speed = 10.0 * Constants.AU_TO_U;
-                case 12 -> speed = 1000.0 * Constants.AU_TO_U;
-                case 13 -> speed = 10000.0 * Constants.AU_TO_U;
-                case 14 -> speed = Constants.PC_TO_U;
-                case 15 -> speed = 2.0 * Constants.PC_TO_U;
+                        speedLimit = 1000.0 * Constants.C * Constants.M_TO_U;
+                case 10 -> speedLimit = Constants.AU_TO_U;
+                case 11 -> speedLimit = 10.0 * Constants.AU_TO_U;
+                case 12 -> speedLimit = 1000.0 * Constants.AU_TO_U;
+                case 13 -> speedLimit = 10000.0 * Constants.AU_TO_U;
+                case 14 -> speedLimit = Constants.PC_TO_U;
+                case 15 -> speedLimit = 2.0 * Constants.PC_TO_U;
                 case 16 ->
                         // 10 pc/s
-                        speed = 10.0 * Constants.PC_TO_U;
+                        speedLimit = 10.0 * Constants.PC_TO_U;
                 case 17 ->
                         // 1000 pc/s
-                        speed = 1000.0 * Constants.PC_TO_U;
+                        speedLimit = 1000.0 * Constants.PC_TO_U;
                 case 18 ->
                         // No limit
-                        speed = -1;
+                        speedLimit = -1;
                 }
             }
         }
