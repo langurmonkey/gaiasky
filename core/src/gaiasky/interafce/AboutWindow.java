@@ -432,10 +432,10 @@ public class AboutWindow extends GenericDialog {
             HardwareAbstractionLayer hal = si.getHardware();
             CentralProcessor cp = hal.getProcessor();
 
-            Label cputitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
+            Label cpuTitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
             Label cpu = new OwnLabel(cp.toString(), skin);
 
-            contentSystem.add(cputitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
+            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
             contentSystem.add(cpu).align(Align.left).padTop(pad5);
             contentSystem.row();
         } catch (Error e) {
