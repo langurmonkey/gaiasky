@@ -17,7 +17,6 @@ public class ViewAngleComparator<T> implements Comparator<T> {
     @Override
     public int compare(T o1, T o2) {
         return Double.compare(((IFocus) o1).getCandidateViewAngleApparent(), ((IFocus) o2).getCandidateViewAngleApparent());
-
     }
 
 }

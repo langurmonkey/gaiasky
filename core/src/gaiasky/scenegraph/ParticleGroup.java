@@ -1119,10 +1119,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public IFocus getFocus(String name) {
-        if (index.containsKey(name))
-            candidateFocusIndex = index.get(name);
-        else
-            candidateFocusIndex = -1;
+        candidateFocusIndex = index.getOrDefault(name, -1);
         return this;
     }
 
@@ -1183,7 +1180,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Returns the delta years to integrate the proper motion.
      *
-     * @return
+     * @return The current delta years.
      */
     protected double getDeltaYears() {
         return 0;
