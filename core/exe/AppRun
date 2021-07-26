@@ -24,8 +24,8 @@ JAVA="$GSDIR/usr/bin/java"
 #
 # Settings.
 #
-# Properties file - by default we use the file at $HOME/.gaiasky/global.properties
-#OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/global.properties"
+# Properties file - by default we use the file at $HOME/.gaiasky/config.yaml
+#OPTS="$OPTS -Dproperties.file=$GSDIRESC/conf/config.yaml"
 
 # Memory
 OPTS="$OPTS -Xms2g -Xmx6g"

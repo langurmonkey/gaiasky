@@ -1865,11 +1865,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private void reloadDefaultPreferences() {
         // User config file
         Path userFolder = SysUtils.getConfigDir();
-        Path userFolderConfFile = userFolder.resolve("global.properties");
+        Path userFolderConfFile = userFolder.resolve("config.yaml");
 
         // Internal config
         Path confFolder = Paths.get(settings.ASSETS_LOC, "conf" + File.separator);
-        Path internalFolderConfFile = confFolder.resolve("global.properties");
+        Path internalFolderConfFile = confFolder.resolve("config.yaml");
 
         // Delete current conf
         if (Files.exists(userFolderConfFile)) {

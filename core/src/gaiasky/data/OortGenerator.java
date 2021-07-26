@@ -46,7 +46,7 @@ public class OortGenerator {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            SettingsManager.initialize(new FileInputStream("../assets/conf/global.properties"), new FileInputStream("../assets/data/dummyversion"));
+            SettingsManager.initialize(new FileInputStream("../assets/conf/config.yaml"), new FileInputStream("../assets/data/dummyversion"));
 
             I18n.initialize(new FileHandle(System.getenv("PROJECTS") + "/gaiasky/android/assets/i18n/gsbundle"));
 

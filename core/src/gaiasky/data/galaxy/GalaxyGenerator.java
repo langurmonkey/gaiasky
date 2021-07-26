@@ -76,7 +76,7 @@ public class GalaxyGenerator {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            SettingsManager.initialize(new FileInputStream("assets/conf/global.properties"), new FileInputStream("assets/dummyversion"));
+            SettingsManager.initialize(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
 
             I18n.initialize(new FileHandle("assets/i18n/gsbundle"));
 

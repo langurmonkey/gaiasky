@@ -57,7 +57,7 @@ public class MilkyWayReshaper {
             if (!dummyv.exists()) {
                 dummyv = new File(ASSETS_LOC + "dummyversion");
             }
-            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "conf/global.properties"), new FileInputStream(dummyv));
+            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(dummyv));
 
             for(int ds = 0; ds < filesIn.length; ds++) {
                 logger.info();

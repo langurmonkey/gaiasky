@@ -45,7 +45,7 @@ public class HeliotropicOrbitDataLoader {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/global.properties"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
+            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"));
 

@@ -6,6 +6,7 @@
 package gaiasky.interafce.components;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -20,10 +21,12 @@ import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnSliderPlus;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Properties;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
@@ -155,21 +158,21 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         resetDefaults.addListener(new OwnTextTooltip(I18n.txt("gui.resetdefaults.tooltip"), skin));
         resetDefaults.addListener(event -> {
             if(event instanceof ChangeEvent){
-                // Read defaults from internal config file
+                // Read defaults from internal settings file
                 try {
                     Path confFolder = Settings.settings.assetsPath("conf");
                     Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr || Settings.settings.runtime.OVR));
-                    Properties internalProps = new Properties();
-                    internalProps.load(Files.newInputStream(internalFolderConfFile));
+                    Yaml yaml = new Yaml();
+                    Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
 
-                    float br = Parser.parseFloat(internalProps.getProperty("scene.star.brightness"));
-                    float pow = Parser.parseFloat(internalProps.getProperty("scene.star.brightness.pow"));
-                    float ss = Parser.parseFloat(internalProps.getProperty("scene.star.point.size"));
-                    float pam = Parser.parseFloat(internalProps.getProperty("scene.point.alpha.min"));
-                    float amb = Parser.parseFloat(internalProps.getProperty("scene.ambient"));
-                    float ls = Parser.parseFloat(internalProps.getProperty("scene.label.size"));
-                    float lw = Parser.parseFloat(internalProps.getProperty("scene.line.width"));
-                    float em = Parser.parseFloat(internalProps.getProperty("scene.elevation.multiplier"));
+                    float br = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
+                    float pow = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
+                    float ss = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
+                    float pam = (((java.util.List<Double>) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
+                    float amb = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
+                    float ls = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
+                    float lw = ((Double) ((Map<String, Object>) conf.get("scene")).get("lineWidth")).floatValue();
+                    float em = ((Double)((Map<String, Object>) ((Map<String, Object>)((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get("multiplier")).floatValue();
 
                     // Events
                     EventManager m = EventManager.instance;

@@ -156,7 +156,7 @@ public class OctreeGeneratorRun {
             if (!Files.exists(dummyv)) {
                 dummyv = Path.of(ASSETS_LOC, "dummyversion");
             }
-            SettingsManager.initialize(new FileInputStream(Path.of(ASSETS_LOC, "conf/global.properties").toFile()), new FileInputStream(dummyv.toFile()));
+            SettingsManager.initialize(new FileInputStream(Path.of(ASSETS_LOC, "conf/config.yaml").toFile()), new FileInputStream(dummyv.toFile()));
 
             // Parallelism
             if (parallelism > 0) {

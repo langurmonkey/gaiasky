@@ -1897,7 +1897,7 @@ public interface IScriptingInterface {
     String getDefaultMappingsDir();
 
     /**
-     * Gets the absolute path of the local data directory, configured in your global.properties file.
+     * Gets the absolute path of the local data directory, configured in your <code>config.yaml</code> file.
      *
      * @return Absolute path to the location of the data files.
      */
