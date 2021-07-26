@@ -33,6 +33,10 @@ public class SettingsManager {
         SettingsManager.instance = new SettingsManager(vr);
         instance.initSettings();
     }
+    public static void initialize(FileInputStream fis, FileInputStream vis) throws Exception {
+        SettingsManager.instance = new SettingsManager(fis, vis);
+        instance.initSettings();
+    }
 
     private Settings settings;
     private Properties vp;
@@ -53,7 +57,7 @@ public class SettingsManager {
             InputStream vis = GaiaSkyDesktop.class.getResourceAsStream("/version");
             if (vis == null) {
                 // In case of running in 'developer' mode
-                vis = new FileInputStream(GlobalConf.ASSETS_LOC + File.separator + "dummyversion");
+                vis = new FileInputStream(Settings.ASSETS_LOC + File.separator + "dummyversion");
             }
             vp = new Properties();
             vp.load(vis);

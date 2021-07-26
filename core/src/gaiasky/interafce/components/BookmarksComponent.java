@@ -30,8 +30,8 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.scene2d.*;
 
 import java.util.HashSet;
@@ -231,7 +231,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 }
 
                                 newMenu(cm);
-                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()) / GlobalConf.program.UI_SCALE, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / GlobalConf.program.UI_SCALE);
+                                cm.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
                             });
                         } else {
                             // New folder

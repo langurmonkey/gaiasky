@@ -6,9 +6,9 @@
 package gaiasky.interafce;
 
 import gaiasky.desktop.util.SortedProperties;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.parse.Parser;
 import org.apache.commons.io.FilenameUtils;
 
@@ -48,7 +48,7 @@ public class ControllerMappings extends AbstractControllerMappings {
         Properties mappings = new SortedProperties();
         try {
             if (!Files.exists(mappingsFile)) {
-                Path internalMappings = Path.of(GlobalConf.ASSETS_LOC).resolve(mappingsFile);
+                Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
                 if(Files.exists(internalMappings))
                     mappingsFile = internalMappings;
             }

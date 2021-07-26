@@ -10,8 +10,8 @@ import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 
 /**
  * Reads an orbit file into an OrbitData object.
@@ -24,7 +24,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
         if(file != null) {
             FileDataLoader odl = new FileDataLoader();
             try {
-                FileHandle f = GlobalConf.data.dataFileHandle(file);
+                FileHandle f = Settings.settings.data.dataFileHandle(file);
                 data = odl.load(f.read());
                 if (parameter.multiplier != 1f) {
                     int n = data.x.size();

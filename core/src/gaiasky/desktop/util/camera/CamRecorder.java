@@ -9,10 +9,10 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -254,7 +254,7 @@ public class CamRecorder implements IObserver {
                     EventManager.instance.post(Events.CAMERA_PLAY_INFO, true);
 
                     // Enable frame output if option is on
-                    if (GlobalConf.frame.AUTO_FRAME_OUTPUT_CAMERA_PLAY) {
+                    if (Settings.settings.camrecorder.auto) {
                         // Stop frame output if it is on!
                         EventManager.instance.post(Events.FRAME_OUTPUT_CMD, true);
                     }

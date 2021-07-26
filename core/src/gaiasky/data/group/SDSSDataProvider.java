@@ -8,10 +8,10 @@ package gaiasky.data.group;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.units.Position;
 import gaiasky.util.units.Position.PositionType;
@@ -35,7 +35,7 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
     }
 
     public List<IParticleRecord> loadData(String file, double factor) {
-        List<IParticleRecord> pointData = loadDataMapped(GlobalConf.data.dataFile(file), factor);
+        List<IParticleRecord> pointData = loadDataMapped(Settings.settings.data.dataFile(file), factor);
         if (pointData != null)
             logger.info(I18n.txt("notif.nodeloader", pointData.size(), file));
 

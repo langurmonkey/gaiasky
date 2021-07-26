@@ -4,8 +4,8 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -92,7 +92,7 @@ public class BookmarksManager implements IObserver {
         final String bookmarksFileName = "bookmarks.txt";
 
         Path customBookmarks = SysUtils.getDefaultBookmarksDir().resolve(bookmarksFileName);
-        Path defaultBookmarks = Paths.get(GlobalConf.ASSETS_LOC, SysUtils.getBookmarksDirName(), bookmarksFileName);
+        Path defaultBookmarks = Paths.get(Settings.ASSETS_LOC, SysUtils.getBookmarksDirName(), bookmarksFileName);
         bookmarksFile = customBookmarks;
         if (!Files.exists(customBookmarks)) {
             try {

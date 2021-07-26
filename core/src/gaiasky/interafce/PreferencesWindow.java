@@ -36,6 +36,7 @@ import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.GlobalConf.ScreenshotMode;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.format.INumberFormat;
@@ -462,7 +463,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         elevationSb = new OwnSelectBox<>(skin);
         elevationSb.setItems(ecbb);
         elevationSb.setWidth(textwidth * 3f);
-        elevationSb.setSelectedIndex(GlobalConf.scene.ELEVATION_TYPE.ordinal());
+        elevationSb.setSelectedIndex(Settings.settings.scene.renderer.elevation.type.ordinal());
         elevationSb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 enableComponents(elevationSb.getSelected().type.isTessellation(), tessQuality, tessQualityLabel);

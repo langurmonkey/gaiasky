@@ -11,7 +11,6 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -33,7 +32,7 @@ public class HeliotropicOrbitDataLoader {
         HeliotropicOrbitDataLoader l = new HeliotropicOrbitDataLoader();
         try {
             // Assets location
-            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
+            String ASSETS_LOC = Settings.ASSETS_LOC;
 
             // Logger
             new ConsoleLogger();
@@ -46,7 +45,7 @@ public class HeliotropicOrbitDataLoader {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "/conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "/dummyversion"))));
+            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/global.properties"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"));
 

@@ -11,10 +11,10 @@ import com.badlogic.gdx.Graphics.Monitor;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
 /**
  * Manages screen mode changes (fullscreen, windowed)
@@ -35,7 +35,7 @@ public class ScreenModeCmd implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         if (event == Events.SCREEN_MODE_CMD) {
-            boolean toFullScreen = GlobalConf.screen.FULLSCREEN;
+            boolean toFullScreen = Settings.settings.graphics.fullScreen.active;
             if (toFullScreen) {
                 // TODO hack
                 Monitor m = Gdx.graphics.getPrimaryMonitor();
@@ -44,7 +44,7 @@ public class ScreenModeCmd implements IObserver {
                 // Find best mode
                 DisplayMode myMode = null;
                 for (DisplayMode mode : modes) {
-                    if (mode.height == GlobalConf.screen.FULLSCREEN_HEIGHT && mode.width == GlobalConf.screen.FULLSCREEN_WIDTH) {
+                    if (mode.height == Settings.settings.graphics.fullScreen.resolution[1] && mode.width == Settings.settings.graphics.fullScreen.resolution[0]) {
                         myMode = mode;
                         break;
                     }
@@ -52,8 +52,8 @@ public class ScreenModeCmd implements IObserver {
                 // If no mode found, get default
                 if (myMode == null) {
                     myMode = Gdx.graphics.getDisplayMode(m);
-                    GlobalConf.screen.FULLSCREEN_WIDTH = myMode.width;
-                    GlobalConf.screen.FULLSCREEN_HEIGHT = myMode.height;
+                    Settings.settings.graphics.fullScreen.resolution[0] = myMode.width;
+                    Settings.settings.graphics.fullScreen.resolution[1] = myMode.height;
                 }
 
                 // set the window to full screen mode
@@ -63,8 +63,8 @@ public class ScreenModeCmd implements IObserver {
                 }
 
             } else {
-                int width = GlobalConf.screen.SCREEN_WIDTH;
-                int height = GlobalConf.screen.SCREEN_HEIGHT;
+                int width = Settings.settings.graphics.resolution[0];
+                int height = Settings.settings.graphics.resolution[1];
 
                 boolean good = Gdx.graphics.setWindowedMode(width, height);
                 if (!good) {
@@ -72,7 +72,7 @@ public class ScreenModeCmd implements IObserver {
                 }
 
             }
-            Gdx.graphics.setVSync(GlobalConf.screen.VSYNC);
+            Gdx.graphics.setVSync(Settings.settings.graphics.vsync);
         }
     }
 }

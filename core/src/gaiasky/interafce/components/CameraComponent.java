@@ -44,7 +44,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
         cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
-        cinematic.setChecked(GlobalConf.scene.CINEMATIC_CAMERA);
+        cinematic.setChecked(Settings.settings.scene.camera.cinematic);
         cinematic.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.CAMERA_CINEMATIC_CMD, cinematic.isChecked(), true);
@@ -74,7 +74,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        if (!GlobalConf.runtime.OPENVR) {
+        if (!Settings.settings.runtime.openVr) {
             Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
             String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
@@ -138,7 +138,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 return false;
             });
 
-            if (GlobalConf.program.isMaster()) {
+            if (Settings.settings.program.net.isMasterInstance()) {
                 Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
                 buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
                 buttonMaster.setProgrammaticChangeEvents(false);
@@ -161,10 +161,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView.setValueSuffix("°");
         fieldOfView.setName("field of view");
         fieldOfView.setWidth(contentWidth);
-        fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
-        fieldOfView.setDisabled(GlobalConf.program.isFixedFov());
+        fieldOfView.setValue(Settings.settings.scene.camera.fov);
+        fieldOfView.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
         fieldOfView.addListener(event -> {
-            if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !GlobalConf.program.isFixedFov()) {
+            if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
                 float value = fieldOfView.getMappedValue();
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
                 return true;
@@ -206,13 +206,13 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             return false;
         });
-        cameraSpeedLimit.setSelectedIndex(GlobalConf.scene.CAMERA_SPEED_LIMIT_IDX);
+        cameraSpeedLimit.setSelectedIndex(Settings.settings.scene.camera.speedLimit);
 
         // CAMERA SPEED
         cameraSpeed = new OwnSliderPlus(I18n.txt("gui.camera.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_CAM_SPEED, Constants.MAX_CAM_SPEED, skin);
         cameraSpeed.setName("camera speed");
         cameraSpeed.setWidth(contentWidth);
-        cameraSpeed.setMappedValue(GlobalConf.scene.CAMERA_SPEED);
+        cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.CAMERA_SPEED_CMD, cameraSpeed.getMappedValue(), true);
@@ -225,7 +225,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         rotateSpeed = new OwnSliderPlus(I18n.txt("gui.rotation.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED, skin);
         rotateSpeed.setName("rotate speed");
         rotateSpeed.setWidth(contentWidth);
-        rotateSpeed.setMappedValue(GlobalConf.scene.ROTATION_SPEED);
+        rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.ROTATION_SPEED_CMD, rotateSpeed.getMappedValue(), true);
@@ -238,7 +238,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turnSpeed = new OwnSliderPlus(I18n.txt("gui.turn.speed"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED, skin);
         turnSpeed.setName("turn speed");
         turnSpeed.setWidth(contentWidth);
-        turnSpeed.setMappedValue(GlobalConf.scene.TURNING_SPEED);
+        turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.TURNING_SPEED_CMD, turnSpeed.getMappedValue(), true);
@@ -250,7 +250,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // FOCUS_MODE lock
         focusLock = new CheckBox(" " + I18n.txt("gui.camera.lock"), skin);
         focusLock.setName("focus lock");
-        focusLock.setChecked(GlobalConf.scene.FOCUS_LOCK);
+        focusLock.setChecked(Settings.settings.scene.camera.focusLock.position);
         focusLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.FOCUS_LOCK_CMD, I18n.txt("gui.camera.lock"), focusLock.isChecked());
@@ -263,8 +263,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
         // FOCUS_MODE orientation lock
         orientationLock = new CheckBox(" " + I18n.txt("gui.camera.lock.orientation"), skin);
         orientationLock.setName("orientation lock");
-        orientationLock.setChecked(GlobalConf.scene.FOCUS_LOCK_ORIENTATION);
-        orientationLock.setVisible(GlobalConf.scene.FOCUS_LOCK);
+        orientationLock.setChecked(Settings.settings.scene.camera.focusLock.orientation);
+        orientationLock.setVisible(Settings.settings.scene.camera.focusLock.position);
         orientationLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.ORIENTATION_LOCK_CMD, I18n.txt("gui.camera.lock.orientation"), orientationLock.isChecked(), true);
@@ -274,13 +274,13 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         HorizontalGroup buttonGroup = null;
-        if (!GlobalConf.runtime.OPENVR) {
+        if (!Settings.settings.runtime.openVr) {
             buttonGroup = new HorizontalGroup();
             buttonGroup.space(pad4);
             buttonGroup.addActor(button3d);
             buttonGroup.addActor(buttonDome);
             buttonGroup.addActor(buttonCubemap);
-            if (GlobalConf.program.isMaster())
+            if (Settings.settings.program.net.isMasterInstance())
                 buttonGroup.addActor(buttonMaster);
         }
 
@@ -296,7 +296,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraGroup.add(cinematic).top().left().padBottom(pad9).row();
         cameraGroup.add(focusLock).top().left().padBottom(pad9).row();
         cameraGroup.add(orientationLock).top().left().padBottom(pad9).row();
-        if (!GlobalConf.runtime.OPENVR)
+        if (!Settings.settings.runtime.openVr)
             cameraGroup.add(group(new Label("", skin), buttonGroup, pad3)).top().center();
 
         component = cameraGroup;
@@ -386,7 +386,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case STEREOSCOPIC_CMD:
-            if (!(boolean) data[1] && !GlobalConf.runtime.OPENVR) {
+            if (!(boolean) data[1] && !Settings.settings.runtime.openVr) {
                 button3d.setProgrammaticChangeEvents(false);
                 button3d.setChecked((boolean) data[0]);
                 button3d.setProgrammaticChangeEvents(true);
@@ -394,11 +394,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
             break;
         case FOV_CHANGE_NOTIFICATION:
             fovFlag = false;
-            fieldOfView.setValue(GlobalConf.scene.CAMERA_FOV);
+            fieldOfView.setValue(Settings.settings.scene.camera.fov);
             fovFlag = true;
             break;
         case CUBEMAP_CMD:
-            if (!(boolean) data[2] && !GlobalConf.runtime.OPENVR) {
+            if (!(boolean) data[2] && !Settings.settings.runtime.openVr) {
                 CubemapProjection proj = (CubemapProjection) data[1];
                 boolean enable = (boolean) data[0];
                 if (proj.isPanorama()) {
@@ -416,7 +416,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case PLANETARIUM_CMD:
-            if (!(boolean) data[1] && !GlobalConf.runtime.OPENVR) {
+            if (!(boolean) data[1] && !Settings.settings.runtime.openVr) {
                 boolean enable = (boolean) data[0];
                 buttonDome.setProgrammaticChangeEvents(false);
                 buttonDome.setChecked(enable);

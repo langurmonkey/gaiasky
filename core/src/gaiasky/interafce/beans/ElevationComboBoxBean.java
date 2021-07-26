@@ -5,7 +5,7 @@
 
 package gaiasky.interafce.beans;
 
-import gaiasky.util.GlobalConf.SceneConf.ElevationType;
+import gaiasky.util.Settings.ElevationType;
 
 public class ElevationComboBoxBean {
 

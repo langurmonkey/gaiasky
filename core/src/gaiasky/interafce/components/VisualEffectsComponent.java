@@ -10,15 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.I18n;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnSliderPlus;
@@ -49,7 +45,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starBrightness = new OwnSliderPlus(I18n.txt("gui.starbrightness"), Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, skin);
         starBrightness.setName("star brightness");
         starBrightness.setWidth(contentWidth);
-        starBrightness.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS);
+        starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
         starBrightness.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 EventManager.instance.post(Events.STAR_BRIGHTNESS_CMD, starBrightness.getMappedValue(), true);
@@ -62,7 +58,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starBrightnessPower = new OwnSliderPlus(I18n.txt("gui.starbrightness.pow"), Constants.MIN_STAR_BRIGHTNESS_POW, Constants.MAX_STAR_BRIGHTNESS_POW, Constants.SLIDER_STEP_TINY, skin);
         starBrightnessPower.setName("star brightness power");
         starBrightnessPower.setWidth(contentWidth);
-        starBrightnessPower.setMappedValue(GlobalConf.scene.STAR_BRIGHTNESS_POWER);
+        starBrightnessPower.setMappedValue(Settings.settings.scene.star.power);
         starBrightnessPower.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 EventManager.instance.post(Events.STAR_BRIGHTNESS_POW_CMD, starBrightnessPower.getValue(), true);
@@ -75,7 +71,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starSize = new OwnSliderPlus(I18n.txt("gui.star.size"), Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.SLIDER_STEP_TINY, skin);
         starSize.setName("star size");
         starSize.setWidth(contentWidth);
-        starSize.setMappedValue(GlobalConf.scene.STAR_POINT_SIZE);
+        starSize.setMappedValue(Settings.settings.scene.star.pointSize);
         starSize.addListener(event -> {
             if (flag && event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, starSize.getMappedValue(), true);
@@ -88,7 +84,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starMinOpacity = new OwnSliderPlus(I18n.txt("gui.star.opacity"), Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.SLIDER_STEP_TINY, skin);
         starMinOpacity.setName("star min opacity");
         starMinOpacity.setWidth(contentWidth);
-        starMinOpacity.setMappedValue(GlobalConf.scene.STAR_MIN_OPACITY);
+        starMinOpacity.setMappedValue(Settings.settings.scene.star.opacity[0]);
         starMinOpacity.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, starMinOpacity.getMappedValue(), true);
@@ -101,7 +97,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         ambientLight = new OwnSliderPlus(I18n.txt("gui.light.ambient"), Constants.MIN_AMBIENT_LIGHT, Constants.MAX_AMBIENT_LIGHT, Constants.SLIDER_STEP_TINY, skin);
         ambientLight.setName("ambient light");
         ambientLight.setWidth(contentWidth);
-        ambientLight.setMappedValue(GlobalConf.scene.AMBIENT_LIGHT);
+        ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
         ambientLight.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.AMBIENT_LIGHT_CMD, ambientLight.getMappedValue());
@@ -114,7 +110,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         labelSize = new OwnSliderPlus(I18n.txt("gui.label.size"), Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, Constants.SLIDER_STEP_TINY, skin);
         labelSize.setName("label size");
         labelSize.setWidth(contentWidth);
-        labelSize.setMappedValue(GlobalConf.scene.LABEL_SIZE_FACTOR);
+        labelSize.setMappedValue(Settings.settings.scene.label.size);
         labelSize.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 float val = labelSize.getMappedValue();
@@ -128,7 +124,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         lineWidth = new OwnSliderPlus(I18n.txt("gui.line.width"), Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, Constants.SLIDER_STEP_TINY, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, skin);
         lineWidth.setName("line width");
         lineWidth.setWidth(contentWidth);
-        lineWidth.setMappedValue(GlobalConf.scene.LINE_WIDTH_FACTOR);
+        lineWidth.setMappedValue(Settings.settings.scene.lineWidth);
         lineWidth.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 float val = lineWidth.getMappedValue();
@@ -142,7 +138,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         elevMult = new OwnSliderPlus(I18n.txt("gui.elevation.multiplier"), Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT, 0.1f, false, skin);
         elevMult.setName("elevation mult");
         elevMult.setWidth(contentWidth);
-        elevMult.setValue((float) MathUtilsd.roundAvoid(GlobalConf.scene.ELEVATION_MULTIPLIER, 1));
+        elevMult.setValue((float) MathUtilsd.roundAvoid(Settings.settings.scene.renderer.elevation.multiplier, 1));
         elevMult.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 float val = elevMult.getValue();
@@ -161,8 +157,8 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             if(event instanceof ChangeEvent){
                 // Read defaults from internal config file
                 try {
-                    Path confFolder = GlobalConf.assetsPath("conf");
-                    Path internalFolderConfFile = confFolder.resolve(DesktopConfInit.getConfigFileName(GlobalConf.runtime.OPENVR || GlobalConf.runtime.OVR));
+                    Path confFolder = Settings.settings.assetsPath("conf");
+                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr || Settings.settings.runtime.OVR));
                     Properties internalProps = new Properties();
                     internalProps.load(Files.newInputStream(internalFolderConfFile));
 

@@ -10,8 +10,8 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.math.CatmullRomSplined;
 import gaiasky.util.math.Lineard;
 import gaiasky.util.math.Pathd;
@@ -196,7 +196,7 @@ public class CameraKeyframeManager implements IObserver {
 
         /** Frame counter **/
         long frames = 0;
-        double frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
+        double frameRate = Settings.settings.camrecorder.targetFps;
 
         try {
             Files.createFile(f);
@@ -212,9 +212,9 @@ public class CameraKeyframeManager implements IObserver {
                 ups[i] = k.up;
             }
 
-            PathPart[] posSplines = positionsToPathParts(keyframes, GlobalConf.frame.KF_PATH_TYPE_POSITION);
-            Pathd<Vector3d> dirSpline = getPath(directions, GlobalConf.frame.KF_PATH_TYPE_ORIENTATION);
-            Pathd<Vector3d> upSpline = getPath(ups, GlobalConf.frame.KF_PATH_TYPE_ORIENTATION);
+            PathPart[] posSplines = positionsToPathParts(keyframes, Settings.settings.camrecorder.keyframe.position);
+            Pathd<Vector3d> dirSpline = getPath(directions, Settings.settings.camrecorder.keyframe.orientation);
+            Pathd<Vector3d> upSpline = getPath(ups, Settings.settings.camrecorder.keyframe.orientation);
 
             Vector3d aux = new Vector3d();
 
@@ -276,7 +276,7 @@ public class CameraKeyframeManager implements IObserver {
                 splinePosIdx += splinePosStep;
 
                 // If k1 is seam and not last and we're doing splines, jump to next spline
-                if (k1.seam && i < keyframes.size -1 && GlobalConf.frame.KF_PATH_TYPE_POSITION == PathType.SPLINE) {
+                if (k1.seam && i < keyframes.size -1 && Settings.settings.camrecorder.keyframe.position == PathType.SPLINE) {
                     currentPosSpline = posSplines[++k];
                     splinePosIdx = 0;
                     splinePosStep = 1d / (currentPosSpline.nPoints - 1);
@@ -298,7 +298,7 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     private PathPart[] positionsToPathParts(Array<Keyframe> keyframes, PathType pathType) {
-        double frameRate = GlobalConf.frame.CAMERA_REC_TARGET_FPS;
+        double frameRate = Settings.settings.camrecorder.targetFps;
         Array<Array<Vector3d>> positionsSep = new Array<>();
         Array<Vector3d> current = new Array<>();
         Array<Double> times = new Array<>();

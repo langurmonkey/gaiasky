@@ -57,7 +57,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
         JsonReader json = new JsonReader();
         for (String filePath : filePaths) {
             try {
-                FileHandle file = GlobalConf.data.dataFileHandle(filePath);
+                FileHandle file = Settings.settings.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
 
                 // Must have an 'objects' element.

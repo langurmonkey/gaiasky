@@ -23,9 +23,9 @@ import gaiasky.interafce.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.util.CatalogManager;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.MusicManager;
+import gaiasky.util.Settings;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.*;
 
@@ -102,7 +102,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         /* ----TIME GROUP---- */
         playStop = new OwnImageButton(skin, "playstop");
         playStop.setName("play stop");
-        playStop.setChecked(GlobalConf.runtime.TIME_ON);
+        playStop.setChecked(Settings.settings.runtime.timeOn);
         playStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.TIME_STATE_CMD, playStop.isChecked(), true);
@@ -127,7 +127,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         // Record camera button
         recCamera = new OwnImageButton(skin, "rec");
         recCamera.setName("recCam");
-        recCamera.setChecked(GlobalConf.runtime.RECORD_CAMERA);
+        recCamera.setChecked(Settings.settings.runtime.recordCamera);
         recCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.RECORD_CAMERA_CMD, recCamera.isChecked(), null, true);
@@ -140,7 +140,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         // Record camera (keyframes)
         recKeyframeCamera = new OwnImageButton(skin, "rec-key");
         recKeyframeCamera.setName("recKeyframeCamera");
-        recKeyframeCamera.setChecked(GlobalConf.runtime.RECORD_KEYFRAME_CAMERA);
+        recKeyframeCamera.setChecked(Settings.settings.runtime.recordKeyframeCamera);
         recKeyframeCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.SHOW_KEYFRAMES_WINDOW_ACTION);
@@ -261,7 +261,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         map = new OwnTextIconButton("", icon, skin, "toggle");
         map.setSize(bw, bh);
         map.setName("map");
-        map.setChecked(GlobalConf.program.DISPLAY_MINIMAP);
+        map.setChecked(Settings.settings.program.minimap.active);
         String minimapHotkey = kb.getStringKeys("action.toggle/gui.minimap.title");
         map.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.map"), minimapHotkey, skin));
         map.addListener(event -> {

@@ -14,10 +14,10 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.concurrent.ServiceThread;
 import gaiasky.util.tree.LoadStatus;
 import gaiasky.util.tree.OctreeNode;
@@ -110,7 +110,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         // We assume 1Gb of graphics memory.
         // GPU ~ 32 byte/star
         // CPU ~ 136 byte/star
-        maxLoadedStars = GlobalConf.scene.MAX_LOADED_STARS;
+        maxLoadedStars = Settings.settings.scene.octree.maxStars;
         logger.info("Maximum loaded stars setting: " + maxLoadedStars);
 
         Comparator<OctreeNode> depthComparator = Comparator.comparingInt((OctreeNode o) -> o.depth);
@@ -396,7 +396,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                         octant.touch(unloaded);
                     } catch (Exception e) {
                         logger.error("Error disposing octant's objects " + octant.pageId, e);
-                        logger.info(GlobalConf.APPLICATION_NAME + " will attempt to continue");
+                        logger.info(Settings.APPLICATION_NAME + " will attempt to continue");
                     }
                 }
             });

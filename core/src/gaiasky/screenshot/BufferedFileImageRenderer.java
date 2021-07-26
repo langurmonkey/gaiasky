@@ -8,8 +8,8 @@ package gaiasky.screenshot;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.Pools;
 import gaiasky.render.BufferedFrame;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalConf.ImageFormat;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.ImageFormat;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -82,7 +82,7 @@ public class BufferedFileImageRenderer implements IFileImageRenderer {
                         String folder = null;
                         for (int i = 0; i < size; i++) {
                             BufferedFrame bf = outputFrameBufferCopy.get(i);
-                            ImageRenderer.writePixmapToImage(bf.folder, bf.filename, bf.pixmap, GlobalConf.frame.FRAME_FORMAT, GlobalConf.frame.FRAME_QUALITY);
+                            ImageRenderer.writePixmapToImage(bf.folder, bf.filename, bf.pixmap, Settings.settings.frame.format, Settings.settings.frame.quality);
                             folder = bf.folder;
                             bfPool.free(bf);
                         }

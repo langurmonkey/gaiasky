@@ -14,8 +14,11 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.MemInfo;
+import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -80,7 +83,7 @@ public class CrashReporter {
         String crf1 = "Crash report file saved to: " + crashReportFile.toAbsolutePath();
         String crf4 = "Full log file saved to: " + logFile.toAbsolutePath();
         String crf2 = "Please attach these files to the bug report";
-        String crf3 = "Create a bug report here: " + GlobalConf.REPO_ISSUES;
+        String crf3 = "Create a bug report here: " + Settings.REPO_ISSUES;
         int len = Math.max(crf1.length(), Math.max(crf3.length(), crf4.length()));
         char[] chars = new char[len];
         Arrays.fill(chars, '#');
@@ -172,14 +175,14 @@ public class CrashReporter {
 
     private static void appendSystemInfo(Array<String> strArray) {
         /* Gaia Sky info */
-        if (GlobalConf.version != null) {
+        if (Settings.settings.version != null) {
             strArray.add("");
             strArray.add("## GAIA SKY INFORMATION");
-            strArray.add("Version: " + GlobalConf.version.version);
-            strArray.add("Build: " + GlobalConf.version.build);
-            strArray.add("Builder: " + GlobalConf.version.builder);
-            strArray.add("System: " + GlobalConf.version.system);
-            strArray.add("Build time: " + GlobalConf.version.buildtime);
+            strArray.add("Version: " + Settings.settings.version.version);
+            strArray.add("Build: " + Settings.settings.version.build);
+            strArray.add("Builder: " + Settings.settings.version.builder);
+            strArray.add("System: " + Settings.settings.version.system);
+            strArray.add("Build time: " + Settings.settings.version.buildTime);
         }
 
         /* Java info */

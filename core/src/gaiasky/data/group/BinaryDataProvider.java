@@ -6,8 +6,8 @@
 package gaiasky.data.group;
 
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 
 import java.io.*;
 import java.nio.MappedByteBuffer;
@@ -144,7 +144,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
     @Override
     public List<IParticleRecord> loadDataMapped(String file, double factor) {
         try {
-            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(Settings.settings.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 
@@ -185,7 +185,7 @@ public class BinaryDataProvider extends AbstractStarGroupDataProvider {
      */
     public List<IParticleRecord> loadDataMapped(String file, double factor, int versionHint) {
         try {
-            FileChannel fc = new RandomAccessFile(GlobalConf.data.dataFile(file), "r").getChannel();
+            FileChannel fc = new RandomAccessFile(Settings.settings.data.dataFile(file), "r").getChannel();
 
             MappedByteBuffer mem = fc.map(FileChannel.MapMode.READ_ONLY, 0, fc.size());
 

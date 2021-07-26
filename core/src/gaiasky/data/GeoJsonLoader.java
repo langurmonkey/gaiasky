@@ -12,9 +12,9 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.scenegraph.Area;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import uk.ac.starlink.util.DataSource;
 
 import java.util.Map;
@@ -43,7 +43,7 @@ public class GeoJsonLoader<T extends SceneGraphNode> implements ISceneGraphLoade
         try {
             JsonReader json = new JsonReader();
             for (String filePath : filePaths) {
-                FileHandle file = GlobalConf.data.dataFileHandle(filePath);
+                FileHandle file = Settings.settings.data.dataFileHandle(filePath);
                 JsonValue model = json.parse(file.read());
                 JsonValue child = model.get("features").child;
                 int size = 0;

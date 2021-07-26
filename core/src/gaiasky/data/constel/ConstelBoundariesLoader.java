@@ -13,9 +13,9 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.ConstellationBoundaries;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -50,7 +50,7 @@ public class ConstelBoundariesLoader<T extends SceneGraphNode> implements IScene
         for (String f : files) {
             try {
                 // load boundaries
-                FileHandle file = GlobalConf.data.dataFileHandle(f);
+                FileHandle file = Settings.settings.data.dataFileHandle(f);
                 BufferedReader br = new BufferedReader(new InputStreamReader(file.read()));
 
                 try {

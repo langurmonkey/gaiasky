@@ -20,9 +20,9 @@ import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.Trio;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
@@ -177,11 +177,11 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         inputInfo.put(Gamepad.RT, new Trio<>(rt, new float[]{354, -265}, "Right trigger"));
 
         // Remove all controller listeners
-        GlobalConf.controls.removeAllControllerListeners();
+        Settings.settings.controls.gamepad.removeAllControllerListeners();
 
         // Park our own
         ConfigControllerListener ccl = new ConfigControllerListener();
-        GlobalConf.controls.addControllerListener(ccl);
+        Settings.settings.controls.gamepad.addControllerListener(ccl);
 
         // Build UI
         buildSuper();
@@ -509,7 +509,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     }
 
     private void restoreControllerListener() {
-        GlobalConf.controls.removeAllControllerListeners();
+        Settings.settings.controls.gamepad.removeAllControllerListeners();
         EventManager.instance.post(Events.CONTROLLER_CONNECTED_INFO, controllerName);
     }
 

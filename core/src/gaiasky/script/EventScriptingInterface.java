@@ -585,7 +585,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         } else {
             ComponentType ct = ComponentType.getFromKey(key);
-            return GlobalConf.scene.VISIBILITY[ct.ordinal()];
+            return Settings.settings.scene.visibility.get(ct);
         }
     }
 
@@ -660,7 +660,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public void setUnfilteredProperMotionsNumberFactor(float factor) {
-        GlobalConf.scene.PM_NUM_FACTOR = factor;
+        Settings.settings.scene.properMotion.number = factor;
     }
 
     @Override
@@ -674,12 +674,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsMaxNumber(long maxNumber) {
-        GlobalConf.scene.STAR_GROUP_N_VELVECS = (int) maxNumber;
+        Settings.settings.scene.star.group.numVelocityVector = (int) maxNumber;
     }
 
     @Override
     public long getProperMotionsMaxNumber() {
-        return GlobalConf.scene.STAR_GROUP_N_VELVECS;
+        return Settings.settings.scene.star.group.numVelocityVector;
     }
 
     @Override
@@ -820,7 +820,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public float getStarBrightness() {
-        return (float) MathUtilsd.lint(GlobalConf.scene.STAR_BRIGHTNESS, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return (float) MathUtilsd.lint(Settings.settings.scene.star.brightness, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
@@ -835,12 +835,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public float getStarSize() {
-        return MathUtilsd.lint(GlobalConf.scene.STAR_POINT_SIZE, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsd.lint(Settings.settings.scene.star.pointSize, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     @Override
     public float getStarMinOpacity() {
-        return MathUtilsd.lint(GlobalConf.scene.STAR_MIN_OPACITY, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
+        return MathUtilsd.lint(Settings.settings.scene.star.opacity[0], Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, Constants.MIN_SLIDER, Constants.MAX_SLIDER);
     }
 
     public float getMinStarOpacity() {
@@ -887,7 +887,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setProjectionYaw(float yaw) {
         if (SlaveManager.projectionActive()) {
             GaiaSky.postRunnable(() -> {
-                GlobalConf.program.NET_SLAVE_YAW = yaw;
+                Settings.settings.program.net.slave.yaw = yaw;
                 SlaveManager.instance.yaw = yaw;
             });
         }
@@ -897,7 +897,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setProjectionPitch(float pitch) {
         if (SlaveManager.projectionActive()) {
             GaiaSky.postRunnable(() -> {
-                GlobalConf.program.NET_SLAVE_PITCH = pitch;
+                Settings.settings.program.net.slave.pitch = pitch;
                 SlaveManager.instance.pitch = pitch;
             });
         }
@@ -907,7 +907,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setProjectionRoll(float roll) {
         if (SlaveManager.projectionActive()) {
             GaiaSky.postRunnable(() -> {
-                GlobalConf.program.NET_SLAVE_ROLL = roll;
+                Settings.settings.program.net.slave.roll = roll;
                 SlaveManager.instance.roll = roll;
             });
         }
@@ -947,7 +947,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix) {
         if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
-            em.post(Events.FRAME_OUTPUT_MODE_CMD, GlobalConf.ScreenshotMode.REDRAW);
+            em.post(Events.FRAME_OUTPUT_MODE_CMD, Settings.ScreenshotMode.REDRAW);
             em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, folder, namePrefix);
         }
     }
@@ -959,13 +959,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFrameOutputMode(String screenshotMode) {
-        if (checkStringEnum(screenshotMode, GlobalConf.ScreenshotMode.class, "screenshotMode"))
+        if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode"))
             em.post(Events.FRAME_OUTPUT_MODE_CMD, screenshotMode);
     }
 
     @Override
     public boolean isFrameOutputActive() {
-        return GlobalConf.frame.RENDER_OUTPUT;
+        return Settings.settings.frame.active;
     }
 
     @Override
@@ -975,7 +975,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public double getFrameOutputFps() {
-        return GlobalConf.frame.RENDER_TARGET_FPS;
+        return Settings.settings.frame.targetFps;
     }
 
     @Override
@@ -1121,7 +1121,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     void goToObject(IFocus object, double viewAngle, float waitTimeSeconds, AtomicBoolean stop) {
         if (checkNotNull(object, "object") && checkNum(viewAngle, -Double.MAX_VALUE, Double.MAX_VALUE, "viewAngle")) {
-
             stops.add(stop);
             NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
@@ -1134,7 +1133,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             long prevTime = TimeUtils.millis();
             if (object.getViewAngleApparent() < target) {
-                System.out.println("TO");
                 // Add forward movement while distance > target distance
                 while (object.getViewAngleApparent() < target && (stop == null || !stop.get())) {
                     // dt in ms
@@ -1149,7 +1147,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     }
                 }
             } else {
-                System.out.println("AWAY");
                 // Add backward movement while distance > target distance
                 while (object.getViewAngleApparent() > target && (stop == null || !stop.get())) {
                     // dt in ms
@@ -1202,16 +1199,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                  */
 
                 // Save speed, set it to 50
-                double speed = GlobalConf.scene.CAMERA_SPEED;
+                double speed = Settings.settings.scene.camera.speed;
                 em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
 
                 // Save turn speed, set it to 50
-                double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
+                double turnSpeedBak = Settings.settings.scene.camera.turn;
                 em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
                 // Save cinematic
-                boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
-                GlobalConf.scene.CINEMATIC_CAMERA = true;
+                boolean cinematic = Settings.settings.scene.camera.cinematic;
+                Settings.settings.scene.camera.cinematic = true;
 
                 /*
                  * FOCUS
@@ -1291,7 +1288,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 em.post(Events.CAMERA_STOP);
 
                 // Restore cinematic
-                GlobalConf.scene.CINEMATIC_CAMERA = cinematic;
+                Settings.settings.scene.camera.cinematic = cinematic;
 
                 // Restore speed
                 em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
@@ -1374,24 +1371,24 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 goToObject(object, 20, -1, stop);
 
                 // Save speed, set it to 50
-                double speed = GlobalConf.scene.CAMERA_SPEED;
+                double speed = Settings.settings.scene.camera.speed;
                 em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
 
                 // Save turn speed, set it to 50
-                double turnSpeedBak = GlobalConf.scene.TURNING_SPEED;
+                double turnSpeedBak = Settings.settings.scene.camera.turn;
                 em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
                 // Save rotation speed, set it to 20
-                double rotationSpeedBak = GlobalConf.scene.ROTATION_SPEED;
+                double rotationSpeedBak = Settings.settings.scene.camera.rotate;
                 em.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
 
                 // Save cinematic
-                boolean cinematic = GlobalConf.scene.CINEMATIC_CAMERA;
-                GlobalConf.scene.CINEMATIC_CAMERA = true;
+                boolean cinematic = Settings.settings.scene.camera.cinematic;
+                Settings.settings.scene.camera.cinematic = true;
 
                 // Save crosshair
-                boolean crosshair = GlobalConf.scene.CROSSHAIR_FOCUS;
-                GlobalConf.scene.CROSSHAIR_FOCUS = false;
+                boolean crosshair = Settings.settings.scene.crosshair.focus;
+                Settings.settings.scene.crosshair.focus = false;
 
                 // Get target position
                 Vector3b target = aux3b1;
@@ -1423,7 +1420,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 goToObject(nameStub, 20, 0, stop);
 
                 // Restore cinematic
-                GlobalConf.scene.CINEMATIC_CAMERA = cinematic;
+                Settings.settings.scene.camera.cinematic = cinematic;
 
                 // Restore speed
                 em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
@@ -1435,7 +1432,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 em.post(Events.ROTATION_SPEED_CMD, (float) rotationSpeedBak, false);
 
                 // Restore crosshair
-                GlobalConf.scene.CROSSHAIR_FOCUS = crosshair;
+                Settings.settings.scene.crosshair.focus = crosshair;
 
                 // Land
                 landOnObject(object, stop);
@@ -1703,7 +1700,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public String getVersionNumber() {
-        return GlobalConf.version.version;
+        return Settings.settings.version.version;
     }
 
     @Override
@@ -1742,7 +1739,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public String getAssetsLocation() {
-        return GlobalConf.ASSETS_LOC;
+        return Settings.settings.ASSETS_LOC;
     }
 
     @Override
@@ -2160,7 +2157,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setHDRToneMappingType(String type) {
         if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
-            GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, GlobalConf.PostprocessConf.ToneMapping.valueOf(type.toUpperCase()), false));
+            GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, Settings.ToneMapping.valueOf(type.toUpperCase()), false));
     }
 
     @Override
@@ -2859,7 +2856,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setMaximumSimulationTime(long years) {
-        GlobalConf.runtime.setMaxTime(Math.abs(years));
+        Settings.settings.runtime.setMaxTime(Math.abs(years));
     }
 
     public void setMaximumSimulationTime(double years) {

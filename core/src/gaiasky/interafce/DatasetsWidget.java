@@ -12,8 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.*;
 import gaiasky.desktop.GaiaSkyDesktop;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
@@ -53,7 +53,7 @@ public class DatasetsWidget {
     public void reloadLocalCatalogs() {
         // Discover data sets, add as buttons
         Array<FileHandle> catalogLocations = new Array<>();
-        catalogLocations.add(Gdx.files.absolute(GlobalConf.data.DATA_LOCATION));
+        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
 
         Array<FileHandle> catalogFiles = new Array<>();
 
@@ -125,7 +125,7 @@ public class DatasetsWidget {
         }
 
         cbs = new OwnCheckBox[datasets.size];
-        Array<String> currentSetting = GlobalConf.data.CATALOG_JSON_FILES;
+        java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
 
         int i = 0;
         for (DatasetType type : types) {
@@ -248,7 +248,7 @@ public class DatasetsWidget {
         return result;
     }
 
-    private boolean contains(String name, Array<String> list) {
+    private boolean contains(String name, java.util.List<String> list) {
         for (String candidate : list)
             if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
                 return true;

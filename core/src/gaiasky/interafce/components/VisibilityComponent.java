@@ -18,8 +18,8 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
@@ -117,7 +117,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // ARROWHEADS
         pmArrowheads = new OwnCheckBox(I18n.txt("gui.pm.arrowheads"), skin, space2);
         pmArrowheads.setName("pm arrow caps");
-        pmArrowheads.setChecked(GlobalConf.scene.PM_ARROWHEADS);
+        pmArrowheads.setChecked(Settings.settings.scene.properMotion.arrowHeads);
         pmArrowheads.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents)
@@ -132,7 +132,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmNumFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
         pmNumFactorSlider.setName("proper motion vectors number factor");
         pmNumFactorSlider.setWidth(contentWidth);
-        pmNumFactorSlider.setMappedValue(GlobalConf.scene.PM_NUM_FACTOR);
+        pmNumFactorSlider.setMappedValue(Settings.settings.scene.properMotion.number);
         pmNumFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents) {
@@ -147,7 +147,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmLenFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmlenfactor"), Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR, Constants.SLIDER_STEP_SMALL, skin);
         pmLenFactorSlider.setName("proper motion vectors number factor");
         pmLenFactorSlider.setWidth(contentWidth);
-        pmLenFactorSlider.setValue(GlobalConf.scene.PM_LEN_FACTOR);
+        pmLenFactorSlider.setValue(Settings.settings.scene.properMotion.length);
         pmLenFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents) {
@@ -172,7 +172,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmColorMode = new OwnSelectBox<>(skin);
         pmColorMode.setItems(cms);
         pmColorMode.setWidth(contentWidth);
-        pmColorMode.setSelectedIndex(GlobalConf.scene.PM_COLOR_MODE);
+        pmColorMode.setSelectedIndex(Settings.settings.scene.properMotion.colorMode);
         pmColorMode.setName("proper motion color mode");
         pmColorMode.addListener((event) -> {
             if (event instanceof ChangeEvent) {

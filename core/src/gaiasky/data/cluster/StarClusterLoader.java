@@ -12,10 +12,10 @@ import gaiasky.data.ISceneGraphLoader;
 import gaiasky.data.stars.AbstractCatalogLoader;
 import gaiasky.scenegraph.StarCluster;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3b;
@@ -73,7 +73,7 @@ public class StarClusterLoader extends AbstractCatalogLoader implements ISceneGr
         if (active) {
             if (files != null) {
                 for (String file : files) {
-                    FileHandle f = GlobalConf.data.dataFileHandle(file);
+                    FileHandle f = Settings.settings.data.dataFileHandle(file);
                     InputStream is = f.read();
                     try {
                         loadClustersCsv(is, clusters);

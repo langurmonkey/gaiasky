@@ -262,7 +262,7 @@ public class ControllerGui extends AbstractGui {
         cameraCinematic = new OwnTextButton(I18n.txt("gui.camera.cinematic"), skin, "toggle-big");
         cameraModel[0][2] = cameraCinematic;
         cameraCinematic.setWidth(ww);
-        cameraCinematic.setChecked(GlobalConf.scene.CINEMATIC_CAMERA);
+        cameraCinematic.setChecked(Settings.settings.scene.camera.cinematic);
         cameraCinematic.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 em.post(Events.CAMERA_CINEMATIC_CMD, cameraCinematic.isChecked(), false);
@@ -278,10 +278,10 @@ public class ControllerGui extends AbstractGui {
         fovSlider.setName("field of view");
         fovSlider.setWidth(sw);
         fovSlider.setHeight(sh);
-        fovSlider.setValue(GlobalConf.scene.CAMERA_FOV);
-        fovSlider.setDisabled(GlobalConf.program.isFixedFov());
+        fovSlider.setValue(Settings.settings.scene.camera.fov);
+        fovSlider.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
         fovSlider.addListener(event -> {
-            if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !GlobalConf.program.isFixedFov()) {
+            if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
                 float value = fovSlider.getMappedValue();
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
                 return true;
@@ -295,7 +295,7 @@ public class ControllerGui extends AbstractGui {
         camSpeedSlider.setName("camera speed");
         camSpeedSlider.setWidth(sw);
         camSpeedSlider.setHeight(sh);
-        camSpeedSlider.setMappedValue(GlobalConf.scene.CAMERA_SPEED);
+        camSpeedSlider.setMappedValue(Settings.settings.scene.camera.speed);
         camSpeedSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.CAMERA_SPEED_CMD, camSpeedSlider.getMappedValue(), false);
@@ -310,7 +310,7 @@ public class ControllerGui extends AbstractGui {
         camRotSlider.setName("rotate speed");
         camRotSlider.setWidth(sw);
         camRotSlider.setHeight(sh);
-        camRotSlider.setMappedValue(GlobalConf.scene.ROTATION_SPEED);
+        camRotSlider.setMappedValue(Settings.settings.scene.camera.rotate);
         camRotSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.ROTATION_SPEED_CMD, camRotSlider.getMappedValue(), false);
@@ -325,7 +325,7 @@ public class ControllerGui extends AbstractGui {
         camTurnSlider.setName("turn speed");
         camTurnSlider.setWidth(sw);
         camTurnSlider.setHeight(sh);
-        camTurnSlider.setMappedValue(GlobalConf.scene.TURNING_SPEED);
+        camTurnSlider.setMappedValue(Settings.settings.scene.camera.turn);
         camTurnSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.TURNING_SPEED_CMD, camTurnSlider.getMappedValue(), false);
@@ -355,7 +355,7 @@ public class ControllerGui extends AbstractGui {
 
         timeT = new Table(skin);
 
-        boolean timeOn = GlobalConf.runtime.TIME_ON;
+        boolean timeOn = Settings.settings.runtime.timeOn;
         timeStartStop = new OwnTextButton(I18n.txt(timeOn ? "gui.time.pause" : "gui.time.start"), skin, "toggle-big");
         timeModel[1][0] = timeStartStop;
         timeStartStop.setWidth(ww);
@@ -476,7 +476,7 @@ public class ControllerGui extends AbstractGui {
         bloomSlider = new OwnSliderPlus(I18n.txt("gui.bloom"), Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, 1f, false, skin, "ui-19");
         bloomSlider.setWidth(sw);
         bloomSlider.setHeight(sh);
-        bloomSlider.setValue(GlobalConf.postprocess.POSTPROCESS_BLOOM_INTENSITY * 10f);
+        bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity * 10f);
         bloomSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.BLOOM_CMD, bloomSlider.getValue() / 10f, false);
@@ -491,7 +491,7 @@ public class ControllerGui extends AbstractGui {
         flareButton = new OwnTextButton(I18n.txt("gui.lensflare"), skin, "toggle-big");
         optionsModel[0][1] = flareButton;
         flareButton.setWidth(ww);
-        flareButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LENS_FLARE);
+        flareButton.setChecked(Settings.settings.postprocess.lensFlare);
         flareButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.LENS_FLARE_CMD, flareButton.isChecked(), false);
@@ -505,7 +505,7 @@ public class ControllerGui extends AbstractGui {
         starGlowButton = new OwnTextButton(I18n.txt("gui.lightscattering"), skin, "toggle-big");
         optionsModel[0][2] = starGlowButton;
         starGlowButton.setWidth(ww);
-        starGlowButton.setChecked(GlobalConf.postprocess.POSTPROCESS_LIGHT_GLOW);
+        starGlowButton.setChecked(Settings.settings.postprocess.lightGlow);
         starGlowButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, starGlowButton.isChecked(), false);
@@ -519,7 +519,7 @@ public class ControllerGui extends AbstractGui {
         motionBlurButton = new OwnTextButton(I18n.txt("gui.motionblur"), skin, "toggle-big");
         optionsModel[0][3] = motionBlurButton;
         motionBlurButton.setWidth(ww);
-        motionBlurButton.setChecked(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR);
+        motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur);
         motionBlurButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlurButton.isChecked(), false);
@@ -1046,12 +1046,12 @@ public class ControllerGui extends AbstractGui {
     private void addControllerListener(NaturalCamera cam, IControllerMappings mappings) {
         guiControllerListener.setCamera(cam);
         guiControllerListener.setMappings(mappings);
-        GlobalConf.controls.addControllerListener(guiControllerListener);
+        Settings.settings.controls.gamepad.addControllerListener(guiControllerListener);
         guiControllerListener.activate();
     }
 
     private void removeControllerListener() {
-        GlobalConf.controls.removeControllerListener(guiControllerListener);
+        Settings.settings.controls.gamepad.removeControllerListener(guiControllerListener);
         guiControllerListener.deactivate();
     }
 
