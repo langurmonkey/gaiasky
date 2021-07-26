@@ -117,10 +117,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
-            shaderProgram.setUniformf("u_brPow", Settings.settings.scene.star.brightness);
+            shaderProgram.setUniformf("u_brPow", Settings.settings.scene.star.power);
             shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
-            // Update projection if fovmode is 3
+            // Update projection if fovMode is 3
             int fovMode = camera.getMode().getGaiaFovMode();
             if (fovMode == 3) {
                 // Cam is Fov1 & Fov2
@@ -142,7 +142,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             starGroup.offset = addMeshData(n);
                             curr = meshes.get(starGroup.offset);
                             ensureTempVertsSize(n * curr.vertexSize);
-                            int nadded = 0;
+                            int numAdded = 0;
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i) && starGroup.isVisible(i)) {
                                     IParticleRecord sb = starGroup.data().get(i);
@@ -178,10 +178,10 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                     tempVerts[curr.vertexIdx + pmOffset + 2] = (float) sb.pmz();
 
                                     curr.vertexIdx += curr.vertexSize;
-                                    nadded++;
+                                    numAdded++;
                                 }
                             }
-                            starGroup.count = nadded * curr.vertexSize;
+                            starGroup.count = numAdded * curr.vertexSize;
                             curr.mesh.setVertices(tempVerts, 0, starGroup.count);
 
                             starGroup.inGpu(true);

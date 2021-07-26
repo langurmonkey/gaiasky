@@ -468,7 +468,7 @@ postprocess:
   # Unsharp mask effect
   unsharpMask:
     # Sharpen factor, in [0,3]
-    factor: 1.0
+    factor: 0.1
   # Activate/deactivate motion blur effect
   motionBlur: false
   # Activate/deactivate lens flare effect
