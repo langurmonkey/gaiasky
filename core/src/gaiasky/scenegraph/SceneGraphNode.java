@@ -1126,12 +1126,12 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, float minSizeDegrees, float maxSizeDegrees) {
         // The smoothing scale must be set according to the distance
-        shader.setUniformf("u_scale", GlobalConf.scene.LABEL_SIZE_FACTOR * scale / camera.getFovFactor());
+        shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
 
         double r = getRadius();
         if (r == 0 || distToCamera > r * 2d) {
 
-            size *= GlobalConf.scene.LABEL_SIZE_FACTOR;
+            size *= Settings.settings.scene.label.size;
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
@@ -1177,7 +1177,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     public boolean isVisible() {
-        return this.visible || msSinceStateChange() <= GlobalConf.scene.OBJECT_FADE_MS;
+        return this.visible || msSinceStateChange() <= Settings.settings.scene.fadeMs;
     }
 
     public boolean isVisible(boolean attributeValue) {
@@ -1211,11 +1211,11 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         long msSinceStateChange = msSinceStateChange();
 
         // Fast track
-        if (msSinceStateChange > GlobalConf.scene.OBJECT_FADE_MS)
+        if (msSinceStateChange > Settings.settings.scene.fadeMs)
             return this.visible ? 1 : 0;
 
         // Fading
-        float visop = MathUtilsd.lint(msSinceStateChange, 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1);
+        float visop = MathUtilsd.lint(msSinceStateChange, 0, Settings.settings.scene.fadeMs, 0, 1);
         if (!this.visible) {
             visop = 1 - visop;
         }
@@ -1223,7 +1223,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     protected boolean shouldRender() {
-        return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < GlobalConf.scene.OBJECT_FADE_MS);
+        return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < Settings.settings.scene.fadeMs);
     }
 
     public float[] getColor() {

@@ -23,7 +23,7 @@ import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -120,7 +120,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
             if (curr != null) {
                 ExtShaderProgram shaderProgram = getShaderProgram();
 
-                boolean stereoHw = GlobalConf.program.isStereoHalfWidth();
+                boolean stereoHw = Settings.settings.program.modeStereo.isStereoHalfWidth();
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -130,7 +130,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 shaderProgram.setUniformf("u_scaleFactor", rc.scaleFactor * 1.5f * (stereoHw ? 2f : 1f));
                 shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
                 shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
-                shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
+                shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
 
                 shaderProgram.setUniformf("u_size", rc.scaleFactor);
                 // VR scale

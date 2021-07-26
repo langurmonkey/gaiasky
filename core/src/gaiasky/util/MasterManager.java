@@ -39,7 +39,7 @@ public class MasterManager implements IObserver {
     public static MasterManager instance;
 
     public static void initialize() {
-        if (GlobalConf.program.NET_MASTER)
+        if (Settings.settings.program.net.master.active)
             MasterManager.instance = new MasterManager();
     }
 
@@ -95,7 +95,7 @@ public class MasterManager implements IObserver {
         super();
 
         // Slave objects
-        slaves = GlobalConf.program.NET_MASTER_SLAVES;
+        slaves = Settings.settings.program.net.master.slaves;
         if (slaves != null && slaves.size() > 0) {
             slaveStates = new byte[slaves.size()];
             slaveFlags = new byte[slaves.size()];
@@ -261,7 +261,7 @@ public class MasterManager implements IObserver {
                 state = (Boolean) data[2];
             } else {
                 ComponentType ct = ComponentType.getFromKey(key);
-                state = GlobalConf.scene.VISIBILITY[ct.ordinal()];
+                state = Settings.settings.scene.visibility.get(ct.toString());
             }
             i = 0;
             for (String slave : slaves) {

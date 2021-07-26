@@ -327,7 +327,7 @@ public class CameraManager implements ICamera, IObserver {
         speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
         // High speed?
-        if (speed > (GlobalConf.runtime.OPENVR ? 5e6 : 5e3)) {
+        if (speed > (Settings.settings.runtime.openVr ? 5e6 : 5e3)) {
             StreamingOctreeLoader.clearQueue();
         }
 

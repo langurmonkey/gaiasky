@@ -41,11 +41,11 @@ public class I18n {
     }
 
     public static boolean forceInit(FileHandle baseFileHandle) {
-        if (GlobalConf.program == null || GlobalConf.program.LOCALE.isEmpty()) {
+        if (Settings.settings.program == null || Settings.settings.program.locale == null || Settings.settings.program.locale.isEmpty()) {
             // Use system default
             locale = Locale.getDefault();
         } else {
-            locale = forLanguageTag(GlobalConf.program.LOCALE);
+            locale = forLanguageTag(Settings.settings.program.locale);
             // Set as default locale
             Locale.setDefault(locale);
         }

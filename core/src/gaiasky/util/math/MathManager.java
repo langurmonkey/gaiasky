@@ -8,14 +8,14 @@ package gaiasky.util.math;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 public class MathManager implements IObserver {
 
     public static MathManager instance;
 
     public static void initialize() {
-        initialize(GlobalConf.data.HIGH_ACCURACY_POSITIONS);
+        initialize(Settings.settings.data.highAccuracy);
     }
 
     public static void initialize(boolean highAccuracy) {
@@ -23,7 +23,7 @@ public class MathManager implements IObserver {
             instance = new MathManager(highAccuracy);
     }
 
-    public ITrigonometry trigo;
+    public ITrigonometry trigonometryInterface;
 
     private final Trigonometry trigonometry;
     private final FastTrigonometry fastTrigonometry;
@@ -32,20 +32,16 @@ public class MathManager implements IObserver {
         trigonometry = new Trigonometry();
         fastTrigonometry = new FastTrigonometry();
 
-        trigo = highAccuracy ? trigonometry : fastTrigonometry;
+        trigonometryInterface = highAccuracy ? trigonometry : fastTrigonometry;
 
         EventManager.instance.subscribe(this, Events.HIGH_ACCURACY_CMD);
     }
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case HIGH_ACCURACY_CMD:
+        if (event == Events.HIGH_ACCURACY_CMD) {
             boolean highAcc = (Boolean) data[0];
-            trigo = highAcc ? trigonometry : fastTrigonometry;
-            break;
-        default:
-            break;
+            trigonometryInterface = highAcc ? trigonometry : fastTrigonometry;
         }
 
     }

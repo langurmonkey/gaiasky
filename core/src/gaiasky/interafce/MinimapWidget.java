@@ -18,8 +18,8 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.interafce.minimap.*;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.OwnTextHotkeyTooltip;
 import gaiasky.util.scene2d.TextureWidget;
@@ -37,9 +37,9 @@ public class MinimapWidget implements Disposable {
     private IMinimapScale current;
 
     public MinimapWidget(final Skin skin, final ShaderProgram shapeShader) {
-        side = (int) (1.4f * GlobalConf.program.MINIMAP_SIZE);
+        side = (int) (1.4f * Settings.settings.program.minimap.size);
         side2 = side / 2;
-        sideshort = (int) (0.7f * GlobalConf.program.MINIMAP_SIZE);
+        sideshort = (int) (0.7f * Settings.settings.program.minimap.size);
         sideshort2 = sideshort / 2;
 
         OrthographicCamera ortho = new OrthographicCamera();

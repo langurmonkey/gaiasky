@@ -111,6 +111,9 @@ public class SettingsManager {
         }
         versionSettings.initialize(versionStr, buildTime, vp.getProperty("builder"), vp.getProperty("system"), vp.getProperty("build"));
 
+        // Initialize runtime
+        settings.runtime = new Settings.RuntimeSettings();
+
         settings.version = versionSettings;
         Settings.settings = settings;
 
@@ -140,7 +143,7 @@ public class SettingsManager {
 
         // Limit draw distance in 32-bit JVM
         if (arch.equals("32")) {
-            double delta = Math.abs(settings.scene.octree.threshold[1] - settings.scene.octree.threshold[0]);
+            float delta = Math.abs(settings.scene.octree.threshold[1] - settings.scene.octree.threshold[0]);
             settings.scene.octree.threshold[0] = (float) Math.toRadians(80);
             settings.scene.octree.threshold[1] = settings.scene.octree.threshold[1] + delta;
         }

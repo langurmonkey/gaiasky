@@ -21,7 +21,8 @@ import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -51,7 +52,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { GlobalConf.scene.STAR_MIN_OPACITY, GlobalConf.scene.STAR_MAX_OPACITY};
+        pointAlpha = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1]};
 
         for (ExtShaderProgram p : programs) {
             if (p != null) {
@@ -133,7 +134,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             POINT_UPDATE_FLAG = false;
         }
         if (!camera.getMode().isGaiaFov()) {
-            int fovmode = camera.getMode().getGaiaFovMode();
+            int fovMode = camera.getMode().getGaiaFovMode();
 
             ExtShaderProgram shaderProgram = getShaderProgram();
 
@@ -142,14 +143,14 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux));
 
             alphaSizeFovBr[0] = alphas[ct.ordinal()];
-            alphaSizeFovBr[1] = fovmode == 0 ? GlobalConf.getStarPointSize() * rc.scaleFactor * (GlobalConf.program.isStereoFullWidth() ? 1 : 2) : GlobalConf.scene.STAR_POINT_SIZE * rc.scaleFactor * 10;
+            alphaSizeFovBr[1] = fovMode == 0 ? StarSettings.getStarPointSize() * rc.scaleFactor * (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1 : 2) : Settings.settings.scene.star.pointSize * rc.scaleFactor * 10;
             alphaSizeFovBr[2] = camera.getFovFactor();
-            alphaSizeFovBr[3] = (float) (GlobalConf.scene.STAR_BRIGHTNESS * BRIGHTNESS_FACTOR);
+            alphaSizeFovBr[3] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
 
             shaderProgram.setUniformf("u_t", (float) AstroUtils.getMsSinceJ2000(GaiaSky.instance.time.getTime()));
-            shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 0.5f : 1f);
-            shaderProgram.setUniformf("u_thAnglePoint", (float) GlobalConf.scene.STAR_THRESHOLD_POINT);
+            shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 0.5f : 1f);
+            shaderProgram.setUniformf("u_thAnglePoint", (float) Settings.settings.scene.star.threshold.point);
 
             // Relativistic effects
             addEffectsUniforms(shaderProgram, camera);

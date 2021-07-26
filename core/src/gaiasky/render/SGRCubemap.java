@@ -18,7 +18,7 @@ import gaiasky.event.Events;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -77,7 +77,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         EventManager.instance.post(Events.FOV_CHANGED_CMD, 90f);
 
         // The sides of the cubemap must be square. We use the max of our resolution
-        int wh = GlobalConf.program.CUBEMAP_FACE_RESOLUTION;
+        int wh = Settings.settings.program.modeCubemap.faceResolution;
         zPosFb = getFrameBuffer(wh, wh, 0);
         zNegFb = getFrameBuffer(wh, wh, 1);
         xPosFb = getFrameBuffer(wh, wh, 2);

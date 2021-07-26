@@ -16,9 +16,10 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 
@@ -126,13 +127,9 @@ public class StereoGui extends AbstractGui {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case STEREO_PROFILE_CMD:
+        if (event == Events.STEREO_PROFILE_CMD) {
             StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
             notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPH);
-            break;
-        default:
-            break;
         }
     }
 

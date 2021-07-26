@@ -179,7 +179,7 @@ public class DownloadDataWindow extends GenericDialog {
             logger.error(e);
             return;
         }
-        String catLoc = GlobalConf.data.DATA_LOCATION;
+        String catLoc = Settings.settings.data.location;
 
         if (dataLocation) {
             OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
@@ -192,22 +192,22 @@ public class DownloadDataWindow extends GenericDialog {
 
             dataLocationButton.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(GlobalConf.data.DATA_LOCATION), FileChooser.FileChooserTarget.DIRECTORIES);
-                    fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-                    fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
+                    fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+                    fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (Files.isReadable(result) && Files.isWritable(result)) {
                                 // Set data location
                                 dataLocationButton.setText(result.toAbsolutePath().toString());
                                 // Change data location
-                                GlobalConf.data.DATA_LOCATION = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
+                                Settings.settings.data.location = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
                                 // Create temp dir
-                                SysUtils.mkdir(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION));
+                                SysUtils.mkdir(SysUtils.getTempDir(Settings.settings.data.location));
                                 me.pack();
                                 GaiaSky.postRunnable(() -> {
                                     // Reset datasets
-                                    GlobalConf.data.CATALOG_JSON_FILES.clear();
+                                    Settings.settings.data.catalogFiles.clear();
                                     reloadAll();
                                 });
                             } else {
@@ -316,7 +316,7 @@ public class DownloadDataWindow extends GenericDialog {
                 descGroup.addActor(desc);
                 // Link
                 if (dataset.link != null) {
-                    String link = dataset.link.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
+                    String link = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
                     LinkButton imgLink = new LinkButton(link, skin);
                     descGroup.addActor(imgLink);
                 } else {
@@ -386,7 +386,7 @@ public class DownloadDataWindow extends GenericDialog {
                                             basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
                                             baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
                                         }
-                                        File dataLoc = new File(GlobalConf.data.DATA_LOCATION);
+                                        File dataLoc = new File(Settings.settings.data.location);
                                         File directory = new File(dataLoc, basePath);
                                         Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
                                         for (File file : files) {
@@ -554,10 +554,10 @@ public class DownloadDataWindow extends GenericDialog {
             Trio<DatasetDesc, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
             DatasetDesc currentDataset = trio.getFirst();
             String name = currentDataset.name;
-            String url = currentDataset.file.replace("@mirror-url@", GlobalConf.program.DATA_MIRROR_URL);
+            String url = currentDataset.file.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
 
             String filename = FilenameUtils.getName(url);
-            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION) + "/" + filename + ".part");
+            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/" + filename + ".part");
 
             ProgressRunnable progressDownload = (read, total, progress, speed) -> {
                 double readMb = (double) read / 1e6d;
@@ -590,7 +590,7 @@ public class DownloadDataWindow extends GenericDialog {
                 // Unpack
                 int errors = 0;
                 logger.info("Extracting: " + tempDownload.path());
-                String dataLocation = GlobalConf.data.DATA_LOCATION + File.separatorChar;
+                String dataLocation = Settings.settings.data.location + File.separatorChar;
                 // Checksum
                 if (digest != null && currentDataset.sha256 != null) {
                     String serverDigest = currentDataset.sha256;
@@ -800,7 +800,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void cleanupTempFiles(boolean dataDownloads, boolean dataDescriptor) {
         if (dataDownloads) {
-            Path tempDir = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION);
+            Path tempDir = SysUtils.getTempDir(Settings.settings.data.location);
             // Clean up partial downloads
             try {
                 Stream<Path> stream = java.nio.file.Files.find(tempDir, 2, (path, basicFileAttributes) -> {
@@ -815,7 +815,7 @@ public class DownloadDataWindow extends GenericDialog {
 
         if (dataDescriptor) {
             // Clean up data descriptor
-            Path gsDownload = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION).resolve("gaiasky-data.json");
+            Path gsDownload = SysUtils.getTempDir(Settings.settings.data.location).resolve("gaiasky-data.json");
             deleteFile(gsDownload);
         }
     }
@@ -880,7 +880,7 @@ public class DownloadDataWindow extends GenericDialog {
         // Select downloaded catalogs
         for (DatasetDesc dd : downloaded) {
             if (dd.type.startsWith("catalog")) {
-                GlobalConf.data.addSelectedCatalog(dd.check);
+                Settings.settings.data.addSelectedCatalog(dd.check);
             }
         }
     }

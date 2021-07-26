@@ -14,7 +14,7 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.math.ITrigonometry;
 import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
@@ -36,7 +36,7 @@ public class RelativisticEffectsManager implements IObserver {
         instance = new RelativisticEffectsManager(time);
     }
 
-    /**
+    /*
      * RELATIVISTIC ABERRATION
      */
     /** Camera velocity direction vector **/
@@ -44,7 +44,7 @@ public class RelativisticEffectsManager implements IObserver {
     /** v/c **/
     public float vc;
 
-    /**
+    /*
      * GRAVITATIONAL WAVES
      */
 
@@ -113,11 +113,11 @@ public class RelativisticEffectsManager implements IObserver {
     }
 
     public boolean relAberrationOn() {
-        return GlobalConf.runtime.RELATIVISTIC_ABERRATION;
+        return Settings.settings.runtime.relativisticAberration;
     }
 
     public boolean gravWavesOn() {
-        return GlobalConf.runtime.GRAVITATIONAL_WAVES;
+        return Settings.settings.runtime.gravitationalWaves;
     }
 
     /**
@@ -126,10 +126,10 @@ public class RelativisticEffectsManager implements IObserver {
      * @param time
      */
     public void update(ITimeFrameProvider time, ICamera camera) {
-        /**
+        /*
          * RELATIVISTIC ABERRATION
          */
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
+        if (Settings.settings.runtime.relativisticAberration) {
             vc = (float) (camera.getSpeed() / Constants.C_KMH);
             if (camera.getVelocity() == null || camera.getVelocity().len() == 0) {
                 velDir.set(1, 0, 0);
@@ -138,10 +138,10 @@ public class RelativisticEffectsManager implements IObserver {
             }
         }
 
-        /**
+        /*
          * GRAVITATIONAL WAVES
          */
-        if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
+        if (Settings.settings.runtime.gravitationalWaves) {
             // Time
             gwtime = (float) ((time.getTime().toEpochMilli() - initime) / 1000d);
 
@@ -165,13 +165,13 @@ public class RelativisticEffectsManager implements IObserver {
      * @param pos The position for chaining
      */
     public Vector3d gravitationalWavePos(Vector3d pos) {
-        if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
+        if (Settings.settings.runtime.gravitationalWaves) {
             float hpluscos = hterms[0];
             float hplussin = hterms[1];
             float htimescos = hterms[2];
             float htimessin = hterms[3];
             float t = gwtime;
-            ITrigonometry trigo = MathManager.instance.trigo;
+            ITrigonometry trigo = MathManager.instance.trigonometryInterface;
 
             Vector3d p = auxd4.set(gw);
             Matrix3 P = gwmat3;
@@ -236,8 +236,7 @@ public class RelativisticEffectsManager implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case GRAV_WAVE_START:
+        if (event == Events.GRAV_WAVE_START) {
             int x = (Integer) data[0];
             int y = (Integer) data[1];
 
@@ -247,10 +246,6 @@ public class RelativisticEffectsManager implements IObserver {
             screenCoords.nor();
 
             this.gw.set(screenCoords);
-
-            break;
-        default:
-            break;
         }
 
     }

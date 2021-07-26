@@ -27,8 +27,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -216,7 +216,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         setPathKnots(kfPositions, kfDirections, kfUps, kfSeams);
         if (keyframes.size > 1) {
             segments.setPoints(kfPositions);
-            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
             path.setPoints(pathSamples);
         } else {
             segments.clear();
@@ -276,7 +276,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             }
             kfPositionsSep.add(current);
 
-            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, GlobalConf.frame.KF_PATH_TYPE_POSITION);
+            double[] pathSamples = CameraKeyframeManager.instance.samplePaths(kfPositionsSep, kfPositions, 20, Settings.settings.camrecorder.keyframe.position);
             path.setPoints(pathSamples);
         }
     }
@@ -409,27 +409,27 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
                 // The object is in front of us
                 double angle = 0.0001;
 
-                PerspectiveCamera pcamera;
-                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                PerspectiveCamera perspectiveCamera;
+                if (Settings.settings.program.modeStereo.active) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
-                        pcamera = camera.getCameraStereoLeft();
+                        perspectiveCamera = camera.getCameraStereoLeft();
                     } else {
-                        pcamera = camera.getCameraStereoRight();
+                        perspectiveCamera = camera.getCameraStereoRight();
                     }
-                    pcamera.update();
+                    perspectiveCamera.update();
                 } else {
-                    pcamera = camera.camera;
+                    perspectiveCamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pcamera.fieldOfView);
-                double pixelSize = Math.max(minPixDist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
-                pcamera.project(pos);
-                pos.y = pcamera.viewportHeight - pos.y;
-                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / perspectiveCamera.fieldOfView);
+                double pixelSize = Math.max(minPixDist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                perspectiveCamera.project(pos);
+                pos.y = perspectiveCamera.viewportHeight - pos.y;
+                if (Settings.settings.program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
-                if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
+                if (checkClickDistance(screenX, screenY, pos, camera, perspectiveCamera, pixelSize)) {
                     //Hit
                     select(kf);
                     initFocus();

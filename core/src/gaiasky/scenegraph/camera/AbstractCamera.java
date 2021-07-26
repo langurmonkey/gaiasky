@@ -11,10 +11,10 @@ import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.camera.Proximity.NearbyRecord;
 import gaiasky.util.math.Frustumd;
@@ -114,11 +114,11 @@ public abstract class AbstractCamera implements ICamera {
         tmp = new Vector3d();
         prevCombined = new Matrix4();
 
-        camLeft = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
+        camLeft = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
         camLeft.near = (float) CAM_NEAR;
         camLeft.far = (float) CAM_FAR;
 
-        camRight = new PerspectiveCamera(GlobalConf.scene.CAMERA_FOV, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
+        camRight = new PerspectiveCamera(Settings.settings.scene.camera.fov, Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight());
         camRight.near = (float) CAM_NEAR;
         camRight.far = (float) CAM_FAR;
 

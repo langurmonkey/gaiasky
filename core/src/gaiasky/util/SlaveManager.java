@@ -37,7 +37,7 @@ public class SlaveManager {
     public static SlaveManager instance;
 
     public static void initialize() {
-        if (instance == null && GlobalConf.program.NET_SLAVE) {
+        if (instance == null && Settings.settings.program.net.slave.active) {
             instance = new SlaveManager();
         }
     }
@@ -69,10 +69,11 @@ public class SlaveManager {
 
     public SlaveManager() {
         super();
-        if (GlobalConf.program.isSlave()) {
-            if (GlobalConf.program.isSlaveMPCDIPresent()) {
-                logger.info("Using slave configuration file: " + GlobalConf.program.NET_SLAVE_CONFIG);
-                String mpcdi = GlobalConf.program.NET_SLAVE_CONFIG;
+        Settings settings = Settings.settings;
+        if (settings.program.net.slave.active) {
+            if (settings.program.net.isSlaveMPCDIPresent()) {
+                logger.info("Using slave configuration file: " + settings.program.net.slave.configFile);
+                String mpcdi = settings.program.net.slave.configFile;
                 try {
                     Path loc = unpackMpcdi(mpcdi);
                     parseMpcdi(mpcdi, loc);
@@ -84,21 +85,21 @@ public class SlaveManager {
                 } catch (Exception e) {
                     logger.error(e);
                 }
-            } else if (GlobalConf.program.areSlaveConfigPropertiesPresent()) {
-                yaw = GlobalConf.program.NET_SLAVE_YAW;
-                pitch = GlobalConf.program.NET_SLAVE_PITCH;
-                roll = GlobalConf.program.NET_SLAVE_ROLL;
+            } else if (settings.program.net.areSlaveConfigPropertiesPresent()) {
+                yaw = settings.program.net.slave.yaw;
+                pitch = settings.program.net.slave.pitch;
+                roll = settings.program.net.slave.roll;
 
-                xResolution = GlobalConf.screen.FULLSCREEN_WIDTH;
-                yResolution = GlobalConf.screen.FULLSCREEN_HEIGHT;
-                upAngle = downAngle = rightAngle = leftAngle = GlobalConf.scene.CAMERA_FOV / 2f;
-                if (GlobalConf.program.NET_SLAVE_WARP != null && !GlobalConf.program.NET_SLAVE_WARP.isEmpty())
-                    pfm = Paths.get(GlobalConf.program.NET_SLAVE_WARP);
+                xResolution = settings.graphics.fullScreen.resolution[0];
+                yResolution = settings.graphics.fullScreen.resolution[1];
+                upAngle = downAngle = rightAngle = leftAngle = settings.scene.camera.fov / 2f;
+                if (settings.program.net.slave.warpFile != null && !settings.program.net.slave.warpFile.isEmpty())
+                    pfm = Paths.get(settings.program.net.slave.warpFile);
                 else
                     pfm = null;
 
-                if (GlobalConf.program.NET_SLAVE_BLEND != null && !GlobalConf.program.NET_SLAVE_BLEND.isEmpty())
-                    blend = Paths.get(GlobalConf.program.NET_SLAVE_BLEND);
+                if (settings.program.net.slave.blendFile != null && !settings.program.net.slave.blendFile.isEmpty())
+                    blend = Paths.get(settings.program.net.slave.blendFile);
                 else
                     blend = null;
 
@@ -113,11 +114,11 @@ public class SlaveManager {
     }
 
     /**
-     * Unpacks the given MPCDI file and returns the unzip location
+     * Unpacks the given MPCDI file and returns the unzip location.
      *
-     * @param mpcdi
-     * @return
-     * @throws IOException
+     * @param mpcdi The MPCDI configuration file.
+     * @return THe path where the contents were unpacked.
+     * @throws IOException If creating directories fails.
      */
     private Path unpackMpcdi(String mpcdi) throws IOException {
         if (mpcdi != null && !mpcdi.isEmpty()) {
@@ -130,7 +131,7 @@ public class SlaveManager {
             logger.info(I18n.txt("notif.loading", mpcdiPath));
 
             String unpackDirName = "mpcdi_" + System.nanoTime();
-            Path unzipLocation = SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION).resolve(unpackDirName);
+            Path unzipLocation = SysUtils.getTempDir(Settings.settings.data.location).resolve(unpackDirName);
             Files.createDirectories(unzipLocation);
             ZipUtils.unzip(mpcdiPath.toString(), unzipLocation.toAbsolutePath().toString());
 
@@ -285,21 +286,21 @@ public class SlaveManager {
 
     private void pushToConf() {
         if (initialized) {
-            GlobalConf.screen.FULLSCREEN_WIDTH = GlobalConf.screen.SCREEN_WIDTH = xResolution;
-            GlobalConf.screen.FULLSCREEN_HEIGHT = GlobalConf.screen.SCREEN_HEIGHT = yResolution;
-            GlobalConf.screen.FULLSCREEN = true;
-            GlobalConf.scene.CAMERA_FOV = cameraFov;
+            Settings.settings.graphics.fullScreen.resolution[0] = Settings.settings.graphics.resolution[0] = xResolution;
+            Settings.settings.graphics.fullScreen.resolution[1] = Settings.settings.graphics.resolution[1] = yResolution;
+            Settings.settings.graphics.fullScreen.active = true;
+            Settings.settings.scene.camera.fov = cameraFov;
 
             setDefaultConf();
         }
     }
 
     private void setDefaultConf() {
-        GlobalConf.runtime.DISPLAY_GUI = false;
-        GlobalConf.runtime.INPUT_ENABLED = false;
-        GlobalConf.scene.CROSSHAIR_FOCUS = false;
-        GlobalConf.scene.CROSSHAIR_HOME = false;
-        GlobalConf.scene.CROSSHAIR_CLOSEST = false;
+        Settings.settings.runtime.displayGui = false;
+        Settings.settings.runtime.inputEnabled = false;
+        Settings.settings.scene.crosshair.focus = false;
+        Settings.settings.scene.crosshair.home = false;
+        Settings.settings.scene.crosshair.closest = false;
     }
 
     private void printInfo() {

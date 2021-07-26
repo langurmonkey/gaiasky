@@ -23,9 +23,8 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.LoadingTextGenerator;
+import gaiasky.util.Settings;
 import gaiasky.util.TipGenerator;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.scene2d.OwnLabel;
@@ -64,12 +63,13 @@ public class LoadingGui extends AbstractGui {
         interfaces = new Array<>();
         float pad30 = 48f;
         float pad10 = 16f;
+        final Settings settings = Settings.settings;
         // User interface
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
         if (vr) {
-            vp.update(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+            vp.update(settings.graphics.backBufferResolution[0], settings.graphics.backBufferResolution[1], true);
         } else {
             vp.update(GaiaSky.instance.graphics.getWidth(), GaiaSky.instance.graphics.getHeight(), true);
         }
@@ -88,7 +88,7 @@ public class LoadingGui extends AbstractGui {
         else if (hoffset < 0)
             center.padRight(-hoffset);
 
-        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(GlobalConf.runtime.OPENVR), skin, "main-title");
+        OwnLabel gaiasky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openVr), skin, "main-title");
 
         // Funny text
         lastFunnyTime = 0;
@@ -122,7 +122,7 @@ public class LoadingGui extends AbstractGui {
         OwnTextIconButton screenModeButton = new OwnTextIconButton("", skin, "screen-mode");
         screenModeButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
+                settings.graphics.fullScreen.active = !settings.graphics.fullScreen.active;
                 EventManager.instance.post(Events.SCREEN_MODE_CMD);
                 return true;
             }
@@ -179,7 +179,7 @@ public class LoadingGui extends AbstractGui {
     }
 
     private void randomFunnyText() {
-        if (GlobalConf.runtime.OPENVR) {
+        if (Settings.settings.runtime.openVr) {
             spin.setText("Loading...");
         } else {
             try {

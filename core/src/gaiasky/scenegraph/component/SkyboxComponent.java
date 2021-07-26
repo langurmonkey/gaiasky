@@ -12,11 +12,11 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureData;
 import gaiasky.data.AssetBean;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
 public class SkyboxComponent {
     private static final Log logger = Logger.getLogger(SkyboxComponent.class);
@@ -33,7 +33,7 @@ public class SkyboxComponent {
             textureParams.minFilter = TextureFilter.Linear;
             skyboxLoad = true;
             try {
-                String skbLoc = GlobalConf.data.SKYBOX_LOCATION;
+                String skbLoc = Settings.settings.data.skyboxLocation;
                 logger.info(I18n.txt("notif.loading", "skybox: " + skbLoc));
                 skyboxBack = GlobalResources.unpackSkyboxSide(skbLoc, "bk");
                 skyboxFront = GlobalResources.unpackSkyboxSide(skbLoc, "ft");
@@ -49,7 +49,7 @@ public class SkyboxComponent {
                 addToLoad(skyboxRight, textureParams);
                 addToLoad(skyboxLeft, textureParams);
             }catch(RuntimeException e){
-                logger.error(e, "Error loading skybox: " + GlobalConf.data.SKYBOX_LOCATION);
+                logger.error(e, "Error loading skybox: " + Settings.settings.data.skyboxLocation);
             }
         }
     }

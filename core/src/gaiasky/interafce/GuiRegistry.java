@@ -192,13 +192,13 @@ public class GuiRegistry implements IObserver {
      * @param rh The render height
      */
     public void render(int rw, int rh) {
-        if (GlobalConf.runtime.DISPLAY_GUI) {
+        if (Settings.settings.runtime.displayGui) {
             synchronized (renderLock) {
                 for (int i = 0; i < guis.size; i++) {
                     guis.get(i).getGuiStage().getViewport().apply();
                     try {
                         guis.get(i).render(rw, rh);
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
 
                     }
                 }
@@ -295,7 +295,7 @@ public class GuiRegistry implements IObserver {
                         GLFW.glfwSetInputMode(((Lwjgl3Graphics) Gdx.graphics).getWindow().getWindowHandle(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
                     } else {
                         Runnable quitRunnable = data.length > 0 ? (Runnable) data[0] : null;
-                        if (GlobalConf.program.EXIT_CONFIRMATION) {
+                        if (Settings.settings.program.exitConfirmation) {
                             QuitWindow quit = new QuitWindow(ui, skin);
                             if (data.length > 0) {
                                 quit.setAcceptRunnable(quitRunnable);
@@ -353,9 +353,9 @@ public class GuiRegistry implements IObserver {
                 }
                 break;
             case SHOW_LOAD_CATALOG_ACTION:
-                if (lastOpenLocation == null && GlobalConf.program.LAST_OPEN_LOCATION != null && !GlobalConf.program.LAST_OPEN_LOCATION.isEmpty()) {
+                if (lastOpenLocation == null && Settings.settings.program.fileChooser.lastLocation != null && !Settings.settings.program.fileChooser.lastLocation.isEmpty()) {
                     try {
-                        lastOpenLocation = Paths.get(GlobalConf.program.LAST_OPEN_LOCATION);
+                        lastOpenLocation = Paths.get(Settings.settings.program.fileChooser.lastLocation);
                     } catch (Exception e) {
                         lastOpenLocation = null;
                     }
@@ -367,8 +367,8 @@ public class GuiRegistry implements IObserver {
                 }
 
                 FileChooser fc = new FileChooser(I18n.txt("gui.loadcatalog"), skin, ui, lastOpenLocation, FileChooser.FileChooserTarget.FILES);
-                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-                fc.setShowHiddenConsumer((showHidden) -> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.txt("gui.loadcatalog"));
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits"));
                 fc.setAcceptedFiles("*.vot, *.csv, *.fits");
@@ -415,7 +415,7 @@ public class GuiRegistry implements IObserver {
                                 dld.show(ui);
 
                                 lastOpenLocation = result.getParent();
-                                GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
+                                Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
                                 return true;
                             } catch (Exception e) {
                                 logger.error(I18n.txt("notif.error", result.getFileName()), e);
@@ -433,7 +433,7 @@ public class GuiRegistry implements IObserver {
                         } else {
                             lastOpenLocation = result;
                         }
-                        GlobalConf.program.LAST_OPEN_LOCATION = lastOpenLocation.toAbsolutePath().toString();
+                        Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
                     }
                     return false;
                 });
@@ -454,7 +454,7 @@ public class GuiRegistry implements IObserver {
                 this.skin = (Skin) data[0];
                 break;
             case MODE_POPUP_CMD:
-                if (GlobalConf.runtime.DISPLAY_GUI) {
+                if (Settings.settings.runtime.displayGui) {
                     ModePopupInfo mpi = (ModePopupInfo) data[0];
                     String name = (String) data[1];
 

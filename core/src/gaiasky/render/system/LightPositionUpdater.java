@@ -18,9 +18,9 @@ import gaiasky.render.PostProcessorFactory;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scenegraph.Star;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
 
@@ -41,7 +41,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
     public LightPositionUpdater() {
         this.lock = new Object();
 
-        reinitialize(GlobalConf.scene.GRAPHICS_QUALITY.getGlowNLights());
+        reinitialize(Settings.settings.graphics.quality.getGlowNLights());
 
         this.auxV = new Vector3();
         this.auxD = new Vector3d();
@@ -86,6 +86,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         synchronized (lock) {
             int size = renderables.size;
             if (PostProcessorFactory.instance.getPostProcessor().isLightScatterEnabled()) {
+                Settings settings = Settings.settings;
                 // Compute light positions for light scattering or light
                 // glow
                 int lightIndex = 0;
@@ -94,7 +95,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                     IRenderable s = renderables.get(i);
                     if (s instanceof Star) {
                         Star p = (Star) s;
-                        if (lightIndex < nLights && (GlobalConf.program.CUBEMAP_MODE || GlobalConf.runtime.OPENVR || GaiaSky.instance.cameraManager.getDirection().angle(p.translation) < angleEdgeDeg)) {
+                        if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openVr || GaiaSky.instance.cameraManager.getDirection().angle(p.translation) < angleEdgeDeg)) {
                             Vector3d pos3d = p.translation.put(auxD);
 
                             // Aberration
@@ -103,8 +104,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                             RelativisticEffectsManager.getInstance().gravitationalWavePos(pos3d);
                             Vector3 pos3 = pos3d.put(auxV);
 
-                            float w = GlobalConf.screen.SCREEN_WIDTH;
-                            float h = GlobalConf.screen.SCREEN_HEIGHT;
+                            float w = settings.graphics.resolution[0];
+                            float h = settings.graphics.resolution[1];
 
                             camera.getCamera().project(pos3, 0, 0, w, h);
                             // Here we **need** to use
@@ -131,15 +132,9 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case GRAPHICS_QUALITY_UPDATED:
-            // Update graphics quality
+        if (event == Events.GRAPHICS_QUALITY_UPDATED) {// Update graphics quality
             GraphicsQuality gq = (GraphicsQuality) data[0];
             reinitialize(gq.getGlowNLights());
-            break;
-        default:
-            break;
-
         }
     }
 }

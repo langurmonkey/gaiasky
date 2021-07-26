@@ -16,8 +16,8 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Pair;
+import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
@@ -29,7 +29,7 @@ import java.util.*;
 
 /**
  * Octree node implementation which contains a list of {@link IPosition} objects
- * and possibly 8 subnodes.
+ * and possibly 8 sub-nodes.
  */
 public class OctreeNode implements ILineRenderable {
     public static int nOctantsObserved = 0;
@@ -86,14 +86,6 @@ public class OctreeNode implements ILineRenderable {
 
     /**
      * Constructs an octree node
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param hsx
-     * @param hsy
-     * @param hsz
-     * @param depth
      */
     private OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
         this.min = new Vector3d(x - hsx, y - hsy, z - hsz);
@@ -108,15 +100,6 @@ public class OctreeNode implements ILineRenderable {
 
     /**
      * Constructs an octree node
-     *
-     * @param pageId
-     * @param x
-     * @param y
-     * @param z
-     * @param hsx
-     * @param hsy
-     * @param hsz
-     * @param depth
      */
     public OctreeNode(long pageId, double x, double y, double z, double hsx, double hsy, double hsz, int depth) {
         this.pageId = pageId;
@@ -132,16 +115,6 @@ public class OctreeNode implements ILineRenderable {
 
     /**
      * Constructs an octree node
-     *
-     * @param x
-     * @param y
-     * @param z
-     * @param hsx
-     * @param hsy
-     * @param hsz
-     * @param depth
-     * @param parent The parent of this octant
-     * @param i      The index in the parent's children
      */
     public OctreeNode(double x, double y, double z, double hsx, double hsy, double hsz, int depth, OctreeNode parent, int i) {
         this(x, y, z, hsx, hsy, hsz, depth);
@@ -218,10 +191,8 @@ public class OctreeNode implements ILineRenderable {
                 if (parent.children[i] == this)
                     return i;
             }
-            return 0;
-        } else {
-            return 0;
         }
+        return 0;
     }
 
     public boolean containsObject(SceneGraphNode object) {
@@ -241,7 +212,7 @@ public class OctreeNode implements ILineRenderable {
      * Resolves and adds the children of this node using the map. It runs
      * recursively once the children have been added.
      *
-     * @param map
+     * @param map The children map.
      */
     public void resolveChildren(Map<Long, Pair<OctreeNode, long[]>> map) {
         Pair<OctreeNode, long[]> me = map.get(pageId);
@@ -264,8 +235,7 @@ public class OctreeNode implements ILineRenderable {
         }
 
         // Recursive running
-        for (int j = 0; j < children.length; j++) {
-            OctreeNode child = children[j];
+        for (OctreeNode child : children) {
             if (child != null) {
                 child.resolveChildren(map);
             }
@@ -313,9 +283,7 @@ public class OctreeNode implements ILineRenderable {
     }
 
     public void toTree(TreeSet<SceneGraphNode> tree) {
-        for (SceneGraphNode i : objects) {
-            tree.add(i);
-        }
+        tree.addAll(objects);
         if (children != null) {
             for (int i = 0; i < 8; i++) {
                 children[i].toTree(tree);
@@ -326,14 +294,14 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Adds all the children of this node and its descendants to the given list.
      *
-     * @param tree
+     * @param list The tree of nodes.
      */
-    public void addChildrenToList(ArrayList<OctreeNode> tree) {
+    public void addChildrenToList(ArrayList<OctreeNode> list) {
         if (children != null) {
             for (int i = 0; i < 8; i++) {
                 if (children[i] != null) {
-                    tree.add(children[i]);
-                    children[i].addChildrenToList(tree);
+                    list.add(children[i]);
+                    children[i].addChildrenToList(list);
                 }
             }
         }
@@ -343,7 +311,7 @@ public class OctreeNode implements ILineRenderable {
      * Adds all the particles of this node and its descendants to the given
      * list.
      *
-     * @param particles
+     * @param particles The list of particles.
      */
     public void addParticlesTo(Array<SceneGraphNode> particles) {
         if (this.objects != null) {
@@ -362,11 +330,9 @@ public class OctreeNode implements ILineRenderable {
     }
 
     public String toString(boolean rec) {
-        StringBuffer str = new StringBuffer(depth);
+        StringBuilder str = new StringBuilder(depth);
         if (rec)
-            for (int i = 0; i < depth; i++) {
-                str.append("  ");
-            }
+            str.append("  ".repeat(Math.max(0, depth)));
 
         int idx = parent != null ? Arrays.asList(parent.children).indexOf(this) : 0;
         str.append(idx).append(":L").append(depth).append(" ");
@@ -377,7 +343,7 @@ public class OctreeNode implements ILineRenderable {
         if (numChildren > 0 && rec) {
             for (OctreeNode child : children) {
                 if (child != null) {
-                    str.append(child.toString(rec));
+                    str.append(child.toString(true));
                 }
             }
         }
@@ -417,7 +383,7 @@ public class OctreeNode implements ILineRenderable {
     /**
      * Removes the child from this octant's descendants
      *
-     * @param child
+     * @param child The child node to remove.
      */
     public void removeChild(OctreeNode child) {
         if (children != null)
@@ -430,9 +396,9 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Counts the number of direct children of this node
+     * Counts the number of direct children of this node.
      *
-     * @return The number of direct children
+     * @return The number of direct children.
      */
     public int numChildren() {
         int num = 0;
@@ -445,9 +411,9 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Counts the number of nodes recursively
+     * Counts the number of nodes recursively.
      *
-     * @return The number of nodes
+     * @return The number of nodes.
      */
     public int numNodesRec() {
         int numNodes = 1;
@@ -480,10 +446,10 @@ public class OctreeNode implements ILineRenderable {
     }
 
     /**
-     * Returns the deepest octant that contains the position
+     * Returns the deepest octant that contains the position.
      *
-     * @param position The position
-     * @return The best octant
+     * @param position The position.
+     * @return The best octant.
      */
     public OctreeNode getBestOctant(Vector3d position) {
         if (!this.contains(position)) {
@@ -544,8 +510,8 @@ public class OctreeNode implements ILineRenderable {
         viewAngle = Math.atan(radius / distToCamera) * 2;
 
         float cf = MathUtilsd.clamp(cam.getFovFactor() * 2.5f, 0.15f, 1f);
-        float th0 = GlobalConf.scene.OCTANT_THRESHOLD_0 * cf;
-        float th1 = GlobalConf.scene.OCTANT_THRESHOLD_1 * cf;
+        float th0 = Settings.settings.scene.octree.threshold[0] * cf;
+        float th1 = Settings.settings.scene.octree.threshold[1] * cf;
 
         if (viewAngle < th0) {
             // Not observed
@@ -553,7 +519,7 @@ public class OctreeNode implements ILineRenderable {
         } else if (this.observed = computeObserved(cam)) {
             nOctantsObserved++;
             //int L_DEPTH = 5;
-            /**
+            /*
              * Load lists of pages
              */
             if (status == LoadStatus.NOT_LOADED && LOAD_ACTIVE /*&& depth == L_DEPTH*/) {
@@ -566,11 +532,10 @@ public class OctreeNode implements ILineRenderable {
                 // Add objects
                 //if (depth == L_DEPTH)
                 addObjectsTo(roulette);
-            } else if (status == LoadStatus.QUEUED) {
-                // What do? Move first in queue?
-            }
+            }  // What do? Move first in queue?
+
             double alpha = 1;
-            if (GlobalConf.scene.OCTREE_PARTICLE_FADE && viewAngle < th1) {
+            if (Settings.settings.scene.octree.fade && viewAngle < th1) {
                 AbstractRenderSystem.POINT_UPDATE_FLAG = true;
                 alpha = MathUtilsd.clamp(MathUtilsd.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
             }
@@ -644,8 +609,8 @@ public class OctreeNode implements ILineRenderable {
         return status;
     }
 
-    public void setStatus(LoadStatus status) {
-        synchronized (status) {
+    public void setStatus(final LoadStatus status) {
+        synchronized (this) {
             this.status = status;
         }
     }
@@ -783,11 +748,10 @@ public class OctreeNode implements ILineRenderable {
     public void render(LineRenderSystem sr, ICamera camera, float alpha) {
         if (this.observed) {
             this.col.set(ColorUtils.gGreenC);
-            this.col.a = alpha * opacity;
         } else {
             this.col.set(ColorUtils.gYellowC);
-            this.col.a = alpha * opacity;
         }
+        this.col.a = alpha * opacity;
 
         if (this.col.a > 0) {
             // Camera correction

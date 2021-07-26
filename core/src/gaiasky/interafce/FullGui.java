@@ -31,6 +31,7 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.scene2d.FileChooser;
@@ -176,18 +177,18 @@ public class FullGui extends AbstractGui {
         // MOUSE X/Y COORDINATES
         pointerXCoord = new OwnLabel("", skin, "default");
         pointerXCoord.setAlignment(Align.bottom);
-        pointerXCoord.setVisible(GlobalConf.program.DISPLAY_POINTER_COORDS);
+        pointerXCoord.setVisible(Settings.settings.program.pointer.coordinates);
         pointerYCoord = new OwnLabel("", skin, "default");
         pointerYCoord.setAlignment(Align.right | Align.center);
-        pointerYCoord.setVisible(GlobalConf.program.DISPLAY_POINTER_COORDS);
+        pointerYCoord.setVisible(Settings.settings.program.pointer.coordinates);
 
         /* ADD TO UI */
         rebuildGui();
 
         /* VERSION CHECK */
-        if (GlobalConf.program.VERSION_LAST_TIME == null || Instant.now().toEpochMilli() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
+        if (Settings.settings.program.update.lastCheck == null || Instant.now().toEpochMilli() - Settings.settings.program.update.lastCheck.toEpochMilli() > UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
             // Start version check
-            VersionChecker vc = new VersionChecker(GlobalConf.program.VERSION_CHECK_URL);
+            VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
             vc.setListener(event -> {
                 if (event instanceof VersionCheckEvent) {
                     VersionCheckEvent vce = (VersionCheckEvent) event;
@@ -196,10 +197,10 @@ public class FullGui extends AbstractGui {
                         String tagVersion = vce.getTag();
                         Integer versionNumber = vce.getVersionNumber();
 
-                        GlobalConf.program.VERSION_LAST_TIME = Instant.now();
+                        Settings.settings.program.update.lastCheck = Instant.now();
 
-                        if (versionNumber > GlobalConf.version.versionNumber) {
-                            logger.info(I18n.txt("gui.newversion.available", GlobalConf.version.version, tagVersion));
+                        if (versionNumber > Settings.settings.version.versionNumber) {
+                            logger.info(I18n.txt("gui.newversion.available", Settings.settings.version.version, tagVersion));
                             // There's a new version!
                             UpdatePopup newVersion = new UpdatePopup(tagVersion, ui, skin);
                             newVersion.pack();
@@ -209,7 +210,7 @@ public class FullGui extends AbstractGui {
                             ui.addActor(newVersion);
                         } else {
                             // No new version
-                            logger.info(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
+                            logger.info(I18n.txt("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
                         }
 
                     } else {
@@ -357,8 +358,8 @@ public class FullGui extends AbstractGui {
             break;
         case SHOW_PLAYCAMERA_ACTION:
             FileChooser fc = new FileChooser(I18n.txt("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
-            fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-            fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+            fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+            fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
             fc.setAcceptText(I18n.txt("gui.camera.run"));
             fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
             fc.setAcceptedFiles("*.dat, *.gsc");
@@ -450,9 +451,9 @@ public class FullGui extends AbstractGui {
             rebuildGui();
             break;
         case RA_DEC_UPDATED:
-            if (GlobalConf.program.DISPLAY_POINTER_COORDS) {
+            if (Settings.settings.program.pointer.coordinates) {
                 Stage ui = pointerYCoord.getStage();
-                float uiScale = GlobalConf.program.UI_SCALE;
+                float uiScale = Settings.settings.program.ui.scale;
                 Double ra = (Double) data[0];
                 Double dec = (Double) data[1];
                 Integer x = (Integer) data[4];
@@ -465,9 +466,9 @@ public class FullGui extends AbstractGui {
             }
             break;
         case LON_LAT_UPDATED:
-            if (GlobalConf.program.DISPLAY_POINTER_COORDS) {
+            if (Settings.settings.program.pointer.coordinates) {
                 Stage ui = pointerYCoord.getStage();
-                float uiScale = GlobalConf.program.UI_SCALE;
+                float uiScale = Settings.settings.program.ui.scale;
                 Double lon = (Double) data[0];
                 Double lat = (Double) data[1];
                 Integer x = (Integer) data[2];
@@ -493,14 +494,14 @@ public class FullGui extends AbstractGui {
 
             int h = (int) getGuiStage().getHeight();
 
-            float px = screenX / GlobalConf.program.UI_SCALE;
-            float py = h - screenY / GlobalConf.program.UI_SCALE - 32f;
+            float px = screenX / Settings.settings.program.ui.scale;
+            float py = h - screenY / Settings.settings.program.ui.scale - 32f;
 
             popup.showMenu(ui, px, py);
 
             break;
         case TOGGLE_MINIMAP:
-            if (GlobalConf.program.MINIMAP_IN_WINDOW) {
+            if (Settings.settings.program.minimap.inWindow) {
                 toggleMinimapWindow(ui);
             } else {
                 toggleMinimapInterface(ui);
@@ -508,7 +509,7 @@ public class FullGui extends AbstractGui {
             break;
         case SHOW_MINIMAP_ACTION:
             boolean show = (Boolean) data[0];
-            if (GlobalConf.program.MINIMAP_IN_WINDOW) {
+            if (Settings.settings.program.minimap.inWindow) {
                 showMinimapWindow(ui, show);
             } else {
                 showMinimapInterface(ui, show);
@@ -543,7 +544,7 @@ public class FullGui extends AbstractGui {
     }
 
     public void addControlsWindow() {
-        controlsWindow = new ControlsWindow(GlobalConf.getSuperShortApplicationName(), skin, ui, catalogManager);
+        controlsWindow = new ControlsWindow(Settings.settings.getSuperShortApplicationName(), skin, ui, catalogManager);
         controlsWindow.setSceneGraph(sg);
         controlsWindow.setVisibilityToggles(visibilityEntities, visible);
         controlsWindow.initialize();
@@ -559,8 +560,8 @@ public class FullGui extends AbstractGui {
     }
 
     public void initializeMinimap(Stage ui) {
-        if (GlobalConf.program.DISPLAY_MINIMAP) {
-            if (GlobalConf.program.MINIMAP_IN_WINDOW) {
+        if (Settings.settings.program.minimap.active) {
+            if (Settings.settings.program.minimap.inWindow) {
                 showMinimapWindow(ui, true);
             } else {
                 if (minimapInterface == null) {

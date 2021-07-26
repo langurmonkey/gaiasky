@@ -168,7 +168,7 @@ public class Billboard extends ModelBody {
 
     public float getFuzzyRenderSize(ICamera camera) {
         float computedSize = this.size;
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * .6e-3;
+        computedSize *= Settings.settings.scene.star.brightness * .6e-3;
 
         return computedSize;
     }

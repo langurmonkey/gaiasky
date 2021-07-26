@@ -24,10 +24,10 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
@@ -224,7 +224,7 @@ public class Orbit extends Polyline {
                         this.alpha = cc[3];
                     }
 
-                    RenderGroup rg = GlobalConf.scene.ORBIT_RENDERER == 1 ? RenderGroup.LINE_GPU : RenderGroup.LINE;
+                    RenderGroup rg = Settings.settings.scene.renderer.orbit.equals(Settings.OrbitMode.GPU_VBO) ? RenderGroup.LINE_GPU : RenderGroup.LINE;
 
                     if (body == null) {
                         // No body, always render

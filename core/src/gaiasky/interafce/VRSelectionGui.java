@@ -10,8 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnProgressBar;
 
@@ -31,8 +30,8 @@ public class VRSelectionGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        float ow =GlobalConf.screen.BACKBUFFER_WIDTH;
-        float oh = GlobalConf.screen.BACKBUFFER_HEIGHT;
+        float ow = Settings.settings.graphics.backBufferResolution[0];
+        float oh = Settings.settings.graphics.backBufferResolution[1];
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);

@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Parses the XML files with the attitudes and their activaton times into a binary search tree.
+ * Parses the XML files with the attitudes and their activation times into a binary search tree.
  */
 public class AttitudeXmlParser {
     private static final Log logger = Logger.getLogger(AttitudeXmlParser.class);
@@ -43,7 +43,7 @@ public class AttitudeXmlParser {
 
     public static BinarySearchTree parseFolder(String folder) {
         final Array<FileHandle> list;
-        try (Stream<Path> paths = Files.walk(Paths.get(GlobalConf.data.dataFile(folder)))) {
+        try (Stream<Path> paths = Files.walk(Paths.get(Settings.settings.data.dataFile(folder)))) {
             List<Path> ps = paths.filter(Files::isRegularFile).collect(Collectors.toList());
             list = new Array<>(false, ps.size());
             for (Path p : ps) {

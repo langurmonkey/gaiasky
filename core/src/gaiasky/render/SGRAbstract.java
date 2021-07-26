@@ -13,7 +13,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 /**
  * Abstract implementation with some useful methods for all SGRs.
@@ -48,7 +48,7 @@ public class SGRAbstract {
         ppb.render(fb);
 
         // Render camera
-        if(!GlobalConf.runtime.OPENVR) {
+        if(!Settings.settings.runtime.openVr) {
             if (fb != null && postproc) {
                 fb.begin();
             }

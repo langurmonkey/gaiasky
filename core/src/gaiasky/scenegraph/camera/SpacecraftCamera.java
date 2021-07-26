@@ -21,8 +21,8 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Pair;
+import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -43,16 +43,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     private Spacecraft sc;
 
     /**
-     * Camera to render the attitude indicator system
-     **/
-    private final PerspectiveCamera guiCam;
-
-    /**
      * The input inputListener attached to this camera
      **/
     private final SpacecraftInputController inputController;
 
-    /**
+    /*
      * Controller listener
      **/
     //private SpacecraftControllerListener controllerListener;
@@ -108,7 +103,10 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         cameras = new PerspectiveCamera[] { camera, camLeft, camRight };
 
         // init gui camera
-        guiCam = new PerspectiveCamera(30, 300, 300);
+        /*
+         * Camera to render the attitude indicator system
+         **/
+        PerspectiveCamera guiCam = new PerspectiveCamera(30, 300, 300);
         guiCam.near = (float) CAM_NEAR;
         guiCam.far = (float) CAM_FAR;
 
@@ -347,7 +345,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         @Override
         public boolean keyDown(int keycode) {
-            if (sc != null && GlobalConf.runtime.INPUT_ENABLED) {
+            if (sc != null && Settings.settings.runtime.inputEnabled) {
                 double step = 0.01;
                 switch (keycode) {
                 case Keys.W:
@@ -400,7 +398,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
 
         @Override
         public boolean keyUp(int keycode) {
-            if (sc != null && GlobalConf.runtime.INPUT_ENABLED) {
+            if (sc != null && Settings.settings.runtime.inputEnabled) {
                 switch (keycode) {
                 case Keys.W:
                 case Keys.S:

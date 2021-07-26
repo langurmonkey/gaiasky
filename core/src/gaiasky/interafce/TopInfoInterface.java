@@ -13,8 +13,8 @@ import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.DateFormatFactory.DateType;
@@ -59,7 +59,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
         time = new OwnLabel(I18n.txt("gui.top.time.ut"), skin, "mono");
         time.setName("label time tii");
 
-        pace = new OwnLabel("(" + (GlobalConf.runtime.TIME_ON ? TextUtils.getFormattedTimeWarp() : I18n.txt("gui.top.time.off")) + ")", skin, "mono");
+        pace = new OwnLabel("(" + (Settings.settings.runtime.timeOn ? TextUtils.getFormattedTimeWarp() : I18n.txt("gui.top.time.off")) + ")", skin, "mono");
         pace.setName("pace tii");
 
         focus = new OwnLabel("", skin, "mono");
@@ -74,7 +74,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         s2 = new OwnLabel("|", skin, "mono");
 
-        home = new OwnLabel(I18n.txt("gui.top.home", TextUtils.capString(GlobalConf.scene.STARTUP_OBJECT, maxNameLen)), skin, "mono");
+        home = new OwnLabel(I18n.txt("gui.top.home", TextUtils.capString(Settings.settings.scene.homeObject, maxNameLen)), skin, "mono");
         home.setName("home tii");
         home.setColor(1f, 0.7f, 0.1f, 1f);
 

@@ -204,11 +204,12 @@ public class GaiaSkyDesktop implements IObserver {
                 initConfigFile(gsArgs.vr);
             }
 
+            // Init global configuration
+            SettingsManager.initialize(gsArgs.vr);
+
             // Initialize i18n (only for global config logging)
             I18n.initialize(Gdx.files.internal("i18n/gsbundle"));
 
-            // Init global configuration
-            SettingsManager.initialize(gsArgs.vr);
 
             // Safe mode
             if (gsArgs.safeMode && !Settings.settings.program.safeMode) {

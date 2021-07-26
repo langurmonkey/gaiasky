@@ -18,9 +18,9 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.MyPools;
+import gaiasky.util.Settings;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -164,15 +164,11 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
     /**
      * Runs the update on all the observed and selected octree objects.
-     *
-     * @param time
-     * @param parentTransform
-     * @param camera
      */
     protected abstract void updateOctreeObjects(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera);
 
     public void addToRenderLists(ICamera camera, OctreeNode octant) {
-        if (this.shouldRender() && GlobalConf.runtime.DRAW_OCTREE && octant.observed) {
+        if (this.shouldRender() && Settings.settings.runtime.drawOctree && octant.observed) {
             boolean added = addToRender(octant, LINE);
 
             if (added)
@@ -186,7 +182,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
     }
 
     @Override
-    /** Not implemented **/ public Iterator<OctreeNode> iterator() {
+    /* Not implemented */ public Iterator<OctreeNode> iterator() {
         return null;
     }
 

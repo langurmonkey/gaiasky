@@ -9,11 +9,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -63,7 +63,7 @@ public class DatasetDesc {
 
         // Check if we have it
         if (source.has("check")) {
-            this.check = Paths.get(GlobalConf.data.DATA_LOCATION, source.getString("check"));
+            this.check = Paths.get(Settings.settings.data.location, source.getString("check"));
             this.exists = Files.exists(check) && Files.isReadable(check);
             this.serverVersion = source.getInt("version", 0);
             if (this.exists) {

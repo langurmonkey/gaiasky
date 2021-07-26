@@ -24,8 +24,8 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.gdx.contrib.postprocess.effects.Anaglyphic;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.math.Vector3d;
@@ -101,7 +101,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
         PerspectiveCamera cam = camera.getCamera();
         // Vector of 1 meter length pointing to the side of the camera
-        double separation = Constants.M_TO_U * GlobalConf.program.STEREOSCOPIC_EYE_SEPARATION_M;
+        double separation = Constants.M_TO_U * Settings.settings.program.modeStereo.eyeSeparation;
         double separationCapped;
         double dirAngleDeg = 0;
 
@@ -138,7 +138,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         Vector3 backupDir = aux3.set(cam.direction);
         Vector3d backupPosd = aux1d.set(camera.getPos());
 
-        if (GlobalConf.program.STEREO_PROFILE.isAnaglyphic()) {
+        if (Settings.settings.program.modeStereo.profile.isAnaglyph()) {
             // Update viewport
             extendViewport.setCamera(camera.getCamera());
             extendViewport.setWorldSize(rw, rh);
@@ -197,10 +197,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
             int srw, srh, boundsw, boundsh, start2w, start2h;
 
-            boolean stretch = GlobalConf.program.STEREO_PROFILE == StereoProfile.HORIZONTAL_3DTV || GlobalConf.program.STEREO_PROFILE == StereoProfile.VERTICAL_3DTV;
-            boolean changeSides = GlobalConf.program.STEREO_PROFILE == StereoProfile.CROSSEYE;
+            boolean stretch = Settings.settings.program.modeStereo.profile == StereoProfile.HORIZONTAL_3DTV || Settings.settings.program.modeStereo.profile == StereoProfile.VERTICAL_3DTV;
+            boolean changeSides = Settings.settings.program.modeStereo.profile == StereoProfile.CROSSEYE;
 
-            if (GlobalConf.program.STEREO_PROFILE.isHorizontal()) {
+            if (Settings.settings.program.modeStereo.profile.isHorizontal()) {
                 if (stretch) {
                     srw = rw;
                 } else {
@@ -223,10 +223,10 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
                 start2w = 0;
                 start2h = boundsh;
             }
-            boundsw /= GlobalConf.program.UI_SCALE;
-            boundsh /= GlobalConf.program.UI_SCALE;
-            start2w /= GlobalConf.program.UI_SCALE;
-            start2h /= GlobalConf.program.UI_SCALE;
+            boundsw /= Settings.settings.program.ui.scale;
+            boundsh /= Settings.settings.program.ui.scale;
+            start2w /= Settings.settings.program.ui.scale;
+            start2h /= Settings.settings.program.ui.scale;
 
             // Side by side rendering
             Viewport viewport = stretch ? stretchViewport : extendViewport;
@@ -354,7 +354,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     }
 
     public void resize(final int w, final int h) {
-        if (GlobalConf.program.STEREOSCOPIC_MODE) {
+        if (Settings.settings.program.modeStereo.active) {
             extendViewport.update(w, h);
             stretchViewport.update(w, h);
 

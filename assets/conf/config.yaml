@@ -189,12 +189,10 @@ scene:
     fade: true
   # Renderer settings
   renderer:
-    # Line renderer type: 0 - performance (GL LINES), 1 - polyline quadstrips (quality)
-    line: 1
-    # Orbit renderer
-    # 0 - use the line renderer setting (see below) - slower, looks better
-    # 1 - use GPU VBOs - faster, looks worse
-    orbit: 0
+    # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]
+    line: POLYLINE_QUADSTRIP
+    # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO]
+    orbit: LINE_MODE_SETTING
     # Ambient light value
     ambient: 0.0
     # Shadow settings
@@ -279,6 +277,8 @@ program:
     inWindow: false
   # File chooser dialog configuration
   fileChooser:
+    # Last location
+    lastLocation: null
     # Show hidden files
     showHidden: false
   # Pointer configuration
@@ -331,7 +331,7 @@ program:
       # Incompatible with slave>is
       active: false
       # List of URLs of the slave instances
-      # Example: [http\://localhost\:13900/api/,http\://localhost\:13901/api]
+      # Example: [http://localhost:13900/api/, http://localhost:13901/api]
       slaves: []
     # Slave configuration
     slave:
@@ -376,11 +376,11 @@ program:
   # Pointers to some resources
   url:
     # URL to check for new versions
-    versionCheck: https\://gitlab.com/api/v4/projects/langurmonkey%2Fgaiasky/repository/tags
+    versionCheck: https://gitlab.com/api/v4/projects/langurmonkey%2Fgaiasky/repository/tags
     # Data repository location
-    dataMirror: https\://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
+    dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
     # Data descriptor file location
-    dataDescriptor: https\://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030000.json
+    dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030000.json
 
 #
 # Controls configuration

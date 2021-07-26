@@ -271,7 +271,7 @@ public class Settings {
         public CameraSettings camera;
         public StarSettings star;
         public LabelSettings label;
-        public double lineWidth;
+        public float lineWidth;
         public ProperMotionSettings properMotion;
         public OctreeSettings octree;
         public RendererSettings renderer;
@@ -382,8 +382,8 @@ public class Settings {
         }
 
         public static class StarSettings implements IObserver {
-            public double brightness;
-            public double power;
+            public float brightness;
+            public float power;
             public float pointSize;
             @JsonIgnore private float pointSizeBak;
             public int textureIndex;
@@ -501,8 +501,8 @@ public class Settings {
         }
 
         public static class LabelSettings implements IObserver {
-            public double size;
-            public double number;
+            public float size;
+            public float number;
 
             public LabelSettings() {
                 EventManager.instance.subscribe(this, Events.LABEL_SIZE_CMD);
@@ -550,7 +550,7 @@ public class Settings {
 
         public static class OctreeSettings implements IObserver {
             public int maxStars;
-            public double[] threshold;
+            public float[] threshold;
             public boolean fade;
 
             public OctreeSettings() {
@@ -566,8 +566,8 @@ public class Settings {
         }
 
         public static class RendererSettings implements IObserver {
-            public int line;
-            public int orbit;
+            public LineMode line;
+            public OrbitMode orbit;
             public double ambient;
             public ShadowSettings shadow;
             public ElevationSettings elevation;
@@ -594,12 +594,12 @@ public class Settings {
 
             @JsonIgnore
             public boolean isNormalLineRenderer() {
-                return line == 0;
+                return line.equals(LineMode.GL_LINES);
             }
 
             @JsonIgnore
             public boolean isQuadLineRenderer() {
-                return line == 1;
+                return line.equals(LineMode.POLYLINE_QUADSTRIP);
             }
 
             @Override
@@ -702,6 +702,7 @@ public class Settings {
 
         public static class FileChooserSettings {
             public boolean showHidden;
+            public String lastLocation;
         }
 
         public static class PointerSettings {
@@ -711,7 +712,7 @@ public class Settings {
             public static class GuidesSettings {
                 public boolean active;
                 public float[] color;
-                public double width;
+                public float width;
 
             }
         }
@@ -728,6 +729,8 @@ public class Settings {
         public static class ModeStereoSettings {
             public boolean active;
             public StereoProfile profile;
+            @JsonIgnore
+            public float eyeSeparation = 1f;
 
             public void setProfile(String profileString) {
                 this.profile = StereoProfile.valueOf(profileString.toUpperCase());
@@ -761,8 +764,8 @@ public class Settings {
             }
 
             public static class PlanetariumSettings {
-                public double aperture;
-                public double angle;
+                public float aperture;
+                public float angle;
             }
 
             /**
@@ -811,9 +814,9 @@ public class Settings {
                 public String configFile;
                 public String warpFile;
                 public String blendFile;
-                public double yaw;
-                public double pitch;
-                public double roll;
+                public float yaw;
+                public float pitch;
+                public float roll;
 
             }
 
@@ -1074,9 +1077,12 @@ public class Settings {
     }
 
     public static class ScreenshotSettings {
+        public static final int MIN_SCREENSHOT_SIZE = 50;
+        public static final int MAX_SCREENSHOT_SIZE = 25000;
+
         public String location;
         public ImageFormat format;
-        public double quality;
+        public float quality;
         public ScreenshotMode mode;
         public int[] resolution;
 
@@ -1309,15 +1315,15 @@ public class Settings {
     public static class RuntimeSettings implements IObserver {
         public boolean openVr = false;
         public boolean OVR = false;
-        public boolean displayGui;
-        public boolean updatePause;
-        public boolean timeOn;
-        public boolean realTime;
-        public boolean inputEnabled;
-        public boolean recordCamera;
-        public boolean recordKeyframeCamera;
+        public boolean displayGui = true;
+        public boolean updatePause = false;
+        public boolean timeOn = false;
+        public boolean realTime = false;
+        public boolean inputEnabled =true;
+        public boolean recordCamera = false;
+        public boolean recordKeyframeCamera = false;
 
-        public boolean drawOctree;
+        public boolean drawOctree = false;
         public boolean relativisticAberration = false;
         public boolean gravitationalWaves = false;
         public boolean displayVrGui = false;
@@ -1574,5 +1580,15 @@ public class Settings {
         UNCHARTED,
         FILMIC,
         NONE
+    }
+
+    public enum LineMode {
+        GL_LINES,
+        POLYLINE_QUADSTRIP,
+    }
+
+    public enum OrbitMode {
+        LINE_MODE_SETTING,
+        GPU_VBO
     }
 }

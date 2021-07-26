@@ -12,7 +12,7 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
@@ -33,9 +33,9 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         super();
 
         cubemapEffect = new CubemapProjections(0, 0);
-        setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
-        setPlanetariumAperture(GlobalConf.program.PLANETARIUM_APERTURE);
-        setProjection(GlobalConf.program.CUBEMAP_PROJECTION);
+        setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
+        setPlanetariumAperture(Settings.settings.program.modeCubemap.planetarium.aperture);
+        setProjection(Settings.settings.program.modeCubemap.projection);
 
         copy = new Copy();
 
@@ -55,7 +55,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
                 yNegFlag = true;
                 zPosFlag = true;
                 zNegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
-                setPlanetariumAngle(GlobalConf.program.PLANETARIUM_ANGLE);
+                setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
                 break;
             default:
                 // In 360 mode we always need all sides
@@ -118,7 +118,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
     @Override
     public void notify(final Events event, final Object... data) {
-        if (!GlobalConf.runtime.OPENVR) {
+        if (!Settings.settings.runtime.openVr) {
             switch (event) {
                 case CUBEMAP_CMD:
                     CubemapProjection p = (CubemapProjection) data[1];

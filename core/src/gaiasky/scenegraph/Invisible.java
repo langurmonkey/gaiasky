@@ -16,8 +16,8 @@ import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector3d;
@@ -54,7 +54,7 @@ public class Invisible extends CelestialBody {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        if (this.raymarchingShader != null && !this.raymarchingShader.isBlank() && !GlobalConf.program.SAFE_GRAPHICS_MODE)
+        if (this.raymarchingShader != null && !this.raymarchingShader.isBlank() && !Settings.settings.program.safeMode)
             EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, coordinates.getEquatorialCartesianCoordinates(Instant.now(), pos), this.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
         else
             raymarchingShader = null;

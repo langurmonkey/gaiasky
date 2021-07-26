@@ -21,8 +21,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
@@ -97,20 +97,20 @@ public class GlobalResources {
         this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
 
         // Star group textures
-        manager.load(GlobalConf.data.dataFile("tex/base/star.jpg"), Texture.class);
-        manager.load(GlobalConf.data.dataFile("tex/base/lut.jpg"), Texture.class);
+        manager.load(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
+        manager.load(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
 
         updateSkin();
     }
 
     public void updateSkin() {
         initCursors();
-        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         if (!fh.exists()) {
             // Default to dark-green
-            logger.info("User interface theme '" + GlobalConf.program.UI_THEME + "' not found, using 'dark-green' instead");
-            GlobalConf.program.UI_THEME = "dark-green";
-            fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+            logger.info("User interface theme '" + Settings.settings.program.ui.theme + "' not found, using 'dark-green' instead");
+            Settings.settings.program.ui.theme = "dark-green";
+            fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         }
         setSkin(new Skin(fh));
         ObjectMap<String, BitmapFont> fonts = getSkin().getAll(BitmapFont.class);
@@ -121,7 +121,7 @@ public class GlobalResources {
 
     private void initCursors() {
         // Create skin right now, it is needed.
-        if (GlobalConf.program.UI_SCALE > 0.8) {
+        if (Settings.settings.program.ui.scale > 0.8) {
             setLinkCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-link-x2.png")), 8, 0));
             setResizeXCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizex-x2.png")), 16, 16));
             setResizeYCursor(Gdx.graphics.newCursor(new Pixmap(Gdx.files.internal("img/cursor-resizey-x2.png")), 16, 16));
@@ -451,7 +451,7 @@ public class GlobalResources {
 
     public static synchronized Vector3d applyRelativisticAberration(Vector3d pos, ICamera cam) {
         // Relativistic aberration
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
+        if (Settings.settings.runtime.relativisticAberration) {
             Vector3d cdir = aux;
             if (cam.getVelocity() != null)
                 cdir.set(cam.getVelocity()).nor();
@@ -640,13 +640,13 @@ public class GlobalResources {
                 String suffix = quality.suffix;
 
                 String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
-                if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
+                if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
             // Try with no suffix
             String texNoSuffix = path.replace(Constants.STAR_SUBSTITUTE, "");
-            if (GlobalConf.data.dataFileHandle(texNoSuffix).exists()) {
+            if (Settings.settings.data.dataFileHandle(texNoSuffix).exists()) {
                 return texNoSuffix;
             }
             // Try higher qualities
@@ -656,7 +656,7 @@ public class GlobalResources {
                 String suffix = quality.suffix;
 
                 String texSuffix = path.replace(Constants.STAR_SUBSTITUTE, suffix);
-                if (GlobalConf.data.dataFileHandle(texSuffix).exists()) {
+                if (Settings.settings.data.dataFileHandle(texSuffix).exists()) {
                     return texSuffix;
                 }
             }
@@ -668,11 +668,11 @@ public class GlobalResources {
     }
 
     public static String unpackAssetPath(String tex) {
-        return GlobalResources.unpackAssetPath(tex, GlobalConf.scene.GRAPHICS_QUALITY);
+        return GlobalResources.unpackAssetPath(tex, Settings.settings.graphics.quality);
     }
 
     public static String unpackSkyboxSide(String skyboxLoc, String side) throws RuntimeException {
-        FileHandle loc = GlobalConf.data.dataFileHandle(skyboxLoc);
+        FileHandle loc = Settings.settings.data.dataFileHandle(skyboxLoc);
         FileHandle[] files = loc.list();
         for (FileHandle file : files) {
             if (file.name().contains("_" + side + ".")) {
