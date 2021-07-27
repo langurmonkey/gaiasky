@@ -1566,6 +1566,16 @@ public class Settings {
             this.aaCode = aacode;
         }
 
+        public static Antialias getFromCode(int code) {
+            return switch(code){
+                case 0 -> NONE;
+                case -1 -> FXAA;
+                case -2 -> NFAA;
+                case 1 -> SSAA;
+                default -> throw new IllegalStateException("Unexpected value: " + code);
+            };
+        }
+
         public int getAACode() {
             return this.aaCode;
         }
