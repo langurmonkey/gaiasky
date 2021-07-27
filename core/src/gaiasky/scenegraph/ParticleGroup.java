@@ -471,10 +471,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         for (int i = 0; i < n; i++) {
             IParticleRecord pb = pointData.get(i);
             if (pb.names() != null) {
-                for (String lcname : pb.names()) {
-                    lcname = lcname.toLowerCase();
-                    index.put(lcname, i);
-                }
+                final int idx = i;
+                Arrays.stream(pb.names()).forEach(name -> index.put(name.toLowerCase(), idx));
             }
         }
         return index;
