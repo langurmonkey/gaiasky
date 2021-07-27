@@ -6,7 +6,6 @@
 package gaiasky.interafce.components;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -17,7 +16,6 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.util.*;
 import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.OwnSliderPlus;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.util.scene2d.OwnTextTooltip;
@@ -27,7 +25,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Properties;
 
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualEffectsComponent.class);
@@ -42,6 +39,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         super(skin, stage);
     }
 
+    @SuppressWarnings("unchecked")
     public void initialize() {
         float contentWidth = ControlsWindow.getContentWidth();
         /* Star brightness */
@@ -157,7 +155,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         resetDefaults.setWidth(contentWidth);
         resetDefaults.addListener(new OwnTextTooltip(I18n.txt("gui.resetdefaults.tooltip"), skin));
         resetDefaults.addListener(event -> {
-            if(event instanceof ChangeEvent){
+            if (event instanceof ChangeEvent) {
                 // Read defaults from internal settings file
                 try {
                     Path confFolder = Settings.settings.assetsPath("conf");
@@ -165,14 +163,14 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                     Yaml yaml = new Yaml();
                     Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
 
-                    float br = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
-                    float pow = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
-                    float ss = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
-                    float pam = (((java.util.List<Double>) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
-                    float amb = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
-                    float ls = ((Double) ((Map<String, Object>)((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
+                    float br = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("brightness")).floatValue();
+                    float pow = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("power")).floatValue();
+                    float ss = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("pointSize")).floatValue();
+                    float pam = (((java.util.List<Double>) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("star")).get("opacity")).get(0)).floatValue();
+                    float amb = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("renderer")).get("ambient")).floatValue();
+                    float ls = ((Double) ((Map<String, Object>) ((Map<String, Object>) conf.get("scene")).get("label")).get("size")).floatValue();
                     float lw = ((Double) ((Map<String, Object>) conf.get("scene")).get("lineWidth")).floatValue();
-                    float em = ((Double)((Map<String, Object>) ((Map<String, Object>)((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get("multiplier")).floatValue();
+                    float em = ((Double) ((Map<String, Object>) ((Map<String, Object>) ((Map<Object, Object>) conf.get("scene")).get("renderer")).get("elevation")).get("multiplier")).floatValue();
 
                     // Events
                     EventManager m = EventManager.instance;
@@ -185,7 +183,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                     m.post(Events.LINE_WIDTH_CMD, lw, false);
                     m.post(Events.ELEVATION_MULTIPLIER_CMD, em, false);
 
-                }catch(IOException e){
+                } catch (IOException e) {
                     logger.error(e, "Error loading default configuration file");
                 }
 
@@ -232,7 +230,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case STAR_BRIGHTNESS_POW_CMD:
-            if(!(boolean) data[1]){
+            if (!(boolean) data[1]) {
                 Float pow = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 starBrightnessPower.setMappedValue(pow);
@@ -248,7 +246,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case LABEL_SIZE_CMD:
-            if(!(boolean) data[1]) {
+            if (!(boolean) data[1]) {
                 Float newsize = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 labelSize.setMappedValue(newsize);
@@ -256,7 +254,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case LINE_WIDTH_CMD:
-            if(!(boolean) data[1]) {
+            if (!(boolean) data[1]) {
                 Float newwidth = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 lineWidth.setMappedValue(newwidth);
