@@ -564,7 +564,7 @@ public class FullGui extends AbstractGui {
                 showMinimapWindow(ui, true);
             } else {
                 if (minimapInterface == null) {
-                    minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader());
+                    minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
                     minimapInterface.setFillParent(true);
                     minimapInterface.right().top();
                     minimapInterface.pad(pad, 0f, 0f, pad);
@@ -576,7 +576,7 @@ public class FullGui extends AbstractGui {
 
     public void showMinimapInterface(Stage ui, boolean show) {
         if (minimapInterface == null) {
-            minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader());
+            minimapInterface = new MinimapInterface(skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
             minimapInterface.setFillParent(true);
             minimapInterface.right().top();
             minimapInterface.pad(pad, 0f, 0f, pad);
@@ -618,7 +618,7 @@ public class FullGui extends AbstractGui {
 
     public void showMinimapWindow(Stage ui, boolean show) {
         if (minimapWindow == null)
-            minimapWindow = new MinimapWindow(ui, skin, globalResources.getShapeShader());
+            minimapWindow = new MinimapWindow(ui, skin, globalResources.getShapeShader(), globalResources.getSpriteShader());
         if (show)
             minimapWindow.show(ui, graphics.getWidth() - minimapWindow.getWidth(), graphics.getHeight() - minimapWindow.getHeight());
         else

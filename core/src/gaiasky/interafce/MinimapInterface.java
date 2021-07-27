@@ -15,10 +15,10 @@ public class MinimapInterface extends TableGuiInterface {
     private final MinimapWidget minimap;
     private final OwnLabel mapName;
 
-    public MinimapInterface(final Skin skin, final ShaderProgram shapeShader) {
+    public MinimapInterface(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
         super(skin);
         float pad = 5f;
-        minimap = new MinimapWidget(skin, shapeShader);
+        minimap = new MinimapWidget(skin, shapeShader, spriteShader);
 
         Table side = new Table(skin);
         side.setBackground("table-bg");
