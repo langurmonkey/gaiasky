@@ -13,13 +13,13 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
 
 public class VRInfoGui extends AbstractGui {
     protected Container<Table> container;
     protected Table contents, infoFocus, infoFree;
-    protected Cell<Table> infoCell;
+    protected Cell<?> infoCell;
 
     public VRInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
@@ -30,8 +30,8 @@ public class VRInfoGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        float h = GlobalConf.screen.BACKBUFFER_HEIGHT;
-        float w = GlobalConf.screen.BACKBUFFER_WIDTH;
+        float h = Settings.settings.graphics.backBufferResolution[0];
+        float w = Settings.settings.graphics.backBufferResolution[1];
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
@@ -45,7 +45,7 @@ public class VRInfoGui extends AbstractGui {
         contents = new Table();
         contents.setFillParent(false);
 
-        // FOUCS INFO
+        // Focus info
         contents.add(new FocusInfoInterface(skin, true)).left().padBottom(15f).row();
         infoCell = contents.add();
 
@@ -95,25 +95,21 @@ public class VRInfoGui extends AbstractGui {
 
     @Override
     public boolean mustDraw(){
-        return GlobalConf.runtime.DISPLAY_VR_GUI;
+        return Settings.settings.runtime.displayVrGui;
     }
 
     @Override
     public void notify(final Events event, final Object... data) {
 
-        switch (event) {
-            case CAMERA_MODE_CMD:
-                CameraMode cm = (CameraMode) data[0];
-                if (cm.isFocus()) {
-                    infoCell.setActor(infoFocus);
-                } else if (cm.isFree()) {
-                    infoCell.setActor(infoFree);
-                } else {
-                    infoCell.clearActor();
-                }
-                break;
-            default:
-                break;
+        if (event == Events.CAMERA_MODE_CMD) {
+            CameraMode cm = (CameraMode) data[0];
+            if (cm.isFocus()) {
+                infoCell.setActor(infoFocus);
+            } else if (cm.isFree()) {
+                infoCell.setActor(infoFree);
+            } else {
+                infoCell.clearActor();
+            }
         }
     }
 

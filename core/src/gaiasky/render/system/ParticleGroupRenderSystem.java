@@ -22,7 +22,8 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -81,7 +82,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size > 0) {
-            boolean stereoHalfWidth = GlobalConf.program.isStereoHalfWidth();
+            boolean stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
             ExtShaderProgram shaderProgram = getShaderProgram();
             shaderProgram.begin();
             // Global uniforms
@@ -89,7 +90,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
             shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
-            shaderProgram.setUniformi("u_cubemap", GlobalConf.program.CUBEMAP_MODE ? 1 : 0);
+            shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
             addEffectsUniforms(shaderProgram, camera);
 
             renderables.forEach(rend -> {
@@ -166,7 +167,7 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
                             shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                             shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                            shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * GlobalConf.getStarPointSize() * 0.05)) * particleGroup.highlightedSizeFactor() * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                            shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.05)) * particleGroup.highlightedSizeFactor() * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                             shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] / camera.getFovFactor()), (float) (particleGroup.particleSizeLimits[1] / camera.getFovFactor()));
 
                             curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());

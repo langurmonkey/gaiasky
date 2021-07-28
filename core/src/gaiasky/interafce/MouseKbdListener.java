@@ -8,7 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.utils.IntSet;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 public abstract class MouseKbdListener extends GestureDetector implements IInputListener {
 
@@ -33,7 +33,7 @@ public abstract class MouseKbdListener extends GestureDetector implements IInput
     @Override
     public boolean keyDown(int keycode) {
         boolean b = false;
-        if (GlobalConf.runtime.INPUT_ENABLED) {
+        if (Settings.settings.runtime.inputEnabled) {
             b = pressedKeys.add(keycode);
             camera.setInputByController(false);
         }

@@ -124,7 +124,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
     }
 
     private Pair<List<IParticleRecord>, String> reloadFile(PointDataProvider prov, String src, String srcUpk, List<IParticleRecord> curr) {
-        String upk = GlobalResources.unpackAssetPath(GlobalConf.data.dataFile(src));
+        String upk = GlobalResources.unpackAssetPath(Settings.settings.data.dataFile(src));
         if (srcUpk == null || !srcUpk.equals(upk)) {
             return new Pair<>(prov.loadData(upk), upk);
         } else {

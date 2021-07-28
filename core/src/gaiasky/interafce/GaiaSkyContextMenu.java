@@ -59,7 +59,7 @@ public class GaiaSkyContextMenu extends ContextMenu {
     public GaiaSkyContextMenu(final Skin skin, final String styleName, final int screenX, final int screenY, final IFocus candidate, final CatalogManager catalogManager) {
         super(skin, styleName);
         this.skin = skin;
-        this.screenX = (int) (screenX / GlobalConf.program.UI_SCALE);
+        this.screenX = (int) (screenX / Settings.settings.program.ui.scale);
         this.screenY = screenY;
         this.sg = GaiaSky.instance.sceneGraph;
         this.candidate = candidate;

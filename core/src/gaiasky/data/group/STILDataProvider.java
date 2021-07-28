@@ -76,7 +76,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public List<IParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.txt("notif.datafile", file));
         try {
-            loadData(new FileDataSource(GlobalConf.data.dataFile(file)), factor);
+            loadData(new FileDataSource(Settings.settings.data.dataFile(file)), factor);
         } catch (Exception e1) {
             try {
                 logger.info("File " + file + " not found in data folder, trying relative path");

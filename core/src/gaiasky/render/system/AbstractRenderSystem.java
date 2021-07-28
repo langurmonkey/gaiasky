@@ -14,7 +14,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Vector3d;
@@ -37,12 +37,15 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     protected Vector3 aux;
     protected Vector3d auxd;
 
+    private final Settings settings;
+
     private boolean vrScaleFlag = false, depthBufferFlag = false;
 
     protected Array<RenderSystemRunnable> preRunnables, postRunnables;
 
     protected AbstractRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         super();
+        this.settings = Settings.settings;
         this.group = rg;
         this.alphas = alphas;
         this.programs = programs;
@@ -135,7 +138,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     protected void addRelativisticUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
+        if (settings.runtime.relativisticAberration) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             shaderProgram.setUniformf("u_velDir", rem.velDir);
             shaderProgram.setUniformf("u_vc", rem.vc);
@@ -143,7 +146,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     protected void addGravWaveUniforms(ExtShaderProgram shaderProgram) {
-        if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
+        if (settings.runtime.gravitationalWaves) {
             RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
             // Time in seconds - use simulation time
             shaderProgram.setUniformf("u_ts", rem.gwtime);
@@ -180,7 +183,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      */
     protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         // Velocity buffer
-        if(GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR) {
+        if(settings.postprocess.motionBlur) {
             shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux));
             shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux));
             shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
@@ -189,23 +192,23 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
 
     protected ExtShaderProgram getShaderProgram() {
         try {
-            if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            if (!settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
                 //return programs[0];
                 // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
                 return programs[SysUtils.isMac() ? 1 : 0];
-            if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            if (settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
                 return programs[1];
-            else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (!settings.postprocess.motionBlur && settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
                 return programs[2];
-            else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (!settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
                 return programs[3];
-            else if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && !GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (settings.postprocess.motionBlur && settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
                 return programs[4];
-            else if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && !GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
                 return programs[5];
-            else if (!GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (!settings.postprocess.motionBlur && settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
                 return programs[6];
-            else if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR && GlobalConf.runtime.RELATIVISTIC_ABERRATION && GlobalConf.runtime.GRAVITATIONAL_WAVES)
+            else if (settings.postprocess.motionBlur && settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
                 return programs[7];
         } catch (Exception ignored) {
         }

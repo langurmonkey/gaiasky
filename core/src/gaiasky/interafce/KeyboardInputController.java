@@ -11,7 +11,7 @@ import com.badlogic.gdx.InputAdapter;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interafce.KeyBindings.ProgramAction;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,7 +39,7 @@ public class KeyboardInputController extends InputAdapter {
     public boolean keyDown(int keycode) {
         cleanSpecial();
 
-        if (GlobalConf.runtime.INPUT_ENABLED) {
+        if (Settings.settings.runtime.inputEnabled) {
             pressedKeys.add(keycode);
         }
         return false;
@@ -52,7 +52,7 @@ public class KeyboardInputController extends InputAdapter {
 
         cleanSpecial();
 
-        if (GlobalConf.runtime.INPUT_ENABLED) {
+        if (Settings.settings.runtime.inputEnabled) {
             // Use key mappings
             ProgramAction action = mappings.getMappings().get(pressedKeys);
             if (action != null) {

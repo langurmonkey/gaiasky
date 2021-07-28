@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.scene2d.OwnLabel;
@@ -21,13 +21,15 @@ public class VersionLineTable extends Table {
         top().left();
         pad(pad16);
 
+        final Settings settings = Settings.settings;
+
         // Gaia Sky version
-        OwnLabel gsversion = new OwnLabel(GlobalConf.version.version, skin, "hud-big");
-        gsversion.addListener(new OwnTextTooltip(I18n.txt("gui.help.version", GlobalConf.APPLICATION_NAME), skin));
+        OwnLabel gsversion = new OwnLabel(settings.version.version, skin, "hud-big");
+        gsversion.addListener(new OwnTextTooltip(I18n.txt("gui.help.version", Settings.APPLICATION_NAME), skin));
         add(gsversion).left().padRight(pad16);
 
         // Gaia Sky build
-        OwnLabel gsbuild = new OwnLabel(I18n.txt("gui.buildandtime", GlobalConf.version.build, GlobalConf.version.getBuildTimePretty()), skin, "hud-med");
+        OwnLabel gsbuild = new OwnLabel(I18n.txt("gui.buildandtime", settings.version.build, settings.version.getBuildTimePretty()), skin, "hud-med");
         gsbuild.addListener(new OwnTextTooltip(I18n.txt("gui.help.buildandtime"), skin));
         gsbuild.setColor(ColorUtils.oLightGrayC);
         add(gsbuild).left().padRight(pad32 * 2f);
@@ -51,7 +53,7 @@ public class VersionLineTable extends Table {
         add(glslvers).left().padRight(pad32);
 
         // VR
-        if (GlobalConf.runtime.OPENVR) {
+        if (settings.runtime.openVr) {
             OwnLabel vr = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.vr.mode")), skin, "hud-med");
             vr.setColor(ColorUtils.gPinkC);
             vr.addListener(new OwnTextTooltip(I18n.txt("gui.vr.mode.tooltip"), skin));
@@ -59,7 +61,7 @@ public class VersionLineTable extends Table {
         }
 
         // Master instance
-        if (GlobalConf.program.NET_MASTER) {
+        if (settings.program.net.master.active) {
             OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.master.instance")), skin, "hud-med");
             master.setColor(ColorUtils.gBlueC);
             master.addListener(new OwnTextTooltip(I18n.txt("gui.master.instance.tooltip"), skin));
@@ -67,7 +69,7 @@ public class VersionLineTable extends Table {
         }
 
         // Slave instance
-        if (GlobalConf.program.NET_SLAVE) {
+        if (settings.program.net.slave.active) {
             OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.slave.instance")), skin, "hud-med");
             slave.setColor(ColorUtils.gYellowC);
             slave.addListener(new OwnTextTooltip(I18n.txt("gui.slave.instance.tooltip"), skin));
@@ -75,7 +77,7 @@ public class VersionLineTable extends Table {
         }
 
         // Safe graphics mode
-        if (GlobalConf.program.SAFE_GRAPHICS_MODE) {
+        if (settings.program.safeMode) {
             OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.debug.safemode")), skin, "hud-med");
             safeMode.setColor(ColorUtils.gRedC);
             safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));

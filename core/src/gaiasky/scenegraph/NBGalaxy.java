@@ -9,12 +9,11 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.render.IRenderable;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3b;
@@ -97,7 +96,7 @@ public class NBGalaxy extends Particle {
      */
     @Override
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
-        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
+        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / Settings.settings.scene.label.number);
         translation.set(parentTransform).add(pos);
         distToCamera = translation.lend();
 
@@ -107,7 +106,7 @@ public class NBGalaxy extends Particle {
             camera.checkClosestBody(this);
 
             viewAngle = (radius / distToCamera);
-            viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
+            viewAngleApparent = viewAngle * Settings.settings.scene.star.brightness / camera.getFovFactor();
 
             addToRenderLists(camera);
         }
@@ -135,7 +134,7 @@ public class NBGalaxy extends Particle {
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
         compalpha = alpha;
-        float size = getFuzzyRenderSize(camera) * GlobalConf.scene.STAR_POINT_SIZE * 1.5f;
+        float size = getFuzzyRenderSize(camera) * Settings.settings.scene.star.pointSize * 1.5f;
 
         Vector3 aux = aux3f1.get();
         shader.setUniformf("u_pos", translation.put(aux));

@@ -13,7 +13,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
-import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
 
@@ -27,6 +26,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.*;
+
+import static gaiasky.util.Settings.StereoProfile.*;
 
 /**
  * Contains the key mappings and the actions. This should be persisted somehow
@@ -168,11 +169,11 @@ public class KeyBindings {
         // Condition that checks the current camera is not Game
         BooleanRunnable noGameCondition = () -> !GaiaSky.instance.getCameraManager().getMode().isGame();
         // Condition that checks the GUI is visible (no clean mode)
-        BooleanRunnable noCleanMode = () -> GlobalConf.runtime.DISPLAY_GUI || GaiaSky.instance.externalView;
+        BooleanRunnable noCleanMode = () -> Settings.settings.runtime.displayGui || GaiaSky.instance.externalView;
         // Condition that checks that panorama mode is off
-        BooleanRunnable noPanorama = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPanorama());
+        BooleanRunnable noPanorama = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPanorama());
         // Condition that checks that planetarium mode is off
-        BooleanRunnable noPlanetarium = () -> !(GlobalConf.program.CUBEMAP_MODE && GlobalConf.program.CUBEMAP_PROJECTION.isPlanetarium());
+        BooleanRunnable noPlanetarium = () -> !(Settings.settings.program.modeCubemap.active && Settings.settings.program.modeCubemap.projection.isPlanetarium());
         // Condition that checks that we are not a slave with a special projection
         BooleanRunnable noSlaveProj = () -> !SlaveManager.projectionActive();
         // Condition that checks that we are a master and have slaves
@@ -270,48 +271,48 @@ public class KeyBindings {
         addAction(new ProgramAction("action.pauseresume", () -> {
             // Game mode has space bound to 'up'
             if (!GaiaSky.instance.cameraManager.mode.isGame())
-                EventManager.instance.post(Events.TIME_STATE_CMD, !GlobalConf.runtime.TIME_ON, false);
+                EventManager.instance.post(Events.TIME_STATE_CMD, !Settings.settings.runtime.timeOn, false);
         }));
 
         // increase field of view
-        addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV + 1f, false), noSlaveProj));
+        addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, Settings.settings.scene.camera.fov + 1f, false), noSlaveProj));
 
         // decrease field of view
-        addAction(new ProgramAction("action.decfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, GlobalConf.scene.CAMERA_FOV - 1f, false), noSlaveProj));
+        addAction(new ProgramAction("action.decfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, Settings.settings.scene.camera.fov - 1f, false), noSlaveProj));
 
         // fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
-            GlobalConf.screen.FULLSCREEN = !GlobalConf.screen.FULLSCREEN;
+            Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
             EventManager.instance.post(Events.SCREEN_MODE_CMD);
         }));
 
         // toggle planetarium mode
-        // addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.FISHEYE_CMD, !GlobalConf.postprocess.POSTPROCESS_FISHEYE)));
+        // addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.FISHEYE_CMD, !Settings.settings.postprocess.POSTPROCESS_FISHEYE)));
 
         // take screenshot
-        addAction(new ProgramAction("action.screenshot", () -> EventManager.instance.post(Events.SCREENSHOT_CMD, GlobalConf.screenshot.SCREENSHOT_WIDTH, GlobalConf.screenshot.SCREENSHOT_HEIGHT, GlobalConf.screenshot.SCREENSHOT_FOLDER)));
+        addAction(new ProgramAction("action.screenshot", () -> EventManager.instance.post(Events.SCREENSHOT_CMD, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
 
         // toggle frame output
-        addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.instance.post(Events.FRAME_OUTPUT_CMD, !GlobalConf.frame.RENDER_OUTPUT)));
+        addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.instance.post(Events.FRAME_OUTPUT_CMD, !Settings.settings.frame.active)));
 
         // toggle UI collapse/expand
         addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition, noCleanMode));
 
         // toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
-            boolean enable = !GlobalConf.program.CUBEMAP_MODE;
+            boolean enable = !Settings.settings.program.modeCubemap.active;
             EventManager.instance.post(Events.CUBEMAP_CMD, enable, CubemapProjection.FISHEYE, false);
         }, noPanorama));
 
         // toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
-            boolean enable = !GlobalConf.program.CUBEMAP_MODE;
+            boolean enable = !Settings.settings.program.modeCubemap.active;
             EventManager.instance.post(Events.CUBEMAP_CMD, enable, CubemapProjection.EQUIRECTANGULAR, false);
         }, noPlanetarium));
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
-            int newprojidx = (GlobalConf.program.CUBEMAP_PROJECTION.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
+            int newprojidx = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
             EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjection.values()[newprojidx]);
         }));
 
@@ -341,20 +342,20 @@ public class KeyBindings {
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // toggle particle fade
-        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.instance.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), !GlobalConf.scene.OCTREE_PARTICLE_FADE)));
+        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.instance.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
 
         // toggle stereoscopic mode
-        addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.instance.post(Events.STEREOSCOPIC_CMD, !GlobalConf.program.STEREOSCOPIC_MODE, false)));
+        addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.instance.post(Events.STEREOSCOPIC_CMD, !Settings.settings.program.modeStereo.active, false)));
 
         // switch stereoscopic profile
         addAction(new ProgramAction("action.switchstereoprofile", () -> {
-            int newidx = GlobalConf.program.STEREO_PROFILE.ordinal();
-            newidx = (newidx + 1) % StereoProfile.values().length;
+            int newidx = Settings.settings.program.modeStereo.profile.ordinal();
+            newidx = (newidx + 1) % values().length;
             EventManager.instance.post(Events.STEREO_PROFILE_CMD, newidx);
         }));
 
         // Toggle clean (no GUI) mode
-        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, !GlobalConf.runtime.DISPLAY_GUI, I18n.txt("notif.cleanmode"))));
+        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, !Settings.settings.runtime.displayGui, I18n.txt("notif.cleanmode"))));
 
         // Travel to focus object
         addAction(new ProgramAction("action.gotoobject", () -> EventManager.instance.post(Events.GO_TO_OBJECT_CMD)));
@@ -411,7 +412,7 @@ public class KeyBindings {
         final String mappingsFileName = "keyboard.mappings";
         // Check if keyboard.mappings file exists in data folder, otherwise copy it there
         Path customMappings = SysUtils.getDefaultMappingsDir().resolve(mappingsFileName);
-        Path defaultMappings = Paths.get(GlobalConf.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
+        Path defaultMappings = Paths.get(Settings.settings.ASSETS_LOC, SysUtils.getMappingsDirName(), mappingsFileName);
         if (!Files.exists(customMappings)) {
             try {
                 Files.copy(defaultMappings, customMappings, StandardCopyOption.REPLACE_EXISTING);
@@ -470,7 +471,7 @@ public class KeyBindings {
      *
  
      */
-    public class ProgramAction implements Runnable, Comparable<ProgramAction> {
+    public static class ProgramAction implements Runnable, Comparable<ProgramAction> {
         final String actionId;
         final String actionName;
         /**

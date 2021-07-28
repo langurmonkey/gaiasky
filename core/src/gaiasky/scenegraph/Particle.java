@@ -12,15 +12,18 @@ import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.render.*;
+import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.ILineRenderable;
+import gaiasky.render.IRenderable;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
@@ -61,7 +64,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             switch (event) {
             case FOV_CHANGE_NOTIFICATION:
                 fovFactor = (Float) data[1];
-                thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * fovFactor;
+                thpointTimesFovfactor = (float) Settings.settings.scene.star.threshold.point * fovFactor;
                 thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
                 thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
                 break;
@@ -80,27 +83,28 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         } else {
             fovFactor = 1f;
         }
-        thpointTimesFovfactor = (float) GlobalConf.scene.STAR_THRESHOLD_POINT * fovFactor;
+        Settings settings = Settings.settings;
+        thpointTimesFovfactor = (float) settings.scene.star.threshold.point * fovFactor;
         thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
         thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
-        float psize = GlobalConf.scene.STAR_POINT_SIZE < 0 ? 8 : GlobalConf.scene.STAR_POINT_SIZE;
-        innerRad = (0.004f * DISC_FACTOR + psize * 0.008f) * 1.5f;
+        float pSize = settings.scene.star.pointSize < 0 ? 8 : settings.scene.star.pointSize;
+        innerRad = (0.004f * DISC_FACTOR + pSize * 0.008f) * 1.5f;
         paramUpdater = new ParamUpdater();
     }
 
     @Override
     public double THRESHOLD_NONE() {
-        return (float) GlobalConf.scene.STAR_THRESHOLD_NONE;
+        return (float) Settings.settings.scene.star.threshold.none;
     }
 
     @Override
     public double THRESHOLD_POINT() {
-        return (float) GlobalConf.scene.STAR_THRESHOLD_POINT;
+        return (float) Settings.settings.scene.star.threshold.point;
     }
 
     @Override
     public double THRESHOLD_QUAD() {
-        return (float) GlobalConf.scene.STAR_THRESHOLD_QUAD;
+        return (float) Settings.settings.scene.star.threshold.quad;
     }
 
     /**
@@ -217,10 +221,11 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             translation.add(pmv);
         }
         distToCamera = translation.lend();
+        Settings settings = Settings.settings;
 
         if (!copy) {
             viewAngle = (radius / distToCamera);
-            viewAngleApparent = viewAngle * GlobalConf.scene.STAR_BRIGHTNESS / camera.getFovFactor();
+            viewAngleApparent = viewAngle * settings.scene.star.brightness / camera.getFovFactor();
 
             addToRenderLists(camera);
         }
@@ -233,7 +238,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             }
         }
 
-        innerRad = 0.01f * DISC_FACTOR + GlobalConf.scene.STAR_POINT_SIZE * 0.016f;
+        innerRad = 0.01f * DISC_FACTOR + settings.scene.star.pointSize * 0.016f;
     }
 
     @Override
@@ -247,7 +252,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                 if (viewAngleApparent >= thpointTimesFovfactor) {
                     addToRender(this, RenderGroup.BILLBOARD_STAR);
                 }
-                if (viewAngleApparent >= thpointTimesFovfactor / GlobalConf.scene.PM_NUM_FACTOR && this.hasPm) {
+                if (viewAngleApparent >= thpointTimesFovfactor / Settings.settings.scene.properMotion.number && this.hasPm) {
                     addToRender(this, RenderGroup.LINE);
                 }
             }
@@ -336,7 +341,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= GlobalConf.scene.STAR_BRIGHTNESS * 0.15f;
+        computedSize *= Settings.settings.scene.star.brightness * 0.15f;
         return (float) computedSize;
     }
 
@@ -384,7 +389,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         Vector3 p1 = translation.setVector3(aux3f1.get());
-        Vector3 ppm = aux3f2.get().set(pm).scl(GlobalConf.scene.PM_LEN_FACTOR);
+        Vector3 ppm = aux3f2.get().set(pm).scl((float) Settings.settings.scene.properMotion.number);
         Vector3 p2 = ppm.add(p1);
 
         // Mualpha -> red channel

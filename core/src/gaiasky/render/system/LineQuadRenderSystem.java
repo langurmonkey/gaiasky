@@ -15,7 +15,7 @@ import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
@@ -148,7 +148,7 @@ public class LineQuadRenderSystem extends LineRenderSystem {
 
     @Override
     public void addLine(ILineRenderable lr, double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a) {
-        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * baseWidthAngleTan * GlobalConf.scene.LINE_WIDTH_FACTOR);
+        addLineInternal(x0, y0, z0, x1, y1, z1, r, g, b, a, lr.getLineWidth() * baseWidthAngleTan * Settings.settings.scene.lineWidth);
     }
 
     private void addLineInternal(double x0, double y0, double z0, double x1, double y1, double z1, float r, float g, float b, float a, double widthAngleTan) {

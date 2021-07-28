@@ -26,9 +26,9 @@ import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Invisible;
 import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
@@ -366,8 +366,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         open.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
-                fc.setShowHidden(GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN);
-                fc.setShowHiddenConsumer((showHidden)-> GlobalConf.program.FILE_CHOOSER_SHOW_HIDDEN = showHidden);
+                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".gkf"));
                 fc.setAcceptedFiles("*.gkf");
                 fc.setResultListener((success, result) -> {
@@ -650,7 +650,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
             secondsCells.put(kf, secondsCell);
         }
         secondsCell.setActor(secondsL).left().padRight(pad10 / 2f).padBottom(pad5);
-        secondsL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.seconds", kf.seconds, GlobalConf.frame.RENDER_TARGET_FPS), skin));
+        secondsL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.seconds", kf.seconds, Settings.settings.frame.targetFps), skin));
         // Can't modify time of first keyframe; it's always zero
         if (index > 0)
             secondsL.addListener((event) -> {
@@ -777,11 +777,11 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 break;
             t += keyframes.get(i).seconds;
         }
-        long frame = (long) ((t + kf.seconds) * GlobalConf.frame.RENDER_TARGET_FPS);
+        long frame = (long) ((t + kf.seconds) * Settings.settings.frame.targetFps);
 
         OwnLabel framesL = new OwnLabel("(" + frame + ")", skin);
         framesL.setWidth(64f);
-        framesL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.frames", frame, (1d / GlobalConf.frame.RENDER_TARGET_FPS)), skin));
+        framesL.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.kf.frames", frame, (1d / Settings.settings.frame.targetFps)), skin));
         addHighlightListener(framesL, kf);
         table.add(framesL).left().padRight(pad10).padBottom(pad5);
 
@@ -970,7 +970,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Clean camera
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
         if(focus instanceof Invisible && focus.getName().startsWith("Keyframe")){
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GlobalConf.scene.STARTUP_OBJECT);
+            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, Settings.settings.scene.homeObject);
             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
         }
 

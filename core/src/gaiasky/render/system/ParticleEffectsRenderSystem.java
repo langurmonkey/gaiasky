@@ -19,7 +19,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
@@ -30,12 +30,12 @@ import org.lwjgl.opengl.GL30;
 import java.util.Random;
 
 public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
-    private static final int N_PARTICLES = (GlobalConf.scene.GRAPHICS_QUALITY.ordinal() + 1) * 100;
+    private static final int N_PARTICLES = (Settings.settings.graphics.quality.ordinal() + 1) * 100;
 
     private final Random rand;
     private final Vector3 aux1f;
     private final Vector3d aux1, aux2, aux5;
-    private final Vector3b aux1b, aux2b, aux5b;
+    private final Vector3b aux1b;
     private int sizeOffset, tOffset;
     private final ComponentTypes ct;
     private final Vector3[] positions;
@@ -50,8 +50,6 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
         aux2 = new Vector3d();
         aux5 = new Vector3d();
         aux1b = new Vector3b();
-        aux2b = new Vector3b();
-        aux5b = new Vector3b();
         rand = new Random(123);
         baseTime = System.currentTimeMillis();
         ct = new ComponentTypes(ComponentType.valueOf("Effects"));
@@ -108,7 +106,7 @@ public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
 
     private void updatePositions(ICamera cam) {
         double tu = cam.getCurrent().speedScaling();
-        double distLimit = 3500000 * tu * Constants.KM_TO_U * getFactor(GlobalConf.scene.CAMERA_SPEED);
+        double distLimit = 3500000 * tu * Constants.KM_TO_U * getFactor(Settings.settings.scene.camera.speed);
         double dist = distLimit * 0.8;
         distLimit *= distLimit;
 

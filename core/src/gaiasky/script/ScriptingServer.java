@@ -8,7 +8,7 @@ package gaiasky.script;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.Logger;
 import py4j.ClientServer;
 import py4j.DefaultGatewayServerListener;
@@ -32,7 +32,7 @@ public class ScriptingServer {
     }
 
     public static void initialize(boolean force) {
-        if (!GlobalConf.program.NET_SLAVE) {
+        if (!Settings.settings.program.net.slave.active) {
             if (force && gatewayServer != null) {
                 // Shutdown
                 try {

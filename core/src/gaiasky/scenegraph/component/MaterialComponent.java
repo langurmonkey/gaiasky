@@ -23,8 +23,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.*;
-import gaiasky.util.GlobalConf.SceneConf.ElevationType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
@@ -140,7 +140,7 @@ public class MaterialComponent implements IObserver {
      * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
      *
-     * @param tex
+     * @param tex The texture file to load.
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -158,7 +158,7 @@ public class MaterialComponent implements IObserver {
      * Adds the texture to load and unpacks any "%QUALITY%" with the current
      * quality setting.
      *
-     * @param tex
+     * @param tex The texture file to load.
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -213,7 +213,7 @@ public class MaterialComponent implements IObserver {
         if (height != null && material.get(TextureExtAttribute.Height) == null) {
             if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                 Texture tex = manager.get(heightUnpacked, Texture.class);
-                if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
                     initializeElevationData(tex);
                 }
             } else {
@@ -223,7 +223,7 @@ public class MaterialComponent implements IObserver {
         if (ring != null) {
             // Ring material
             ringMaterial = ring;
-            if (ring != null && ringMaterial.get(TextureAttribute.Diffuse) == null) {
+            if (ringMaterial.get(TextureAttribute.Diffuse) == null) {
                 ringMaterial.set(new TextureAttribute(TextureAttribute.Diffuse, manager.get(ringUnpacked, Texture.class)));
             }
             if (ringnormal != null && ringMaterial.get(TextureAttribute.Normal) == null) {
@@ -247,8 +247,8 @@ public class MaterialComponent implements IObserver {
 
     private void initializeGenElevationData() {
         Thread t = new Thread(() -> {
-            final int N = GlobalConf.scene.GRAPHICS_QUALITY.texWidthTarget;
-            final int M = GlobalConf.scene.GRAPHICS_QUALITY.texHeightTarget;
+            final int N = Settings.settings.graphics.quality.texWidthTarget;
+            final int M = Settings.settings.graphics.quality.texHeightTarget;
 
             Pair<float[][], Pixmap> pair = ec.generateElevation(N, M, heightScale);
             float[][] data = pair.getFirst();
@@ -262,10 +262,10 @@ public class MaterialComponent implements IObserver {
 
                 heightSize.set(tex.getWidth(), tex.getHeight());
                 material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
-                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
                 material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
                 //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, noiseSize));
-                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
+                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
             });
         });
         t.start();
@@ -290,9 +290,9 @@ public class MaterialComponent implements IObserver {
                 heightMap = partialData;
                 heightSize.set(tex.getWidth(), tex.getHeight());
                 material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
-                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) GlobalConf.scene.ELEVATION_MULTIPLIER));
+                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
                 material.set(new Vector2Attribute(Vector2Attribute.HeightSize, heightSize));
-                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) GlobalConf.scene.TESSELLATION_QUALITY));
+                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
             });
         });
         t.start();
@@ -308,11 +308,11 @@ public class MaterialComponent implements IObserver {
     }
 
     public void setBase(String base) {
-        this.base = GlobalConf.data.dataFile(base);
+        this.base = Settings.settings.data.dataFile(base);
     }
 
     public void setSpecular(String specular) {
-        this.specular = GlobalConf.data.dataFile(specular);
+        this.specular = Settings.settings.data.dataFile(specular);
     }
 
     public void setSpecular(Double specular) {
@@ -320,23 +320,23 @@ public class MaterialComponent implements IObserver {
     }
 
     public void setNormal(String normal) {
-        this.normal = GlobalConf.data.dataFile(normal);
+        this.normal = Settings.settings.data.dataFile(normal);
     }
 
     public void setNight(String night) {
-        this.night = GlobalConf.data.dataFile(night);
+        this.night = Settings.settings.data.dataFile(night);
     }
 
     public void setRing(String ring) {
-        this.ring = GlobalConf.data.dataFile(ring);
+        this.ring = Settings.settings.data.dataFile(ring);
     }
 
     public void setRingnormal(String ringnormal) {
-        this.ringnormal = GlobalConf.data.dataFile(ringnormal);
+        this.ringnormal = Settings.settings.data.dataFile(ringnormal);
     }
 
     public void setHeight(String height) {
-        this.height = GlobalConf.data.dataFile(height);
+        this.height = Settings.settings.data.dataFile(height);
     }
 
     public void setHeightScale(Double heightScale) {
@@ -419,7 +419,7 @@ public class MaterialComponent implements IObserver {
         if (mat != null) {
             Attribute attr = mat.get(attrMask);
             mat.remove(attrMask);
-            if (attr != null && attr instanceof TextureAttribute) {
+            if (attr instanceof TextureAttribute) {
                 Texture tex = ((TextureAttribute) attr).textureDescription.texture;
                 tex.dispose();
             }
@@ -445,7 +445,7 @@ public class MaterialComponent implements IObserver {
                                 } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
                                     if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
                                         Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
-                                        if (!GlobalConf.scene.ELEVATION_TYPE.isNone()) {
+                                        if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
                                             initializeElevationData(tex);
                                         }
                                     } else {

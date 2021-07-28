@@ -277,7 +277,7 @@ public class AstroUtils {
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
     private static Vector3b plutoEclipticCoordinates(double d, Vector3b out) {
-        ITrigonometry trigo = MathManager.instance.trigo;
+        ITrigonometry trigo = MathManager.instance.trigonometryInterface;
 
         double S = Math.toRadians(50.03 + 0.033459652 * d);
         double P = Math.toRadians(238.95 + 0.003968789 * d);
@@ -309,7 +309,7 @@ public class AstroUtils {
      * @return Suml and Sumr
      */
     private static double[] calculateSumlSumr(double D, double M, double Mp, double F, double E, double A1, double A2, double Lp) {
-        ITrigonometry trigo = MathManager.instance.trigo;
+        ITrigonometry trigo = MathManager.instance.trigonometryInterface;
 
         double suml = 0.0, sumr = 0.0;
         for (int i = 0; i < table47a.length; i++) {
@@ -338,7 +338,7 @@ public class AstroUtils {
     }
 
     private static double calculateSumb(double D, double M, double Mp, double F, double E, double A1, double A3, double Lp) {
-        ITrigonometry trigo = MathManager.instance.trigo;
+        ITrigonometry trigo = MathManager.instance.trigonometryInterface;
 
         double sumb = 0.0;
         for (int i = 0; i < table47b.length; i++) {

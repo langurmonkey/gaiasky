@@ -11,13 +11,12 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.data.group.PointDataProvider;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.ConfInit;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
+import gaiasky.util.SettingsManager;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 
@@ -37,7 +36,7 @@ public class MilkyWayReshaper {
     public static void main(String[] args) {
         try {
             // Assets location
-            String ASSETS_LOC = GlobalConf.ASSETS_LOC + "/";
+            String ASSETS_LOC = Settings.ASSETS_LOC + "/";
 
             Gdx.files = new Lwjgl3Files();
 
@@ -58,7 +57,7 @@ public class MilkyWayReshaper {
             if (!dummyv.exists()) {
                 dummyv = new File(ASSETS_LOC + "dummyversion");
             }
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "conf/global.properties")), new FileInputStream(dummyv)));
+            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(dummyv));
 
             for(int ds = 0; ds < filesIn.length; ds++) {
                 logger.info();
@@ -72,7 +71,7 @@ public class MilkyWayReshaper {
                 PointDataProvider provider = new PointDataProvider();
                 List<IParticleRecord> particles = provider.loadData(fileIn);
 
-                String out = GlobalConf.data.dataFile(fileOut);
+                String out = Settings.settings.data.dataFile(fileOut);
                 if (Files.exists(Paths.get(out))) {
                     logger.error("ERROR - Output file exists: " + out);
                     continue;

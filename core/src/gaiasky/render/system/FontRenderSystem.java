@@ -12,7 +12,7 @@ import gaiasky.render.IAnnotationsRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
@@ -71,7 +71,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
             I3DTextRenderable lr = (I3DTextRenderable) r;
 
             // Label color
-            program.setUniform4fv("u_color", GlobalConf.program.isUINightMode() ? red : lr.textColour(), 0, 4);
+            program.setUniform4fv("u_color", Settings.settings.program.ui.isUINightMode() ? red : lr.textColour(), 0, 4);
             // Component alpha
             program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : alpha));
             // Font opacity multiplier, take into account element opacity

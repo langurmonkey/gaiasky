@@ -9,9 +9,9 @@ package gaiasky.util.gdx.contrib.utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import gaiasky.assets.ShaderTemplatingLoader;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -41,17 +41,15 @@ public final class ShaderLoader {
         vpSrc = ShaderTemplatingLoader.resolveIncludes(vpSrc);
         fpSrc = ShaderTemplatingLoader.resolveIncludes(fpSrc);
 
-        ShaderProgram program = ShaderLoader.fromString(vpSrc, fpSrc, vertexFileName, fragmentFileName, defines);
-        return program;
+        return ShaderLoader.fromString(vpSrc, fpSrc, vertexFileName, fragmentFileName, defines);
     }
 
     private static String loadShaderCode(String file) {
         try {
-            String src = Gdx.files.internal(BasePath + file).readString();
-            return src;
+            return Gdx.files.internal(BasePath + file).readString();
         } catch (Exception e0) {
             // Try to load from data
-            Path path = GlobalConf.data.dataPath(file);
+            Path path = Settings.settings.data.dataPath(file);
             if (Files.exists(path) && Files.isReadable(path)) {
                 try {
                     return Files.readString(path);

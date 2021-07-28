@@ -8,8 +8,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.scene2d.Link;
 import gaiasky.util.scene2d.OwnLabel;
 
@@ -37,13 +37,13 @@ public class UpdatePopup extends GenericDialog {
         content.clear();
         content.pad(16f);
         content.add(new OwnLabel(I18n.txt("gui.newversion.new.current") + ":", skin)).left().padRight(padb).padBottom(padb);
-        content.add(new OwnLabel(GlobalConf.version.version, skin)).left().padBottom(padb).row();
+        content.add(new OwnLabel(Settings.settings.version.version, skin)).left().padBottom(padb).row();
 
         content.add(new OwnLabel(I18n.txt("gui.newversion.new.new") + ":", skin)).left().padRight(padb).padBottom(padb * 2);
         content.add(new OwnLabel(tagVersion, skin, "header")).left().padBottom(padb * 2).row();
 
         Label.LabelStyle linkStyle = skin.get("link", Label.LabelStyle.class);
-        content.add(new Link(I18n.txt("gui.newversion.getit"), linkStyle, GlobalConf.WEBPAGE_DOWNLOADS)).center().colspan(2);
+        content.add(new Link(I18n.txt("gui.newversion.getit"), linkStyle, Settings.WEBPAGE_DOWNLOADS)).center().colspan(2);
     }
 
     @Override

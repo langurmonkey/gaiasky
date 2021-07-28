@@ -125,7 +125,7 @@ public class SpacecraftGui extends AbstractGui {
         indicatory = -20f;
 
         // init gui camera
-        aiCam = new PerspectiveCamera(30, indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE);
+        aiCam = new PerspectiveCamera(30, indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale);
         aiCam.near = (float) (1e5 * Constants.KM_TO_U);
         aiCam.far = (float) (1e8 * Constants.KM_TO_U);
         aiCam.up.set(0, 1, 0);
@@ -142,7 +142,7 @@ public class SpacecraftGui extends AbstractGui {
         db = new DecalBatch(4, new CameraGroupStrategy(aiCam));
         mb = new IntModelBatch();
 
-        assetManager.load(GlobalConf.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
+        assetManager.load(Settings.settings.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
         assetManager.load("img/ai-pointer.png", Texture.class);
         assetManager.load("img/ai-vel.png", Texture.class);
         assetManager.load("img/ai-antivel.png", Texture.class);
@@ -154,7 +154,7 @@ public class SpacecraftGui extends AbstractGui {
      * Constructs the interface
      */
     public void doneLoading(AssetManager assetManager) {
-        aiTexture = assetManager.get(GlobalConf.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
+        aiTexture = assetManager.get(Settings.settings.data.dataFile("tex/base/attitudeindicator.png"), Texture.class);
         aiTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         aiPointerTexture = assetManager.get("img/ai-pointer.png", Texture.class);
         aiPointerTexture.setFilter(TextureFilter.Linear, TextureFilter.Linear);
@@ -171,7 +171,7 @@ public class SpacecraftGui extends AbstractGui {
         aiModel = new IntModelBuilder().createSphere(1.6f, 30, 30, false, mat, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
         aiTransform = new Matrix4();
         aiModelInstance = new IntModelInstance(aiModel, aiTransform);
-        aiViewport = new ExtendViewport(indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE, aiCam);
+        aiViewport = new ExtendViewport(indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale, aiCam);
 
         buildGui();
 
@@ -325,10 +325,10 @@ public class SpacecraftGui extends AbstractGui {
         // Whether to keep the velocity pointing in the direction vector
         velToDir = new OwnCheckBox(I18n.txt("gui.sc.veltodir"), skin, 16f);
         velToDir.setName("sc veltodir");
-        velToDir.setChecked(GlobalConf.spacecraft.SC_VEL_TO_DIRECTION);
+        velToDir.setChecked(Settings.settings.spacecraft.velocityDirection);
         velToDir.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                GlobalConf.spacecraft.SC_VEL_TO_DIRECTION = velToDir.isChecked();
+                Settings.settings.spacecraft.velocityDirection = velToDir.isChecked();
             }
             return false;
         });
@@ -546,8 +546,8 @@ public class SpacecraftGui extends AbstractGui {
 
         // Draw attitude indicator
         aiViewport.setCamera(aiCam);
-        aiViewport.setWorldSize(indicatorw * GlobalConf.program.UI_SCALE, indicatorh * GlobalConf.program.UI_SCALE);
-        aiViewport.setScreenBounds((int) (indicatorx * GlobalConf.program.UI_SCALE), (int) (indicatory * GlobalConf.program.UI_SCALE), (int) (indicatorw * GlobalConf.program.UI_SCALE), (int) (indicatorh * GlobalConf.program.UI_SCALE));
+        aiViewport.setWorldSize(indicatorw * Settings.settings.program.ui.scale, indicatorh * Settings.settings.program.ui.scale);
+        aiViewport.setScreenBounds((int) (indicatorx * Settings.settings.program.ui.scale), (int) (indicatory * Settings.settings.program.ui.scale), (int) (indicatorw * Settings.settings.program.ui.scale), (int) (indicatorh * Settings.settings.program.ui.scale));
         aiViewport.apply();
 
         // Model

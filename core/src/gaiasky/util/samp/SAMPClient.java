@@ -67,15 +67,15 @@ public class SAMPClient implements IObserver {
 
         // Configure it with metadata about this application
         Metadata meta = new Metadata();
-        meta.setName(GlobalConf.APPLICATION_NAME);
+        meta.setName(Settings.APPLICATION_NAME);
         meta.setDescriptionText("3D Universe application focused on ESA's Gaia satellite");
-        meta.setDocumentationUrl(GlobalConf.DOCUMENTATION);
-        meta.setIconUrl(GlobalConf.ICON_URL);
-        meta.put("author.name", GlobalConf.AUTHOR_NAME_PLAIN);
-        meta.put("author.email", GlobalConf.AUTHOR_EMAIL);
-        meta.put("author.affiliation", GlobalConf.AUTHOR_AFFILIATION_PLAIN);
-        meta.put("home.page", GlobalConf.WEBPAGE);
-        meta.put("gaiasky.version", GlobalConf.version.version);
+        meta.setDocumentationUrl(Settings.DOCUMENTATION);
+        meta.setIconUrl(Settings.ICON_URL);
+        meta.put("author.name", Settings.AUTHOR_NAME_PLAIN);
+        meta.put("author.email", Settings.AUTHOR_EMAIL);
+        meta.put("author.affiliation", Settings.AUTHOR_AFFILIATION_PLAIN);
+        meta.put("home.page", Settings.WEBPAGE);
+        meta.put("gaiasky.version", Settings.settings.version.version);
 
         conn.declareMetadata(meta);
 

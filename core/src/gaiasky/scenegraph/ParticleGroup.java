@@ -269,7 +269,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 // Create catalog info and broadcast
                 CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoType.INTERNAL, 1f, this);
                 ci.nParticles = pointData != null ? pointData.size() : -1;
-                Path df = Path.of(GlobalConf.data.dataFile(datafile));
+                Path df = Path.of(Settings.settings.data.dataFile(datafile));
                 ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
 
                 // Insert
@@ -576,7 +576,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         this.focusDistToCamera = aux.sub(camera.getPos()).len();
         this.focusSize = getFocusSize();
         this.focusViewAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
-        this.focusViewAngleApparent = this.focusViewAngle * GlobalConf.scene.STAR_BRIGHTNESS;
+        this.focusViewAngleApparent = this.focusViewAngle * Settings.settings.scene.star.brightness;
     }
 
     @Override
@@ -649,7 +649,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public float textScale() {
-        return .5f / GlobalConf.scene.LABEL_SIZE_FACTOR;
+        return .5f / Settings.settings.scene.label.size;
     }
 
     public String getProvider() {
@@ -939,29 +939,28 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                         double dist = posd.len();
                         double angle = getRadius(i) / dist / camera.getFovFactor();
 
-                        PerspectiveCamera pcamera;
-                        if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                        PerspectiveCamera perspectiveCamera;
+                        if (Settings.settings.program.modeStereo.active) {
                             if (screenX < Gdx.graphics.getWidth() / 2f) {
-                                pcamera = camera.getCameraStereoLeft();
-                                pcamera.update();
+                                perspectiveCamera = camera.getCameraStereoLeft();
                             } else {
-                                pcamera = camera.getCameraStereoRight();
-                                pcamera.update();
+                                perspectiveCamera = camera.getCameraStereoRight();
                             }
+                            perspectiveCamera.update();
                         } else {
-                            pcamera = camera.camera;
+                            perspectiveCamera = camera.camera;
                         }
 
-                        angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / pcamera.fieldOfView);
-                        double pixelSize = Math.max(pxdist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
-                        pcamera.project(pos);
-                        pos.y = pcamera.viewportHeight - pos.y;
-                        if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                        angle = (float) Math.toDegrees(angle * camera.fovFactor) * (40f / perspectiveCamera.fieldOfView);
+                        double pixelSize = Math.max(pxdist, ((angle * perspectiveCamera.viewportHeight) / perspectiveCamera.fieldOfView) / 2);
+                        perspectiveCamera.project(pos);
+                        pos.y = perspectiveCamera.viewportHeight - pos.y;
+                        if (Settings.settings.program.modeStereo.active) {
                             pos.x /= 2;
                         }
 
                         // Check click distance
-                        if (pos.dst(screenX % pcamera.viewportWidth, screenY, pos.z) <= pixelSize) {
+                        if (pos.dst(screenX % perspectiveCamera.viewportWidth, screenY, pos.z) <= pixelSize) {
                             //Hit
                             temporalHits.add(new Pair<>(i, angle));
                         }
@@ -1118,10 +1117,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public IFocus getFocus(String name) {
-        if (index.containsKey(name))
-            candidateFocusIndex = index.get(name);
-        else
-            candidateFocusIndex = -1;
+        candidateFocusIndex = index.getOrDefault(name, -1);
         return this;
     }
 
@@ -1182,7 +1178,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Returns the delta years to integrate the proper motion.
      *
-     * @return
+     * @return The current delta years.
      */
     protected double getDeltaYears() {
         return 0;

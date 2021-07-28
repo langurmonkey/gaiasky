@@ -22,9 +22,9 @@ import gaiasky.scenegraph.MilkyWay;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalConf.SceneConf.GraphicsQuality;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
+import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
@@ -75,7 +75,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         super(rg, alphas, starShaders);
         aux3f1 = new Vector3();
         this.maxSizes = new float[PType.values().length];
-        initializeMaxSizes(GlobalConf.scene.GRAPHICS_QUALITY);
+        initializeMaxSizes(Settings.settings.graphics.quality);
         EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
     }
 
@@ -123,7 +123,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             shaderProgram.setUniformf("u_pointAlphaMax", 1.0f);
             shaderProgram.end();
         }
-        initializeTextureArray(GlobalConf.scene.GRAPHICS_QUALITY);
+        initializeTextureArray(Settings.settings.graphics.quality);
     }
 
     private void initializeTextureArray(GraphicsQuality gq) {
@@ -141,7 +141,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
     }
 
     private FileHandle unpack(String texName, GraphicsQuality gq) {
-        return GlobalConf.data.dataFileHandle(GlobalResources.unpackAssetPath(texFolder + texName, gq));
+        return Settings.settings.data.dataFileHandle(GlobalResources.unpackAssetPath(texFolder + texName, gq));
     }
 
     private void disposeTextureArray() {
@@ -293,9 +293,9 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
-                    shaderProgram.setUniformf("u_ar", GlobalConf.program.isStereoHalfWidth() ? 2f : 1f);
+                    shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
                     shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
-                    double pointScaleFactor = ((GlobalConf.program.isStereoFullWidth() ? 1f : 2f) * rc.scaleFactor) / camera.getFovFactor();
+                    double pointScaleFactor = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * rc.scaleFactor) / camera.getFovFactor();
 
                     // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);

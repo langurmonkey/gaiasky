@@ -16,7 +16,7 @@ import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.ObjLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.*;
@@ -702,16 +702,16 @@ public class VRContext implements Disposable {
             ObjLoader ol = new ObjLoader();
             if (manufacturer.equalsIgnoreCase("Oculus")) {
                 if (isControllerLeft(name, modelNumber, role)) {
-                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
+                    model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
                 } else if (isControllerRight(name, modelNumber, role)) {
-                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
+                    model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/oculus/oculus-right.obj"));
                 } else {
                     logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
                 }
             } else {
                 // HTC
                 if (isControllerRight(name, modelNumber, role) || isControllerLeft(name, modelNumber, role)) {
-                    model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
+                    model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
                 } else {
                     logger.info("WARN: Could not parse controller name - Manufacturer: " + manufacturer + ", Name: " + name + ", ModelNumber: " + modelNumber);
                 }
@@ -720,7 +720,7 @@ public class VRContext implements Disposable {
             // Load default
             if (model == null) {
                 logger.info("WARN: Could not find suitable controller model, using default...");
-                model = ol.loadModel(GlobalConf.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
+                model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/vive/vr_controller_vive.obj"));
             }
         }
 

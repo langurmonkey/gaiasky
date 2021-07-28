@@ -9,9 +9,9 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
@@ -153,11 +153,11 @@ public abstract class Satellite extends ModelBody {
 
     @Override
     public void setSize(Long size) {
-        super.setSize(size * (GlobalConf.runtime.OPENVR ? 4000L : 1L));
+        super.setSize(size * (Settings.settings.runtime.openVr ? 4000L : 1L));
     }
 
     @Override
     public void setSize(Double size) {
-        super.setSize(size * (GlobalConf.runtime.OPENVR ? 4000d : 1d));
+        super.setSize(size * (Settings.settings.runtime.openVr ? 4000d : 1d));
     }
 }

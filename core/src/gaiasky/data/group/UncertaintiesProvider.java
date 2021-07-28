@@ -9,10 +9,10 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
@@ -34,7 +34,7 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     @Override
     public List<IParticleRecord> loadData(String file, double factor) {
 
-        FileHandle f = GlobalConf.data.dataFileHandle(file);
+        FileHandle f = Settings.settings.data.dataFileHandle(file);
         @SuppressWarnings("unchecked")
         List<IParticleRecord> pointData = loadData(f.read(), factor);
 

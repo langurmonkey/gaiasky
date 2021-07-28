@@ -10,11 +10,10 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Files;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.util.ConfInit;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.SettingsManager;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathUtilsd;
@@ -77,7 +76,7 @@ public class GalaxyGenerator {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File("assets/conf/global.properties")), new FileInputStream(new File("assets/dummyversion"))));
+            SettingsManager.initialize(new FileInputStream("assets/conf/config.yaml"), new FileInputStream("assets/dummyversion"));
 
             I18n.initialize(new FileHandle("assets/i18n/gsbundle"));
 

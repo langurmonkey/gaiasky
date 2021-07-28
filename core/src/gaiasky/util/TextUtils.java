@@ -6,6 +6,7 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
@@ -191,6 +192,26 @@ public class TextUtils {
      * @return The concatenation
      */
     public static String concatenate(final String split, final Array<String> strings) {
+        java.lang.StringBuilder out = new java.lang.StringBuilder();
+        for (String str : strings) {
+            if (str != null && !str.isEmpty()) {
+                if (out.length() > 0)
+                    out.append(split);
+                out.append(str);
+            }
+        }
+        return out.toString();
+    }
+
+    /**
+     * Concatenates the strings using the given split
+     *
+     * @param split   The split
+     * @param strings The strings
+     *
+     * @return The concatenation
+     */
+    public static String concatenate(final String split, final java.util.List<String> strings) {
         java.lang.StringBuilder out = new java.lang.StringBuilder();
         for (String str : strings) {
             if (str != null && !str.isEmpty()) {

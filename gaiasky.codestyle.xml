@@ -6,6 +6,9 @@
     <option name="ARRAY_WRAPPING" value="0" />
   </JSON>
   <JavaCodeStyleSettings>
+    <option name="INSERT_INNER_CLASS_IMPORTS" value="true" />
+    <option name="JD_ADD_BLANK_AFTER_PARM_COMMENTS" value="true" />
+    <option name="JD_ADD_BLANK_AFTER_RETURN" value="true" />
     <option name="JD_DO_NOT_WRAP_ONE_LINE_COMMENTS" value="true" />
   </JavaCodeStyleSettings>
   <codeStyleSettings language="JAVA">

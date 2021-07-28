@@ -25,10 +25,10 @@ import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.*;
@@ -53,7 +53,7 @@ public class AboutWindow extends GenericDialog {
     private OwnLabel checkLabel;
 
     public AboutWindow(Stage stage, Skin skin) {
-        super(I18n.txt("gui.help.help") + " - " + GlobalConf.version.version + " - " + I18n.txt("gui.build", GlobalConf.version.build), skin, stage);
+        super(I18n.txt("gui.help.help") + " - " + Settings.settings.version.version + " - " + I18n.txt("gui.build", Settings.settings.version.build), skin, stage);
         this.linkStyle = skin.get("link", LabelStyle.class);
 
         setCancelText(I18n.txt("gui.close"));
@@ -110,20 +110,20 @@ public class AboutWindow extends GenericDialog {
         final Table contentHelp = new Table(skin);
         contentHelp.align(Align.top);
 
-        OwnLabel gaiasky = new OwnLabel(GlobalConf.getApplicationTitle(GlobalConf.runtime.OPENVR), skin, "main-title");
+        OwnLabel gaiasky = new OwnLabel(Settings.settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
 
         // User manual
         Label homepageTitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
         Label homepageTxt = new OwnLabel(I18n.txt("gui.help.help1"), skin);
-        Link homepageLink = new Link(GlobalConf.WEBPAGE, linkStyle, GlobalConf.WEBPAGE);
+        Link homepageLink = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
 
         // Wiki
         Label docsTitle = new OwnLabel("Docs", skin);
         Label docsTxt = new OwnLabel(I18n.txt("gui.help.help2"), skin);
-        Link docsLink = new Link(GlobalConf.DOCUMENTATION, linkStyle, GlobalConf.DOCUMENTATION);
+        Link docsLink = new Link(Settings.settings.DOCUMENTATION, linkStyle, Settings.settings.DOCUMENTATION);
 
         // Icon
-        FileHandle gsIcon = Gdx.files.internal(GlobalConf.runtime.OPENVR ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
+        FileHandle gsIcon = Gdx.files.internal(Settings.settings.runtime.openVr ? "icon/gsvr_icon.png" : "icon/gs_icon.png");
         Texture iconTex = new Texture(gsIcon);
         iconTex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image gaiaskyIcon = new Image(iconTex);
@@ -152,14 +152,14 @@ public class AboutWindow extends GenericDialog {
         contentAbout.top().left();
 
         // Intro
-        TextArea intro = new OwnTextArea(I18n.txt("gui.help.gscredits", GlobalConf.version.version), skin.get("regular", TextFieldStyle.class));
+        TextArea intro = new OwnTextArea(I18n.txt("gui.help.gscredits", Settings.settings.version.version), skin.get("regular", TextFieldStyle.class));
         intro.setDisabled(true);
         intro.setPrefRows(3);
         intro.setWidth(contentHelp.getWidth());
 
         // Home page
         Label homepagetitle = new OwnLabel(I18n.txt("gui.help.homepage"), skin);
-        Link homepage = new Link(GlobalConf.WEBPAGE, linkStyle, GlobalConf.WEBPAGE);
+        Link homepage = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
 
         // Twitter
         Label twtitle = new OwnLabel(I18n.txt("gui.help.twitter"), skin);
@@ -169,8 +169,8 @@ public class AboutWindow extends GenericDialog {
         Label authortitle = new OwnLabel(I18n.txt("gui.help.author"), skin);
 
         Table author = new Table(skin);
-        Label authorname = new OwnLabel(GlobalConf.AUTHOR_NAME, skin);
-        Link authormail = new Link(GlobalConf.AUTHOR_EMAIL, linkStyle, "mailto:" + GlobalConf.AUTHOR_EMAIL);
+        Label authorname = new OwnLabel(Settings.settings.AUTHOR_NAME, skin);
+        Link authormail = new Link(Settings.settings.AUTHOR_EMAIL, linkStyle, "mailto:" + Settings.settings.AUTHOR_EMAIL);
         Link authorpage = new Link("www.tonisagrista.com", linkStyle, "https://tonisagrista.com");
         Link authormasto = new Link("@jumpinglangur@mastodont.cat", linkStyle, "https://mastodont.cat/@jumpinglangur");
         author.add(authorname).left().row();
@@ -245,23 +245,23 @@ public class AboutWindow extends GenericDialog {
         // Build info
         Label buildinfo = new OwnLabel(I18n.txt("gui.help.buildinfo"), skin, "header");
 
-        Label versiontitle = new OwnLabel(I18n.txt("gui.help.version", GlobalConf.APPLICATION_NAME), skin);
-        Label version = new OwnLabel(GlobalConf.version.version, skin);
+        Label versiontitle = new OwnLabel(I18n.txt("gui.help.version", Settings.settings.APPLICATION_NAME), skin);
+        Label version = new OwnLabel(Settings.settings.version.version, skin);
 
         Label revisiontitle = new OwnLabel(I18n.txt("gui.help.buildnumber"), skin);
-        Label revision = new OwnLabel(GlobalConf.version.build, skin);
+        Label revision = new OwnLabel(Settings.settings.version.build, skin);
 
         Label timetitle = new OwnLabel(I18n.txt("gui.help.buildtime"), skin);
-        Label time = new OwnLabel(GlobalConf.version.buildtime.toString(), skin);
+        Label time = new OwnLabel(Settings.settings.version.buildTime.toString(), skin);
 
         Label systemtitle = new OwnLabel(I18n.txt("gui.help.buildsys"), skin);
-        TextArea system = new OwnTextArea(GlobalConf.version.system, skin.get("regular", TextFieldStyle.class));
+        TextArea system = new OwnTextArea(Settings.settings.version.system, skin.get("regular", TextFieldStyle.class));
         system.setDisabled(true);
         system.setPrefRows(3);
         system.setWidth(taWidth * 2f / 3f);
 
         Label buildertitle = new OwnLabel(I18n.txt("gui.help.builder"), skin);
-        Label builder = new OwnLabel(GlobalConf.version.builder, skin);
+        Label builder = new OwnLabel(Settings.settings.version.builder, skin);
 
         // Paths
         Label paths = new OwnLabel(I18n.txt("gui.help.paths"), skin, "header");
@@ -432,10 +432,10 @@ public class AboutWindow extends GenericDialog {
             HardwareAbstractionLayer hal = si.getHardware();
             CentralProcessor cp = hal.getProcessor();
 
-            Label cputitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
+            Label cpuTitle = new OwnLabel(I18n.txt("gui.help.cpu"), skin);
             Label cpu = new OwnLabel(cp.toString(), skin);
 
-            contentSystem.add(cputitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
+            contentSystem.add(cpuTitle).align(Align.topLeft).padRight(pad10).padTop(pad5);
             contentSystem.add(cpu).align(Align.left).padTop(pad5);
             contentSystem.row();
         } catch (Error e) {
@@ -483,13 +483,13 @@ public class AboutWindow extends GenericDialog {
             checkLabel = new OwnLabel("", skin);
 
             checkTable.add(checkLabel).top().left().padBottom(pad5).row();
-            if (GlobalConf.program.VERSION_LAST_TIME == null || new Date().getTime() - GlobalConf.program.VERSION_LAST_TIME.toEpochMilli() > GlobalConf.ProgramConf.VERSION_CHECK_INTERVAL_MS) {
+            if (Settings.settings.program.update.lastCheck == null || new Date().getTime() - Settings.settings.program.update.lastCheck.toEpochMilli() > Settings.ProgramSettings.UpdateSettings.VERSION_CHECK_INTERVAL_MS) {
                 // Check!
                 checkLabel.setText(I18n.txt("gui.newversion.checking"));
                 getCheckVersionThread().start();
             } else {
                 // Inform latest
-                newVersionCheck(GlobalConf.version.version, GlobalConf.version.versionNumber, GlobalConf.version.buildtime, false);
+                newVersionCheck(Settings.settings.version.version, Settings.settings.version.versionNumber, Settings.settings.version.buildTime, false);
             }
             contentUpdates.add(checkTable).left().top().padTop(pad10 * 2f);
         }
@@ -574,22 +574,22 @@ public class AboutWindow extends GenericDialog {
      * @param tagDate       The date
      */
     private void newVersionCheck(String tagVersion, Integer versionNumber, Instant tagDate, boolean log) {
-        GlobalConf.program.VERSION_LAST_TIME = Instant.now();
-        if (versionNumber > GlobalConf.version.versionNumber) {
+        Settings.settings.program.update.lastCheck = Instant.now();
+        if (versionNumber > Settings.settings.version.versionNumber) {
             IDateFormat df = DateFormatFactory.getFormatter(I18n.locale, DateFormatFactory.DateType.DATETIME);
             if (log) {
-                logger.info(I18n.txt("gui.newversion.available", GlobalConf.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
+                logger.info(I18n.txt("gui.newversion.available", Settings.settings.version.version, tagVersion + " [" + df.format(tagDate) + "]"));
             }
             // There's a new version!
-            checkLabel.setText(I18n.txt("gui.newversion.available", GlobalConf.version, tagVersion + " [" + df.format(tagDate) + "]"));
-            final String uri = GlobalConf.WEBPAGE_DOWNLOADS;
+            checkLabel.setText(I18n.txt("gui.newversion.available", Settings.settings.version, tagVersion + " [" + df.format(tagDate) + "]"));
+            final String uri = Settings.settings.WEBPAGE_DOWNLOADS;
 
             OwnTextButton getNewVersion = new OwnTextButton(I18n.txt("gui.newversion.getit"), skin);
             getNewVersion.pad(0, pad10, 0, pad10);
             getNewVersion.setHeight(40f);
             getNewVersion.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    Gdx.net.openURI(GlobalConf.WEBPAGE_DOWNLOADS);
+                    Gdx.net.openURI(Settings.settings.WEBPAGE_DOWNLOADS);
                     return true;
                 }
                 return false;
@@ -601,8 +601,8 @@ public class AboutWindow extends GenericDialog {
 
         } else {
             if (log)
-                logger.info(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
-            checkLabel.setText(I18n.txt("gui.newversion.nonew", GlobalConf.program.getLastCheckedString()));
+                logger.info(I18n.txt("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
+            checkLabel.setText(I18n.txt("gui.newversion.nonew", Settings.settings.program.update.getLastCheckedString()));
             // Add check now button
             OwnTextButton checkNewVersion = new OwnTextButton(I18n.txt("gui.newversion.checknow"), skin);
             checkNewVersion.pad(pad5, pad10, pad5, pad10);
@@ -621,7 +621,7 @@ public class AboutWindow extends GenericDialog {
 
     private Thread getCheckVersionThread() {
         // Start version check
-        VersionChecker vc = new VersionChecker(GlobalConf.program.VERSION_CHECK_URL);
+        VersionChecker vc = new VersionChecker(Settings.settings.program.url.versionCheck);
         vc.setListener(event -> {
             if (event instanceof VersionCheckEvent) {
                 VersionCheckEvent vce = (VersionCheckEvent) event;

@@ -15,7 +15,7 @@ import gaiasky.render.IGPUVertsRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
@@ -150,7 +150,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
             // Regular
             if (isLine())
-                Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * GlobalConf.scene.LINE_WIDTH_FACTOR);
+                Gdx.gl.glLineWidth(renderable.getPrimitiveSize() * Settings.settings.scene.lineWidth);
             if (isPoint())
                 shaderProgram.setUniformf("u_pointSize", renderable.getPrimitiveSize());
 

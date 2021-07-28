@@ -420,9 +420,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         };
         clearDepthR = (renderSystem, renderList, camera) -> Gdx.gl.glClear(GL20.GL_DEPTH_BUFFER_BIT);
 
-        if (GlobalConf.scene.SHADOW_MAPPING) {
+        if (Settings.settings.scene.renderer.shadow.active) {
             // Shadow map camera
-            cameraLight = new PerspectiveCamera(0.5f, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION);
+            cameraLight = new PerspectiveCamera(0.5f, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution);
 
             // Aux vectors
             aux1 = new Vector3();
@@ -435,7 +435,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             buildShadowMapData();
         }
 
-        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING) {
+        if (Settings.settings.postprocess.lightGlow) {
             buildGlowData();
         }
     }
@@ -609,8 +609,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // Set reference
         visible = new ComponentTypes();
-        for (int i = 0; i < GlobalConf.scene.VISIBILITY.length; i++) {
-            if (GlobalConf.scene.VISIBILITY[i]) {
+        final ComponentType[] types = ComponentType.values();
+        for (int i = 0; i < Settings.settings.scene.visibility.size(); i++) {
+            if (Settings.settings.scene.visibility.get(types[i].toString())) {
                 visible.set(ComponentType.values()[i].ordinal());
             }
         }
@@ -662,7 +663,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         annotationsProc.addPostRunnables(clearDepthR);
 
         // BILLBOARD STARS
-        billboardStarsProc = new BillboardStarRenderSystem(BILLBOARD_STAR, alphas, starBillboardShaders, GlobalConf.scene.getStarTexture(), ComponentType.Stars.ordinal());
+        billboardStarsProc = new BillboardStarRenderSystem(BILLBOARD_STAR, alphas, starBillboardShaders, Settings.settings.scene.star.getStarTexture(), ComponentType.Stars.ordinal());
         billboardStarsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         lpu = new LightPositionUpdater();
         billboardStarsProc.addPostRunnables(lpu);
@@ -839,16 +840,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private void initSGR(ICamera camera) {
-        if (GlobalConf.runtime.OPENVR) {
+        if (Settings.settings.runtime.openVr) {
             // Using Steam OpenVR renderer
             sgr = sgrList[SGR_OPENVR_IDX];
         } else if (camera.getNCameras() > 1) {
             // FOV mode
             sgr = sgrList[SGR_FOV_IDX];
-        } else if (GlobalConf.program.STEREOSCOPIC_MODE) {
+        } else if (Settings.settings.program.modeStereo.active) {
             // Stereoscopic mode
             sgr = sgrList[SGR_STEREO_IDX];
-        } else if (GlobalConf.program.CUBEMAP_MODE) {
+        } else if (Settings.settings.program.modeCubemap.active) {
             // 360 mode: cube map -> equirectangular map
             sgr = sgrList[SGR_CUBEMAP_IDX];
         } else {
@@ -863,7 +864,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         if (frameBuffer == null) {
             frameBuffer = glowFb;
         }
-        if (GlobalConf.postprocess.POSTPROCESS_LIGHT_SCATTERING && frameBuffer != null) {
+        if (Settings.settings.postprocess.lightGlow && frameBuffer != null) {
             // Get all billboard stars
             Array<IRenderable> billboardStars = renderLists.get(BILLBOARD_STAR.ordinal());
 
@@ -879,7 +880,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Array<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
 
             // VR controllers
-            if (GlobalConf.runtime.OPENVR) {
+            if (Settings.settings.runtime.openVr) {
                 SGROpenVR sgrVR = (SGROpenVR) sgrList[SGR_OPENVR_IDX];
                 if (vrContext != null) {
                     for (StubModel m : sgrVR.controllerObjects) {
@@ -893,7 +894,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Gdx.gl.glEnable(GL30.GL_DEPTH_TEST);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            //if (!GlobalConf.program.CUBEMAP360_MODE) {
+            //if (!Settings.settings.program.CUBEMAP360_MODE) {
             // Render billboard stars
             billboardStarsProc.render(stars, camera, 0, null);
 
@@ -942,7 +943,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                         candidates.add(num, mr);
                         mr.shadow = 0;
                         num++;
-                        if (num == GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS)
+                        if (num == Settings.settings.scene.renderer.shadow.number)
                             break;
                     }
                 }
@@ -1077,7 +1078,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     private void renderShadowMap(ICamera camera) {
-        if (GlobalConf.scene.SHADOW_MAPPING) {
+        if (Settings.settings.scene.renderer.shadow.active) {
             /*
              * Shadow mapping here?
              * <ul>
@@ -1097,7 +1098,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             Array<IRenderable> modelsTess = renderLists.get(MODEL_PIX_TESS.ordinal());
             models.sort(Comparator.comparingDouble(IRenderable::getDistToCamera));
 
-            int shadowNRender = (GlobalConf.program.STEREOSCOPIC_MODE || GlobalConf.runtime.OPENVR) ? 2 : GlobalConf.program.CUBEMAP_MODE ? 6 : 1;
+            int shadowNRender = (Settings.settings.program.modeStereo.active || Settings.settings.runtime.openVr) ? 2 : Settings.settings.program.modeCubemap.active ? 6 : 1;
 
             if (shadowMapFb != null && smCombinedMap != null) {
                 addCandidates(models, shadowCandidates);
@@ -1122,7 +1123,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         renderShadowMap(camera);
 
         // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
-        if (!GlobalConf.program.STEREOSCOPIC_MODE && !GlobalConf.program.CUBEMAP_MODE && !GlobalConf.runtime.OPENVR) {
+        if (!Settings.settings.program.modeStereo.active && !Settings.settings.program.modeCubemap.active && !Settings.settings.runtime.openVr) {
             renderGlowPass(camera, glowFb);
         }
 
@@ -1286,18 +1287,18 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (stereo)
                 sgr = sgrList[SGR_STEREO_IDX];
             else {
-                if (GlobalConf.runtime.OPENVR)
+                if (Settings.settings.runtime.openVr)
                     sgr = sgrList[SGR_OPENVR_IDX];
                 else
                     sgr = sgrList[SGR_DEFAULT_IDX];
             }
             break;
         case CUBEMAP_CMD:
-            boolean cubemap = (Boolean) data[0] && !GlobalConf.runtime.OPENVR;
+            boolean cubemap = (Boolean) data[0] && !Settings.settings.runtime.openVr;
             if (cubemap) {
                 sgr = sgrList[SGR_CUBEMAP_IDX];
             } else {
-                if (GlobalConf.runtime.OPENVR)
+                if (Settings.settings.runtime.openVr)
                     sgr = sgrList[SGR_OPENVR_IDX];
                 else
                     sgr = sgrList[SGR_DEFAULT_IDX];
@@ -1308,11 +1309,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             if (cm.isGaiaFov())
                 sgr = sgrList[SGR_FOV_IDX];
             else {
-                if (GlobalConf.runtime.OPENVR)
+                if (Settings.settings.runtime.openVr)
                     sgr = sgrList[SGR_OPENVR_IDX];
-                else if (GlobalConf.program.STEREOSCOPIC_MODE)
+                else if (Settings.settings.program.modeStereo.active)
                     sgr = sgrList[SGR_STEREO_IDX];
-                else if (GlobalConf.program.CUBEMAP_MODE)
+                else if (Settings.settings.program.modeCubemap.active)
                     sgr = sgrList[SGR_CUBEMAP_IDX];
                 else
                     sgr = sgrList[SGR_DEFAULT_IDX];
@@ -1344,7 +1345,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     private float calculateAlpha(ComponentType type, double t) {
         int ordinal = type.ordinal();
         long diff = (long) (t * 1000f) - times[ordinal];
-        if (diff > GlobalConf.scene.OBJECT_FADE_MS) {
+        if (diff > Settings.settings.scene.fadeMs) {
             if (visible.get(ordinal)) {
                 alphas[ordinal] = 1;
             } else {
@@ -1352,7 +1353,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
             return alphas[ordinal];
         } else {
-            return visible.get(ordinal) ? MathUtilsd.lint(diff, 0, GlobalConf.scene.OBJECT_FADE_MS, 0, 1) : MathUtilsd.lint(diff, 0, GlobalConf.scene.OBJECT_FADE_MS, 1, 0);
+            return visible.get(ordinal) ? MathUtilsd.lint(diff, 0, Settings.settings.scene.fadeMs, 0, 1) : MathUtilsd.lint(diff, 0, Settings.settings.scene.fadeMs, 1, 0);
         }
     }
 
@@ -1398,13 +1399,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         shadowMapCombined = null;
 
         // Shadow map frame buffer
-        shadowMapFb = new FrameBuffer[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS][Constants.N_DIR_LIGHTS];
+        shadowMapFb = new FrameBuffer[Settings.settings.scene.renderer.shadow.number][Constants.N_DIR_LIGHTS];
         // Shadow map combined matrices
-        shadowMapCombined = new Matrix4[GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS][Constants.N_DIR_LIGHTS];
+        shadowMapCombined = new Matrix4[Settings.settings.scene.renderer.shadow.number][Constants.N_DIR_LIGHTS];
         // Init
-        for (int i = 0; i < GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS; i++) {
+        for (int i = 0; i < Settings.settings.scene.renderer.shadow.number; i++) {
             for (int j = 0; j < 1; j++) {
-                shadowMapFb[i][j] = new FrameBuffer(Format.RGBA8888, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, GlobalConf.scene.SHADOW_MAPPING_RESOLUTION, true);
+                shadowMapFb[i][j] = new FrameBuffer(Format.RGBA8888, Settings.settings.scene.renderer.shadow.resolution, Settings.settings.scene.renderer.shadow.resolution, true);
                 shadowMapCombined[i][j] = new Matrix4();
             }
         }
@@ -1417,8 +1418,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         smCombinedMap.clear();
 
         if (shadowCandidates == null) {
-            shadowCandidates = new ArrayList<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
-            shadowCandidatesTess = new ArrayList<>(GlobalConf.scene.SHADOW_MAPPING_N_SHADOWS);
+            shadowCandidates = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
+            shadowCandidatesTess = new ArrayList<>(Settings.settings.scene.renderer.shadow.number);
         }
         shadowCandidates.clear();
         shadowCandidatesTess.clear();
@@ -1441,7 +1442,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             }
         }
         final int idx = renderSystems.indexOf(current, true);
-        if (current != null && ((current instanceof LineQuadRenderSystem && GlobalConf.scene.isNormalLineRenderer()) || (!(current instanceof LineQuadRenderSystem) && !GlobalConf.scene.isNormalLineRenderer()))) {
+        if (current != null && ((current instanceof LineQuadRenderSystem && Settings.settings.scene.renderer.isNormalLineRenderer()) || (!(current instanceof LineQuadRenderSystem) && !Settings.settings.scene.renderer.isNormalLineRenderer()))) {
             renderSystems.removeIndex(idx);
             AbstractRenderSystem lineSys = getLineRenderSystem();
             renderSystems.insert(idx, lineSys);
@@ -1451,7 +1452,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private AbstractRenderSystem getLineRenderSystem() {
         AbstractRenderSystem sys;
-        if (GlobalConf.scene.isNormalLineRenderer()) {
+        if (Settings.settings.scene.renderer.isNormalLineRenderer()) {
             // Normal
             sys = new LineRenderSystem(LINE, alphas, lineShaders);
             sys.addPreRunnables(regularBlendR, depthTestR, noDepthWritesR);

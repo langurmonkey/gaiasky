@@ -53,14 +53,14 @@ public class ModelComponent implements Disposable, IObserver {
     private boolean updateStaticLight = false;
 
     static {
-        ambient = new ColorAttribute(ColorAttribute.AmbientLight, (float) GlobalConf.scene.AMBIENT_LIGHT, (float) GlobalConf.scene.AMBIENT_LIGHT, (float) GlobalConf.scene.AMBIENT_LIGHT, 1f);
+        ambient = new ColorAttribute(ColorAttribute.AmbientLight, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
     }
 
     public static void toggleAmbientLight(boolean on) {
         if (on) {
             ambient.color.set(.7f, .7f, .7f, 1f);
         } else {
-            ambient.color.set((float) GlobalConf.scene.AMBIENT_LIGHT, (float) GlobalConf.scene.AMBIENT_LIGHT, (float) GlobalConf.scene.AMBIENT_LIGHT, 1f);
+            ambient.color.set((float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, (float) Settings.settings.scene.renderer.ambient, 1f);
         }
     }
 
@@ -140,18 +140,18 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void initialize(boolean mesh) {
-        FileHandle model = modelFile != null ? GlobalConf.data.dataFileHandle(modelFile) : null;
+        FileHandle model = modelFile != null ? Settings.settings.data.dataFileHandle(modelFile) : null;
         if (mesh) {
-            if (!GlobalConf.scene.LAZY_MESH_INIT && modelFile != null && model.exists()) {
-                AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), IntModel.class);
+            if (!Settings.settings.scene.initialization.lazyMesh && modelFile != null && model.exists()) {
+                AssetBean.addAsset(Settings.settings.data.dataFile(modelFile), IntModel.class);
             }
         } else {
             if (modelFile != null && model.exists()) {
-                AssetBean.addAsset(GlobalConf.data.dataFile(modelFile), IntModel.class);
+                AssetBean.addAsset(Settings.settings.data.dataFile(modelFile), IntModel.class);
             }
         }
 
-        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && mtc != null) {
+        if ((forceInit || !Settings.settings.scene.initialization.lazyTexture) && mtc != null) {
             mtc.initialize();
             mtc.texLoading = true;
         }
@@ -176,14 +176,14 @@ public class ModelComponent implements Disposable, IObserver {
             // Ambient
 
             // If lazy texture init, we turn off the lights until the texture is loaded
-            float level = GlobalConf.scene.LAZY_TEXTURE_INIT ? 0f : staticLightLevel;
+            float level = Settings.settings.scene.initialization.lazyTexture ? 0f : staticLightLevel;
             ColorAttribute alight = new ColorAttribute(ColorAttribute.AmbientLight, level, level, level, 1f);
             env.set(alight);
-            updateStaticLight = GlobalConf.scene.LAZY_TEXTURE_INIT;
+            updateStaticLight = Settings.settings.scene.initialization.lazyTexture;
         }
 
         // CREATE MAIN MODEL INSTANCE
-        if (!mesh || !GlobalConf.scene.LAZY_MESH_INIT) {
+        if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
             Pair<IntModel, Map<String, Material>> modmat = initModelFile();
             model = modmat.getFirst();
             instance = new IntModelInstance(model, localTransform);
@@ -191,7 +191,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         // INITIALIZE MATERIAL
-        if ((forceInit || !GlobalConf.scene.LAZY_TEXTURE_INIT) && mtc != null) {
+        if ((forceInit || !Settings.settings.scene.initialization.lazyTexture) && mtc != null) {
             mtc.initMaterial(manager, instance, cc, culling);
             mtc.texLoading = false;
             mtc.texInitialised = true;
@@ -204,16 +204,16 @@ public class ModelComponent implements Disposable, IObserver {
         // Subscribe to new graphics quality setting event
         EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
 
-        this.modelInitialised = this.modelInitialised || !GlobalConf.scene.LAZY_MESH_INIT;
+        this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
         this.modelLoading = false;
     }
 
     private Pair<IntModel, Map<String, Material>> initModelFile() {
         IntModel model = null;
         Map<String, Material> materials = null;
-        if (modelFile != null && manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {
+        if (modelFile != null && manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
             // Model comes from file (probably .obj or .g3db)
-            model = manager.get(GlobalConf.data.dataFile(modelFile), IntModel.class);
+            model = manager.get(Settings.settings.data.dataFile(modelFile), IntModel.class);
             materials = new HashMap<>();
             if (model.materials.size == 0) {
                 Material material = new Material();
@@ -255,7 +255,7 @@ public class ModelComponent implements Disposable, IObserver {
     public void load(Matrix4 localTransform) {
         AssetManager mgr = AssetBean.manager();
         mgr.update();
-        if (mgr.isLoaded(GlobalConf.data.dataFile(modelFile))) {
+        if (mgr.isLoaded(Settings.settings.data.dataFile(modelFile))) {
             this.doneLoading(mgr, localTransform, null);
             this.modelLoading = false;
             this.modelInitialised = true;
@@ -287,7 +287,7 @@ public class ModelComponent implements Disposable, IObserver {
      * Initialises the model or texture if LAZY_X_INIT is on
      */
     public void touch(Matrix4 localTransform) {
-        if (GlobalConf.scene.LAZY_TEXTURE_INIT && mtc != null && !mtc.texInitialised) {
+        if (Settings.settings.scene.initialization.lazyTexture && mtc != null && !mtc.texInitialised) {
             if (!mtc.texLoading) {
                 mtc.initialize(manager);
                 mtc.texLoading = true;
@@ -302,13 +302,13 @@ public class ModelComponent implements Disposable, IObserver {
             }
         }
 
-        if (localTransform != null && GlobalConf.scene.LAZY_MESH_INIT && !modelInitialised) {
+        if (localTransform != null && Settings.settings.scene.initialization.lazyMesh && !modelInitialised) {
             if (!modelLoading) {
-                String mf = GlobalConf.data.dataFile(modelFile);
+                String mf = Settings.settings.data.dataFile(modelFile);
                 logger.info(I18n.txt("notif.loading", mf));
                 AssetBean.addAsset(mf, IntModel.class);
                 modelLoading = true;
-            } else if (manager.isLoaded(GlobalConf.data.dataFile(modelFile))) {
+            } else if (manager.isLoaded(Settings.settings.data.dataFile(modelFile))) {
                 IntModel model;
                 Pair<IntModel, Map<String, Material>> modMat = initModelFile();
                 model = modMat.getFirst();
@@ -518,7 +518,7 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void updateVelocityBufferUniforms(Material mat, ICamera camera) {
-        if (GlobalConf.postprocess.POSTPROCESS_MOTION_BLUR) {
+        if (Settings.settings.postprocess.motionBlur) {
             vbc.updateVelocityBufferMaterial(mat, camera);
         } else if (vbc.hasVelocityBuffer(mat)) {
             vbc.removeVelocityBufferMaterial(mat);
@@ -540,13 +540,13 @@ public class ModelComponent implements Disposable, IObserver {
     }
 
     public void updateRelativisticEffects(Material mat, ICamera camera, float vc) {
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
+        if (Settings.settings.runtime.relativisticAberration) {
             rec.updateRelativisticEffectsMaterial(mat, camera, vc);
         } else if (rec.hasRelativisticEffects(mat)) {
             rec.removeRelativisticEffectsMaterial(mat);
         }
 
-        if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
+        if (Settings.settings.runtime.gravitationalWaves) {
             rec.updateGravitationalWavesMaterial(mat);
         } else if (rec.hasGravitationalWaves(mat)) {
             rec.removeGravitationalWavesMaterial(mat);

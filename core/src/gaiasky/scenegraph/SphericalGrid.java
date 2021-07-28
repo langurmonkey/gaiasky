@@ -17,9 +17,9 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
@@ -90,21 +90,21 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
 
         font.setColor(labelcolor[0], labelcolor[1], labelcolor[2], labelcolor[3] * alpha);
 
-        Vector3 vroffset = aux3f4.get();
-        if (GlobalConf.runtime.OPENVR) {
+        Vector3 vrOffset = aux3f4.get();
+        if (Settings.settings.runtime.openVr) {
             if (camera.getCurrent() instanceof NaturalCamera) {
-                ((NaturalCamera) camera.getCurrent()).vrOffset.put(vroffset);
-                vroffset.scl((float)(1f / Constants.M_TO_U));
+                ((NaturalCamera) camera.getCurrent()).vrOffset.put(vrOffset);
+                vrOffset.scl((float)(1f / Constants.M_TO_U));
             }
         } else {
-            vroffset.set(0, 0, 0);
+            vrOffset.set(0, 0, 0);
         }
 
         for (int angle = 0; angle < 360; angle += stepAngle) {
             auxf.set(Coordinates.sphericalToCartesian(Math.toRadians(angle), 0f, 1f, auxd).valuesf()).mul(annotTransform).nor();
             effectsPos(auxf, camera);
             if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
-                auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
+                auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vrOffset);
                 camera.getCamera().project(auxf);
                 font.draw(spriteBatch, angle(angle), auxf.x, auxf.y);
             }
@@ -117,14 +117,14 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
                 auxf.set(Coordinates.sphericalToCartesian(0, Math.toRadians(angle), 1f, auxd).valuesf()).mul(annotTransform).nor();
                 effectsPos(auxf, camera);
                 if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
-                    auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
+                    auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vrOffset);
                     camera.getCamera().project(auxf);
                     font.draw(spriteBatch, angleSign(angle), auxf.x, auxf.y);
                 }
                 auxf.set(Coordinates.sphericalToCartesian(0, Math.toRadians(-angle), -1f, auxd).valuesf()).mul(annotTransform).nor();
                 effectsPos(auxf, camera);
                 if (auxf.dot(camera.getCamera().direction.nor()) > 0) {
-                    auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vroffset);
+                    auxf.add(camera.getCamera().position).scl((float) Constants.DISTANCE_SCALE_FACTOR).add(vrOffset);
                     camera.getCamera().project(auxf);
                     font.draw(spriteBatch, angleSign(angle), auxf.x, auxf.y);
                 }
@@ -146,7 +146,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
     }
 
     private void relativisticPos(Vector3 auxf, ICamera camera) {
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
+        if (Settings.settings.runtime.relativisticAberration) {
             auxd.set(auxf);
             GlobalResources.applyRelativisticAberration(auxd, camera);
             auxd.put(auxf);
@@ -154,7 +154,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
     }
 
     private void gravwavePos(Vector3 auxf) {
-        if (GlobalConf.runtime.GRAVITATIONAL_WAVES) {
+        if (Settings.settings.runtime.gravitationalWaves) {
             auxd.set(auxf);
             RelativisticEffectsManager.getInstance().gravitationalWavePos(auxd);
             auxd.put(auxf);

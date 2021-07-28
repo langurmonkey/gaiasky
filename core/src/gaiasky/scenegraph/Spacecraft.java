@@ -29,10 +29,10 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Pair;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Intersectord;
 import gaiasky.util.math.MathUtilsd;
@@ -326,7 +326,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         force.set(thrust);
 
         // Scale force if relativistic effects are on
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION) {
+        if (Settings.settings.runtime.relativisticAberration) {
             double speed = vel.len();
             double scale = (relativisticSpeedCap - speed) / relativisticSpeedCap;
             force.scl(scale);
@@ -360,7 +360,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         // convert metres to internal units so we have the velocity in u/s
         Vector3d acc = aux3d1.get().set(accel).scl(Constants.M_TO_U);
 
-        if (GlobalConf.spacecraft.SC_VEL_TO_DIRECTION) {
+        if (Settings.settings.spacecraft.velocityDirection) {
             double velocityLength = vel.len();
             vel.set(direction).nor().scl(velocityLength);
         }
@@ -595,7 +595,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender() && this.viewAngleApparent > TH_ANGLE_POINT * camera.getFovFactor()) {
             super.addToRenderLists(camera);
-            if (GlobalConf.spacecraft.SC_SHOW_AXES)
+            if (Settings.settings.spacecraft.showAxes)
                 addToRender(this, RenderGroup.LINE);
 
             // Thrusters

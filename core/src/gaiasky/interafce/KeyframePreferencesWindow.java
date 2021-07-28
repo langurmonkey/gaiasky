@@ -12,8 +12,8 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.parse.Parser;
@@ -48,7 +48,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
-        camrecFps = new OwnTextField(nf3.format(GlobalConf.frame.CAMERA_REC_TARGET_FPS), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
+        camrecFps = new OwnTextField(nf3.format(Settings.settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
         camrecFps.setWidth(240f);
 
         OwnLabel interpTitle = new OwnLabel(I18n.txt("gui.keyframes.interp"), skin, "hud-header");
@@ -57,7 +57,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         OwnLabel pos = new OwnLabel(I18n.txt("gui.cam.pos"), skin);
         posMethod = new OwnSelectBox<>(skin);
         posMethod.setItems(interpolation);
-        posMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_POSITION.ordinal());
+        posMethod.setSelectedIndex(Settings.settings.camrecorder.keyframe.position.ordinal());
         posMethod.setItems(interpolation);
         posMethod.setWidth(240f);
 
@@ -65,7 +65,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
         OwnLabel orientation = new OwnLabel(I18n.txt("gui.cam.orientation"), skin);
         orientationMethod = new OwnSelectBox<>(skin);
         orientationMethod.setItems(interpolation);
-        orientationMethod.setSelectedIndex(GlobalConf.frame.KF_PATH_TYPE_ORIENTATION.ordinal());
+        orientationMethod.setSelectedIndex(Settings.settings.camrecorder.keyframe.orientation.ordinal());
         orientationMethod.setItems(interpolation);
         orientationMethod.setWidth(240f);
 
@@ -94,8 +94,8 @@ public class KeyframePreferencesWindow extends GenericDialog {
     @Override
     protected void accept() {
         EventManager.instance.post(Events.CAMRECORDER_FPS_CMD, Parser.parseDouble(camrecFps.getText()));
-        GlobalConf.frame.KF_PATH_TYPE_POSITION = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
-        GlobalConf.frame.KF_PATH_TYPE_ORIENTATION = CameraKeyframeManager.PathType.values()[orientationMethod.getSelectedIndex()];
+        Settings.settings.camrecorder.keyframe.position = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
+        Settings.settings.camrecorder.keyframe.orientation = CameraKeyframeManager.PathType.values()[orientationMethod.getSelectedIndex()];
     }
 
     @Override

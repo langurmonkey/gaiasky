@@ -15,7 +15,7 @@ import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
@@ -96,14 +96,14 @@ public class LineRenderSystem extends ImmediateRenderSystem {
             ILineRenderable renderable = (ILineRenderable) r;
             renderable.render(this, camera, getAlpha(renderable));
 
-            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * GlobalConf.scene.LINE_WIDTH_FACTOR);
+            Gdx.gl.glLineWidth(renderable.getLineWidth() * 1.5f * Settings.settings.scene.lineWidth);
 
             for (int md = 0; md < meshIdx; md++) {
-                MeshData meshd = meshes.get(md);
-                meshd.mesh.setVertices(meshd.vertices, 0, meshd.vertexIdx);
-                meshd.mesh.render(shaderProgram, renderable.getGlPrimitive());
+                MeshData meshDouble = meshes.get(md);
+                meshDouble.mesh.setVertices(meshDouble.vertices, 0, meshDouble.vertexIdx);
+                meshDouble.mesh.render(shaderProgram, renderable.getGlPrimitive());
 
-                meshd.clear();
+                meshDouble.clear();
             }
         });
         shaderProgram.end();

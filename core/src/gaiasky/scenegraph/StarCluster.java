@@ -30,10 +30,10 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntMeshPartBuilder;
 import gaiasky.util.gdx.IntModelBatch;
@@ -115,7 +115,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     public void initModel() {
         if (clusterTex == null) {
-            clusterTex = new Texture(GlobalConf.data.dataFileHandle("data/tex/base/cluster-tex.png"), true);
+            clusterTex = new Texture(Settings.settings.data.dataFileHandle("data/tex/base/cluster-tex.png"), true);
             clusterTex.setFilter(TextureFilter.MipMapLinearNearest, TextureFilter.Linear);
         }
         if (model == null) {
@@ -141,10 +141,10 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         mc.instance = new IntModelInstance(model, modelTransform);
 
         // Relativistic effects
-        if (GlobalConf.runtime.RELATIVISTIC_ABERRATION)
+        if (Settings.settings.runtime.relativisticAberration)
             mc.rec.setUpRelativisticEffectsMaterial(mc.instance.materials);
         // Gravitational waves
-        if (GlobalConf.runtime.GRAVITATIONAL_WAVES)
+        if (Settings.settings.runtime.gravitationalWaves)
             mc.rec.setUpGravitationalWavesMaterial(mc.instance.materials);
 
     }
@@ -418,7 +418,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
                 double angle = viewAngle;
 
                 PerspectiveCamera pcamera;
-                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                if (Settings.settings.program.modeStereo.active) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
                         pcamera = camera.getCameraStereoLeft();
                     } else {
@@ -433,7 +433,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
                 double pixelSize = ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2;
                 pcamera.project(pos);
                 pos.y = pcamera.viewportHeight - pos.y;
-                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                if (Settings.settings.program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance

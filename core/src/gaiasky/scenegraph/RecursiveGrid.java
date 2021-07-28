@@ -89,7 +89,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     @Override
     public void initialize() {
-        transformName = GlobalConf.scene.VISIBILITY[ComponentType.Galactic.ordinal()] ? "galacticToEquatorial" : (GlobalConf.scene.VISIBILITY[ComponentType.Ecliptic.ordinal()] ? "eclipticToEquatorial" : null);
+        transformName = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? "galacticToEquatorial" : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? "eclipticToEquatorial" : null);
         coordinateSystem = new Matrix4();
         coordinateSystemd = new Matrix4d();
         mat4daux = new Matrix4d();
@@ -98,7 +98,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         nf = NumberFormatFactory.getFormatter("0.###E0");
 
-        cc = GlobalConf.scene.VISIBILITY[ComponentType.Galactic.ordinal()] ? ccGal : (GlobalConf.scene.VISIBILITY[ComponentType.Ecliptic.ordinal()] ? ccEcl : ccEq);
+        cc = Settings.settings.scene.visibility.get(ComponentType.Galactic.toString()) ? ccGal : (Settings.settings.scene.visibility.get(ComponentType.Ecliptic.toString()) ? ccEcl : ccEq);
         labelcolor = cc;
         label = true;
         labelPosition = new Vector3b();
@@ -226,7 +226,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD);
 
         // Fade out in VR
-        if (GlobalConf.runtime.OPENVR) {
+        if (Settings.settings.runtime.openVr) {
             setFadeout(new double[] { 5e6, 50e6 });
         }
     }
@@ -240,7 +240,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             if (label) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
-            if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES && camera.getFocus() != null) {
+            if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
                 addToRender(this, RenderGroup.LINE);
             }
         }
@@ -253,7 +253,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         this.regime = this.distToCamera * Constants.DISTANCE_SCALE_FACTOR > 5e7 * Constants.PC_TO_U ? (byte) 2 : (byte) 1;
         this.opacity = opacity * this.getVisibilityOpacityFactor();
         super.updateOpacity();
-        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && camera.getFocus() != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isFocus() && camera.getFocus() != null) {
             // Baked fade-in as we get close to focus
             IFocus focus = camera.getFocus();
             this.opacity *= MathUtilsd.lint(this.distToCamera, focus.getRadius() * 4d, focus.getRadius() * 10d, 0d, 1d);
@@ -266,7 +266,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         getGridScaling(distToCamera, scalingFading);
 
         // Compute projection lines to refsys
-        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && GlobalConf.program.RECURSIVE_GRID_ORIGIN_LINES && camera.getFocus() != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
             IFocus focus = camera.getFocus();
             Vector3d cpos = aux3d3.get();
             Vector3d fpos = aux3d4.get();
@@ -314,7 +314,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         Vector3 vroffset = aux3f4.get();
         float vrScl = 1f;
-        if (GlobalConf.runtime.OPENVR) {
+        if (Settings.settings.runtime.openVr) {
             vrScl = 100f;
             if (camera.getCurrent() instanceof NaturalCamera) {
                 ((NaturalCamera) camera.getCurrent()).vrOffset.put(vroffset);
@@ -324,7 +324,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             vroffset.set(0, 0, 0);
         }
 
-        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
             // Coordinate origin - Sun
             if (regime == 1)
                 localTransform.translate(camera.getInversePos().put(aux3f1.get()));
@@ -367,7 +367,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     private double getDistanceToOrigin(ICamera camera) {
         IFocus focus = camera.getFocus();
-        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() || focus == null) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
             return camera.getPos().lend();
         } else {
             return focus.getDistToCamera();
@@ -388,7 +388,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         // Fading in u_heightScale
         mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
         // FovFactor
-        mc.setFloatExtAttribute(FloatExtAttribute.Ts, this.fovFactor * 0.5f * GlobalConf.scene.LINE_WIDTH_FACTOR);
+        mc.setFloatExtAttribute(FloatExtAttribute.Ts, this.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
         modelBatch.render(mc.instance, mc.env);
     }
 
@@ -415,7 +415,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         }
 
         // Projection lines labels
-        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isRefsys() && camera.getFocus() != null && d01 > 0 && d02 > 0) {
+        if (Settings.settings.program.recursiveGrid.origin.isRefSys() && camera.getFocus() != null && d01 > 0 && d02 > 0) {
             shader.setUniform4fv("u_color", ccL, 0, 4);
             Pair<Double, String> d = GlobalResources.doubleToDistanceString(d01);
             float ff = camera.getFovFactor();
@@ -438,10 +438,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
         IFocus focus = camera.getFocus();
         Vector3b v = aux3b1.get().setZero();
-        if (GlobalConf.program.RECURSIVE_GRID_ORIGIN.isFocus() && focus != null) {
+        if (Settings.settings.program.recursiveGrid.origin.isFocus() && focus != null) {
             focus.getAbsolutePosition(v);
-        } else {
-
         }
         float ff = camera.getFovFactor();
         float min = 0.025f * ff;
@@ -584,10 +582,9 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
 
     @Override
     public void notify(Events event, Object... data) {
-        switch (event) {
-        case TOGGLE_VISIBILITY_CMD:
+        if (event == Events.TOGGLE_VISIBILITY_CMD) {
             ComponentType ct = ComponentType.getFromKey((String) data[0]);
-            if (ct != null && GlobalConf.scene.VISIBILITY[ct.ordinal()]) {
+            if (ct != null && Settings.settings.scene.visibility.get(ct.toString())) {
                 if (ct.equals(ComponentType.Equatorial)) {
                     // Activate equatorial
                     transformName = null;
@@ -608,9 +605,6 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
                 mc.setColorAttribute(ColorAttribute.Diffuse, cc);
                 mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
             }
-            break;
-        default:
-            break;
         }
     }
 

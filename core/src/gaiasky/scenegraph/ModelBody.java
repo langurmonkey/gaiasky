@@ -23,8 +23,8 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ITransform;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
@@ -208,7 +208,7 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     public boolean renderTessellated() {
-        return GlobalConf.scene.ELEVATION_TYPE.isTessellation() && mc.hasHeight();
+        return Settings.settings.scene.renderer.elevation.type.isTessellation() && mc.hasHeight();
     }
 
     @Override
@@ -388,7 +388,7 @@ public abstract class ModelBody extends CelestialBody {
                 dCam = distToCamera;
             }
             // Only when we have height map and we are below the highest point in the surface
-            if (dCam < getRadius() + mc.mtc.heightScale * GlobalConf.scene.ELEVATION_MULTIPLIER * 4) {
+            if (dCam < getRadius() + mc.mtc.heightScale * Settings.settings.scene.renderer.elevation.multiplier * 4) {
                 float[][] m = mc.mtc.heightMap;
                 int W = mc.mtc.heightMap.length;
                 int H = mc.mtc.heightMap[0].length;
@@ -431,7 +431,7 @@ public abstract class ModelBody extends CelestialBody {
                 height = (((x2 - x) * (y2 - y)) / denom) * f11 + ((x - x1) * (y2 - y) / denom) * f21 + ((x2 - x) * (y - y1) / denom) * f12 + ((x - x1) * (y - y1) / denom) * f22;
             }
         }
-        return getRadius() + height * GlobalConf.scene.ELEVATION_MULTIPLIER;
+        return getRadius() + height * Settings.settings.scene.renderer.elevation.multiplier;
     }
 
     public double getHeightScale() {
@@ -445,7 +445,7 @@ public abstract class ModelBody extends CelestialBody {
      * Sets the shadow environment
      */
     protected void prepareShadowEnvironment() {
-        if (GlobalConf.scene.SHADOW_MAPPING) {
+        if (Settings.settings.scene.renderer.shadow.active) {
             Environment env = mc.env;
             SceneGraphRenderer sgr = GaiaSky.instance.sgr;
             if (shadow > 0 && sgr.smTexMap.containsKey(this)) {

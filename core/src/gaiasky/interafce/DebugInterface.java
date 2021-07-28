@@ -14,8 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.INumberFormat;
@@ -113,6 +113,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         }
 
         /* GRAPHICS DEVICE */
+        final Settings settings = Settings.settings;
         HorizontalGroup deviceGroup = new HorizontalGroup();
         deviceGroup.space(pad05);
         String glDevice = Gdx.gl.glGetString(GL20.GL_RENDERER);
@@ -128,21 +129,21 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         }
         extra.add(deviceGroup).colspan(2).right().padBottom(pad05).row();
 
-        if(GlobalConf.program.NET_MASTER){
+        if (settings.program.net.master.active) {
             OwnLabel master = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.master.instance")), skin, "hud-big");
             master.setColor(ColorUtils.gYellowC);
             master.addListener(new OwnTextTooltip(I18n.txt("gui.master.instance.tooltip"), skin));
 
             extra.add(master).colspan(2).right().padBottom(pad10).row();
         }
-        if(GlobalConf.program.NET_SLAVE){
+        if (settings.program.net.slave.active) {
             OwnLabel slave = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.slave.instance")), skin, "hud-big");
             slave.setColor(ColorUtils.gYellowC);
             slave.addListener(new OwnTextTooltip(I18n.txt("gui.slave.instance.tooltip"), skin));
 
             extra.add(slave).colspan(2).right().padBottom(pad10).row();
         }
-        if(GlobalConf.program.SAFE_GRAPHICS_MODE){
+        if (settings.program.safeMode) {
             OwnLabel safeMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.debug.safemode")), skin, "hud-big");
             safeMode.setColor(ColorUtils.gRedC);
             safeMode.addListener(new OwnTextTooltip(I18n.txt("gui.debug.safemode.tooltip"), skin));
@@ -254,7 +255,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         pack();
 
-        this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
+        this.setVisible(settings.program.debugInfo);
         this.lock = lock;
         EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_VRAM, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
     }
@@ -278,9 +279,10 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         synchronized (lock) {
+            final boolean debug = Settings.settings.program.debugInfo;
             switch (event) {
             case DEBUG_TIME:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     // Double with run time
                     Double runTime = (Double) data[0];
                     debugRuntime.setText(getRunTimeString(runTime));
@@ -288,7 +290,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 break;
 
             case DEBUG_RAM:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     // Doubles (MB):
                     // used/free/total/max
                     Double used = (Double) data[0];
@@ -305,7 +307,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 break;
             case DEBUG_VRAM:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     Double used = (Double) data[0];
                     Double total = (Double) data[1];
                     if (used <= 0 || total <= 0) {
@@ -320,7 +322,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 break;
             case DEBUG_OBJECTS:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     Integer display = (Integer) data[0];
                     Integer loaded = (Integer) data[1];
                     debugObjectsDisplay.setText(display);
@@ -328,7 +330,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 break;
             case DEBUG_QUEUE:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     int observed = (Integer) data[0];
                     int queueSize = (Integer) data[1];
                     // Text
@@ -345,7 +347,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 break;
             case FPS_INFO:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     double dfps = (Float) data[0];
                     double dspf = 1000 / dfps;
                     fps.setText(fpsFormatter.format(dfps).concat(" " + I18n.txt("gui.debug.fps")));
@@ -353,7 +355,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 }
                 break;
             case SAMP_INFO:
-                if (GlobalConf.program.SHOW_DEBUG_INFO && data.length > 0) {
+                if (debug && data.length > 0) {
                     debugSamp.setText((String) data[0]);
                 }
                 break;
@@ -364,8 +366,8 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                 } else {
                     shw = !this.isVisible();
                 }
-                GlobalConf.program.SHOW_DEBUG_INFO = shw;
-                this.setVisible(GlobalConf.program.SHOW_DEBUG_INFO);
+                Settings.settings.program.debugInfo = shw;
+                this.setVisible(Settings.settings.program.debugInfo);
                 break;
             default:
                 break;

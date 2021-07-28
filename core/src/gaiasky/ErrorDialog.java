@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 /**
  * This application displays an error in a window.
@@ -31,11 +31,11 @@ public class ErrorDialog implements ApplicationListener {
     @Override
     public void create() {
         ui = new Stage();
-        FileHandle fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+        FileHandle fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         if (!fh.exists()) {
             // Default to dark-green
-            GlobalConf.program.UI_THEME = "dark-green";
-            fh = Gdx.files.internal("skins/" + GlobalConf.program.UI_THEME + "/" + GlobalConf.program.UI_THEME + ".json");
+            Settings.settings.program.ui.theme = "dark-green";
+            fh = Gdx.files.internal("skins/" + Settings.settings.program.ui.theme + "/" + Settings.settings.program.ui.theme + ".json");
         }
         Skin skin = new Skin(fh);
 

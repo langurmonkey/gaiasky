@@ -6,7 +6,7 @@
 package gaiasky.util.ds;
 
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.Logger;
 
 import java.util.concurrent.*;
@@ -43,7 +43,7 @@ public class DatasetUpdater {
 
     public void initialize() {
         workQueue = new LinkedBlockingQueue<>();
-        int nThreads = !GlobalConf.performance.MULTITHREADING ? 1 : Math.max(1, GlobalConf.performance.NUMBER_THREADS() - 1);
+        int nThreads = !Settings.settings.performance.multithreading ? 1 : Math.max(1, Settings.settings.performance.getNumberOfThreads() - 1);
         pool = new ThreadPoolExecutor(nThreads, nThreads, 5, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());
     }

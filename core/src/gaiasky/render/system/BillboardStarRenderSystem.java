@@ -22,7 +22,7 @@ import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.DecalUtils;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -78,7 +78,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
     }
 
     public void setStarTexture(String tex0) {
-        texture0 = new Texture(GlobalConf.data.dataFileHandle(tex0), true);
+        texture0 = new Texture(Settings.settings.data.dataFileHandle(tex0), true);
         texture0.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     }
 
@@ -161,7 +161,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
     @Override
     public void notify(final Events event, final Object... data) {
         if (event == Events.STAR_TEXTURE_IDX_CMD) {
-            GaiaSky.postRunnable(() -> setStarTexture(GlobalConf.scene.getStarTexture()));
+            GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
         }
     }
 }

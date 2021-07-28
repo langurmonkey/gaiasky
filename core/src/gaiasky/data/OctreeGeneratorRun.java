@@ -25,7 +25,6 @@ import gaiasky.data.octreegen.generator.OctreeGeneratorParams;
 import gaiasky.data.util.HipNames;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
@@ -136,7 +135,7 @@ public class OctreeGeneratorRun {
             Files.createDirectories(outPath);
 
             // Assets location
-            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
+            String ASSETS_LOC = Settings.ASSETS_LOC;
 
             Gdx.files = new Lwjgl3Files();
 
@@ -157,7 +156,7 @@ public class OctreeGeneratorRun {
             if (!Files.exists(dummyv)) {
                 dummyv = Path.of(ASSETS_LOC, "dummyversion");
             }
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(Path.of(ASSETS_LOC, "conf/global.properties").toFile()), new FileInputStream(dummyv.toFile())));
+            SettingsManager.initialize(new FileInputStream(Path.of(ASSETS_LOC, "conf/config.yaml").toFile()), new FileInputStream(dummyv.toFile()));
 
             // Parallelism
             if (parallelism > 0) {

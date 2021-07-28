@@ -7,8 +7,8 @@ package gaiasky.data.group;
 
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
+import gaiasky.util.Settings;
 
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -23,7 +23,7 @@ public class SerializedDataProvider extends AbstractStarGroupDataProvider {
     public List<IParticleRecord> loadData(String file, double factor) {
         logger.info(I18n.txt("notif.datafile", file));
 
-        FileHandle f = GlobalConf.data.dataFileHandle(file);
+        FileHandle f = Settings.settings.data.dataFileHandle(file);
         loadData(f.read(), factor);
         logger.info(I18n.txt("notif.nodeloader", list.size(), file));
 

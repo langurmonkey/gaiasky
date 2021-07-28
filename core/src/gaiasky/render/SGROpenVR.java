@@ -23,8 +23,11 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.*;
+import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.RenderUtils;
+import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3d;
 import gaiasky.vr.openvr.VRContext;
 import gaiasky.vr.openvr.VRContext.Space;
@@ -97,7 +100,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
             // Sprite batch
             this.sb = spriteBatch;
-            sb.getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE, GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE);
+            sb.getProjectionMatrix().setToOrtho2D(0, 0, Settings.settings.graphics.backBufferResolution[0] * Settings.settings.program.ui.scale, Settings.settings.graphics.backBufferResolution[1] * Settings.settings.program.ui.scale);
 
             // Controllers
             Array<VRDevice> controllers = vrContext.getDevicesByType(VRDeviceType.Controller);
@@ -152,26 +155,26 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     }
 
     private void initializeVRGUI(Lwjgl3Graphics graphics) {
-        float uiScale = GlobalConf.program.UI_SCALE;
+        float uiScale = Settings.settings.program.ui.scale;
         float uiDistance = 8f;
         // GUI
         if (infoGui != null)
             infoGui.dispose();
-        infoGui = new VRGui<>(VRInfoGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
+        infoGui = new VRGui<>(VRInfoGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), graphics, 1f / uiScale);
         infoGui.initialize(null, sb);
-        infoGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+        infoGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
 
         if (controllerHintGui != null)
             controllerHintGui.dispose();
-        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
+        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * Settings.settings.graphics.backBufferResolution[0]) / uiDistance), graphics, 1f / uiScale);
         controllerHintGui.initialize(null, sb);
-        controllerHintGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+        controllerHintGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
 
         if (selectionGui != null)
             selectionGui.dispose();
-        selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((GlobalConf.screen.BACKBUFFER_WIDTH) / uiDistance), graphics, 1f / uiScale);
+        selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), graphics, 1f / uiScale);
         selectionGui.initialize(null, sb);
-        selectionGui.updateViewportSize(GlobalConf.screen.BACKBUFFER_WIDTH, GlobalConf.screen.BACKBUFFER_HEIGHT, true);
+        selectionGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
     }
 
     @Override
@@ -189,7 +192,6 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 Vector3 devicePos = controller.getDevice().getPosition(Space.Tracker);
                 // Length from headset to controller
                 auxd1.set(devicePos).sub(vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay).getPosition(Space.Tracker));
-                double controllerDist = auxd1.len();
                 if (controller.instance != null) {
                     controller.addToRenderLists(SceneGraphRenderer.RenderGroup.MODEL_PIX);
                 }
@@ -307,8 +309,8 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
 
     private void renderGui(IGui gui) {
         gui.update(Gdx.graphics.getDeltaTime());
-        int width = GlobalConf.screen.BACKBUFFER_WIDTH;
-        int height = GlobalConf.screen.BACKBUFFER_HEIGHT;
+        int width = Settings.settings.graphics.backBufferResolution[0];
+        int height = Settings.settings.graphics.backBufferResolution[1];
         gui.render(width, height);
     }
 
@@ -359,7 +361,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
             }
             break;
         case UI_SCALE_CMD:
-            sb.getProjectionMatrix().setToOrtho2D(0, 0, GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE, GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE);
+            sb.getProjectionMatrix().setToOrtho2D(0, 0, Settings.settings.graphics.backBufferResolution[0] * Settings.settings.program.ui.scale, Settings.settings.graphics.backBufferResolution[1] * Settings.settings.program.ui.scale);
             initializeVRGUI((Lwjgl3Graphics) Gdx.graphics);
             break;
         default:

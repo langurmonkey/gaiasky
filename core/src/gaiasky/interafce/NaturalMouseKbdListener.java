@@ -21,11 +21,11 @@ import gaiasky.scenegraph.KeyframesPathObject;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 import gaiasky.util.comp.ViewAngleComparator;
 
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Input listener for the natural camera.
@@ -119,7 +119,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
             float amount = newZoom - previousZoom;
             previousZoom = newZoom;
             float w = Gdx.graphics.getWidth(), h = Gdx.graphics.getHeight();
-            return inputListener.zoom(amount / ((w > h) ? h : w));
+            return inputListener.zoom(amount / (Math.min(w, h)));
         }
 
         @Override
@@ -178,18 +178,21 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
             return null;
     }
 
-    private boolean dragKeyframe(int screenX, int screenY, double dragDx, double dragDy) {
+    private void dragKeyframe(int screenX, int screenY, double dragDx, double dragDy) {
         if (isKeyPressed(Keys.SHIFT_LEFT) && !anyPressed(Keys.CONTROL_LEFT, Keys.ALT_LEFT)) {
             // Rotate around up (rotate dir)
-            return getKeyframesPathObject().rotateAroundUp(dragDx, dragDy, camera);
+            Objects.requireNonNull(getKeyframesPathObject()).rotateAroundUp(dragDx, dragDy, camera);
+            return;
         } else if (isKeyPressed(Keys.CONTROL_LEFT) && !anyPressed(Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
             // Rotate around dir (rotate up)
-            return getKeyframesPathObject().rotateAroundDir(dragDx, dragDy, camera);
+            Objects.requireNonNull(getKeyframesPathObject()).rotateAroundDir(dragDx, dragDy, camera);
+            return;
         } else if (isKeyPressed(Keys.ALT_LEFT) && !anyPressed(Keys.SHIFT_LEFT, Keys.CONTROL_LEFT)) {
             // Rotate around dir.crs(up)
-            return getKeyframesPathObject().rotateAroundCrs(dragDx, dragDy, camera);
+            Objects.requireNonNull(getKeyframesPathObject()).rotateAroundCrs(dragDx, dragDy, camera);
+            return;
         }
-        return getKeyframesPathObject().moveSelection(screenX, screenY, camera);
+        Objects.requireNonNull(getKeyframesPathObject()).moveSelection(screenX, screenY, camera);
     }
 
     private Array<IFocus> getHits(int screenX, int screenY) {
@@ -197,10 +200,8 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
         Array<IFocus> hits = new Array<>();
 
-        Iterator<IFocus> it = l.iterator();
         // Add all hits
-        while (it.hasNext()) {
-            IFocus s = it.next();
+        for (IFocus s : l) {
             s.addHit(screenX, screenY, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), MIN_PIX_DIST, camera, hits);
         }
 
@@ -220,7 +221,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (GlobalConf.runtime.INPUT_ENABLED) {
+        if (Settings.settings.runtime.inputEnabled) {
             touched |= (1 << pointer);
             multiTouch = !MathUtils.isPowerOfTwo(touched);
             if (multiTouch)
@@ -252,8 +253,8 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     @Override
     public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
         EventManager.instance.post(Events.INPUT_EVENT, button);
-        if (GlobalConf.runtime.INPUT_ENABLED) {
-            touched &= -1 ^ (1 << pointer);
+        if (Settings.settings.runtime.inputEnabled) {
+            touched &= ~(1 << pointer);
             multiTouch = !MathUtils.isPowerOfTwo(touched);
             if (button == this.button && button == leftMouseButton) {
                 final long currentTime = TimeUtils.millis();
@@ -261,7 +262,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
                 GaiaSky.postRunnable(() -> {
                     // 5% of width pixels distance
-                    if (!GlobalConf.scene.CINEMATIC_CAMERA || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
+                    if (!Settings.settings.scene.camera.cinematic || gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
                         boolean stopped = camera.stopMovement();
                         boolean focusRemoved = GaiaSky.instance.mainGui != null && GaiaSky.instance.mainGui.cancelTouchFocus();
                         boolean doubleClick = currentTime - lastLeftTime < doubleClickTime;
@@ -285,7 +286,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                     keyframeBeingDragged = false;
                 } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST &&  getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
                     EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-                    getKeyframesPathObject().unselect();
+                    Objects.requireNonNull(getKeyframesPathObject()).unselect();
                 } else {
                     // Ensure Octants observed property is computed
                     GaiaSky.postRunnable(() -> {
@@ -315,7 +316,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     }
 
     protected boolean processDrag(int screenX, int screenY, double deltaX, double deltaY, int button) {
-        boolean accel = GlobalConf.scene.CINEMATIC_CAMERA;
+        boolean accel = Settings.settings.scene.camera.cinematic;
         if (accel) {
             dragDx = deltaX;
             dragDy = deltaY;
@@ -369,7 +370,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        if (GlobalConf.runtime.INPUT_ENABLED) {
+        if (Settings.settings.runtime.inputEnabled) {
             boolean result = super.touchDragged(screenX, screenY, pointer);
             if (result || this.button < 0)
                 return result;
@@ -384,7 +385,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
     @Override
     public boolean scrolled(float amountX, float amountY) {
-        if (GlobalConf.runtime.INPUT_ENABLED) {
+        if (Settings.settings.runtime.inputEnabled) {
             return zoom(amountY * scrollFactor);
         }
         return false;

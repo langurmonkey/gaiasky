@@ -18,8 +18,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.FontRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
@@ -82,7 +81,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public boolean renderText() {
-        return !GlobalConf.program.CUBEMAP_MODE;
+        return !Settings.settings.program.modeCubemap.active;
     }
 
     @Override

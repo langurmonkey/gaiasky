@@ -14,8 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
-import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
 
 public class VRControllerInfoGui extends AbstractGui {
 
@@ -30,8 +29,8 @@ public class VRControllerInfoGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        float h = GlobalConf.screen.BACKBUFFER_HEIGHT * GlobalConf.program.UI_SCALE;
-        float w = GlobalConf.screen.BACKBUFFER_WIDTH * GlobalConf.program.UI_SCALE;
+        float w = Settings.settings.graphics.backBufferResolution[0] * Settings.settings.program.ui.scale;
+        float h = Settings.settings.graphics.backBufferResolution[1] * Settings.settings.program.ui.scale;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);

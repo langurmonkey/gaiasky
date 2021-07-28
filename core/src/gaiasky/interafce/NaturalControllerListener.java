@@ -13,9 +13,9 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,7 +86,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         if (Files.exists(Path.of(mappingsFile))) {
             mappings = new ControllerMappings(null, Path.of(mappingsFile));
         } else {
-            Path internalMappings = Path.of(GlobalConf.ASSETS_LOC).resolve(mappingsFile);
+            Path internalMappings = Path.of(Settings.ASSETS_LOC).resolve(mappingsFile);
             if(Files.exists(internalMappings)){
                 mappings = new ControllerMappings(null, internalMappings);
             }
@@ -179,7 +179,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             cam.setVelocity(-val * mappings.getAxisLstickVSensitivity());
             treated = true;
         } else if (axisCode == mappings.getAxisRstickH()) {
-            double valr = (GlobalConf.controls.INVERT_LOOK_X_AXIS ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
+            double valr = (Settings.settings.controls.gamepad.invertX ? -1.0 : 1.0) * val * mappings.getAxisRstickVSensitivity();
             if (cam.getMode().isFocus()) {
                 cam.setHorizontal(valr * 0.1);
             } else {
@@ -187,7 +187,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
             }
             treated = true;
         } else if (axisCode == mappings.getAxisRstickV()) {
-            double valr = (GlobalConf.controls.INVERT_LOOK_Y_AXIS ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
+            double valr = (Settings.settings.controls.gamepad.invertY ? 1.0 : -1.0) * val * mappings.getAxisRstickHSensitivity();
             if (cam.getMode().isFocus()) {
                 cam.setVertical(valr * 0.1);
             } else {
@@ -213,14 +213,9 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-        case RELOAD_CONTROLLER_MAPPINGS:
+        if (event == Events.RELOAD_CONTROLLER_MAPPINGS) {
             updateControllerMappings((String) data[0]);
-            break;
-        default:
-            break;
         }
-
     }
 
     @Override

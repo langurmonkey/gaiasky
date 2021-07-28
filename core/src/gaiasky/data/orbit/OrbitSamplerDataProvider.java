@@ -12,12 +12,11 @@ import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.format.DesktopDateFormatFactory;
 import gaiasky.desktop.format.DesktopNumberFormatFactory;
-import gaiasky.desktop.util.DesktopConfInit;
 import gaiasky.interafce.ConsoleLogger;
-import gaiasky.util.ConfInit;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
+import gaiasky.util.SettingsManager;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.format.DateFormatFactory;
@@ -25,7 +24,6 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3b;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,7 +41,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
     public static void main(String[] args) {
         try {
             // Assets location
-            String ASSETS_LOC = GlobalConf.ASSETS_LOC;
+            String ASSETS_LOC = Settings.ASSETS_LOC;
 
             // Logger
             new ConsoleLogger();
@@ -56,7 +54,7 @@ public class OrbitSamplerDataProvider implements IOrbitDataProvider {
             // Initialize date format
             DateFormatFactory.initialize(new DesktopDateFormatFactory());
 
-            ConfInit.initialize(new DesktopConfInit(new FileInputStream(new File(ASSETS_LOC + "/conf/global.properties")), new FileInputStream(new File(ASSETS_LOC + "/dummyversion"))));
+            SettingsManager.initialize(new FileInputStream(ASSETS_LOC + "/conf/config.yaml"), new FileInputStream(ASSETS_LOC + "/dummyversion"));
 
             I18n.initialize(new FileHandle(ASSETS_LOC + "/i18n/gsbundle"));
 

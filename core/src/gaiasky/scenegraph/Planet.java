@@ -21,8 +21,8 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.Nature;
+import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.MathUtilsd;
@@ -149,7 +149,7 @@ public class Planet extends ModelBody implements ILineRenderable {
             // If atmosphere ground params are present, set them
             if (ac != null) {
                 float atmOpacity = (float) MathUtilsd.lint(viewAngle, 0.00745329f, 0.02490659f, 0f, 1f);
-                if (GlobalConf.scene.VISIBILITY[ComponentType.Atmospheres.ordinal()] && atmOpacity > 0) {
+                if (Settings.settings.scene.visibility.get(ComponentType.Atmospheres.toString()) && atmOpacity > 0) {
                     ac.updateAtmosphericScatteringParams(mc.instance.materials.first(), alpha * atmOpacity, true, this, rc.vrOffset);
                 } else {
                     ac.removeAtmosphericScattering(mc.instance.materials.first());

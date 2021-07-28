@@ -14,10 +14,10 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
-import gaiasky.util.GlobalConf.ProgramConf.StereoProfile;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.LoggerLevel;
+import gaiasky.util.Settings;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 
@@ -210,7 +210,7 @@ public class ConsoleLogger implements IObserver {
             addMessage(I18n.txt("notif." + (!displayGui ? "activated" : "deactivated"), data[1]));
             break;
         case STEREO_PROFILE_CMD:
-            addMessage(I18n.txt("notif.stereoscopic.profile", StereoProfile.values()[(Integer) data[0]].toString()));
+            addMessage(I18n.txt("notif.stereoscopic.profile", Settings.StereoProfile.values()[(Integer) data[0]].toString()));
             break;
         case FRAME_OUTPUT_CMD:
             boolean activated = (Boolean) data[0];

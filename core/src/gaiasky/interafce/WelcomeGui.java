@@ -93,7 +93,7 @@ public class WelcomeGui extends AbstractGui {
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
 
-        } else if (GlobalConf.program.isSlave()) {
+        } else if (Settings.settings.program.net.slave.active) {
             // If slave, data load can start
             gaiaSky();
         } else {
@@ -103,8 +103,8 @@ public class WelcomeGui extends AbstractGui {
             // Otherwise, check for updates, etc.
             clearGui();
 
-            dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(GlobalConf.data.DATA_LOCATION) + "/gaiasky-data.json");
-            DownloadHelper.downloadFile(GlobalConf.program.DATA_DESCRIPTOR_URL, dataDescriptor, null, null, (digest) -> {
+            dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
+            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
                 GaiaSky.postRunnable(() -> {
                     // Data descriptor ok. Skip welcome screen only if flag and basedata present
                     if (skipWelcome && basicDataPresent()) {
@@ -188,8 +188,8 @@ public class WelcomeGui extends AbstractGui {
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
         titleGroup.space(pad32);
-        OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", GlobalConf.APPLICATION_NAME, GlobalConf.version.version), skin, "main-title");
-        OwnLabel gs = new OwnLabel(GlobalConf.APPLICATION_NAME + " " + GlobalConf.version.version, skin, "main-title");
+        OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", Settings.APPLICATION_NAME, Settings.settings.version.version), skin, "main-title");
+        OwnLabel gs = new OwnLabel(Settings.APPLICATION_NAME + " " + Settings.settings.version.version, skin, "main-title");
         gs.setColor(skin.getColor("theme"));
         titleGroup.addActor(title);
         titleGroup.addActor(gs);
@@ -197,7 +197,7 @@ public class WelcomeGui extends AbstractGui {
         String textStyle = "main-title-s";
 
         // Start Gaia Sky button
-        OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", GlobalConf.APPLICATION_NAME), skin, "start");
+        OwnTextIconButton startButton = new OwnTextIconButton(I18n.txt("gui.welcome.start", Settings.APPLICATION_NAME), skin, "start");
         startButton.setSpace(pad18);
         startButton.setContentAlign(Align.center);
         startButton.align(Align.center);
@@ -209,7 +209,7 @@ public class WelcomeGui extends AbstractGui {
             return true;
         });
         Table startGroup = new Table(skin);
-        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", GlobalConf.APPLICATION_NAME), skin, textStyle);
+        OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
         startGroup.add(startLabel).top().left().padTop(pad16).padBottom(pad16).row();
         if (!basicDataPresent) {
             // No basic data, can't start!
@@ -355,11 +355,11 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private boolean isCatalogSelected() {
-        return GlobalConf.data.CATALOG_JSON_FILES != null && GlobalConf.data.CATALOG_JSON_FILES.size > 0;
+        return Settings.settings.data.catalogFiles != null && Settings.settings.data.catalogFiles.size() > 0;
     }
 
     private int numTotalCatalogsSelected() {
-        return GlobalConf.data.CATALOG_JSON_FILES.size;
+        return Settings.settings.data.catalogFiles.size();
     }
 
     private int numCatalogsAvailable() {
@@ -368,7 +368,7 @@ public class WelcomeGui extends AbstractGui {
 
     private int numGaiaDRCatalogsSelected() {
         int matches = 0;
-        for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
+        for (String f : Settings.settings.data.catalogFiles) {
             String filename = Path.of(f).getFileName().toString();
             if (isGaiaDRCatalogFile(filename)) {
                 matches++;
@@ -386,7 +386,7 @@ public class WelcomeGui extends AbstractGui {
         if (dd == null && (dw == null || dw.datasets == null))
             return 0;
 
-        for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
+        for (String f : Settings.settings.data.catalogFiles) {
             // File name with no extension
             Path path = Path.of(f);
             String filenameExt = path.getFileName().toString();
@@ -413,7 +413,7 @@ public class WelcomeGui extends AbstractGui {
 
     private Set<String> removeNonExistent() {
         Set<String> toRemove = new HashSet<>();
-        for (String f : GlobalConf.data.CATALOG_JSON_FILES) {
+        for (String f : Settings.settings.data.catalogFiles) {
             // File name with no extension
             Path path = Path.of(f);
             if (!Files.exists(path)) {
@@ -424,7 +424,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Remove non-existent files
         for (String out : toRemove) {
-            GlobalConf.data.CATALOG_JSON_FILES.removeValue(out, true);
+            Settings.settings.data.catalogFiles.remove(out);
         }
 
         return toRemove;
@@ -451,7 +451,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void fillBasicDataFiles(Array<Path> required) {
-        Path dataPath = Paths.get(GlobalConf.data.DATA_LOCATION).normalize();
+        Path dataPath = Paths.get(Settings.settings.data.location).normalize();
         required.add(dataPath.resolve("data-main.json"));
         required.add(dataPath.resolve("asteroids.json"));
         required.add(dataPath.resolve("planets.json"));

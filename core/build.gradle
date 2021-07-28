@@ -163,7 +163,7 @@ task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the o
 
 task runGalaxyGenerator(dependsOn: jar, type: JavaExec, description: "Runs the galaxy generator to procedurally generate a galaxy") {
     main = 'gaiasky.data.galaxy.GalaxyGenerator'
-    systemProperties['properties.file'] = '../assets/conf/global.properties'
+    systemProperties['properties.file'] = '../assets/conf/config.yaml'
     classpath = sourceSets.main.runtimeClasspath
     classpath += files(project.assetsDir)
     standardInput = System.in

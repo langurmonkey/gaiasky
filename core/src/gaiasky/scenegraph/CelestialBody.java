@@ -19,8 +19,8 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalConf;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -91,7 +91,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
      */
     public CelestialBody() {
         super();
-        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / GlobalConf.scene.LABEL_NUMBER_FACTOR);
+        TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / Settings.settings.scene.label.number);
     }
 
     /**
@@ -206,7 +206,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     /**
      * Adds all the children that are focusable objects to the list.
      * 
-     * @param list
+     * @param list The list to add to.
      */
     public void addFocusableObjects(Array<IFocus> list) {
         list.add(this);
@@ -354,28 +354,27 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
                 // The object is in front of us
                 double angle = computeViewAngle(camera.getFovFactor());
 
-                PerspectiveCamera pcamera;
-                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                PerspectiveCamera pCamera;
+                if (Settings.settings.program.modeStereo.active) {
                     if (screenX < Gdx.graphics.getWidth() / 2f) {
-                        pcamera = camera.getCameraStereoLeft();
-                        pcamera.update();
+                        pCamera = camera.getCameraStereoLeft();
                     } else {
-                        pcamera = camera.getCameraStereoRight();
-                        pcamera.update();
+                        pCamera = camera.getCameraStereoRight();
                     }
+                    pCamera.update();
                 } else {
-                    pcamera = camera.camera;
+                    pCamera = camera.camera;
                 }
 
-                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pcamera.fieldOfView);
-                double pixelSize = Math.max(minPixDist, ((angle * pcamera.viewportHeight) / pcamera.fieldOfView) / 2);
-                pcamera.project(pos);
-                pos.y = pcamera.viewportHeight - pos.y;
-                if (GlobalConf.program.STEREOSCOPIC_MODE) {
+                angle = (float) Math.toDegrees(angle * camera.getFovFactor()) * (40f / pCamera.fieldOfView);
+                double pixelSize = Math.max(minPixDist, ((angle * pCamera.viewportHeight) / pCamera.fieldOfView) / 2);
+                pCamera.project(pos);
+                pos.y = pCamera.viewportHeight - pos.y;
+                if (Settings.settings.program.modeStereo.active) {
                     pos.x /= 2;
                 }
                 // Check click distance
-                if (checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize)) {
+                if (checkClickDistance(screenX, screenY, pos, camera, pCamera, pixelSize)) {
                     //Hit
                     hits.add(this);
                 }

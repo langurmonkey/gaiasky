@@ -619,7 +619,7 @@ public interface IScriptingInterface {
     /**
      * Sets the visibility of a particular object. Use this method to hide individual objects.
      * @param name The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
-     * @param visible The visible status to set. Set to false to hide the object. True to make it visible.
+     * @param visible The visible status to set. Set to false in order to hide the object. True to make it visible.
      * @return True if the visibility was set successfully, false if there were errors.
      */
     boolean setObjectVisibility(String name, boolean visible);
@@ -802,8 +802,9 @@ public interface IScriptingInterface {
     boolean isSimulationTimeOn();
 
     /**
-     * @deprectaed use {@link IScriptingInterface#setTimeWarp(double)} instead.
+     * Deprecated, use {@link IScriptingInterface#setTimeWarp(double)} instead.
      */
+    @Deprecated
     void setSimulationPace(double pace);
 
     /**
@@ -834,9 +835,9 @@ public interface IScriptingInterface {
      * @param hour     The hour-of-day to represent, from 0 to 23.
      * @param min      The minute-of-hour to represent, from 0 to 59.
      * @param sec      The second-of-minute to represent, from 0 to 59.
-     * @param millisec The millisecond-of-second, from 0 to 999.
+     * @param milliSec The millisecond-of-second, from 0 to 999.
      */
-    void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec);
+    void setTargetTime(int year, int month, int day, int hour, int min, int sec, int milliSec);
 
     /**
      * Unsets the target time bookmark from the global clock, if any.
@@ -1897,7 +1898,7 @@ public interface IScriptingInterface {
     String getDefaultMappingsDir();
 
     /**
-     * Gets the absolute path of the local data directory, configured in your global.properties file.
+     * Gets the absolute path of the local data directory, configured in your <code>config.yaml</code> file.
      *
      * @return Absolute path to the location of the data files.
      */

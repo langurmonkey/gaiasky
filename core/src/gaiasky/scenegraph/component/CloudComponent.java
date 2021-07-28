@@ -67,7 +67,7 @@ public class CloudComponent {
     }
 
     public void initialize(boolean force) {
-        if (!GlobalConf.scene.LAZY_TEXTURE_INIT || force) {
+        if (!Settings.settings.scene.initialization.lazyTexture || force) {
             // Add textures to load
             cloudUnpacked = addToLoad(cloud);
             cloudtransUnpacked = addToLoad(cloudtrans);
@@ -108,17 +108,17 @@ public class CloudComponent {
         // CREATE CLOUD MODEL
         mc.instance = new IntModelInstance(cloudModel, this.localTransform);
 
-        if (!GlobalConf.scene.LAZY_TEXTURE_INIT)
+        if (!Settings.settings.scene.initialization.lazyTexture)
             initMaterial();
 
         // Initialised
-        texInitialised = !GlobalConf.scene.LAZY_TEXTURE_INIT;
+        texInitialised = !Settings.settings.scene.initialization.lazyTexture;
         // Loading
         texLoading = false;
     }
 
     public void touch() {
-        if (GlobalConf.scene.LAZY_TEXTURE_INIT && !texInitialised) {
+        if (Settings.settings.scene.initialization.lazyTexture && !texInitialised) {
 
             if (!texLoading) {
                 initialize(true);
@@ -214,7 +214,7 @@ public class CloudComponent {
     }
 
     public void setCloud(String cloud) {
-        this.cloud = GlobalConf.data.dataFile(cloud);
+        this.cloud = Settings.settings.data.dataFile(cloud);
     }
 
     public void setCloudtrans(String cloudtrans) {

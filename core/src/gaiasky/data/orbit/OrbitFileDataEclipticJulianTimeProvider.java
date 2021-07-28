@@ -11,7 +11,7 @@ import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.util.GlobalConf;
+import gaiasky.util.Settings;
 
 /**
  * Reads an orbit file into an OrbitData object.
@@ -23,7 +23,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
     public void load(String file, OrbitDataLoaderParameter parameter) {
         FileDataLoaderEclipticJulianTime odl = new FileDataLoaderEclipticJulianTime();
         try {
-            FileHandle f = GlobalConf.data.dataFileHandle(file);
+            FileHandle f = Settings.settings.data.dataFileHandle(file);
             data = odl.load(f.read());
             EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, file);
         } catch (Exception e) {
