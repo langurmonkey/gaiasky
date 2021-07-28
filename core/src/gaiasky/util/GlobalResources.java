@@ -435,7 +435,7 @@ public class GlobalResources {
 
     public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
         List<Map.Entry<K, V>> list = new LinkedList<>(map.entrySet());
-        list.sort(Comparator.comparing(Map.Entry::getValue));
+        list.sort(Map.Entry.comparingByValue());
 
         Map<K, V> result = new LinkedHashMap<>();
         for (Map.Entry<K, V> entry : list) {
@@ -461,11 +461,11 @@ public class GlobalResources {
             double vc = cam.getSpeed() / Constants.C_KMH;
             if (vc > 0) {
                 cdir.scl(-1);
-                double costh_s = cdir.dot(pos) / pos.len();
-                double th_s = Math.acos(costh_s);
+                double cosThS = cdir.dot(pos) / pos.len();
+                double th_s = Math.acos(cosThS);
 
-                double costh_o = (costh_s - vc) / (1 - vc * costh_s);
-                double th_o = Math.acos(costh_o);
+                double cosThO = (cosThS - vc) / (1 - vc * cosThS);
+                double th_o = Math.acos(cosThO);
 
                 pos.rotate(cdir.crs(pos).nor(), Math.toDegrees(th_o - th_s));
             }
@@ -529,7 +529,7 @@ public class GlobalResources {
 
         final AtomicLong size = new AtomicLong(0);
 
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+        Files.walkFileTree(path, new SimpleFileVisitor<>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
 
@@ -560,7 +560,7 @@ public class GlobalResources {
 
     /**
      * Parses the string and creates a string array. The string is a list of whitespace-separated
-     * tokens, each surrounded by double qutotes '"':
+     * tokens, each surrounded by double quotes '"':
      * str = '"a" "bc" "d" "efghi"'
      *
      * @param str The string
@@ -571,7 +571,7 @@ public class GlobalResources {
         if (str == null || str.isEmpty())
             return null;
 
-        List<String> l = new ArrayList<String>();
+        List<String> l = new ArrayList<>();
         int n = str.length();
         StringBuilder current = new StringBuilder();
         boolean inString = false;
@@ -590,7 +590,7 @@ public class GlobalResources {
                     current.append(c);
             }
         }
-        return l.toArray(new String[l.size()]);
+        return l.toArray(new String[0]);
     }
 
     /**
@@ -626,7 +626,7 @@ public class GlobalResources {
 
         StringBuilder sb = new StringBuilder();
         for (String s : l) {
-            sb.append(quote).append(s).append(quote + separator);
+            sb.append(quote).append(s).append(quote).append(separator);
         }
         return sb.toString().trim();
 
@@ -715,15 +715,15 @@ public class GlobalResources {
         combinations.add("");
         // Add all combinations
         int n = values.length;
-        for (int nobj = 1; nobj <= n; nobj++) {
+        for (int objectNumber = 1; objectNumber <= n; objectNumber++) {
             // Iterate over all elements
-            List<List<String>> res = combination(valueList, nobj);
+            List<List<String>> res = combination(valueList, objectNumber);
             for (List<String> r : res) {
                 // Concat all strings in r and add to combinations
-                String value = "";
+                StringBuilder value = new StringBuilder();
                 for (String s : r)
-                    value += s;
-                combinations.add(value);
+                    value.append(s);
+                combinations.add(value.toString());
             }
         }
         return combinations.toArray(String.class);
@@ -768,15 +768,15 @@ public class GlobalResources {
         return combination;
     }
 
-    public static String nObjectsToString(long objs) {
-        if (objs > 1e9) {
-            return String.format("%.1f", objs / 1.0e9) + " B";
-        } else if (objs > 1e6) {
-            return String.format("%.1f", objs / 1.0e6) + " M";
-        } else if (objs > 1e3) {
-            return String.format("%.1f", objs / 1.0e3) + " K";
+    public static String nObjectsToString(long objects) {
+        if (objects > 1e9) {
+            return String.format("%.1f", objects / 1.0e9) + " B";
+        } else if (objects > 1e6) {
+            return String.format("%.1f", objects / 1.0e6) + " M";
+        } else if (objects > 1e3) {
+            return String.format("%.1f", objects / 1.0e3) + " K";
         } else {
-            return objs + "";
+            return objects + "";
         }
     }
 
