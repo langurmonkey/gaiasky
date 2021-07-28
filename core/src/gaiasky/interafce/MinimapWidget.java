@@ -37,9 +37,9 @@ public class MinimapWidget implements Disposable {
     private IMinimapScale current;
 
     public MinimapWidget(final Skin skin, final ShaderProgram shapeShader, final ShaderProgram spriteShader) {
-        side = (int) (1.4f * GlobalConf.program.MINIMAP_SIZE);
+        side = (int) (1.4f * Settings.settings.program.minimap.size);
         side2 = side / 2;
-        sideShort = (int) (0.7f * GlobalConf.program.MINIMAP_SIZE);
+        sideShort = (int) (0.7f * Settings.settings.program.minimap.size);
         sideShort2 = sideShort / 2;
 
         OrthographicCamera ortho = new OrthographicCamera();
