@@ -11,7 +11,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import gaiasky.util.GlobalResources;
 
 /**
  * TextButton in which the cursor changes when the mouse rolls over. It also
@@ -19,7 +18,7 @@ import gaiasky.util.GlobalResources;
  */
 public class OwnTextButton extends TextButton {
 
-    private float ownwidth = 0f, ownheight = 0f;
+    private float ownWidth = 0f, ownHeight = 0f;
     OwnTextButton me;
 
     public OwnTextButton(String text, Skin skin) {
@@ -58,7 +57,7 @@ public class OwnTextButton extends TextButton {
 
     @Override
     public void setWidth(float width) {
-        ownwidth = width;
+        ownWidth = width;
         super.setWidth(width);
     }
 
@@ -68,7 +67,7 @@ public class OwnTextButton extends TextButton {
 
     @Override
     public void setHeight(float height) {
-        ownheight = height;
+        ownHeight = height;
         super.setHeight(height);
     }
 
@@ -78,15 +77,15 @@ public class OwnTextButton extends TextButton {
 
     @Override
     public void setSize(float width, float height) {
-        ownwidth = width;
-        ownheight = height;
+        ownWidth = width;
+        ownHeight = height;
         super.setSize(width, height);
     }
 
     @Override
     public float getPrefWidth() {
-        if (ownwidth != 0) {
-            return ownwidth;
+        if (ownWidth != 0) {
+            return ownWidth;
         } else {
             return super.getPrefWidth();
         }
@@ -94,8 +93,8 @@ public class OwnTextButton extends TextButton {
 
     @Override
     public float getPrefHeight() {
-        if (ownheight != 0) {
-            return ownheight;
+        if (ownHeight != 0) {
+            return ownHeight;
         } else {
             return super.getPrefHeight();
         }

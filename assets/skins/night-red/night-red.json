@@ -236,6 +236,7 @@
     "default": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-17",
@@ -245,6 +246,7 @@
     "big": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-23",
@@ -254,6 +256,7 @@
     "huge": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-27",
@@ -263,6 +266,7 @@
     "download": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "font": "title-21",
       "fontColor": "theme",
@@ -271,6 +275,7 @@
     "download-big": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
@@ -279,6 +284,7 @@
     "toggle": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
@@ -290,6 +296,7 @@
     "toggle-big": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
@@ -464,6 +471,7 @@
     "start": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
@@ -473,6 +481,7 @@
     "cloud-download": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "theme",
@@ -482,6 +491,7 @@
     "check": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "theme",
@@ -491,6 +501,7 @@
     "plus": {
       "down": "default-round-down",
       "up": "default-round",
+      "over": "default-round-over",
       "disabled": "default-round-disabled",
       "font": "title-17",
       "fontColor": "theme",

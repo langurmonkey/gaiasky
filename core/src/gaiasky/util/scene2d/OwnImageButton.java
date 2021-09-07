@@ -6,13 +6,13 @@
 package gaiasky.util.scene2d;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import gaiasky.util.GlobalResources;
 
 /**
  * ImageButton in which the cursor changes when the mouse rolls over.
@@ -61,5 +61,29 @@ public class OwnImageButton extends ImageButton {
             }
             return false;
         });
+    }
+
+    protected void updateImage() {
+        getImage().setDrawable(getImageDrawable());
+        Color theme;
+        try {
+            theme = getSkin().getColor("theme");
+        } catch (Exception e) {
+            theme = null;
+        }
+
+        if (isOver()) {
+            if (theme != null)
+                getImage().setColor(theme);
+            else
+                getImage().setColor(1, 1, 1, 1);
+        } else {
+            getImage().setColor(1, 1, 1, 1);
+        }
+    }
+
+    public void draw(Batch batch, float parentAlpha) {
+        updateImage();
+        super.draw(batch, parentAlpha);
     }
 }

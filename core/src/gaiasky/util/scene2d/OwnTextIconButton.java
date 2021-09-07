@@ -116,6 +116,8 @@ public class OwnTextIconButton extends OwnTextButton {
             Drawable drawable = style.imageUp;
             if (isChecked() && style.imageDown != null)
                 drawable = style.imageDown;
+            else if (isOver() && style.imageOver != null)
+                drawable = style.imageOver;
             icon.setDrawable(drawable);
         }
     }
@@ -140,7 +142,7 @@ public class OwnTextIconButton extends OwnTextButton {
     }
 
     static public class TextIconButtonStyle extends TextButtonStyle {
-        Drawable imageUp, imageDown;
+        Drawable imageUp, imageDown, imageOver;
 
         public TextIconButtonStyle() {
         }
@@ -149,8 +151,10 @@ public class OwnTextIconButton extends OwnTextButton {
             super(def);
             Drawable imageUp = style.imageUp;
             Drawable imageDown = style.imageDown;
+            Drawable imageHover = style.imageOver;
             this.imageUp = imageUp;
             this.imageDown = imageDown;
+            this.imageOver = imageHover;
             if (style.up != null)
                 this.up = style.up;
             if (style.down != null)
