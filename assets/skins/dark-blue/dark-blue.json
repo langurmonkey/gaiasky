@@ -663,6 +663,7 @@
     "default": {
       "font": "ui-18",
       "fontColor": "white",
+      "overFontColor": "theme",
       "disabledFontColor": "grey",
       "background": "default-select",
       "backgroundDisabled": "default-select-disabled",
@@ -705,8 +706,11 @@
   "com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle": {
     "default-horizontal": {
       "background": "default-slider",
+      "backgroundOver": "default-slider-over",
       "knob": "default-slider-knob",
+      "knobOver": "default-slider-knob-over",
       "knobBefore": "default-slider-knob-before"
+      "knobBeforeOver": "default-slider-knob-before-over"
     },
     "default-vertical": {
       "background": "default-slider",
@@ -715,8 +719,11 @@
     },
     "big-horizontal": {
       "background": "big-slider",
+      "backgroundOver": "big-slider-over",
       "knob": "big-slider-knob",
+      "knobOver": "big-slider-knob-over",
       "knobBefore": "big-slider-knob-before"
+      "knobBeforeOver": "big-slider-knob-before-over"
     },
     "big-horizontal-arrow": {
       "background": "big-slider",
@@ -947,6 +954,7 @@
     "default": {
       "selection": "selection",
       "background": "textfield",
+      "focusedBackground": "textfield-focused",
       "disabledBackground": "textfield-disabled",
       "font": "ui-18",
       "fontColor": "white",
@@ -957,6 +965,7 @@
     "big": {
       "selection": "selection",
       "background": "textfield",
+      "focusedBackground": "textfield-focused",
       "disabledBackground": "textfield-disabled",
       "font": "ui-30",
       "fontColor": "white",
@@ -967,6 +976,7 @@
     "no-disabled": {
       "selection": "selection",
       "background": "textfield",
+      "focusedBackground": "textfield-focused",
       "font": "ui-18",
       "fontColor": "white",
       "messageFontColor": "dark-gray",
@@ -1065,6 +1075,8 @@
       "checkboxOn": "check-on",
       "checkboxOnDisabled": "check-on-disabled",
       "checkboxOff": "check-off",
+      "checkboxOnOver": "check-on-over",
+      "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
       "font": "ui-18",
       "fontColor": "white"
@@ -1073,6 +1085,8 @@
       "checkboxOn": "check-on",
       "checkboxOnDisabled": "check-on-disabled",
       "checkboxOff": "check-off",
+      "checkboxOnOver": "check-on-over",
+      "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
       "font": "ui-23",
       "fontColor": "white"
@@ -1081,6 +1095,8 @@
       "checkboxOn": "check-on",
       "checkboxOnDisabled": "check-on-disabled",
       "checkboxOff": "check-off",
+      "checkboxOnOver": "check-on-over",
+      "checkboxOver": "check-off-over",
       "checkboxOffDisabled": "check-off-disabled",
       "font": "ui-19",
       "fontColor": "theme"
@@ -1089,6 +1105,8 @@
       "checkboxOn": "radio-on",
       "checkboxOnDisabled": "radio-on-disabled",
       "checkboxOff": "radio-off",
+      "checkboxOnOver": "radio-on-over",
+      "checkboxOver": "radio-off-over",
       "checkboxOffDisabled": "radio-off-disabled",
       "font": "ui-18",
       "fontColor": "white"
