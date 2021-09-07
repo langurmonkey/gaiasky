@@ -5,9 +5,6 @@
 
 package gaiasky.desktop.util;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.tools.texturepacker.TexturePacker;
-
 public class PackUITextures {
     public static void main(String[] args) {
         //TexturePacker.Settings x1settings = new TexturePacker.Settings();
