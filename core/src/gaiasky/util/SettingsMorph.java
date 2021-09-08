@@ -313,9 +313,9 @@ public class SettingsMorph {
         program.update = new UpdateSettings();
         program.update.lastVersion = "";
         program.url = new UrlSettings();
-        program.url.versionCheck = str("program.url.versioncheck", p);
-        program.url.dataMirror = str("program.url.data.mirror", p);
-        program.url.dataDescriptor = str("program.url.data.descriptor", p);
+        program.url.versionCheck = escapeURL(str("program.url.versioncheck", p));
+        program.url.dataMirror = escapeURL(str("program.url.data.mirror", p));
+        program.url.dataDescriptor = escapeURL(str("program.url.data.descriptor", p));
         s.program = program;
 
         // Controls
@@ -377,5 +377,9 @@ public class SettingsMorph {
 
     private static long i64(final String key, final Properties properties) {
         return Parser.parseLong(properties.getProperty(key));
+    }
+
+    private static String escapeURL(final String url) {
+        return url.replaceAll("\\\\", "");
     }
 }

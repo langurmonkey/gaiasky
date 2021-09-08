@@ -533,7 +533,8 @@ public class GaiaSkyDesktop implements IObserver {
             try {
                 Path propertiesFile = SysUtils.getConfigDir().resolve(vr ? "global.vr.properties" : "global.properties");
                 if (Files.exists(propertiesFile)) {
-                    out.println("Converting " + propertiesFile + " to " + userFolderConfFile);
+                    out.println("Old properties file detected!");
+                    out.println("    -> Converting " + propertiesFile + " to " + userFolderConfFile);
                     SettingsMorph.morphSettings(propertiesFile, userFolderConfFile);
                     overwrite = false;
                     userConfExists = true;
