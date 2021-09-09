@@ -732,6 +732,7 @@
     },
     "big-horizontal-arrow": {
       "background": "big-slider",
+      "backgroundOver": "big-slider-over",
       "knob": "big-slider-knob-arrow"
     },
     "sc-engine": {
