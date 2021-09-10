@@ -227,7 +227,8 @@ public class DownloadDataWindow extends GenericDialog {
         }
 
         // Build datasets table
-        Table datasetsTable = new Table(skin);
+        final Table datasetsTable = new Table(skin);
+        datasetsTable.align(Align.topLeft);
 
         for (DatasetType type : dd.types) {
             List<DatasetDesc> datasets = type.datasets;
@@ -238,7 +239,7 @@ public class DownloadDataWindow extends GenericDialog {
             titleGroup.space(padLarge);
             titleGroup.addActor(expandIcon);
             titleGroup.addActor(dsType);
-            datasetsTable.add(titleGroup).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
+            datasetsTable.add(titleGroup).top().left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
 
             Table t = new Table(skin);
             Cell<Table> c = datasetsTable.add(t).colspan(2).left();
@@ -277,16 +278,16 @@ public class DownloadDataWindow extends GenericDialog {
                     }
                     return false;
                 });
-                OwnLabel haveit = new OwnLabel("", skin);
-                haveit.setWidth(68f);
+                OwnLabel haveIt = new OwnLabel("", skin);
+                haveIt.setWidth(75f);
                 if (dataset.exists) {
                     if (dataset.outdated) {
-                        setStatusOutdated(dataset, haveit);
+                        setStatusOutdated(dataset, haveIt);
                     } else {
-                        setStatusFound(dataset, haveit);
+                        setStatusFound(dataset, haveIt);
                     }
                 } else {
-                    setStatusNotFound(dataset, haveit);
+                    setStatusNotFound(dataset, haveIt);
                 }
 
                 // Can't proceed without base data - force download
@@ -408,33 +409,31 @@ public class DownloadDataWindow extends GenericDialog {
                     });
                     rubbishes.add(rubbish);
                 }
-                t.add(cb).left().padRight(padLarge).padBottom(pad);
+                t.add(cb).left().padLeft(padLarge * 2f).padRight(padLarge).padBottom(pad);
                 t.add(descGroup).left().padRight(padLarge).padBottom(pad);
                 t.add(vers).center().padRight(padLarge).padBottom(pad);
                 t.add(typeImage).center().padRight(padLarge).padBottom(pad);
                 t.add(size).left().padRight(padLarge).padBottom(pad);
                 t.add(nObjects).left().padRight(padLarge).padBottom(pad);
-                t.add(haveit).left().padBottom(pad);
+                t.add(haveIt).left().padBottom(pad);
                 if (dataset.exists) {
                     t.add(rubbish).center().padLeft(padLarge * 2.5f);
                 }
                 t.row();
 
-                choiceList.add(new Trio<>(dataset, cb, haveit));
+                choiceList.add(new Trio<>(dataset, cb, haveIt));
             }
             expandIcon.setChecked(!haveAll);
 
         }
 
-        datasetsTable.align(Align.top | Align.center);
-
         datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
         datasetsScroll.setScrollingDisabled(true, false);
-        datasetsScroll.setForceScroll(false, false);
+        datasetsScroll.setForceScroll(false, true);
         datasetsScroll.setSmoothScrolling(false);
         datasetsScroll.setFadeScrollBars(false);
 
-        downloadTable.add(datasetsScroll).top().center().padBottom(padLarge).colspan(2).row();
+        downloadTable.add(datasetsScroll).top().center().padLeft(pad20).padRight(pad20).padBottom(padLarge).colspan(2).row();
 
         // Current dataset info
         currentDownloadFile = new OwnLabel("", skin, "hotkey");
@@ -691,7 +690,6 @@ public class DownloadDataWindow extends GenericDialog {
             // RELOAD DATASETS VIEW
             GaiaSky.postRunnable(this::reloadAll);
         }
-
     }
 
     private void setDisabled(Array<OwnImageButton> l, boolean disabled) {
@@ -711,14 +709,14 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private void decompress(String in, File out, OwnTextButton b, ProgressBar p) throws Exception {
-        FileInfoInputStream fin = new FileInfoInputStream(in);
-        GzipCompressorInputStream gzin = new GzipCompressorInputStream(fin);
-        TarArchiveInputStream tarin = new TarArchiveInputStream(gzin);
+        FileInfoInputStream fIs = new FileInfoInputStream(in);
+        GzipCompressorInputStream gzIs = new GzipCompressorInputStream(fIs);
+        TarArchiveInputStream tarIs = new TarArchiveInputStream(gzIs);
         double sizeKb = fileSize(in) / 1000d;
         String sizeKbStr = nf.format(sizeKb);
         TarArchiveEntry entry;
         long last = 0;
-        while ((entry = tarin.getNextTarEntry()) != null) {
+        while ((entry = tarIs.getNextTarEntry()) != null) {
             if (entry.isDirectory()) {
                 continue;
             }
@@ -727,15 +725,15 @@ public class DownloadDataWindow extends GenericDialog {
             if (!parent.exists())
                 parent.mkdirs();
 
-            IOUtils.copy(tarin, new FileOutputStream(curFile));
+            IOUtils.copy(tarIs, new FileOutputStream(curFile));
 
             // Every 250 ms we update the view
             long current = System.currentTimeMillis();
             long elapsed = current - last;
             if (elapsed > 250) {
                 GaiaSky.postRunnable(() -> {
-                    float val = (float) ((fin.getBytesRead() / 1000d) / sizeKb);
-                    b.setText(I18n.txt("gui.download.extracting", nf.format(fin.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
+                    float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb);
+                    b.setText(I18n.txt("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
                     p.setValue(val * 100);
                 });
                 last = current;
@@ -786,13 +784,13 @@ public class DownloadDataWindow extends GenericDialog {
         deleteFile(Path.of(file));
     }
 
-    private void cleanupTempFiles(boolean dataDownloads, boolean dataDescriptor) {
+    private void cleanupTempFiles(final boolean dataDownloads, final boolean dataDescriptor) {
         if (dataDownloads) {
-            Path tempDir = SysUtils.getTempDir(Settings.settings.data.location);
+            final Path tempDir = SysUtils.getTempDir(Settings.settings.data.location);
             // Clean up partial downloads
             try {
-                Stream<Path> stream = java.nio.file.Files.find(tempDir, 2, (path, basicFileAttributes) -> {
-                    File file = path.toFile();
+                final Stream<Path> stream = java.nio.file.Files.find(tempDir, 2, (path, basicFileAttributes) -> {
+                    final File file = path.toFile();
                     return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
                 });
                 stream.forEach(this::deleteFile);

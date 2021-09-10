@@ -10,6 +10,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.*;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.util.I18n;
@@ -39,7 +40,6 @@ public class DatasetsWidget {
     private final Skin skin;
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
-    private OwnScrollPane scroll;
     public Array<DatasetType> types;
     public Array<DatasetDesc> datasets;
 
@@ -104,24 +104,23 @@ public class DatasetsWidget {
 
     public Actor buildDatasetsWidget(boolean scrollOn, int maxCharsDescription) {
         float pad = 4.8f;
-
-
-        // Containers
-        Table dsTable = new Table(skin);
-        dsTable.align(Align.top);
+        float padLarge = 14.4f;
 
         Actor result;
 
-        scroll = null;
+        final Table datasetsTable = new Table(skin);
+        datasetsTable.align(Align.topLeft);
+
+        OwnScrollPane scroll = null;
         if (scrollOn) {
-            scroll = new OwnScrollPane(dsTable, skin, "minimalist-nobg");
+            scroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
             scroll.setFadeScrollBars(false);
             scroll.setScrollingDisabled(true, false);
             scroll.setSmoothScrolling(true);
 
             result = scroll;
         } else {
-            result = dsTable;
+            result = datasetsTable;
         }
 
         cbs = new OwnCheckBox[datasets.size];
@@ -136,14 +135,38 @@ public class DatasetsWidget {
                typeKey = "gui.download.type.unknown";
             }
             OwnLabel dsType = new OwnLabel(I18n.txt(typeKey), skin, "hud-header");
-            dsTable.add(dsType).colspan(5).left().padTop(pad * 4f).padBottom(pad * 4f).row();
+
+            OwnImageButton expandIcon = new OwnImageButton(skin, "expand-collapse");
+            expandIcon.setChecked(true);
+            HorizontalGroup titleGroup = new HorizontalGroup();
+            titleGroup.space(padLarge);
+            titleGroup.addActor(expandIcon);
+            titleGroup.addActor(dsType);
+            datasetsTable.add(titleGroup).top().left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
+
+            Table t = new Table(skin);
+            Cell<Table> c = datasetsTable.add(t).colspan(2).left();
+            c.row();
+
+            expandIcon.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    if (c.getActor() == null) {
+                        c.setActor(t);
+                    } else {
+                        c.setActor(null);
+                    }
+                    datasetsTable.pack();
+                    return true;
+                }
+                return false;
+            });
 
             // Sort datasets
             Comparator<DatasetDesc> byName = Comparator.comparing(datasetDesc -> datasetDesc.name.toLowerCase());
-            Collections.sort(type.datasets, byName);
+            type.datasets.sort(byName);
 
             for (DatasetDesc dataset : type.datasets) {
-                OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.name, 33), skin, "large", pad * 2f);
+                final OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.name, 33), skin, "large", pad * 2f);
                 boolean gsVersionTooSmall = false;
                 if (dataset.minGsVersion >= 0 && dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
                     // Can't select! minimum GS version larger than current
@@ -157,9 +180,10 @@ public class DatasetsWidget {
                     cb.setChecked(contains(dataset.catalogFile.path(), currentSetting));
                     cb.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
                 }
+                cb.setMinWidth(380f);
                 cb.bottom().left();
 
-                dsTable.add(cb).left().padRight(pad * 6f).padBottom(pad);
+                t.add(cb).left().padLeft(padLarge * 2f).padRight(pad * 6f).padBottom(pad);
 
                 // Description
                 HorizontalGroup descGroup = new HorizontalGroup();
@@ -169,19 +193,20 @@ public class DatasetsWidget {
                 if(gsVersionTooSmall)
                     description.setColor(ColorUtils.gRedC);
                 description.addListener(new OwnTextTooltip(dataset.description, skin, 10));
+                description.setWidth(420f);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
                 descGroup.addActor(imgTooltip);
                 descGroup.addActor(description);
-                dsTable.add(descGroup).left().padRight(pad * 6f).padBottom(pad);
+                t.add(descGroup).left().padRight(pad * 6f).padBottom(pad);
 
                 // Link
                 if (dataset.link != null) {
                     LinkButton imgLink = new LinkButton(dataset.link, skin);
-                    dsTable.add(imgLink).left().padRight(pad * 6f).padBottom(pad);
+                   t.add(imgLink).left().padRight(pad * 6f).padBottom(pad);
                 } else {
-                    dsTable.add().left().padRight(pad * 6f).padBottom(pad);
+                    t.add().left().padRight(pad * 6f).padBottom(pad);
                 }
 
                 // Version
@@ -190,7 +215,7 @@ public class DatasetsWidget {
                     vers = "v-" + dataset.myVersion;
                 }
                 OwnLabel versionLabel = new OwnLabel(vers, skin);
-                dsTable.add(versionLabel).left().padRight(pad * 6f).padBottom(pad);
+                t.add(versionLabel).left().padRight(pad * 6f).padBottom(pad);
 
                 // Type
                 Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
@@ -200,17 +225,17 @@ public class DatasetsWidget {
                 typeImage.setSize(iw * scl, ih * scl);
                 typeImage.setScaling(Scaling.none);
                 typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
-                dsTable.add(typeImage).left().padRight(pad * 4f).padBottom(pad);
+                t.add(typeImage).left().padRight(pad * 4f).padBottom(pad);
 
                 // Size
                 OwnLabel sizeLabel = new OwnLabel(dataset.size, skin);
                 sizeLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.size.tooltip"), skin, 10));
-                dsTable.add(sizeLabel).left().padRight(pad * 6f).padBottom(pad);
+                t.add(sizeLabel).left().padRight(pad * 6f).padBottom(pad);
 
                 // # objects
-                OwnLabel nobjsLabel = new OwnLabel(dataset.nObjectsStr, skin);
-                nobjsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.nobjects.tooltip"), skin, 10));
-                dsTable.add(nobjsLabel).left().padBottom(pad).row();
+                OwnLabel nObjectsLabel = new OwnLabel(dataset.nObjectsStr, skin);
+                nObjectsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.nobjects.tooltip"), skin, 10));
+                t.add(nObjectsLabel).left().padBottom(pad).row();
 
                 datasets.add(dataset);
                 candidates.put(cb, dataset.catalogFile.path());
@@ -225,16 +250,16 @@ public class DatasetsWidget {
         bg.setMaxCheckCount(datasets.size);
         bg.add(cbs);
 
-        dsTable.pack();
+        datasetsTable.pack();
         if (scroll != null) {
 
-            scroll.setWidth(Math.min(1520f, dsTable.getWidth() + pad * 15f));
+            scroll.setWidth(Math.min(1520f, datasetsTable.getWidth() + pad * 15f));
             scroll.setHeight(Math.min(ui.getHeight() * 0.7f, 1500f));
         }
 
         // No files
         if (datasets.size == 0) {
-            dsTable.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center();
+            datasetsTable.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center();
         }
 
         float maxw = 0;
