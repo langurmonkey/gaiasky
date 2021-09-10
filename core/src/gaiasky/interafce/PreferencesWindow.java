@@ -121,15 +121,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     protected void build() {
-        float contentw = 1120f;
-        float contenth = 1120f;
-        final float tawidth = 960f;
-        float textwidth = 104f;
-        float scrollh = 640f;
-        float controlsscrollw = 880f;
-        float controlsscrollh = 560f;
-        float sliderWidth = textwidth * 3f;
-        float buttonh = 40f;
+        final float contentWidth = 1100f;
+        final float contentHeight = 1120f;
+        final float taWidth = 960f;
+        final float textWidth = 104f;
+        final float scrollHeight = 640f;
+        final float controlsScrollWidth = 880f;
+        final float controlsScrollHeight = 560f;
+        final float sliderWidth = textWidth * 3f;
+        final float buttonHeight = 40f;
 
         // Create the tab buttons
         Table group = new Table(skin);
@@ -164,14 +164,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
-        tabContent.setSize(contentw, contenth);
+        tabContent.setSize(contentWidth, contentHeight);
 
         /*
          * ==== GRAPHICS ====
          */
         final Table contentGraphicsTable = new Table(skin);
         final OwnScrollPane contentGraphics = new OwnScrollPane(contentGraphicsTable, skin, "minimalist-nobg");
-        contentGraphics.setHeight(scrollh);
+        contentGraphics.setWidth(contentWidth);
+        contentGraphics.setHeight(scrollHeight);
         contentGraphics.setScrollingDisabled(true, false);
         contentGraphics.setFadeScrollBars(false);
         contents.add(contentGraphics);
@@ -185,7 +186,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Array<DisplayMode> modes = new Array<>(Gdx.graphics.getDisplayModes());
         modes.sort((o1, o2) -> Integer.compare(o2.height * o2.width, o1.height * o1.width));
         fullscreenResolutions = new OwnSelectBox<>(skin);
-        fullscreenResolutions.setWidth(textwidth * 3.45f);
+        fullscreenResolutions.setWidth(textWidth * 3.45f);
         fullscreenResolutions.setItems(modes);
 
         DisplayMode selectedMode = null;
@@ -202,10 +203,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table windowedResolutions = new Table(skin);
         IValidator widthValidator = new IntValidator(100, 10000);
         widthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.graphics.resolution[0], 100, 10000)), skin, widthValidator);
-        widthField.setWidth(textwidth);
+        widthField.setWidth(textWidth);
         IValidator heightValidator = new IntValidator(100, 10000);
         heightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.graphics.resolution[1], 100, 10000)), skin, heightValidator);
-        heightField.setWidth(textwidth);
+        heightField.setWidth(textWidth);
         final OwnLabel widthLabel = new OwnLabel(I18n.txt("gui.width") + ":", skin);
         final OwnLabel heightLabel = new OwnLabel(I18n.txt("gui.height") + ":", skin);
 
@@ -285,7 +286,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         gquality = new OwnSelectBox<>(skin);
         gquality.setItems(gqs);
-        gquality.setWidth(textwidth * 3f);
+        gquality.setWidth(textWidth * 3f);
         gquality.setSelected(gqs[settings.graphics.quality.ordinal()]);
         gquality.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -300,7 +301,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                         OwnTextArea noticeHiRes = new OwnTextArea(infoString, skin, "info");
                         noticeHiRes.setDisabled(true);
                         noticeHiRes.setPrefRows(lines1 + 1);
-                        noticeHiRes.setWidth(tawidth);
+                        noticeHiRes.setWidth(taWidth);
                         noticeHiRes.clearListeners();
                         noticeHiResCell.setActor(noticeHiRes);
                     }
@@ -325,7 +326,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean[] aas = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.aa.no"), 0), new ComboBoxBean(I18n.txt("gui.aa.fxaa"), -1), new ComboBoxBean(I18n.txt("gui.aa.nfaa"), -2) };
         aa = new OwnSelectBox<>(skin);
         aa.setItems(aas);
-        aa.setWidth(textwidth * 3f);
+        aa.setWidth(textWidth * 3f);
         aa.setSelected(aas[idxAa(2, settings.postprocess.antialias)]);
 
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
@@ -336,7 +337,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean[] orbitItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.orbitrenderer.line"), OrbitMode.LINE_MODE_SETTING.ordinal()), new ComboBoxBean(I18n.txt("gui.orbitrenderer.gpu"), OrbitMode.GPU_VBO.ordinal()) };
         orbitRenderer = new OwnSelectBox<>(skin);
         orbitRenderer.setItems(orbitItems);
-        orbitRenderer.setWidth(textwidth * 3f);
+        orbitRenderer.setWidth(textWidth * 3f);
         orbitRenderer.setSelected(orbitItems[settings.scene.renderer.orbit.ordinal()]);
 
         // LINE RENDERER
@@ -344,7 +345,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.linerenderer.normal"), LineMode.GL_LINES.ordinal()), new ComboBoxBean(I18n.txt("gui.linerenderer.quad"), LineMode.POLYLINE_QUADSTRIP.ordinal()) };
         lineRenderer = new OwnSelectBox<>(skin);
         lineRenderer.setItems(lineRenderers);
-        lineRenderer.setWidth(textwidth * 3f);
+        lineRenderer.setWidth(textWidth * 3f);
         lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.ordinal()]);
 
         // BLOOM
@@ -460,7 +461,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
         elevationSb = new OwnSelectBox<>(skin);
         elevationSb.setItems(ecbb);
-        elevationSb.setWidth(textwidth * 3f);
+        elevationSb.setWidth(textWidth * 3f);
         elevationSb.setSelectedIndex(Settings.settings.scene.renderer.elevation.type.ordinal());
         elevationSb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -499,7 +500,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         smResolutionLabel.setDisabled(!settings.scene.renderer.shadow.active);
         IntValidator smResValidator = new IntValidator(128, 4096);
         smResolution = new OwnTextField(Integer.toString(MathUtils.clamp(settings.scene.renderer.shadow.resolution, 128, 4096)), skin, smResValidator);
-        smResolution.setWidth(textwidth * 3f);
+        smResolution.setWidth(textWidth * 3f);
         smResolution.setDisabled(!settings.scene.renderer.shadow.active);
 
         // N SHADOWS
@@ -512,7 +513,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         nshadows = new OwnSelectBox<>(skin);
         nshadows.setItems(nsh);
-        nshadows.setWidth(textwidth * 3f);
+        nshadows.setWidth(textWidth * 3f);
         nshadows.setSelected(nsh[settings.scene.renderer.shadow.number - 1]);
         nshadows.setDisabled(!settings.scene.renderer.shadow.active);
 
@@ -649,7 +650,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         OwnSelectBox<ComboBoxBean> toneMappingSelect = new OwnSelectBox<>(skin);
         toneMappingSelect.setItems(toneMappingTypes);
-        toneMappingSelect.setWidth(textwidth * 3f);
+        toneMappingSelect.setWidth(textWidth * 3f);
         toneMappingSelect.setSelectedIndex(settings.postprocess.toneMapping.type.ordinal());
         display.add(toneMappingl).left().padRight(pad5 * 4).padBottom(pad5);
         display.add(toneMappingSelect).left().padBottom(pad5).row();
@@ -696,8 +697,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         float labelWidth = 400f;
 
         final Table contentUI = new Table(skin);
-        contents.add(contentUI);
+        contentUI.setWidth(contentWidth);
         contentUI.align(Align.top | Align.left);
+        contents.add(contentUI);
 
         OwnLabel titleUI = new OwnLabel(I18n.txt("gui.ui.interfacesettings"), skin, "header");
 
@@ -729,7 +731,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Arrays.sort(langs);
 
         lang = new OwnSelectBox<>(skin);
-        lang.setWidth(textwidth * 3f);
+        lang.setWidth(textWidth * 3f);
         lang.setItems(langs);
         if (settings.program.locale != null) {
             lang.setSelected(langs[idxLang(settings.program.locale, langs)]);
@@ -751,7 +753,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         themeLabel.setWidth(labelWidth);
         String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "night-red" };
         theme = new OwnSelectBox<>(skin);
-        theme.setWidth(textwidth * 3f);
+        theme.setWidth(textWidth * 3f);
         theme.setItems(themes);
         theme.setSelected(settings.program.ui.theme);
 
@@ -759,11 +761,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel uiScalelabel = new OwnLabel(I18n.txt("gui.ui.theme.scale"), skin);
         uiScalelabel.setWidth(labelWidth);
         uiScale = new OwnSlider(Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.SLIDER_STEP_SMALL, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX, skin);
-        uiScale.setWidth(textwidth * 3f);
+        uiScale.setWidth(textWidth * 3f);
         uiScale.setMappedValue(settings.program.ui.scale);
         OwnTextButton applyUiScale = new OwnTextButton(I18n.txt("gui.apply"), skin);
         applyUiScale.pad(0, pad10, 0, pad10);
-        applyUiScale.setHeight(buttonh);
+        applyUiScale.setHeight(buttonHeight);
         applyUiScale.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 EventManager.instance.post(Events.UI_SCALE_CMD, uiScale.getMappedValue());
@@ -868,7 +870,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         originLabel.setWidth(labelWidth);
         String[] origins = new String[] { I18n.txt("gui.ui.recursivegrid.origin.refsys"), I18n.txt("gui.ui.recursivegrid.origin.focus") };
         recgridOrigin = new OwnSelectBox<>(skin);
-        recgridOrigin.setWidth(textwidth * 3f);
+        recgridOrigin.setWidth(textWidth * 3f);
         recgridOrigin.setItems(origins);
         recgridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
 
@@ -897,8 +899,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== PERFORMANCE ====
          */
         final Table contentPerformance = new Table(skin);
-        contents.add(contentPerformance);
+        contentPerformance.setWidth(contentWidth);
         contentPerformance.align(Align.top | Align.left);
+        contents.add(contentPerformance);
 
         // MULTITHREADING
         OwnLabel titleMultiThread = new OwnLabel(I18n.txt("gui.multithreading"), skin, "header");
@@ -913,7 +916,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             cbs[i] = new ComboBoxBean(I18n.txt("gui.thread", i), i);
         }
         numThreads = new OwnSelectBox<>(skin);
-        numThreads.setWidth(textwidth * 3f);
+        numThreads.setWidth(textWidth * 3f);
         numThreads.setItems(cbs);
         numThreads.setSelectedIndex(settings.performance.numberThreads);
 
@@ -944,7 +947,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     TextArea nextTimeInfo = new OwnTextArea(nextInfoStr, skin, "info");
                     nextTimeInfo.setDisabled(true);
                     nextTimeInfo.setPrefRows(lines + 1);
-                    nextTimeInfo.setWidth(tawidth);
+                    nextTimeInfo.setWidth(taWidth);
                     nextTimeInfo.clearListeners();
                     noticeMultiThreadCell.setActor(nextTimeInfo);
                 }
@@ -993,8 +996,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== CONTROLS ====
          */
         final Table contentControls = new Table(skin);
-        contents.add(contentControls);
+        contentControls.setWidth(contentWidth);
         contentControls.align(Align.top | Align.left);
+        contents.add(contentControls);
 
         OwnLabel titleController = new OwnLabel(I18n.txt("gui.controller"), skin, "header");
 
@@ -1069,8 +1073,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         OwnScrollPane controlsScroll = new OwnScrollPane(controls, skin, "minimalist-nobg");
-        controlsScroll.setWidth(controlsscrollw);
-        controlsScroll.setHeight(controlsscrollh);
+        controlsScroll.setWidth(controlsScrollWidth);
+        controlsScroll.setHeight(controlsScrollHeight);
         controlsScroll.setScrollingDisabled(true, false);
         controlsScroll.setSmoothScrolling(true);
         controlsScroll.setFadeScrollBars(false);
@@ -1091,8 +1095,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== SCREENSHOTS ====
          */
         final Table contentScreenshots = new Table(skin);
-        contents.add(contentScreenshots);
+        contentScreenshots.setWidth(contentWidth);
         contentScreenshots.align(Align.top | Align.left);
+        contents.add(contentScreenshots);
 
         // SCREEN CAPTURE
         OwnLabel titleScreenshots = new OwnLabel(I18n.txt("gui.screencapture"), skin, "header");
@@ -1105,7 +1110,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         TextArea screenshotsInfo = new OwnTextArea(ssInfoStr, skin, "info");
         screenshotsInfo.setDisabled(true);
         screenshotsInfo.setPrefRows(ssLines + 1);
-        screenshotsInfo.setWidth(tawidth);
+        screenshotsInfo.setWidth(taWidth);
         screenshotsInfo.clearListeners();
 
         // Save location
@@ -1138,10 +1143,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel xLabel = new OwnLabel("x", skin);
         IValidator screenshotsSizeValidator = new IntValidator(ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE);
         sswidthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.screenshot.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
-        sswidthField.setWidth(textwidth);
+        sswidthField.setWidth(textWidth);
         sswidthField.setDisabled(settings.screenshot.isSimpleMode());
         ssheightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.screenshot.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, screenshotsSizeValidator);
-        ssheightField.setWidth(textwidth);
+        ssheightField.setWidth(textWidth);
         ssheightField.setDisabled(settings.screenshot.isSimpleMode());
         HorizontalGroup ssSizeGroup = new HorizontalGroup();
         ssSizeGroup.space(pad5 * 2);
@@ -1154,7 +1159,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean[] screenshotModes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1) };
         screenshotMode = new OwnSelectBox<>(skin);
         screenshotMode.setItems(screenshotModes);
-        screenshotMode.setWidth(textwidth * 3f);
+        screenshotMode.setWidth(textWidth * 3f);
         screenshotMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Simple
@@ -1195,8 +1200,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== FRAME OUTPUT ====
          */
         final Table contentFrames = new Table(skin);
-        contents.add(contentFrames);
+        contentFrames.setWidth(contentWidth);
         contentFrames.align(Align.top | Align.left);
+        contents.add(contentFrames);
 
         // FRAME OUTPUT CONFIG
         OwnLabel titleFrameoutput = new OwnLabel(I18n.txt("gui.frameoutput"), skin, "header");
@@ -1209,7 +1215,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         TextArea frameoutputInfo = new OwnTextArea(foinfostr, skin, "info");
         frameoutputInfo.setDisabled(true);
         frameoutputInfo.setPrefRows(ssLines + 1);
-        frameoutputInfo.setWidth(tawidth);
+        frameoutputInfo.setWidth(taWidth);
         frameoutputInfo.clearListeners();
 
         // Save location
@@ -1238,12 +1244,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Prefix
         OwnLabel prefixLabel = new OwnLabel(I18n.txt("gui.frameoutput.prefix"), skin);
         frameoutputPrefix = new OwnTextField(settings.frame.prefix, skin, new RegexpValidator("^\\w+$"));
-        frameoutputPrefix.setWidth(textwidth * 3f);
+        frameoutputPrefix.setWidth(textWidth * 3f);
 
         // FPS
         OwnLabel fpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         frameoutputFps = new OwnTextField(nf3.format(settings.frame.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
-        frameoutputFps.setWidth(textwidth * 3f);
+        frameoutputFps.setWidth(textWidth * 3f);
 
         // Size
         final OwnLabel frameoutputSizeLabel = new OwnLabel(I18n.txt("gui.frameoutput.size"), skin);
@@ -1251,10 +1257,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final OwnLabel xLabelfo = new OwnLabel("x", skin);
         IValidator frameoutputSizeValidator = new IntValidator(ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE);
         fowidthField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.frame.resolution[0], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, frameoutputSizeValidator);
-        fowidthField.setWidth(textwidth);
+        fowidthField.setWidth(textWidth);
         fowidthField.setDisabled(settings.frame.isSimpleMode());
         foheightField = new OwnTextField(Integer.toString(MathUtils.clamp(settings.frame.resolution[1], ScreenshotSettings.MIN_SCREENSHOT_SIZE, ScreenshotSettings.MAX_SCREENSHOT_SIZE)), skin, frameoutputSizeValidator);
-        foheightField.setWidth(textwidth);
+        foheightField.setWidth(textWidth);
         foheightField.setDisabled(settings.frame.isSimpleMode());
         HorizontalGroup foSizeGroup = new HorizontalGroup();
         foSizeGroup.space(pad5 * 2);
@@ -1267,7 +1273,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ComboBoxBean[] frameoutputModes = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.screenshots.mode.simple"), 0), new ComboBoxBean(I18n.txt("gui.screenshots.mode.redraw"), 1) };
         frameoutputMode = new OwnSelectBox<>(skin);
         frameoutputMode.setItems(frameoutputModes);
-        frameoutputMode.setWidth(textwidth * 3f);
+        frameoutputMode.setWidth(textWidth * 3f);
         frameoutputMode.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Simple
@@ -1293,7 +1299,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         HorizontalGroup counterGroup = new HorizontalGroup();
         counterGroup.space(pad5);
         OwnLabel counter = new OwnLabel(ImageRenderer.getSequenceNumber() + "", skin);
-        counter.setWidth(textwidth * 3f);
+        counter.setWidth(textWidth * 3f);
         OwnTextButton resetCounter = new OwnTextButton(I18n.txt("gui.frameoutput.sequence.reset"), skin);
         resetCounter.pad(pad10);
         resetCounter.addListener((event) -> {
@@ -1334,8 +1340,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== CAMERA ====
          */
         final Table contentCamera = new Table(skin);
-        contents.add(contentCamera);
+        contentCamera.setWidth(contentWidth);
         contentCamera.align(Align.top | Align.left);
+        contents.add(contentCamera);
 
         // CAMERA RECORDING
         Table camrec = new Table(skin);
@@ -1345,7 +1352,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // fps
         OwnLabel camfpsLabel = new OwnLabel(I18n.txt("gui.target.fps"), skin);
         camrecFps = new OwnTextField(nf3.format(settings.camrecorder.targetFps), skin, new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS));
-        camrecFps.setWidth(textwidth * 3f);
+        camrecFps.setWidth(textWidth * 3f);
         OwnImageButton camrecFpsTooltip = new OwnImageButton(skin, "tooltip");
         camrecFpsTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.targetfps"), skin));
 
@@ -1398,8 +1405,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== PANORAMA ====
          */
         final Table content360 = new Table(skin);
-        contents.add(content360);
+        content360.setWidth(contentWidth);
         content360.align(Align.top | Align.left);
+        contents.add(content360);
 
         // CUBEMAP
         OwnLabel titleCubemap = new OwnLabel(I18n.txt("gui.360"), skin, "header");
@@ -1411,13 +1419,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         TextArea cmInfo = new OwnTextArea(cminfostr, skin, "info");
         cmInfo.setDisabled(true);
         cmInfo.setPrefRows(ssLines + 1);
-        cmInfo.setWidth(tawidth);
+        cmInfo.setWidth(taWidth);
         cmInfo.clearListeners();
 
         // Resolution
         OwnLabel cmResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
         cmResolution = new OwnTextField(Integer.toString(settings.program.modeCubemap.faceResolution), skin, new IntValidator(20, 15000));
-        cmResolution.setWidth(textwidth * 3f);
+        cmResolution.setWidth(textWidth * 3f);
         cmResolution.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (cmResolution.isValid()) {
@@ -1444,8 +1452,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== PLANETARIUM ====
          */
         final Table contentPlanetarium = new Table(skin);
-        contents.add(contentPlanetarium);
+        contentPlanetarium.setWidth(contentWidth);
         contentPlanetarium.align(Align.top | Align.left);
+        contents.add(contentPlanetarium);
 
         // CUBEMAP
         OwnLabel titlePlanetarium = new OwnLabel(I18n.txt("gui.planetarium"), skin, "header");
@@ -1454,26 +1463,26 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Aperture
         Label apertureLabel = new OwnLabel(I18n.txt("gui.planetarium.aperture"), skin);
         plAperture = new OwnTextField(Float.toString(settings.program.modeCubemap.planetarium.aperture), skin, new FloatValidator(30, 360));
-        plAperture.setWidth(textwidth * 3f);
+        plAperture.setWidth(textWidth * 3f);
 
         // Skew angle
-        Label plangleLabel = new OwnLabel(I18n.txt("gui.planetarium.angle"), skin);
+        Label plAngleLabel = new OwnLabel(I18n.txt("gui.planetarium.angle"), skin);
         plAngle = new OwnTextField(Float.toString(settings.program.modeCubemap.planetarium.angle), skin, new FloatValidator(-180, 180));
-        plAngle.setWidth(textwidth * 3f);
+        plAngle.setWidth(textWidth * 3f);
 
         // Info
-        String plinfostr = I18n.txt("gui.planetarium.info") + '\n';
-        ssLines = GlobalResources.countOccurrences(plinfostr, '\n');
-        TextArea plInfo = new OwnTextArea(plinfostr, skin, "info");
+        String plInfoStr = I18n.txt("gui.planetarium.info") + '\n';
+        ssLines = GlobalResources.countOccurrences(plInfoStr, '\n');
+        TextArea plInfo = new OwnTextArea(plInfoStr, skin, "info");
         plInfo.setDisabled(true);
         plInfo.setPrefRows(ssLines + 1);
-        plInfo.setWidth(tawidth);
+        plInfo.setWidth(taWidth);
         plInfo.clearListeners();
 
         // Resolution
         OwnLabel plResolutionLabel = new OwnLabel(I18n.txt("gui.360.resolution"), skin);
         plResolution = new OwnTextField(Integer.toString(settings.program.modeCubemap.faceResolution), skin, new IntValidator(20, 15000));
-        plResolution.setWidth(textwidth * 3f);
+        plResolution.setWidth(textWidth * 3f);
         plResolution.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (plResolution.isValid()) {
@@ -1490,7 +1499,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         planetarium.add(apertureLabel).left().padRight(pad20).padBottom(pad10 * 3f);
         planetarium.add(plAperture).left().expandX().padBottom(pad10 * 3f).row();
-        planetarium.add(plangleLabel).left().padRight(pad20).padBottom(pad10 * 3f);
+        planetarium.add(plAngleLabel).left().padRight(pad20).padBottom(pad10 * 3f);
         planetarium.add(plAngle).left().expandX().padBottom(pad10 * 3f).row();
         planetarium.add(plInfo).colspan(2).left().padBottom(pad5).row();
         planetarium.add(plResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
@@ -1505,9 +1514,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== DATA ====
          */
         final Table contentDataTable = new Table(skin);
+        contentDataTable.setWidth(contentWidth);
         contentDataTable.align(Align.top | Align.left);
         final OwnScrollPane contentData = new OwnScrollPane(contentDataTable, skin, "minimalist-nobg");
-        contentData.setHeight(scrollh);
+        contentData.setWidth(contentWidth);
+        contentData.setHeight(scrollHeight);
         contentData.setScrollingDisabled(true, false);
         contentData.setFadeScrollBars(false);
         contents.add(contentData);
@@ -1526,24 +1537,24 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         haGroup.addActor(highAccTooltip);
 
         // DATA SOURCE
-        OwnLabel titleData = new OwnLabel(I18n.txt("gui.data.source"), skin, "header");
+        final OwnLabel titleData = new OwnLabel(I18n.txt("gui.data.source"), skin, "header");
 
         // Info
         String dsInfoStr = I18n.txt("gui.data.source.info") + '\n';
         int dsLines = GlobalResources.countOccurrences(dsInfoStr, '\n');
-        TextArea dataSourceInfo = new OwnTextArea(dsInfoStr, skin, "info");
+        final TextArea dataSourceInfo = new OwnTextArea(dsInfoStr, skin, "info");
         dataSourceInfo.setDisabled(true);
         dataSourceInfo.setPrefRows(dsLines + 1);
-        dataSourceInfo.setWidth(tawidth);
+        dataSourceInfo.setWidth(taWidth);
         dataSourceInfo.clearListeners();
 
         dw = new DatasetsWidget(stage, skin);
         dw.reloadLocalCatalogs();
-        Actor dataSource = dw.buildDatasetsWidget(false, 20);
+        final Actor dataSource = dw.buildDatasetsWidget(false, 20, 220f);
 
-        OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
-        dataDownload.pad(0, pad10, 0, pad10);
-        dataDownload.setHeight(buttonh);
+        final OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
+        dataDownload.pad(pad20, pad20 * 2f, pad20, pad20 * 2f);
+        dataDownload.setHeight(buttonHeight);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.currentDataDescriptor != null) {
@@ -1581,8 +1592,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== GAIA ====
          */
         final Table contentGaia = new Table(skin);
-        contents.add(contentGaia);
+        contentGaia.setWidth(contentWidth);
         contentGaia.align(Align.top | Align.left);
+        contents.add(contentGaia);
 
         // ATTITUDE
         OwnLabel titleAttitude = new OwnLabel(I18n.txt("gui.gaia.attitude"), skin, "header");
@@ -1604,12 +1616,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventListener attNoticeListener = event -> {
             if (event instanceof ChangeEvent) {
                 if (noticeAttCell.getActor() == null) {
-                    String nextinfostr = I18n.txt("gui.ui.info") + '\n';
-                    int lines1 = GlobalResources.countOccurrences(nextinfostr, '\n');
-                    TextArea nextTimeInfo = new OwnTextArea(nextinfostr, skin, "info");
+                    String nextInfoStr = I18n.txt("gui.ui.info") + '\n';
+                    int lines1 = GlobalResources.countOccurrences(nextInfoStr, '\n');
+                    TextArea nextTimeInfo = new OwnTextArea(nextInfoStr, skin, "info");
                     nextTimeInfo.setDisabled(true);
                     nextTimeInfo.setPrefRows(lines1 + 1);
-                    nextTimeInfo.setWidth(tawidth);
+                    nextTimeInfo.setWidth(taWidth);
                     nextTimeInfo.clearListeners();
                     noticeAttCell.setActor(nextTimeInfo);
                 }
@@ -1628,8 +1640,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
          * ==== SYSTEM ====
          */
         final Table contentSystem = new Table(skin);
-        contents.add(contentSystem);
+        contentSystem.setWidth(contentWidth);
         contentSystem.align(Align.top | Align.left);
+        contents.add(contentSystem);
 
         // STATS
         OwnLabel titleStats = new OwnLabel(I18n.txt("gui.system.reporting"), skin, "header");
@@ -1665,7 +1678,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
         reloadDefaults.pad(0, pad10, 0, pad10);
-        reloadDefaults.setHeight(buttonh);
+        reloadDefaults.setHeight(buttonHeight);
 
         OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
@@ -1686,7 +1699,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (l.getWidth() > maxLabelWidth)
                 maxLabelWidth = l.getWidth();
         }
-        maxLabelWidth = Math.max(textwidth * 2, maxLabelWidth);
+        maxLabelWidth = Math.max(textWidth * 2, maxLabelWidth);
         for (OwnLabel l : labels)
             l.setWidth(maxLabelWidth);
 

@@ -24,7 +24,6 @@ import gaiasky.util.scene2d.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +41,9 @@ public class DatasetsWidget {
     public Map<Button, String> candidates;
     public Array<DatasetType> types;
     public Array<DatasetDesc> datasets;
+    private float padFactor = 1f;
 
-    public DatasetsWidget(Stage ui, Skin skin) {
+    public DatasetsWidget(final Stage ui, final Skin skin) {
         super();
         this.ui = ui;
         this.skin = skin;
@@ -98,13 +98,21 @@ public class DatasetsWidget {
         return buildDatasetsWidget(true);
     }
 
-    public Actor buildDatasetsWidget(boolean scrollOn) {
-        return buildDatasetsWidget(scrollOn, 40);
+    public Actor buildDatasetsWidget(final boolean scrollOn) {
+        return buildDatasetsWidget(scrollOn, 40, 420f);
     }
 
-    public Actor buildDatasetsWidget(boolean scrollOn, int maxCharsDescription) {
-        float pad = 4.8f;
-        float padLarge = 14.4f;
+    /**
+     * This function sets the padding factor of this widget. Call before {@link #buildDatasetsWidget()}.
+     * @param factor The pad factor
+     */
+    public void setPadFactor(final float factor){
+        this.padFactor = factor;
+    }
+
+    public Actor buildDatasetsWidget(final boolean scrollOn, final int maxCharsDescription, final float descriptionWidth) {
+        final float pad = 4.8f * padFactor;
+        final float padLarge = 14.4f * padFactor;
 
         Actor result;
 
@@ -166,6 +174,18 @@ public class DatasetsWidget {
             type.datasets.sort(byName);
 
             for (DatasetDesc dataset : type.datasets) {
+
+                // Type
+                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
+                float scl = 0.7f;
+                float iw = typeImage.getWidth();
+                float ih = typeImage.getHeight();
+                typeImage.setSize(iw * scl, ih * scl);
+                typeImage.setScaling(Scaling.none);
+                typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
+                t.add(typeImage).left().padLeft(padLarge * 2f).padRight(pad * 4f).padBottom(pad);
+
+                // Select checkbox
                 final OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.name, 33), skin, "large", pad * 2f);
                 boolean gsVersionTooSmall = false;
                 if (dataset.minGsVersion >= 0 && dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
@@ -180,10 +200,10 @@ public class DatasetsWidget {
                     cb.setChecked(contains(dataset.catalogFile.path(), currentSetting));
                     cb.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
                 }
-                cb.setMinWidth(380f);
+                cb.setMinWidth(370f);
                 cb.bottom().left();
 
-                t.add(cb).left().padLeft(padLarge * 2f).padRight(pad * 6f).padBottom(pad);
+                t.add(cb).left().padRight(pad * 6f).padBottom(pad);
 
                 // Description
                 HorizontalGroup descGroup = new HorizontalGroup();
@@ -193,13 +213,13 @@ public class DatasetsWidget {
                 if(gsVersionTooSmall)
                     description.setColor(ColorUtils.gRedC);
                 description.addListener(new OwnTextTooltip(dataset.description, skin, 10));
-                description.setWidth(420f);
+                description.setWidth(descriptionWidth);
                 // Info
                 OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
                 imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
                 descGroup.addActor(imgTooltip);
                 descGroup.addActor(description);
-                t.add(descGroup).left().padRight(pad * 6f).padBottom(pad);
+                t.add(descGroup).left().padRight(pad * 2f).padBottom(pad);
 
                 // Link
                 if (dataset.link != null) {
@@ -210,27 +230,18 @@ public class DatasetsWidget {
                 }
 
                 // Version
-                String vers = "v-0";
+                String version = "v-0";
                 if (dataset.myVersion >= 0) {
-                    vers = "v-" + dataset.myVersion;
+                    version = "v-" + dataset.myVersion;
                 }
-                OwnLabel versionLabel = new OwnLabel(vers, skin);
+                OwnLabel versionLabel = new OwnLabel(version, skin);
                 t.add(versionLabel).left().padRight(pad * 6f).padBottom(pad);
-
-                // Type
-                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
-                float scl = 0.7f;
-                float iw = typeImage.getWidth();
-                float ih = typeImage.getHeight();
-                typeImage.setSize(iw * scl, ih * scl);
-                typeImage.setScaling(Scaling.none);
-                typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
-                t.add(typeImage).left().padRight(pad * 4f).padBottom(pad);
 
                 // Size
                 OwnLabel sizeLabel = new OwnLabel(dataset.size, skin);
+                sizeLabel.setWidth(85f);
                 sizeLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.size.tooltip"), skin, 10));
-                t.add(sizeLabel).left().padRight(pad * 6f).padBottom(pad);
+                t.add(sizeLabel).left().padRight(pad * 4f).padBottom(pad);
 
                 // # objects
                 OwnLabel nObjectsLabel = new OwnLabel(dataset.nObjectsStr, skin);
