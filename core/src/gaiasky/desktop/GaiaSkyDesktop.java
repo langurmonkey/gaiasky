@@ -536,17 +536,14 @@ public class GaiaSkyDesktop implements IObserver {
                     out.println("Old properties file detected!");
                     out.println("    -> Converting " + propertiesFile + " to " + userFolderConfFile);
                     SettingsMorph.morphSettings(propertiesFile, userFolderConfFile);
-                    overwrite = false;
                     userConfExists = true;
                 } else {
                     // Old configuration not found!
                     out.println("Failed updating old global.properties file into new config.yaml: Old configuration file not found");
-                    userConfExists = false;
                 }
             } catch (Exception e) {
                 // Failed!
                 out.println("Failed updating old global.properties file into new config.yaml");
-                userConfExists = false;
             }
         }
 

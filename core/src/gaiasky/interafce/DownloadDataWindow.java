@@ -75,26 +75,17 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     public static int getTypeWeight(String type) {
-        switch (type) {
-        case "catalog-lod":
-            return 0;
-        case "catalog-gaia":
-            return 1;
-        case "catalog-star":
-            return 2;
-        case "catalog-gal":
-            return 3;
-        case "catalog-cluster":
-            return 4;
-        case "catalog-other":
-            return 5;
-        case "mesh":
-            return 6;
-        case "other":
-            return 8;
-        default:
-            return 10;
-        }
+        return switch (type) {
+            case "catalog-lod" -> 0;
+            case "catalog-gaia" -> 1;
+            case "catalog-star" -> 2;
+            case "catalog-gal" -> 3;
+            case "catalog-cluster" -> 4;
+            case "catalog-other" -> 5;
+            case "mesh" -> 6;
+            case "other" -> 8;
+            default -> 10;
+        };
     }
 
     public static String getIcon(String type) {
@@ -108,7 +99,7 @@ public class DownloadDataWindow extends GenericDialog {
     private OwnProgressBar downloadProgress;
     private OwnLabel currentDownloadFile, downloadSpeed;
     private OwnScrollPane datasetsScroll;
-    private Cell<OwnTextButton> cancelCell;
+    private Cell<?> cancelCell;
     private float scrollX = 0f, scrollY = 0f;
 
     private final Color highlight;
@@ -250,7 +241,7 @@ public class DownloadDataWindow extends GenericDialog {
             datasetsTable.add(titleGroup).left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
 
             Table t = new Table(skin);
-            Cell c = datasetsTable.add(t).colspan(2).left();
+            Cell<Table> c = datasetsTable.add(t).colspan(2).left();
             c.row();
 
             expandIcon.addListener((event) -> {
@@ -409,9 +400,7 @@ public class DownloadDataWindow extends GenericDialog {
                                 }
                             }
                             // RELOAD DATASETS VIEW
-                            GaiaSky.postRunnable(() -> {
-                                reloadAll();
-                            });
+                            GaiaSky.postRunnable(this::reloadAll);
 
                             return true;
                         }
@@ -644,7 +633,7 @@ public class DownloadDataWindow extends GenericDialog {
                     setMessageOk(I18n.txt("gui.download.idle"));
                     setStatusFound(currentDataset, trio.getThird());
 
-                    GaiaSky.postRunnable(() -> downloadNext());
+                    GaiaSky.postRunnable(this::downloadNext);
                 } else {
                     logger.info("Error getting dataset: " + name);
                     setStatusError(currentDataset, trio.getThird());
@@ -661,7 +650,7 @@ public class DownloadDataWindow extends GenericDialog {
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
                 cancelCell.setActor(null);
-                GaiaSky.postRunnable(() -> downloadNext());
+                GaiaSky.postRunnable(this::downloadNext);
             };
 
             Runnable cancel = () -> {
@@ -672,7 +661,7 @@ public class DownloadDataWindow extends GenericDialog {
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
                 cancelCell.setActor(null);
-                GaiaSky.postRunnable(() -> downloadNext());
+                GaiaSky.postRunnable(this::downloadNext);
             };
 
             // Download
@@ -700,7 +689,7 @@ public class DownloadDataWindow extends GenericDialog {
         } else {
             // Finished all downloads!
             // RELOAD DATASETS VIEW
-            GaiaSky.postRunnable(() -> reloadAll());
+            GaiaSky.postRunnable(this::reloadAll);
         }
 
     }
@@ -735,9 +724,8 @@ public class DownloadDataWindow extends GenericDialog {
             }
             File curFile = new File(out, entry.getName());
             File parent = curFile.getParentFile();
-            if (!parent.exists()) {
+            if (!parent.exists())
                 parent.mkdirs();
-            }
 
             IOUtils.copy(tarin, new FileOutputStream(curFile));
 
@@ -771,9 +759,9 @@ public class DownloadDataWindow extends GenericDialog {
      *
      * @param inputFilePath A gzipped file
      * @return The uncompressed size in bytes
-     * @throws Exception
+     * @throws IOException If the file failed to read
      */
-    private long fileSizeGZUncompressed(String inputFilePath) throws Exception {
+    private long fileSizeGZUncompressed(String inputFilePath) throws IOException {
         RandomAccessFile raf = new RandomAccessFile(inputFilePath, "r");
         raf.seek(raf.length() - 4);
         byte[] bytes = new byte[4];
@@ -807,7 +795,7 @@ public class DownloadDataWindow extends GenericDialog {
                     File file = path.toFile();
                     return !file.isDirectory() && file.getName().endsWith("tar.gz.part");
                 });
-                stream.forEach(f -> deleteFile(f));
+                stream.forEach(this::deleteFile);
             } catch (IOException e) {
                 logger.error(e);
             }
