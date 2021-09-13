@@ -67,7 +67,7 @@ public class OwnImageButton extends ImageButton {
         getImage().setDrawable(getImageDrawable());
         Color theme;
         try {
-            theme = getSkin().getColor("theme");
+            theme = getSkin().getColor("highlight");
         } catch (Exception e) {
             theme = null;
         }

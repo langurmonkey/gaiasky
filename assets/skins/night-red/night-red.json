@@ -190,15 +190,15 @@
     },
     "highlight": {
       "a": 1,
-      "b": 0,
-      "g": 1,
-      "r": 1
+      "b": 0.04509,
+      "g": 0.81568,
+      "r": 0.95882
     },
     "yellow": {
       "a": 1,
-      "b": 0,
-      "g": 1,
-      "r": 1
+      "b": 0.04509,
+      "g": 0.81568,
+      "r": 0.95882
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable": {
@@ -236,7 +236,7 @@
     "default": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-17",
@@ -246,7 +246,7 @@
     "big": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-23",
@@ -256,7 +256,7 @@
     "huge": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "font": "title-27",
@@ -266,7 +266,7 @@
     "download": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "font": "title-21",
       "fontColor": "theme",
@@ -275,7 +275,7 @@
     "download-big": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
@@ -284,10 +284,11 @@
     "toggle": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
+      "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
       "font": "title-17",
       "fontColor": "theme",
@@ -296,10 +297,11 @@
     "toggle-big": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "focused": "default-round-sel",
       "checked": "default-round-down",
+      "checkedOver": "default-round-down-sel",
       "checkedFocused": "default-round-down-sel",
       "font": "title-23",
       "fontColor": "theme",
@@ -471,7 +473,7 @@
     "start": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "font": "title-27",
       "fontColor": "theme",
@@ -481,7 +483,7 @@
     "cloud-download": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "font": "title-23",
       "fontColor": "theme",
@@ -501,7 +503,7 @@
     "plus": {
       "down": "default-round-down",
       "up": "default-round",
-      "over": "default-round-over",
+      "over": "default-round-sel",
       "disabled": "default-round-disabled",
       "font": "title-17",
       "fontColor": "theme",
@@ -669,6 +671,7 @@
     "default": {
       "font": "ui-18",
       "fontColor": "black",
+      "overFontColor": "highlight",
       "disabledFontColor": "disabled-font",
       "background": "default-select",
       "backgroundDisabled": "default-select-disabled",
@@ -1123,7 +1126,7 @@
       "fontColorUnselected": "black",
       "selection": "selection",
       "fontColorSelected": "black",
-      "font": "ui-11",
+      "font": "ui-18",
       "background": "darker-grey"
     },
     "light": {
