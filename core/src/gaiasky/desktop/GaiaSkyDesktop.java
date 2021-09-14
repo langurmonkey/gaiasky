@@ -67,11 +67,11 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * Leading zeroes are omitted to avoid octal literal interpretation.
      */
-    public static int SOURCE_VERSION = 30105;
+    public static final int SOURCE_VERSION = 30105;
     private static boolean REST_ENABLED = false;
     private static boolean JAVA_VERSION_FLAG = false;
 
-    private static final String REQUIRED_JAVA_VERSION = "11";
+    private static final String REQUIRED_JAVA_VERSION = "15";
 
     private static GaiaSkyArgs gsArgs;
 
@@ -135,7 +135,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * @param args Arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Thread.currentThread().setName("gaiasky-main-thread");
         out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         gsArgs = new GaiaSkyArgs();
@@ -386,7 +386,7 @@ public class GaiaSkyDesktop implements IObserver {
         }
     }
 
-    private void configureWindowSize(Lwjgl3ApplicationConfiguration cfg) {
+    private void configureWindowSize(final Lwjgl3ApplicationConfiguration cfg) {
         int w = Settings.settings.graphics.getScreenWidth();
         int h = Settings.settings.graphics.getScreenHeight();
         if (!SysUtils.isMac()) {
@@ -432,19 +432,19 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.setWindowedMode(w, h);
     }
 
-    private void runGaiaSky(Lwjgl3ApplicationConfiguration cfg) {
+    private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
         gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
         new Lwjgl3Application(gs, cfg);
     }
 
-    private void setSafeMode(Lwjgl3ApplicationConfiguration cfg) {
+    private void setSafeMode(final Lwjgl3ApplicationConfiguration cfg) {
         logger.info(I18n.txt("startup.safe.enable", MIN_OPENGL, MIN_GLSL));
         Settings.settings.scene.renderer.elevation.type = ElevationType.NONE;
         Settings.settings.program.safeMode = true;
         cfg.useOpenGL3(true, MIN_OPENGL_MAJOR, MIN_OPENGL_MINOR);
     }
 
-    private void showDialogOGL(Exception ex, String title, String message) {
+    private void showDialogOGL(final Exception ex, final String title, final String message) {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
@@ -455,13 +455,13 @@ public class GaiaSkyDesktop implements IObserver {
         new Lwjgl3Application(new ErrorDialog(ex, message), cfg);
     }
 
-    private static void checkLogger(ConsoleLogger consoleLogger) {
+    private static void checkLogger(final ConsoleLogger consoleLogger) {
         EventManager.instance.clearAllSubscriptions();
         consoleLogger.subscribe();
     }
 
     @Override
-    public void notify(Events event, final Object... data) {
+    public void notify(final Events event, final Object... data) {
         switch (event) {
         case SCENE_GRAPH_LOADED:
             if (REST_ENABLED) {
@@ -501,7 +501,7 @@ public class GaiaSkyDesktop implements IObserver {
      *
      * @throws IOException If the file fails to be written successfully.
      */
-    private static void initConfigFile(boolean vr) throws IOException {
+    private static void initConfigFile(final boolean vr) throws IOException {
         // Use user folder
         Path userFolderConfFile = SysUtils.getConfigDir().resolve(SettingsManager.getConfigFileName(vr));
 

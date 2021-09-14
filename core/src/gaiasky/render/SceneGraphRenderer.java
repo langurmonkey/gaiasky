@@ -198,6 +198,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
         MODEL_VERT_THRUSTER(30),
         /**
+         * Variable star group
+         **/
+        VARIABLE_GROUP(31),
+        /**
          * None
          **/
         NONE(-1);
@@ -260,7 +264,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private ExtShaderProgram[] lineShaders;
     private ExtShaderProgram[] lineQuadShaders;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
      * Render lists for all render groups
@@ -360,6 +364,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
         particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
+        variableGroupDesc = loadShader(manager, "shader/variable.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
 
         // Add shaders to load (with providers)
@@ -523,6 +528,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          * STAR GROUP - default and relativistic
          */
         ExtShaderProgram[] starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
+
+        /*
+         * VARIABLE GROUP - default and relativistic
+         */
+        ExtShaderProgram[] variableGroupShaders = fetchShaderProgram(manager, variableGroupDesc, TextUtils.concatAll("variable.group", names));
 
         /*
          * STAR POINT
@@ -728,6 +738,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
+        // VARIABLE GROUP
+        AbstractRenderSystem variableGroupProc = new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+        variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // ORBITAL ELEMENTS PARTICLES
         AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
         orbitElemProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -781,6 +796,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Stars, particles
         addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupProc);
+        addRenderSystem(variableGroupProc);
         addRenderSystem(orbitElemProc);
 
         // Additive meshes
@@ -1115,7 +1131,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     @Override
-    public void render(ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
+    public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
         if (sgr == null)
             initSGR(camera);
 

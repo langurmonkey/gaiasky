@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.BVToTeff_ballesteros;
@@ -95,6 +96,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
      * @param row  The row objects
+     *
      * @return Pair of <UCD,Double>
      */
     private Pair<UCD, Double> getDoubleUcd(Array<UCD> UCDs, Object[] row) {
@@ -117,6 +119,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @param UCDs The set of UCD objects
      * @param row  The row
+     *
      * @return A pair with the UCD and the string
      */
     private Pair<UCD, String> getStringUcd(Array<UCD> UCDs, Object[] row) {
@@ -155,12 +158,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     }
 
     /**
-     * @param ds
-     * @param factor
+     * @param ds             The data source.
+     * @param factor         Length factor.
      * @param preCallback    A function that runs before.
      * @param updateCallback A function that runs after each object has loaded. Gets two longs, the first holds the current number of loaded objects and the
      *                       second holds the total number of objects to load.
      * @param postCallback   A function that runs after the data has been loaded.
+     *
      * @return The list of particle records.
      */
     public List<IParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
@@ -181,50 +185,49 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 long count = table.getRowCount();
                 initLists((int) count);
 
-                UCDParser ucdp = new UCDParser();
-                ucdp.parse(table);
+                UCDParser ucdParser = new UCDParser();
+                ucdParser.parse(table);
 
-                if (ucdp.haspos) {
-                    BVToTeff_ballesteros bvToTeff = new BVToTeff_ballesteros();
+                if (ucdParser.haspos) {
+                    BVToTeff_ballesteros bvToTEff = new BVToTeff_ballesteros();
 
-                    int nInvalidPllx = 0;
-                    long i = 0l;
-                    long step = Math.max(1l, Math.round(count / 100d));
+                    int nInvalidParallaxes = 0;
+                    long i = 0L;
+                    long step = Math.max(1L, Math.round(count / 100d));
 
                     RowSequence rs = table.getRowSequence();
                     while (rs.next()) {
                         Object[] row = rs.getRow();
-                        boolean skip = false;
                         try {
                             /* POSITION */
-                            Pair<UCD, Double> a = getDoubleUcd(ucdp.POS1, row);
-                            Pair<UCD, Double> b = getDoubleUcd(ucdp.POS2, row);
+                            Pair<UCD, Double> a = getDoubleUcd(ucdParser.POS1, row);
+                            Pair<UCD, Double> b = getDoubleUcd(ucdParser.POS2, row);
                             Pair<UCD, Double> c;
-                            String unitc;
+                            String unitC;
 
-                            Pair<UCD, Double> pos3 = getDoubleUcd(ucdp.POS3, row);
+                            Pair<UCD, Double> pos3 = getDoubleUcd(ucdParser.POS3, row);
                             // Check missing pos3 -> Use default parallax
-                            if (ucdp.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
+                            if (ucdParser.POS3.isEmpty() || pos3 == null || pos3.getSecond() == null || !Double.isFinite(pos3.getSecond())) {
                                 c = new Pair<>(null, 0.04);
-                                unitc = "mas";
-                                nInvalidPllx++;
+                                unitC = "mas";
+                                nInvalidParallaxes++;
                             } else {
-                                c = getDoubleUcd(ucdp.POS3, row);
-                                unitc = c.getFirst().unit;
+                                c = getDoubleUcd(ucdParser.POS3, row);
+                                unitC = c.getFirst().unit;
                             }
 
-                            PositionType pt = ucdp.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
+                            PositionType pt = ucdParser.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
                             // Check negative parallaxes -> Use default for consistency
                             if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
                                 c.setSecond(0.04);
-                                unitc = "mas";
-                                nInvalidPllx++;
+                                unitC = "mas";
+                                nInvalidParallaxes++;
                             }
 
-                            Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitc, pt);
+                            Position p = new Position(a.getSecond(), a.getFirst().unit, b.getSecond(), b.getFirst().unit, c.getSecond(), unitC, pt);
 
-                            double distpc = p.gsposition.len();
-                            if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distpc) || distpc < 0) {
+                            double distPc = p.gsposition.len();
+                            if ((pt.isParallax() && c.getSecond() <= 0) || !Double.isFinite(distPc) || distPc < 0) {
                                 // Next
                                 break;
                             }
@@ -236,49 +239,45 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             /* PROPER MOTION */
                             Vector3d pm;
-                            double mualphastar = 0, mudelta = 0, radvel = 0;
+                            double muAlphaStar = 0, muDelta = 0, radVel = 0;
                             // Only supported if position is equatorial spherical coordinates (ra/dec)
                             if (pt == PositionType.EQ_SPH_DIST || pt == PositionType.EQ_SPH_PLX) {
-                                Pair<UCD, Double> pma = getDoubleUcd(ucdp.PMRA, row);
-                                Pair<UCD, Double> pmb = getDoubleUcd(ucdp.PMDEC, row);
-                                Pair<UCD, Double> pmc = getDoubleUcd(ucdp.RADVEL, row);
+                                Pair<UCD, Double> pma = getDoubleUcd(ucdParser.PMRA, row);
+                                Pair<UCD, Double> pmb = getDoubleUcd(ucdParser.PMDEC, row);
+                                Pair<UCD, Double> pmc = getDoubleUcd(ucdParser.RADVEL, row);
 
-                                mualphastar = pma != null ? pma.getSecond() : 0;
-                                mudelta = pmb != null ? pmb.getSecond() : 0;
-                                radvel = pmc != null ? pmc.getSecond() : 0;
+                                muAlphaStar = pma != null ? pma.getSecond() : 0;
+                                muDelta = pmb != null ? pmb.getSecond() : 0;
+                                radVel = pmc != null ? pmc.getSecond() : 0;
 
-                                double rarad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
-                                double decrad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
-                                pm = AstroUtils.properMotionsToCartesian(mualphastar, mudelta, radvel, rarad, decrad, distpc, new Vector3d());
+                                double raRad = new Angle(a.getSecond(), a.getFirst().unit).get(AngleUnit.RAD);
+                                double decRad = new Angle(b.getSecond(), b.getFirst().unit).get(AngleUnit.RAD);
+                                pm = AstroUtils.properMotionsToCartesian(muAlphaStar, muDelta, radVel, raRad, decRad, distPc, new Vector3d());
                             } else {
                                 pm = new Vector3d(Vector3d.Zero);
                             }
 
                             /* MAGNITUDE */
-                            double appmag;
-                            if (!ucdp.MAG.isEmpty()) {
-                                Pair<UCD, Double> appmagPair = getDoubleUcd(ucdp.MAG, row);
-                                appmag = appmagPair.getSecond();
+                            double appMag;
+                            if (!ucdParser.MAG.isEmpty()) {
+                                Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
+                                appMag = appMagPair.getSecond();
                             } else {
                                 // Default magnitude
-                                appmag = 15;
+                                appMag = 15;
                             }
                             // Scale magnitude if needed
-                            double magscl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) ? datasetOptions.magnitudeScale : 0f;
-                            appmag -= magscl;
+                            double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) ? datasetOptions.magnitudeScale : 0f;
+                            appMag -= magScl;
 
-                            //
-                            double absmag = appmag - 5 * Math.log10((distpc <= 0 ? 10 : distpc)) + 5;
-                            // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
-                            double pseudoL = Math.pow(10, -0.4 * absmag);
-                            double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-                            float size = (float) Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10);
-                            size *= Constants.DISTANCE_SCALE_FACTOR;
+                            // Absolute magnitude to pseudo-size
+                            double absMag = appMag - 5 * Math.log10((distPc <= 0 ? 10 : distPc)) + 5;
+                            float size = (float) magnitudeToPseudoSize(absMag);
 
                             /* COLOR */
                             float color;
-                            if (!ucdp.COL.isEmpty()) {
-                                Pair<UCD, Double> colPair = getDoubleUcd(ucdp.COL, row);
+                            if (!ucdParser.COL.isEmpty()) {
+                                Pair<UCD, Double> colPair = getDoubleUcd(ucdParser.COL, row);
                                 if (colPair == null) {
                                     color = 0.656f;
                                 } else {
@@ -289,14 +288,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 color = 0.656f;
                             }
 
-                            /* TEFF */
-                            float teff;
-                            if (!ucdp.TEFF.isEmpty()) {
-                                Pair<UCD, Double> teffPair = getDoubleUcd(ucdp.TEFF, row);
-                                teff = teffPair.getSecond().floatValue();
+                            /* EFFECTIVE TEMPERATURE */
+                            float tEff;
+                            if (!ucdParser.TEFF.isEmpty()) {
+                                Pair<UCD, Double> tEffPair = getDoubleUcd(ucdParser.TEFF, row);
+                                tEff = tEffPair.getSecond().floatValue();
                             } else {
                                 // Convert B-V to T_eff using Ballesteros 2012
-                                teff = (float) bvToTeff.bvToTeff(color);
+                                tEff = (float) bvToTEff.bvToTeff(color);
                             }
 
                             // RGB
@@ -307,28 +306,28 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             /* IDENTIFIER AND NAME */
                             String[] names;
-                            Long id = -1l;
+                            long id = -1L;
                             int hip = -1;
-                            if (ucdp.NAME.isEmpty()) {
+                            if (ucdParser.NAME.isEmpty()) {
                                 // Empty name
-                                if (!ucdp.ID.isEmpty()) {
+                                if (!ucdParser.ID.isEmpty()) {
                                     // We have ID
-                                    Pair<UCD, String> namePair = getStringUcd(ucdp.ID, row);
+                                    Pair<UCD, String> namePair = getStringUcd(ucdParser.ID, row);
                                     names = new String[] { namePair.getSecond() };
                                     if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                        hip = Integer.valueOf(namePair.getSecond());
+                                        hip = Integer.parseInt(namePair.getSecond());
                                         id = (long) hip;
                                     } else {
                                         id = ++starId;
                                     }
                                 } else {
-                                    // Emtpy ID
+                                    // Empty ID
                                     id = ++starId;
-                                    names = new String[] { id.toString() };
+                                    names = new String[] { Long.toString(id) };
                                 }
                             } else {
                                 // We have name
-                                Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdp.NAME, row);
+                                Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdParser.NAME, row);
                                 Array<String> namesArray = new Array<>(false, namePairs.length);
                                 for (Pair<UCD, String> pair : namePairs) {
                                     String[] currNames = pair.getSecond().split(Constants.nameSeparatorRegex);
@@ -344,14 +343,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     names[k++] = n;
                                 }
                                 if (names.length == 0) {
-                                    names = new String[] { id.toString() };
+                                    names = new String[] { Long.toString(id) };
                                 }
 
                                 // Take care of HIP stars
-                                if (!ucdp.ID.isEmpty()) {
-                                    Pair<UCD, String> idpair = getStringUcd(ucdp.ID, row);
-                                    if (idpair.getFirst().colname.equalsIgnoreCase("hip")) {
-                                        hip = Integer.valueOf(idpair.getSecond());
+                                if (!ucdParser.ID.isEmpty()) {
+                                    Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
+                                    if (idPair.getFirst().colname.equalsIgnoreCase("hip")) {
+                                        hip = Integer.parseInt(idPair.getSecond());
                                         id = (long) hip;
                                     } else {
                                         id = ++starId;
@@ -361,21 +360,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 }
                             }
 
-                            if (mustLoad(id)) {
-                                // Check must load
-                                skip = false;
-                            }
-
-                            if (skip) {
-                                // Next
-                                continue;
-                            }
-
                             // Populate provider lists
                             colors.put(id, rgb);
                             sphericalPositions.put(id, new double[] { sph.x, sph.y, sph.z });
 
-                            if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) {
+                            if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || datasetOptions.type == DatasetOptions.DatasetLoadType.VARIABLES) {
                                 double[] dataD = new double[ParticleRecord.STAR_SIZE_D];
                                 float[] dataF = new float[ParticleRecord.STAR_SIZE_F];
                                 dataD[ParticleRecord.I_X] = p.gsposition.x;
@@ -385,31 +374,42 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataF[ParticleRecord.I_FPMX] = (float) pm.x;
                                 dataF[ParticleRecord.I_FPMY] = (float) pm.y;
                                 dataF[ParticleRecord.I_FPMZ] = (float) pm.z;
-                                dataF[ParticleRecord.I_FMUALPHA] = (float) mualphastar;
-                                dataF[ParticleRecord.I_FMUDELTA] = (float) mudelta;
-                                dataF[ParticleRecord.I_FRADVEL] = (float) radvel;
-                                dataF[ParticleRecord.I_FAPPMAG] = (float) appmag;
-                                dataF[ParticleRecord.I_FABSMAG] = (float) absmag;
+                                dataF[ParticleRecord.I_FMUALPHA] = (float) muAlphaStar;
+                                dataF[ParticleRecord.I_FMUDELTA] = (float) muDelta;
+                                dataF[ParticleRecord.I_FRADVEL] = (float) radVel;
+                                dataF[ParticleRecord.I_FAPPMAG] = (float) appMag;
+                                dataF[ParticleRecord.I_FABSMAG] = (float) absMag;
                                 dataF[ParticleRecord.I_FCOL] = col;
                                 dataF[ParticleRecord.I_FSIZE] = size;
                                 dataF[ParticleRecord.I_FHIP] = hip;
 
+                                // TODO - Variable stars
+                                float[] magnitudes = null;
+                                int nMagnitudes = 0;
+
                                 // Extra
-                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdp, row);
-                                if (ucdp.TEFF.isEmpty()) {
-                                    UCD teffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
+                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
+                                if (ucdParser.TEFF.isEmpty()) {
+                                    UCD tEffUCD = new UCD("phys.temperature.effective", "teff", "K", -1);
                                     extraAttributes = initExtraAttributes(extraAttributes);
-                                    extraAttributes.put(teffUCD, teff);
+                                    extraAttributes.put(tEffUCD, tEff);
                                 } else {
                                     extraAttributes = initExtraAttributes(extraAttributes);
-                                    extraAttributes.put(ucdp.TEFF.first(), teff);
+                                    extraAttributes.put(ucdParser.TEFF.first(), tEff);
                                 }
 
-                                IParticleRecord sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
+                                // IParticleRecord sb = switch (datasetOptions.type) {
+                                //     case STARS -> new ParticleRecord(dataD, dataF, id, names, extraAttributes);
+                                //     case VARIABLES -> new VariableRecord(dataD, dataF, magnitudes, nMagnitudes, id, names, extraAttributes);
+                                //     default -> null;
+                                // };
+
+                                IParticleRecord sb = magnitudes == null ? new ParticleRecord(dataD, dataF, id, names, extraAttributes) : new VariableRecord(dataD, dataF, magnitudes, nMagnitudes, id, names, extraAttributes);
+
                                 list.add(sb);
 
-                                int appclmp = (int) MathUtilsd.clamp(appmag, 0, 21);
-                                countsPerMag[appclmp] += 1;
+                                int appMagClamp = (int) MathUtilsd.clamp(appMag, 0, 21);
+                                countsPerMag[appMagClamp] += 1;
                             } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
                                 double[] point = new double[3];
                                 point[ParticleRecord.I_X] = p.gsposition.x;
@@ -417,7 +417,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 point[ParticleRecord.I_Z] = p.gsposition.z;
 
                                 // Extra
-                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdp, row);
+                                ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
 
                                 IParticleRecord pb = new ParticleRecord(point, null, null, names, extraAttributes);
                                 list.add(pb);
@@ -426,12 +426,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                         } catch (Exception e) {
                             logger.debug(e);
                             logger.debug("Exception parsing row " + i + ": skipping");
-                        } i++;
+                        }
+                        i++;
                         if (updateCallback != null && i % step == 0) {
                             updateCallback.run(i, count);
                         }
-                    } if (nInvalidPllx > 0) {
-                        logger.warn("Found " + nInvalidPllx + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
+                    }
+                    if (nInvalidParallaxes > 0) {
+                        logger.warn("Found " + nInvalidParallaxes + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
                     }
                 } else {
                     logger.error("Table not loaded: Position not found");
@@ -447,8 +449,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return list;
     }
 
-    private ObjectDoubleMap<UCD> initExtraAttributes(ObjectDoubleMap<UCD> extra){
-        if(extra == null)
+    private ObjectDoubleMap<UCD> initExtraAttributes(ObjectDoubleMap<UCD> extra) {
+        if (extra == null)
             extra = new ObjectDoubleMap<>(5);
         return extra;
     }
@@ -457,14 +459,14 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         // Extra
         ObjectDoubleMap<UCD> extraAttributes = null;
         for (UCD extra : ucdp.extra) {
-            Double val = Double.NaN;
+            double val = Double.NaN;
             try {
                 val = ((Number) row[extra.index]).doubleValue();
             } catch (Exception e) {
                 Object o = row[extra.index];
                 if (o instanceof Character) {
                     Character c = (Character) o;
-                    val = (double) c.charValue();
+                    val = (double) c;
                 }
             }
             if (extraAttributes == null)
@@ -510,6 +512,21 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
     @Override
     public void setMagCorrections(boolean magCorrections) {
+    }
+
+    /**
+     * Works out the size from the absolute magnitude.
+     *
+     * @param absMag The absolute magnitude
+     *
+     * @return The pseudo-size of this star
+     */
+    private double magnitudeToPseudoSize(final double absMag) {
+
+        // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
+        double pseudoL = Math.pow(10, -0.4 * absMag);
+        double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
+        return Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
     }
 
 }

@@ -49,7 +49,8 @@ public class DatasetOptions {
     public enum DatasetLoadType {
         PARTICLES,
         STARS,
-        CLUSTERS
+        CLUSTERS,
+        VARIABLES
     }
 
     public DatasetLoadType type;

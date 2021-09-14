@@ -188,7 +188,7 @@ public class DatasetsWidget {
                 // Select checkbox
                 final OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.name, 33), skin, "large", pad * 2f);
                 boolean gsVersionTooSmall = false;
-                if (dataset.minGsVersion >= 0 && dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
                     // Can't select! minimum GS version larger than current
                     cb.setChecked(false);
                     cb.setDisabled(true);

@@ -24,7 +24,7 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
@@ -35,11 +35,11 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class VariableGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset;
+    private int nSizesOffset, sizesOffset, pmOffset;
     private float[] pointAlpha;
     private final float[] alphaSizeFovBr;
     private final float[] pointAlphaHl;
@@ -47,7 +47,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
     private Texture starTex;
 
-    public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public VariableGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
@@ -102,7 +102,8 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        nSizesOffset = curr.mesh.getVertexAttribute(Usage.BiNormal) != null ? curr.mesh.getVertexAttribute(Usage.BiNormal).offset / 4 : 0;
+        sizesOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
         return mdi;
     }
 
@@ -134,65 +135,68 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             alphaSizeFovBr[3] = rc.scaleFactor;
 
             renderables.forEach(r -> {
-                final StarGroup starGroup = (StarGroup) r;
-                synchronized (starGroup) {
-                    if (!starGroup.disposed) {
-                        boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                        if (!starGroup.inGpu()) {
-                            int n = starGroup.size();
-                            starGroup.offset = addMeshData(n);
-                            curr = meshes.get(starGroup.offset);
+                final StarGroup variableGroup = (StarGroup) r;
+                synchronized (variableGroup) {
+                    if (!variableGroup.disposed) {
+                        boolean hlCmap = variableGroup.isHighlighted() && !variableGroup.isHlplain();
+                        if (!variableGroup.inGpu()) {
+                            int n = variableGroup.size();
+                            variableGroup.offset = addMeshData(n);
+                            curr = meshes.get(variableGroup.offset);
                             ensureTempVertsSize(n * curr.vertexSize);
                             int numAdded = 0;
                             for (int i = 0; i < n; i++) {
-                                if (starGroup.filter(i) && starGroup.isVisible(i)) {
-                                    IParticleRecord particle = starGroup.data().get(i);
-                                    if (!Double.isFinite(particle.size())) {
-                                        logger.debug("Star " + particle.id() + " has a non-finite size");
+                                if (variableGroup.filter(i) && variableGroup.isVisible(i)) {
+                                    VariableRecord vr = (VariableRecord) variableGroup.data().get(i);
+                                    if (!Double.isFinite(vr.size())) {
+                                        logger.debug("Star " + vr.id() + " has a non-finite size");
                                         continue;
                                     }
                                     // COLOR
                                     if (hlCmap) {
                                         // Color map
-                                        double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
+                                        double[] color = cmap.colormap(variableGroup.getHlcmi(), variableGroup.getHlcma().get(vr), variableGroup.getHlcmmin(), variableGroup.getHlcmmax());
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                                     } else {
                                         // Plain
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                        tempVerts[curr.vertexIdx + curr.colorOffset] = variableGroup.getColor(i);
                                     }
 
                                     // SIZE
-                                    if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                                    } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + nSizesOffset] = vr.nMagnitudes;
+                                    for (int k = 0; k < vr.nMagnitudes; k++) {
+                                        if (variableGroup.isHlAllVisible() && variableGroup.isHighlighted()) {
+                                            tempVerts[curr.vertexIdx + sizesOffset + k] = Math.max(10f, (float) (vr.sizes(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor());
+                                        } else {
+                                            tempVerts[curr.vertexIdx + sizesOffset + k] = (float) (vr.sizes(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor();
+                                        }
                                     }
 
                                     // POSITION [u]
-                                    tempVerts[curr.vertexIdx] = (float) particle.x();
-                                    tempVerts[curr.vertexIdx + 1] = (float) particle.y();
-                                    tempVerts[curr.vertexIdx + 2] = (float) particle.z();
+                                    tempVerts[curr.vertexIdx] = (float) vr.x();
+                                    tempVerts[curr.vertexIdx + 1] = (float) vr.y();
+                                    tempVerts[curr.vertexIdx + 2] = (float) vr.z();
 
                                     // PROPER MOTION [u/yr]
-                                    tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+                                    tempVerts[curr.vertexIdx + pmOffset] = (float) vr.pmx();
+                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) vr.pmy();
+                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) vr.pmz();
 
                                     curr.vertexIdx += curr.vertexSize;
                                     numAdded++;
                                 }
                             }
-                            starGroup.count = numAdded * curr.vertexSize;
-                            curr.mesh.setVertices(tempVerts, 0, starGroup.count);
+                            variableGroup.count = numAdded * curr.vertexSize;
+                            curr.mesh.setVertices(tempVerts, 0, variableGroup.count);
 
-                            starGroup.inGpu(true);
+                            variableGroup.inGpu(true);
 
                         }
 
                         /*
                          * RENDER
                          */
-                        curr = meshes.get(starGroup.offset);
+                        curr = meshes.get(variableGroup.offset);
                         if (curr != null) {
 
                             if (starTex != null) {
@@ -200,17 +204,21 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
+                            shaderProgram.setUniform2fv("u_pointAlpha", variableGroup.isHighlighted() && variableGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
 
-                            alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
+                            alphaSizeFovBr[0] = variableGroup.opacity * alphas[variableGroup.ct.getFirstOrdinal()];
+                            alphaSizeFovBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * variableGroup.highlightedSizeFactor()) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility
-                            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), starGroup.getEpoch());
+                            double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), variableGroup.getEpoch());
                             float curRt2 = (float) (curRt - (double) ((float) curRt));
                             shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
+
+                            double seconds = (curRt - ((int) curRt)) * 86400.0;
+                            shaderProgram.setUniformf("u_s", (float) (seconds % 16d));
+                            logger.info("u_s=" + ((float) (seconds % 16d)));
 
                             try {
                                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
@@ -231,7 +239,11 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
+        attributes.add(new VertexAttribute(Usage.BiNormal, 1, "a_nsizes"));
+        attributes.add(new VertexAttribute(Usage.Generic, 4, "a_sizes1"));
+        attributes.add(new VertexAttribute(Usage.Normal, 4, "a_sizes2"));
+        attributes.add(new VertexAttribute(Usage.BoneWeight, 4, "a_sizes3"));
+        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 4, "a_sizes4"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)

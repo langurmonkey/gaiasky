@@ -36,6 +36,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
+import gaiasky.scenegraph.particle.ParticleRecord;
+import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
@@ -249,7 +251,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
-            addToRender(this, RenderGroup.STAR_GROUP);
+            if (pointData.get(0) instanceof VariableRecord) {
+                addToRender(this, RenderGroup.VARIABLE_GROUP);
+            } else {
+                addToRender(this, RenderGroup.STAR_GROUP);
+            }
             addToRender(this, RenderGroup.MODEL_VERT_STAR);
             if (Settings.settings.scene.star.group.billboard) {
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
@@ -380,11 +386,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             IParticleRecord star = pointData.get(active[i]);
             float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
-            Vector3d lpos = fetchPosition(star, cPosD, aux3d1.get(), currDeltaYears);
+            Vector3d lPos = fetchPosition(star, cPosD, aux3d1.get(), currDeltaYears);
             // Proper motion
             Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
             // Rest of attributes
-            float distToCamera = (float) lpos.len();
+            float distToCamera = (float) lPos.len();
             float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness);
             if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
                 Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
@@ -392,7 +398,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 double p1p2len = ppm.len();
                 Vector3d p2 = aux3d3.get().set(ppm).add(p1);
 
-                // Max speed in km/s, to normalize
+                // Maximum speed in km/s, to normalize
                 float maxSpeedKms = 100;
                 float r, g, b;
                 switch (Settings.settings.scene.properMotion.colorMode) {

@@ -290,7 +290,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param externalView Open a new window with a view of the rendered scene
      * @param debugMode    Output debug information
      */
-    public GaiaSky(boolean skipWelcome, boolean vr, boolean externalView, boolean noScriptingServer, boolean debugMode) {
+    public GaiaSky(final boolean skipWelcome, final boolean vr, final boolean externalView, final boolean noScriptingServer, final boolean debugMode) {
         super();
         instance = this;
         this.settings = Settings.settings;
@@ -340,8 +340,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         }
 
         // Initialise times
-        ITimeFrameProvider clock = new GlobalClock(1, Instant.now());
-        ITimeFrameProvider real = new RealTimeClock();
+        final ITimeFrameProvider clock = new GlobalClock(1, Instant.now());
+        final ITimeFrameProvider real = new RealTimeClock();
         time = settings.runtime.realTime ? real : clock;
         t = 0;
 
@@ -353,8 +353,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         TooltipManager.getInstance().hideAll();
 
         // Initialise asset manager
-        FileHandleResolver internalResolver = new InternalFileHandleResolver();
-        FileHandleResolver dataResolver = fileName -> settings.data.dataFileHandle(fileName);
+        final FileHandleResolver internalResolver = new InternalFileHandleResolver();
+        final FileHandleResolver dataResolver = fileName -> settings.data.dataFileHandle(fileName);
         assetManager = new AssetManager(internalResolver);
         assetManager.setLoader(com.badlogic.gdx.graphics.Texture.class, ".pfm", new PFMTextureLoader(dataResolver));
         assetManager.setLoader(PFMData.class, new PFMDataLoader(dataResolver));
@@ -409,7 +409,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         AssetBean.setAssetManager(assetManager);
 
         // Create vr context if possible
-        VRStatus vrStatus = createVR();
+        final VRStatus vrStatus = createVR();
         cameraManager.updateFrustumPlanes();
 
         // Tooltip to 1s
@@ -439,7 +439,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             ScriptingServer.initialize();
 
         // Tell the asset manager to load all the assets
-        Set<AssetBean> assets = AssetBean.getAssets();
+        final Set<AssetBean> assets = AssetBean.getAssets();
         for (AssetBean ab : assets) {
             ab.load(assetManager);
         }
@@ -478,7 +478,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 vrContext = new VRContext();
                 vrContext.pollEvents();
 
-                VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
+                final VRDevice hmd = vrContext.getDeviceByType(VRDeviceType.HeadMountedDisplay);
                 logger.info("Initialization of VR successful");
                 if (hmd == null) {
                     logger.info("HMD device is null!");
@@ -597,7 +597,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
 
         // First time, set assets
-        Array<SceneGraphNode> nodes = sceneGraph.getNodes();
+        final Array<SceneGraphNode> nodes = sceneGraph.getNodes();
         for (SceneGraphNode sgn : nodes) {
             sgn.doneLoading(assetManager);
         }
@@ -657,7 +657,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         frames = 0;
 
         // Debug info scheduler
-        Task debugTask1 = new Task() {
+        final Task debugTask1 = new Task() {
             @Override
             public void run() {
                 // FPS
@@ -675,7 +675,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         };
 
-        Task debugTask10 = new Task() {
+        final Task debugTask10 = new Task() {
             @Override
             public void run() {
                 EventManager.instance.post(Events.SAMP_INFO, sampClient.getStatus());
@@ -688,7 +688,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Timer.schedule(debugTask10, 2, 10);
 
         // Start capturing locations
-        Task startCapturing = new Task() {
+        final Task startCapturing = new Task() {
             @Override
             public void run() {
                 LocationLogManager.instance().startCapturing();
@@ -707,7 +707,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Moves the camera home. That is either the Earth, if it exists, or somewhere close to the Sun
      */
     private void goHome() {
-        IFocus homeObject = sceneGraph.findFocus(settings.scene.homeObject);
+        final IFocus homeObject = sceneGraph.findFocus(settings.scene.homeObject);
         boolean isOn = true;
         if (homeObject != null && (isOn = GaiaSky.instance.isOn(homeObject.getCt())) && !settings.program.net.slave.active) {
             // Set focus to Earth
@@ -1155,7 +1155,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
     }
 
-    public void renderSgr(ICamera camera, double t, int width, int height, int tw, int th, FrameBuffer frameBuffer, PostProcessBean ppb) {
+    public void renderSgr(final ICamera camera, final double t, final int width, final int height, final int tw, final int th, final FrameBuffer frameBuffer, final PostProcessBean ppb) {
         sgr.render(camera, t, width, height, tw, th, frameBuffer, ppb);
     }
 
@@ -1188,8 +1188,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public void resizeImmediate(final int width, final int height, boolean resizePostProcessors, boolean resizeRenderSys, boolean resizeGuis, boolean resizeScreenConf) {
         try {
-            int renderWidth = (int) Math.round(width * settings.graphics.backBufferScale);
-            int renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
+            final int renderWidth = (int) Math.round(width * settings.graphics.backBufferScale);
+            final int renderHeight = (int) Math.round(height * settings.graphics.backBufferScale);
 
             // Resize global UI sprite batch
             globalResources.getSpriteBatch().getProjectionMatrix().setToOrtho2D(0, 0, renderWidth, renderHeight);
@@ -1225,7 +1225,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      *
      * @param gui The GUI to render
      */
-    private void renderGui(IGui gui) {
+    private void renderGui(final IGui gui) {
         gui.update(graphics.getDeltaTime());
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -1237,10 +1237,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return sceneGraph.getFocusableObjects();
     }
 
-    public FrameBuffer getFrameBuffer(int w, int h) {
-        String key = getKey(w, h);
+    public FrameBuffer getFrameBuffer(final int w, final int h) {
+        final String key = getKey(w, h);
         if (!frameBufferMap.containsKey(key)) {
-            FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, Format.RGB888, true);
+            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, Format.RGB888, true);
             frameBufferMap.put(key, fb);
         }
         return frameBufferMap.get(key);
@@ -1286,15 +1286,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return this.postProcessor;
     }
 
-    public boolean isOn(int ordinal) {
+    public boolean isOn(final int ordinal) {
         return this.sgr.isOn(ordinal);
     }
 
-    public boolean isOn(ComponentType comp) {
+    public boolean isOn(final ComponentType comp) {
         return this.sgr.isOn(comp);
     }
 
-    public boolean isOn(ComponentTypes cts) {
+    public boolean isOn(final ComponentTypes cts) {
         return this.sgr.allOn(cts);
     }
 
@@ -1323,7 +1323,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             /* LOAD SCENE GRAPH */
             if (sceneGraph == null) {
                 dataLoadString = "SceneGraphData";
-                String[] dataFilesToLoad = new String[settings.data.catalogFiles.size() + settings.data.objectFiles.size()];
+                final String[] dataFilesToLoad = new String[settings.data.catalogFiles.size() + settings.data.objectFiles.size()];
                 int i = 0;
                 // Catalog files
                 for (String dataFile : settings.data.catalogFiles) {
@@ -1354,7 +1354,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case CAMERA_MODE_CMD:
             // Register/unregister GUI
-            CameraMode mode = (CameraMode) data[0];
+            final CameraMode mode = (CameraMode) data[0];
             if (settings.program.modeStereo.isStereoHalfViewport()) {
                 guiRegistry.change(stereoGui);
             } else if (mode == CameraMode.SPACECRAFT_MODE) {
@@ -1364,7 +1364,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
             break;
         case STEREOSCOPIC_CMD:
-            boolean stereoMode = (Boolean) data[0];
+            final boolean stereoMode = (Boolean) data[0];
             if (stereoMode && guiRegistry.current != stereoGui) {
                 guiRegistry.change(stereoGui);
             } else if (!stereoMode && guiRegistry.previous != stereoGui) {
@@ -1374,7 +1374,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Post a message to the screen
             if (stereoMode) {
-                ModePopupInfo mpi = new ModePopupInfo();
+                final ModePopupInfo mpi = new ModePopupInfo();
                 mpi.title = "Stereoscopic mode";
                 mpi.header = "You have entered Stereoscopic mode!";
                 mpi.addMapping("Back to normal mode", "CTRL", "S");
@@ -1443,23 +1443,23 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             goHome();
             break;
         case PER_OBJECT_VISIBILITY_CMD:
-            IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-            String name = (String) data[1];
-            boolean state = (boolean) data[2];
+            final IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
+            final String name = (String) data[1];
+            final boolean state = (boolean) data[2];
             vs.setVisible(state, name.toLowerCase());
             logger.info(I18n.txt("notif.visibility.object.set", vs.getName(), state));
             break;
         case PARK_RUNNABLE:
             synchronized (parkedRunnables) {
-                String key = (String) data[0];
-                Runnable runnable = (Runnable) data[1];
+                final String key = (String) data[0];
+                final Runnable runnable = (Runnable) data[1];
                 parkRunnable(key, runnable);
             }
             break;
         case UNPARK_RUNNABLE:
             synchronized (parkedRunnables) {
-                String key = (String) data[0];
-                unparkRunnable(key);
+                final String key = (String) data[0];
+                removeRunnable(key);
             }
             break;
         default:
@@ -1483,18 +1483,18 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable.
      */
-    public void parkRunnable(String key, Runnable runnable) {
+    public void parkRunnable(final String key, final Runnable runnable) {
         parkedRunnablesMap.put(key, runnable);
         parkedRunnables.add(runnable);
     }
 
     /**
-     * Unparks a previously parked runnable.
+     * Removes a previously parked runnable.
      *
-     * @param key The key of the runnable to unpark.
+     * @param key The key of the runnable to remove.
      */
-    public void unparkRunnable(String key) {
-        Runnable r = parkedRunnablesMap.get(key);
+    public void removeRunnable(final String key) {
+        final Runnable r = parkedRunnablesMap.get(key);
         if (r != null) {
             parkedRunnables.removeValue(r, true);
             parkedRunnablesMap.remove(key);
@@ -1506,7 +1506,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      *
      * @param r The runnable to post.
      */
-    public static void postRunnable(Runnable r) {
+    public static void postRunnable(final Runnable r) {
         if (instance != null && instance.window != null)
             instance.window.postRunnable(r);
         else

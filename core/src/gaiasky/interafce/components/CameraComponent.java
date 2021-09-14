@@ -40,7 +40,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
 
     @Override
     public void initialize() {
-        float contentWidth = ControlsWindow.getContentWidth();
+        final float contentWidth = ControlsWindow.getContentWidth();
 
         cinematic = new OwnCheckBox(I18n.txt("gui.camera.cinematic"), skin, pad8);
         cinematic.setName("cinematic camera");
@@ -53,9 +53,9 @@ public class CameraComponent extends GuiComponent implements IObserver {
             return false;
         });
 
-        Label modeLabel = new Label(I18n.txt("gui.camera.mode"), skin, "default");
-        int cameraModes = CameraMode.values().length;
-        CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
+        final Label modeLabel = new Label(I18n.txt("gui.camera.mode"), skin, "default");
+        final int cameraModes = CameraMode.values().length;
+        final CameraComboBoxBean[] cameraOptions = new CameraComboBoxBean[cameraModes];
         for (int i = 0; i < cameraModes; i++) {
             cameraOptions[i] = new CameraComboBoxBean(Objects.requireNonNull(CameraMode.getMode(i)).toStringI18n(), CameraMode.getMode(i));
         }
@@ -75,9 +75,9 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         if (!Settings.settings.runtime.openVr) {
-            Image icon3d = new Image(skin.getDrawable("3d-icon"));
+            final Image icon3d = new Image(skin.getDrawable("3d-icon"));
             button3d = new OwnTextIconButton("", icon3d, skin, "toggle");
-            String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
+            final String hk3d = KeyBindings.instance.getStringKeys("action.toggle/element.stereomode");
             button3d.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.stereomode")), hk3d, skin));
             button3d.setName("3d");
             button3d.addListener(event -> {
@@ -95,10 +95,10 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 return false;
             });
 
-            Image iconDome = new Image(skin.getDrawable("dome-icon"));
+            final Image iconDome = new Image(skin.getDrawable("dome-icon"));
             buttonDome = new OwnTextIconButton("", iconDome, skin, "toggle");
-            String hkdome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
-            buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), hkdome, skin));
+            final String hkDome = KeyBindings.instance.getStringKeys("action.toggle/element.planetarium");
+            buttonDome.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.planetarium")), hkDome, skin));
             buttonDome.setName("dome");
             buttonDome.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -116,11 +116,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 return false;
             });
 
-            Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
+            final Image iconCubemap = new Image(skin.getDrawable("cubemap-icon"));
             buttonCubemap = new OwnTextIconButton("", iconCubemap, skin, "toggle");
             buttonCubemap.setProgrammaticChangeEvents(false);
-            String hkcubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
-            buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.360")), hkcubemap, skin));
+            final String hkCubemap = KeyBindings.instance.getStringKeys("action.toggle/element.360");
+            buttonCubemap.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.360")), hkCubemap, skin));
             buttonCubemap.setName("cubemap");
             buttonCubemap.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -139,11 +139,11 @@ public class CameraComponent extends GuiComponent implements IObserver {
             });
 
             if (Settings.settings.program.net.isMasterInstance()) {
-                Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
+                final Image iconMaster = new Image(skin.getDrawable("iconic-link-intact"));
                 buttonMaster = new OwnTextIconButton("", iconMaster, skin, "default");
                 buttonMaster.setProgrammaticChangeEvents(false);
                 buttonMaster.setSize(28f, 29.6f);
-                String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
+                final String hkmaster = KeyBindings.instance.getStringKeys("action.slave.configure");
                 buttonMaster.addListener(new OwnTextHotkeyTooltip(TextUtils.capitalise(I18n.txt("element.slave.config")), hkmaster, skin));
                 buttonMaster.setName("master");
                 buttonMaster.addListener(event -> {
@@ -165,7 +165,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView.setDisabled(Settings.settings.program.modeCubemap.isFixedFov());
         fieldOfView.addListener(event -> {
             if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
-                float value = fieldOfView.getMappedValue();
+                final float value = fieldOfView.getMappedValue();
                 EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
                 return true;
             }
@@ -173,7 +173,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         });
 
         // CAMERA SPEED LIMIT
-        String[] speedLimits = new String[19];
+        final String[] speedLimits = new String[19];
         speedLimits[0] = I18n.txt("gui.camera.speedlimit.100kmh");
         speedLimits[1] = I18n.txt("gui.camera.speedlimit.cfactor", "0.5");
         speedLimits[2] = I18n.txt("gui.camera.speedlimit.cfactor", "0.8");
@@ -200,7 +200,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.setItems(speedLimits);
         cameraSpeedLimit.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                int idx = cameraSpeedLimit.getSelectedIndex();
+                final int idx = cameraSpeedLimit.getSelectedIndex();
                 EventManager.instance.post(Events.SPEED_LIMIT_CMD, idx, true);
                 return true;
             }
@@ -284,7 +284,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 buttonGroup.addActor(buttonMaster);
         }
 
-        Table cameraGroup = new Table(skin);
+        final Table cameraGroup = new Table(skin);
         cameraGroup.align(Align.left);
 
         cameraGroup.add(group(modeLabel, cameraMode, pad3)).top().left().padBottom(pad9).row();
@@ -310,7 +310,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         switch (event) {
         case CAMERA_CINEMATIC_CMD:
 
-            boolean gui = (Boolean) data[1];
+            final boolean gui = (Boolean) data[1];
             if (!gui) {
                 cinematic.setProgrammaticChangeEvents(false);
                 cinematic.setChecked((Boolean) data[0]);
@@ -320,7 +320,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             break;
         case CAMERA_MODE_CMD:
             // Update camera mode selection
-            CameraMode mode = (CameraMode) data[0];
+            final CameraMode mode = (CameraMode) data[0];
             Array<CameraComboBoxBean> cModes = cameraMode.getItems();
             CameraComboBoxBean selected = null;
             for (CameraComboBoxBean ccbb : cModes) {
@@ -347,7 +347,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         case CAMERA_SPEED_CMD:
             interf = (Boolean) data[1];
             if (!interf) {
-                float value = (Float) data[0];
+                final float value = (Float) data[0];
                 fieldLock = true;
                 cameraSpeed.setMappedValue(value);
                 fieldLock = false;
@@ -357,7 +357,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         case TURNING_SPEED_CMD:
             interf = (Boolean) data[1];
             if (!interf) {
-                float value = (Float) data[0];
+                final float value = (Float) data[0];
                 fieldLock = true;
                 turnSpeed.setMappedValue(value);
                 fieldLock = false;
@@ -368,7 +368,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             if (data.length > 1)
                 interf = (Boolean) data[1];
             if (!interf) {
-                int value = (Integer) data[0];
+                final int value = (Integer) data[0];
                 cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
                 cameraSpeedLimit.setSelectedIndex(value);
                 cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(true);
@@ -379,7 +379,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             if (data.length > 2)
                 interf = (Boolean) data[2];
             if (!interf) {
-                boolean lock = (Boolean) data[1];
+                final boolean lock = (Boolean) data[1];
                 orientationLock.setProgrammaticChangeEvents(false);
                 orientationLock.setChecked(lock);
                 orientationLock.setProgrammaticChangeEvents(true);
@@ -399,8 +399,8 @@ public class CameraComponent extends GuiComponent implements IObserver {
             break;
         case CUBEMAP_CMD:
             if (!(boolean) data[2] && !Settings.settings.runtime.openVr) {
-                CubemapProjection proj = (CubemapProjection) data[1];
-                boolean enable = (boolean) data[0];
+                final CubemapProjection proj = (CubemapProjection) data[1];
+                final boolean enable = (boolean) data[0];
                 if (proj.isPanorama()) {
                     buttonCubemap.setProgrammaticChangeEvents(false);
                     buttonCubemap.setChecked(enable);
@@ -417,7 +417,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             break;
         case PLANETARIUM_CMD:
             if (!(boolean) data[1] && !Settings.settings.runtime.openVr) {
-                boolean enable = (boolean) data[0];
+                final boolean enable = (boolean) data[0];
                 buttonDome.setProgrammaticChangeEvents(false);
                 buttonDome.setChecked(enable);
                 buttonDome.setProgrammaticChangeEvents(true);

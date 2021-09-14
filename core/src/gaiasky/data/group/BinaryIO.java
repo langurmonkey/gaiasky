@@ -22,7 +22,7 @@ public interface BinaryIO {
      * Read a star from the mapped buffer.
      *
      * @param mem    Mapped memory buffer to read from.
-     * @param factor Scale factor to apply to positions.
+     * @param factor Scale factor to apply to the positions.
      * @return The star.
      */
     ParticleRecord readParticleRecord(MappedByteBuffer mem, double factor);
@@ -31,7 +31,7 @@ public interface BinaryIO {
      * Read a star from the input stream.
      *
      * @param in Input stream.
-     * @param factor Scale factor to apply to positions.
+     * @param factor Scale factor to apply to the positions.
      * @return The star.
      * @throws IOException If the read fails.
      */
@@ -42,7 +42,7 @@ public interface BinaryIO {
      *
      * @param sb  The star bean.
      * @param out The output stream.
-     * @throws IOException If the write fails.
+     * @throws IOException If the write operation fails.
      */
     void writeParticleRecord(IParticleRecord sb, DataOutputStream out) throws IOException;
 }
