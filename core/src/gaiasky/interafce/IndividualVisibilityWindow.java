@@ -4,6 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
@@ -16,10 +17,8 @@ import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This window controls the visibility of individual objects
@@ -125,15 +124,21 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         content.pack();
     }
 
-    private Group visibilitySwitcher(ComponentType ct, String title, String id) {
+    private boolean filter(final String[] names, final String filter) {
+        if (filter == null || filter.isEmpty())
+            return true;
 
-        float componentWidth = 400f;
-        VerticalGroup objectsGroup = new VerticalGroup();
-        objectsGroup.space(space4);
-        objectsGroup.left();
-        objectsGroup.columnLeft();
+        for (final String name : names) {
+            if (name.toLowerCase(Locale.ROOT).contains(filter))
+                return true;
+        }
+        return false;
+    }
+
+    private void addObjects(final VerticalGroup objectsGroup, final List<OwnCheckBox> checkBoxes, final ComponentType ct, final String filter) {
+        objectsGroup.clear();
+        checkBoxes.clear();
         Array<SceneGraphNode> objects = new Array<>();
-        List<OwnCheckBox> cbs = new ArrayList<>();
         sg.getRoot().getChildrenByComponentType(ct, objects);
         Array<String> names = new Array<>(false, objects.size);
         Map<String, IVisibilitySwitch> objMap = new HashMap<>();
@@ -141,7 +146,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
         for (SceneGraphNode object : objects) {
             // Omit stars with no proper names and particle groups
-            if (object.getName() != null && !GlobalResources.isNumeric(object.getName()) && !exception(ct, object)) {
+            if (object.getName() != null && !GlobalResources.isNumeric(object.getName()) && !exception(ct, object) && filter(object.getNames(), filter)) {
                 names.add(object.getName());
                 objMap.put(object.getName(), object);
             }
@@ -177,11 +182,29 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
                 }
 
                 objectsGroup.addActor(objectHgroup);
-                cbs.add(cb);
+                checkBoxes.add(cb);
             }
         }
 
+        if (ct.equals(ComponentType.Stars)) {
+            objectsGroup.addActor(new OwnLabel("", skin));
+            objectsGroup.addActor(new OwnLabel(I18n.txt("notif.visibility.stars"), skin));
+        }
+
         objectsGroup.pack();
+    }
+
+    private Group visibilitySwitcher(final ComponentType ct, final String title, final String id) {
+        float componentWidth = 400f;
+
+        // Objects
+        final VerticalGroup objectsGroup = new VerticalGroup();
+        objectsGroup.space(space4);
+        objectsGroup.left();
+        objectsGroup.columnLeft();
+        final List<OwnCheckBox> checkBoxes = new ArrayList<>();
+        addObjects(objectsGroup, checkBoxes, ct, null);
+
         OwnScrollPane scrollPane = new OwnScrollPane(objectsGroup, skin, "minimalist-nobg");
         scrollPane.setName(id + " scroll");
 
@@ -191,6 +214,19 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         scrollPane.setHeight(360f);
         scrollPane.setWidth(componentWidth);
 
+        // Filter
+        OwnTextField filter = new OwnTextField("", skin);
+        filter.setWidth(componentWidth);
+        filter.setMessageText(I18n.txt("gui.dataset.filter"));
+        filter.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                addObjects(objectsGroup, checkBoxes, ct, filter.getText().trim().toLowerCase(Locale.ROOT));
+                return true;
+            }
+            return false;
+        });
+
+        // Buttons
         HorizontalGroup buttons = new HorizontalGroup();
         buttons.space(pad5);
         OwnTextIconButton selAll = new OwnTextIconButton("", skin, "audio");
@@ -198,7 +234,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         selAll.pad(space2);
         selAll.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
-                GaiaSky.postRunnable(() -> cbs.forEach((i) -> i.setChecked(true)));
+                GaiaSky.postRunnable(() -> checkBoxes.forEach((i) -> i.setChecked(true)));
                 return true;
             }
             return false;
@@ -208,7 +244,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         selNone.pad(space2);
         selNone.addListener((event) -> {
             if (event instanceof ChangeListener.ChangeEvent) {
-                GaiaSky.postRunnable(() -> cbs.forEach((i) -> i.setChecked(false)));
+                GaiaSky.postRunnable(() -> checkBoxes.forEach((i) -> i.setChecked(false)));
                 return true;
             }
             return false;
@@ -222,6 +258,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         group.space(space8);
 
         group.addActor(new OwnLabel(TextUtils.trueCapitalise(title), skin, "header"));
+        group.addActor(filter);
         group.addActor(scrollPane);
         group.addActor(buttons);
 
@@ -234,11 +271,11 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
      *
      * @param ct     The component type
      * @param object The object
+     *
      * @return Whether this object is an exception (should not be listed) or not
      */
     private boolean exception(ComponentType ct, SceneGraphNode object) {
-        return ct == ComponentType.Planets && object instanceof Orbit
-                || object instanceof ParticleGroup || object.hasName("asteroids hook");
+        return ct == ComponentType.Planets && object instanceof Orbit || object instanceof ParticleGroup || object.hasName("asteroids hook");
     }
 
     @Override
