@@ -238,7 +238,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
      */
     private boolean exception(ComponentType ct, SceneGraphNode object) {
         return ct == ComponentType.Planets && object instanceof Orbit
-                || object instanceof ParticleGroup;
+                || object instanceof ParticleGroup || object.hasName("asteroids hook");
     }
 
     @Override

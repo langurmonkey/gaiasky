@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
@@ -35,11 +36,13 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
     private final Vector3 aux1;
     private final Matrix4 maux;
     private int elems01Offset, elems02Offset, sizeOffset, count;
+    private boolean forceAdd = false;
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
+        EventManager.instance.subscribe(this, Events.RESET_ORBITAL_ELEMENTS_SYSTEM);
     }
 
     @Override
@@ -57,6 +60,7 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
      * @param nVertices The max number of vertices this mesh data can hold
+     *
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
@@ -79,11 +83,12 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         int n = renderables.size;
         if (n > 0 && renderables.get(0).getOpacity() > 0) {
             Orbit first = (Orbit) renderables.get(0);
-            if (!first.elemsInGpu) {
+            if (forceAdd || !first.elemsInGpu) {
+                forceAdd = false;
                 curr = meshes.get(addMeshData(n));
 
                 ensureTempVertsSize(n * curr.vertexSize);
-                renderables.forEach(renderable ->{
+                renderables.forEach(renderable -> {
                     Orbit orbitElems = (Orbit) renderable;
 
                     if (!orbitElems.elemsInGpu) {
@@ -151,20 +156,29 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         }
     }
 
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Tangent, 4, "a_orbitelems01"));
-        attribs.add(new VertexAttribute(Usage.Generic, 4, "a_orbitelems02"));
-        attribs.add(new VertexAttribute(Usage.Normal, 1, "a_size"));
+    public void reset() {
+        clearMeshes();
+        curr = null;
+        forceAdd = true;
+    }
 
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
+    protected VertexAttribute[] buildVertexAttributes() {
+        Array<VertexAttribute> attributes = new Array<>();
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.Tangent, 4, "a_orbitelems01"));
+        attributes.add(new VertexAttribute(Usage.Generic, 4, "a_orbitelems02"));
+        attributes.add(new VertexAttribute(Usage.Normal, 1, "a_size"));
+
+        VertexAttribute[] array = new VertexAttribute[attributes.size];
+        for (int i = 0; i < attributes.size; i++)
+            array[i] = attributes.get(i);
         return array;
     }
 
     @Override
     public void notify(final Events event, final Object... data) {
+        if (event.equals(Events.RESET_ORBITAL_ELEMENTS_SYSTEM)) {
+            GaiaSky.postRunnable(this::reset);
+        }
     }
 }

@@ -18,6 +18,8 @@ import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
@@ -425,6 +427,17 @@ public class Orbit extends Polyline {
     @Override
     public double getAlpha() {
         return alpha;
+    }
+
+    @Override
+    public void setVisible(boolean visible, String name) {
+        boolean change = this.visible != visible;
+        super.setVisible(visible, name);
+
+        if (change) {
+            EventManager.instance.post(Events.RESET_ORBITAL_ELEMENTS_SYSTEM);
+        }
+
     }
 
     @Override

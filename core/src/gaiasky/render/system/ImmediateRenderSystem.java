@@ -78,6 +78,15 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         return mdi;
     }
 
+    public void clearMeshes() {
+        if(meshes != null) {
+            for (int i = 0; i < meshes.size; i++) {
+                clearMeshData(i);
+            }
+            meshes.clear();
+        }
+    }
+
     /**
      * Clears the mesh data at the index i
      *
@@ -113,15 +122,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected abstract void initVertices();
 
     public void dispose(){
-        if(meshes != null) {
-            for (int i = 0; i < meshes.size; i++) {
-                MeshData md = meshes.get(i);
-                if (md != null) {
-                    md.dispose();
-                }
-            }
-            meshes.clear();
-        }
+        clearMeshes();
         tempVerts = null;
         curr = null;
     }

@@ -1163,6 +1163,11 @@ public enum Events {
     STOP_CAMERA_PLAY,
 
     /**
+     * Resets the {@link gaiasky.render.system.OrbitalElementsParticlesRenderSystem}
+     */
+    RESET_ORBITAL_ELEMENTS_SYSTEM,
+
+    /**
      * Sets and unsets the target time. Contains a time (set), or nothing
      * (unset)
      **/
