@@ -124,9 +124,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         int[] screenshot, frame;
         screenshot = getSize(RenderType.screenshot);
         frame = getSize(RenderType.frame);
-        if (Settings.settings.screenshot.isRedrawMode())
+        if (Settings.settings.screenshot.isAdvancedMode())
             pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, screenshot[0], screenshot[1], screenshot[0], screenshot[1], manager);
-        if (Settings.settings.frame.isRedrawMode())
+        if (Settings.settings.frame.isAdvancedMode())
             pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, frame[0], frame[1], frame[0], frame[1], manager);
     }
 
@@ -609,7 +609,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             });
             break;
         case SCREENSHOT_SIZE_UPDATE:
-            if (pps != null && Settings.settings.screenshot.isRedrawMode()) {
+            if (pps != null && Settings.settings.screenshot.isAdvancedMode()) {
                 int neww = (Integer) data[0];
                 int newh = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
@@ -622,7 +622,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             }
             break;
         case FRAME_SIZE_UPDATE:
-            if (pps != null && Settings.settings.frame.isRedrawMode()) {
+            if (pps != null && Settings.settings.frame.isAdvancedMode()) {
                 int neww = (Integer) data[0];
                 int newh = (Integer) data[1];
                 if (pps[RenderType.frame.index] != null) {

@@ -1099,8 +1099,8 @@ public class Settings {
         }
 
         @JsonIgnore
-        public boolean isRedrawMode() {
-            return mode.equals(ScreenshotMode.REDRAW);
+        public boolean isAdvancedMode() {
+            return mode.equals(ScreenshotMode.ADVANCED);
         }
     }
 
@@ -1111,7 +1111,7 @@ public class Settings {
         public double targetFps;
 
         public FrameSettings() {
-            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD);
+            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_MODE_CMD);
         }
 
         @Override
@@ -1133,9 +1133,9 @@ public class Settings {
                 ScreenshotMode mode = null;
                 if (newMode instanceof String) {
                     try {
-                        mode = ScreenshotMode.valueOf((String) newMode);
+                        mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        logger.error("Given value is not a representation of ScreenshotMode (simple|redraw): '" + newMode + "'");
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
                     }
                 } else {
                     mode = (ScreenshotMode) newMode;
@@ -1420,7 +1420,7 @@ public class Settings {
 
     public enum ScreenshotMode {
         SIMPLE,
-        REDRAW
+        ADVANCED
     }
 
     public enum ImageFormat {

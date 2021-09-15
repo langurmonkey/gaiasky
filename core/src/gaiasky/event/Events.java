@@ -422,7 +422,7 @@ public enum Events {
     FRAME_OUTPUT_CMD,
 
     /**
-     * Sets the frame output mode, either simple or redraw. Gets a string or a {@link ScreenshotSettings} object.
+     * Sets the frame output mode, either SIMPLE or ADVANCED. Gets a string or a {@link ScreenshotSettings} object.
      */
     FRAME_OUTPUT_MODE_CMD,
 

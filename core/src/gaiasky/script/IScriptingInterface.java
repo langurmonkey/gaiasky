@@ -1000,7 +1000,7 @@ public interface IScriptingInterface {
     /**
      * Configures the frame output system, setting the resolution of the images,
      * the target frames per second, the output folder and the image name
-     * prefix. This function sets the frame output mode to 'redraw'.
+     * prefix. This function sets the frame output mode to 'advanced'.
      *
      * @param width      Width of images.
      * @param height     Height of images.
@@ -1013,7 +1013,7 @@ public interface IScriptingInterface {
     /**
      * Configures the frame output system, setting the resolution of the images,
      * the target frames per second, the output folder and the image name
-     * prefix. This function sets the frame output mode to 'redraw'.
+     * prefix. This function sets the frame output mode to 'advanced'.
      *
      * @param width      Width of images.
      * @param height     Height of images.
@@ -1024,13 +1024,13 @@ public interface IScriptingInterface {
     void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix);
 
     /**
-     * Sets the frame output mode. Possible values are 'redraw' or 'simple'.
-     * Simple mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
+     * Sets the frame output mode. Possible values are 'simple' and 'advanced'.
+     * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
      * resolution and containing the UI elements.
-     * Redraw mode redraws the last frame using the resolution configured using {@link #configureFrameOutput(int, int, int, String, String)} and
-     * it does not draw the UI elements.
+     * The <b>advanced</b> mode redraws the last frame using the resolution configured using {@link #configureFrameOutput(int, int, int, String, String)} and
+     * it does not draw the UI.
      *
-     * @param screenshotMode The screenshot mode. 'simple' or 'redraw'.
+     * @param screenshotMode The screenshot mode. 'simple' or 'advanced'.
      */
     void setFrameOutputMode(String screenshotMode);
 

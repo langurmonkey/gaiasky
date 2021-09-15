@@ -1,5 +1,6 @@
 package gaiasky.util;
 
+import com.badlogic.gdx.Screen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -102,7 +103,7 @@ public class SettingsMorph {
 
         // Frame
         var frame = new FrameSettings();
-        frame.mode = ScreenshotMode.valueOf(str("graphics.render.mode", p).toUpperCase());
+        frame.mode = screenshotMode(str("graphics.render.mode", p));
         int fw = i32("graphics.render.width", p);
         int fh = i32("graphics.render.height", p);
         frame.resolution = new int[] { fw, fh };
@@ -116,7 +117,7 @@ public class SettingsMorph {
 
         // Screenshot
         var screenshot = new ScreenshotSettings();
-        screenshot.mode = ScreenshotMode.valueOf(str("screenshot.mode", p).toUpperCase());
+        screenshot.mode = screenshotMode(str("screenshot.mode", p).toUpperCase());
         int sw = i32("screenshot.width", p);
         int sh = i32("screenshot.height", p);
         screenshot.resolution = new int[] { sw, sh };
@@ -347,6 +348,13 @@ public class SettingsMorph {
         SequenceWriter sequenceWriter = mapper.writerWithDefaultPrettyPrinter().writeValues(fos);
         sequenceWriter.write(s);
         fos.close();
+    }
+
+    private static ScreenshotMode screenshotMode(String value) {
+        if (value.equalsIgnoreCase("redraw")) {
+            value = "ADVANCED";
+        }
+        return ScreenshotMode.valueOf(value.toUpperCase());
     }
 
 

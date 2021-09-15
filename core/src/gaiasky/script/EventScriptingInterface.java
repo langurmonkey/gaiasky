@@ -947,7 +947,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix) {
         if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
-            em.post(Events.FRAME_OUTPUT_MODE_CMD, Settings.ScreenshotMode.REDRAW);
+            em.post(Events.FRAME_OUTPUT_MODE_CMD, Settings.ScreenshotMode.ADVANCED);
             em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, folder, namePrefix);
         }
     }
@@ -959,6 +959,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFrameOutputMode(String screenshotMode) {
+        // Hack to keep compatibility with old scripts
+        if (screenshotMode != null && screenshotMode.equalsIgnoreCase("redraw")) {
+            screenshotMode = "ADVANCED";
+        }
         if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode"))
             em.post(Events.FRAME_OUTPUT_MODE_CMD, screenshotMode);
     }
@@ -1262,8 +1266,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 // Roll till done
                 Vector3d up = cam.up;
                 // aux1 <- camera-object
-                camObj = object.
-                        getAbsolutePosition(aux3b1).sub(cam.pos);
+                camObj = object.getAbsolutePosition(aux3b1).sub(cam.pos);
                 double ang1 = up.angle(camObj);
                 double ang2 = up.cpy().rotate(cam.direction, 1).angle(camObj);
                 double rollSign = ang1 < ang2 ? -1d : 1d;

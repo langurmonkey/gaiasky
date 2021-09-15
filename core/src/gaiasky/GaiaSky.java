@@ -890,7 +890,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             EventManager.instance.post(Events.RENDER_FRAME, this);
 
             /*
-             * SCREENSHOT OUTPUT - simple|redraw mode
+             * SCREENSHOT OUTPUT - simple|advanced mode
              */
             EventManager.instance.post(Events.RENDER_SCREENSHOT, this);
 
