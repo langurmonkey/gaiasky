@@ -5,8 +5,10 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -23,7 +25,7 @@ public class CollapsiblePane extends Table {
 
     CollapsibleWindow dialogWindow;
     ImageButton expandIcon, detachIcon;
-    float lastx = -1, lasty = -1;
+    float lastX = -1, lastY = -1;
     Actor content;
     String labelText;
     Skin skin;
@@ -59,18 +61,18 @@ public class CollapsiblePane extends Table {
         this.content = content;
         this.skin = skin;
         this.space = 6.4f;
-        this.collapseSpeed = 1000;
+        this.collapseSpeed = 100;
 
         OwnLabel mainLabel = new OwnLabel(labelText, skin, labelStyle);
         float lw = mainLabel.getWidth();
         LabelStyle ls = skin.get(labelStyle, LabelStyle.class);
 
-        float mwidth = width * 0.8f;
-        if (lw > mwidth) {
-            com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout(); //dont do this every frame! Store it as member
+        float mWidth = width * 0.8f;
+        if (lw > mWidth) {
+            com.badlogic.gdx.graphics.g2d.GlyphLayout layout = new com.badlogic.gdx.graphics.g2d.GlyphLayout();
             for (int chars = labelText.length() - 1; chars > 0; chars--) {
                 layout.setText(ls.font, TextUtils.capString(labelText, chars));
-                if (layout.width <= mwidth) {
+                if (layout.width <= mWidth) {
                     mainLabel.setText(TextUtils.capString(labelText, chars));
                     break;
                 }
@@ -178,10 +180,12 @@ public class CollapsiblePane extends Table {
 
     private void toggleExpandCollapse() {
         if (expandIcon.isChecked() && dialogWindow == null) {
+            // Expand
             contentCell.setActor(content);
             expanding = true;
             collapsing = false;
         } else {
+            // Collapse
             contentCell.clearActor();
             expanding = false;
             collapsing = true;
@@ -190,7 +194,7 @@ public class CollapsiblePane extends Table {
     }
 
     public void detach() {
-        dialogWindow = createWindow(labelText, content, skin, stage, lastx, lasty);
+        dialogWindow = createWindow(labelText, content, skin, stage, lastX, lastY);
 
         // Display
         if (!stage.getActors().contains(dialogWindow, true))
@@ -226,13 +230,13 @@ public class CollapsiblePane extends Table {
 
         window.add(contentScroll).pad(8f).row();
 
-        /** Close button **/
+        // Close button
         OwnTextButton close = new OwnTextButton(I18n.txt("gui.close"), skin, "default");
         close.setName("close");
         close.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                lastx = window.getX();
-                lasty = window.getY();
+                lastX = window.getX();
+                lastY = window.getY();
                 window.remove();
                 dialogWindow = null;
                 expandIcon.setDisabled(false);

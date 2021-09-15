@@ -113,7 +113,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     public void buildSuper() {
 
-        /** BUTTONS **/
+        // BUTTONS
         buttonGroup = new HorizontalGroup();
         buttonGroup.space(pad5);
 
@@ -199,7 +199,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
             return false;
         });
 
-        /** CAPTURE SCROLL FOCUS **/
+        // CAPTURE SCROLL FOCUS
         stage.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
@@ -274,7 +274,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * default fadeIn action
      */
     public GenericDialog show(Stage stage) {
-        show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.4f, Interpolation.fade)));
+        show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.6f, Interpolation.fade)));
         if(lastPosX >= 0 && lastPosY >= 0){
             setPosition(Math.round(lastPosX), Math.round(lastPosY));
         } else {
@@ -288,7 +288,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      * {@link #pack() Packs} the dialog and adds it to the stage at the specified position
      */
     public GenericDialog show(Stage stage, float x, float y) {
-        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(0.4f, Interpolation.fade)));
+        show(stage, sequence(Actions.alpha(0f), Actions.fadeIn(0.6f, Interpolation.fade)));
         setPosition(Math.round(x), Math.round(y));
         setKeyboardFocus();
         return this;
@@ -336,6 +336,15 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
+     * Hides the dialog. Called automatically when a button is clicked. The
+     * default implementation fades out the dialog over 400 milliseconds and
+     * then removes it from the stage.
+     */
+    public void hide() {
+        hide(Actions.fadeOut(0.6f, Interpolation.fade));
+    }
+
+    /**
      * Sets the runnable which runs when accept is clicked
      *
      * @param r The runnable
@@ -359,15 +368,6 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     public boolean hasCancelRunnable() {
         return cancelRunnable != null;
-    }
-
-    /**
-     * Hides the dialog. Called automatically when a button is clicked. The
-     * default implementation fades out the dialog over 400 milliseconds and
-     * then removes it from the stage.
-     */
-    public void hide() {
-        hide(Actions.fadeOut(0.4f, Interpolation.fade));
     }
 
     /**

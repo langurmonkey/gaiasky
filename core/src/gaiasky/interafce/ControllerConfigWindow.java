@@ -42,7 +42,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     private static final String button = "Button";
     private static final String axis = "Axis";
 
-    private Texture controller, stick, stickH, stickV, dpadU, dpadD, dpadL, dpadR, startSelect, a, b, x, y, lt, rt, lb, rb;
+    private Texture controller;
     // For each button/axis we have the texture, the location in pixels and the name
     private Map<Gamepad, Trio<Texture, float[], String>> inputInfo;
     private Map<Gamepad, OwnTextField> inputFields;
@@ -57,7 +57,6 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
     // The cell with the active element
     private Cell<Image> elementCell;
-    private final boolean jumpToNext = true;
     // Saved file, at the end, if any
     public Path savedFile = null;
 
@@ -123,15 +122,31 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         setCancelText(I18n.txt("gui.cancel"));
 
         // Initialize textures
+        Texture rb;
+        Texture lb;
+        Texture rt;
+        Texture lt;
+        Texture y;
+        Texture x;
+        Texture b;
+        Texture a;
+        Texture startSelect;
+        Texture dPadR;
+        Texture dPadL;
+        Texture dPadD;
+        Texture dPadU;
+        Texture stickV;
+        Texture stickH;
+        Texture stick;
         try {
             controller = new Texture(Gdx.files.internal("img/controller/illustration/controller-nocontrast.png"));
             stick = new Texture(Gdx.files.internal("img/controller/illustration/button-stick.png"));
             stickH = new Texture(Gdx.files.internal("img/controller/illustration/axis-stick-h.png"));
             stickV = new Texture(Gdx.files.internal("img/controller/illustration/axis-stick-v.png"));
-            dpadU = new Texture(Gdx.files.internal("img/controller/illustration/dpad-u.png"));
-            dpadD = new Texture(Gdx.files.internal("img/controller/illustration/dpad-d.png"));
-            dpadL = new Texture(Gdx.files.internal("img/controller/illustration/dpad-l.png"));
-            dpadR = new Texture(Gdx.files.internal("img/controller/illustration/dpad-r.png"));
+            dPadU = new Texture(Gdx.files.internal("img/controller/illustration/dpad-u.png"));
+            dPadD = new Texture(Gdx.files.internal("img/controller/illustration/dpad-d.png"));
+            dPadL = new Texture(Gdx.files.internal("img/controller/illustration/dpad-l.png"));
+            dPadR = new Texture(Gdx.files.internal("img/controller/illustration/dpad-r.png"));
             startSelect = new Texture(Gdx.files.internal("img/controller/illustration/start-select.png"));
             a = new Texture(Gdx.files.internal("img/controller/illustration/button-a.png"));
             b = new Texture(Gdx.files.internal("img/controller/illustration/button-b.png"));
@@ -162,10 +177,10 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         inputInfo.put(Gamepad.RSTICK_H, new Trio<>(stickH, new float[]{160, 50}, "Right stick horizontal"));
         inputInfo.put(Gamepad.RSTICK_V, new Trio<>(stickV, new float[]{160, 50}, "Right stick vertical"));
         // Dpad
-        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dpadU, new float[]{-155, 10}, "Dpad up"));
-        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dpadD, new float[]{-155, 85}, "Dpad down"));
-        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dpadL, new float[]{-194, 49}, "Dpad left"));
-        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dpadR, new float[]{-120, 49}, "Dpad right"));
+        inputInfo.put(Gamepad.DPAD_UP, new Trio<>(dPadU, new float[]{-155, 10}, "Dpad up"));
+        inputInfo.put(Gamepad.DPAD_DOWN, new Trio<>(dPadD, new float[]{-155, 85}, "Dpad down"));
+        inputInfo.put(Gamepad.DPAD_LEFT, new Trio<>(dPadL, new float[]{-194, 49}, "Dpad left"));
+        inputInfo.put(Gamepad.DPAD_RIGHT, new Trio<>(dPadR, new float[]{-120, 49}, "Dpad right"));
         // Start/select
         inputInfo.put(Gamepad.START, new Trio<>(startSelect, new float[]{75, -170}, "Start button"));
         inputInfo.put(Gamepad.SELECT, new Trio<>(startSelect, new float[]{-75, -170}, "Select button"));
@@ -199,13 +214,13 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         content.add(tip).colspan(2).padBottom(pad10 * 2f).row();
 
         // Controller
-        Cell controllerCell = content.add().padRight(pad10 * 2);
+        Cell<?> controllerCell = content.add().padRight(pad10 * 2);
 
         Table controllerTable = new Table(skin);
         controllerTable.setBackground(new SpriteDrawable(new Sprite(controller)));
         controllerTable.setSize(controller.getWidth(), controller.getHeight());
         controllerCell.setActor(controllerTable);
-        elementCell = controllerTable.add();
+        elementCell = controllerTable.add((Image) null);
 
         // Last input
         OwnLabel currentInputLabel = new OwnLabel("Last input:", skin, "header");
@@ -319,9 +334,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         content.add(filenameGroup).colspan(2).padTop(pad20);
 
         // Select first
-        GaiaSky.postRunnable(() -> {
-            stage.setKeyboardFocus(inputFields.get(gpds[0]));
-        });
+        GaiaSky.postRunnable(() -> stage.setKeyboardFocus(inputFields.get(gpds[0])));
 
         content.pack();
     }
@@ -605,10 +618,6 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
-        switch (event) {
-            default:
-                break;
-        }
     }
 
     private class ConfigControllerListener implements ControllerListener {
@@ -684,7 +693,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         }
 
         private void jumpToNext() {
-            if (currTextField != inputFields.get(Gamepad.values()[Gamepad.values().length - 1]) && jumpToNext) {
+            if (currTextField != inputFields.get(Gamepad.values()[Gamepad.values().length - 1])) {
                 currTextField.next(false);
             } else {
                 stage.setKeyboardFocus(null);
