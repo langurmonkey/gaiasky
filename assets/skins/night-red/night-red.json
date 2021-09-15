@@ -478,7 +478,7 @@
       "font": "title-27",
       "fontColor": "theme",
       "disabledFontColor": "disabled-font",
-      "imageUp": "car-icon"
+      "imageUp": "iconic-play-circle"
     },
     "cloud-download": {
       "down": "default-round-down",
@@ -488,7 +488,7 @@
       "font": "title-23",
       "fontColor": "theme",
       "disabledFontColor": "disabled-font",
-      "imageUp": "iconic-cloud-download"
+      "imageUp": "iconic-data-transfer-download"
     },
     "check": {
       "down": "default-round-down",
@@ -498,7 +498,7 @@
       "font": "title-23",
       "fontColor": "theme",
       "disabledFontColor": "disabled-font",
-      "imageUp": "iconic-check"
+      "imageUp": "iconic-task"
     },
     "plus": {
       "down": "default-round-down",

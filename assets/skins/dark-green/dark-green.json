@@ -472,7 +472,7 @@
       "font": "title-27",
       "fontColor": "theme",
       "disabledFontColor": "dark-gray",
-      "imageUp": "car-icon"
+      "imageUp": "iconic-play-circle"
     },
     "cloud-download": {
       "down": "default-round-down",
@@ -482,7 +482,7 @@
       "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
-      "imageUp": "iconic-cloud-download"
+      "imageUp": "iconic-data-transfer-download"
     },
     "check": {
       "down": "default-round-down",
@@ -492,7 +492,7 @@
       "font": "title-23",
       "fontColor": "white",
       "disabledFontColor": "dark-gray",
-      "imageUp": "iconic-check"
+      "imageUp": "iconic-task"
     },
     "plus": {
       "down": "default-round-down",
