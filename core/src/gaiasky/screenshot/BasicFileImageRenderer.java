@@ -13,8 +13,8 @@ import gaiasky.util.Settings.ImageFormat;
 public class BasicFileImageRenderer implements IFileImageRenderer {
 
     @Override
-    public String saveScreenshot(String absoluteLocation, String baseFileName, int w, int h, boolean immediate, ImageFormat type, float quality) {
-        return ImageRenderer.renderToImageGl20(absoluteLocation, baseFileName, w, h, type, quality);
+    public String saveScreenshot(String absoluteLocation, String baseFileName, int w, int h, boolean immediate, ImageFormat format, float quality) {
+        return ImageRenderer.renderToImageGl20(absoluteLocation, baseFileName, w, h, format, quality);
     }
 
     @Override

@@ -2060,11 +2060,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.frame.mode = ScreenshotMode.values()[frameoutputMode.getSelectedIndex()];
         int fow = Integer.parseInt(fowidthField.getText());
         int foh = Integer.parseInt(foheightField.getText());
-        boolean foupdate = fow != settings.frame.resolution[0] || foh != settings.frame.resolution[1] || !prev.equals(settings.frame.mode);
+        boolean frameOutputUpdate = fow != settings.frame.resolution[0] || foh != settings.frame.resolution[1] || !prev.equals(settings.frame.mode);
         settings.frame.resolution[0] = fow;
         settings.frame.resolution[1] = foh;
         settings.frame.targetFps = Parser.parseDouble(frameoutputFps.getText());
-        if (foupdate)
+        if (frameOutputUpdate)
             EventManager.instance.post(Events.FRAME_SIZE_UPDATE, settings.frame.resolution[0], settings.frame.resolution[1]);
 
         // Camera recording
@@ -2072,9 +2072,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.camrecorder.auto = cbAutoCamrec.isChecked();
 
         // Cubemap resolution (same as plResolution)
-        int newres = Integer.parseInt(cmResolution.getText());
-        if (newres != settings.program.modeCubemap.faceResolution)
-            EventManager.instance.post(Events.CUBEMAP_RESOLUTION_CMD, newres);
+        int newResolution = Integer.parseInt(cmResolution.getText());
+        if (newResolution != settings.program.modeCubemap.faceResolution)
+            EventManager.instance.post(Events.CUBEMAP_RESOLUTION_CMD, newResolution);
 
         // Planetarium aperture
         float ap = Float.parseFloat(plAperture.getText());

@@ -38,15 +38,15 @@ public class ImageRenderer {
      *            The width of the image
      * @param h
      *            The height of the image
-     * @param type
-     *            The format
+     * @param format
+     *            The format, either JPG or PNG
      * @param quality
      *            Quality, in case of JPG [0..1]
      */
-    public static String renderToImageGl20(String absoluteLocation, String baseFileName, int w, int h, ImageFormat type, float quality) {
+    public static String renderToImageGl20(String absoluteLocation, String baseFileName, int w, int h, ImageFormat format, float quality) {
         Pixmap pixmap = getScreenshot(0, 0, w, h, true);
 
-        String file = writePixmapToImage(absoluteLocation, baseFileName, pixmap, type, quality);
+        String file = writePixmapToImage(absoluteLocation, baseFileName, pixmap, format, quality);
         pixmap.dispose();
         return file;
     }
@@ -55,21 +55,19 @@ public class ImageRenderer {
         return getScreenshot(0, 0, w, h, true);
     }
 
-    public static String writePixmapToImage(String absoluteLocation, String baseFileName, Pixmap pixmap, ImageFormat type, float quality) {
-        /** Make sure the directory exists **/
+    public static String writePixmapToImage(String absoluteLocation, String baseFileName, Pixmap pixmap, ImageFormat format, float quality) {
+        // Make sure the directory exists
         FileHandle dir = Gdx.files.absolute(absoluteLocation);
         dir.mkdirs();
 
-        /** Save to file **/
-        FileHandle fh = getTarget(absoluteLocation, baseFileName, type);
-        switch (type) {
-        case PNG:
-            PixmapIO.writePNG(fh, pixmap);
-            break;
-        case JPG:
+        // Save to file
+        FileHandle fh = getTarget(absoluteLocation, baseFileName, format);
+        switch (format) {
+        case PNG -> PixmapIO.writePNG(fh, pixmap);
+        case JPG -> {
             JPGWriter.setQuality(quality);
             JPGWriter.write(fh, pixmap);
-            break;
+        }
         }
         return fh.path();
     }
@@ -103,10 +101,10 @@ public class ImageRenderer {
         return pixmap;
     }
 
-    private static FileHandle getTarget(String absoluteLocation, String baseFileName, ImageFormat type) {
-        FileHandle fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + type.toString().toLowerCase());
+    private static FileHandle getTarget(String absoluteLocation, String baseFileName, ImageFormat format) {
+        FileHandle fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.toString().toLowerCase());
         while (fh.exists()) {
-            fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + type.toString().toLowerCase());
+            fh = Gdx.files.absolute(absoluteLocation + File.separator + baseFileName + getNextSeqNumSuffix() + "." + format.toString().toLowerCase());
         }
         return fh;
     }

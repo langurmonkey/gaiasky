@@ -122,7 +122,7 @@ public class ScreenshotsManager implements IObserver {
      * @param renderer the {@link IFileImageRenderer} to use.
      * @return String with the path to the screenshot image file.
      */
-    public String renderToImage(IMainRenderer mr, ICamera camera, double dt, PostProcessBean ppb, int width, int height, String folder, String filename, IFileImageRenderer renderer, ImageFormat type, float quality) {
+    public String renderToImage(IMainRenderer mr, ICamera camera, double dt, PostProcessBean ppb, int width, int height, String folder, String filename, IFileImageRenderer renderer, ImageFormat format, float quality) {
         FrameBuffer frameBuffer = mr.getFrameBuffer(width, height);
         // TODO That's a dirty trick, we should find a better way (i.e. making
         // buildEnabledEffectsList() method public)
@@ -150,7 +150,7 @@ public class ScreenshotsManager implements IObserver {
         }
 
         frameBuffer.getColorBufferTexture().getTextureData().getFormat();
-        String res = renderer.saveScreenshot(folder, filename, width, height, false, type, quality);
+        String res = renderer.saveScreenshot(folder, filename, width, height, false, format, quality);
 
         frameBuffer.end();
         return res;

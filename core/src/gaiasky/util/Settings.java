@@ -174,6 +174,7 @@ public class Settings {
          * Adds the given catalog descriptor file to the list of JSON selected files.
          *
          * @param catalog The catalog descriptor file pointer.
+         *
          * @return True if the catalog was added, false if it does not exist, or it is not a file, or it is not readable, or it is already in the list.
          */
         public boolean addSelectedCatalog(Path catalog) {
@@ -300,8 +301,7 @@ public class Settings {
 
         public static class CameraSettings implements IObserver {
             public int speedLimitIndex;
-            @JsonIgnore
-            public double speedLimit;
+            @JsonIgnore public double speedLimit;
             public double speed;
             public double turn;
             public double rotate;
@@ -691,7 +691,6 @@ public class Settings {
         public UpdateSettings update;
         public UrlSettings url;
 
-
         public ProgramSettings() {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
         }
@@ -731,8 +730,7 @@ public class Settings {
         public static class ModeStereoSettings {
             public boolean active;
             public StereoProfile profile;
-            @JsonIgnore
-            public float eyeSeparation = 1f;
+            @JsonIgnore public float eyeSeparation = 1f;
 
             public void setProfile(String profileString) {
                 this.profile = StereoProfile.valueOf(profileString.toUpperCase());
@@ -887,8 +885,7 @@ public class Settings {
 
         public static class UpdateSettings {
             // Update checker time, in ms
-            @JsonIgnore
-            public static long VERSION_CHECK_INTERVAL_MS = 86400000L;
+            @JsonIgnore public static long VERSION_CHECK_INTERVAL_MS = 86400000L;
             public Instant lastCheck;
             public String lastVersion;
 
@@ -1114,25 +1111,24 @@ public class Settings {
         public double targetFps;
 
         public FrameSettings() {
-            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD, Events.CAMRECORDER_FPS_CMD);
+            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD);
         }
 
         @Override
         public void notify(final Events event, final Object... data) {
             switch (event) {
-            case CONFIG_FRAME_OUTPUT_CMD:
+            case CONFIG_FRAME_OUTPUT_CMD -> {
                 boolean updateFrameSize = resolution[0] != (int) data[0] || resolution[1] != (int) data[1];
                 resolution[0] = (int) data[0];
                 resolution[1] = (int) data[1];
                 targetFps = (double) data[2];
                 location = (String) data[3];
                 prefix = (String) data[4];
-
                 if (updateFrameSize) {
                     EventManager.instance.post(Events.FRAME_SIZE_UPDATE, resolution[0], resolution[1]);
                 }
-                break;
-            case FRAME_OUTPUT_MODE_CMD:
+            }
+            case FRAME_OUTPUT_MODE_CMD -> {
                 Object newMode = data[0];
                 ScreenshotMode mode = null;
                 if (newMode instanceof String) {
@@ -1147,27 +1143,35 @@ public class Settings {
                 if (mode != null) {
                     this.mode = mode;
                 }
-                break;
-            case FRAME_OUTPUT_CMD:
+            }
+            case FRAME_OUTPUT_CMD -> {
                 active = (Boolean) data[0];
                 // Flush buffer if needed
                 if (!active && GaiaSky.instance != null) {
                     EventManager.instance.post(Events.FLUSH_FRAMES);
                 }
-                break;
-            case CAMRECORDER_FPS_CMD:
-                targetFps = (Double) data[0];
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
             }
         }
     }
 
-    public static class CamrecorderSettings {
+    public static class CamrecorderSettings implements IObserver {
         public double targetFps;
         public KeyframeSettings keyframe;
         public boolean auto;
+
+        public CamrecorderSettings() {
+            EventManager.instance.subscribe(this, Events.CAMRECORDER_FPS_CMD);
+        }
+
+        @Override
+        public void notify(Events event, Object... data) {
+            if (event == Events.CAMRECORDER_FPS_CMD) {
+                targetFps = (Double) data[0];
+            }
+        }
 
         public static class KeyframeSettings {
             public CameraKeyframeManager.PathType position;
@@ -1321,7 +1325,7 @@ public class Settings {
         public boolean updatePause = false;
         public boolean timeOn = false;
         public boolean realTime = false;
-        public boolean inputEnabled =true;
+        public boolean inputEnabled = true;
         public boolean recordCamera = false;
         public boolean recordKeyframeCamera = false;
 
@@ -1567,7 +1571,7 @@ public class Settings {
         }
 
         public static Antialias getFromCode(int code) {
-            return switch(code){
+            return switch (code) {
                 case 0 -> NONE;
                 case -1 -> FXAA;
                 case -2 -> NFAA;
