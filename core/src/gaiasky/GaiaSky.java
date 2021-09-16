@@ -933,7 +933,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (settings.graphics.fpsLimit > 0.0) {
             sleep(settings.graphics.fpsLimit);
         } else if (settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastResolutionChange > 2000 && !settings.runtime.openVr) {
-            // Dynamic resolution
+            // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
             float fps = 1f / graphics.getDeltaTime();
             if (!lowResolution && fps < 20) {
                 // Downscale
@@ -1086,6 +1086,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     private long start = System.currentTimeMillis();
 
+    /**
+     * Pause the main thread for a certain amount of time to match the
+     * given target frame rate.
+     * @param fps The target frame rate
+     */
     private void sleep(double fps) {
         if (fps > 0) {
             long diff = System.currentTimeMillis() - start;
