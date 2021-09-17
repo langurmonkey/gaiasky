@@ -1965,12 +1965,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void sleep(float seconds) {
-        if (checkNum(seconds, 1E-10f, Float.MAX_VALUE, "seconds")) {
+        if (checkNum(seconds, 0f, Float.MAX_VALUE, "seconds")) {
+            if (seconds == 0f)
+                return;
+
             if (this.isFrameOutputActive()) {
-                this.sleepFrames(Math.round(this.getFrameOutputFps() * seconds));
+                this.sleepFrames(Math.max(1, Math.round(this.getFrameOutputFps() * seconds)));
             } else {
                 try {
-                    Thread.sleep(Math.round(seconds * 1000));
+                    Thread.sleep(Math.round(seconds * 1000f));
                 } catch (InterruptedException e) {
                     logger.error(e);
                 }

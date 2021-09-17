@@ -1118,12 +1118,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // The actual frame time difference in seconds
         double dtGs;
         if (settings.frame.active) {
-            // If RENDER_OUTPUT is active, we need to set our dt according to
-            // the fps
+            // If frame output is active, we need to set our delta t according to
+            // the configured frame rate of the frame output system
             dtGs = 1.0 / settings.frame.targetFps;
         } else if (camRecording) {
-            // If Camera is recording, we need to set our dt according to
-            // the fps
+            // If Camera is recording, we need to set our delta t according to
+            // the configured frame rate of the camrecorder
             dtGs = 1.0 / settings.camrecorder.targetFps;
         } else {
             // Max time step is 0.05 seconds. Not in RENDER_OUTPUT MODE.

@@ -229,6 +229,10 @@ public class Settings {
         public boolean dynamicResolution;
         public boolean screenOutput;
 
+        public GraphicsSettings() {
+            EventManager.instance.subscribe(this, Events.LIMIT_FPS_CMD);
+        }
+
         public void setQuality(final String qualityString) {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
@@ -628,17 +632,11 @@ public class Settings {
             @Override
             public void notify(final Events event, final Object... data) {
                 switch (event) {
-                case CROSSHAIR_FOCUS_CMD:
-                    focus = (boolean) data[0];
-                    break;
-                case CROSSHAIR_CLOSEST_CMD:
-                    closest = (boolean) data[0];
-                    break;
-                case CROSSHAIR_HOME_CMD:
-                    home = (boolean) data[0];
-                    break;
-                default:
-                    break;
+                case CROSSHAIR_FOCUS_CMD -> focus = (boolean) data[0];
+                case CROSSHAIR_CLOSEST_CMD -> closest = (boolean) data[0];
+                case CROSSHAIR_HOME_CMD -> home = (boolean) data[0];
+                default -> {
+                }
                 }
             }
         }
@@ -651,7 +649,7 @@ public class Settings {
         @Override
         public void notify(final Events event, final Object... data) {
             switch (event) {
-            case TOGGLE_VISIBILITY_CMD:
+            case TOGGLE_VISIBILITY_CMD -> {
                 String key = (String) data[0];
                 Boolean state = null;
                 if (data.length > 2) {
@@ -661,12 +659,10 @@ public class Settings {
                 if (ct != null) {
                     visibility.put(ct.name(), (state != null ? state : !visibility.get(ct.name())));
                 }
-                break;
-            case LINE_WIDTH_CMD:
-                lineWidth = MathUtilsd.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
-                break;
-            default:
-                break;
+            }
+            case LINE_WIDTH_CMD -> lineWidth = MathUtilsd.clamp((float) data[0], Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH);
+            default -> {
+            }
             }
         }
     }
@@ -1249,22 +1245,12 @@ public class Settings {
         @Override
         public void notify(final Events event, final Object... data) {
             switch (event) {
-            case BLOOM_CMD:
-                bloom.intensity = (float) data[0];
-                break;
-            case UNSHARP_MASK_CMD:
-                unsharpMask.factor = (float) data[0];
-                break;
-            case LENS_FLARE_CMD:
-                lensFlare = (Boolean) data[0];
-                break;
-            case LIGHT_SCATTERING_CMD:
-                lightGlow = (Boolean) data[0];
-                break;
-            case MOTION_BLUR_CMD:
-                motionBlur = (Boolean) data[0];
-                break;
-            case FISHEYE_CMD:
+            case BLOOM_CMD -> bloom.intensity = (float) data[0];
+            case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
+            case LENS_FLARE_CMD -> lensFlare = (Boolean) data[0];
+            case LIGHT_SCATTERING_CMD -> lightGlow = (Boolean) data[0];
+            case MOTION_BLUR_CMD -> motionBlur = (Boolean) data[0];
+            case FISHEYE_CMD -> {
                 fisheye = (Boolean) data[0];
 
                 // Post a message to the screen
@@ -1279,23 +1265,13 @@ public class Settings {
                 } else {
                     EventManager.instance.post(Events.MODE_POPUP_CMD, null, "planetarium");
                 }
-                break;
-            case BRIGHTNESS_CMD:
-                levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
-                break;
-            case CONTRAST_CMD:
-                levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
-                break;
-            case HUE_CMD:
-                levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
-                break;
-            case SATURATION_CMD:
-                levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
-                break;
-            case GAMMA_CMD:
-                levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
-                break;
-            case TONEMAPPING_TYPE_CMD:
+            }
+            case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
+            case CONTRAST_CMD -> levels.contrast = MathUtils.clamp((float) data[0], Constants.MIN_CONTRAST, Constants.MAX_CONTRAST);
+            case HUE_CMD -> levels.hue = MathUtils.clamp((float) data[0], Constants.MIN_HUE, Constants.MAX_HUE);
+            case SATURATION_CMD -> levels.saturation = MathUtils.clamp((float) data[0], Constants.MIN_SATURATION, Constants.MAX_SATURATION);
+            case GAMMA_CMD -> levels.gamma = MathUtils.clamp((float) data[0], Constants.MIN_GAMMA, Constants.MAX_GAMMA);
+            case TONEMAPPING_TYPE_CMD -> {
                 ToneMapping newTM;
                 if (data[0] instanceof String) {
                     newTM = ToneMapping.valueOf(((String) data[0]).toUpperCase());
@@ -1303,12 +1279,10 @@ public class Settings {
                     newTM = (ToneMapping) data[0];
                 }
                 toneMapping.type = newTM;
-                break;
-            case EXPOSURE_CMD:
-                toneMapping.exposure = MathUtilsd.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
-                break;
-            default:
-                break;
+            }
+            case EXPOSURE_CMD -> toneMapping.exposure = MathUtilsd.clamp((float) data[0], Constants.MIN_EXPOSURE, Constants.MAX_EXPOSURE);
+            default -> {
+            }
             }
         }
     }
@@ -1380,7 +1354,6 @@ public class Settings {
             case INPUT_ENABLED_CMD:
                 inputEnabled = (boolean) data[0];
                 break;
-
             case DISPLAY_GUI_CMD:
                 displayGui = (boolean) data[0];
                 break;

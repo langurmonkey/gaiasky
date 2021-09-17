@@ -244,16 +244,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         vsync.setChecked(settings.graphics.vsync);
 
         // LIMIT FPS
-        IValidator limitfpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
-        double lfps = settings.graphics.fpsLimit == 0 ? 60 : settings.graphics.fpsLimit;
-        limitFps = new OwnTextField(nf3.format(MathUtilsd.clamp(lfps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitfpsValidator);
-        limitFps.setDisabled(settings.graphics.fpsLimit == 0);
+        IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
+        double limitFps = settings.graphics.fpsLimit == 0 ? 60 : settings.graphics.fpsLimit;
+        this.limitFps = new OwnTextField(nf3.format(MathUtilsd.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
+        this.limitFps.setDisabled(settings.graphics.fpsLimit == 0);
 
         limitfpsCb = new OwnCheckBox(I18n.txt("gui.limitfps"), skin, "default", pad5);
         limitfpsCb.setChecked(settings.graphics.fpsLimit > 0);
         limitfpsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                enableComponents(limitfpsCb.isChecked(), limitFps);
+                enableComponents(limitfpsCb.isChecked(), this.limitFps);
                 return true;
             }
             return false;
@@ -265,7 +265,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         mode.add(windowedResolutions).left().padTop(pad5 * 2f).row();
         mode.add(vsync).left().padTop(pad5 * 2f).colspan(2).row();
         mode.add(limitfpsCb).left().padRight(pad20 * 4.9f);
-        mode.add(limitFps).left();
+        mode.add(this.limitFps).left();
 
         // Add to content
         contentGraphicsTable.add(titleResolution).left().padBottom(pad5 * 2f).row();

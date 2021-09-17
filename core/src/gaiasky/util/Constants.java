@@ -187,7 +187,7 @@ public class Constants {
     public static final float MIN_FOV = 2f;
 
     /** Minimum limit/frame/camrec fps value **/
-    public static final double MIN_FPS = 1d;
+    public static final double MIN_FPS = 0.05d;
     /** Maximum limit/frame/camrec fps value **/
     public static final double MAX_FPS = 1000d;
 

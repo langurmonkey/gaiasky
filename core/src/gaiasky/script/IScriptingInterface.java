@@ -1568,8 +1568,9 @@ public interface IScriptingInterface {
     void sleep(float seconds);
 
     /**
-     * Sleeps for a number of frames. This is very useful for scripts which need
-     * to run alongside the frame output system.
+     * Sleeps for a number of frames. The frame monitor is notified at the beginning
+     * of each frame, before the update-render cycle. When frames is 1, this method
+     * returns just before the processing of the next frame starts.
      *
      * @param frames The number of frames to wait.
      */

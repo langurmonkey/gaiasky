@@ -255,7 +255,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
                 octant.setStatus(LoadStatus.NOT_LOADED);
             }
             toLoadQueue.clear();
-            logger.info(I18n.txt("notif.loadingoctants.emtpied", n));
+            //logger.info(I18n.txt("notif.loadingoctants.emtpied", n));
         }
     }
 
@@ -310,6 +310,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      *
      * @param lod           The level of detail to load.
      * @param octreeWrapper The octree wrapper.
+     *
      * @throws IOException When any of the level's files fails to load.
      */
     public void loadLod(final Integer lod, final AbstractOctreeWrapper octreeWrapper) throws IOException {
@@ -323,6 +324,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octant        The octant to load.
      * @param octreeWrapper The octree wrapper.
      * @param level         The depth to load.
+     *
      * @throws IOException When the octant's file fails to load.
      */
     public void loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, Integer level) throws IOException {
@@ -343,7 +345,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octants       The list holding the octants to load.
      * @param octreeWrapper The octree wrapper.
      * @param abort         State variable that will be set to true if an abort is called.
+     *
      * @return The actual number of loaded octants.
+     *
      * @throws IOException When any of the octants' files fail to load.
      */
     public int loadOctants(final Array<OctreeNode> octants, final AbstractOctreeWrapper octreeWrapper, final AtomicBoolean abort) throws IOException {
@@ -410,7 +414,9 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
      * @param octreeWrapper The octree wrapper.
      * @param fullInit      Whether to fully initialise the objects (on-demand load) or
      *                      not (startup)
+     *
      * @return True if the octant was loaded, false otherwise
+     *
      * @throws IOException When the octant file could not be read.
      */
     public abstract boolean loadOctant(final OctreeNode octant, final AbstractOctreeWrapper octreeWrapper, boolean fullInit) throws IOException;
@@ -428,7 +434,6 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             this.octreeWrapper = aow;
             this.toLoad = new Array<>();
             this.abort = new AtomicBoolean(false);
-
 
             this.task = () -> {
                 /* ----------- PROCESS OCTANTS ----------- */
@@ -479,7 +484,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
             };
         }
 
-        public void abort(){
+        public void abort() {
             this.abort.set(true);
         }
 
