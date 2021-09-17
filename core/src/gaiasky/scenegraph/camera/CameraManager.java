@@ -443,18 +443,16 @@ public class CameraManager implements ICamera, IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case CAMERA_MODE_CMD:
-                CameraMode cm = (CameraMode) data[0];
-                boolean centerFocus = true;
-                if (data.length > 1)
-                    centerFocus = (Boolean) data[1];
-                updateMode(current, this.mode, cm, centerFocus, true);
-                break;
-            case FOV_CHANGE_NOTIFICATION:
-                updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-                break;
-            default:
-                break;
+        case CAMERA_MODE_CMD -> {
+            CameraMode cm = (CameraMode) data[0];
+            boolean centerFocus = true;
+            if (data.length > 1)
+                centerFocus = (Boolean) data[1];
+            updateMode(current, this.mode, cm, centerFocus, true);
+        }
+        case FOV_CHANGE_NOTIFICATION -> updateAngleEdge(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        default -> {
+        }
         }
 
     }

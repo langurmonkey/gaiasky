@@ -1126,7 +1126,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             // the configured frame rate of the camrecorder
             dtGs = 1.0 / settings.camrecorder.targetFps;
         } else {
-            // Max time step is 0.05 seconds. Not in RENDER_OUTPUT MODE.
+            // Max time step is 0.05 seconds (20 FPS). Not in RENDER_OUTPUT MODE.
             dtGs = Math.min(dt, 0.05);
         }
 

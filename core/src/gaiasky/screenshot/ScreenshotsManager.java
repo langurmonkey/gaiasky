@@ -128,7 +128,7 @@ public class ScreenshotsManager implements IObserver {
         // buildEnabledEffectsList() method public)
         boolean postprocessing = ppb.pp.buildEnabledEffectsList() > 0;
         if (!postprocessing) {
-            // If post processing is not active, we must start the buffer now.
+            // If post-processing is not active, we must start the buffer now.
             // Otherwise, it is used in the render method to write the results
             // of the pp.
             frameBuffer.begin();
@@ -139,7 +139,7 @@ public class ScreenshotsManager implements IObserver {
         mr.renderSgr(camera, dt, width, height, width, height, frameBuffer, ppb);
 
         if (postprocessing) {
-            // If post processing is active, we have to begin the buffer now again because
+            // If post-processing is active, we have to begin the buffer now again because
             // the renderSgr() has closed it.
             frameBuffer.begin();
         }

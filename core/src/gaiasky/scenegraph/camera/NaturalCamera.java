@@ -419,7 +419,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         case FOCUS_MODE:
             if (focus != null && !focus.isCoordinatesTimeOverflow()) {
                 focusBak = focus;
-                focus.getAbsolutePosition(aux4b);
+                this.focus.getAbsolutePosition(aux4b);
                 // Hack, fix this by understanding underlying problem
                 if (!aux4b.hasNaN()) {
                     focusPos.set(aux4b);
