@@ -1944,6 +1944,15 @@ public interface IScriptingInterface {
      *
      * @param id The id of the runnable to remove.
      */
+    void removeRunnable(String id);
+
+    /**
+     * Removes the runnable with the given id, if any.
+     *
+     * @param id The id of the runnable to remove.
+     * @deprecated Use {@link IScriptingInterface#removeRunnable(String)}.
+     */
+    @Deprecated
     void unparkRunnable(String id);
 
     /**

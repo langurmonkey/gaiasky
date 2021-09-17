@@ -1950,7 +1950,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
             }
 
-            // Unpark and return
+            // Remove and return
             unparkRunnable(name);
         }
     }
@@ -1965,16 +1965,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void sleep(float seconds) {
-        if (this.isFrameOutputActive()) {
-            this.sleepFrames(Math.round(this.getFrameOutputFps() * seconds));
-        } else {
-            try {
-                Thread.sleep(Math.round(seconds * 1000));
-            } catch (InterruptedException e) {
-                logger.error(e);
+        if (checkNum(seconds, 1E-10f, Float.MAX_VALUE, "seconds")) {
+            if (this.isFrameOutputActive()) {
+                this.sleepFrames(Math.round(this.getFrameOutputFps() * seconds));
+            } else {
+                try {
+                    Thread.sleep(Math.round(seconds * 1000));
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
             }
         }
-
     }
 
     public void sleep(int seconds) {
@@ -2403,9 +2404,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void unparkRunnable(String id) {
+    public void removeRunnable(String id) {
         if (checkString(id, "id"))
             em.post(Events.UNPARK_RUNNABLE, id);
+    }
+
+    @Override
+    public void unparkRunnable(String id) {
+        removeRunnable(id);
     }
 
     @Override
