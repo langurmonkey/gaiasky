@@ -937,21 +937,21 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void configureFrameOutput(int width, int height, int fps, String folder, String namePrefix) {
-        configureFrameOutput(width, height, (double) fps, folder, namePrefix);
+    public void configureFrameOutput(int width, int height, int fps, String directory, String namePrefix) {
+        configureFrameOutput(width, height, (double) fps, directory, namePrefix);
     }
 
     @Override
-    public void configureFrameOutput(int width, int height, double fps, String folder, String namePrefix) {
-        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(folder, "folder") && checkString(namePrefix, "namePrefix")) {
+    public void configureFrameOutput(int width, int height, double fps, String directory, String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(directory, "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
             em.post(Events.FRAME_OUTPUT_MODE_CMD, Settings.ScreenshotMode.ADVANCED);
-            em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, folder, namePrefix);
+            em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, directory, namePrefix);
         }
     }
 
     @Override
-    public void configureRenderOutput(int width, int height, int fps, String folder, String namePrefix) {
-        configureFrameOutput(width, height, fps, folder, namePrefix);
+    public void configureRenderOutput(int width, int height, int fps, String directory, String namePrefix) {
+        configureFrameOutput(width, height, fps, directory, namePrefix);
     }
 
     @Override
@@ -3117,6 +3117,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
         logPossibleValues(value, possibleValues, name);
         return false;
+    }
+
+    private boolean checkDirectoryExists(String location, String name) {
+        if (location == null) {
+            logger.error(name + ": location can't be null");
+            return false;
+        }
+        Path p = Path.of(location);
+        if (Files.notExists(p)) {
+            logger.error(name + ": path does not exist");
+            return false;
+        }
+        return true;
     }
 
     private boolean checkObjectName(String name) {

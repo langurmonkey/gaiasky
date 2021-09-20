@@ -397,12 +397,9 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case SCREENSHOT_SIZE_UPDATE:
-        case FRAME_SIZE_UPDATE:
-            GaiaSky.postRunnable(this::clearFrameBufferMap);
-            break;
-        default:
-            break;
+        case SCREENSHOT_SIZE_UPDATE, FRAME_SIZE_UPDATE -> GaiaSky.postRunnable(this::clearFrameBufferMap);
+        default -> {
+        }
         }
 
     }

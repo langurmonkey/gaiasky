@@ -623,16 +623,18 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case FRAME_SIZE_UPDATE:
             if (pps != null && Settings.settings.frame.isAdvancedMode()) {
-                int neww = (Integer) data[0];
-                int newh = (Integer) data[1];
+                int newWidth = (Integer) data[0];
+                int newHeight = (Integer) data[1];
                 if (pps[RenderType.frame.index] != null) {
-                    if (changed(pps[RenderType.frame.index].pp, neww, newh)) {
+                    if (changed(pps[RenderType.frame.index].pp, newWidth, newHeight)) {
                         GaiaSky.postRunnable(() -> {
-                            replace(RenderType.frame, neww, newh, neww, newh);
+                            replace(RenderType.frame, newWidth, newHeight, newWidth, newHeight);
                         });
                     }
                 } else {
-                    pps[RenderType.frame.index] = newPostProcessor(RenderType.frame, neww, newh, neww, newh, manager);
+                    GaiaSky.postRunnable(() -> {
+                        replace(RenderType.frame, newWidth, newHeight, newWidth, newHeight);
+                    });
                 }
             }
             break;
