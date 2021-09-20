@@ -365,7 +365,7 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     public double getHeight(Vector3b camPos, boolean useFuturePosition) {
         if (useFuturePosition) {
-            Vector3b nextPos = getPredictedPosition(aux3b1.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+            Vector3b nextPos = getPredictedPosition(aux3b3.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             return getHeight(camPos, nextPos);
         } else {
             return getHeight(camPos, null);

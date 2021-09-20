@@ -709,7 +709,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         T copy = null;
         try {
             copy = (T) this.getClass().getConstructor().newInstance();
-            copy.names = this.names;
             copy.parentName = this.parentName;
             copy.copy = true;
             copy.pos.set(this.pos);
@@ -913,15 +912,15 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * internal reference system using the given time provider and the given
      * camera.
      *
-     * @param aux    The out vector where the result will be stored.
+     * @param out    The out vector where the result will be stored.
      * @param time   The time frame provider.
      * @param camera The camera.
      * @param force  Whether to force the computation if time is off.
      * @return The aux vector for chaining.
      */
-    public Vector3b getPredictedPosition(Vector3b aux, ITimeFrameProvider time, ICamera camera, boolean force) {
+    public Vector3b getPredictedPosition(Vector3b out, ITimeFrameProvider time, ICamera camera, boolean force) {
         if (!mustUpdatePosition(time) && !force) {
-            return getAbsolutePosition(aux);
+            return getAbsolutePosition(out);
         } else {
             // Get copy of focus and update it to know where it will be in the
             // next step
@@ -931,7 +930,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             root.translation.set(camera.getInversePos());
             root.update(time, root.translation, camera);
 
-            fccopy.getAbsolutePosition(aux);
+            fccopy.getAbsolutePosition(out);
 
             // Return to pool
             SceneGraphNode ape = fccopy;
@@ -940,7 +939,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
                 ape = ape.parent;
             } while (ape != null);
 
-            return aux;
+            return out;
         }
     }
 

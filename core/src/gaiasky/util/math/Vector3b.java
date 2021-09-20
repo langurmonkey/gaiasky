@@ -363,6 +363,13 @@ public class Vector3b implements Serializable {
         return this;
     }
 
+    public Vector3b div(Apfloat num) {
+        x = x.divide(num);
+        y = y.divide(num);
+        z = z.divide(num);
+        return this;
+    }
+
     public Vector3b scl(Apfloat scl) {
         x = x.multiply(scl);
         y = y.multiply(scl);
@@ -564,7 +571,7 @@ public class Vector3b implements Serializable {
         final double len2d = len2.doubleValue();
         if (len2d == 0f || len2d == 1f)
             return this;
-        return this.scl(Apfloat.ONE.divide(ApfloatMath.sqrt(len2)));
+        return this.div(ApfloatMath.sqrt(len2));
     }
 
     public double dot(final Vector3d vec) {

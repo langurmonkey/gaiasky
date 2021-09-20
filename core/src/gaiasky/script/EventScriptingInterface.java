@@ -43,7 +43,6 @@ import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.ucd.UCD;
-import org.apfloat.Apfloat;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
@@ -218,12 +217,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 GaiaSky.postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
-                    double[] campos = GaiaSky.instance.cameraManager.getPos().valuesd();
+                    Vector3b camPos = GaiaSky.instance.cameraManager.getPos();
                     Vector3b dir = new Vector3b();
-                    focus.getAbsolutePosition(dir).sub(campos[0], campos[1], campos[2]);
-                    Apfloat[] b = dir.nor().values();
-                    double[] d = new double[] { b[0].doubleValue(), b[1].doubleValue(), b[2].doubleValue() };
-                    em.post(Events.CAMERA_DIR_CMD, d);
+                    focus.getAbsolutePosition(dir).sub(camPos);
+                    em.post(Events.CAMERA_DIR_CMD, (Object) dir.nor().valuesd());
                 });
                 // Make sure the last action is flushed
                 sleepFrames(2);
@@ -1143,7 +1140,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
 
-                    em.post(Events.CAMERA_FWD, 1d * dt);
+                    em.post(Events.CAMERA_FWD, (double) dt);
                     try {
                         sleep(0.1f);
                     } catch (Exception e) {
@@ -1157,7 +1154,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
 
-                    em.post(Events.CAMERA_FWD, -1d * dt);
+                    em.post(Events.CAMERA_FWD, (double) -dt);
                     try {
                         sleep(0.1f);
                     } catch (Exception e) {
@@ -2056,7 +2053,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
         Vector3b in = aux3b1.set(x, y, z);
-        Vector3d out = aux3d2;
+        Vector3d out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
         return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lend() };
     }

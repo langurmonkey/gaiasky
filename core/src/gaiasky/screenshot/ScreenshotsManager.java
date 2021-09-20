@@ -149,7 +149,6 @@ public class ScreenshotsManager implements IObserver {
             renderGui().render(width, height);
         }
 
-        frameBuffer.getColorBufferTexture().getTextureData().getFormat();
         String res = renderer.saveScreenshot(folder, filename, width, height, false, format, quality);
 
         frameBuffer.end();

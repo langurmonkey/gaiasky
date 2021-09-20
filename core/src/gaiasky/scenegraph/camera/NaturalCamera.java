@@ -194,6 +194,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      **/
     boolean inputByController = false;
 
+    /** We use this lock to update any attributes of this camera **/
+    private final Object updateLock = new Object();
     boolean diverted = false;
     boolean vr = false;
 
@@ -418,95 +420,97 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         switch (m) {
         case FOCUS_MODE:
             if (focus != null && !focus.isCoordinatesTimeOverflow()) {
-                focusBak = focus;
-                this.focus.getAbsolutePosition(aux4b);
-                // Hack, fix this by understanding underlying problem
-                if (!aux4b.hasNaN()) {
-                    focusPos.set(aux4b);
-                }
-                dx.set(0, 0, 0);
+                synchronized (updateLock) {
+                    focusBak = focus;
+                    this.focus.getAbsolutePosition(aux4b);
+                    // Hack, fix this by understanding underlying problem
+                    if (!aux4b.hasNaN()) {
+                        focusPos.set(aux4b);
+                    }
+                    dx.set(0, 0, 0);
 
-                if (Settings.settings.scene.camera.focusLock.position) {
-                    // Get focus dx
-                    dx.set(nextFocusPosition).sub(focusPos);
+                    if (Settings.settings.scene.camera.focusLock.position) {
+                        // Get focus dx
+                        dx.set(nextFocusPosition).sub(focusPos);
 
-                    // Lock orientation - FOR NOW THIS ONLY WORKS WITH
-                    // PLANETS and MOONS
-                    if (Settings.settings.scene.camera.focusLock.orientation && time.getHdiff() > 0 && focus.getOrientation() != null) {
-                        RotationComponent rc = focus.getRotationComponent();
-                        if (rc != null) {
-                            // Rotation component present - planets, etc
-                            double angleBak = rc.angle;
-                            double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
-                            // aux5 <- focus (future) position
-                            focus.getAbsolutePosition(aux5b);
-                            // aux3 <- focus to camera vector
-                            aux3b.set(pos).sub(aux5b);
-                            // aux2 <- spin axis
-                            aux2.set(0, 1, 0).mul(focus.getOrientation());
-                            // rotate aux3 around focus spin axis
-                            aux3b.rotate(aux2, angle);
-                            // aux3 <- camera pos after rotating
-                            aux3b.add(aux5b);
-                            // pos <- aux3
-                            pos.set(aux3b);
-                            direction.rotate(aux2, angle);
-                            up.rotate(aux2, angle);
-                            previousOrientationAngle = angleBak;
-                        } else if (focus.getOrientationQuaternion() != null) {
-                            Matrix4d ori = focus.getOrientation();
-                            // aux5 <- focus (future) position
-                            focus.getAbsolutePosition(aux5b);
-                            // aux3 <- focus->camera vector
-                            aux3b.set(pos).sub(aux5b);
-                            // aux3 <- orientation difference from last frame = aux * O * O'^-1
-                            aux3b.mul(ori).mul(orip);
-                            // aux3 <- camera pos after rotating
-                            aux3b.add(aux5b);
-                            // pos <- aux3
-                            pos.set(aux3b);
-                            direction.mul(ori).mul(orip);
-                            up.mul(ori).mul(orip);
-                            // Set ori to this frame's inv(ori)
-                            orip.set(ori).inv();
+                        // Lock orientation - FOR NOW THIS ONLY WORKS WITH
+                        // PLANETS and MOONS
+                        if (Settings.settings.scene.camera.focusLock.orientation && time.getHdiff() > 0 && focus.getOrientation() != null) {
+                            RotationComponent rc = focus.getRotationComponent();
+                            if (rc != null) {
+                                // Rotation component present - planets, etc
+                                double angleBak = rc.angle;
+                                double angle = previousOrientationAngle != 0 ? (angleBak - previousOrientationAngle) : 0;
+                                // aux5 <- focus (future) position
+                                focus.getAbsolutePosition(aux5b);
+                                // aux3 <- focus to camera vector
+                                aux3b.set(pos).sub(aux5b);
+                                // aux2 <- spin axis
+                                aux2.set(0, 1, 0).mul(focus.getOrientation());
+                                // rotate aux3 around focus spin axis
+                                aux3b.rotate(aux2, angle);
+                                // aux3 <- camera pos after rotating
+                                aux3b.add(aux5b);
+                                // pos <- aux3
+                                pos.set(aux3b);
+                                direction.rotate(aux2, angle);
+                                up.rotate(aux2, angle);
+                                previousOrientationAngle = angleBak;
+                            } else if (focus.getOrientationQuaternion() != null) {
+                                Matrix4d ori = focus.getOrientation();
+                                // aux5 <- focus (future) position
+                                focus.getAbsolutePosition(aux5b);
+                                // aux3 <- focus->camera vector
+                                aux3b.set(pos).sub(aux5b);
+                                // aux3 <- orientation difference from last frame = aux * O * O'^-1
+                                aux3b.mul(ori).mul(orip);
+                                // aux3 <- camera pos after rotating
+                                aux3b.add(aux5b);
+                                // pos <- aux3
+                                pos.set(aux3b);
+                                direction.mul(ori).mul(orip);
+                                up.mul(ori).mul(orip);
+                                // Set ori to this frame's inv(ori)
+                                orip.set(ori).inv();
+                            }
+
                         }
 
+                        // Add dx to camera position
+                        pos.add(dx);
+
                     }
 
-                    // Add dx to camera position
-                    pos.add(dx);
+                    // Update direction to follow focus and activate custom input
+                    // listener
+                    // aux4b <- foucs.abspos + dx
+                    this.focus.getAbsolutePosition(aux4b).add(dx);
 
-                }
-
-                // Update direction to follow focus and activate custom input
-                // listener
-                // aux4b <- foucs.abspos + dx
-                this.focus.getAbsolutePosition(aux4b).add(dx);
-
-                if (!Settings.settings.runtime.openVr) {
-                    if (!diverted) {
-                        directionToTarget(dt, aux4b, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
-                    } else {
-                        updateRotationFree(dt, Settings.settings.scene.camera.turn);
+                    if (!Settings.settings.runtime.openVr) {
+                        if (!diverted) {
+                            directionToTarget(dt, aux4b, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3f : 1e2f));
+                        } else {
+                            updateRotationFree(dt, Settings.settings.scene.camera.turn);
+                        }
+                        updateRoll(dt, Settings.settings.scene.camera.turn);
                     }
-                    updateRoll(dt, Settings.settings.scene.camera.turn);
+
+                    updatePosition(dt, translateUnits, realTransUnits);
+                    updateRotation(dt, aux4b);
+
+                    // Update focus direction
+                    focusDirection.set(aux4b).sub(pos).nor();
+                    focus = focusBak;
+
+                    double dist = aux4b.dstd(pos);
+                    if (dist < focus.getRadius()) {
+                        // aux2 <- focus-cam with a length of radius
+                        aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
+                        // Correct camera position
+                        pos.set(aux4b).add(aux2b);
+                    }
+
                 }
-
-                updatePosition(dt, translateUnits, realTransUnits);
-                updateRotation(dt, aux4b);
-
-                // Update focus direction
-                focusDirection.set(aux4b).sub(pos).nor();
-                focus = focusBak;
-
-                double dist = aux4b.dstd(pos);
-                if (dist < focus.getRadius()) {
-                    // aux2 <- focus-cam with a length of radius
-                    aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
-                    // Correct camera position
-                    pos.set(aux4b).add(aux2b);
-                }
-
                 // Apparent magnitude from camera
                 double appMagCamera;
                 if (focus instanceof CelestialBody) {
@@ -549,7 +553,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 } else {
                     appMagEarth = Double.NaN;
                 }
-
                 EventManager.instance.post(Events.FOCUS_INFO_UPDATED, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
             } else {
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
@@ -571,22 +574,23 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 fullStop = true;
             }
         case FREE_MODE:
-            updatePosition(dt, translateUnits, Settings.settings.scene.camera.targetMode ? realTransUnits : 1);
-            if (!Settings.settings.runtime.openVr) {
-                // If target is present, update direction
-                if (freeTargetOn) {
-                    directionToTarget(dt, freeTargetPos, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3d : 1e2d));
-                    if (facingFocus) {
-                        freeTargetOn = false;
+            synchronized (updateLock) {
+                updatePosition(dt, translateUnits, Settings.settings.scene.camera.targetMode ? realTransUnits : 1);
+                if (!Settings.settings.runtime.openVr) {
+                    // If target is present, update direction
+                    if (freeTargetOn) {
+                        directionToTarget(dt, freeTargetPos, Settings.settings.scene.camera.turn / (Settings.settings.scene.camera.cinematic ? 1e3d : 1e2d));
+                        if (facingFocus) {
+                            freeTargetOn = false;
+                        }
                     }
+
+                    // Update direction with pitch, yaw, roll
+                    updateRotationFree(dt, Settings.settings.scene.camera.turn);
+                    updateRoll(dt, Settings.settings.scene.camera.turn);
                 }
-
-                // Update direction with pitch, yaw, roll
-                updateRotationFree(dt, Settings.settings.scene.camera.turn);
-                updateRoll(dt, Settings.settings.scene.camera.turn);
+                updateLateral(dt, translateUnits);
             }
-            updateLateral(dt, translateUnits);
-
             break;
         case GAIA_SCENE_MODE:
             if (entity1 == null || entity2 == null) {
@@ -803,21 +807,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         velocityVR1 = null;
         velocityVRX = 0;
         velocityVRY = 0;
-    }
-
-    /**
-     * Adds a pan movement to the camera.
-     *
-     * @param deltaX Amount of horizontal movement.
-     * @param deltaY Amount of vertical movement.
-     */
-    public void addPanMovement(double deltaX, double deltaY) {
-        double tu = speedScaling();
-        desired.set(direction).crs(up).nor().scl(-deltaX * tu);
-        desired.add(aux1.set(up).nor().scl(-deltaY * tu));
-        force.set(desired);
-        // We reset the time counter
-        lastFwdTime = 0;
     }
 
     public void forward(double amount) {
@@ -1323,6 +1312,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The speed scaling function.
      *
      * @param min The minimum speed.
+     *
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
@@ -1441,46 +1431,66 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case CAMERA_POS_CMD:
-            pos.set((double[]) data[0]);
-            posinv.set(pos).scl(-1d);
+            synchronized (updateLock) {
+                pos.set((double[]) data[0]);
+                posinv.set(pos).scl(-1d);
+            }
             break;
         case CAMERA_DIR_CMD:
-            direction.set((double[]) data[0]).nor();
+            synchronized (updateLock) {
+                direction.set((double[]) data[0]).nor();
+            }
             break;
         case CAMERA_UP_CMD:
-            up.set((double[]) data[0]).nor();
+            synchronized (updateLock) {
+                up.set((double[]) data[0]).nor();
+            }
             break;
         case CAMERA_PROJECTION_CMD:
-            // Position
-            pos.set((double[]) data[0]);
-            posinv.set(pos).scl(-1d);
-            // Direction
-            direction.set((double[]) data[1]).nor();
-            // Up
-            up.set((double[]) data[2]).nor();
-            // Change projection flag
-            projectionFlag = true;
+            synchronized (updateLock) {
+                // Position
+                pos.set((double[]) data[0]);
+                posinv.set(pos).scl(-1d);
+                // Direction
+                direction.set((double[]) data[1]).nor();
+                // Up
+                up.set((double[]) data[2]).nor();
+                // Change projection flag
+                projectionFlag = true;
+            }
             break;
         case CAMERA_FWD:
-            addForwardForce((double) data[0]);
+            synchronized (updateLock) {
+                addForwardForce((double) data[0]);
+            }
             break;
         case CAMERA_ROTATE:
-            addRotateMovement((double) data[0], (double) data[1], false, true);
+            synchronized (updateLock) {
+                addRotateMovement((double) data[0], (double) data[1], false, true);
+            }
             break;
         case CAMERA_TURN:
-            addRotateMovement((double) data[0], (double) data[1], true, true);
+            synchronized (updateLock) {
+                addRotateMovement((double) data[0], (double) data[1], true, true);
+            }
             break;
         case CAMERA_PAN:
 
             break;
         case CAMERA_ROLL:
-            addRoll((double) data[0], Settings.settings.scene.camera.cinematic);
+            synchronized (updateLock) {
+                addRoll((double) data[0], Settings.settings.scene.camera.cinematic);
+            }
             break;
         case CAMERA_STOP:
-            stopTotalMovement();
+            synchronized (updateLock) {
+                stopTotalMovement();
+            }
             break;
         case CAMERA_CENTER:
-            diverted = false;
+            synchronized (updateLock) {
+                diverted = false;
+            }
             break;
         case GO_TO_OBJECT_CMD:
             if (this.focus != null) {
@@ -1506,21 +1516,24 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     rotate(up, 0.01);
                     updatePerspectiveCamera();
                 });
-
             }
             break;
         case ORIENTATION_LOCK_CMD:
-            previousOrientationAngle = 0;
+            synchronized (updateLock) {
+                previousOrientationAngle = 0;
+            }
             break;
         case FREE_MODE_COORD_CMD:
-            double ra = (Double) data[0];
-            double dec = (Double) data[1];
-            double dist = 1e12d * Constants.PC_TO_U;
-            aux1.set(MathUtilsd.degRad * ra, MathUtilsd.degRad * dec, dist);
-            Coordinates.sphericalToCartesian(aux1, aux2);
-            freeTargetPos.set(aux2);
-            facingFocus = false;
-            freeTargetOn = true;
+            synchronized (updateLock) {
+                double ra = (Double) data[0];
+                double dec = (Double) data[1];
+                double dist = 1e12d * Constants.PC_TO_U;
+                aux1.set(MathUtilsd.degRad * ra, MathUtilsd.degRad * dec, dist);
+                Coordinates.sphericalToCartesian(aux1, aux2);
+                freeTargetPos.set(aux2);
+                facingFocus = false;
+                freeTargetOn = true;
+            }
             break;
         case FOCUS_NOT_AVAILABLE:
             if (getMode().isFocus()) {
@@ -1556,7 +1569,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             break;
         case CAMERA_CENTER_FOCUS_CMD:
-            setCenterFocus((Boolean) data[0]);
+            synchronized (updateLock) {
+                setCenterFocus((Boolean) data[0]);
+            }
             break;
         case CONTROLLER_CONNECTED_INFO:
             Settings.settings.controls.gamepad.addControllerListener(controllerListener, (String) data[0]);
@@ -1565,9 +1580,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // Nothing
             break;
         case NEW_DISTANCE_SCALE_FACTOR:
-            DIST_A = 0.1 * Constants.PC_TO_U;
-            DIST_B = 5.0 * Constants.KPC_TO_U;
-            DIST_C = 5000.0 * Constants.MPC_TO_U;
+            synchronized (updateLock) {
+                DIST_A = 0.1 * Constants.PC_TO_U;
+                DIST_B = 5.0 * Constants.KPC_TO_U;
+                DIST_C = 5000.0 * Constants.MPC_TO_U;
+            }
             break;
         default:
             break;
@@ -1578,7 +1595,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Rotates the direction and up vector of this camera by the given angle around
      * the given axis, with the axis attached to given point. The direction and up
-     * vector will not be orthogonalized.
+     * vector will not be orthogonal.
      *
      * @param rotationCenter the point to attach the axis to
      * @param rotationAxis   the axis to rotate around
