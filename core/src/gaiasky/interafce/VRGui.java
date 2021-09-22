@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.render.ComponentTypes;
 import gaiasky.util.Logger;
 
@@ -13,13 +14,13 @@ public class VRGui<T extends IGui> implements IGui {
     private T right;
     private T left;
 
-    public VRGui(Class<T> clazz, int hOffset, Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public VRGui(Class<T> clazz, int hOffset, Skin skin, Lwjgl3Graphics graphics, Float unitsPerPixel) {
         super();
         try {
-            right = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
+            right = clazz.getDeclaredConstructor(Skin.class, Lwjgl3Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             right.setVr(true);
             right.setHoffset(-hOffset);
-            left = clazz.getDeclaredConstructor(Lwjgl3Graphics.class, Float.class).newInstance(graphics, unitsPerPixel);
+            left = clazz.getDeclaredConstructor(Skin.class, Lwjgl3Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             left.setVr(true);
             left.setHoffset(hOffset);
         } catch (Exception e) {

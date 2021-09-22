@@ -22,7 +22,7 @@ public class VRSelectionGui extends AbstractGui {
     private boolean selectionState = false;
     private double selectionCompletion = 0d;
 
-    public VRSelectionGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
+    public VRSelectionGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

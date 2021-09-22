@@ -21,7 +21,7 @@ public class VRInfoGui extends AbstractGui {
     protected Table contents, infoFocus, infoFree;
     protected Cell<?> infoCell;
 
-    public VRInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
+    public VRInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD);

@@ -14,7 +14,7 @@ public class WelcomeGuiVR extends AbstractGui {
 
     private Table center;
 
-    public WelcomeGuiVR(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel){
+    public WelcomeGuiVR(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr){
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

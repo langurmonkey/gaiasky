@@ -21,7 +21,7 @@ public class VRControllerInfoGui extends AbstractGui {
     protected Container<Table> container;
     protected Table contents;
 
-    public VRControllerInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
+    public VRControllerInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
@@ -157,22 +158,23 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     private void initializeVRGUI(Lwjgl3Graphics graphics) {
         float uiScale = Settings.settings.program.ui.scale;
         float uiDistance = 8f;
+        final Skin skin = GaiaSky.instance.getGlobalResources().getSkin();
         // GUI
         if (infoGui != null)
             infoGui.dispose();
-        infoGui = new VRGui<>(VRInfoGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), graphics, 1f / uiScale);
+        infoGui = new VRGui<>(VRInfoGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
         infoGui.initialize(null, sb);
         infoGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
 
         if (controllerHintGui != null)
             controllerHintGui.dispose();
-        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * Settings.settings.graphics.backBufferResolution[0]) / uiDistance), graphics, 1f / uiScale);
+        controllerHintGui = new VRGui<>(VRControllerInfoGui.class, (int) ((uiScale * Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin,  graphics, 1f / uiScale);
         controllerHintGui.initialize(null, sb);
         controllerHintGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
 
         if (selectionGui != null)
             selectionGui.dispose();
-        selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), graphics, 1f / uiScale);
+        selectionGui = new VRGui<>(VRSelectionGui.class, (int) ((Settings.settings.graphics.backBufferResolution[0]) / uiDistance), skin, graphics, 1f / uiScale);
         selectionGui.initialize(null, sb);
         selectionGui.updateViewportSize(Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1], true);
     }
