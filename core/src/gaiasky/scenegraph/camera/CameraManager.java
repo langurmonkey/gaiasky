@@ -162,12 +162,12 @@ public class CameraManager implements ICamera, IObserver {
     /**
      * Velocity vector
      **/
-    protected Vector3d velocity, velocitynor;
+    protected Vector3d velocity, velocityNormalized;
 
     public CameraManager(AssetManager manager, CameraMode mode, boolean vr, GlobalResources globalResources) {
         // Initialize
         // Initialize Cameras
-        naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader());
+        naturalCamera = new NaturalCamera(manager, this, vr, globalResources.getSpriteShader(), globalResources.getShapeShader());
         fovCamera = new FovCamera(manager, this, globalResources.getSpriteBatch());
         spacecraftCamera = new SpacecraftCamera(this);
         relativisticCamera = new RelativisticCamera(manager, this);
@@ -184,7 +184,7 @@ public class CameraManager implements ICamera, IObserver {
         v1 = new Vector3();
         isec = new Vector3();
         velocity = new Vector3d();
-        velocitynor = new Vector3d();
+        velocityNormalized = new Vector3d();
         localTransformInv = new Matrix4();
 
         updateCurrentCamera();
@@ -323,7 +323,7 @@ public class CameraManager implements ICamera, IObserver {
 
         // Speed = dx/dt
         velocity.set(lastPos).sub(current.getPos());
-        velocitynor.set(velocity).nor();
+        velocityNormalized.set(velocity).nor();
         speed = (velocity.len() * Constants.U_TO_KM) / (dt * Nature.S_TO_H);
 
         // High speed?
@@ -332,7 +332,7 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         // Post event with camera motion parameters
-        EventManager.instance.post(Events.CAMERA_MOTION_UPDATE, current.getPos(), speed, velocitynor, current.getCamera());
+        EventManager.instance.post(Events.CAMERA_MOTION_UPDATE, current.getPos(), speed, velocityNormalized, current.getCamera());
 
         // Update last pos and dir
         lastPos.set(current.getPos());
@@ -351,7 +351,7 @@ public class CameraManager implements ICamera, IObserver {
         // Update Pointer LAT/LON
         updateFocusLatLon(screenX, screenY);
 
-        // Work out and broadcast closest objects
+        // Work out and broadcast the closest objects
         IFocus closestBody = getClosestBody();
         if (closestBody != null && closestBody.getOctant() != null && !closestBody.getOctant().observed)
             closestBody = null;

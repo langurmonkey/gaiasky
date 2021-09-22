@@ -21,7 +21,6 @@ import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
@@ -110,7 +109,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Previous orientation matrix, for focus lock
      */
-    Matrix4d orip;
+    Matrix4d previousOrientation;
     /**
      * Fov value backup
      **/
@@ -164,7 +163,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * VR mode stuff
      **/
     private boolean firstAux = true;
-    private float firstAngl = 0;
+    private float firstAngle = 0;
 
     /**
      * Velocity module, in case it comes from a game pad.
@@ -207,8 +206,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public double[] hudScales;
     public Color[] hudColors;
-    public int hudColor;
-    public float hudw, hudh;
+    public float hudWidth, hudHeight;
     private static final double HUD_SCALE_MIN = 0.5f;
     private static final double HUD_SCALE_MAX = 3.0f;
 
@@ -229,7 +227,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * Implements gamepad camera input
      **/
     private NaturalControllerListener controllerListener;
-    private ControllerConnectionListener controllerConnectionListener;
 
     /**
      * VR listener
@@ -242,23 +239,26 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
-    private Texture crosshairFocus, crosshairClosest, crosshairHome, crosshairArrow, velocityCrosshair, antivelocityCrosshair, gravWaveCrosshair;
-    private Sprite[] hudSprites;
+    private Texture crosshairFocus;
+    private Texture crosshairClosest;
+    private Texture crosshairHome;
+    private Texture crosshairArrow;
+    private Texture gravWaveCrosshair;
 
-    public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr, ShaderProgram spriteShader) {
+    public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr, ShaderProgram spriteShader, ShaderProgram shapeShader) {
         super(parent);
         vrOffset = new Vector3d();
         vel = new Vector3d();
         accel = new Vector3d();
         force = new Vector3b();
         posBak = new Vector3d();
-        orip = new Matrix4d();
+        previousOrientation = new Matrix4d();
         this.vr = vr;
-        initialize(spriteShader);
+        initialize(spriteShader, shapeShader);
 
     }
 
-    public void initialize(ShaderProgram spriteShader) {
+    public void initialize(ShaderProgram spriteShader, ShaderProgram shapeShader) {
         if (vr) {
             camera = new PerspectiveCamera(Settings.settings.scene.camera.fov, Settings.settings.graphics.backBufferResolution[0], Settings.settings.graphics.backBufferResolution[1]);
         } else {
@@ -315,13 +315,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         currentMouseKbdListener = null;
         // Controller listeners
         controllerListener = new NaturalControllerListener(this, Settings.settings.controls.gamepad.mappingsFile);
-        controllerConnectionListener = new ControllerConnectionListener();
+        ControllerConnectionListener controllerConnectionListener = new ControllerConnectionListener();
         Controllers.addListener(controllerConnectionListener);
         if (vr)
             openVRListener = new OpenVRListener(this);
 
         // Shape renderer (pointer guide lines)
-        shapeRenderer = new ShapeRenderer(10, spriteShader);
+        shapeRenderer = new ShapeRenderer(10, shapeShader);
         shapeRenderer.getProjectionMatrix().setToOrtho2D(0, 0, camera.viewportWidth, camera.viewportHeight);
 
         // Init sprite batch for crosshair
@@ -344,11 +344,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         crosshairArrow.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         // Velocity vector crosshair
-        velocityCrosshair = new Texture(Gdx.files.internal("img/ai-vel.png"));
+        Texture velocityCrosshair = new Texture(Gdx.files.internal("img/ai-vel.png"));
         velocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         // Antivelocity vector crosshair
-        antivelocityCrosshair = new Texture(Gdx.files.internal("img/ai-antivel.png"));
+        Texture antivelocityCrosshair = new Texture(Gdx.files.internal("img/ai-antivel.png"));
         antivelocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         // Grav wave crosshair
@@ -358,11 +358,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         // Speed HUD
         Texture sHUD = new Texture(Gdx.files.internal("img/hud-corners.png"));
         sHUD.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        hudw = sHUD.getWidth();
-        hudh = sHUD.getHeight();
+        hudWidth = sHUD.getWidth();
+        hudHeight = sHUD.getHeight();
 
         hudScales = new double[] { HUD_SCALE_MIN, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) / 3d, HUD_SCALE_MIN + (HUD_SCALE_MAX - HUD_SCALE_MIN) * 2d / 3d };
-        hudSprites = new Sprite[hudScales.length];
+        Sprite[] hudSprites = new Sprite[hudScales.length];
         hudColors = new Color[] { Color.WHITE, Color.GREEN, Color.GOLD, Color.LIME, Color.PINK, Color.ORANGE, Color.CORAL, Color.CYAN, Color.FIREBRICK, Color.FOREST };
 
         for (int i = 0; i < hudScales.length; i++) {
@@ -420,6 +420,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         switch (m) {
         case FOCUS_MODE:
             if (focus != null && !focus.isCoordinatesTimeOverflow()) {
+                final double appMagCamera, appMagEarth;
                 synchronized (updateLock) {
                     focusBak = focus;
                     this.focus.getAbsolutePosition(aux4b);
@@ -463,15 +464,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                                 // aux3 <- focus->camera vector
                                 aux3b.set(pos).sub(aux5b);
                                 // aux3 <- orientation difference from last frame = aux * O * O'^-1
-                                aux3b.mul(ori).mul(orip);
+                                aux3b.mul(ori).mul(previousOrientation);
                                 // aux3 <- camera pos after rotating
                                 aux3b.add(aux5b);
                                 // pos <- aux3
                                 pos.set(aux3b);
-                                direction.mul(ori).mul(orip);
-                                up.mul(ori).mul(orip);
+                                direction.mul(ori).mul(previousOrientation);
+                                up.mul(ori).mul(previousOrientation);
                                 // Set ori to this frame's inv(ori)
-                                orip.set(ori).inv();
+                                previousOrientation.set(ori).inv();
                             }
 
                         }
@@ -510,68 +511,33 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         pos.set(aux4b).add(aux2b);
                     }
 
-                }
-                // Apparent magnitude from camera
-                double appMagCamera;
-                if (focus instanceof CelestialBody) {
-                    // m - H = 5 * log10(r * D) + g
-                    // m: apparent magnitude
-                    // H: absolute magnitude
-                    // r: dist to star [au]
-                    // D: dist to Earth [au]
-                    // g: term for phase effects (~0)
-                    double distCamAu = pos.put(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
-                    SceneGraphNode starAncestor = focus.getFirstStarAncestor();
-                    double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
-                    appMagCamera = 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
-
-                } else {
-                    // m - M = 5 * log10(d) - 5
-                    // m: apparent magnitude
-                    // M: absolute magnitude
-                    // d: distance [pc]
-                    appMagCamera = 5d * Math.log10(focus.getDistToCamera() * Constants.U_TO_PC) - 5d + focus.getAbsmag();
+                    // Apparent magnitude from camera
+                    appMagCamera = computeFocusApparentMagnitudeCamera();
+                    // Apparent magnitude from Earth (planets, etc)
+                    appMagEarth = computeFocusApparentMagnitudeEarth();
                 }
 
-                // Apparent magnitude from Earth (planets, etc)
-                ISceneGraph sg = GaiaSky.instance.sceneGraph;
-                SceneGraphNode earth = sg.getNode("Earth");
-                double appMagEarth;
-                if (focus instanceof CelestialBody && earth != null) {
-                    // Distance between earth and the body
-                    // Apparent magnitude in Solar System bodies
-                    // m - H = 5 * log10(r * D) + g
-                    // m: apparent magnitude
-                    // H: absolute magnitude
-                    // r: dist to star [au]
-                    // D: dist to Earth [au]
-                    // g: term for phase effects (~0)
-                    double distEarthAu = earth.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
-                    SceneGraphNode starAncestor = focus.getFirstStarAncestor();
-                    double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
-                    appMagEarth = 5d * Math.log10(distStarAu * distEarthAu) + focus.getAbsmag();
-                } else {
-                    appMagEarth = Double.NaN;
-                }
                 EventManager.instance.post(Events.FOCUS_INFO_UPDATED, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
             } else {
                 EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
             }
             break;
         case GAME_MODE:
-            if (gravity && (closestBody != null) && closestBody instanceof Planet && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
-                // Add gravity to force, pulling to closest body
-                Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
-                double dist = camObj.lend();
-                // Gravity acts only at twice the radius, in planets
-                if (dist < closestBody.getRadius() * 2d) {
-                    force.add(camObj.nor().scl(0.002d));
-                    fullStop = false;
+            synchronized (updateLock) {
+                if (gravity && (closestBody != null) && closestBody instanceof Planet && !currentMouseKbdListener.isKeyPressed(Input.Keys.SPACE)) {
+                    // Add gravity to force, pulling to the closest body
+                    final Vector3b camObj = closestBody.getAbsolutePosition(aux1b).sub(pos);
+                    final double dist = camObj.lend();
+                    // Gravity acts only at twice the radius, in planets
+                    if (dist < closestBody.getRadius() * 2d) {
+                        force.add(camObj.nor().scl(0.002d));
+                        fullStop = false;
+                    } else {
+                        fullStop = true;
+                    }
                 } else {
                     fullStop = true;
                 }
-            } else {
-                fullStop = true;
             }
         case FREE_MODE:
             synchronized (updateLock) {
@@ -598,10 +564,10 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 entity2 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Earth");
                 entity3 = (CelestialBody) GaiaSky.instance.sceneGraph.getNode("Mars");
             }
-            SceneGraphNode fccopy = entity1.getLineCopy();
-            fccopy.getRoot().translation.set(0, 0, 0);
-            fccopy.getRoot().update(time, null, this);
-            fccopy.translation.put(this.pos);
+            SceneGraphNode focusCopy = entity1.getLineCopy();
+            focusCopy.getRoot().translation.set(0, 0, 0);
+            focusCopy.getRoot().update(time, null, this);
+            focusCopy.translation.put(this.pos);
 
             this.pos.add(0, 0, entity1.getRadius() * 5.0);
             this.posinv.set(this.pos).scl(-1);
@@ -610,7 +576,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             closestBody = entity1;
 
             // Return to pool
-            SceneGraphNode ape = fccopy;
+            SceneGraphNode ape = focusCopy;
             do {
                 ape.returnToPool();
                 ape = ape.parent;
@@ -663,57 +629,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
     }
 
-    public void updateHUD(float dt) {
-        double angleVelDirection = vel.anglePrecise(direction);
-        if (angleVelDirection < 60 || angleVelDirection > 120) {
-            // Current speed
-            double speed = vel.len() * (angleVelDirection < 60 ? 1 : -1) * Constants.U_TO_KM;
-            // Distance covered since last frame
-            double dist = (speed * dt);
-
-            float hud_scl_dist = 1;
-            double sp = Math.abs(speed);
-            if (sp < 3e4) {
-                hud_scl_dist = 1e4f;
-                hudColor = 0;
-            } else if (sp < 3e6) {
-                hud_scl_dist = 1e6f;
-                hudColor = 1;
-            } else if (sp < 3e8) {
-                hud_scl_dist = 1e8f;
-                hudColor = 2;
-            } else if (sp < 3e10) {
-                hud_scl_dist = 1e10f;
-                hudColor = 3;
-            } else if (sp < 3e12) {
-                hud_scl_dist = 1e12f;
-                hudColor = 4;
-            } else if (sp < 3e14) {
-                hud_scl_dist = 1e14f;
-                hudColor = 5;
-            } else if (sp < 3e20) {
-                hud_scl_dist = 1e20f;
-                hudColor = 6;
-            }
-
-            // Update scales
-            for (int i = 0; i < hudScales.length; i++) {
-                double distPart = dist / hud_scl_dist;
-
-                hudScales[i] = hudScales[i] + (HUD_SCALE_MAX - HUD_SCALE_MIN) * distPart;
-                if (dist > 0 && hudScales[i] > HUD_SCALE_MAX) {
-                    hudScales[i] = HUD_SCALE_MIN;
-                }
-                if (dist < 0 && hudScales[i] < HUD_SCALE_MIN) {
-                    hudScales[i] = HUD_SCALE_MAX;
-                }
-            }
-        } else {
-            hudColor = 0;
-        }
-
-    }
-
     /**
      * Updates the perspective camera float values from the computed double vectors
      */
@@ -724,25 +639,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         camera.update();
 
         posinv.set(pos).scl(-1);
-    }
-
-    /**
-     * Does the camera math in higher precision Matrix4d objects and then down-casts
-     * the results into the perspective camera
-     */
-    protected void cameraUpdate(PerspectiveCamera camera) {
-        // Update in double matrices
-        super.update(camera, aux1.set(0, 0, 0), direction, up);
-
-        // Down-cast to perspective camera
-        projection.putIn(camera.projection);
-        view.putIn(camera.view);
-        combined.putIn(camera.combined);
-
-        // Update frustum
-        camera.invProjectionView.set(camera.combined);
-        Matrix4.inv(camera.invProjectionView.val);
-        camera.frustum.update(camera.invProjectionView);
     }
 
     /**
@@ -820,10 +716,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         lastFwdTime = 0;
     }
 
-    public void strafe(double amount) {
-        strafe(amount, 0);
-    }
-
     public void strafe(double amount, double minTu) {
         double speedScaling = speedScaling(minTu);
         desired.set(direction).crs(up).nor().scl(amount * speedScaling);
@@ -860,7 +752,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             addPitch(deltaY, acceleration);
         } else if (parent.mode.equals(CameraMode.FOCUS_MODE)) {
             double th = 30;
-            double vadeg = Math.toDegrees(focus.getViewAngle());
+            double viewAngleDegrees = Math.toDegrees(focus.getViewAngle());
 
             if (focusLookKeyPressed) {
                 diverted = true;
@@ -868,15 +760,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addPitch(deltaY * fovFactor, acceleration);
             } else {
                 // This factor slows the rotation as the focus gets closer and closer
-                double factor = vadeg > th ? Math.pow(th / vadeg, 3) : 1.0;
+                double factor = viewAngleDegrees > th ? Math.pow(th / viewAngleDegrees, 3) : 1.0;
                 addHorizontal(deltaX * factor, acceleration);
                 addVertical(deltaY * factor, acceleration);
             }
         }
-    }
-
-    public void setGamepadMultiplier(double amount) {
-        gamepadMultiplier = amount;
     }
 
     public void addAmount(Vector3d vec, double amount, boolean x) {
@@ -969,11 +857,8 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     /**
      * Stops the camera movement.
      *
-     * @return True if the camera had any movement at all and it has been stopped.
-     * False if camera was already still.
      */
-    public boolean stopTotalMovement() {
-        boolean stopped = (vel.len2() != 0 || yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
+    public void stopTotalMovement() {
         force.setZero();
         vel.setZero();
         yaw.setZero();
@@ -981,45 +866,23 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         roll.setZero();
         horizontal.setZero();
         vertical.setZero();
-        return stopped;
     }
 
-    public boolean stopRotateMovement() {
-        boolean stopped = (yaw.y != 0 || pitch.y != 0 || vertical.y != 0 || horizontal.y != 0);
+    public void stopRotateMovement() {
         yaw.setZero();
         pitch.setZero();
         horizontal.setZero();
         vertical.setZero();
-        return stopped;
-    }
-
-    public boolean stopRollMovement() {
-        boolean stopped = (roll.y != 0);
-        roll.setZero();
-        return stopped;
-    }
-
-    public boolean stopTurnMovement() {
-        boolean stopped = (yaw.y != 0 || pitch.y != 0 || roll.y != 0 || vertical.y != 0 || horizontal.y != 0);
-        yaw.setZero();
-        pitch.setZero();
-        roll.setZero();
-        horizontal.setZero();
-        vertical.setZero();
-        return stopped;
     }
 
     /**
      * Stops the camera movement.
      *
-     * @return True if the camera had any movement at all and it has been stopped.
-     * False if camera was already still.
      */
-    public boolean stopForwardMovement() {
+    public void stopForwardMovement() {
         boolean stopped = (vel.len2() != 0);
         force.setZero();
         vel.setZero();
-        return stopped;
     }
 
     /**
@@ -1356,22 +1219,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      */
     public double speedScaling() {
         return speedScaling(0.5e-8);
-    }
-
-    /**
-     * Depends on the distance to the focus
-     *
-     * @return The scaling for the rotation movement
-     */
-    public double rotationScaling() {
-        double dist;
-        if (parent.mode == CameraMode.FOCUS_MODE) {
-            SceneGraphNode ancestor = (SceneGraphNode) focus;
-            dist = ancestor.distToCamera - ancestor.getRadius();
-        } else {
-            dist = distance;
-        }
-        return Math.max(2000, Math.min(dist * Constants.U_TO_KM, Settings.settings.scene.camera.rotate));
     }
 
     @Override
@@ -1733,15 +1580,58 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         this.diverted = !centerFocus;
     }
 
-    public void resetState() {
-        pos.setZero();
-        posinv.setZero();
-        vrOffset.setZero();
-        direction.set(0, 0, -1);
-        for (PerspectiveCamera cam : cameras) {
-            cam.position.setZero();
-            cam.direction.set(0, 0, -1);
-            cam.update();
+    /**
+     * Computes the apparent magnitude of the current focus object as seen from the camera
+     * position.
+     *
+     * @return The magnitude.
+     */
+    private double computeFocusApparentMagnitudeCamera() {
+        if (focus instanceof CelestialBody) {
+            // m - H = 5 * log10(r * D) + g
+            // m: apparent magnitude
+            // H: absolute magnitude
+            // r: dist to star [au]
+            // D: dist to Earth [au]
+            // g: term for phase effects (~0)
+            double distCamAu = pos.put(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+            SceneGraphNode starAncestor = focus.getFirstStarAncestor();
+            double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
+            return 5d * Math.log10(distStarAu * distCamAu) + focus.getAbsmag();
+
+        } else {
+            // m - M = 5 * log10(d) - 5
+            // m: apparent magnitude
+            // M: absolute magnitude
+            // d: distance [pc]
+            return 5d * Math.log10(focus.getDistToCamera() * Constants.U_TO_PC) - 5d + focus.getAbsmag();
+        }
+    }
+
+    /**
+     * Computes the apparent magnitude of the current focus object as seen from Earth.
+     *
+     * @return The magnitude.
+     */
+    private double computeFocusApparentMagnitudeEarth() {
+        // Apparent magnitude from Earth (planets, etc)
+        ISceneGraph sg = GaiaSky.instance.sceneGraph;
+        SceneGraphNode earth = sg.getNode("Earth");
+        if (focus instanceof CelestialBody && earth != null) {
+            // Distance between earth and the body
+            // Apparent magnitude in Solar System bodies
+            // m - H = 5 * log10(r * D) + g
+            // m: apparent magnitude
+            // H: absolute magnitude
+            // r: dist to star [AU]
+            // D: dist to Earth [AU]
+            // g: term for phase effects (~0)
+            double distEarthAu = earth.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() * Constants.U_TO_AU;
+            SceneGraphNode starAncestor = focus.getFirstStarAncestor();
+            double distStarAu = (starAncestor != null ? starAncestor.getAbsolutePosition(aux4b).sub(focus.getAbsolutePosition(aux5b)).lend() : focus.getAbsolutePosition(aux5b).lend()) * Constants.U_TO_AU;
+            return 5d * Math.log10(distStarAu * distEarthAu) + focus.getAbsmag();
+        } else {
+            return Double.NaN;
         }
     }
 
@@ -1795,39 +1685,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 drawCrosshair(closest, false, crosshairClosest, crosshairArrow, rw, rh, 0.3f, 0.5f, 1f, 1f);
             }
 
-            // Mark focus in GREEN
+            // Mark the focus in GREEN
             if (Settings.settings.scene.crosshair.focus && getMode().isFocus()) {
                 // Green, focus mode
                 drawCrosshair(focus, true, crosshairFocus, crosshairArrow, rw, rh, 0.2f, 1f, 0.4f, 1f);
             }
-
-            // Velocity crosshair only if we move
-            // double speed = vel.len();
-            // if (speed > 0) {
-            // float chw = velocityCrosshair.getWidth();
-            // float chh = velocityCrosshair.getHeight();
-            // float chw2 = chw / 2;
-            // float chh2 = chh / 2;
-            //
-            // if (vel.anglePrecise(direction) < 60) {
-            //
-            // // ANTIVEL
-            // drawVelCrosshair(antivelocityCrosshair, rw, rh, chw, chh, chw2,
-            // chh2, -1);
-            //
-            // // VEL
-            // drawVelCrosshair(velocityCrosshair, rw, rh, chw, chh, chw2, chh2,
-            // 1);
-            // } else {
-            // // VEL
-            // drawVelCrosshair(velocityCrosshair, rw, rh, chw, chh, chw2, chh2,
-            // 1);
-            //
-            // // ANTIVEL
-            // drawVelCrosshair(antivelocityCrosshair, rw, rh, chw, chh, chw2,
-            // chh2, -1);
-            // }
-            // }
 
             // Gravitational waves crosshair
             if (Settings.settings.runtime.gravitationalWaves) {
@@ -1850,39 +1712,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     spriteBatch.setColor(0, 1, 1, 1);
                     spriteBatch.draw(gravWaveCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
                 }
-            }
-        }
-
-        if (false && Settings.settings.program.hud) {
-            // Speed HUD
-            float dx, dy;
-            float centerx = rw / 2f;
-            float centery = rh / 2f;
-            if (vel.len2() != 0) {
-                aux1.set(vel);
-                if (vel.anglePrecise(direction) > 90) {
-                    aux1.scl(-1);
-                }
-                projectToScreen(aux1, auxf1, rw, rh, 0, 0, 0, 0);
-                dx = auxf1.x - rw / 2f;
-                dy = auxf1.y - rh / 2f;
-            } else {
-                dx = 0;
-                dy = 0;
-            }
-
-            for (int i = 0; i < hudScales.length; i++) {
-                float scl = (float) hudScales[i];
-
-                float dscale = (float) MathUtilsd.lint(scl, HUD_SCALE_MIN, HUD_SCALE_MAX, 1d, 0d);
-
-                Sprite s = hudSprites[i];
-                s.setColor(hudColors[hudColor]);
-                s.setOriginCenter();
-                s.setScale(scl);
-                s.setPosition(centerx + (dx * dscale) - hudw / 2, centery + (dy * dscale) - hudh / 2);
-                s.draw(spriteBatch);
-
             }
         }
 
@@ -1937,30 +1766,23 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 spriteBatch.draw(crosshairTex, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
             } else {
                 if (vr) {
-                    float ang = firstAux ? -90 + aux2f2.angle() : firstAngl;
+                    float ang = firstAux ? -90f + aux2f2.angleDeg() : firstAngle;
                     if (firstAux) {
-                        firstAngl = ang;
+                        firstAngle = ang;
                     }
                     firstAux = !firstAux;
-                    aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
+                    aux2f2.set(auxf1.x - (rw / 2f), auxf1.y - (rh / 2f));
                     aux2.set(up).rotate(direction, 90).add(up).scl(0.04);
                     aux1.set(vrOffset).add(aux2).scl(1 / Constants.M_TO_U).add(direction);
                     projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
                     spriteBatch.draw(arrowTex, auxf1.x, auxf1.y, chw2, chh2, chw, chh, 1f, 1f, ang, 0, 0, (int) chw, (int) chw, false, false);
                 } else {
-                    aux2f2.set(auxf1.x - (rw / 2), auxf1.y - (rh / 2));
-                    spriteBatch.draw(arrowTex, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90 + aux2f2.angle(), 0, 0, (int) chw, (int) chh, false, false);
+                    aux2f2.set(auxf1.x - (rw / 2f), auxf1.y - (rh / 2f));
+                    spriteBatch.draw(arrowTex, auxf1.x - chw2, auxf1.y - chh2, chw2, chh2, chw, chh, 1f, 1f, -90f + aux2f2.angleDeg(), 0, 0, (int) chw, (int) chh, false, false);
                 }
             }
         }
 
-    }
-
-    private void drawVelCrosshair(Texture tex, int rw, int rh, float chw, float chh, float chw2, float chh2, float scl) {
-        aux1.set(vel).scl(scl);
-        projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
-
-        spriteBatch.draw(tex, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
     }
 
     /**
@@ -1994,11 +1816,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 // Q2
                 out.x = rw - chw2;
                 out.y = rh - chh2;
-            } else if (out.x <= w2 && out.y <= h2) {
+            } else if (out.x <= w2) {
                 // Q3
                 out.x = chw2;
                 out.y = chh2;
-            } else if (out.x > w2 && out.y < h2) {
+            } else if (out.y < h2) {
                 // Q4
                 out.x = rw - chw2;
                 out.y = chh2;
