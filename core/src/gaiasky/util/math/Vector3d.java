@@ -895,16 +895,16 @@ public class Vector3d implements Serializable, Vectord<Vector3d> {
 
 	/** Gets the angle in degrees between the two vectors **/
 	public double angle(Vector3d v) {
-		return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.len() * v.len()));
+		return MathUtilsd.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.len()), -1d, 1d));
 	}
 	/** Gets the angle in degrees between the two vectors **/
 	public double angle(Vector3b v) {
-		return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.len() * v.lend()));
+		return MathUtilsd.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.lend()), -1d, 1d));
 	}
 
 	/** Gets the angle in degrees between the two vectors **/
 	public double anglePrecise(Vector3d v) {
-		return MathUtilsd.radiansToDegrees * Math.acos(this.dot(v) / (this.len() * v.len()));
+		return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.len() * v.len()), -1d, 1d));
 	}
 
 	public boolean hasNaN() {

@@ -95,7 +95,8 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                     IRenderable s = renderables.get(i);
                     if (s instanceof Star) {
                         Star p = (Star) s;
-                        if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openVr || GaiaSky.instance.cameraManager.getDirection().angle(p.translation) < angleEdgeDeg)) {
+                        double angle = GaiaSky.instance.cameraManager.getDirection().angle(p.translation);
+                        if (lightIndex < nLights && (settings.program.modeCubemap.active || settings.runtime.openVr || angle < angleEdgeDeg)) {
                             Vector3d pos3d = p.translation.put(auxD);
 
                             // Aberration

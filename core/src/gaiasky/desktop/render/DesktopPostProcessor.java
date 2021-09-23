@@ -567,13 +567,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                    if (lightglow != null) {
-                        lightglow.setLightPositions(nLights, lightPos);
-                        lightglow.setLightViewAngles(angles);
-                        lightglow.setLightColors(colors);
+                    LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
+                    if (lightGlow != null) {
+                        lightGlow.setLightPositions(nLights, lightPos);
+                        lightGlow.setLightViewAngles(angles);
+                        lightGlow.setLightColors(colors);
                         if (prePass != null)
-                            lightglow.setPrePassTexture(prePass);
+                            lightGlow.setPrePassTexture(prePass);
                     }
                 }
             }
@@ -596,10 +596,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 for (int i = 0; i < RenderType.values().length; i++) {
                     if (pps[i] != null) {
                         PostProcessBean ppb = pps[i];
-                        LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-                        if (lightglow != null) {
-                            lightglow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
-                            lightglow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
+                        LightGlow lightGlow = (LightGlow) ppb.get(LightGlow.class);
+                        if (lightGlow != null) {
+                            lightGlow.setTextureScale(getGlowTextureScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor(), Settings.settings.program.modeCubemap.active));
+                            lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
                         }
                         Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
                         if (fisheye != null)
@@ -610,14 +610,14 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case SCREENSHOT_SIZE_UPDATE:
             if (pps != null && Settings.settings.screenshot.isAdvancedMode()) {
-                int neww = (Integer) data[0];
-                int newh = (Integer) data[1];
+                int newWidth = (Integer) data[0];
+                int newHeight = (Integer) data[1];
                 if (pps[RenderType.screenshot.index] != null) {
-                    if (changed(pps[RenderType.screenshot.index].pp, neww, newh)) {
-                        GaiaSky.postRunnable(() -> replace(RenderType.screenshot, neww, newh, neww, newh));
+                    if (changed(pps[RenderType.screenshot.index].pp, newWidth, newHeight)) {
+                        GaiaSky.postRunnable(() -> replace(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight));
                     }
                 } else {
-                    pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, neww, newh, neww, newh, manager);
+                    pps[RenderType.screenshot.index] = newPostProcessor(RenderType.screenshot, newWidth, newHeight, newWidth, newHeight, manager);
                 }
             }
             break;
@@ -666,13 +666,13 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             break;
         case LENS_FLARE_CMD:
             active = (Boolean) data[0];
-            int nnghosts = active ? nGhosts : 0;
+            int numGhosts = active ? nGhosts : 0;
             float intensity = active ? flareIntensity : 0;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     LensFlare2 lensFlare = (LensFlare2) ppb.get(LensFlare2.class);
-                    lensFlare.setGhosts(nnghosts);
+                    lensFlare.setGhosts(numGhosts);
                     lensFlare.setFlareIntesity(intensity);
                 }
             }

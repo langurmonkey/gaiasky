@@ -446,8 +446,16 @@ public interface IScriptingInterface {
     /**
      * Changes the speed of the camera when it rotates around a focus.
      *
-     * @param speed The new rotation speed, from 0 to 100.
+     * @param speed The new rotation speed in [0,100]
      */
+    void setCameraRotationSpeed(float speed);
+
+    /**
+     * Changes the speed of the camera when it rotates around a focus.
+     * @param speed The new rotation speed in [0,100]
+     * @deprecated Use {@link IScriptingInterface#setCameraRotationSpeed(float)}
+     */
+    @Deprecated
     void setRotationCameraSpeed(float speed);
 
     /**
@@ -455,6 +463,15 @@ public interface IScriptingInterface {
      *
      * @param speed The new turning speed, from 1 to 100.
      */
+    void setCameraTurningSpeed(float speed);
+
+    /**
+     * Changes the turning speed of the camera.
+     *
+     * @param speed The new turning speed, from 1 to 100.
+     * @deprecated Use {@link IScriptingInterface#setCameraTurningSpeed(float)}
+     */
+    @Deprecated
     void setTurningCameraSpeed(float speed);
 
     /**
@@ -485,6 +502,19 @@ public interface IScriptingInterface {
      * @param index The index of the top speed.
      */
     void setCameraSpeedLimit(int index);
+
+    /**
+     * Sets the camera to track the object with the given name. In this mode,
+     * the position of the camera is still dependent on the focus object (if any), but
+     * its direction points to the tracking object.
+     * @param objectName The name of the new tracking object.
+     */
+    void setCameraTrackingObject(String objectName);
+
+    /**
+     * Removes the tracking object from the camera, if any.
+     */
+    void removeCameraTrackingObject();
 
     /**
      * Adds a forward movement to the camera with the given value. If value is

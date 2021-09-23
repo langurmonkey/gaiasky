@@ -144,6 +144,15 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public IFocus focus, focusBak;
 
     /**
+     * The tracking object, if any
+     */
+    private IFocus trackingObject;
+    /**
+     * The name of the tracking object
+     */
+    private String trackingName;
+
+    /**
      * The direction point to seek
      */
     private Vector3d lastVel;
@@ -347,9 +356,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         Texture velocityCrosshair = new Texture(Gdx.files.internal("img/ai-vel.png"));
         velocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-        // Antivelocity vector crosshair
-        Texture antivelocityCrosshair = new Texture(Gdx.files.internal("img/ai-antivel.png"));
-        antivelocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        // Anti-velocity vector crosshair
+        Texture antiVelocityCrosshair = new Texture(Gdx.files.internal("img/ai-antivel.png"));
+        antiVelocityCrosshair.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
         // Grav wave crosshair
         gravWaveCrosshair = new Texture(Gdx.files.internal("img/gravwave-pointer.png"));
@@ -371,7 +380,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO, Events.NEW_DISTANCE_SCALE_FACTOR);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO, Events.NEW_DISTANCE_SCALE_FACTOR, Events.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -482,8 +491,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
                     }
 
-                    // Update direction to follow focus and activate custom input
-                    // listener
                     // aux4b <- foucs.abspos + dx
                     this.focus.getAbsolutePosition(aux4b).add(dx);
 
@@ -509,6 +516,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                         aux2b.set(pos).sub(aux4b).nor().scl(focus.getRadius());
                         // Correct camera position
                         pos.set(aux4b).add(aux2b);
+                    }
+
+                    // Track
+                    if (!Settings.settings.runtime.openVr && this.trackingObject != null && this.trackingName != null) {
+                        // Track the tracking object
+                        this.trackingObject.getAbsolutePosition(trackingName, aux5b);
+                        directionToTrackingObject(aux5b);
                     }
 
                     // Apparent magnitude from camera
@@ -856,7 +870,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Stops the camera movement.
-     *
      */
     public void stopTotalMovement() {
         force.setZero();
@@ -877,7 +890,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     /**
      * Stops the camera movement.
-     *
      */
     public void stopForwardMovement() {
         boolean stopped = (vel.len2() != 0);
@@ -1076,8 +1088,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * @param turnVelocity The velocity at which to turn
      */
     private void directionToTarget(double dt, final Vector3b target, double turnVelocity) {
-        desired.set(target).sub(pos);
-        desired.nor();
+        desired.set(target).sub(pos).nor();
         double desiredDirectionAngle = desired.angle(direction);
         if (desiredDirectionAngle > Math.min(0.3, 0.3 * fovFactor)) {
             // Add desired to direction with given turn velocity (v*dt)
@@ -1091,6 +1102,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         } else {
             facingFocus = true;
         }
+    }
+
+    /**
+     * Updates the camera direction and up vectors so that they track the given target instantly.
+     *
+     * @param target The position of the target
+     */
+    private void directionToTrackingObject(final Vector3b target) {
+        desired.set(target).sub(pos).nor();
+        direction.set(desired);
+        aux1.set(direction).crs(up);
+        up.set(aux1).crs(direction).nor();
+        facingFocus = false;
     }
 
     private void setMouseKbdListener(MouseKbdListener newListener) {
@@ -1225,6 +1249,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     public void notify(final Events event, final Object... data) {
         switch (event) {
         case FOCUS_CHANGE_CMD:
+            setTrackingObject(null, null);
             // Check the type of the parameter: IFocus or String
             IFocus focus = null;
 
@@ -1343,6 +1368,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             if (this.focus != null) {
                 final IFocus f = this.focus;
                 GaiaSky.postRunnable(() -> {
+                    setTrackingObject(null, null);
                     // Position camera near focus
                     stopTotalMovement();
 
@@ -1431,6 +1457,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 DIST_A = 0.1 * Constants.PC_TO_U;
                 DIST_B = 5.0 * Constants.KPC_TO_U;
                 DIST_C = 5000.0 * Constants.MPC_TO_U;
+            }
+            break;
+        case CAMERA_TRACKING_OBJECT_CMD:
+            final IFocus newTrackingObject = (IFocus) data[0];
+            final String newTrackingName = (String) data[1];
+            synchronized (updateLock) {
+                this.setTrackingObject(newTrackingObject, newTrackingName != null ? newTrackingName.toLowerCase() : null);
             }
             break;
         default:
@@ -1855,5 +1888,11 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     public MouseKbdListener getCurrentMouseKbdListener() {
         return currentMouseKbdListener;
+    }
+
+    private void setTrackingObject(final IFocus trackingObject, final String trackingName) {
+        this.trackingObject = trackingObject;
+        this.trackingName = trackingName;
+        EventManager.instance.post(Events.CAMERA_TRACKING_OBJECT_UPDATE, trackingObject, trackingName);
     }
 }

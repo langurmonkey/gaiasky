@@ -201,6 +201,19 @@ public enum Events {
      * Contains a double[] with the new up vector
      **/
     CAMERA_UP_CMD,
+    /**
+     * Sets or unsets the tracking object of the camera
+     * <ul>
+     * <li>[0] - The new tracking object, or null to disable tracking mode</li>
+     * <li>[1] - The name of the tracking object, or null to disable tracking mode</li>
+     * </ul>
+     */
+    CAMERA_TRACKING_OBJECT_CMD,
+    /**
+     * Broadcasts the new camera tracking object, contains the object and the name, or null
+     * to indicate the camera is not tracking
+     */
+    CAMERA_TRACKING_OBJECT_UPDATE,
 
     /**
      * Limits the frame rate, contains a double with the new limit frame rate

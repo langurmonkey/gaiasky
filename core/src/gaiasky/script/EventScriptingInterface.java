@@ -425,19 +425,38 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void setRotationCameraSpeed(final float speed) {
+    public void setCameraRotationSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
             GaiaSky.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
+    }
+
+    public void setCameraRotationSpeed(final int speed) {
+        setRotationCameraSpeed((float) speed);
+    }
+
+    @Override
+    public void setRotationCameraSpeed(final float speed) {
+        setCameraRotationSpeed(speed);
     }
 
     public void setRotationCameraSpeed(final int speed) {
         setRotationCameraSpeed((float) speed);
     }
 
+
     @Override
-    public void setTurningCameraSpeed(final float speed) {
+    public void setCameraTurningSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
             GaiaSky.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+    }
+
+    public void setCameraTurningSpeed(final int speed) {
+        setTurningCameraSpeed((float) speed);
+    }
+
+    @Override
+    public void setTurningCameraSpeed(final float speed) {
+        setCameraTurningSpeed(speed);
 
     }
 
@@ -449,6 +468,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCameraSpeedLimit(int index) {
         if (checkNum(index, 0, 18, "index"))
             GaiaSky.postRunnable(() -> em.post(Events.SPEED_LIMIT_CMD, index, false));
+    }
+
+    @Override
+    public void setCameraTrackingObject(String objectName) {
+        if (objectName == null) {
+            removeCameraTrackingObject();
+        } else if (checkFocusName(objectName)) {
+            IFocus trackingObject = getFocus(objectName);
+            em.post(Events.CAMERA_TRACKING_OBJECT_CMD, trackingObject, objectName);
+        } else {
+            removeCameraTrackingObject();
+        }
+    }
+
+    @Override
+    public void removeCameraTrackingObject() {
+        em.post(Events.CAMERA_TRACKING_OBJECT_CMD, null, null);
     }
 
     @Override
@@ -1019,6 +1055,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             elapsedSeconds = (System.currentTimeMillis() - startMs) / 1000d;
         }
         return obj;
+    }
+
+    private IFocus getFocus(String name) {
+        ISceneGraph sg = GaiaSky.instance.sceneGraph;
+        return sg.findFocus(name.toLowerCase());
     }
 
     @Override
@@ -3135,6 +3176,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private boolean checkObjectName(String name) {
         SceneGraphNode sgn = getObject(name);
         return sgn != null;
+    }
+
+    private boolean checkFocusName(String name) {
+        IFocus focus = getFocus(name);
+        return focus != null;
     }
 
     private void logPossibleValues(String value, String[] possibleValues, String name) {

@@ -5,6 +5,7 @@
 
 package gaiasky.util.math;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.util.Constants;
@@ -858,21 +859,21 @@ public class Vector3b implements Serializable {
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3b v) {
-        return MathUtilsd.radiansToDegrees * FastMath.acos(this.dotd(v) / (this.lend() * v.lend()));
+        return MathUtilsd.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double angle(Vector3d v) {
-        return MathUtilsd.radiansToDegrees * FastMath.acos(this.dot(v) / (this.lend() * v.len()));
+        return MathUtilsd.radiansToDegrees * FastMath.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
     }
 
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3b v) {
-        return MathUtilsd.radiansToDegrees * Math.acos(this.dotd(v) / (this.lend() * v.lend()));
+        return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dotd(v) / (this.lend() * v.lend()), -1d, 1d));
     }
     /** Gets the angle in degrees between the two vectors **/
     public double anglePrecise(Vector3d v) {
-        return MathUtilsd.radiansToDegrees * Math.acos(this.dot(v) / (this.lend() * v.len()));
+        return MathUtilsd.radiansToDegrees * Math.acos(MathUtils.clamp(this.dot(v) / (this.lend() * v.len()), -1d, 1d));
     }
 
     @Override
