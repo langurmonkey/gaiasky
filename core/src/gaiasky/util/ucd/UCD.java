@@ -11,7 +11,7 @@ package gaiasky.util.ucd;
 public class UCD {
 
     enum UCDType {
-        POS, PHOT, STAT, PHYS, META, ARITH, EM, OBS, SPECT, SRC, TIME, INSTR, UNKNOWN, MISSING
+        POS, PHOT, STAT, PHYS, META, ARITH, EM, OBS, SPECT, SRC, TIME, INSTR, VARI, UNKNOWN, MISSING
     }
 
     public String originalucd, converted, colname, unit;

@@ -40,7 +40,7 @@ public class AstroUtils {
     static final public double JD_J2015_5 = getJulianDate(2015.5);
 
     /**
-     * Julian date of TGAS epoch 2010-01-01T00:00:00
+     * Julian date of the variable stars' epoch: 2010-01-01T00:00:00
      **/
     static final public double JD_J2010 = getJulianDate(2010.0);
 

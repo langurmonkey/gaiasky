@@ -8,18 +8,28 @@ import gaiasky.util.ucd.UCD;
  */
 public class VariableRecord extends ParticleRecord {
 
-    public float[] magnitudes;
-    public int nMagnitudes;
+    public int nVari;
+    public float[] variMags;
+    public double[] variTimes;
+    public double period;
 
-    public VariableRecord(double[] dataD, float[] dataF, float[] magnitudes, int nMagnitudes, Long id, String[] names, ObjectDoubleMap<UCD> extra) {
+
+    public VariableRecord(double[] dataD, float[] dataF, int nVari, double period, float[] variMags, double[] variTimes, Long id, String[] names, ObjectDoubleMap<UCD> extra) {
         super(dataD, dataF, id, names, extra);
-        this.magnitudes = magnitudes;
-        this.nMagnitudes = nMagnitudes;
+        this.nVari = nVari;
+        this.variMags = variMags;
+        this.variTimes = variTimes;
+        this.period = period;
     }
 
-    public float sizes(int i) {
-        assert i < nMagnitudes : "Size out of bounds";
-        return magnitudes[i];
+    public float variMag(int i) {
+        assert i < nVari : "Size out of bounds";
+        return variMags[i];
+    }
+
+    public double variTime(int i) {
+        assert i < nVari : "Size out of bounds";
+        return variTimes[i];
     }
 
 }

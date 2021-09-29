@@ -8,6 +8,8 @@ package gaiasky.data.group;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
+import gaiasky.data.group.DatasetOptions.DatasetLoadType;
+import gaiasky.render.system.VariableGroupRenderSystem;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
@@ -19,12 +21,15 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCD;
 import gaiasky.util.ucd.UCDParser;
 import gaiasky.util.units.Position;
 import gaiasky.util.units.Position.PositionType;
 import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
+import org.apache.commons.math.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
@@ -35,8 +40,9 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 
 /**
@@ -108,8 +114,43 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     throw new Exception();
                 }
                 return new Pair<>(ucd, num);
-            } catch (Exception e) {
-                // not working, try next
+            } catch (Exception e0) {
+                // not working, try String
+                try {
+                    double num = Parser.parseDouble((String) row[ucd.index]);
+                    if (Double.isNaN(num)) {
+                        throw new Exception();
+                    }
+                    return new Pair<>(ucd, num);
+                } catch (Exception e1) {
+                    // Out of ideas
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Gets the first ucd that can be translated to a double[] from the set.
+     *
+     * @param UCDs The array of UCDs. The UCDs which coincide with the names should be first.
+     * @param row  The row objects
+     *
+     * @return Pair of <UCD,double[]>
+     */
+    private Pair<UCD, double[]> getDoubleArrayUcd(Array<UCD> UCDs, Object[] row) {
+        for (UCD ucd : UCDs) {
+            try {
+                double[] nums = (double[]) row[ucd.index];
+                return new Pair<>(ucd, nums);
+            } catch (Exception e0) {
+                // not working, try String
+                try {
+                    double[] nums = Parser.parseDoubleArray((String) row[ucd.index]);
+                    return new Pair<>(ucd, nums);
+                } catch (Exception e1) {
+                    // Out of ideas
+                }
             }
         }
         return null;
@@ -171,6 +212,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
     public List<IParticleRecord> loadData(DataSource ds, double factor, Runnable preCallback, RunnableLongLong updateCallback, Runnable postCallback) {
         try {
             if (factory != null) {
+                // RNG
+                final Random r = new Random(123L);
 
                 // Add extra builders
                 List<TableBuilder> builders = factory.getDefaultBuilders();
@@ -189,6 +232,9 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                 UCDParser ucdParser = new UCDParser();
                 ucdParser.parse(table);
 
+                int resampledLightCurves = 0;
+                int noPeriods = 0;
+
                 if (ucdParser.haspos) {
                     BVToTeff_ballesteros bvToTEff = new BVToTeff_ballesteros();
 
@@ -200,7 +246,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     while (rs.next()) {
                         Object[] row = rs.getRow();
                         try {
-                            /* POSITION */
+                            // POSITION
                             Pair<UCD, Double> a = getDoubleUcd(ucdParser.POS1, row);
                             Pair<UCD, Double> b = getDoubleUcd(ucdParser.POS2, row);
                             Pair<UCD, Double> c;
@@ -214,9 +260,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 nInvalidParallaxes++;
                             } else {
                                 c = getDoubleUcd(ucdParser.POS3, row);
+                                assert c != null;
                                 unitC = c.getFirst().unit;
                             }
 
+                            assert a != null;
+                            assert b != null;
                             PositionType pt = ucdParser.getPositionType(a.getFirst(), b.getFirst(), c.getFirst());
                             // Check negative parallaxes -> Use default for consistency
                             if (pt.isParallax() && (c.getSecond() == null || c.getSecond().isNaN() || c.getSecond() <= 0)) {
@@ -238,7 +287,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             Vector3d sph = new Vector3d();
                             Coordinates.cartesianToSpherical(p.gsposition, sph);
 
-                            /* PROPER MOTION */
+                            // PROPER MOTION
                             Vector3d pm;
                             double muAlphaStar = 0, muDelta = 0, radVel = 0;
                             // Only supported if position is equatorial spherical coordinates (ra/dec)
@@ -258,10 +307,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 pm = new Vector3d(Vector3d.Zero);
                             }
 
-                            /* MAGNITUDE */
+                            // MAGNITUDE
                             double appMag;
                             if (!ucdParser.MAG.isEmpty()) {
                                 Pair<UCD, Double> appMagPair = getDoubleUcd(ucdParser.MAG, row);
+                                assert appMagPair != null;
                                 appMag = appMagPair.getSecond();
                             } else {
                                 // Default magnitude
@@ -275,7 +325,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double absMag = appMag - 5 * Math.log10((distPc <= 0 ? 10 : distPc)) + 5;
                             float size = (float) magnitudeToPseudoSize(absMag);
 
-                            /* COLOR */
+                            // COLOR
                             float color;
                             if (!ucdParser.COL.isEmpty()) {
                                 Pair<UCD, Double> colPair = getDoubleUcd(ucdParser.COL, row);
@@ -289,10 +339,82 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 color = 0.656f;
                             }
 
-                            /* EFFECTIVE TEMPERATURE */
+                            // VARIABILITY
+                            float[] variMags = null;
+                            double[] variTimes = null;
+                            double pf = 0;
+                            int nVari = 0;
+                            if (ucdParser.hasvari) {
+                                Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
+                                if (!ucdParser.hasperiod || period == null || !Double.isFinite(period.getSecond())) {
+                                    // Skip stars without period
+                                    noPeriods++;
+                                    continue;
+                                } else {
+                                   pf = period.getSecond();
+                                }
+                                double magSclVari = (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES) ? datasetOptions.magnitudeScale : 0f;
+                                Pair<UCD, double[]> variMagsPair = getDoubleArrayUcd(ucdParser.VARI_MAGS, row);
+                                assert variMagsPair != null;
+                                double[] variMagsDouble = variMagsPair.getSecond();
+                                nVari = variMagsDouble.length;
+                                variMags = new float[nVari];
+
+                                Pair<UCD, double[]> variTimesPair = getDoubleArrayUcd(ucdParser.VARI_TIMES, row);
+                                assert variTimesPair != null;
+                                variTimes = variTimesPair.getSecond();
+
+                                double[] auxMags = variMagsDouble;
+                                double[] auxTimes = variTimes;
+
+                                // Remove possible NaNs
+                                List<Double> magnitudesList = new ArrayList<>();
+                                List<Double> timesList = new ArrayList<>();
+                                int idx = 0;
+                                for (double mag : auxMags) {
+                                    if (Double.isFinite(mag)) {
+                                        magnitudesList.add(mag - magSclVari);
+                                        timesList.add(auxTimes[idx]);
+                                    }
+                                    idx++;
+                                }
+                                variMagsDouble = magnitudesList.stream().mapToDouble(Double::doubleValue).toArray();
+                                variTimes = timesList.stream().mapToDouble(Double::doubleValue).toArray();
+                                nVari = variMagsDouble.length;
+
+                                final int MAX_VARI = VariableGroupRenderSystem.MAX_VARI;
+                                if (variMagsDouble.length > MAX_VARI) {
+                                    LinearInterpolator interp = new LinearInterpolator();
+                                    PolynomialSplineFunction f = interp.interpolate(variTimes, variMagsDouble);
+
+                                    variMagsDouble = new double[MAX_VARI];
+                                    variTimes = new double[MAX_VARI];
+
+                                    double t0 = timesList.get(0);
+                                    double tn = timesList.get(timesList.size() - 1);
+                                    double tStep = (tn - t0) / (MAX_VARI - 1);
+
+                                    idx = 0;
+                                    for (double t = t0; t <= tn; t += tStep) {
+                                        variTimes[idx] = t;
+                                        variMagsDouble[idx] = f.value(t);
+                                        idx++;
+                                    }
+                                    nVari = MAX_VARI;
+                                    resampledLightCurves++;
+                                }
+                                // Convert magnitudes to sizes
+                                assert variMags.length == variTimes.length;
+                                for (int j = 0; j < variMagsDouble.length; j++) {
+                                    variMags[j] = (float) magnitudeToPseudoSize(variMagsDouble[j]);
+                                }
+                            }
+
+                            // EFFECTIVE TEMPERATURE
                             float tEff;
                             if (!ucdParser.TEFF.isEmpty()) {
                                 Pair<UCD, Double> tEffPair = getDoubleUcd(ucdParser.TEFF, row);
+                                assert tEffPair != null;
                                 tEff = tEffPair.getSecond().floatValue();
                             } else {
                                 // Convert B-V to T_eff using Ballesteros 2012
@@ -305,7 +427,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
 
                             float col = Color.toFloatBits(rgb[0], rgb[1], rgb[2], 1.0f);
 
-                            /* IDENTIFIER AND NAME */
+                            // IDENTIFIER AND NAME
                             String[] names;
                             long id = -1L;
                             int hip = -1;
@@ -314,10 +436,11 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 if (!ucdParser.ID.isEmpty()) {
                                     // We have ID
                                     Pair<UCD, String> namePair = getStringUcd(ucdParser.ID, row);
+                                    assert namePair != null;
                                     names = new String[] { namePair.getSecond() };
                                     if (namePair.getFirst().colname.equalsIgnoreCase("hip")) {
                                         hip = Integer.parseInt(namePair.getSecond());
-                                        id = (long) hip;
+                                        id = hip;
                                     } else {
                                         id = ++starId;
                                     }
@@ -327,7 +450,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     names = new String[] { Long.toString(id) };
                                 }
                             } else {
-                                // We have name
+                                // We have a name
                                 Pair<UCD, String>[] namePairs = getAllStringsUcd(ucdParser.NAME, row);
                                 Array<String> namesArray = new Array<>(false, namePairs.length);
                                 for (Pair<UCD, String> pair : namePairs) {
@@ -350,6 +473,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Take care of HIP stars
                                 if (!ucdParser.ID.isEmpty()) {
                                     Pair<UCD, String> idPair = getStringUcd(ucdParser.ID, row);
+                                    assert idPair != null;
                                     if (idPair.getFirst().colname.equalsIgnoreCase("hip")) {
                                         hip = Integer.parseInt(idPair.getSecond());
                                         id = (long) hip;
@@ -385,8 +509,21 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataF[ParticleRecord.I_FHIP] = hip;
 
                                 // TODO - Variable stars
-                                float[] magnitudes = null;
-                                int nMagnitudes = 0;
+                                //int nVari = 10 - r.nextInt(5);
+                                //double amplitude = (r.nextDouble() + 1.0) / 2.0 * 3.5;
+                                //variMags = new float[nVari - 1];
+                                //variTimes = new double[nVari - 1];
+                                //List<Double> l = r.doubles(nVari / 2, appMag - amplitude, appMag + amplitude).sorted().boxed().collect(Collectors.toList());
+                                //List<Double> mags = new ArrayList<>(l);
+                                //Collections.reverse(l);
+                                //mags.addAll(l);
+                                //double baseTime = 1714.0;
+                                //for (int j = 0; j < mags.size() - 1; j++) {
+                                //    variMags[j] = (float) magnitudeToPseudoSize(mags.get(j));
+                                //    variTimes[j] = baseTime;
+                                //    baseTime += 0.05;
+                                //}
+                                //nVari--;
 
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
@@ -398,14 +535,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     extraAttributes = initExtraAttributes(extraAttributes);
                                     extraAttributes.put(ucdParser.TEFF.first(), tEff);
                                 }
-
-                                // IParticleRecord sb = switch (datasetOptions.type) {
-                                //     case STARS -> new ParticleRecord(dataD, dataF, id, names, extraAttributes);
-                                //     case VARIABLES -> new VariableRecord(dataD, dataF, magnitudes, nMagnitudes, id, names, extraAttributes);
-                                //     default -> null;
-                                // };
-
-                                IParticleRecord sb = magnitudes == null ? new ParticleRecord(dataD, dataF, id, names, extraAttributes) : new VariableRecord(dataD, dataF, magnitudes, nMagnitudes, id, names, extraAttributes);
+                                final IParticleRecord sb;
+                                if (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES || variMags != null) {
+                                    sb = new VariableRecord(dataD, dataF, nVari, pf, variMags, variTimes, id, names, extraAttributes);
+                                } else {
+                                    sb = new ParticleRecord(dataD, dataF, id, names, extraAttributes);
+                                }
 
                                 list.add(sb);
 
@@ -435,6 +570,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                     }
                     if (nInvalidParallaxes > 0) {
                         logger.warn("Found " + nInvalidParallaxes + " rows with nonexistent or negative parallax. Using the default 0.04 mas for them.");
+                    }
+                    if (resampledLightCurves > 0) {
+                        logger.warn(resampledLightCurves + " light curves resampled to fit in default array size (=" + VariableGroupRenderSystem.MAX_VARI + ")");
+                    }
+                    if (noPeriods > 0) {
+                        logger.warn("Skipped " + noPeriods + " variable stars without a period");
                     }
                 } else {
                     logger.error("Table not loaded: Position not found");

@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.cluster.StarClusterLoader;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
@@ -2605,6 +2606,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadDataset(dsName, path, CatalogInfoType.SCRIPT, datasetOptions, sync);
     }
 
+    @Override
+    public boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+        return loadVariableStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
+    }
+
+    public boolean loadVariableStarDataset(String dsName, String path, CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+        DatasetOptions dops = DatasetOptions.getVariableStarDatasetOptions(dsName, magnitudeScale, labelColor, ComponentType.Stars, fadeIn, fadeOut);
+        return loadDataset(dsName, path, type, dops, sync);
+    }
+
     public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, List<?> labelColor, String ct, List<?> fadeIn, List<?> fadeOut, boolean sync) {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
@@ -2652,7 +2663,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             // Create star/particle group or star clusters
             if (checkString(dsName, "datasetName")) {
-                if (datasetOptions == null || datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) {
+                if (datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) {
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {
                         // STAR GROUP
@@ -2664,14 +2675,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
                             EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                            logger.info(data.size() + " stars loaded");
+                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? "stars" : "variable stars";
+
+                            assert data != null;
+                            logger.info(data.size() + " " + typeStr + " loaded");
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
                             sleepFrames(1);
                         }
                     }
-                } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.PARTICLES) {
+                } else if (datasetOptions.type == DatasetLoadType.PARTICLES) {
                     // PARTICLE GROUP
                     List<IParticleRecord> data = loadParticleBeans(ds, datasetOptions);
                     if (data != null && !data.isEmpty()) {
@@ -2690,7 +2704,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             sleepFrames(1);
                         }
                     }
-                } else if (datasetOptions.type == DatasetOptions.DatasetLoadType.CLUSTERS) {
+                } else if (datasetOptions.type == DatasetLoadType.CLUSTERS) {
                     // STAR CLUSTERS
                     GenericCatalog scc = new GenericCatalog();
                     scc.setName(dsName);

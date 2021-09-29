@@ -26,5 +26,7 @@ public class AstroUtilsTest {
         System.out.println("lambda[deg] : " + Math.toDegrees(coord.x));
         System.out.println("beta[deg]   : " + Math.toDegrees(coord.y));
         System.out.println("dist[km]    : " + coord.z);
+
+        System.out.println("J2010: " + AstroUtils.JD_J2010);
     }
 }

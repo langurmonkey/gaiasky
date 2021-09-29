@@ -33,17 +33,26 @@ import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
 
+/**
+ * Renders variable stars which have periodical light curve data
+ */
 public class VariableGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int nSizesOffset, sizesOffset, pmOffset;
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset;
     private float[] pointAlpha;
     private final float[] alphaSizeFovBr;
     private final float[] pointAlphaHl;
     private final Colormap cmap;
+
+    // Maximum number of data points in the light curves
+    public static final int MAX_VARI = 20;
+    private static final int usageVariMags = 400;
+    private static final int usageVariTimes = 500;
 
     private Texture starTex;
 
@@ -102,8 +111,9 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        nSizesOffset = curr.mesh.getVertexAttribute(Usage.BiNormal) != null ? curr.mesh.getVertexAttribute(Usage.BiNormal).offset / 4 : 0;
-        sizesOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        nVariOffset = curr.mesh.getVertexAttribute(Usage.BiNormal) != null ? curr.mesh.getVertexAttribute(Usage.BiNormal).offset / 4 : 0;
+        variMagsOffset = curr.mesh.getVertexAttribute(usageVariMags) != null ? curr.mesh.getVertexAttribute(usageVariMags).offset / 4 : 0;
+        variTimesOffset = curr.mesh.getVertexAttribute(usageVariTimes) != null ? curr.mesh.getVertexAttribute(usageVariTimes).offset / 4 : 0;
         return mdi;
     }
 
@@ -162,14 +172,20 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
                                         tempVerts[curr.vertexIdx + curr.colorOffset] = variableGroup.getColor(i);
                                     }
 
-                                    // SIZE
-                                    tempVerts[curr.vertexIdx + nSizesOffset] = vr.nMagnitudes;
-                                    for (int k = 0; k < vr.nMagnitudes; k++) {
+                                    // VARIABLE STARS (magnitudes and times)
+                                    tempVerts[curr.vertexIdx + nVariOffset] = vr.nVari;
+                                    for (int k = 0; k < vr.nVari; k++) {
                                         if (variableGroup.isHlAllVisible() && variableGroup.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + sizesOffset + k] = Math.max(10f, (float) (vr.sizes(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor());
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (vr.variMag(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor());
                                         } else {
-                                            tempVerts[curr.vertexIdx + sizesOffset + k] = (float) (vr.sizes(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor();
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (vr.variMag(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor();
                                         }
+                                        tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) vr.variTime(k);
+                                    }
+                                    // Unused
+                                    for (int k = vr.nVari; k < 16; k++) {
+                                        tempVerts[curr.vertexIdx + variMagsOffset + k] = 0;
+                                        tempVerts[curr.vertexIdx + variTimesOffset + k] = 0;
                                     }
 
                                     // POSITION [u]
@@ -216,9 +232,8 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
                             float curRt2 = (float) (curRt - (double) ((float) curRt));
                             shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
-                            double seconds = (curRt - ((int) curRt)) * 86400.0;
-                            shaderProgram.setUniformf("u_s", (float) (seconds % 16d));
-                            logger.info("u_s=" + ((float) (seconds % 16d)));
+                            curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), variableGroup.getVariabilityepoch());
+                            shaderProgram.setUniformf("u_s", (float) curRt);
 
                             try {
                                 curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
@@ -239,11 +254,17 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
         attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.BiNormal, 1, "a_nsizes"));
-        attributes.add(new VertexAttribute(Usage.Generic, 4, "a_sizes1"));
-        attributes.add(new VertexAttribute(Usage.Normal, 4, "a_sizes2"));
-        attributes.add(new VertexAttribute(Usage.BoneWeight, 4, "a_sizes3"));
-        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 4, "a_sizes4"));
+        attributes.add(new VertexAttribute(Usage.BiNormal, 1, "a_nVari"));
+        attributes.add(new VertexAttribute(usageVariMags, 4, "a_vmags1"));
+        attributes.add(new VertexAttribute(usageVariMags + 1, 4, "a_vmags2"));
+        attributes.add(new VertexAttribute(usageVariMags + 2, 4, "a_vmags3"));
+        attributes.add(new VertexAttribute(usageVariMags + 3, 4, "a_vmags4"));
+        attributes.add(new VertexAttribute(usageVariMags + 4, 4, "a_vmags5"));
+        attributes.add(new VertexAttribute(usageVariTimes, 4, "a_vtimes1"));
+        attributes.add(new VertexAttribute(usageVariTimes + 1, 4, "a_vtimes2"));
+        attributes.add(new VertexAttribute(usageVariTimes + 2, 4, "a_vtimes3"));
+        attributes.add(new VertexAttribute(usageVariTimes + 3, 4, "a_vtimes4"));
+        attributes.add(new VertexAttribute(usageVariTimes + 4, 4, "a_vtimes5"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)
@@ -254,18 +275,14 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD:
-            pointAlpha[0] = (float) data[0];
-            break;
-        case DISPOSE_STAR_GROUP_GPU_MESH:
+        case STAR_MIN_OPACITY_CMD -> pointAlpha[0] = (float) data[0];
+        case DISPOSE_STAR_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
-            break;
-        case STAR_TEXTURE_IDX_CMD:
-            GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
-            break;
-        default:
-            break;
+        }
+        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        default -> {
+        }
         }
     }
 

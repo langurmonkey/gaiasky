@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -22,7 +23,7 @@ import gaiasky.util.validator.TextFieldComparatorValidator;
 
 public class DatasetLoadDialog extends GenericDialog {
 
-    public OwnCheckBox particles, stars, clusters, fadeIn, fadeOut;
+    public OwnCheckBox particles, stars, clusters, variables, fadeIn, fadeOut;
     public OwnTextField dsName, magnitudeScale, fadeInMin, fadeInMax, fadeOutMin, fadeOutMax, profileDecay;
     public OwnSliderPlus particleSize, colorNoise;
     public ColorPicker particleColor, labelColor;
@@ -107,9 +108,24 @@ public class DatasetLoadDialog extends GenericDialog {
             return false;
         });
         clusters.setChecked(false);
-        content.add(clusters).left().padBottom(pad10 * 2f).row();
+        content.add(clusters).left().padBottom(pad10).row();
 
-        new ButtonGroup<>(particles, stars, clusters);
+        variables = new OwnCheckBox(I18n.txt("gui.dsload.variable"), skin, "radio", pad5);
+        variables.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                if (variables.isChecked()) {
+                    container.clear();
+                    addVariableStarsWidget(container);
+                    pack();
+                }
+                return true;
+            }
+            return false;
+        });
+        variables.setChecked(false);
+        content.add(variables).left().padBottom(pad10 * 2f).row();
+
+        new ButtonGroup<>(particles, stars, clusters, variables);
 
         content.add(cont).left();
     }
@@ -130,7 +146,6 @@ public class DatasetLoadDialog extends GenericDialog {
         magnitudeScale.setWidth(fieldWidth);
         container.add(new OwnLabel(I18n.txt("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
-
 
         // Fade
         addFadeAttributes(container);
@@ -240,14 +255,50 @@ public class DatasetLoadDialog extends GenericDialog {
 
     }
 
-    private void addFileName(Table container){
+    private void addVariableStarsWidget(Table container) {
+        OwnLabel starProps = new OwnLabel(I18n.txt("gui.dsload.variable.properties"), skin, "hud-subheader");
+        container.add(starProps).colspan(2).left().padTop(pad15).padBottom(pad10).row();
+
+        // Info
+        String scInfoStr = I18n.txt("gui.dsload.variable.info") + '\n';
+        int scLines = GlobalResources.countOccurrences(scInfoStr, '\n');
+        TextArea scInfo = new OwnTextArea(scInfoStr, skin, "info");
+        scInfo.setDisabled(true);
+        scInfo.setPrefRows(scLines + 1);
+        scInfo.setWidth(taWidth);
+        scInfo.clearListeners();
+
+        container.add(scInfo).colspan(2).left().padTop(pad5).padBottom(pad10).row();
+
+        // Name
+        addFileName(container);
+
+        // Label color
+        addLabelColor(container);
+
+        // Magnitude multiplier
+        FloatValidator sclValidator = new FloatValidator(-100f, 100f);
+        magnitudeScale = new OwnTextField("0.0", skin, sclValidator);
+        magnitudeScale.setWidth(fieldWidth);
+        container.add(new OwnLabel(I18n.txt("gui.dsload.magnitude.scale"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
+        container.add(GuiUtils.tooltipHg(magnitudeScale, "gui.dsload.magnitude.scale.tooltip", skin)).left().padBottom(pad10).row();
+
+        // Fade
+        addFadeAttributes(container);
+        // Default fade out for stars
+        fadeOut.setChecked(true);
+        fadeOutMin.setText("10000");
+        fadeOutMax.setText("80000");
+    }
+
+    private void addFileName(Table container) {
         dsName = new OwnTextField(fileName, skin);
         dsName.setWidth(fieldWidth);
         container.add(new OwnLabel(I18n.txt("gui.dsload.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(dsName).left().padBottom(pad10).row();
     }
 
-    private void addParticleColor(Table container){
+    private void addParticleColor(Table container) {
         particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
         particleColor.setNewColorRunnable(() -> {
             updateFrameBuffer();
@@ -256,7 +307,7 @@ public class DatasetLoadDialog extends GenericDialog {
         container.add(particleColor).size(cpSize).left().padBottom(pad5).row();
     }
 
-    private void addLabelColor(Table container){
+    private void addLabelColor(Table container) {
         labelColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
         container.add(new OwnLabel(I18n.txt("gui.dsload.color.label"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         Table lc = new Table(skin);
@@ -366,20 +417,23 @@ public class DatasetLoadDialog extends GenericDialog {
         DatasetOptions dops = new DatasetOptions();
 
         if (stars.isChecked()) {
-            dops.type = DatasetOptions.DatasetLoadType.STARS;
+            dops.type = DatasetLoadType.STARS;
             dops.magnitudeScale = magnitudeScale.getDoubleValue(0);
-        } else if(particles.isChecked()) {
-            dops.type = DatasetOptions.DatasetLoadType.PARTICLES;
+        } else if (particles.isChecked()) {
+            dops.type = DatasetLoadType.PARTICLES;
             dops.ct = componentType.getSelected();
             dops.profileDecay = profileDecay.getDoubleValue(5d);
             dops.particleColor = particleColor.getPickedColorDouble();
             dops.particleColorNoise = colorNoise.getValue();
             dops.particleSize = particleSize.getValue();
             dops.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * dops.particleSize) };
-        } else if (clusters.isChecked()){
-            dops.type = DatasetOptions.DatasetLoadType.CLUSTERS;
+        } else if (clusters.isChecked()) {
+            dops.type = DatasetLoadType.CLUSTERS;
             dops.ct = componentType.getSelected();
             dops.particleColor = particleColor.getPickedColorDouble();
+        } else if (variables.isChecked()) {
+            dops.type = DatasetLoadType.VARIABLES;
+            dops.magnitudeScale = magnitudeScale.getDoubleValue(0);
         }
         // Common properties
         dops.catalogName = dsName.getText();

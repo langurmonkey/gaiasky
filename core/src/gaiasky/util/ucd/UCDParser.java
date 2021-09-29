@@ -41,6 +41,9 @@ public class UCDParser {
     public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
     public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
+    public static String[] varimagscolnames = new String[] { "g_transit_mag" };
+    public static String[] varitimescolnames = new String[] { "g_transit_time" };
+    public static String[] periodcolnames = new String[] { "pf", "period" };
 
     public static boolean isName(String colname) {
         return TextUtils.contains(namecolnames, colname, true);
@@ -110,6 +113,18 @@ public class UCDParser {
         return TextUtils.contains(nstarscolnames, colname, true);
     }
 
+    public static boolean isGVariMags(String colname) {
+        return TextUtils.contains(varimagscolnames, colname, true);
+    }
+
+    public static boolean isGVariTimes(String colname) {
+        return TextUtils.contains(varitimescolnames, colname, true);
+    }
+
+    public static boolean isPeriod(String colname) {
+        return TextUtils.contains(periodcolnames, colname, true);
+    }
+
     public Map<UCDType, Set<UCD>> ucdmap;
 
     // IDS
@@ -140,6 +155,11 @@ public class UCDParser {
     public boolean hasteff = false;
     public Array<UCD> TEFF;
 
+    // VARIABILITY
+    public boolean hasvari = false;
+    public boolean hasperiod = false;
+    public Array<UCD> VARI_TIMES, VARI_MAGS, VARI_PERIOD;
+
     // REST
     public Array<UCD> extra;
 
@@ -156,6 +176,9 @@ public class UCDParser {
         PMRA = new Array<>();
         PMDEC = new Array<>();
         RADVEL = new Array<>();
+        VARI_TIMES = new Array<>();
+        VARI_MAGS = new Array<>();
+        VARI_PERIOD = new Array<>();
         extra = new Array<>();
     }
 
@@ -179,7 +202,7 @@ public class UCDParser {
             addToMap(ucd);
         }
 
-        /** ID and NAME **/
+        // ID and NAME
         Set<UCD> meta = ucdmap.get(UCDType.META);
         if (meta != null)
             for (UCD candidate : meta) {
@@ -198,7 +221,7 @@ public class UCDParser {
         }
         this.hasname = !this.NAME.isEmpty();
 
-        /** POSITIONS **/
+        // POSITIONS
         Set<UCD> pos = ucdmap.get(UCDType.POS);
         if (pos != null) {
             String posrefsys = getBestRefsys(pos);
@@ -281,7 +304,7 @@ public class UCDParser {
 
         this.haspos = !this.POS1.isEmpty() && !this.POS2.isEmpty();
 
-        /** PROPER MOTIONS **/
+        // PROPER MOTIONS
 
         // RA/DEC
         if (pos != null) {
@@ -326,7 +349,7 @@ public class UCDParser {
                     this.RADVEL.add(candidate);
             }
 
-        /** MAGNITUDES **/
+        // MAGNITUDES
         Set<UCD> mag = ucdmap.get(UCDType.PHOT);
         if (mag != null)
             for (UCD candidate : mag) {
@@ -346,7 +369,7 @@ public class UCDParser {
         }
         this.hasmag = !this.MAG.isEmpty();
 
-        /** COLORS **/
+        // COLORS
         Set<UCD> col = ucdmap.get(UCDType.PHOT);
         if (col != null) {
             for (UCD candidate : col) {
@@ -361,7 +384,7 @@ public class UCDParser {
         }
         this.hascol = !this.COL.isEmpty();
 
-        /** PHYSICAL QUANTITIES **/
+        // PHYSICAL QUANTITIES
         // T_eff
         Set<UCD> phys = ucdmap.get(UCDType.PHYS);
         if (phys != null) {
@@ -377,7 +400,34 @@ public class UCDParser {
         }
         this.hasteff = !this.TEFF.isEmpty();
 
-        /** REST OF COLUMNS **/
+        // VARIABILITY
+        Set<UCD> vari = ucdmap.get(UCDType.VARI);
+        if (vari != null) {
+            for (UCD candidate : vari) {
+                if (candidate.ucd[0].length >= 3 && candidate.ucd[0][1].equals("time")) {
+                    this.VARI_TIMES.add(candidate);
+                    break;
+                }
+                if (candidate.ucd[0].length >= 3 && candidate.ucd[0][1].equals("magnitude")) {
+                    this.VARI_MAGS.add(candidate);
+                    break;
+                }
+            }
+        }
+        if (this.VARI_TIMES == null || this.VARI_TIMES.isEmpty()) {
+            this.VARI_TIMES = getByColNames(varitimescolnames, "d");
+        }
+        if (this.VARI_MAGS == null || this.VARI_MAGS.isEmpty()) {
+            this.VARI_MAGS = getByColNames(varimagscolnames, "mag");
+        }
+        this.hasvari = !this.VARI_MAGS.isEmpty();
+        if (this.VARI_PERIOD == null || this.VARI_PERIOD.isEmpty()) {
+            this.VARI_PERIOD = getByColNames(periodcolnames, "d");
+        }
+        this.hasperiod = !this.VARI_PERIOD.isEmpty();
+
+
+        // REST OF COLUMNS
         Set<UCDType> keys = ucdmap.keySet();
         for (UCDType ucdType : keys) {
             Set<UCD> ucds = ucdmap.get(ucdType);
@@ -405,29 +455,17 @@ public class UCDParser {
         String postypestr = null, disttype = null;
         PositionType postype = null;
         switch (meaning) {
-        case "eq":
-            postypestr = "EQ_SPH_";
-            break;
-        case "ecliptic":
-            postypestr = "ECL_SPH_";
-            break;
-        case "galactic":
-            postypestr = "GAL_SPH_";
-            break;
-        case "cartesian":
-            postype = PositionType.EQ_XYZ;
-            break;
+        case "eq" -> postypestr = "EQ_SPH_";
+        case "ecliptic" -> postypestr = "ECL_SPH_";
+        case "galactic" -> postypestr = "GAL_SPH_";
+        case "cartesian" -> postype = PositionType.EQ_XYZ;
         }
 
         if (pos3 != null) {
             meaning = pos3.ucd[0][1];
             switch (meaning) {
-            case "parallax":
-                disttype = "PLX";
-                break;
-            case "distance":
-                disttype = "DIST";
-                break;
+            case "parallax" -> disttype = "PLX";
+            case "distance" -> disttype = "DIST";
             }
         } else {
             disttype = "PLX";
@@ -439,6 +477,10 @@ public class UCDParser {
         }
 
         return postype;
+    }
+
+    public UCD getByColumName(String columName) {
+        return getByColNames(new String[]{columName}).first();
     }
 
     private Array<UCD> getByColNames(String[] colnames) {

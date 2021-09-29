@@ -152,7 +152,7 @@ public class CatalogInfo {
      * @return True if this is a catalog of stars or particles, false otherwise (star clusters)
      */
     public boolean isRegular() {
-        return this.object instanceof ParticleGroup || this.object instanceof StarGroup || this.object instanceof OctreeWrapper;
+        return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
     }
 
 }

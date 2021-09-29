@@ -25,6 +25,7 @@ allprojects {
         compressVersion = "1.20"
         commonsioVersion = "2.+"
         commonsimagingVersion = "+"
+        commonsmathVersion = "+"
         py4jVersion = "0.10.9.+"
         oshiVersion = "5.7.+"
         stilVersion = "4.0.+"
@@ -148,6 +149,8 @@ project(":core") {
         api group: "com.github.oshi", name: "oshi-core", version: "$oshiVersion"
         // Screenshots and frames
         api group: "org.apache.commons", name: "commons-imaging", version: "$commonsimagingVersion"
+        // Interpolators
+        api group: "org.apache.commons", name: "commons-math", version: "$commonsmathVersion"
         // Yaml
         api group: "com.fasterxml.jackson.core", name: "jackson-databind", version: "$jacksonVersion"
         api group: "com.fasterxml.jackson.dataformat", name: "jackson-dataformat-yaml", version: "$jacksonVersion"

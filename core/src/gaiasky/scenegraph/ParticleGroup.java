@@ -1338,7 +1338,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         pg.setCt(ct);
         pg.setData(data);
         pg.initialize(false, false);
-        pg.doneLoading(null);
+        pg.doneLoading(GaiaSky.instance.assetManager);
         return pg;
     }
 

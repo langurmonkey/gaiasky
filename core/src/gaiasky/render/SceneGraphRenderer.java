@@ -1182,6 +1182,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 }
             }
         } catch (Exception ignored) {
+            logger.error(ignored);
         }
 
     }

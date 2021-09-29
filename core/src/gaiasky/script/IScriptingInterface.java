@@ -2252,6 +2252,31 @@ public interface IScriptingInterface {
     boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync);
 
     /**
+     * Loads a variable star dataset from a VOTable file (<code>.vot</code>).
+     * The variable star table must have the following columns representing the light curve:
+     * <ul>
+     *     <li><code>g_transit_time</code>: list of times as Julian days since J2010 for each of the magnitudes</li>
+     *     <li><code>g_transit_mag</code>: list of magnitudes corresponding to the times in <code>g_transit_times</code></li>
+     *     <li><code>pf</code>: the period in days</li>
+     * </ul>
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName         The name of the dataset.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the magnitudes in the light curve, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param labelColor     The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
+     * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync);
+
+    /**
      * Removes the dataset identified by the given name, if it exists.
      *
      * @param dsName The name of the dataset to remove.

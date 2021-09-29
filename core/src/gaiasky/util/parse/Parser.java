@@ -2,10 +2,6 @@
  * This file is part of Gaia Sky, which is released under the Mozilla Public License 2.0.
  * See the file LICENSE.md in the project root for full license details.
  */
-
-/**
- *
- */
 package gaiasky.util.parse;
 
 import java.util.Arrays;
@@ -57,16 +53,13 @@ public final class Parser {
             if (pos >= len)
                 return 0;
         } else if (c == '+') {
-            sign = 1;
             ++pos;
             if (pos >= len)
                 return 0;
         }
 
-        while (true) // breaks inside on pos >= len or non-digit character
-        {
-            if (pos >= len)
-                return sign * result;
+        // breaks inside on pos >= len or non-digit character
+        while (pos < len) {
             c = input.charAt(pos++);
             if (c < '0' || c > '9') {
                 if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\0') // break on trailing white space or exponent
@@ -118,16 +111,13 @@ public final class Parser {
             if (pos >= len)
                 throw new NumberFormatException("Invalid input");
         } else if (c == '+') {
-            sign = 1;
             ++pos;
             if (pos >= len)
                 throw new NumberFormatException("Invalid input");
         }
 
-        while (true) // breaks inside on pos >= len or non-digit character
-        {
-            if (pos >= len)
-                return sign * result;
+        // breaks inside on pos >= len or non-digit character
+        while (pos < len) {
             c = input.charAt(pos++);
             if (c < '0' || c > '9') {
                 if (c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\0') // break on trailing white space or exponent
@@ -188,7 +178,6 @@ public final class Parser {
             if (pos >= len)
                 return Double.NaN;
         } else if (c == '+') {
-            sign = 1;
             ++pos;
             if (pos >= len)
                 return Double.NaN;
@@ -257,7 +246,6 @@ public final class Parser {
             if (pos >= len)
                 return sign * result;
         } else if (c == '+') {
-            expSign = 1;
             ++pos;
             if (pos >= len)
                 return sign * result;
@@ -341,7 +329,6 @@ public final class Parser {
             if (pos >= len)
                 throw new NumberFormatException("Invalid input");
         } else if (c == '+') {
-            sign = 1;
             ++pos;
             if (pos >= len)
                 throw new NumberFormatException("Invalid input");
@@ -410,7 +397,6 @@ public final class Parser {
             if (pos >= len)
                 return sign * result;
         } else if (c == '+') {
-            expSign = 1;
             ++pos;
             if (pos >= len)
                 return sign * result;
@@ -551,7 +537,7 @@ public final class Parser {
         }
         input = input.trim();
         String[] tokens = input.substring(1, input.length() - 1).split(",");
-        List<Float> list = Arrays.stream(tokens).map(token -> parseFloat(token)).collect(Collectors.toList());
+        List<Float> list = Arrays.stream(tokens).map(Parser::parseFloat).collect(Collectors.toList());
         float[] result = new float[list.size()];
         int i = 0;
         for (Float f : list) {
@@ -572,10 +558,52 @@ public final class Parser {
         }
         input = input.trim();
         String[] tokens = input.substring(1, input.length() - 1).split(",");
-        List<Float> list = Arrays.stream(tokens).map(token -> parseFloatException(token)).collect(Collectors.toList());
+        List<Float> list = Arrays.stream(tokens).map(Parser::parseFloatException).collect(Collectors.toList());
         float[] result = new float[list.size()];
         int i = 0;
         for (Float f : list) {
+            result[i] = f;
+            i++;
+        }
+        return result;
+    }
+
+    /**
+     * Parses a double precision float array in the form '[a, b, c, ...]
+     * @param input The input string.
+     * @return The parsed double precision float array, or null if the parsing failed.
+     */
+    public static double[] parseDoubleArray(String input) {
+        if (input == null) {
+            return null;
+        }
+        input = input.trim();
+        String[] tokens = input.substring(1, input.length() - 1).split(",");
+        List<Double> list = Arrays.stream(tokens).map(Parser::parseDouble).collect(Collectors.toList());
+        double[] result = new double[list.size()];
+        int i = 0;
+        for (Double f : list) {
+            result[i] = f;
+            i++;
+        }
+        return result;
+    }
+
+    /**
+     * Parses a double precision float array in the form '[a, b, c, ...]
+     * @param input The input string.
+     * @return The parsed double precision float array, or null if the parsing failed.
+     */
+    public static double[] parseDoubleArrayException(String input) throws NumberFormatException {
+        if (input == null) {
+            return null;
+        }
+        input = input.trim();
+        String[] tokens = input.substring(1, input.length() - 1).split(",");
+        List<Double> list = Arrays.stream(tokens).map(Parser::parseDoubleException).collect(Collectors.toList());
+        double[] result = new double[list.size()];
+        int i = 0;
+        for (Double f : list) {
             result[i] = f;
             i++;
         }

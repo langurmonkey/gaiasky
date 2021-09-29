@@ -17,6 +17,9 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Contains some general utilities to deal with text and strings.
+ */
 public class TextUtils {
 
     public static String surroundBrackets(String in) {

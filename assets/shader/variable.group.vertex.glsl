@@ -7,15 +7,23 @@
 in vec3 a_position;
 in vec3 a_pm;
 in vec4 a_color;
-in float a_nsizes;
-in vec4 a_sizes1;
-in vec4 a_sizes2;
-in vec4 a_sizes3;
-in vec4 a_sizes4;
+in float a_nVari;
+// Magnitudes
+in vec4 a_vmags1;
+in vec4 a_vmags2;
+in vec4 a_vmags3;
+in vec4 a_vmags4;
+in vec4 a_vmags5;
+// Times
+in vec4 a_vtimes1;
+in vec4 a_vtimes2;
+in vec4 a_vtimes3;
+in vec4 a_vtimes4;
+in vec4 a_vtimes5;
 
-// time in days since epoch, as a 64-bit double encoded with two floats
+// time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
-// seconds in day
+// time in julian days since variablity epoch
 uniform float u_s;
 uniform mat4 u_projModelView;
 uniform vec3 u_camPos;
@@ -53,7 +61,7 @@ out vec4 v_col;
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
-#define N_SIZES 16
+#define N_SIZES 20
 
 void main() {
 	// Lengths
@@ -94,31 +102,69 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float sizes[N_SIZES];
-    sizes[0] = a_sizes1[0];
-    sizes[1] = a_sizes1[1];
-    sizes[2] = a_sizes1[2];
-    sizes[3] = a_sizes1[3];
-    sizes[4] = a_sizes2[0];
-    sizes[5] = a_sizes2[1];
-    sizes[6] = a_sizes2[2];
-    sizes[7] = a_sizes2[3];
-    sizes[8] = a_sizes3[0];
-    sizes[9] = a_sizes3[1];
-    sizes[10] = a_sizes3[2];
-    sizes[11] = a_sizes3[3];
-    sizes[12] = a_sizes4[0];
-    sizes[13] = a_sizes4[1];
-    sizes[14] = a_sizes4[2];
-    sizes[15] = a_sizes4[3];
+    // Magnitudes vector
+    float vmags[N_SIZES];
+    vmags[0] = a_vmags1[0];
+    vmags[1] = a_vmags1[1];
+    vmags[2] = a_vmags1[2];
+    vmags[3] = a_vmags1[3];
+    vmags[4] = a_vmags2[0];
+    vmags[5] = a_vmags2[1];
+    vmags[6] = a_vmags2[2];
+    vmags[7] = a_vmags2[3];
+    vmags[8] = a_vmags3[0];
+    vmags[9] = a_vmags3[1];
+    vmags[10] = a_vmags3[2];
+    vmags[11] = a_vmags3[3];
+    vmags[12] = a_vmags4[0];
+    vmags[13] = a_vmags4[1];
+    vmags[14] = a_vmags4[2];
+    vmags[15] = a_vmags4[3];
+    vmags[16] = a_vmags5[0];
+    vmags[17] = a_vmags5[1];
+    vmags[18] = a_vmags5[2];
+    vmags[19] = a_vmags5[3];
+    // Times vector
+    float vtimes[N_SIZES];
+    vtimes[0] = a_vtimes1[0];
+    vtimes[1] = a_vtimes1[1];
+    vtimes[2] = a_vtimes1[2];
+    vtimes[3] = a_vtimes1[3];
+    vtimes[4] = a_vtimes2[0];
+    vtimes[5] = a_vtimes2[1];
+    vtimes[6] = a_vtimes2[2];
+    vtimes[7] = a_vtimes2[3];
+    vtimes[8] = a_vtimes3[0];
+    vtimes[9] = a_vtimes3[1];
+    vtimes[10] = a_vtimes3[2];
+    vtimes[11] = a_vtimes3[3];
+    vtimes[12] = a_vtimes4[0];
+    vtimes[13] = a_vtimes4[1];
+    vtimes[14] = a_vtimes4[2];
+    vtimes[15] = a_vtimes4[3];
+    vtimes[16] = a_vtimes5[0];
+    vtimes[17] = a_vtimes5[1];
+    vtimes[18] = a_vtimes5[2];
+    vtimes[19] = a_vtimes5[3];
 
-    int si0 = int(u_s);
-    int si1 = si0 + 1;
-    if (si1 > 15) {
-        si1 = 0;
+    // Linear interpolation of time in light curve
+    int nVari = int(a_nVari);
+    float t0 = vtimes[0];
+    float t1 = vtimes[nVari - 1];
+    float period = t1 - t0;
+    float t = mod(u_s, period);
+    float size = 0.0;
+    for (int i = 0; i < nVari - 1; i++) {
+        float x0 = vtimes[i] - t0;
+        float x1 = vtimes[i+1] - t0;
+        if (t >= x0 && t <= x1) {
+           size = lint(t, x0, x1, vmags[i], vmags[i+1]);
+        } else {
+            // Next
+        }
     }
-    float size = lint(u_s - floor(u_s), 0.0, 1.0, sizes[si0], sizes[si1]);
-    //float size = (a_nsizes / float(N_SIZES)) * sizes[0];
+
+    //float size = (a_nVari / float(N_SIZES)) * vmags[0];
 
     float viewAngleApparent = atan((size * u_alphaSizeFovBr.z) / dist);
     float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y);

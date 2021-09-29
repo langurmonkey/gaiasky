@@ -46,6 +46,18 @@ public class DatasetOptions {
         return datasetOptions;
     }
 
+    public static DatasetOptions getVariableStarDatasetOptions(String catalogName, double magnitudeScale, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut){
+        DatasetOptions datasetOptions = new DatasetOptions();
+        datasetOptions.type = DatasetLoadType.VARIABLES;
+        datasetOptions.catalogName = catalogName;
+        datasetOptions.labelColor = labelColor;
+        datasetOptions.magnitudeScale = magnitudeScale;
+        datasetOptions.ct = ct;
+        datasetOptions.fadeIn = fadeIn;
+        datasetOptions.fadeOut = fadeOut;
+        return datasetOptions;
+    }
+
     public enum DatasetLoadType {
         PARTICLES,
         STARS,

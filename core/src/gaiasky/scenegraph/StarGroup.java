@@ -36,7 +36,6 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.scenegraph.particle.ParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.*;
 import gaiasky.util.color.ColorUtils;
@@ -68,9 +67,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private ModelComponent mc;
 
     /**
-     * Epoch in julian days
+     * Epoch for positions/proper motions in julian days
      **/
-    private double epoch_jd = AstroUtils.JD_J2015_5;
+    private double epochJd;
+
+    /**
+     * Epoch for the times in the light curves in julian days
+     */
+    private double variabilityEpochJd;
     /**
      * Current computed epoch time
      **/
@@ -80,7 +84,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     public StarGroup() {
         super();
-        lastSortTime = -1;
+        this.lastSortTime = -1;
+        // Default epochs
+        this.epochJd = AstroUtils.JD_J2015_5;
+        this.variabilityEpochJd = AstroUtils.JD_J2010;
     }
 
     public void initialize() {
@@ -198,7 +205,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (active.length > 0) {
             cPosD.set(camera.getPos());
             // Delta years
-            currDeltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
+            currDeltaYears = AstroUtils.getMsSince(time.getTime(), epochJd) * Nature.MS_TO_Y;
 
             super.update(time, parentTransform, camera, opacity);
 
@@ -243,7 +250,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         if (time.getHdiff() == 0 && !force) {
             return getAbsolutePosition(aux);
         } else {
-            double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
+            double deltaYears = AstroUtils.getMsSince(time.getTime(), epochJd) * Nature.MS_TO_Y;
             return aux.set(this.fetchPosition(pointData.get(focusIndex), null, aux3d1.get(), deltaYears));
         }
     }
@@ -734,7 +741,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param epochJd The epoch in julian days (days since January 1, 4713 BCE)
      */
     public void setEpoch(Double epochJd) {
-        this.epoch_jd = epochJd;
+        this.epochJd = epochJd;
     }
 
     /**
@@ -743,7 +750,25 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @return The epoch in julian days
      */
     public Double getEpoch() {
-        return this.epoch_jd;
+        return this.epochJd;
+    }
+
+    /**
+     * Sets the light curve epoch to use for the stars in this group
+     *
+     * @param epochJd The light curve epoch in julian days (days since January 1, 4713 BCE)
+     */
+    public void setVariabilityepoch(Double epochJd) {
+        this.variabilityEpochJd = epochJd;
+    }
+
+    /**
+     * Returns the light curve epoch in Julian Days used for the stars in this group
+     *
+     * @return The light curve epoch in julian days
+     */
+    public Double getVariabilityepoch() {
+        return this.variabilityEpochJd;
     }
 
     @Override
@@ -792,7 +817,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         sg.setLabelposition(new double[] { 0.0, -5.0e7, -4e8 });
         sg.setCt("Stars");
         sg.setData(data);
-        sg.doneLoading(null);
+        sg.doneLoading(GaiaSky.instance.assetManager);
         return sg;
     }
 
@@ -840,7 +865,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     public void updateMetadata(ITimeFrameProvider time, ICamera camera) {
         Vector3d camPos = camera.getPos().tov3d(aux3d4.get());
-        double deltaYears = AstroUtils.getMsSince(time.getTime(), epoch_jd) * Nature.MS_TO_Y;
+        double deltaYears = AstroUtils.getMsSince(time.getTime(), epochJd) * Nature.MS_TO_Y;
         if (pointData != null) {
             int n = pointData.size();
             for (int i = 0; i < n; i++) {
