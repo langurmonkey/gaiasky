@@ -40,11 +40,11 @@ uniform float u_vrScale;
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
-#endif // relativisticEffects
+#endif// relativisticEffects
 
 #ifdef gravitationalWaves
 #include shader/lib_gravwaves.glsl
-#endif // gravitationalWaves
+#endif// gravitationalWaves
 
 // x - alpha
 // y - point size/fov factor
@@ -64,9 +64,9 @@ out vec4 v_col;
 #define N_SIZES 20
 
 void main() {
-	// Lengths
-	float l0 = len0 * u_vrScale;
-	float l1 = l0 * 1e3;
+    // Lengths
+    float l0 = len0 * u_vrScale;
+    float l1 = l0 * 1e3;
 
     vec3 pos = a_position - u_camPos;
 
@@ -87,20 +87,20 @@ void main() {
     float dist = length(pos);
 
     float sizefactor = 1.0;
-    if(u_cubemap == 1) {
+    if (u_cubemap == 1) {
         // Cosine of angle between star position and camera direction
         // Correct point primitive size error due to perspective projection
         float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);
         sizefactor = 1.0 - cosphi * 0.65;
     }
-    
-    #ifdef relativisticEffects
-    	pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
-    #endif // relativisticEffects
-    
+
+        #ifdef relativisticEffects
+    pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
+    #endif// relativisticEffects
+
     #ifdef gravitationalWaves
-        pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
-    #endif // gravitationalWaves
+    pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    #endif// gravitationalWaves
 
     // Magnitudes vector
     float vmags[N_SIZES];
@@ -153,18 +153,17 @@ void main() {
     float t1 = vtimes[nVari - 1];
     float period = t1 - t0;
     float t = mod(u_s, period);
-    float size = 0.0;
+    float size = vmags[0];
     for (int i = 0; i < nVari - 1; i++) {
         float x0 = vtimes[i] - t0;
         float x1 = vtimes[i+1] - t0;
         if (t >= x0 && t <= x1) {
-           size = lint(t, x0, x1, vmags[i], vmags[i+1]);
+            size = lint(t, x0, x1, vmags[i], vmags[i+1]);
+            break;
         } else {
             // Next
         }
     }
-
-    //float size = (a_nVari / float(N_SIZES)) * vmags[0];
 
     float viewAngleApparent = atan((size * u_alphaSizeFovBr.z) / dist);
     float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y);
@@ -181,7 +180,7 @@ void main() {
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
     #endif
 
-    if(dist < l0){
+    if (dist < l0){
         // The pixels of this star will be discarded in the fragment shader
         v_col = vec4(0.0, 0.0, 0.0, 0.0);
     }

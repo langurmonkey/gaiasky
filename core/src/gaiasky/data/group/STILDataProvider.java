@@ -318,12 +318,13 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 appMag = 15;
                             }
                             // Scale magnitude if needed
-                            double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS) ? datasetOptions.magnitudeScale : 0f;
+                            double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) ? datasetOptions.magnitudeScale : 0f;
                             appMag -= magScl;
 
                             // Absolute magnitude to pseudo-size
-                            double absMag = appMag - 5 * Math.log10((distPc <= 0 ? 10 : distPc)) + 5;
-                            float size = (float) magnitudeToPseudoSize(absMag);
+                            final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
+                            final double absMag = appMag - v + 5.0;
+                            final float size = (float) absoluteMagnitudeToPseudoSize(absMag);
 
                             // COLOR
                             float color;
@@ -353,7 +354,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 } else {
                                    pf = period.getSecond();
                                 }
-                                double magSclVari = (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES) ? datasetOptions.magnitudeScale : 0f;
                                 Pair<UCD, double[]> variMagsPair = getDoubleArrayUcd(ucdParser.VARI_MAGS, row);
                                 assert variMagsPair != null;
                                 double[] variMagsDouble = variMagsPair.getSecond();
@@ -373,7 +373,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 int idx = 0;
                                 for (double mag : auxMags) {
                                     if (Double.isFinite(mag)) {
-                                        magnitudesList.add(mag - magSclVari);
+                                        magnitudesList.add(mag - magScl);
                                         timesList.add(auxTimes[idx]);
                                     }
                                     idx++;
@@ -406,7 +406,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Convert magnitudes to sizes
                                 assert variMags.length == variTimes.length;
                                 for (int j = 0; j < variMagsDouble.length; j++) {
-                                    variMags[j] = (float) magnitudeToPseudoSize(variMagsDouble[j]);
+                                    double absoluteMagnitude = variMagsDouble[j] - v + 5.0;
+                                    variMags[j] = (float) absoluteMagnitudeToPseudoSize(absoluteMagnitude);
                                 }
                             }
 
@@ -476,7 +477,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     assert idPair != null;
                                     if (idPair.getFirst().colname.equalsIgnoreCase("hip")) {
                                         hip = Integer.parseInt(idPair.getSecond());
-                                        id = (long) hip;
+                                        id = hip;
                                     } else {
                                         id = ++starId;
                                     }
@@ -663,7 +664,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      *
      * @return The pseudo-size of this star
      */
-    private double magnitudeToPseudoSize(final double absMag) {
+    private double absoluteMagnitudeToPseudoSize(final double absMag) {
 
         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
         double pseudoL = Math.pow(10, -0.4 * absMag);

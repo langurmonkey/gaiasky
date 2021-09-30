@@ -174,6 +174,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * Generates the index (maps star name and id to array index)
      *
      * @param pointData The star data
+     *
      * @return An map{string,int} mapping names/ids to indexes
      */
     public Map<String, Integer> generateIndex(Array<IParticleRecord> pointData) {
@@ -213,7 +214,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             for (int i = 0; i < Math.min(proximity.updating.length, pointData.size()); i++) {
                 if (filter(active[i]) && isVisible(active[i])) {
                     IParticleRecord closeStar = pointData.get(active[i]);
-                    proximity.set(i, closeStar, camera, currDeltaYears);
+                    proximity.set(i, active[i], closeStar, camera, currDeltaYears);
                     camera.checkClosestParticle(proximity.updating[i]);
 
                     // Model distance
@@ -282,15 +283,15 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(ExtShaderProgram shader, float alpha, IntMesh mesh, ICamera camera) {
-        double thpointTimesFovfactor = Settings.settings.scene.star.threshold.point * camera.getFovFactor();
-        double thupOverFovfactor = Constants.THRESHOLD_UP / camera.getFovFactor();
-        double thdownOverFovfactor = Constants.THRESHOLD_DOWN / camera.getFovFactor();
+        double thPointTimesFovFactor = Settings.settings.scene.star.threshold.point * camera.getFovFactor();
+        double thUpOverFovFactor = Constants.THRESHOLD_UP / camera.getFovFactor();
+        double thDownOverFovFactor = Constants.THRESHOLD_DOWN / camera.getFovFactor();
         double innerRad = 0.006 + Settings.settings.scene.star.pointSize * 0.008;
         alpha = alpha * this.opacity;
         float fovFactor = camera.getFovFactor();
 
         // GENERAL UNIFORMS
-        shader.setUniformf("u_thpoint", (float) thpointTimesFovfactor);
+        shader.setUniformf("u_thpoint", (float) thPointTimesFovFactor);
         // Light glow always disabled with star groups
         shader.setUniformi("u_lightScattering", 0);
         shader.setUniformf("u_inner_rad", (float) innerRad);
@@ -299,11 +300,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         boolean focusRendered = false;
         int n = Math.min(Settings.settings.scene.star.group.numBillboard, pointData.size());
         for (int i = 0; i < n; i++) {
-            renderCloseupStar(active[i], fovFactor, cPosD, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
+            renderCloseupStar(active[i], fovFactor, cPosD, shader, mesh, thPointTimesFovFactor, thUpOverFovFactor, thDownOverFovFactor, alpha);
             focusRendered = focusRendered || active[i] == focusIndex;
         }
         if (focus != null && !focusRendered) {
-            renderCloseupStar(focusIndex, fovFactor, cPosD, shader, mesh, thpointTimesFovfactor, thupOverFovfactor, thdownOverFovfactor, alpha);
+            renderCloseupStar(focusIndex, fovFactor, cPosD, shader, mesh, thPointTimesFovFactor, thUpOverFovFactor, thDownOverFovFactor, alpha);
         }
     }
 
@@ -312,15 +313,18 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     private void renderCloseupStar(int idx, float fovFactor, Vector3d cposd, ExtShaderProgram shader, IntMesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
         if (filter(idx) && isVisible(idx)) {
             IParticleRecord star = pointData.get(idx);
-            double size = getSize(idx);
+            double varScl = getVariableSizeScaling(idx);
+
+            double sizeOriginal = getSize(idx);
+            double size = sizeOriginal * varScl;
             double radius = size * Constants.STAR_SIZE_FACTOR;
             Vector3d starPos = fetchPosition(star, cposd, aux3d1.get(), currDeltaYears);
             double distToCamera = starPos.len();
-            double viewAngle = (radius / distToCamera) / fovFactor;
+            double viewAngle = (sizeOriginal * Constants.STAR_SIZE_FACTOR / distToCamera) / fovFactor;
 
             Color.abgr8888ToColor(c, getColor(idx));
             if (viewAngle >= thpointTimesFovfactor) {
-                double fuzzySize = getFuzzyRenderSize(size, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
+                double fuzzySize = getFuzzyRenderSize(sizeOriginal, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
 
                 Vector3 pos = starPos.put(aux3f3.get());
                 shader.setUniformf("u_pos", pos);
@@ -358,7 +362,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
-        if(mc != null && mc.isModelInitialised()) {
+        if (mc != null && mc.isModelInitialised()) {
             mc.touch();
             float opacity = (float) MathUtilsd.lint(proximity.updating[0].distToCamera, modelDist / 50f, modelDist, 1f, 0f);
             if (alpha * opacity > 0) {
@@ -367,7 +371,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
                 ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;
                 // Local transform
-                mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d));
+                double variableScaling = getVariableSizeScaling(proximity.updating[0].index);
+                mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d * variableScaling));
                 mc.updateRelativisticEffects(GaiaSky.instance.getICamera());
                 mc.updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
                 modelBatch.render(mc.instance, mc.env);
@@ -555,6 +560,31 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         }
     }
 
+    private double getVariableSizeScaling(final int idx) {
+        IParticleRecord ipr = pointData.get(idx);
+        if (ipr instanceof VariableRecord) {
+            VariableRecord vr = (VariableRecord) ipr;
+            double[] times = vr.variTimes;
+            float[] sizes = vr.variMags;
+            int n = vr.nVari;
+
+            // Days since epoch
+            double t = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), this.getVariabilityepoch());
+            double t0 = times[0];
+            double t1 = times[n - 1];
+            double period = t1 - t0;
+            t = t % period;
+            for (int i = 0; i < n - 1; i++) {
+                double x0 = times[i] - t0;
+                double x1 = times[i + 1] - t0;
+                if (t >= x0 && t <= x1) {
+                    return MathUtilsd.lint(t, x0, x1, sizes[i], sizes[i + 1]) / vr.size();
+                }
+            }
+        }
+        return 1;
+    }
+
     public double getFocusSize() {
         return focus.size();
     }
@@ -612,6 +642,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * Returns the size of the particle at index i
      *
      * @param i The index
+     *
      * @return The size
      */
     public double getSize(int i) {
@@ -799,6 +830,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param name           The name of the star group. Any occurrence of '%%SGID%%' will be replaced with the id of the star group
      * @param data           The data of the star group
      * @param datasetOptions The dataset options
+     *
      * @return A new star group with the given parameters
      */
     public static StarGroup getStarGroup(String name, List<IParticleRecord> data, DatasetOptions datasetOptions) {
@@ -826,6 +858,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      *
      * @param name The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
      * @param data The data of the star group
+     *
      * @return A new star group with sane parameters
      */
     public static StarGroup getDefaultStarGroup(String name, List<IParticleRecord> data) {
@@ -838,6 +871,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      * @param name     The name of the star group. Any occurrence of '%%SGID%%' in name will be replaced with the id of the star group
      * @param data     The data of the star group
      * @param fullInit Initializes the group right away
+     *
      * @return A new star group with sane parameters
      */
     public static StarGroup getDefaultStarGroup(String name, List<IParticleRecord> data, boolean fullInit) {

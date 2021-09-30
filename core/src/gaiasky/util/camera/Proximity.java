@@ -40,24 +40,26 @@ public class Proximity {
         this.effective = this.array1;
     }
 
-    public void set(int index, IParticleRecord pr, ICamera camera) {
-        this.set(index, pr, camera, 0);
+    public void set(int index, int originalIndex, IParticleRecord pr, ICamera camera) {
+        this.set(index, originalIndex, pr, camera, 0);
     }
 
-    public void set(int index, IParticleRecord pr, ICamera camera, double deltaYears) {
+    public void set(int index, int originalIndex, IParticleRecord pr, ICamera camera, double deltaYears) {
         if (this.updating[index] == null) {
             this.updating[index] = new NearbyRecord();
         }
         NearbyRecord c = this.updating[index];
         convert(pr, c, camera, deltaYears);
+        c.index = originalIndex;
     }
 
-    public void set(int index, IFocus focus, ICamera camera) {
+    public void set(int index, int originalIndex, IFocus focus, ICamera camera) {
         if (this.updating[index] == null) {
             this.updating[index] = new NearbyRecord();
         }
         NearbyRecord c = this.updating[index];
         convert(focus, c, camera);
+        c.index = originalIndex;
     }
 
     /**
@@ -128,13 +130,14 @@ public class Proximity {
      * Updates the list of proximal objects with the given {@link IFocus}
      *
      * @param object The record to use for updating
+     * @param camera The camera
      * @return Whether this proximity array was modified
      */
     public boolean update(IFocus object, ICamera camera) {
         int i = 0;
         for (NearbyRecord record : updating) {
             if (record == null) {
-                set(i, object, camera);
+                set(i, -1, object, camera);
             } else if (record == object) {
                 // Already in
                 return false;
@@ -228,6 +231,8 @@ public class Proximity {
         public float[] col;
         public String name;
         public byte type = TYPE_UNDEFINED;
+        // The index in the source list
+        public int index;
 
         public NearbyRecord() {
             pos = new Vector3d();
