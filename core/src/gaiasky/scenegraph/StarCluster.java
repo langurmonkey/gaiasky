@@ -50,11 +50,11 @@ import net.jafama.FastMath;
 
 public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion, IModelRenderable, I3DTextRenderable, IQuadRenderable {
 
-    private static final double TH_ANGLE = Math.toRadians(0.6);
+    private static final double TH_ANGLE = Math.toRadians(0.5);
     private static final double TH_ANGLE_OVERLAP = Math.toRadians(0.7);
-    private static Texture clusterTex;
 
     private ModelComponent mc;
+    private Texture clusterTex;
 
     /**
      * Proper motion in units/year
@@ -223,7 +223,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
 
-            if (this.viewAngleApparent < TH_ANGLE) {
+            if (this.viewAngleApparent < TH_ANGLE_OVERLAP) {
                 addToRender(this, RenderGroup.BILLBOARD_SPRITE);
             }
         }
@@ -247,7 +247,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
-        mc.update(null, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(null, alpha * opacity * fadeAlpha, GL20.GL_ONE, GL20.GL_ONE);
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);
         mc.instance.transform.set(this.localTransform);
