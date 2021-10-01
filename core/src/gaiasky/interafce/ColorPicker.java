@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.INumberFormat;
@@ -59,34 +58,31 @@ public class ColorPicker extends ColorPickerAbstract {
     }
 
     protected void initialize() {
-        this.addListener(new ClickListener() {
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                return super.touchDown(event, x, y, pointer, button);
-            }
+        this.addListener(event -> {
+            if (event instanceof InputEvent) {
+                InputEvent ie = (InputEvent) event;
+                Type type = ie.getType();
+                // Click
+                if ((type == Type.touchDown) && (ie.getButton() == Buttons.LEFT)) {
+                    // Launch color picker window
+                    ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
+                    cpd.setAcceptRunnable(() -> {
+                        // Set color and run runnable, if any
+                        setPickedColor(cpd.color);
+                        if (newColorRunnable != null) {
+                            newColorRunnable.run();
+                        }
+                    });
+                    cpd.show(stage);
 
-            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (event instanceof InputEvent) {
-                    Type type = event.getType();
-                    // Click
-                    if ((type == Type.touchUp) && (event.getButton() == Buttons.LEFT)) {
-                        // Launch color picker window
-                        ColorPickerDialog cpd = new ColorPickerDialog(name, color, stage, skin);
-                        cpd.setAcceptRunnable(() -> {
-                            // Set color and run runnable, if any
-                            setPickedColor(cpd.color);
-                            if (newColorRunnable != null) {
-                                newColorRunnable.run();
-                            }
-                        });
-                        cpd.show(stage);
-
-                    } else if (type == Type.enter) {
-                        Gdx.graphics.setSystemCursor(SystemCursor.Hand);
-                    } else if (type == Type.exit) {
-                        Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                    }
+                } else if (type == Type.enter) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Hand);
+                } else if (type == Type.exit) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }
+                return true;
             }
+            return false;
         });
     }
 
@@ -128,7 +124,7 @@ public class ColorPicker extends ColorPickerAbstract {
 
     /** A color picker dialog **/
     private class ColorPickerDialog extends GenericDialog {
-        private float[] color;
+        private float[] color, colorBak;
         private final INumberFormat nf;
         private OwnTextField[] textfields;
         private OwnTextField hexfield;
@@ -141,6 +137,7 @@ public class ColorPicker extends ColorPickerAbstract {
             super(I18n.txt("gui.colorpicker.title") + (elementName != null ? ": " + elementName : ""), skin, stage);
             this.cpd = this;
             this.color = new float[4];
+            this.colorBak = new float[4];
             this.color[0] = color[0];
             this.color[1] = color[1];
             this.color[2] = color[2];
@@ -163,73 +160,73 @@ public class ColorPicker extends ColorPickerAbstract {
         protected void build() {
             float textfieldLen = 80f;
             float sliderLen = 240f;
-            float colsize = 160f;
+            float colSize = 160f;
             content.clear();
 
             HorizontalGroup hg = new HorizontalGroup();
             hg.space(pad10);
             Image oldColorImage = new Image(skin.getDrawable("white"));
             oldColorImage.setColor(color[0], color[1], color[2], color[3]);
-            Table ocol = new Table();
-            ocol.add(oldColorImage).size(colsize);
+            Table oColor = new Table();
+            oColor.add(oldColorImage).size(colSize);
             newColorImage = new Image(skin.getDrawable("white"));
             newColorImage.setColor(color[0], color[1], color[2], color[3]);
             Table col = new Table();
-            col.add(newColorImage).size(colsize);
-            hg.addActor(ocol);
+            col.add(newColorImage).size(colSize);
+            hg.addActor(oColor);
             hg.addActor(new OwnLabel(">", skin));
             hg.addActor(col);
 
             /* Sliders */
             sliders = new OwnSlider[4];
-            OwnSlider sred, sgreen, sblue, salpha;
-            sred = new OwnSlider(0f, 1f, 0.01f, skin);
-            sred.showValueLabel(false);
-            sred.setWidth(sliderLen);
-            sred.setValue(color[0]);
-            sliders[0] = sred;
-            sgreen = new OwnSlider(0f, 1f, 0.01f, skin);
-            sgreen.showValueLabel(false);
-            sgreen.setWidth(sliderLen);
-            sgreen.setValue(color[1]);
-            sliders[1] = sgreen;
-            sblue = new OwnSlider(0f, 1f, 0.01f, skin);
-            sblue.showValueLabel(false);
-            sblue.setWidth(sliderLen);
-            sblue.setValue(color[2]);
-            sliders[2] = sblue;
-            salpha = new OwnSlider(0f, 1f, 0.01f, skin);
-            salpha.showValueLabel(false);
-            salpha.setWidth(sliderLen);
-            salpha.setValue(color[3]);
-            sliders[3] = salpha;
+            OwnSlider sRed, sGreen, sBlue, sAlpha;
+            sRed = new OwnSlider(0f, 1f, 0.01f, skin);
+            sRed.showValueLabel(false);
+            sRed.setWidth(sliderLen);
+            sRed.setValue(color[0]);
+            sliders[0] = sRed;
+            sGreen = new OwnSlider(0f, 1f, 0.01f, skin);
+            sGreen.showValueLabel(false);
+            sGreen.setWidth(sliderLen);
+            sGreen.setValue(color[1]);
+            sliders[1] = sGreen;
+            sBlue = new OwnSlider(0f, 1f, 0.01f, skin);
+            sBlue.showValueLabel(false);
+            sBlue.setWidth(sliderLen);
+            sBlue.setValue(color[2]);
+            sliders[2] = sBlue;
+            sAlpha = new OwnSlider(0f, 1f, 0.01f, skin);
+            sAlpha.showValueLabel(false);
+            sAlpha.setWidth(sliderLen);
+            sAlpha.setValue(color[3]);
+            sliders[3] = sAlpha;
 
             /* Inputs */
             textfields = new OwnTextField[4];
-            FloatValidator fval = new FloatValidator(0f, 1f);
-            OwnTextField tred, tgreen, tblue, talpha;
-            tred = new OwnTextField(nf.format(color[0]), skin, fval);
-            tred.setWidth(textfieldLen);
-            textfields[0] = tred;
-            tgreen = new OwnTextField(nf.format(color[1]), skin, fval);
-            tgreen.setWidth(textfieldLen);
-            textfields[1] = tgreen;
-            tblue = new OwnTextField(nf.format(color[2]), skin, fval);
-            tblue.setWidth(textfieldLen);
-            textfields[2] = tblue;
-            talpha = new OwnTextField(nf.format(color[3]), skin, fval);
-            talpha.setWidth(textfieldLen);
-            textfields[3] = talpha;
+            FloatValidator floatValidator = new FloatValidator(0f, 1f);
+            OwnTextField tRed, tGreen, tBlue, tAlpha;
+            tRed = new OwnTextField(nf.format(color[0]), skin, floatValidator);
+            tRed.setWidth(textfieldLen);
+            textfields[0] = tRed;
+            tGreen = new OwnTextField(nf.format(color[1]), skin, floatValidator);
+            tGreen.setWidth(textfieldLen);
+            textfields[1] = tGreen;
+            tBlue = new OwnTextField(nf.format(color[2]), skin, floatValidator);
+            tBlue.setWidth(textfieldLen);
+            textfields[2] = tBlue;
+            tAlpha = new OwnTextField(nf.format(color[3]), skin, floatValidator);
+            tAlpha.setWidth(textfieldLen);
+            textfields[3] = tAlpha;
 
             /* Hex */
-            IValidator hval = new HexColorValidator(true);
-            hexfield = new OwnTextField(ColorUtils.rgbaToHex(color), skin, hval);
+            IValidator hVal = new HexColorValidator(true);
+            hexfield = new OwnTextField(ColorUtils.rgbaToHex(color), skin, hVal);
             hexfield.setWidth(sliderLen);
 
             /* Color table */
-            Table coltable = new Table();
+            Table colTable = new Table();
             float size = 24f;
-            float cpad = 1.6f;
+            float cPad = 1.6f;
             int i = 1;
             int n = 4 * 4 * 4;
             float a = 1f;
@@ -247,9 +244,9 @@ public class ColorPicker extends ColorPickerAbstract {
                         });
                         c.addListener(new TextTooltip(Arrays.toString(pick), skin));
                         if (i % (n / 4) == 0) {
-                            coltable.add(c).size(size).pad(cpad).row();
+                            colTable.add(c).size(size).pad(cPad).row();
                         } else {
-                            coltable.add(c).size(size).pad(cpad);
+                            colTable.add(c).size(size).pad(cPad);
                         }
                         i++;
                     }
@@ -257,16 +254,16 @@ public class ColorPicker extends ColorPickerAbstract {
             }
 
             // Connect sliders
-            sred.addListener(new UpdaterListener(true, this, color, 0));
-            sgreen.addListener(new UpdaterListener(true, this, color, 1));
-            sblue.addListener(new UpdaterListener(true, this, color, 2));
-            salpha.addListener(new UpdaterListener(true, this, color, 3));
+            sRed.addListener(new UpdaterListener(true, this, color, 0));
+            sGreen.addListener(new UpdaterListener(true, this, color, 1));
+            sBlue.addListener(new UpdaterListener(true, this, color, 2));
+            sAlpha.addListener(new UpdaterListener(true, this, color, 3));
 
-            // Connect textfields
-            tred.addListener(new UpdaterListener(false, this, color, 0));
-            tgreen.addListener(new UpdaterListener(false, this, color, 1));
-            tblue.addListener(new UpdaterListener(false, this, color, 2));
-            talpha.addListener(new UpdaterListener(false, this, color, 3));
+            // Connect text fields
+            tRed.addListener(new UpdaterListener(false, this, color, 0));
+            tGreen.addListener(new UpdaterListener(false, this, color, 1));
+            tBlue.addListener(new UpdaterListener(false, this, color, 2));
+            tAlpha.addListener(new UpdaterListener(false, this, color, 3));
 
             // Connect hex
             hexfield.addListener(new ChangeListener() {
@@ -283,25 +280,25 @@ public class ColorPicker extends ColorPickerAbstract {
             content.add(hg).padBottom(pad10 * 2f).colspan(3).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.red"), skin)).padRight(pad10).padBottom(pad10);
-            content.add(sred).left().padRight(pad10).padBottom(pad10);
-            content.add(tred).padBottom(pad10).row();
+            content.add(sRed).left().padRight(pad10).padBottom(pad10);
+            content.add(tRed).padBottom(pad10).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.green"), skin)).padRight(pad10).padBottom(pad10);
-            content.add(sgreen).left().padRight(pad10).padBottom(pad10);
-            content.add(tgreen).padBottom(pad10).row();
+            content.add(sGreen).left().padRight(pad10).padBottom(pad10);
+            content.add(tGreen).padBottom(pad10).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.blue"), skin)).padRight(pad10).padBottom(pad10);
-            content.add(sblue).left().padRight(pad10).padBottom(pad10);
-            content.add(tblue).padBottom(pad10).row();
+            content.add(sBlue).left().padRight(pad10).padBottom(pad10);
+            content.add(tBlue).padBottom(pad10).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.alpha"), skin)).padRight(pad10).padBottom(pad10);
-            content.add(salpha).left().padRight(pad10).padBottom(pad10);
-            content.add(talpha).padBottom(pad10).row();
+            content.add(sAlpha).left().padRight(pad10).padBottom(pad10);
+            content.add(tAlpha).padBottom(pad10).row();
 
             content.add(new OwnLabel(I18n.txt("gui.colorpicker.hex"), skin)).padRight(pad10).padBottom(pad10);
             content.add(hexfield).colspan(2).left().padBottom(pad10).row();
 
-            content.add(coltable).colspan(3).padBottom(pad10).row();
+            content.add(colTable).colspan(3).padBottom(pad10).row();
 
         }
 
@@ -312,12 +309,19 @@ public class ColorPicker extends ColorPickerAbstract {
 
         @Override
         protected void cancel() {
-            color = null;
+            System.arraycopy(this.colorBak, 0, this.color, 0, this.color.length);
         }
 
         @Override
         public void dispose() {
 
+        }
+
+        @Override
+        public GenericDialog show(Stage stage) {
+            // Backup color
+            System.arraycopy(this.color, 0, this.colorBak, 0, this.color.length);
+            return super.show(stage);
         }
 
         public void setColor(float[] color) {

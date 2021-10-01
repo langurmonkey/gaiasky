@@ -842,7 +842,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pointerGuidesCbGroup.addActor(guidesTooltip);
 
         // GUIDES COLOR
-        float cpsize = 32f;
+        float colorPickerSize = 32f;
         pointerGuidesColor = new ColorPicker(stage, skin);
         pointerGuidesColor.setPickedColor(settings.program.pointer.guides.color);
 
@@ -857,7 +857,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to table
         pg.add(pointerGuidesCbGroup).left().colspan(2).padBottom(pad5).row();
         pg.add(new OwnLabel(I18n.txt("gui.ui.pointer.guides.color"), skin)).left().padBottom(pad5).padRight(pad10);
-        pg.add(pointerGuidesColor).left().size(cpsize).padBottom(pad5).row();
+        pg.add(pointerGuidesColor).left().size(colorPickerSize).padBottom(pad5).row();
         pg.add(guidesWidthLabel).left().padBottom(pad5).padRight(pad10);
         pg.add(pointerGuidesWidth).left().padBottom(pad5).padRight(pad10);
 
@@ -2225,12 +2225,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case CONTROLLER_CONNECTED_INFO:
-        case CONTROLLER_DISCONNECTED_INFO:
-            generateControllersList(controllersTable);
-            break;
-        default:
-            break;
+        case CONTROLLER_CONNECTED_INFO, CONTROLLER_DISCONNECTED_INFO -> generateControllersList(controllersTable);
+        default -> {
+        }
         }
     }
 }
