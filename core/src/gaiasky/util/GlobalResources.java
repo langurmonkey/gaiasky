@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.BufferUtils;
 import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -137,18 +138,19 @@ public class GlobalResources {
     public static void doneLoading(AssetManager manager) {
     }
 
-    public static Pair<Double, String> doubleToDistanceString(Apfloat d) {
-        return doubleToDistanceString(d.doubleValue());
+    public static Pair<Double, String> doubleToDistanceString(Apfloat d, DistanceUnits du) {
+        return doubleToDistanceString(d.doubleValue(), du);
     }
 
     /**
      * Converts this double to the string representation of a distance
      *
-     * @param d In internal units
+     * @param d  Distance in internal units
+     * @param du The distance units to use
      *
      * @return An array containing the float number and the string units
      */
-    public static Pair<Double, String> doubleToDistanceString(double d) {
+    public static Pair<Double, String> doubleToDistanceString(double d, DistanceUnits du) {
         d = d * Constants.U_TO_KM;
         if (Math.abs(d) < 1f) {
             // m
@@ -157,12 +159,12 @@ public class GlobalResources {
         if (Math.abs(d) < 0.1 * Nature.AU_TO_KM) {
             // km
             return new Pair<>(d, "km");
-        } else if (Math.abs(d) < 0.1 * Nature.PC_TO_KM) {
+        } else if (Math.abs(d) < 0.1 * du.toKm) {
             // AU
             return new Pair<>(d * Nature.KM_TO_AU, "AU");
         } else {
-            // pc
-            return new Pair<>((d * Nature.KM_TO_PC), "pc");
+            // distance units
+            return new Pair<>((d * du.fromKm), du.unitString);
         }
     }
 
@@ -170,12 +172,13 @@ public class GlobalResources {
      * Converts the double to the string representation of a velocity (always in
      * seconds)
      *
-     * @param d In internal units
+     * @param d Distance in internal units
+     * @param du The distance units to use
      *
      * @return Array containing the number and the units
      */
-    public static Pair<Double, String> doubleToVelocityString(double d) {
-        Pair<Double, String> res = doubleToDistanceString(d);
+    public static Pair<Double, String> doubleToVelocityString(double d, DistanceUnits du) {
+        Pair<Double, String> res = doubleToDistanceString(d, du);
         res.setSecond(res.getSecond().concat("/s"));
         return res;
     }
@@ -183,12 +186,13 @@ public class GlobalResources {
     /**
      * Converts this float to the string representation of a distance
      *
-     * @param f In internal units
+     * @param f Distance in internal units
+     * @param du The distance units to use
      *
      * @return An array containing the float number and the string units
      */
-    public static Pair<Float, String> floatToDistanceString(float f) {
-        Pair<Double, String> result = doubleToDistanceString(f);
+    public static Pair<Float, String> floatToDistanceString(float f, DistanceUnits du) {
+        Pair<Double, String> result = doubleToDistanceString(f, du);
         return new Pair<>(result.getFirst().floatValue(), result.getSecond());
     }
 

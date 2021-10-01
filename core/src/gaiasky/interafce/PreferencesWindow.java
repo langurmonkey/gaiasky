@@ -39,6 +39,7 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.*;
+import org.lwjgl.system.CallbackI.V;
 
 import java.io.File;
 import java.io.IOException;
@@ -70,7 +71,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
-    private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows;
+    private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> theme, recgridOrigin;
@@ -786,6 +787,20 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         minimapSize.setWidth(sliderWidth);
         minimapSize.setValue(settings.program.minimap.size);
 
+        // PREFERRED DISTANCE UNITS
+        OwnLabel distUnitsLabel = new OwnLabel(I18n.txt("gui.ui.distance.units"), skin, "default");
+        distUnitsLabel.setWidth(labelWidth);
+        DistanceUnits[] dus = DistanceUnits.values();
+        ComboBoxBean[] distUnits = new ComboBoxBean[dus.length];
+        for(int idu = 0; idu < dus.length; idu++){
+            DistanceUnits du = dus[idu];
+            distUnits[idu] = new ComboBoxBean(I18n.txt("gui.ui.distance.units." + du.name().toLowerCase(Locale.ROOT)), du.ordinal());
+        }
+        distUnitsSelect = new OwnSelectBox<>(skin);
+        distUnitsSelect.setItems(distUnits);
+        distUnitsSelect.setWidth(textWidth * 3f);
+        distUnitsSelect.setSelectedIndex(settings.program.ui.distanceUnits.ordinal());
+
         // LABELS
         labels.addAll(langLabel, themeLabel);
 
@@ -800,6 +815,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         ui.add(pointerCoords).colspan(3).left().padRight(pad5).padBottom(pad10).row();
         ui.add(minimapSizeLabel).left().padRight(pad5).padBottom(pad10);
         ui.add(minimapSize).colspan(2).left().padRight(pad5).padBottom(pad10).row();
+        ui.add(distUnitsLabel).left().padRight(pad5).padBottom(pad10);
+        ui.add(distUnitsSelect).colspan(2).left().padRight(pad5).padBottom(pad10).row();
 
 
         /* CROSSHAIR AND MARKERS */
@@ -1917,7 +1934,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         settings.graphics.fullScreen.active = fullscreen.isChecked();
 
-        // Fullscreen options
+        // Full screen options
         settings.graphics.fullScreen.resolution[0] = fullscreenResolutions.getSelected().width;
         settings.graphics.fullScreen.resolution[1] = fullscreenResolutions.getSelected().height;
 
@@ -1994,7 +2011,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             EventManager.instance.post(Events.DISPLAY_POINTER_COORDS_CMD, settings.program.pointer.coordinates);
         }
 
-        // Crosshairs
+        // Cross-hairs
         EventManager.instance.post(Events.CROSSHAIR_FOCUS_CMD, crosshairFocusCb.isChecked());
         EventManager.instance.post(Events.CROSSHAIR_CLOSEST_CMD, crosshairClosestCb.isChecked());
         EventManager.instance.post(Events.CROSSHAIR_HOME_CMD, crosshairHomeCb.isChecked());
@@ -2008,6 +2025,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Minimap size
         settings.program.minimap.size = minimapSize.getValue();
+
+        // Distance units
+        settings.program.ui.distanceUnits = DistanceUnits.values()[distUnitsSelect.getSelectedIndex()];
 
         // Performance
         bean = numThreads.getSelected();

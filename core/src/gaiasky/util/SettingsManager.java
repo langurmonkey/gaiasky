@@ -7,6 +7,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.util.Settings.DistanceUnits;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsd;
 
@@ -126,6 +127,11 @@ public class SettingsManager {
 
         // UI scale mapping
         settings.program.ui.scale = MathUtilsd.lint(settings.program.ui.scale, Constants.UI_SCALE_MIN, Constants.UI_SCALE_MAX, Constants.UI_SCALE_INTERNAL_MIN, Constants.UI_SCALE_INTERNAL_MAX);
+
+        // Default distance units
+        if (settings.program.ui.distanceUnits == null) {
+            settings.program.ui.distanceUnits = DistanceUnits.PC;
+        }
 
         // Scripts location
         String scl = settings.program.scriptsLocation;

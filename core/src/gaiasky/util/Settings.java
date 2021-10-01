@@ -859,6 +859,7 @@ public class Settings {
         public static class UiSettings {
             public String theme;
             public float scale;
+            public DistanceUnits distanceUnits;
 
             /**
              * Never use this method to get the scale, use the field itself, it is public.
@@ -875,6 +876,10 @@ public class Settings {
             @JsonIgnore
             public boolean isHiDPITheme() {
                 return scale > 1.5;
+            }
+
+            public void setDistanceUnits(String distanceUnits) {
+                this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase(Locale.ROOT));
             }
 
         }
@@ -1579,5 +1584,20 @@ public class Settings {
     public enum OrbitMode {
         LINE_MODE_SETTING,
         GPU_VBO
+    }
+
+    public enum DistanceUnits {
+        PC(Nature.PC_TO_KM, Nature.KM_TO_PC, "pc"),
+        LY(Nature.LY_TO_KM, Nature.KM_TO_LY, "ly");
+        // Factor to apply to this unit to get kilometres
+        public final double toKm;
+        // Factor to apply to kilometers to get this unit
+        public final double fromKm;
+        public final String unitString;
+        DistanceUnits(double toKm, double fromKm, String unitString){
+            this.toKm = toKm;
+            this.fromKm = fromKm;
+            this.unitString = unitString;
+        }
     }
 }

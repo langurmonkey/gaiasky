@@ -371,6 +371,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
+        final Settings s = Settings.settings;
         switch (event) {
         case FOCUS_CHANGED -> {
             IFocus focus;
@@ -566,12 +567,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             focusAngle.setText(sf.format(Math.toDegrees((double) data[1]) % 360) + "°");
 
             // Dist to cam
-            Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0]);
+            Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], s.program.ui.distanceUnits);
             focusDistCam.setText(sf.format(Math.max(0d, distCam.getFirst())) + " " + distCam.getSecond());
 
             // Dist to sol
             if (data.length > 4) {
-                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4]);
+                Pair<Double, String> distSol = GlobalResources.doubleToDistanceString((double) data[4], s.program.ui.distanceUnits);
                 focusDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
             }
 
@@ -588,9 +589,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
         case CAMERA_MOTION_UPDATE -> {
             final Vector3b campos = (Vector3b) data[0];
-            Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x);
-            Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y);
-            Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z);
+            Pair<Double, String> x = GlobalResources.doubleToDistanceString(campos.x, s.program.ui.distanceUnits);
+            Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y, s.program.ui.distanceUnits);
+            Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z, s.program.ui.distanceUnits);
             String camPosStr = "[" + sf.format(x.getFirst()) + " " + x.getSecond() + ", " + sf.format(y.getFirst()) + " " + y.getSecond() + ", " + sf.format(z.getFirst()) + " " + z.getSecond() + "]";
             camVel.setText(sf.format((double) data[1]) + " km/h");
             camPos.setText(TextUtils.capString(camPosStr, 40));

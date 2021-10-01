@@ -21,6 +21,7 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Pair;
+import gaiasky.util.Settings;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -133,7 +134,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
             pos.set(m).sub(translation);
             // Distance in internal units
             double dst = p0.dst(p1);
-            Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst);
+            Pair<Double, String> d = GlobalResources.doubleToDistanceString(dst, Settings.settings.program.ui.distanceUnits);
             dist = nf.format(d.getFirst()) + " " + d.getSecond();
 
             GaiaSky.postRunnable(() -> {

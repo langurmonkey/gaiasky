@@ -35,6 +35,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.scenegraph.MachineDefinition;
@@ -637,7 +638,7 @@ public class SpacecraftGui extends AbstractGui {
             pitchvel.setText(nf.format(p) + "°");
             rollvel.setText(nf.format(r) + "°");
 
-            Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v);
+            Pair<Double, String> velstr = GlobalResources.doubleToVelocityString(v, Settings.settings.program.ui.distanceUnits);
             mainvel.setText(sf.format(velstr.getFirst()) + " " + velstr.getSecond());
 
             thrustfactor.setText("x" + (thf > 1000 ? sf.format(thf) : nf.format(thf)));
@@ -651,8 +652,8 @@ public class SpacecraftGui extends AbstractGui {
         case SPACECRAFT_NEAREST_INFO:
             if (data[0] != null) {
                 closestname.setText((String) data[0]);
-                Pair<Double, String> cldist = GlobalResources.doubleToDistanceString((Double) data[1]);
-                closestdist.setText(sf.format(cldist.getFirst()) + " " + cldist.getSecond());
+                Pair<Double, String> closestDistance = GlobalResources.doubleToDistanceString((Double) data[1], Settings.settings.program.ui.distanceUnits);
+                closestdist.setText(sf.format(closestDistance.getFirst()) + " " + closestDistance.getSecond());
             } else {
                 closestname.setText("");
                 closestdist.setText("");

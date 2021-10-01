@@ -11,16 +11,16 @@ package gaiasky.util;
  */
 public class Nature {
 
-    /**
+    /*
      * ======= ANGLE UNITS =======
      */
     /** Degrees to radians **/
     public static final double TO_RAD = Math.PI / 180;
     /** Radians to degrees **/
     public static final double TO_DEG = 180 / Math.PI;
-    /** Degrees to arcseconds **/
+    /** Degrees to arc-seconds **/
     public static final double DEG_TO_ARCSEC = 3600;
-    /** Arcseconds to degrees **/
+    /** Arc-seconds to degrees **/
     public static final double ARCSEC_TO_DEG = 1 / DEG_TO_ARCSEC;
     public static final double ARCSEC_TO_RAD = ARCSEC_TO_DEG * TO_RAD;
     public static final double DEG_TO_MILLARCSEC = DEG_TO_ARCSEC * 1000;
@@ -29,7 +29,7 @@ public class Nature {
     public static final double MILLARCSEC_TO_RAD = MILLARCSEC_TO_DEG * TO_RAD;
     public static final double MILLIARCSEC_TO_ARCSEC = 1d / 1000d;
     
-    /**
+    /*
      * ======= DISTANCE UNITS =======
      */
     /** Parsecs to kilometres **/
@@ -45,11 +45,11 @@ public class Nature {
     /** Kilometres to astronomical units **/
     public static final double KM_TO_AU = 1.0 / AU_TO_KM;
     /** Light years to kilometers **/
-    public static final double LY_TO_KM = 9460730000000d;
+    public static final double LY_TO_KM = 9.46073e12;
     /** Kilometers to light years **/
     public static final double KM_TO_LY = 1.0 / LY_TO_KM;
     
-    /**
+    /*
      * ======= TIME UNITS =======
      */
     /** Seconds to milliseconds **/
