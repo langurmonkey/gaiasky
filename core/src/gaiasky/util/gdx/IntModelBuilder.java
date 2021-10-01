@@ -785,13 +785,6 @@ public class IntModelBuilder {
     /**
      * Creates an octahedron-sphere
      * 
-     * @param radius
-     * @param divisions
-     * @param flipNormals
-     * @param hardEdges
-     * @param primitiveType
-     * @param material
-     * @param attributes
      * @return The model
      */
     public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, final Material material, final long attributes) {
@@ -812,11 +805,11 @@ public class IntModelBuilder {
      *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
      *            Position, Color, Normal and TextureCoordinates is supported.
      */
-    public IntModel createSphereRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, final Material materialShpere, final Material materialRing, final long attributes) {
+    public IntModel createSphereRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, final Material materialShpere, final Material materialRing, final long attributes) {
         begin();
-        part("sphere", GL20.GL_TRIANGLES, attributes, materialShpere).sphere(sphereDiameter, sphereDiameter, sphereDiameter, divisionsU, divisionsV, false, 0, 360, 0, 180);
-        part("ring", GL20.GL_TRIANGLES, attributes, materialRing).ring(innerRingRadius, outerRingRadius, ringDivisions, false);
-        part("ring", GL20.GL_TRIANGLES, attributes, materialRing).ring(new Matrix4().translate(0, -0.00001f, 0), innerRingRadius, outerRingRadius, ringDivisions, true);
+        part("sphere", primitiveType, attributes, materialShpere).sphere(sphereDiameter, sphereDiameter, sphereDiameter, divisionsU, divisionsV, false, 0, 360, 0, 180);
+        part("ring", primitiveType, attributes, materialRing).ring(innerRingRadius, outerRingRadius, ringDivisions, false);
+        part("ring", primitiveType, attributes, materialRing).ring(new Matrix4().translate(0, -0.00001f, 0), innerRingRadius, outerRingRadius, ringDivisions, true);
         return end();
     }
 

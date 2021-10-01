@@ -237,7 +237,7 @@ public class ModelComponent implements Disposable, IObserver {
 
         } else if (type != null) {
             // We create the model
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
             model = pair.getFirst();
             materials = pair.getSecond();
         } else {

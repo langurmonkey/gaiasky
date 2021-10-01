@@ -87,7 +87,7 @@ public class ContextMenu extends Table {
         stageListener = new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (getRootMenu().subMenuStructureContains(x, y) == false) {
+                if (!getRootMenu().subMenuStructureContains(x, y)) {
                     remove();
                 }
                 return true;

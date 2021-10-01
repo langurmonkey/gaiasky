@@ -23,6 +23,7 @@ import gaiasky.event.Events;
 import gaiasky.util.scene2d.CollapsibleWindow;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
+import gaiasky.util.scene2d.Separator;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 
@@ -275,7 +276,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
      */
     public GenericDialog show(Stage stage) {
         show(stage, sequence(Actions.alpha(0), Actions.fadeIn(0.6f, Interpolation.fade)));
-        if(lastPosX >= 0 && lastPosY >= 0){
+        if (lastPosX >= 0 && lastPosY >= 0) {
             setPosition(Math.round(lastPosX), Math.round(lastPosY));
         } else {
             setPosition(Math.round((stage.getWidth() - getWidth()) / 2f), Math.round((stage.getHeight() - getHeight()) / 2f));
@@ -345,6 +346,23 @@ public abstract class GenericDialog extends CollapsibleWindow {
     }
 
     /**
+     * Adds a horizontal separator to the main content table with the default colspan of 1
+     */
+    public void addSeparator() {
+        addSeparator(1);
+    }
+
+    /**
+     * Adds a horizontal separator to the main content table with the given colspan
+     *
+     * @param colspan The colspan to use
+     */
+    public void addSeparator(int colspan) {
+        if (content != null)
+            content.add(new Separator(skin, "menu")).padTop(pad10).padBottom(pad10).colspan(colspan).fill().expand().row();
+    }
+
+    /**
      * Sets the runnable which runs when accept is clicked
      *
      * @param r The runnable
@@ -373,7 +391,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     /**
      * Sets the enabled property on the given components.
      *
-     * @param enabled The state to set.
+     * @param enabled    The state to set.
      * @param components The components to enable or disable.
      */
     protected void enableComponents(boolean enabled, Disableable... components) {

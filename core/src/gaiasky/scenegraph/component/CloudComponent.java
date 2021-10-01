@@ -7,6 +7,7 @@ package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -100,7 +101,7 @@ public class CloudComponent {
 
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
         IntModel cloudModel = pair.getFirst();
         Material material = pair.getSecond().get("base");
         material.clear();

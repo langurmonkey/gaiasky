@@ -63,7 +63,7 @@ public class AtmosphereComponent {
         this.planetSize = planetSize;
         setUpAtmosphericScatteringMaterial(planetMat, correctGround);
 
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
         IntModel atmosphereModel = pair.getFirst();
         Material atmMat = pair.getSecond().get("base");
         atmMat.clear();

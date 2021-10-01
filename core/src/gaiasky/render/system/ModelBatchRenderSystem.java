@@ -6,8 +6,10 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.utils.Array;
-import gaiasky.render.*;
+import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.IModelRenderable;
+import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.comp.ModelComparator;
@@ -19,7 +21,9 @@ import gaiasky.util.gdx.IntModelBatch;
 public class ModelBatchRenderSystem extends AbstractRenderSystem {
 
     public enum ModelRenderType {
-        NORMAL, ATMOSPHERE, CLOUD
+        NORMAL,
+        ATMOSPHERE,
+        CLOUD
     }
 
     protected ComponentTypes ctAtm, ctClouds;
@@ -29,13 +33,10 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
 
     /**
      * Creates a new model batch render component.
-     * 
-     * @param rg
-     *            The render group.
-     * @param alphas
-     *            The alphas list.
-     * @param batch
-     *            The model batch.
+     *
+     * @param rg     The render group.
+     * @param alphas The alphas list.
+     * @param batch  The model batch.
      */
     public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
         super(rg, alphas, null);
@@ -52,10 +53,9 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
             batch.begin(camera.getCamera());
             renderables.forEach(r -> {
                 IModelRenderable s = (IModelRenderable) r;
-                        s.render(batch, getAlpha(s), t, rc, getRenderGroup());
+                s.render(batch, getAlpha(s), t, rc, getRenderGroup());
             });
             batch.end();
-
         }
     }
 

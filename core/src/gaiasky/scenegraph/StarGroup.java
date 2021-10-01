@@ -128,7 +128,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         params.put("diameter", 1d);
         params.put("flip", false);
 
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
         IntModel model = pair.getFirst();
         Material mat = pair.getSecond().get("base");
         mat.clear();

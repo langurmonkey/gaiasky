@@ -28,7 +28,7 @@ public class ModelCache {
         mb = new IntModelBuilder();
     }
 
-    public Pair<IntModel, Map<String, Material>> getModel(String shape, Map<String, Object> params, int attributes) {
+    public Pair<IntModel, Map<String, Material>> getModel(String shape, Map<String, Object> params, int attributes, int primitiveType) {
 
         String key = getKey(shape, params, attributes);
         IntModel model = null;
@@ -41,24 +41,24 @@ public class ModelCache {
             mat = new Material();
             switch (shape) {
             case "sphere":
-                Integer quality = ((Long) params.get("quality")).intValue();
-                Float diameter = ((Double) params.get("diameter")).floatValue();
+                int quality = ((Long) params.get("quality")).intValue();
+                float diameter = ((Double) params.get("diameter")).floatValue();
                 Boolean flip = (Boolean) params.get("flip");
-                model = mb.createSphere(diameter, quality, quality, flip, mat, attributes);
+                model = mb.createSphere(diameter, diameter, diameter, quality, quality, flip, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
             case "icosphere":
-                Integer recursion = ((Long) params.get("recursion")).intValue();
+                int recursion = ((Long) params.get("recursion")).intValue();
                 diameter = ((Double) params.get("diameter")).floatValue();
                 flip = (Boolean) params.get("flip");
-                model = mb.createIcoSphere(diameter / 2, recursion, flip, false, mat, attributes);
+                model = mb.createIcoSphere(diameter / 2, recursion, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
             case "octahedronsphere":
-                Integer divisions = ((Long) params.get("divisions")).intValue();
+                int divisions = ((Long) params.get("divisions")).intValue();
                 diameter = ((Double) params.get("diameter")).floatValue();
                 flip = (Boolean) params.get("flip");
-                model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, mat, attributes);
+                model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
             case "disc":
@@ -103,8 +103,8 @@ public class ModelCache {
                 vb10.setUV(1, 0);
 
                 mb.begin();
-                mb.part("up", GL20.GL_TRIANGLES, attributes, mat).rect(vt00, vt01, vt11, vt10);
-                mb.part("down", GL20.GL_TRIANGLES, attributes, mat).rect(vb00, vb10, vb11, vb01);
+                mb.part("up", primitiveType, attributes, mat).rect(vt00, vt01, vt11, vt10);
+                mb.part("down", primitiveType, attributes, mat).rect(vb00, vb10, vb11, vb01);
                 model = mb.end();
                 break;
             case "twofacedbillboard":
@@ -149,19 +149,19 @@ public class ModelCache {
                 vb10.setUV(0, 0);
 
                 mb.begin();
-                mb.part("up", GL20.GL_TRIANGLES, attributes, mat).rect(vt00, vt01, vt11, vt10);
-                mb.part("down", GL20.GL_TRIANGLES, attributes, mat).rect(vb00, vb10, vb11, vb01);
+                mb.part("up", primitiveType, attributes, mat).rect(vt00, vt01, vt11, vt10);
+                mb.part("down", primitiveType, attributes, mat).rect(vb00, vb10, vb11, vb01);
                 model = mb.end();
                 break;
             case "cylinder":
                 // Use builder
-                Float width = ((Double) params.get("width")).floatValue();
-                Float height = ((Double) params.get("height")).floatValue();
-                Float depth = ((Double) params.get("depth")).floatValue();
+                float width = ((Double) params.get("width")).floatValue();
+                float height = ((Double) params.get("height")).floatValue();
+                float depth = ((Double) params.get("depth")).floatValue();
                 divisions = ((Long) params.get("divisions")).intValue();
                 flip = (Boolean) params.get("flip");
 
-                model = mb.createCylinder(width, height, depth, divisions, flip, mat, attributes);
+                model = mb.createCylinder(width, height, depth, divisions, flip, primitiveType, mat, attributes);
 
                 break;
             case "ring":
@@ -171,10 +171,10 @@ public class ModelCache {
 
                 quality = ((Long) params.get("quality")).intValue();
                 divisions = ((Long) params.get("divisions")).intValue();
-                Float innerRad = ((Double) params.get("innerradius")).floatValue();
-                Float outerRad = ((Double) params.get("outerradius")).floatValue();
+                float innerRad = ((Double) params.get("innerradius")).floatValue();
+                float outerRad = ((Double) params.get("outerradius")).floatValue();
 
-                model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+                model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
                 break;
             case "cone":
                 width = ((Double) params.get("width")).floatValue();
@@ -187,9 +187,9 @@ public class ModelCache {
                 }
 
                 if (hDivisions == 0)
-                    model = mb.createCone(width, height, depth, divisions, mat, attributes);
+                    model = mb.createCone(width, height, depth, divisions, primitiveType, mat, attributes);
                 else
-                    model = mb.createCone(width, height, depth, divisions, hDivisions, GL20.GL_TRIANGLES, mat, attributes);
+                    model = mb.createCone(width, height, depth, divisions, hDivisions, primitiveType, mat, attributes);
 
                 break;
             }
@@ -200,13 +200,13 @@ public class ModelCache {
     }
 
     private String getKey(String shape, Map<String, Object> params, int attributes) {
-        String key = shape + "-" + attributes;
+        StringBuilder key = new StringBuilder(shape + "-" + attributes);
         Set<String> keys = params.keySet();
         Object[] par = keys.toArray();
-        for (int i = 0; i < par.length; i++) {
-            key += "-" + params.get(par[i]);
+        for (Object o : par) {
+            key.append("-").append(params.get(o));
         }
-        return key;
+        return key.toString();
 
     }
 

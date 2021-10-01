@@ -6,27 +6,36 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.stars.UncertaintiesHandler;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
+import gaiasky.interafce.AddShapeDialog.Primitive;
+import gaiasky.render.ComponentTypes;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
+import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.ContextMenu;
 import gaiasky.util.scene2d.MenuItem;
 import gaiasky.util.scene2d.OwnCheckBox;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class GaiaSkyContextMenu extends ContextMenu {
 
@@ -100,7 +109,9 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(go);
 
+            addSeparator();
 
+            // Tracking object
             MenuItem track = new MenuItem(I18n.txt("context.track", candidateNameShort), skin, skin.getDrawable("highlight-on"));
             track.addListener(event -> {
                 if (event instanceof ChangeEvent) {
@@ -119,6 +130,96 @@ public class GaiaSkyContextMenu extends ContextMenu {
             });
             addItem(noTrack);
 
+            addSeparator();
+
+            // Add bounding shape at object position
+            MenuItem addShape = new MenuItem(I18n.txt("context.shape.new", candidateNameShort), skin, skin.getDrawable("icon-elem-grids"));
+            addShape.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    AddShapeDialog dialog = new AddShapeDialog(I18n.txt("context.shape.new", candidateNameShort), candidate, skin, getStage());
+                    dialog.setAcceptRunnable(() -> {
+                        double size = dialog.units.getSelected().toInternal(dialog.size.getDoubleValue(1)) * 2.0;
+                        float[] color = dialog.color.getPickedColor();
+                        String shape = dialog.shape.getSelected().toString().toLowerCase(Locale.ROOT);
+                        int primitive = dialog.primitive.getSelected().equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                        boolean trackObj = dialog.track.isChecked();
+                        GaiaSky.postRunnable(() -> {
+                            final ShapeObject shapeObj;
+                            if (trackObj) {
+                                shapeObj = new ShapeObject(new String[] { dialog.name.getText().trim() }, "Universe", candidate, candidateName, color);
+                            } else {
+                                shapeObj = new ShapeObject(new String[] { dialog.name.getText().trim() }, "Universe", candidate.getAbsolutePosition(candidateName, new Vector3b()), candidateName, color);
+                            }
+                            shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
+                            shapeObj.size = (float) size;
+                            Map<String, Object> params = new HashMap<>();
+                            params.put("quality", 50L);
+                            params.put("divisions", shape.equals("octahedronsphere") ? 3L : 15L);
+                            params.put("recursion", 5L);
+                            params.put("diameter", 1.0);
+                            params.put("width", 1.0);
+                            params.put("height", 1.0);
+                            params.put("depth", 1.0);
+                            params.put("innerradius", 0.6);
+                            params.put("outerradius", 1.0);
+                            params.put("flip", false);
+                            shapeObj.setModel(shape, primitive, params);
+
+                            shapeObj.doneLoading(GaiaSky.instance.assetManager);
+
+                            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, shapeObj, false);
+                        });
+
+                    });
+                    dialog.show(getStage());
+                    return true;
+                }
+                return false;
+            });
+            addItem(addShape);
+
+            MenuItem removeShapesObj = new MenuItem(I18n.txt("context.shape.remove", candidateNameShort), skin, skin.getDrawable("iconic-delete"));
+            removeShapesObj.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    ISceneGraph sg = GaiaSky.instance.sceneGraph;
+                    Array<SceneGraphNode> l = new Array<>();
+                    sg.getRoot().getChildrenByType(ShapeObject.class, l);
+
+                    GaiaSky.postRunnable(() -> {
+                        for (SceneGraphNode n : l) {
+                            ShapeObject shapeObject = (ShapeObject) n;
+                            IFocus tr = shapeObject.getTrack();
+                            String trName = shapeObject.getTrackName();
+                            if (tr != null && tr == candidate) {
+                                EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, candidate, false);
+                            } else if (trName != null && trName.equalsIgnoreCase(candidateName)) {
+                                EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, candidate, false);
+                            }
+                        }
+                    });
+
+                }
+                return false;
+            });
+            addItem(removeShapesObj);
+
+            MenuItem removeShapesAll = new MenuItem(I18n.txt("context.shape.remove.all"), skin, skin.getDrawable("iconic-delete"));
+            removeShapesAll.addListener(event -> {
+                if (event instanceof ChangeEvent) {
+                    ISceneGraph sg = GaiaSky.instance.sceneGraph;
+                    Array<SceneGraphNode> l = new Array<>();
+                    sg.getRoot().getChildrenByType(ShapeObject.class, l);
+
+                    GaiaSky.postRunnable(() -> {
+                        for (SceneGraphNode n : l) {
+                            EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, n, false);
+                        }
+                    });
+
+                }
+                return false;
+            });
+            addItem(removeShapesAll);
 
             if (candidate instanceof Planet) {
                 addSeparator();
@@ -274,12 +375,12 @@ public class GaiaSkyContextMenu extends ContextMenu {
 
         // Load
         MenuItem dsLoad = new MenuItem(I18n.txt("context.dataset.load"), skin, skin.getDrawable("open-icon"));
-        dsLoad.addListener(event ->{
-           if(event instanceof ChangeEvent){
-               EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
-               return true;
-           }
-           return false;
+        dsLoad.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
+                return true;
+            }
+            return false;
         });
         addItem(dsLoad);
 
@@ -289,18 +390,18 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem dsHighlight = new MenuItem(I18n.txt("context.dataset.highlight"), skin, skin.getDrawable("highlight-on"));
             ContextMenu dsHighlightSubmenu = new ContextMenu(skin, "default");
             for (CatalogInfo ci : cis) {
-                if(ci.isVisible()) {
+                if (ci.isVisible()) {
                     MenuItem cim = new MenuItem(ci.name, skin, "default");
                     cim.align(Align.right);
                     OwnCheckBox cb = new OwnCheckBox(null, skin, pad);
                     cb.setChecked(ci.highlighted);
                     cim.add(cb).right().expand();
-                    cim.addListener(event ->{
-                       if(event instanceof ChangeEvent){
-                           EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, !ci.highlighted, false);
-                           return true;
-                       }
-                       return false;
+                    cim.addListener(event -> {
+                        if (event instanceof ChangeEvent) {
+                            EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, !ci.highlighted, false);
+                            return true;
+                        }
+                        return false;
                     });
                     dsHighlightSubmenu.addItem(cim);
                 }
@@ -314,25 +415,23 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem dsVisibility = new MenuItem(I18n.txt("context.dataset.visibility"), skin, skin.getDrawable("eye-icon"));
             ContextMenu dsVisibilitySubmenu = new ContextMenu(skin, "default");
             for (CatalogInfo ci : cis) {
-                    MenuItem cim = new MenuItem(ci.name, skin, "default");
-                    cim.align(Align.right);
-                    OwnCheckBox cb = new OwnCheckBox(null, skin, pad);
-                    cb.setChecked(ci.isVisible());
-                    cim.add(cb).right().expand();
-                    cim.addListener(event ->{
-                        if(event instanceof ChangeEvent){
-                            EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, !ci.isVisible(), false);
-                            return true;
-                        }
-                        return false;
-                    });
-                    dsVisibilitySubmenu.addItem(cim);
+                MenuItem cim = new MenuItem(ci.name, skin, "default");
+                cim.align(Align.right);
+                OwnCheckBox cb = new OwnCheckBox(null, skin, pad);
+                cb.setChecked(ci.isVisible());
+                cim.add(cb).right().expand();
+                cim.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, !ci.isVisible(), false);
+                        return true;
+                    }
+                    return false;
+                });
+                dsVisibilitySubmenu.addItem(cim);
             }
             dsVisibility.setSubMenu(dsVisibilitySubmenu);
             addItem(dsVisibility);
         }
-
-
 
         if (relativisticEffects) {
             // Spawn gravitational waves
