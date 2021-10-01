@@ -665,7 +665,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
      * @return The pseudo-size of this star
      */
     private double absoluteMagnitudeToPseudoSize(final double absMag) {
-
         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
         double pseudoL = Math.pow(10, -0.4 * absMag);
         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;

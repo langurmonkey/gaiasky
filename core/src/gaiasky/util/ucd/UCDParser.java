@@ -41,8 +41,8 @@ public class UCDParser {
     public static String[] radvelcolnames = new String[] { "radial_velocity", "radvel", "rv", "dr2_radial_velocity" };
     public static String[] radiuscolnames = new String[] { "radius", "rcluster", "radi" };
     public static String[] nstarscolnames = new String[] { "n", "nstars", "n_stars", "n_star" };
-    public static String[] varimagscolnames = new String[] { "g_transit_mag" };
-    public static String[] varitimescolnames = new String[] { "g_transit_time" };
+    public static String[] varimagscolnames = new String[] { "g_transit_mag", "g_mag_list", "g_mag_series" };
+    public static String[] varitimescolnames = new String[] { "g_transit_time", "time_list", "time_series" };
     public static String[] periodcolnames = new String[] { "pf", "period" };
 
     public static boolean isName(String colname) {
