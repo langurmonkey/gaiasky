@@ -9,10 +9,14 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.scenegraph.IFocus;
-import gaiasky.util.Constants;
 import gaiasky.util.I18n;
-import gaiasky.util.scene2d.*;
+import gaiasky.util.Nature;
+import gaiasky.util.scene2d.OwnCheckBox;
+import gaiasky.util.scene2d.OwnLabel;
+import gaiasky.util.scene2d.OwnSelectBox;
+import gaiasky.util.scene2d.OwnTextField;
 import gaiasky.util.validator.FloatValidator;
 
 public class AddShapeDialog extends GenericDialog {
@@ -25,13 +29,18 @@ public class AddShapeDialog extends GenericDialog {
     public OwnSelectBox<Primitive> primitive;
 
     private final IFocus object;
+    private final String objectName;
     private final float fieldWidth;
     private final float titleWidth;
     private final float cpSize;
 
-    public AddShapeDialog(final String title, final IFocus object, final Skin skin, final Stage ui) {
-        super(title, skin, ui);
+    // We can recompute the name only when the filed
+    // has not been manually edited
+    private boolean canRecomputeName = true;
 
+    public AddShapeDialog(final String title, final IFocus object, final String objectName, final Skin skin, final Stage ui) {
+        super(title, skin, ui);
+        this.objectName = objectName;
         this.object = object;
         fieldWidth = 288f;
         titleWidth = 150f;
@@ -51,16 +60,28 @@ public class AddShapeDialog extends GenericDialog {
         content.add(info).left().padBottom(pad15).row();
 
         // Name
-        addName(content, "1 AU around " + object.getName());
+        addName(content, "1 AU from " + objectName);
 
         // Size
         FloatValidator val = new FloatValidator(0f, Float.MAX_VALUE);
         size = new OwnTextField("1.0", skin, val);
         size.setWidth(fieldWidth * 0.6f);
+        size.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                recomputeObjectName();
+            }
+            return true;
+        });
         units = new OwnSelectBox<>(skin);
         units.setWidth(fieldWidth * 0.3f);
         units.setItems(Units.values());
         units.setSelected(Units.AU);
+        units.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                recomputeObjectName();
+            }
+            return true;
+        });
         HorizontalGroup sizeGroup = new HorizontalGroup();
         sizeGroup.space(15f);
         sizeGroup.addActor(size);
@@ -105,6 +126,14 @@ public class AddShapeDialog extends GenericDialog {
     private void addName(Table container, String text) {
         name = new OwnTextField(text, skin);
         name.setWidth(fieldWidth);
+        name.addListener((event) -> {
+            if (event instanceof ChangeEvent) {
+                if (!name.getText().equals(text)) {
+                    canRecomputeName = false;
+                }
+            }
+            return true;
+        });
         container.add(new OwnLabel(I18n.txt("gui.shape.name"), skin, titleWidth)).left().padRight(pad10).padBottom(pad10);
         container.add(name).left().padBottom(pad10).row();
     }
@@ -115,6 +144,14 @@ public class AddShapeDialog extends GenericDialog {
         Table lc = new Table(skin);
         lc.add(color).size(cpSize);
         container.add(lc).left().padBottom(pad5).row();
+    }
+
+    private void recomputeObjectName() {
+        if (canRecomputeName) {
+            String newName = size.getText() + " " + units.getSelected().text() + " from " + objectName;
+            name.setText(newName);
+            canRecomputeName = true;
+        }
     }
 
     @Override
@@ -142,18 +179,25 @@ public class AddShapeDialog extends GenericDialog {
     }
 
     public enum Units {
-        M(Constants.M_TO_U),
-        KM(Constants.KM_TO_U),
-        AU(Constants.AU_TO_U),
-        LY(Constants.LY_TO_U),
-        PC(Constants.PC_TO_U);
-        private double toInternal;
+        M(1e-3, "metres"),
+        KM(1, "km"),
+        AU(Nature.AU_TO_KM, "AU"),
+        LY(Nature.LY_TO_KM, "light years"),
+        PC(Nature.PC_TO_KM, "pc");
+        private double toKm;
+        private String text;
 
-        Units(double toInternal) {
-            this.toInternal = toInternal;
+        Units(double toKm, String text) {
+            this.toKm = toKm;
+            this.text = text;
         }
-        public double toInternal(double value){
-            return value * toInternal;
+
+        public String text() {
+            return text;
+        }
+
+        public double toKm(double value) {
+            return value * toKm;
         }
     }
 

@@ -1173,7 +1173,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
     @Override
     public void octahedronsphere(float radius, int divisions, boolean flipNormals, boolean hardEdges) {
-        octahedronsphere(radius, divisions, flipNormals, hardEdges, 0, Integer.MAX_VALUE);
+        octahedronsphere(radius, divisions, flipNormals, hardEdges, 0, 10000000);
     }
 
     @Override
@@ -1187,7 +1187,8 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
 
             int[] tri = new int[3];
             for (int i = 0; i < 3; i++) {
-                VertexInfo v = vertTmp1.set(osc.vertices.get(face.v()[i] - 1), osc.normals.get(face.n()[i] - 1), null, osc.uv.get(face.v()[i] - 1));
+                //VertexInfo v = vertTmp1.set(osc.vertices.get(face.v()[i]), osc.normals.get(face.n()[i]), null, osc.uv.get(face.v()[i]));
+                VertexInfo v = vertTmp1.setPos(osc.vertices.get(face.v()[i]));
                 int idx = vertex(v);
                 tri[i] = idx;
             }

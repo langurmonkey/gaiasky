@@ -173,8 +173,13 @@ public class ModelCache {
                 divisions = ((Long) params.get("divisions")).intValue();
                 float innerRad = ((Double) params.get("innerradius")).floatValue();
                 float outerRad = ((Double) params.get("outerradius")).floatValue();
+                boolean sph = params.containsKey("sphere-in-ring")  ? (Boolean) params.get("sphere-in-ring") : true;
 
-                model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+                if (sph) {
+                    model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+                } else {
+                    model = ModelCache.cache.mb.createRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+                }
                 break;
             case "cone":
                 width = ((Double) params.get("width")).floatValue();

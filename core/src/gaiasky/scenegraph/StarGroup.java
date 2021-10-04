@@ -693,6 +693,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return this;
     }
 
+    @Override
+    public Vector3b getAbsolutePosition(String name, Vector3b aux) {
+        Vector3d vec = getAbsolutePosition(name, aux3d1.get());
+        aux.set(vec);
+        return aux;
+    }
+
     public Vector3d getAbsolutePosition(String name, Vector3d aux) {
         if (index.containsKey(name)) {
             int idx = index.get(name);

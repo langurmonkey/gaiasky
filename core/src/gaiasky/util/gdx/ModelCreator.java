@@ -34,16 +34,16 @@ public abstract class ModelCreator {
         public int[] n;
 
         /**
-         * Constructs a face with the indeces of the vertices.
-         * @param v Indeces of the vertices.
+         * Constructs a face with the indices of the vertices.
+         * @param v Indices of the vertices.
          */
         public Face(int... v) {
             this.v = v;
         }
 
         /**
-         * Sets the normal indeces.
-         * @param n Indeces of the normals.
+         * Sets the normal indices.
+         * @param n Indices of the normals.
          */
         public void setNormals(int... n) {
             this.n = n;
@@ -87,31 +87,42 @@ public abstract class ModelCreator {
     protected boolean hardEdges;
 
     public ModelCreator() {
-        this.vertices = new ArrayList<Vector3>();
-        this.normals = new ArrayList<Vector3>();
-        this.uv = new ArrayList<Vector2>();
-        this.faces = new ArrayList<IFace>();
+        this.vertices = new ArrayList<>();
+        this.normals = new ArrayList<>();
+        this.uv = new ArrayList<>();
+        this.faces = new ArrayList<>();
         this.index = 1;
+    }
+
+    /**
+     * Adds a vertex.
+     *
+     * @param p      The point.
+     *
+     * @return The index of this vertex.
+     */
+    protected int addVertex(Vector3 p) {
+        vertices.add(p);
+        return index++;
     }
 
     /**
      * Exports the model to the .obj (Wavefront) format in the given output stream. 
      * @param os The output stream.
-     * @throws IOException
      */
     public void dumpObj(OutputStream os) throws IOException {
         INumberFormat nf = NumberFormatFactory.getFormatter("########0.000000");
         OutputStreamWriter osw = new OutputStreamWriter(os);
-        osw.append("# Created by " + this.getClass().getSimpleName() + " - ARI - ZAH - Heidelberg Universitat\n");
-        osw.append("o " + name + "\n");
+        osw.append("# Created by ").append(this.getClass().getSimpleName()).append(" - ARI - ZAH - Heidelberg Universitat\n");
+        osw.append("o ").append(name).append("\n");
         // Write vertices
         for (Vector3 vertex : vertices) {
-            osw.append("v " + nf.format(vertex.x) + " " + nf.format(vertex.y) + " " + nf.format(vertex.z) + "\n");
+            osw.append("v ").append(nf.format(vertex.x)).append(" ").append(nf.format(vertex.y)).append(" ").append(nf.format(vertex.z)).append("\n");
         }
 
         // Write vertex normals
         for (Vector3 vertex : normals) {
-            osw.append("vn " + nf.format(vertex.x) + " " + nf.format(vertex.y) + " " + nf.format(vertex.z) + "\n");
+            osw.append("vn ").append(nf.format(vertex.x)).append(" ").append(nf.format(vertex.y)).append(" ").append(nf.format(vertex.z)).append("\n");
         }
 
         //osw.append("s 1\n");
@@ -138,7 +149,7 @@ public abstract class ModelCreator {
      * Constructs the face string for the given vertex.
      * @param vi The vertex index.
      * @param ni The normal index
-     * @return
+     * @return The face string
      */
     private String idx(int vi, int ni) {
         return vi + "//" + ni;

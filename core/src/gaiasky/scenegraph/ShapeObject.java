@@ -44,46 +44,48 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class ShapeObject extends SceneGraphNode implements IFocus, IModelRenderable, I3DTextRenderable {
 
     private ModelComponent mc;
 
-    protected float[] labelcolor;
-
     private IntModel model;
     private Matrix4 modelTransform;
     private String modelShape;
     private Map<String, Object> modelParams;
     private int primitiveType;
+    private boolean showLabel;
 
     private IFocus track;
     private String trackName;
 
-    public ShapeObject(String[] names, String parentName, IFocus track, String trackName) {
+    public ShapeObject(String[] names, String parentName, IFocus track, String trackName, boolean showLabel) {
         super();
         this.parentName = parentName;
         this.setNames(names);
         this.track = track;
         this.trackName = trackName;
+        this.showLabel = showLabel;
     }
 
-    public ShapeObject(String[] names, String parentName, Vector3b pos, String trackName) {
+    public ShapeObject(String[] names, String parentName, Vector3b pos, String trackName, boolean showLabel) {
         super();
         this.parentName = parentName;
         this.setNames(names);
         this.pos = pos;
         this.trackName = trackName;
+        this.showLabel = showLabel;
     }
 
-    public ShapeObject(String[] names, String parentName, Vector3b pos, String trackName, float[] color) {
-        this(names, parentName, pos, trackName);
+    public ShapeObject(String[] names, String parentName, Vector3b pos, String trackName, boolean showLabel, float[] color) {
+        this(names, parentName, pos, trackName, showLabel);
         this.setColor(color);
     }
 
-    public ShapeObject(String[] names, String parentName, IFocus track, String trackName, float[] color) {
-        this(names, parentName, track, trackName);
+    public ShapeObject(String[] names, String parentName, IFocus track, String trackName, boolean showLabel, float[] color) {
+        this(names, parentName, track, trackName, showLabel);
         this.setColor(color);
     }
 
@@ -133,23 +135,11 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     @Override
     public void setColor(double[] color) {
         super.setColor(color);
-        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
     }
 
     @Override
     public void setColor(float[] color) {
         super.setColor(color);
-        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
-    }
-
-    @Override
-    public void setLabelcolor(double[] labelcolor) {
-        this.labelcolor = GlobalResources.toFloatArray(labelcolor);
-    }
-
-    @Override
-    public void setLabelcolor(float[] labelcolor) {
-        this.labelcolor = labelcolor;
     }
 
     /**
@@ -161,7 +151,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         if (track != null) {
-            track.getAbsolutePosition(trackName, pos);
+            track.getAbsolutePosition(trackName.toLowerCase(Locale.ROOT), pos);
         }
         // Update pos, local transform
         this.translation.add(pos);
@@ -187,7 +177,8 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
             addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
-            addToRender(this, RenderGroup.FONT_LABEL);
+            if (showLabel)
+                addToRender(this, RenderGroup.FONT_LABEL);
         }
     }
 
@@ -207,10 +198,10 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
-        mc.update(null, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
+        mc.update(null, alpha * opacity * cc[3], GL20.GL_ONE, GL20.GL_ONE);
         // Depth reads, no depth writes
-        mc.setDepthTest(GL20.GL_LEQUAL, true);
-        Gdx.gl20.glLineWidth(2);
+        mc.setDepthTest(GL20.GL_LEQUAL, false);
+        Gdx.gl20.glLineWidth(1.5f);
         mc.instance.transform.set(this.localTransform);
         modelBatch.render(mc.instance, mc.env);
 
@@ -243,8 +234,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
 
     @Override
     public float[] textColour() {
-        labelcolor[3] = 8.0f;
-        return labelcolor;
+        return cc;
     }
 
     @Override
@@ -398,8 +388,6 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     public <T extends SceneGraphNode> T getSimpleCopy() {
         ShapeObject copy = super.getSimpleCopy();
         copy.localTransform.set(this.localTransform);
-        copy.labelcolor = this.labelcolor;
-
         return (T) copy;
     }
 

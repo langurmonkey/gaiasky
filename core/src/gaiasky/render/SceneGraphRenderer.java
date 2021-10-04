@@ -756,7 +756,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // BILLBOARD SSO
         AbstractRenderSystem billboardSSOProc = new BillboardStarRenderSystem(BILLBOARD_SSO, alphas, starBillboardShaders, "data/tex/base/sso.png", -1);
-        billboardSSOProc.addPreRunnables(additiveBlendR, depthTestR);
+        billboardSSOProc.addPreRunnables(additiveBlendR, depthTestNoWritesR);
 
         // MODEL ATMOSPHERE
         AbstractRenderSystem modelAtmProc = new ModelBatchRenderSystem(MODEL_ATM, alphas, mbAtmosphere) {
@@ -799,8 +799,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(variableGroupProc);
         addRenderSystem(orbitElemProc);
 
-        // Additive meshes
-        addRenderSystem(modelMeshAdditiveProc);
         // Diffuse meshes
         addRenderSystem(modelMeshDiffuse);
 
@@ -835,6 +833,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(modelCloudProc);
         addRenderSystem(shapeProc);
         addRenderSystem(particleEffectsProc);
+
+        // Additive meshes
+        addRenderSystem(modelMeshAdditiveProc);
 
         // INIT GL STATE
         GL30.glClampColor(GL30.GL_CLAMP_READ_COLOR, GL30.GL_FALSE);

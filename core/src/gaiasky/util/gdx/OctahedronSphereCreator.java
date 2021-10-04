@@ -10,23 +10,16 @@ import com.badlogic.gdx.math.Vector3;
 
 import java.util.*;
 
+/**
+ * Utility class to create octahedron spheres.
+ */
 public class OctahedronSphereCreator extends ModelCreator {
 
     private Map<Long, Integer> middlePointIndexCache;
 
-    /**
-     * Adds a vertex and its UV mapping.
-     * @param p The point.
-     * @param radius The radius.
-     * @return
-     */
-    protected int addVertex(Vector3 p, float radius) {
-        p.nor();
-
-        // Vertex is p times the radius
-        vertices.add(p.scl(radius));
-
-        return index++;
+    public OctahedronSphereCreator() {
+        super();
+        index = 0;
     }
 
     /**
@@ -55,8 +48,8 @@ public class OctahedronSphereCreator extends ModelCreator {
             // Calculate normals
             if (hardEdges) {
                 // Calculate face normal, shared amongst all vertices
-                Vector3 a = vertices.get(face.v()[1] - 1).cpy().sub(vertices.get(face.v()[0] - 1));
-                Vector3 b = vertices.get(face.v()[2] - 1).cpy().sub(vertices.get(face.v()[1] - 1));
+                Vector3 a = vertices.get(face.v()[1]).cpy().sub(vertices.get(face.v()[0]));
+                Vector3 b = vertices.get(face.v()[2]).cpy().sub(vertices.get(face.v()[1]));
                 normals.add(a.crs(b).nor());
 
                 // Add index to face
@@ -65,46 +58,41 @@ public class OctahedronSphereCreator extends ModelCreator {
 
             } else {
                 // Just add the vertex normal
-                normals.add(vertices.get(face.v()[0] - 1).cpy().nor());
-                normals.add(vertices.get(face.v()[1] - 1).cpy().nor());
-                normals.add(vertices.get(face.v()[2] - 1).cpy().nor());
+                normals.add(vertices.get(face.v()[0]).cpy().nor());
+                normals.add(vertices.get(face.v()[1]).cpy().nor());
+                normals.add(vertices.get(face.v()[2]).cpy().nor());
 
                 // Add indices to face
                 int idx = normals.size();
-                face.setNormals(idx - 2, idx - 1, idx);
+                face.setNormals(idx - 3, idx - 2, idx - 1);
             }
         }
     }
 
     // return index of point in the middle of p1 and p2
-    private int getMiddlePoint(int p1, int p2, float radius, Set<Integer> seam) {
-        boolean inSeam = seam.contains(p1) && seam.contains(p2);
+    private int getMiddlePoint(int p1, int p2, float radius) {
 
         // first check if we have it already
         boolean firstIsSmaller = p1 < p2;
-        Long smallerIndex = (long) (firstIsSmaller ? p1 : p2);
-        Long greaterIndex = (long) (firstIsSmaller ? p2 : p1);
-        Long key = (smallerIndex << 32) + greaterIndex;
+        long smallerIndex = firstIsSmaller ? p1 : p2;
+        long greaterIndex = firstIsSmaller ? p2 : p1;
+        long key = (smallerIndex << 32) + greaterIndex;
 
-        if (!inSeam && this.middlePointIndexCache.containsKey(key)) {
+        if (this.middlePointIndexCache.containsKey(key)) {
             return middlePointIndexCache.get(key);
         }
 
         // not in cache, calculate it
-        Vector3 point1 = this.vertices.get(p1 - 1);
-        Vector3 point2 = this.vertices.get(p2 - 1);
+        Vector3 point1 = this.vertices.get(p1);
+        Vector3 point2 = this.vertices.get(p2);
         Vector3 middle = new Vector3((point1.x + point2.x) / 2.0f, (point1.y + point2.y) / 2.0f, (point1.z + point2.z) / 2.0f);
 
-        middle.nor();
+        middle.nor().scl(radius);
         // add vertex makes sure point is on unit sphere
-        int i = addVertex(middle, radius);
+        int i = addVertex(middle);
 
-        if (inSeam) {
-            seam.add(i);
-        } else {
-            // store it only if not in seam, return index
-            this.middlePointIndexCache.put(key, i);
-        }
+        // store it only if not in seam, return index
+        this.middlePointIndexCache.put(key, i);
         return i;
     }
 
@@ -113,66 +101,50 @@ public class OctahedronSphereCreator extends ModelCreator {
             throw new AssertionError("Divisions must be in [0..6]");
         this.flipNormals = flipNormals;
         this.hardEdges = hardEdges;
-        this.middlePointIndexCache = new HashMap<Long, Integer>();
+        this.middlePointIndexCache = new HashMap<>();
 
-        // Add four top points (0,1,2,3)
-        for (int i = 0; i < 4; i++)
-            addVertex(new Vector3(0, 1, 0), radius);
+        // +y
+        addVertex(new Vector3(0, radius, 0));
+        // +z
+        addVertex(new Vector3(0, 0, radius));
+        // +x
+        addVertex(new Vector3(radius, 0, 0));
+        // -z
+        addVertex(new Vector3(0, 0, -radius));
+        // -x
+        addVertex(new Vector3(-radius, 0, 0));
+        // -y
+        addVertex(new Vector3(0, -radius, 0));
 
-        // Add five middle vertices, +z +x -z -x +z (4,5,6,7,8)
-        addVertex(new Vector3(0, 0, 1), radius);
-        addVertex(new Vector3(1, 0, 0), radius);
-        addVertex(new Vector3(0, 0, -1), radius);
-        addVertex(new Vector3(-1, 0, 0), radius);
-        addVertex(new Vector3(0, 0, 1), radius);
+        // Triangles
+        int[] triangles = new int[] {
+                0, 1, 2,
+                0, 2, 3,
+                0, 3, 4,
+                0, 4, 1,
+                5, 2, 1,
+                5, 3, 2,
+                5, 4, 3,
+                5, 1, 4 };
 
-        // Add four bottom points  (9,10,11,12)
-        for (int i = 0; i < 4; i++)
-            addVertex(new Vector3(0, -1, 0), radius);
+        List<IFace> faces = new ArrayList<>();
 
-        /**
-         *  Now the 8 faces are:
-         *  
-         *  TOP HALF
-         *  1-4-5
-         *  2-5-6
-         *  3-6-7
-         *  0-7-8
-         *  
-         *  BOTTOM HALF
-         *  ?
-         */
-
-        // SEAM (+1): 1-5-13
-        Set<Integer> seam = new HashSet<Integer>();
-        seam.add(1);
-        seam.add(9);
-
-        List<IFace> faces = new ArrayList<IFace>();
-
-        // 4 top faces
-        addFace(faces, flipNormals, 2,5,6);
-        addFace(faces, flipNormals, 3,6,7);
-        addFace(faces, flipNormals, 4,7,8);
-        addFace(faces, flipNormals, 1,8,9);
-
-        // 4 bottom faces
-        //        addFace(faces, flipNormals, 13, 5, 6);
-        //        addFace(faces, flipNormals, 12, 8, 9);
-        //        addFace(faces, flipNormals, 11, 7, 8);
-        //        addFace(faces, flipNormals, 10, 6, 7);
+        // Add faces
+        for (int f = 0; f < 8; f++) {
+            addFace(faces, flipNormals, triangles[f * 3], triangles[f * 3 + 1], triangles[f * 3 + 2]);
+        }
 
         // refine triangles
-        for (int i = 0; i < divisions; i++) {
-            List<IFace> faces2 = new ArrayList<IFace>();
+        for (int division = 0; division < divisions; division++) {
+            List<IFace> faces2 = new ArrayList<>();
             for (IFace face : faces) {
                 // replace triangle by 4 triangles
                 int f0 = face.v()[0];
                 int f1 = face.v()[1];
                 int f2 = face.v()[2];
-                int a = getMiddlePoint(f0, f1, radius, seam);
-                int b = getMiddlePoint(f1, f2, radius, seam);
-                int c = getMiddlePoint(f2, f0, radius, seam);
+                int a = getMiddlePoint(f0, f1, radius);
+                int b = getMiddlePoint(f1, f2, radius);
+                int c = getMiddlePoint(f2, f0, radius);
 
                 addFace(faces2, flipNormals, face.v()[0], a, c);
                 addFace(faces2, flipNormals, face.v()[1], b, a);
@@ -184,8 +156,7 @@ public class OctahedronSphereCreator extends ModelCreator {
         this.faces = faces;
 
         addNormals();
-
-        addUV(seam);
+        //addUV(seam);
 
         return this;
     }

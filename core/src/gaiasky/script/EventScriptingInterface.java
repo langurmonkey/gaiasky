@@ -23,8 +23,11 @@ import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interafce.AddShapeDialog.Primitive;
+import gaiasky.interafce.AddShapeDialog.Shape;
 import gaiasky.interafce.ColormapPicker;
 import gaiasky.interafce.IGui;
+import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -442,7 +445,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setRotationCameraSpeed(final int speed) {
         setRotationCameraSpeed((float) speed);
     }
-
 
     @Override
     public void setCameraTurningSpeed(float speed) {
@@ -2902,6 +2904,42 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return exists;
         }
         return false;
+    }
+
+    @Override
+    public void addShapeAroundObject(String shapeName, String shape, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject) {
+        if (checkString(shapeName, "shapeName") && checkStringEnum(shape, Shape.class, "shape") && checkStringEnum(primitive, Primitive.class, "primitive") && checkNum(size, 0, Double.MAX_VALUE, "size") && checkObjectName(objectName)) {
+            GaiaSky.postRunnable(() -> {
+                IFocus object = getFocus(objectName);
+                float[] color = new float[] { r, g, b, a };
+                int primitiveInt = Primitive.valueOf(primitive.toUpperCase()).equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                final ShapeObject shapeObj;
+                if (trackObject) {
+                    shapeObj = new ShapeObject(new String[] { shapeName.trim() }, "Universe", object, objectName, showLabel, color);
+                } else {
+                    shapeObj = new ShapeObject(new String[] { shapeName.trim() }, "Universe", object.getAbsolutePosition(objectName, new Vector3b()), objectName, showLabel, color);
+                }
+                shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
+                shapeObj.size = (float) (size * Constants.KM_TO_U);
+                Map<String, Object> params = new HashMap<>();
+                params.put("quality", 25L);
+                params.put("divisions", shape.equals("octahedronsphere") ? 3L : 15L);
+                params.put("recursion", 3L);
+                params.put("diameter", 1.0);
+                params.put("width", 1.0);
+                params.put("height", 1.0);
+                params.put("depth", 1.0);
+                params.put("innerradius", 0.6);
+                params.put("outerradius", 1.0);
+                params.put("sphere-in-ring", false);
+                params.put("flip", false);
+                shapeObj.setModel(shape, primitiveInt, params);
+
+                shapeObj.doneLoading(GaiaSky.instance.assetManager);
+
+                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, shapeObj, false);
+            });
+        }
     }
 
     @Override

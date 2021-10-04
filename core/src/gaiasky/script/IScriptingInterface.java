@@ -452,7 +452,9 @@ public interface IScriptingInterface {
 
     /**
      * Changes the speed of the camera when it rotates around a focus.
+     *
      * @param speed The new rotation speed in [0,100]
+     *
      * @deprecated Use {@link IScriptingInterface#setCameraRotationSpeed(float)}
      */
     @Deprecated
@@ -469,6 +471,7 @@ public interface IScriptingInterface {
      * Changes the turning speed of the camera.
      *
      * @param speed The new turning speed, from 1 to 100.
+     *
      * @deprecated Use {@link IScriptingInterface#setCameraTurningSpeed(float)}
      */
     @Deprecated
@@ -507,6 +510,7 @@ public interface IScriptingInterface {
      * Sets the camera to track the object with the given name. In this mode,
      * the position of the camera is still dependent on the focus object (if any), but
      * its direction points to the tracking object.
+     *
      * @param objectName The name of the new tracking object.
      */
     void setCameraTrackingObject(String objectName);
@@ -2372,6 +2376,23 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be found.
      */
     boolean setDatasetHighlightAllVisible(String dsName, boolean allVisible);
+
+    /**
+     * Creates a shape object of the given type with the given size around the object with the given name.
+     *
+     * @param shapeName   The name of the shape object.
+     * @param shape       The shape type, one of <ul><li>sphere</li><li>icosphere</li><li>octahedronsphere</li><li>ring</li><li>cylinder</li><li>cone</li></ul>
+     * @param primitive   The primitive to use, one of <ul><li>lines</li><li>triangles</li></ul>. Use 'lines' to create a wireframe shape, use 'triangles' for a solid shape.
+     * @param size        The size of the object in kilometers.
+     * @param objectName  The name of the object to use as the position.
+     * @param r           The red component of the color in [0,1].
+     * @param g           The green component of the color in [0,1].
+     * @param b           The blue component of the color in [0,1].
+     * @param a           The alpha component of the color in [0,1].
+     * @param showLabel   Whether to show a label with the name of the shape.
+     * @param trackObject Whether to track the object if/when it moves.
+     */
+    void addShapeAroundObject(String shapeName, String shape, String primitive, double size, String objectName, float r, float g, float b, float a, boolean showLabel, boolean trackObject);
 
     /**
      * Sets the maximum simulation time allowed, in years. This sets the maximum time in the future (years)

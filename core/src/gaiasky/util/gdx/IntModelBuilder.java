@@ -791,6 +791,24 @@ public class IntModelBuilder {
         begin();
         // All in one part
         part("octahedronsphere", primitiveType, attributes, material).octahedronsphere(radius, divisions, flipNormals, hardEdges);
+        part("octahedronsphere", primitiveType, attributes, material).octahedronsphere(radius, divisions, flipNormals, hardEdges);
+        return end();
+    }
+
+    /**
+     * Convenience method to create a ring model. The resources the Materials might contain are not
+     * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
+     * the model.
+     *
+     * @param attributes
+     *            bitwise mask of the
+     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *            Position, Color, Normal and TextureCoordinates is supported.
+     */
+    public IntModel createRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, final Material materialShpere, final Material materialRing, final long attributes) {
+        begin();
+        part("ring", primitiveType, attributes, materialRing).ring(innerRingRadius, outerRingRadius, ringDivisions, false);
+        part("ring", primitiveType, attributes, materialRing).ring(new Matrix4().translate(0, -0.00001f, 0), innerRingRadius, outerRingRadius, ringDivisions, true);
         return end();
     }
 

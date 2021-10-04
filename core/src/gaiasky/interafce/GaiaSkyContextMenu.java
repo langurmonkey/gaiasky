@@ -6,7 +6,6 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -18,7 +17,6 @@ import gaiasky.GaiaSky;
 import gaiasky.data.stars.UncertaintiesHandler;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.interafce.AddShapeDialog.Primitive;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
@@ -136,40 +134,15 @@ public class GaiaSkyContextMenu extends ContextMenu {
             MenuItem addShape = new MenuItem(I18n.txt("context.shape.new", candidateNameShort), skin, skin.getDrawable("icon-elem-grids"));
             addShape.addListener(event -> {
                 if (event instanceof ChangeEvent) {
-                    AddShapeDialog dialog = new AddShapeDialog(I18n.txt("context.shape.new", candidateNameShort), candidate, skin, getStage());
+                    AddShapeDialog dialog = new AddShapeDialog(I18n.txt("context.shape.new", candidateNameShort), candidate, candidateName, skin, getStage());
                     dialog.setAcceptRunnable(() -> {
-                        double size = dialog.units.getSelected().toInternal(dialog.size.getDoubleValue(1)) * 2.0;
+                        double size = dialog.units.getSelected().toKm(dialog.size.getDoubleValue(1)) * 2.0;
                         float[] color = dialog.color.getPickedColor();
                         String shape = dialog.shape.getSelected().toString().toLowerCase(Locale.ROOT);
-                        int primitive = dialog.primitive.getSelected().equals(Primitive.LINES) ? GL20.GL_LINES : GL20.GL_TRIANGLES;
+                        String primitive = dialog.primitive.getSelected().toString();
+                        boolean showLabel = dialog.showLabel.isChecked();
                         boolean trackObj = dialog.track.isChecked();
-                        GaiaSky.postRunnable(() -> {
-                            final ShapeObject shapeObj;
-                            if (trackObj) {
-                                shapeObj = new ShapeObject(new String[] { dialog.name.getText().trim() }, "Universe", candidate, candidateName, color);
-                            } else {
-                                shapeObj = new ShapeObject(new String[] { dialog.name.getText().trim() }, "Universe", candidate.getAbsolutePosition(candidateName, new Vector3b()), candidateName, color);
-                            }
-                            shapeObj.ct = new ComponentTypes(ComponentType.Others.ordinal());
-                            shapeObj.size = (float) size;
-                            Map<String, Object> params = new HashMap<>();
-                            params.put("quality", 50L);
-                            params.put("divisions", shape.equals("octahedronsphere") ? 3L : 15L);
-                            params.put("recursion", 5L);
-                            params.put("diameter", 1.0);
-                            params.put("width", 1.0);
-                            params.put("height", 1.0);
-                            params.put("depth", 1.0);
-                            params.put("innerradius", 0.6);
-                            params.put("outerradius", 1.0);
-                            params.put("flip", false);
-                            shapeObj.setModel(shape, primitive, params);
-
-                            shapeObj.doneLoading(GaiaSky.instance.assetManager);
-
-                            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, shapeObj, false);
-                        });
-
+                        GaiaSky.instance.scripting().addShapeAroundObject(dialog.name.getText().trim(), shape, primitive, size, candidateName, color[0], color[1], color[2], color[3], showLabel, trackObj);
                     });
                     dialog.show(getStage());
                     return true;
