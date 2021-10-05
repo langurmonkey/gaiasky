@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 public class BookmarksManager implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(BookmarksManager.class);
 
-
     public static class BookmarkNode {
         // The name of this node
         public String name;
@@ -41,7 +40,7 @@ public class BookmarksManager implements IObserver {
         public void insert(BookmarkNode node) {
             if (node != null) {
                 initChildren();
-                if(!children.contains(node)) {
+                if (!children.contains(node)) {
                     children.add(node);
                     node.parent = this;
                 }
@@ -58,8 +57,8 @@ public class BookmarksManager implements IObserver {
             return path.toString();
         }
 
-        public BookmarkNode getFirstFolderAncestor(){
-            if(folder)
+        public BookmarkNode getFirstFolderAncestor() {
+            if (folder)
                 return this;
             else if (parent != null)
                 return parent.getFirstFolderAncestor();
@@ -85,7 +84,7 @@ public class BookmarksManager implements IObserver {
 
     public BookmarksManager() {
         initDefault();
-        EventManager.instance.subscribe(this, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL, Events.BOOKMARKS_MOVE);
+        EventManager.instance.subscribe(this, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL, Events.BOOKMARKS_MOVE, Events.BOOKMARKS_MOVE_UP, Events.BOOKMARKS_MOVE_DOWN);
     }
 
     private void initDefault() {
@@ -112,6 +111,7 @@ public class BookmarksManager implements IObserver {
 
     /**
      * Returns the internal list of bookmark nodes.
+     *
      * @return The list of {@link BookmarkNode} objects.
      */
     public List<BookmarkNode> getBookmarks() {
@@ -138,10 +138,7 @@ public class BookmarksManager implements IObserver {
 
     private List<BookmarkNode> loadBookmarks(Path file) {
         try (Stream<String> lines = Files.lines(file)) {
-            List<String> bookmarks = lines.filter(line -> !line.strip().startsWith("#"))
-                    .filter(line -> !line.isBlank())
-                    .map(String::strip)
-                    .collect(Collectors.toList());
+            List<String> bookmarks = lines.filter(line -> !line.strip().startsWith("#")).filter(line -> !line.isBlank()).map(String::strip).collect(Collectors.toList());
 
             nodes = new HashMap<>();
             this.bookmarks = new ArrayList<>();
@@ -180,7 +177,6 @@ public class BookmarksManager implements IObserver {
         return nodes != null && nodes.containsKey(path);
     }
 
-
     public synchronized void persistBookmarks() {
         persistBookmarks(bookmarksFile);
     }
@@ -217,6 +213,7 @@ public class BookmarksManager implements IObserver {
      * Adds a bookmark with the given path.
      *
      * @param path The path to add.
+     *
      * @return True if added.
      */
     public synchronized boolean addBookmark(String path, boolean folder) {
@@ -259,6 +256,7 @@ public class BookmarksManager implements IObserver {
      * Removes a bookmark by its path.
      *
      * @param path The path to remove
+     *
      * @return True if removed.
      */
     public synchronized boolean removeBookmark(String path) {
@@ -281,6 +279,7 @@ public class BookmarksManager implements IObserver {
      * Remove all bookmarks with the given name.
      *
      * @param name The name to remove.
+     *
      * @return Number of removed bookmarks.
      */
     public synchronized int removeBookmarksByName(String name) {
@@ -325,41 +324,68 @@ public class BookmarksManager implements IObserver {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-            case BOOKMARKS_ADD:
-                String name = (String) data[0];
-                boolean folder = (boolean) data[1];
-                if (addBookmark(name, folder))
-                    logger.info("Bookmark added: " + name);
-                break;
-            case BOOKMARKS_REMOVE:
-                name = (String) data[0];
-                if (removeBookmark(name))
-                    logger.info("Bookmark removed: " + name);
-                break;
-            case BOOKMARKS_REMOVE_ALL:
-                name = (String) data[0];
-                int removed = removeBookmarksByName(name);
-                logger.info(removed + " bookmarks with name " + name + " removed");
-                break;
-            case BOOKMARKS_MOVE:
-                BookmarkNode src = (BookmarkNode) data[0];
-                BookmarkNode dest = (BookmarkNode) data[1];
-                if(dest == null){
-                    // Move to root
+        case BOOKMARKS_ADD:
+            String name = (String) data[0];
+            boolean folder = (boolean) data[1];
+            if (addBookmark(name, folder))
+                logger.info("Bookmark added: " + name);
+            break;
+        case BOOKMARKS_REMOVE:
+            name = (String) data[0];
+            if (removeBookmark(name))
+                logger.info("Bookmark removed: " + name);
+            break;
+        case BOOKMARKS_REMOVE_ALL:
+            name = (String) data[0];
+            int removed = removeBookmarksByName(name);
+            logger.info(removed + " bookmarks with name " + name + " removed");
+            break;
+        case BOOKMARKS_MOVE:
+            BookmarkNode src = (BookmarkNode) data[0];
+            BookmarkNode dest = (BookmarkNode) data[1];
+            if (dest == null) {
+                // Move to root
+                removeBookmark(src.path.toString());
+                addBookmark(src.name, false);
+            } else {
+                // Move to dest folder
+                if (dest.folder) {
                     removeBookmark(src.path.toString());
-                    addBookmark(src.name, false);
+                    addBookmark(dest.path.resolve(src.name).toString(), false);
                 } else {
-                    // Move to dest folder
-                    if (dest.folder) {
-                        removeBookmark(src.path.toString());
-                        addBookmark(dest.path.resolve(src.name).toString(), false);
-                    } else {
-                        logger.error("Destination is not a folder: " + dest);
-                    }
+                    logger.error("Destination is not a folder: " + dest);
                 }
-                break;
-            default:
-                break;
+            }
+            break;
+        case BOOKMARKS_MOVE_UP:
+            BookmarkNode bookmark = (BookmarkNode) data[0];
+            List<BookmarkNode> list;
+            if (bookmark.parent != null) {
+                list = bookmark.parent.children;
+            } else {
+                list = bookmarks;
+            }
+            int idx = list.indexOf(bookmark);
+            if (idx > 0) {
+                list.remove(idx);
+                list.add(idx - 1, bookmark);
+            }
+            break;
+        case BOOKMARKS_MOVE_DOWN:
+            bookmark = (BookmarkNode) data[0];
+            if (bookmark.parent != null) {
+                list = bookmark.parent.children;
+            } else {
+                list = bookmarks;
+            }
+            idx = list.indexOf(bookmark);
+            if (idx < list.size() - 1) {
+                list.remove(idx);
+                list.add(idx + 1, bookmark);
+            }
+            break;
+        default:
+            break;
         }
     }
 }

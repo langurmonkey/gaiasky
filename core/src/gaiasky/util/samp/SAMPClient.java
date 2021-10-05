@@ -196,16 +196,16 @@ public class SAMPClient implements IObserver {
 
     public String getStatus() {
         if (conn == null) {
-            return "Not initialized";
+            return I18n.txt("gui.debug.samp.notinit");
         } else {
             if (conn.isConnected()) {
                 try {
-                    return "Connected: " + conn.getConnection().getRegInfo().getHubId();
+                    return I18n.txt("gui.debug.samp.connected", conn.getConnection().getRegInfo().getHubId());
                 } catch (Exception e) {
-                    return "Error getting state";
+                    return I18n.txt("gui.debug.samp.error");
                 }
             } else {
-                return "Not connected";
+                return I18n.txt("gui.debug.samp.notconnected");
             }
         }
     }

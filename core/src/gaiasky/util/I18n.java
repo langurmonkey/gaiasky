@@ -50,14 +50,14 @@ public class I18n {
             Locale.setDefault(locale);
         }
         try {
-            bundle = I18NBundle.createBundle(baseFileHandle, locale);
+            bundle = I18NBundle.createBundle(baseFileHandle, locale, "ISO-8859-1");
             return true;
         } catch (MissingResourceException e) {
             logger.info(e.getLocalizedMessage());
             // Use default locale - en_GB
             locale = new Locale("en", "GB");
             try {
-                bundle = I18NBundle.createBundle(baseFileHandle, locale);
+                bundle = I18NBundle.createBundle(baseFileHandle, locale, "ISO-8859-1");
             } catch (Exception e2) {
                 logger.error(e);
             }

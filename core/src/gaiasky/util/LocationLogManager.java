@@ -132,8 +132,7 @@ public class LocationLogManager implements IObserver {
                 }
                 locations.add(record);
                 EventManager.instance.post(Events.NEW_LOCATION_RECORD, locations);
-                logger.debug("New location record:");
-                logger.debug(record.toStringFull());
+                logger.debug(I18n.txt("gui.locationlog.newrecord", record.toStringFull()));
             }
         }
     }

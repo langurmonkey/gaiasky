@@ -74,7 +74,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
-    private OwnSelectBox<String> theme, recgridOrigin;
+    private OwnSelectBox<String> recgridOrigin;
+    private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
     private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
@@ -752,11 +753,22 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // THEME
         OwnLabel themeLabel = new OwnLabel(I18n.txt("gui.ui.theme"), skin);
         themeLabel.setWidth(labelWidth);
-        String[] themes = new String[] { "dark-green", "dark-blue", "dark-orange", "night-red" };
+
+        StrComboBoxBean[] themes = new StrComboBoxBean[] { new StrComboBoxBean(I18n.txt("gui.theme.darkgreen"), "dark-green"), new StrComboBoxBean(I18n.txt("gui.theme.darkblue"), "dark-blue"), new StrComboBoxBean(I18n.txt("gui.theme.darkorange"), "dark-orange"), new StrComboBoxBean(I18n.txt("gui.theme.nightred"), "night-red") };
         theme = new OwnSelectBox<>(skin);
         theme.setWidth(textWidth * 3f);
         theme.setItems(themes);
-        theme.setSelected(settings.program.ui.theme);
+        int themeIndex;
+        if (settings.program.ui.theme.contains("dark-green")) {
+            themeIndex = 0;
+        } else if (settings.program.ui.theme.contains("dark-blue")) {
+            themeIndex = 1;
+        } else if (settings.program.ui.theme.contains("dark-orange")) {
+            themeIndex = 2;
+        } else {
+            themeIndex = 3;
+        }
+        theme.setSelectedIndex(themeIndex);
 
         // SCALING
         OwnLabel uiScalelabel = new OwnLabel(I18n.txt("gui.ui.theme.scale"), skin);
@@ -1996,15 +2008,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Interface
         LangComboBoxBean lbean = lang.getSelected();
-        String newTheme = theme.getSelected();
+        StrComboBoxBean newTheme = theme.getSelected();
         // UI scale
         float factor = uiScale.getMappedValue();
         EventManager.instance.post(Events.UI_SCALE_CMD, factor);
 
-        boolean reloadUI = !settings.program.ui.theme.equals(newTheme) || !lbean.locale.toLanguageTag().equals(settings.program.locale) || settings.program.minimap.size != minimapSize.getValue();
+        boolean reloadUI = !settings.program.ui.theme.equals(newTheme.value) || !lbean.locale.toLanguageTag().equals(settings.program.locale) || settings.program.minimap.size != minimapSize.getValue();
         settings.program.locale = lbean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/gsbundle"));
-        settings.program.ui.theme = newTheme;
+        settings.program.ui.theme = newTheme.value;
         boolean previousPointerCoords = settings.program.pointer.coordinates;
         settings.program.pointer.coordinates = pointerCoords.isChecked();
         if (previousPointerCoords != settings.program.pointer.coordinates) {

@@ -177,11 +177,11 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 String parentName = "/" + (parent == null ? "" : parent.path.toString());
                                 MenuItem newFolder = new MenuItem(I18n.txt("gui.bookmark.context.newfolder", parentName), skin);
                                 newFolder.addListener(evt -> {
-                                    if (evt instanceof ChangeEvent && parent != null) {
-                                        NewBookmarkFolderDialog newBookmarkFolderDialog = new NewBookmarkFolderDialog(parent.path.toString(), skin, stage);
+                                    if (evt instanceof ChangeEvent) {
+                                        NewBookmarkFolderDialog newBookmarkFolderDialog = new NewBookmarkFolderDialog(parent != null ? parent.path.toString() : "/", skin, stage);
                                         newBookmarkFolderDialog.setAcceptRunnable(() -> {
                                             String folderName = newBookmarkFolderDialog.input.getText();
-                                            EventManager.instance.post(Events.BOOKMARKS_ADD, parent.path.resolve(folderName).toString(), true);
+                                            EventManager.instance.post(Events.BOOKMARKS_ADD, parent != null ? parent.path.resolve(folderName).toString() : folderName, true);
                                             reloadBookmarksTree();
                                         });
                                         newBookmarkFolderDialog.show(stage);
@@ -203,17 +203,43 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 cm.addItem(delete);
 
                                 cm.add(new Separator(skin, "menu")).padTop(2).padBottom(2).fill().expand().row();
-                                // Move to...
-                                MenuItem move = new MenuItem(I18n.txt("gui.bookmark.context.move", target.getValue(), "/"), skin);
-                                move.addListener(evt -> {
+
+                                // Move up and down
+                                MenuItem moveUp = new MenuItem(I18n.txt("gui.bookmark.context.move.up"), skin);
+                                moveUp.addListener(evt -> {
                                     if (evt instanceof ChangeEvent) {
-                                        EventManager.instance.post(Events.BOOKMARKS_MOVE, target.node, null);
+                                        EventManager.instance.post(Events.BOOKMARKS_MOVE_UP, target.node);
                                         reloadBookmarksTree();
                                         return true;
                                     }
                                     return false;
                                 });
-                                cm.addItem(move);
+                                cm.addItem(moveUp);
+                                MenuItem moveDown = new MenuItem(I18n.txt("gui.bookmark.context.move.down"), skin);
+                                moveDown.addListener(evt -> {
+                                    if (evt instanceof ChangeEvent) {
+                                        EventManager.instance.post(Events.BOOKMARKS_MOVE_DOWN, target.node);
+                                        reloadBookmarksTree();
+                                        return true;
+                                    }
+                                    return false;
+                                });
+                                cm.addItem(moveDown);
+
+
+                                // Move to...
+                                if(target.node.parent != null) {
+                                    MenuItem move = new MenuItem(I18n.txt("gui.bookmark.context.move", target.getValue(), "/"), skin);
+                                    move.addListener(evt -> {
+                                        if (evt instanceof ChangeEvent) {
+                                            EventManager.instance.post(Events.BOOKMARKS_MOVE, target.node, null);
+                                            reloadBookmarksTree();
+                                            return true;
+                                        }
+                                        return false;
+                                    });
+                                    cm.addItem(move);
+                                }
                                 List<BookmarkNode> folders = GaiaSky.instance.getBookmarksManager().getFolders();
                                 for (BookmarkNode folder : folders) {
                                     if (!target.node.isDescendantOf(folder)) {

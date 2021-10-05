@@ -118,7 +118,7 @@ public class AboutWindow extends GenericDialog {
         Link homepageLink = new Link(Settings.settings.WEBPAGE, linkStyle, Settings.settings.WEBPAGE);
 
         // Wiki
-        Label docsTitle = new OwnLabel("Docs", skin);
+        Label docsTitle = new OwnLabel(I18n.txt("gui.help.docs"), skin);
         Label docsTxt = new OwnLabel(I18n.txt("gui.help.help2"), skin);
         Link docsLink = new Link(Settings.settings.DOCUMENTATION, linkStyle, Settings.settings.DOCUMENTATION);
 

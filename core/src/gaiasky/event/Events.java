@@ -88,6 +88,10 @@ public enum Events {
     BOOKMARKS_REMOVE_ALL,
     /** Moves the bookmark 1 to a child of bookmark 2 **/
     BOOKMARKS_MOVE,
+    /** Moves the bookmark up in the list of its parent **/
+    BOOKMARKS_MOVE_UP,
+    /** Moves the bookmark down in the list of its parent **/
+    BOOKMARKS_MOVE_DOWN,
 
     /**
      * Empty event which informs that background loading is active

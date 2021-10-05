@@ -25,7 +25,6 @@ import java.time.temporal.ChronoField;
 
 /**
  * A dialog to pick a date.
- * TODO Migrate to GenericDialog
  */
 public class DateDialog extends CollapsibleWindow {
     private final OwnWindow me;
@@ -43,8 +42,8 @@ public class DateDialog extends CollapsibleWindow {
 
         float pad = 8f;
 
-        /** SET NOW **/
-        setNow = new OwnTextButton("Set current time (UTC)", skin);
+        // SET NOW
+        setNow = new OwnTextButton(I18n.txt("gui.pickdate.setcurrent"), skin);
         setNow.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 updateTime(Instant.now(), ZoneOffset.UTC);
@@ -56,7 +55,7 @@ public class DateDialog extends CollapsibleWindow {
         add(setNow).center().colspan(2).padTop(pad);
         row();
 
-        /** DAY GROUP **/
+        // DAY GROUP
         HorizontalGroup dayGroup = new HorizontalGroup();
         dayGroup.space(pad);
         day = new OwnTextField("", skin);
@@ -73,8 +72,8 @@ public class DateDialog extends CollapsibleWindow {
             return false;
         });
 
-        month = new SelectBox<String>(skin);
-        month.setItems("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec");
+        month = new SelectBox<>(skin);
+        month.setItems(I18n.txt("gui.date.jan"), I18n.txt("gui.date.feb"), I18n.txt("gui.date.mar"), I18n.txt("gui.date.apr"), I18n.txt("gui.date.may"), I18n.txt("gui.date.jun"), I18n.txt("gui.date.jul"), I18n.txt("gui.date.aug"), I18n.txt("gui.date.sep"), I18n.txt("gui.date.oct"), I18n.txt("gui.date.nov"), I18n.txt("gui.date.dec"));
         month.setWidth(64f);
 
         year = new OwnTextField("", skin);
@@ -97,11 +96,11 @@ public class DateDialog extends CollapsibleWindow {
         dayGroup.addActor(new OwnLabel("/", skin));
         dayGroup.addActor(year);
 
-        add(new OwnLabel(I18n.txt("gui.time.date") + " (dd/MM/yyyy):", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.txt("gui.time.date") + " (" + I18n.txt("gui.time.date.format") + ":", skin)).pad(pad, pad, 0, pad * 2).right();
         add(dayGroup).pad(pad, 0, 0, pad);
         row();
 
-        /** HOUR GROUP **/
+        // HOUR GROUP
         HorizontalGroup hourGroup = new HorizontalGroup();
         hourGroup.space(pad);
         hour = new OwnTextField("", skin);
@@ -152,11 +151,11 @@ public class DateDialog extends CollapsibleWindow {
         hourGroup.addActor(new OwnLabel(":", skin));
         hourGroup.addActor(sec);
 
-        add(new OwnLabel(I18n.txt("gui.time.time") + " (hh:mm:ss):", skin)).pad(pad, pad, 0, pad * 2).right();
+        add(new OwnLabel(I18n.txt("gui.time.time")+ " (" + I18n.txt("gui.time.time.format")+ ":", skin)).pad(pad, pad, 0, pad * 2).right();
         add(hourGroup).pad(pad, 0, 0, pad);
         row();
 
-        /** BUTTONS **/
+        // BUTTONS
         HorizontalGroup buttonGroup = new HorizontalGroup();
         buttonGroup.pad(pad);
         buttonGroup.space(pad);
@@ -214,15 +213,13 @@ public class DateDialog extends CollapsibleWindow {
 
     /**
      * Returns true if all is good
-     * 
-     * @param f
-     *            The text field
-     * @param min
-     *            The minimum value
-     * @param max
-     *            The maximum value
+     *
+     * @param f   The text field
+     * @param min The minimum value
+     * @param max The maximum value
+     *
      * @return The boolean indicating whether the value in this field is between
-     *         min and max
+     * min and max
      */
     public boolean checkField(TextField f, int min, int max) {
         try {

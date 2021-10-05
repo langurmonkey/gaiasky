@@ -154,17 +154,17 @@ public class GlobalResources {
         d = d * Constants.U_TO_KM;
         if (Math.abs(d) < 1f) {
             // m
-            return new Pair<>((d * 1000), "m");
+            return new Pair<>((d * 1000), I18n.txt("gui.unit.m"));
         }
         if (Math.abs(d) < 0.1 * Nature.AU_TO_KM) {
             // km
-            return new Pair<>(d, "km");
+            return new Pair<>(d, I18n.txt("gui.unit.km"));
         } else if (Math.abs(d) < 0.1 * du.toKm) {
             // AU
-            return new Pair<>(d * Nature.KM_TO_AU, "AU");
+            return new Pair<>(d * Nature.KM_TO_AU, I18n.txt("gui.unit.au"));
         } else {
             // distance units
-            return new Pair<>((d * du.fromKm), du.unitString);
+            return new Pair<>((d * du.fromKm), du.getUnitString());
         }
     }
 
@@ -478,12 +478,12 @@ public class GlobalResources {
     }
 
     /**
-     * Converts bytes to a human readable format
+     * Converts bytes to a human-readable format
      *
      * @param bytes The bytes
      * @param si    Whether to use SI units (1000-multiples) or binary (1024-multiples)
      *
-     * @return The size in a human readable form
+     * @return The size in a human-readable form
      */
     public static String humanReadableByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
@@ -599,7 +599,7 @@ public class GlobalResources {
 
     /**
      * Converts the string array into a whitespace-separated string
-     * where each element is double quoted.
+     * where each element is double-quoted.
      *
      * @param l The string array
      *
@@ -773,12 +773,22 @@ public class GlobalResources {
     }
 
     public static String nObjectsToString(long objects) {
-        if (objects > 1e9) {
-            return String.format("%.1f", objects / 1.0e9) + " B";
+        if (objects > 1e18) {
+            return String.format("%1$.1f %2$s", objects / 1.0e18, I18n.txt("gui.unit.exa"));
+        } else if (objects > 1e15) {
+            return String.format("%1$.1f %2$s", objects / 1.0e15, I18n.txt("gui.unit.peta"));
+        } else if (objects > 1e12) {
+            return String.format("%1$.1f %2$s", objects / 1.0e12, I18n.txt("gui.unit.tera"));
+        } else if (objects > 1e9) {
+            return String.format("%1$.1f %2$s", objects / 1.0e9, I18n.txt("gui.unit.giga"));
         } else if (objects > 1e6) {
-            return String.format("%.1f", objects / 1.0e6) + " M";
+            return String.format("%1$.1f %2$s", objects / 1.0e6, I18n.txt("gui.unit.mega"));
         } else if (objects > 1e3) {
-            return String.format("%.1f", objects / 1.0e3) + " K";
+            return String.format("%1$.1f %2$s", objects / 1.0e3, I18n.txt("gui.unit.kilo"));
+        } else if (objects > 1e2) {
+            return String.format("%1$.1f %2$s", objects / 1.0e2, I18n.txt("gui.unit.hecto"));
+        } else if (objects > 1e1) {
+            return String.format("%1$.1f %2$s", objects / 1.0e1, I18n.txt("gui.unit.deca"));
         } else {
             return objects + "";
         }
@@ -791,15 +801,15 @@ public class GlobalResources {
         double days = hours / 24d;
         double years = days / 365.25d;
         if (seconds < 60) {
-            return String.format("%.0f", seconds) + " s";
+            return String.format("%1$.0f %2$s", seconds, I18n.txt("gui.unit.second"));
         } else if (minutes < 60) {
-            return String.format("%.0f", minutes) + " m";
+            return String.format("%1$.0f %2$s", minutes, I18n.txt("gui.unit.minute"));
         } else if (hours < 24) {
-            return String.format("%.0f", hours) + " h";
+            return String.format("%1$.0f %2$s", hours, I18n.txt("gui.unit.hour"));
         } else if (days < 365.25d) {
-            return String.format("%.0f", days) + " d";
+            return String.format("%1$.0f %2$s", days, I18n.txt("gui.unit.day"));
         } else {
-            return String.format("%.0f", years) + " y";
+            return String.format("%1$.0f %2$s", years, I18n.txt("gui.unit.year"));
         }
 
     }

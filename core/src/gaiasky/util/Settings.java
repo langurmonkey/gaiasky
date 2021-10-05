@@ -1593,11 +1593,15 @@ public class Settings {
         public final double toKm;
         // Factor to apply to kilometers to get this unit
         public final double fromKm;
-        public final String unitString;
+        private final String unitString;
         DistanceUnits(double toKm, double fromKm, String unitString){
             this.toKm = toKm;
             this.fromKm = fromKm;
             this.unitString = unitString;
+        }
+
+        public String getUnitString(){
+           return I18n.txt("gui.unit." + this.unitString);
         }
     }
 }

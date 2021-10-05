@@ -26,6 +26,8 @@ import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
+import javax.tools.Tool;
+
 public class MusicComponent extends GuiComponent implements IObserver {
 
     protected ImageButton prev, play, next;
@@ -84,7 +86,8 @@ public class MusicComponent extends GuiComponent implements IObserver {
         next.addListener(new OwnTextTooltip(I18n.txt("gui.music.next"), skin));
 
         /* Volume */
-        vol = new OwnLabel("VOL: " + nf.format(getVolumePercentage()) + "%", skin, "mono");
+        vol = new OwnLabel(I18n.txt("gui.music.volume.short")+ ": " + nf.format(getVolumePercentage()) + "%", skin, "mono-pink");
+        vol.addListener(new OwnTextTooltip(I18n.txt("gui.music.volume"), skin));
         vol.receiveScrollEvents();
         vol.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -94,7 +97,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
                     float currentVol = getVolume();
                     float newVol = Math.max(0f, Math.min(1f, currentVol + scroll));
                     EventManager.instance.post(Events.MUSIC_VOLUME_CMD, newVol);
-                    vol.setText("VOL: " + nf.format(getVolumePercentage()) + "%");
+                    vol.setText(I18n.txt("gui.music.volume.short") + ": " + nf.format(getVolumePercentage()) + "%");
                     return true;
                 }
             }

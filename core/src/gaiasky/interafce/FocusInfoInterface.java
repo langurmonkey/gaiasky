@@ -129,7 +129,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         viewRADEC = new OwnLabel("", skin, "hud");
         viewRADEC.setWidth(pointerWidth);
         float labelWidth = 80f;
-        lonLatLabel = new OwnLabel("Lat/Lon", skin, "hud");
+        lonLatLabel = new OwnLabel(I18n.txt("gui.focusinfo.latlon"), skin, "hud");
         lonLatLabel.setWidth(labelWidth);
         RADECPointerLabel = new OwnLabel(I18n.txt("gui.focusinfo.alpha") + "/" + I18n.txt("gui.focusinfo.delta"), skin, "hud");
         RADECPointerLabel.setWidth(labelWidth);
@@ -371,6 +371,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
     @Override
     public void notify(final Events event, final Object... data) {
+        final String deg = I18n.txt("gui.unit.deg");
         final Settings s = Settings.settings;
         switch (event) {
         case FOCUS_CHANGED -> {
@@ -476,19 +477,19 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
             Vector2d posSph = focus.getPosSph();
             if (posSph != null && posSph.len() > 0f) {
-                focusRA.setText(nf.format(posSph.x) + "°");
-                focusDEC.setText(nf.format(posSph.y) + "°");
+                focusRA.setText(nf.format(posSph.x) + deg);
+                focusDEC.setText(nf.format(posSph.y) + deg);
             } else {
                 Coordinates.cartesianToSpherical(focus.getAbsolutePosition(posb), pos);
 
-                focusRA.setText(nf.format(MathUtilsd.radDeg * pos.x % 360) + "°");
-                focusDEC.setText(nf.format(MathUtilsd.radDeg * pos.y % 360) + "°");
+                focusRA.setText(nf.format(MathUtilsd.radDeg * pos.x % 360) + deg);
+                focusDEC.setText(nf.format(MathUtilsd.radDeg * pos.y % 360) + deg);
             }
             if (focus instanceof IProperMotion) {
                 IProperMotion part = (IProperMotion) focus;
-                focusMuAlpha.setText(nf.format(part.getMuAlpha()) + " mas/yr");
-                focusMuDelta.setText(nf.format(part.getMuDelta()) + " mas/yr");
-                focusRadVel.setText(nf.format(part.getRadialVelocity()) + " km/s");
+                focusMuAlpha.setText(nf.format(part.getMuAlpha()) + " " + I18n.txt("gui.unit.masyr"));
+                focusMuDelta.setText(nf.format(part.getMuDelta()) + " " + I18n.txt("gui.unit.masyr"));
+                focusRadVel.setText(nf.format(part.getRadialVelocity()) + " " + I18n.txt("gui.unit.kms"));
             } else {
                 focusMuAlpha.setText("-");
                 focusMuDelta.setText("-");
@@ -555,7 +556,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             if (ComponentType.values()[focus.getCt().getFirstOrdinal()] == ComponentType.Stars) {
                 focusRadius.setText("-");
             } else {
-                focusRadius.setText(sf.format(focus.getRadius() * Constants.U_TO_KM) + " km");
+                focusRadius.setText(sf.format(focus.getRadius() * Constants.U_TO_KM) + " " + I18n.txt("gui.unit.km"));
             }
 
             // Update more info table
@@ -564,7 +565,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 externalInfoUpdater.update(focus);
         }
         case FOCUS_INFO_UPDATED -> {
-            focusAngle.setText(sf.format(Math.toDegrees((double) data[1]) % 360) + "°");
+            focusAngle.setText(sf.format(Math.toDegrees((double) data[1]) % 360) + deg);
 
             // Dist to cam
             Pair<Double, String> distCam = GlobalResources.doubleToDistanceString((double) data[0], s.program.ui.distanceUnits);
@@ -584,8 +585,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 // Apparent magnitude from Earth
                 focusAppMagEarth.setText(nf.format((double) data[6]));
             }
-            focusRA.setText(nf.format((double) data[2] % 360) + "°");
-            focusDEC.setText(nf.format((double) data[3] % 360) + "°");
+            focusRA.setText(nf.format((double) data[2] % 360) + deg);
+            focusDEC.setText(nf.format((double) data[3] % 360) + deg);
         }
         case CAMERA_MOTION_UPDATE -> {
             final Vector3b campos = (Vector3b) data[0];
@@ -593,7 +594,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             Pair<Double, String> y = GlobalResources.doubleToDistanceString(campos.y, s.program.ui.distanceUnits);
             Pair<Double, String> z = GlobalResources.doubleToDistanceString(campos.z, s.program.ui.distanceUnits);
             String camPosStr = "[" + sf.format(x.getFirst()) + " " + x.getSecond() + ", " + sf.format(y.getFirst()) + " " + y.getSecond() + ", " + sf.format(z.getFirst()) + " " + z.getSecond() + "]";
-            camVel.setText(sf.format((double) data[1]) + " km/h");
+            camVel.setText(sf.format((double) data[1]) + " " + I18n.txt("gui.unit.kmh"));
             camPos.setText(TextUtils.capString(camPosStr, 40));
             camPos.addListener(new OwnTextTooltip(camPosStr, skin));
         }
@@ -618,15 +619,15 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         case LON_LAT_UPDATED -> {
             Double lon = (Double) data[0];
             Double lat = (Double) data[1];
-            pointerLonLat.setText(nf.format(lat) + "°/" + nf.format(lon) + "°");
+            pointerLonLat.setText(nf.format(lat) + deg + "/" + nf.format(lon) + deg);
         }
         case RA_DEC_UPDATED -> {
             Double pra = (Double) data[0];
             Double pdec = (Double) data[1];
             Double vra = (Double) data[2];
             Double vdec = (Double) data[3];
-            pointerRADEC.setText(nf.format(pra) + "°/" + nf.format(pdec) + "°");
-            viewRADEC.setText(nf.format(vra) + "°/" + nf.format(vdec) + "°");
+            pointerRADEC.setText(nf.format(pra) + deg + "/" + nf.format(pdec) + deg);
+            viewRADEC.setText(nf.format(vra) + deg + "/" + nf.format(vdec) + deg);
         }
         case RULER_ATTACH_0 -> {
             String n0 = (String) data[0];

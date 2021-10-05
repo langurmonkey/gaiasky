@@ -135,7 +135,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         fadeInGroup.addActor(fadeInMin);
         fadeInGroup.addActor(new OwnLabel(", ", skin));
         fadeInGroup.addActor(fadeInMax);
-        fadeInGroup.addActor(new OwnLabel("] pc", skin));
+        fadeInGroup.addActor(new OwnLabel("] " + I18n.txt("gui.unit.pc"), skin));
         fadeIn.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 boolean disable = !fadeIn.isChecked();
@@ -172,7 +172,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         fadeOutGroup.addActor(fadeOutMin);
         fadeOutGroup.addActor(new OwnLabel(", ", skin));
         fadeOutGroup.addActor(fadeOutMax);
-        fadeOutGroup.addActor(new OwnLabel("] pc", skin));
+        fadeOutGroup.addActor(new OwnLabel("] " + I18n.txt("gui.unit.pc"), skin));
         fadeOut.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 boolean disable = !fadeOut.isChecked();
@@ -359,7 +359,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
             });
         } else {
             // Add
-            filterTable.add(new OwnLabel("No filters yet", skin)).left().padBottom(pad10).row();
+            filterTable.add(new OwnLabel(I18n.txt("gui.dataset.filter.nofilters"), skin)).left().padBottom(pad10).row();
             OwnTextIconButton addFilter = new OwnTextIconButton(I18n.txt("gui.dataset.filter.add"), skin, "add");
             addFilter.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.filter.add"), skin));
             addFilter.pad(pad10);
