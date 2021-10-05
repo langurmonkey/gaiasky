@@ -148,7 +148,11 @@ public class AddShapeDialog extends GenericDialog {
 
     private void recomputeObjectName() {
         if (canRecomputeName) {
-            String newName = size.getText() + " " + units.getSelected().text() + " from " + objectName;
+            String newName = size.getText()
+                    + " "
+                    + units.getSelected().text()
+                    + " from "
+                    + objectName;
             name.setText(newName);
             canRecomputeName = true;
         }

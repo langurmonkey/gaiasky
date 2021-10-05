@@ -39,7 +39,6 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.*;
-import org.lwjgl.system.CallbackI.V;
 
 import java.io.File;
 import java.io.IOException;
@@ -91,7 +90,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     // Backup values
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
-    private boolean lensflareBak, lightglowBak, debugInfoBak, motionblurBak;
+    private boolean lensflareBak, lightGlowBak, debugInfoBak, motionblurBak;
     private Settings settings;
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
@@ -113,8 +112,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.instance.subscribe(this, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO);
     }
 
-    private OwnTextIconButton createTab(String title, Image img, Skin skin, String style) {
-        OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, style);
+    private OwnTextIconButton createTab(String title, Image img, Skin skin) {
+        OwnTextIconButton tab = new OwnTextIconButton(TextUtils.capString(title, 26), img, skin, "toggle-big");
         tab.addListener(new OwnTextTooltip(title, skin));
         tab.pad(pad5);
         tab.setWidth(480f);
@@ -137,18 +136,18 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table group = new Table(skin);
         group.align(Align.left | Align.top);
 
-        final OwnTextIconButton tabGraphics = createTab(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin, "toggle-big");
-        final OwnTextIconButton tabUI = createTab(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin, "toggle-big");
-        final OwnTextIconButton tabPerformance = createTab(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin, "toggle-big");
-        final OwnTextIconButton tabControls = createTab(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin, "toggle-big");
-        final OwnTextIconButton tabScreenshots = createTab(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin, "toggle-big");
-        final OwnTextIconButton tabFrames = createTab(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin, "toggle-big");
-        final OwnTextIconButton tabCamera = createTab(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin, "toggle-big");
-        final OwnTextIconButton tab360 = createTab(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin, "toggle-big");
-        final OwnTextIconButton tabPlanetarium = createTab(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin, "toggle-big");
-        final OwnTextIconButton tabData = createTab(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin, "toggle-big");
-        final OwnTextIconButton tabGaia = createTab(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin, "toggle-big");
-        final OwnTextIconButton tabSystem = createTab(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin, "toggle-big");
+        final OwnTextIconButton tabGraphics = createTab(I18n.txt("gui.graphicssettings"), new Image(skin.getDrawable("iconic-bolt")), skin);
+        final OwnTextIconButton tabUI = createTab(I18n.txt("gui.ui.interfacesettings"), new Image(skin.getDrawable("iconic-browser")), skin);
+        final OwnTextIconButton tabPerformance = createTab(I18n.txt("gui.performance"), new Image(skin.getDrawable("iconic-dial")), skin);
+        final OwnTextIconButton tabControls = createTab(I18n.txt("gui.controls"), new Image(skin.getDrawable("iconic-laptop")), skin);
+        final OwnTextIconButton tabScreenshots = createTab(I18n.txt("gui.screenshots"), new Image(skin.getDrawable("iconic-image")), skin);
+        final OwnTextIconButton tabFrames = createTab(I18n.txt("gui.frameoutput.title"), new Image(skin.getDrawable("iconic-layers")), skin);
+        final OwnTextIconButton tabCamera = createTab(I18n.txt("gui.camerarec.title"), new Image(skin.getDrawable("iconic-camera-slr")), skin);
+        final OwnTextIconButton tab360 = createTab(I18n.txt("gui.360.title"), new Image(skin.getDrawable("iconic-cubemap")), skin);
+        final OwnTextIconButton tabPlanetarium = createTab(I18n.txt("gui.planetarium.title"), new Image(skin.getDrawable("iconic-dome")), skin);
+        final OwnTextIconButton tabData = createTab(I18n.txt("gui.data"), new Image(skin.getDrawable("iconic-clipboard")), skin);
+        final OwnTextIconButton tabGaia = createTab(I18n.txt("gui.gaia"), new Image(skin.getDrawable("iconic-gaia")), skin);
+        final OwnTextIconButton tabSystem = createTab(I18n.txt("gui.system"), new Image(skin.getDrawable("iconic-terminal")), skin);
 
         group.add(tabGraphics).row();
         group.add(tabUI).row();
@@ -397,7 +396,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lensFlare.setChecked(settings.postprocess.lensFlare);
 
         // LIGHT GLOW
-        lightglowBak = settings.postprocess.lightGlow;
+        lightGlowBak = settings.postprocess.lightGlow;
         CheckBox lightGlow = new OwnCheckBox(I18n.txt("gui.lightscattering"), skin, pad5);
         lightGlow.setName("light scattering");
         lightGlow.setChecked(settings.postprocess.lightGlow);
@@ -1818,12 +1817,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         GlobalResources.listRecursive(mappingsData, mappingFiles, ".inputListener", ".controller");
         FileComboBoxBean selected = null;
         for (Path path : mappingFiles) {
-            FileComboBoxBean fcbb = new MappingFileComboBoxBean(path);
-            controllerMappingsFiles.add(fcbb);
+            FileComboBoxBean fileBean = new MappingFileComboBoxBean(path);
+            controllerMappingsFiles.add(fileBean);
             if (selectedFile == null && settings.controls.gamepad.mappingsFile.endsWith(path.getFileName().toString())) {
-                selected = fcbb;
+                selected = fileBean;
             } else if (selectedFile != null && selectedFile.toAbsolutePath().toString().endsWith(path.getFileName().toString())) {
-                selected = fcbb;
+                selected = fileBean;
             }
         }
 
@@ -1941,8 +1940,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private void saveCurrentPreferences() {
         // Add all properties to settings.instance
 
-        final boolean reloadFullscreenMode = fullscreen.isChecked() != settings.graphics.fullScreen.active;
-        final boolean reloadScreenMode = reloadFullscreenMode || (settings.graphics.fullScreen.active && (settings.graphics.fullScreen.resolution[0] != fullscreenResolutions.getSelected().width || settings.graphics.fullScreen.resolution[1] != fullscreenResolutions.getSelected().height)) || (!settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
+        final boolean reloadFullScreenMode = fullscreen.isChecked() != settings.graphics.fullScreen.active;
+        final boolean reloadScreenMode = reloadFullScreenMode || (settings.graphics.fullScreen.active && (settings.graphics.fullScreen.resolution[0] != fullscreenResolutions.getSelected().width || settings.graphics.fullScreen.resolution[1] != fullscreenResolutions.getSelected().height)) || (!settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
 
         settings.graphics.fullScreen.active = fullscreen.isChecked();
 
@@ -1962,8 +1961,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         bean = aa.getSelected();
-        Antialias newaa = settings.postprocess.getAntialias(bean.value);
-        if (settings.postprocess.antialias != newaa) {
+        Antialias newAntiAlias = settings.postprocess.getAntialias(bean.value);
+        if (settings.postprocess.antialias != newAntiAlias) {
             settings.postprocess.antialias = settings.postprocess.getAntialias(bean.value);
             EventManager.instance.post(Events.ANTIALIASING_CMD, settings.postprocess.antialias);
         }
@@ -2007,14 +2006,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final boolean reloadShadows = shadowsCb.isChecked() && (settings.scene.renderer.shadow.resolution != newShadowResolution || settings.scene.renderer.shadow.number != newShadowNumber);
 
         // Interface
-        LangComboBoxBean lbean = lang.getSelected();
+        LangComboBoxBean languageBean = lang.getSelected();
         StrComboBoxBean newTheme = theme.getSelected();
         // UI scale
         float factor = uiScale.getMappedValue();
         EventManager.instance.post(Events.UI_SCALE_CMD, factor);
 
-        boolean reloadUI = !settings.program.ui.theme.equals(newTheme.value) || !lbean.locale.toLanguageTag().equals(settings.program.locale) || settings.program.minimap.size != minimapSize.getValue();
-        settings.program.locale = lbean.locale.toLanguageTag();
+        boolean reloadUI = !settings.program.ui.theme.equals(newTheme.value) || !languageBean.locale.toLanguageTag().equals(settings.program.locale) || settings.program.minimap.size != minimapSize.getValue();
+        settings.program.locale = languageBean.locale.toLanguageTag();
         I18n.forceInit(new FileHandle(settings.ASSETS_LOC + File.separator + "i18n/gsbundle"));
         settings.program.ui.theme = newTheme.value;
         boolean previousPointerCoords = settings.program.pointer.coordinates;
@@ -2183,7 +2182,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.instance.post(Events.GAMMA_CMD, gammaBak, true);
         EventManager.instance.post(Events.MOTION_BLUR_CMD, motionblurBak, true);
         EventManager.instance.post(Events.LENS_FLARE_CMD, lensflareBak, true);
-        EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightglowBak, true);
+        EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, lightGlowBak, true);
         EventManager.instance.post(Events.BLOOM_CMD, bloomBak, true);
         EventManager.instance.post(Events.UNSHARP_MASK_CMD, unsharpMaskBak, true);
         EventManager.instance.post(Events.EXPOSURE_CMD, exposureBak, true);

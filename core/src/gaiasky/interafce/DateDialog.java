@@ -32,7 +32,6 @@ public class DateDialog extends CollapsibleWindow {
 
     private final OwnTextField day, year, hour, min, sec;
     private final SelectBox<String> month;
-    private final OwnTextButton setNow;
     private final Color defaultColor;
 
     public DateDialog(Stage stage, Skin skin) {
@@ -43,7 +42,7 @@ public class DateDialog extends CollapsibleWindow {
         float pad = 8f;
 
         // SET NOW
-        setNow = new OwnTextButton(I18n.txt("gui.pickdate.setcurrent"), skin);
+        OwnTextButton setNow = new OwnTextButton(I18n.txt("gui.pickdate.setcurrent"), skin);
         setNow.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 updateTime(Instant.now(), ZoneOffset.UTC);
@@ -52,7 +51,7 @@ public class DateDialog extends CollapsibleWindow {
             return false;
         });
         setNow.setSize(288f, 28f);
-        add(setNow).center().colspan(2).padTop(pad);
+        add(setNow).center().colspan(2).padTop(pad).padBottom(pad * 3f);
         row();
 
         // DAY GROUP
