@@ -20,6 +20,7 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.math.MathUtilsd;
+import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.ucd.UCD;
@@ -28,8 +29,9 @@ import gaiasky.util.units.Position;
 import gaiasky.util.units.Position.PositionType;
 import gaiasky.util.units.Quantity.Angle;
 import gaiasky.util.units.Quantity.Angle.AngleUnit;
-import org.apache.commons.math.analysis.interpolation.LinearInterpolator;
-import org.apache.commons.math.analysis.polynomials.PolynomialSplineFunction;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.interpolation.UnivariateInterpolator;
 import uk.ac.starlink.table.RowSequence;
 import uk.ac.starlink.table.StarTable;
 import uk.ac.starlink.table.StarTableFactory;
@@ -39,8 +41,12 @@ import uk.ac.starlink.table.formats.CsvTableBuilder;
 import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.FileDataSource;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -318,7 +324,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 appMag = 15;
                             }
                             // Scale magnitude if needed
-                            double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || datasetOptions.type == DatasetLoadType.VARIABLES) ? datasetOptions.magnitudeScale : 0f;
+                            double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES)) ? datasetOptions.magnitudeScale : 0f;
                             appMag -= magScl;
 
                             // Absolute magnitude to pseudo-size
@@ -345,6 +351,12 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double[] variTimes = null;
                             double pf = 0;
                             int nVari = 0;
+
+                            boolean hit = false;
+                            if (((Long) row[0]) == 1747459842980485504L) {
+                                hit = true;
+                            }
+
                             if (ucdParser.hasvari) {
                                 Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
                                 if (!ucdParser.hasperiod || period == null || !Double.isFinite(period.getSecond())) {
@@ -352,7 +364,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     noPeriods++;
                                     continue;
                                 } else {
-                                   pf = period.getSecond();
+                                    pf = period.getSecond();
                                 }
                                 Pair<UCD, double[]> variMagsPair = getDoubleArrayUcd(ucdParser.VARI_MAGS, row);
                                 assert variMagsPair != null;
@@ -367,7 +379,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 double[] auxMags = variMagsDouble;
                                 double[] auxTimes = variTimes;
 
-                                // Remove possible NaNs
+                                // SANITIZE (no NaNs)
                                 List<Double> magnitudesList = new ArrayList<>();
                                 List<Double> timesList = new ArrayList<>();
                                 int idx = 0;
@@ -382,27 +394,53 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 variTimes = timesList.stream().mapToDouble(Double::doubleValue).toArray();
                                 nVari = variMagsDouble.length;
 
+                                Path tmp = Path.of(System.getProperty("user.home") + "/temp/data/");
+                                if (hit) {
+                                    exportCsv(variTimes, variMagsDouble, nVari, tmp.resolve("data.nonans.csv"), "time", "mag");
+                                }
+
+                                // FOLD
+                                List<Vector2d> list = new ArrayList<>(nVari);
+                                for (int k = 0; k < nVari; k++) {
+                                    double phase = ((variTimes[k] - variTimes[0]) % pf);
+                                    list.add(new Vector2d(phase, variMagsDouble[k]));
+                                }
+                                list.sort(Comparator.comparingDouble(o -> o.x));
+
+                                for (int k = 0; k < nVari; k++) {
+                                    Vector2d point = list.get(k);
+                                    variTimes[k] = point.x + variTimes[0];
+                                    variMagsDouble[k] = point.y;
+                                }
+                                if (hit) {
+                                    exportCsv(variTimes, variMagsDouble, nVari, tmp.resolve("data.fold.csv"), "time", "mag");
+                                }
+
+                                // RESAMPLE (only if too many samples)
                                 final int MAX_VARI = VariableGroupRenderSystem.MAX_VARI;
                                 if (variMagsDouble.length > MAX_VARI) {
-                                    LinearInterpolator interp = new LinearInterpolator();
-                                    PolynomialSplineFunction f = interp.interpolate(variTimes, variMagsDouble);
+                                    nVari = MAX_VARI;
+                                    double t0 = variTimes[0];
+                                    double tn = variTimes[variTimes.length - 1];
+                                    double tStep = (tn - t0) / (nVari - 1);
 
-                                    variMagsDouble = new double[MAX_VARI];
-                                    variTimes = new double[MAX_VARI];
+                                    UnivariateInterpolator interp = new LinearInterpolator();
+                                    UnivariateFunction f = interp.interpolate(variTimes, variMagsDouble);
 
-                                    double t0 = timesList.get(0);
-                                    double tn = timesList.get(timesList.size() - 1);
-                                    double tStep = (tn - t0) / (MAX_VARI - 1);
+                                    variMagsDouble = new double[nVari];
+                                    variTimes = new double[nVari];
 
-                                    idx = 0;
-                                    for (double t = t0; t <= tn; t += tStep) {
+                                    for (idx = 0; idx < nVari; idx++) {
+                                        double t = t0 + tStep * idx;
                                         variTimes[idx] = t;
                                         variMagsDouble[idx] = f.value(t);
-                                        idx++;
                                     }
-                                    nVari = MAX_VARI;
                                     resampledLightCurves++;
+                                    if (hit) {
+                                        exportCsv(variTimes, variMagsDouble, nVari, tmp.resolve("data.resample.csv"), "time", "mag");
+                                    }
                                 }
+
                                 // Convert magnitudes to sizes
                                 assert variMags.length == variTimes.length;
                                 for (int j = 0; j < variMagsDouble.length; j++) {
@@ -590,6 +628,22 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         }
 
         return list;
+    }
+
+    private void exportCsv(double[] x, double[] y, int n, Path p, String... cols) {
+        try {
+            FileWriter myWriter = new FileWriter(p.toString());
+            if (cols != null && cols.length >= 2) {
+                myWriter.write(String.format("%1$s,%2$s\n", cols[0], cols[1]));
+            }
+            for (int i = 0; i < n; i++) {
+                myWriter.write(String.format("%1$f,%2$f\n", x[i], y[i]));
+            }
+            myWriter.close();
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
     }
 
     private ObjectDoubleMap<UCD> initExtraAttributes(ObjectDoubleMap<UCD> extra) {
