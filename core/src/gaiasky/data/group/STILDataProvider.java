@@ -352,11 +352,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             double pf = 0;
                             int nVari = 0;
 
-                            boolean hit = false;
-                            if (((Long) row[0]) == 1747459842980485504L) {
-                                hit = true;
-                            }
-
                             if (ucdParser.hasvari) {
                                 Pair<UCD, Double> period = getDoubleUcd(ucdParser.VARI_PERIOD, row);
                                 if (!ucdParser.hasperiod || period == null || !Double.isFinite(period.getSecond())) {
@@ -395,9 +390,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 nVari = variMagsDouble.length;
 
                                 Path tmp = Path.of(System.getProperty("user.home") + "/temp/data/");
-                                if (hit) {
-                                    exportCsv(variTimes, variMagsDouble, nVari, tmp.resolve("data.nonans.csv"), "time", "mag");
-                                }
 
                                 // FOLD
                                 List<Vector2d> list = new ArrayList<>(nVari);
@@ -411,9 +403,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                     Vector2d point = list.get(k);
                                     variTimes[k] = point.x + variTimes[0];
                                     variMagsDouble[k] = point.y;
-                                }
-                                if (hit) {
-                                    exportCsv(variTimes, variMagsDouble, nVari, tmp.resolve("data.fold.csv"), "time", "mag");
                                 }
 
                                 // RESAMPLE (only if too many samples)
@@ -436,9 +425,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                         variMagsDouble[idx] = f.value(t);
                                     }
                                     resampledLightCurves++;
-                                    if (hit) {
-                                        exportCsv(variTimes, variMagsDouble, nVari, tmp.resolve("data.resample.csv"), "time", "mag");
-                                    }
                                 }
 
                                 // Convert magnitudes to sizes
