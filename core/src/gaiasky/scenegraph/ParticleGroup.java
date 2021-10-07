@@ -74,7 +74,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     protected String datafile;
 
     // Parameters for the data provider
-    private Map<String, Object> providerParams;
+    protected Map<String, Object> providerParams;
 
     /**
      * Profile decay of the particles in the shader

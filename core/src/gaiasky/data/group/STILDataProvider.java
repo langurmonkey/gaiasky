@@ -19,6 +19,7 @@ import gaiasky.util.color.BVToTeff_ballesteros;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;
@@ -45,10 +46,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
 
 /**
@@ -711,4 +709,49 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         return Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
     }
 
+    @Override
+    public void setProviderParams(Map<String, Object> params) {
+        super.setProviderParams(params);
+        datasetOptionsFromParameters();
+    }
+
+    private void datasetOptionsFromParameters() {
+        if (params != null) {
+            DatasetOptions dOps = new DatasetOptions();
+            // Catalog name
+            if (params.containsKey("catalogName")) {
+                dOps.catalogName = (String) params.get("catalogName");
+            }
+
+            // Type
+            if (params.containsKey("type")) {
+                String typeStr = (String) params.get("type");
+                dOps.type = DatasetLoadType.valueOf(typeStr.toUpperCase());
+            }
+
+            // Label color
+            if (params.containsKey("labelColor")) {
+                dOps.labelColor = (double[]) params.get("labelColor");
+            }
+
+            // Magnitude scale
+            if (params.containsKey("magnitudeScale")) {
+                dOps.magnitudeScale = (double) params.get("magnitudeScale");
+            }
+
+            // Fade in
+            if (params.containsKey("fadeIn")) {
+                dOps.fadeIn = (double[]) params.get("fadeIn");
+            }
+
+            // Fade out
+            if (params.containsKey("fadeOut")) {
+                dOps.fadeOut = (double[]) params.get("fadeOut");
+            }
+
+            // Set
+            this.datasetOptions = dOps;
+        }
+
+    }
 }

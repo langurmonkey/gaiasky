@@ -95,6 +95,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         try {
             Class<?> clazz = Class.forName(provider);
             IStarGroupDataProvider provider = (IStarGroupDataProvider) clazz.getConstructor().newInstance();
+            provider.setProviderParams(providerParams);
 
             if (factor == null)
                 factor = 1d;
