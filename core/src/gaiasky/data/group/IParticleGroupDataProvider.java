@@ -9,6 +9,7 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data provider for a particle group.
@@ -63,4 +64,10 @@ public interface IParticleGroupDataProvider {
      * @param cap The star cap number
      */
     void setStarNumberCap(int cap);
+
+    /**
+     * Set provider parameters as a map
+     * @param params The parameters map
+     */
+    void setProviderParams(Map<String, Object> params);
 }

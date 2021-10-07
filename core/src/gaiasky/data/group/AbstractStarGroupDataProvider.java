@@ -33,6 +33,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     protected static Log logger = Logger.getLogger(AbstractStarGroupDataProvider.class);
     public static double NEGATIVE_DIST = 1 * Constants.M_TO_U;
 
+    protected Map<String, Object> params;
+
     /**
      * Represents a column type.
      */
@@ -625,4 +627,8 @@ public abstract class AbstractStarGroupDataProvider implements IStarGroupDataPro
     public void setOutputFormatVersion(int version) {
     }
 
+    @Override
+    public void setProviderParams(Map<String, Object> params) {
+        this.params = params;
+    }
 }

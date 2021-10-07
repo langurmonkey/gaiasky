@@ -36,6 +36,7 @@ import uk.ac.starlink.util.FileDataSource;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 /**

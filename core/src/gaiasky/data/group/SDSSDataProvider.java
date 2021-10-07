@@ -23,6 +23,7 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Loads SDSS data from a text file with a series of [ra, dec, z]
@@ -94,6 +95,10 @@ public class SDSSDataProvider implements IParticleGroupDataProvider {
 
     @Override
     public void setStarNumberCap(int cap) {
+    }
+
+    @Override
+    public void setProviderParams(Map<String, Object> params) {
     }
 
     @Override

@@ -49,7 +49,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
     @Override
     public Array<? extends SceneGraphNode> loadData() {
-        Array<T> bodies = new Array<T>();
+        Array<T> bodies = new Array<>();
 
         Array<String> filePaths = new Array<>(this.filePaths);
 
@@ -263,7 +263,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
     }
 
     public Map<String, Object> convertJsonToMap(JsonValue json) {
-        Map<String, Object> map = new TreeMap<String, Object>();
+        Map<String, Object> map = new TreeMap<>();
 
         JsonValue child = json.child;
         while (child != null) {

@@ -73,6 +73,9 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      */
     protected String datafile;
 
+    // Parameters for the data provider
+    private Map<String, Object> providerParams;
+
     /**
      * Profile decay of the particles in the shader
      */
@@ -257,6 +260,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (dataLoad) {
                 Class<?> clazz = Class.forName(provider);
                 IParticleGroupDataProvider provider = (IParticleGroupDataProvider) clazz.getConstructor().newInstance();
+                provider.setProviderParams(providerParams);
 
                 setData(provider.loadData(datafile, factor));
             }
@@ -662,6 +666,10 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     public void setDatafile(String datafile) {
         this.datafile = datafile;
+    }
+
+    public void setProviderparams(Map<String, Object> params) {
+        this.providerParams = params;
     }
 
     @Override

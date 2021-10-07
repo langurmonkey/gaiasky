@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class UncertaintiesProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(UncertaintiesProvider.class);
@@ -90,6 +91,10 @@ public class UncertaintiesProvider implements IParticleGroupDataProvider {
     @Override
     public void setStarNumberCap(int cap) {
 
+    }
+
+    @Override
+    public void setProviderParams(Map<String, Object> params) {
     }
 
     @Override
