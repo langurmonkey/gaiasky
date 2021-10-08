@@ -60,9 +60,12 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         float[] vertices = new float[20];
         fillVertices(vertices, w, h);
 
-        // We wont need indices if we use GL_TRIANGLE_FAN to draw our quad
-        // TRIANGLE_FAN will draw the verts in this order: 0, 1, 2; 0, 2, 3
-        mesh = new IntMesh(true, 4, 6, new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
+        // We won't need indices if we use GL_TRIANGLE_FAN to draw our quad
+        // TRIANGLE_FAN will draw the vertices in this order: 0, 1, 2; 0, 2, 3
+        mesh = new IntMesh(true, 4, 6,
+                new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE),
+                new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE),
+                new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
 
         mesh.setVertices(vertices, 0, vertices.length);
         mesh.getIndicesBuffer().position(0);
@@ -89,9 +92,9 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         float height = -h;
         final float fx2 = x + width;
         final float fy2 = y + height;
-        final float u = 0;
+        final float u = 1;
         final float v = 1;
-        final float u2 = 1;
+        final float u2 = 0;
         final float v2 = 0;
 
         float color = Color.WHITE.toFloatBits();

@@ -79,9 +79,9 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         float height = -h;
         final float fx2 = x + width;
         final float fy2 = y + height;
-        final float u = 0;
+        final float u = 1;
         final float v = 1;
-        final float u2 = 1;
+        final float u2 = 0;
         final float v2 = 0;
 
         final float color = Color.WHITE.toFloatBits();

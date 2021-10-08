@@ -46,27 +46,22 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
         if (cubemapEffect != null) {
             cubemapEffect.setProjection(projection);
         }
-        switch (projection) {
-            case FISHEYE:
-                // In planetarium mode we only render back iff aperture > 180
-                xPosFlag = true;
-                xNegFlag = true;
-                yPosFlag = true;
-                yNegFlag = true;
-                zPosFlag = true;
-                zNegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
-                setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
-                break;
-            default:
-                // In 360 mode we always need all sides
-                xPosFlag = true;
-                xNegFlag = true;
-                yPosFlag = true;
-                yNegFlag = true;
-                zPosFlag = true;
-                zNegFlag = true;
-                setPlanetariumAngle(0);
-                break;
+        if (projection == CubemapProjection.FISHEYE) {// In planetarium mode we only render back iff aperture > 180
+            xPosFlag = true;
+            xNegFlag = true;
+            yPosFlag = true;
+            yNegFlag = true;
+            zPosFlag = true;
+            zNegFlag = cubemapEffect.getPlanetariumAperture() > 180f;
+            setPlanetariumAngle(Settings.settings.program.modeCubemap.planetarium.angle);
+        } else {// In 360 mode we always need all sides
+            xPosFlag = true;
+            xNegFlag = true;
+            yPosFlag = true;
+            yNegFlag = true;
+            zPosFlag = true;
+            zNegFlag = true;
+            setPlanetariumAngle(0);
         }
     }
 

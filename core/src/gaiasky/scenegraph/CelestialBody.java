@@ -8,6 +8,7 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -19,6 +20,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.util.Constants;
+import gaiasky.util.DecalUtils;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
@@ -93,7 +95,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         super();
         TH_OVER_FACTOR = (float) (THRESHOLD_POINT() / Settings.settings.scene.label.number);
     }
-
     /**
      * Billboard quad render, for planets and stars.
      */
@@ -102,9 +103,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         compalpha = alpha;
 
         float size = getFuzzyRenderSize(camera);
-
-        Vector3 aux = aux3f1.get();
-        shader.setUniformf("u_pos", translation.put(aux));
+        shader.setUniformf("u_pos", translation.put(aux3f1.get()));
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", ccPale[0], ccPale[1], ccPale[2], alpha * opacity);

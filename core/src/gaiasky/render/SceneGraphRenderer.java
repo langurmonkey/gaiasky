@@ -264,7 +264,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private ExtShaderProgram[] lineShaders;
     private ExtShaderProgram[] lineQuadShaders;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, starGroupQuadDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
      * Render lists for all render groups
@@ -364,6 +364,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
         particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
+        starGroupQuadDesc = loadShader(manager, "shader/star.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("star.group.quad", namesCmap), definesCmap);
         variableGroupDesc = loadShader(manager, "shader/variable.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
 
@@ -528,6 +529,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          * STAR GROUP - default and relativistic
          */
         ExtShaderProgram[] starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
+
+        /*
+         * STAR GROUP QUAD - default and relativistic
+         */
+        ExtShaderProgram[] starGroupQuadShaders = fetchShaderProgram(manager, starGroupQuadDesc, TextUtils.concatAll("star.group.quad", names));
 
         /*
          * VARIABLE GROUP - default and relativistic
@@ -737,6 +743,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders);
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
+
+        // STAR GROUP QUAD
+        AbstractRenderSystem starGroupQuadProc = new StarGroupQuadRenderSystem(STAR_GROUP, alphas, starGroupQuadShaders);
+        starGroupQuadProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        starGroupQuadProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);

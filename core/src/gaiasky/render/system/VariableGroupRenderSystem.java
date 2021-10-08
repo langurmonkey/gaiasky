@@ -6,12 +6,8 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -33,7 +29,6 @@ import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
 
 /**
@@ -51,8 +46,6 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
 
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
-    private static final int usageVariMags = 400;
-    private static final int usageVariTimes = 500;
 
     private Texture starTex;
 
@@ -112,8 +105,8 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
         nVariOffset = curr.mesh.getVertexAttribute(Usage.BiNormal) != null ? curr.mesh.getVertexAttribute(Usage.BiNormal).offset / 4 : 0;
-        variMagsOffset = curr.mesh.getVertexAttribute(usageVariMags) != null ? curr.mesh.getVertexAttribute(usageVariMags).offset / 4 : 0;
-        variTimesOffset = curr.mesh.getVertexAttribute(usageVariTimes) != null ? curr.mesh.getVertexAttribute(usageVariTimes).offset / 4 : 0;
+        variMagsOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
+        variTimesOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
         return mdi;
     }
 
@@ -176,9 +169,9 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
                                     tempVerts[curr.vertexIdx + nVariOffset] = vr.nVari;
                                     for (int k = 0; k < vr.nVari; k++) {
                                         if (variableGroup.isHlAllVisible() && variableGroup.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (vr.variMag(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor());
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (vr.variMag(k) * Constants.STAR_POINT_SIZE_FACTOR) * variableGroup.highlightedSizeFactor());
                                         } else {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (vr.variMag(k) * Constants.STAR_SIZE_FACTOR) * variableGroup.highlightedSizeFactor();
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (vr.variMag(k) * Constants.STAR_POINT_SIZE_FACTOR) * variableGroup.highlightedSizeFactor();
                                         }
                                         tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) vr.variTime(k);
                                     }
@@ -236,7 +229,7 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
                             shaderProgram.setUniformf("u_s", (float) curRt);
 
                             try {
-                                curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                                curr.mesh.render(shaderProgram, GL20.GL_POINTS);
                             } catch (IllegalArgumentException e) {
                                 logger.error("Render exception");
                             }
@@ -255,16 +248,16 @@ public class VariableGroupRenderSystem extends ImmediateRenderSystem implements 
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.BiNormal, 1, "a_nVari"));
-        attributes.add(new VertexAttribute(usageVariMags, 4, "a_vmags1"));
-        attributes.add(new VertexAttribute(usageVariMags + 1, 4, "a_vmags2"));
-        attributes.add(new VertexAttribute(usageVariMags + 2, 4, "a_vmags3"));
-        attributes.add(new VertexAttribute(usageVariMags + 3, 4, "a_vmags4"));
-        attributes.add(new VertexAttribute(usageVariMags + 4, 4, "a_vmags5"));
-        attributes.add(new VertexAttribute(usageVariTimes, 4, "a_vtimes1"));
-        attributes.add(new VertexAttribute(usageVariTimes + 1, 4, "a_vtimes2"));
-        attributes.add(new VertexAttribute(usageVariTimes + 2, 4, "a_vtimes3"));
-        attributes.add(new VertexAttribute(usageVariTimes + 3, 4, "a_vtimes4"));
-        attributes.add(new VertexAttribute(usageVariTimes + 4, 4, "a_vtimes5"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes, 4, "a_vmags1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 1, 4, "a_vmags2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 2, 4, "a_vmags3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 3, 4, "a_vmags4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes + 4, 4, "a_vmags5"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes, 4, "a_vtimes1"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 1, 4, "a_vtimes2"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 2, 4, "a_vtimes3"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 3, 4, "a_vtimes4"));
+        attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 4, 4, "a_vtimes5"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)

@@ -86,7 +86,7 @@ public final class CubemapProjectionsFilter extends Filter<CubemapProjectionsFil
     /**
      * Sets the projection to use
      *
-     * @param proj
+     * @param proj Cubemap projection
      */
     public void setProjection(CubemapProjections.CubemapProjection proj) {
         switch (proj) {

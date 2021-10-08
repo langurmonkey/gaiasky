@@ -170,7 +170,7 @@ public class Star extends Particle {
     @Override
     public void initialize() {
         setDerivedAttributes();
-        radius = size * Constants.STAR_SIZE_FACTOR;
+        radius = size * Constants.STAR_POINT_SIZE_FACTOR;
         modelDistance = 172.4643429 * radius;
     }
 

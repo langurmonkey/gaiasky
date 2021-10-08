@@ -8,6 +8,7 @@ package gaiasky.render.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -21,7 +22,8 @@ import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.Constants;
+import gaiasky.util.DecalUtils;
+import gaiasky.util.Pair;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
@@ -31,27 +33,49 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
+/**
+ * Renders star groups using quads.
+ */
+public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;
-    private int sizeOffset, pmOffset;
+    private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private float[] pointAlpha;
     private final float[] alphaSizeFovBr;
     private final float[] pointAlphaHl;
     private final Colormap cmap;
 
     private Texture starTex;
+    private Quaternion quaternion;
 
-    public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    // Positions per vertex index
+    private Pair<Float, Float>[] vertPos;
+    // UV coordinates per vertex index (0,1,2,4)
+    private Pair<Float, Float>[] vertUV;
+
+    public StarGroupQuadRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
+        this.quaternion = new Quaternion();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
+
+        vertPos = new Pair[4];
+        vertPos[0] = new Pair<>(1f, 1f);
+        vertPos[1] = new Pair<>(1f, -1f);
+        vertPos[2] = new Pair<>(-1f, -1f);
+        vertPos[3] = new Pair<>(-1f, 1f);
+
+        vertUV = new Pair[4];
+        vertUV[0] = new Pair<>(1f, 1f);
+        vertUV[1] = new Pair<>(1f, 0f);
+        vertUV[2] = new Pair<>(0f, 0f);
+        vertUV[3] = new Pair<>(0f, 1f);
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
@@ -84,21 +108,25 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
-     * @param nVertices The max number of vertices this mesh data can hold
+     * @param maxVerts   The max number of vertices this mesh data can hold
+     * @param maxIndices The maximum number of indices this mesh data can hold
      *
      * @return The index of the new mesh data
      */
-    private int addMeshData(int nVertices) {
+    private int addMeshData(int maxVerts, int maxIndices) {
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
         VertexAttribute[] attributes = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attributes);
+        curr.mesh = new IntMesh(false, maxVerts, maxIndices, attributes);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.StarPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.StarPosition).offset / 4 : 0;
+
         return mdi;
     }
 
@@ -108,12 +136,15 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
             ExtShaderProgram shaderProgram = getShaderProgram();
             float starPointSize = StarSettings.getStarPointSize();
 
+            // Billboard quaternion
+            DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
+
             shaderProgram.begin();
             // Global uniforms
+            shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
             shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
-            shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
             shaderProgram.setUniformf("u_brPow", Settings.settings.scene.star.power);
             shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
@@ -136,10 +167,13 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
                         if (!starGroup.inGpu()) {
                             int n = starGroup.size();
-                            starGroup.offset = addMeshData(n);
+                            starGroup.offset = addMeshData(n * 4, n * 6);
                             curr = meshes.get(starGroup.offset);
-                            ensureTempVertsSize(n * curr.vertexSize);
-                            int numAdded = 0;
+                            ensureTempVertsSize(n * 4 * curr.vertexSize);
+                            ensureTempIndicesSize(n * 6);
+                            int numVerticesAdded = 0;
+                            int numStarsAdded = 0;
+
                             for (int i = 0; i < n; i++) {
                                 if (starGroup.filter(i) && starGroup.isVisible(i)) {
                                     IParticleRecord particle = starGroup.data().get(i);
@@ -147,42 +181,64 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                                         logger.debug("Star " + particle.id() + " has a non-finite size");
                                         continue;
                                     }
-                                    // COLOR
-                                    if (hlCmap) {
-                                        // Color map
-                                        double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                    } else {
-                                        // Plain
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                    // 4 vertices per star
+                                    for (int vert = 0; vert < 4; vert++) {
+                                        // COLOR
+                                        if (hlCmap) {
+                                            // Color map
+                                            double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
+                                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                                        } else {
+                                            // Plain
+                                            tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                        }
+
+                                        // SIZE
+                                        double sizeFac = 6e1;
+                                        if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
+                                            tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * sizeFac) * starGroup.highlightedSizeFactor());
+                                        } else {
+                                            tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * sizeFac) * starGroup.highlightedSizeFactor();
+                                        }
+
+                                        // Vertex POSITION [u]
+                                        tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
+                                        tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
+
+                                        // UV coordinates
+                                        tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                                        tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+
+                                        // PROPER MOTION [u/yr]
+                                        tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
+                                        tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
+                                        tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+
+                                        // STAR POSITION [u]
+                                        tempVerts[curr.vertexIdx + starPosOffset] = (float) particle.x();
+                                        tempVerts[curr.vertexIdx + starPosOffset + 1] = (float) particle.y();
+                                        tempVerts[curr.vertexIdx + starPosOffset + 2] = (float) particle.z();
+
+                                        curr.vertexIdx += curr.vertexSize;
+                                        curr.numVertices++;
+                                        numVerticesAdded++;
                                     }
+                                    // Indices
+                                    index(curr.numVertices - 4);
+                                    index(curr.numVertices - 3);
+                                    index(curr.numVertices - 2);
 
-                                    // SIZE
-                                    if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_POINT_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                                    } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_POINT_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                    }
-
-                                    // POSITION [u]
-                                    tempVerts[curr.vertexIdx] = (float) particle.x();
-                                    tempVerts[curr.vertexIdx + 1] = (float) particle.y();
-                                    tempVerts[curr.vertexIdx + 2] = (float) particle.z();
-
-                                    // PROPER MOTION [u/yr]
-                                    tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                    tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                    tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
-
-                                    curr.vertexIdx += curr.vertexSize;
-                                    numAdded++;
+                                    index(curr.numVertices - 2);
+                                    index(curr.numVertices - 1);
+                                    index(curr.numVertices - 4);
+                                    numStarsAdded++;
                                 }
                             }
-                            starGroup.count = numAdded * curr.vertexSize;
+                            starGroup.count = numVerticesAdded * curr.vertexSize;
                             curr.mesh.setVertices(tempVerts, 0, starGroup.count);
+                            curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
 
                             starGroup.inGpu(true);
-
                         }
 
                         /*
@@ -190,7 +246,6 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                          */
                         curr = meshes.get(starGroup.offset);
                         if (curr != null) {
-
                             if (starTex != null) {
                                 starTex.bind(0);
                                 shaderProgram.setUniformi("u_starTex", 0);
@@ -209,9 +264,9 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                             shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
                             try {
-                                curr.mesh.render(shaderProgram, GL20.GL_POINTS);
+                                curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
                             } catch (IllegalArgumentException e) {
-                                logger.error("Render exception");
+                                logger.error(e);
                             }
                         }
                     }
@@ -222,12 +277,18 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
         }
     }
 
+    private void index(int idx) {
+        tempIndices[curr.indexIdx++] = idx;
+    }
+
     protected VertexAttribute[] buildVertexAttributes() {
         Array<VertexAttribute> attributes = new Array<>();
-        attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.StarPosition, 3, "a_starPos"));
 
         VertexAttribute[] array = new VertexAttribute[attributes.size];
         for (int i = 0; i < attributes.size; i++)

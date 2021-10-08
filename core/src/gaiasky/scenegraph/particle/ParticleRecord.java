@@ -298,7 +298,7 @@ public class ParticleRecord implements IParticleRecord {
 
     @Override
     public double radius() {
-        return size() * Constants.STAR_SIZE_FACTOR;
+        return size() * Constants.STAR_POINT_SIZE_FACTOR;
     }
 
     @Override

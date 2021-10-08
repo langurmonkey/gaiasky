@@ -21,6 +21,8 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected MeshData curr;
     // Auxiliary array that holds vertices temporarily
     protected float[] tempVerts;
+    // Auxiliary array that holds indices temporarily
+    protected int[] tempIndices;
 
     protected static class MeshData {
 
@@ -53,6 +55,12 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
             vertices = null;
             indices = null;
         }
+    }
+
+    protected static class OwnUsage {
+        public static final int VariableMagnitudes = 400;
+        public static final int VariableTimes = 500;
+        public static final int StarPosition = 600;
     }
 
     /**
@@ -136,6 +144,18 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected void ensureTempVertsSize(int size){
         if(tempVerts == null || tempVerts.length < size) {
             tempVerts = new float[size];
+        }
+    }
+
+    /**
+     * This function makes sure that the tempIndices array has at least
+     * the given size. After calling this function, the elements of tempIndices
+     * may have been cleared.
+     * @param size The size to ensure
+     */
+    protected void ensureTempIndicesSize(int size) {
+        if(tempIndices == null || tempIndices.length < size) {
+            tempIndices = new int[size];
         }
     }
 
