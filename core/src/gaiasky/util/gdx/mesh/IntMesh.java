@@ -73,7 +73,7 @@ public class IntMesh implements Disposable {
 	}
 
 	/** list of all meshes **/
-	static final Map<Application, Array<IntMesh>> meshes = new HashMap<Application, Array<IntMesh>>();
+	static final Map<Application, Array<IntMesh>> meshes = new HashMap<>();
 
 	final IntVertexData vertices;
 	final IntIndexData indices;

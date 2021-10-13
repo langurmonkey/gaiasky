@@ -509,7 +509,7 @@ public class Coordinates {
      * </ol>
      */
     public static Vector3b cartesianToSpherical(Vector3b vec, Vector3b out) {
-        /**
+        /*
          *
          * x, y, z = values[:] xsq = x ** 2 ysq = y ** 2 zsq = z ** 2 distance =
          * math.sqrt(xsq + ysq + zsq)

@@ -26,6 +26,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
@@ -341,7 +342,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= Settings.settings.scene.star.brightness * 0.15f;
+        computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
         return (float) computedSize;
     }
 
@@ -357,12 +358,18 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
         if (coordinates != null && (time.getHdiff() != 0 || force)) {
             Vector3d aux3 = aux3d1.get();
-            // Load this objects's equatorial cartesian coordinates into pos
+            // Load this object's equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
             // Convert to cartesian coordinates and put them in aux3 vector
-            //Coordinates.cartesianToSpherical(pos, aux3);
-            posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+            if (pos.len2d() == 0) {
+                // Sun!
+
+
+            } else {
+                Coordinates.cartesianToSpherical(pos, aux3);
+                posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+            }
             // Update angle
             if (rc != null)
                 rc.update(time);

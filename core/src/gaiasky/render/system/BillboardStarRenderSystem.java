@@ -31,7 +31,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 public class BillboardStarRenderSystem extends AbstractRenderSystem implements IObserver {
 
     private IntMesh mesh;
-    private Quaternion quaternion;
     private Texture texture0;
     private final int ctIndex;
 
@@ -75,7 +74,6 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
         mesh.setIndices(indices);
 
-        quaternion = new Quaternion();
         aux = new Vector3();
 
         EventManager.instance.subscribe(this, Events.STAR_TEXTURE_IDX_CMD);

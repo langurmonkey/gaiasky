@@ -19,7 +19,6 @@ uniform vec3 u_camDir;
 uniform vec3 u_camUp;
 uniform vec4 u_quaternion;
 
-uniform vec2 u_pointAlpha;
 uniform vec2 u_thAnglePoint;
 
 uniform float u_brPow;
@@ -41,13 +40,15 @@ uniform float u_vrScale;
 uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
+// Minimum solid anlge of the quads
+uniform float u_minSolidAngle;
 
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
 
-#define len0 20000.0
-#define day_to_year 1.0 / 365.25
+#define LEN0 20000.0
+#define DAY_TO_YEAR 1.0 / 365.25
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -55,15 +56,15 @@ out vec2 v_uv;
 
 void main() {
 	// Lengths
-	float l0 = len0 * u_vrScale;
+	float l0 = LEN0 * u_vrScale;
 	float l1 = l0 * 1e3;
 
     vec3 pos = a_starPos - u_camPos;
 
     // Proper motion using 64-bit emulated arithmetics:
-    // pm = a_pm * t * day_to_yr
+    // pm = a_pm * t * DAY_TO_YEAR
     // pos = pos + pm
-    vec2 t_yr = ds_mul(u_t, ds_set(day_to_year));
+    vec2 t_yr = ds_mul(u_t, ds_set(DAY_TO_YEAR));
     vec2 pmx = ds_mul(ds_set(a_pm.x), t_yr);
     vec2 pmy = ds_mul(ds_set(a_pm.y), t_yr);
     vec2 pmz = ds_mul(ds_set(a_pm.z), t_yr);
@@ -85,10 +86,10 @@ void main() {
     #endif // gravitationalWaves
 
     float viewAngleApparent = atan(a_size / dist);
-    float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y) * (u_alphaSizeBr.z - 0.4f) / 7.6;
+    float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, 0.0, 1.0) * (u_alphaSizeBr.z - 0.4f) / 7.6;
     float boundaryFade = smoothstep(l0, l1, dist);
     v_col = vec4(a_color.rgb * clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0), opacity * u_alphaSizeBr.x);
-    float quadSize = a_size * pow(viewAngleApparent, u_brightnessPower) * (u_alphaSizeBr.y * 0.05f);
+    float quadSize = max(u_minSolidAngle * dist, a_size * pow(viewAngleApparent, u_brightnessPower) * (u_alphaSizeBr.y * 0.05f));
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

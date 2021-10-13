@@ -7,6 +7,7 @@ package gaiasky.util.coord;
 
 import gaiasky.util.Constants;
 import gaiasky.util.math.Vector3b;
+import gaiasky.util.math.Vector3d;
 import org.apfloat.Apfloat;
 
 import java.time.Instant;
@@ -16,8 +17,12 @@ import java.time.Instant;
  * Algorithms book.
  */
 public class MoonAACoordinates extends AbstractOrbitCoordinates {
+
+    private Vector3d aux;
+
     public MoonAACoordinates(){
         super();
+        aux = new Vector3d();
     }
 
     @Override
@@ -29,7 +34,7 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
     public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
         if (!Constants.withinVSOPTime(date.toEpochMilli()))
             return null;
-        AstroUtils.moonEclipticCoordinates(date, out);
+        out = AstroUtils.moonEclipticCoordinates(date, aux, out);
         // To internal units
         out.z = out.z.multiply(new Apfloat(Constants.KM_TO_U * scaling, Constants.PREC));
         return out;
@@ -37,18 +42,13 @@ public class MoonAACoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
-        Vector3b v = getEclipticSphericalCoordinates(date, out);
-        if (v == null)
-            return null;
         Coordinates.sphericalToCartesian(out, out);
         return out;
     }
 
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
-        Vector3b v = getEclipticSphericalCoordinates(date, out);
-        if (v == null)
-            return null;
+        getEclipticSphericalCoordinates(date, out);
         Coordinates.sphericalToCartesian(out, out);
         out.mul(Coordinates.eclToEq());
         return out;

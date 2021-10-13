@@ -328,7 +328,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
                 shader.setUniformf("u_color", c.r, c.g, c.b, alpha);
                 shader.setUniformf("u_distance", (float) distToCamera);
-                shader.setUniformf("u_apparent_angle", (float) (viewAngle * Settings.settings.scene.star.brightness));
+                shader.setUniformf("u_apparent_angle", (float) (viewAngle * Settings.settings.scene.star.pointSize));
                 shader.setUniformf("u_radius", (float) radius);
 
                 // Sprite.render
@@ -348,7 +348,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             computedSize = (size * (dist / radius) * Constants.THRESHOLD_DOWN);
         }
         // Change the factor at the end here to control the stray light of stars
-        computedSize *= Settings.settings.scene.star.brightness * 0.2;
+        computedSize *= Settings.settings.scene.star.pointSize * 0.4;
 
         return computedSize;
     }

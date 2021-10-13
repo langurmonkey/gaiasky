@@ -24,6 +24,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
@@ -126,7 +127,7 @@ public class Planet extends ModelBody implements ILineRenderable {
         coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
         // Convert to cartesian coordinates and put them in aux3 vector
-        //Coordinates.cartesianToSpherical(pos, aux3);
+        Coordinates.cartesianToSpherical(pos, aux3);
         posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
         // Update angle
         if (rc != null)
