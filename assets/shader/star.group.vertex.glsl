@@ -11,7 +11,7 @@ in float a_size;
 
 // time in days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
 uniform int u_cubemap;
@@ -94,7 +94,7 @@ void main() {
 
     v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeFovBr.x * boundaryFade, 0.0, 1.0));
 
-    vec4 gpos = u_projModelView * vec4(pos, 1.0);
+    vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
     gl_PointSize = max(3.3 * u_alphaSizeFovBr.w, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
 

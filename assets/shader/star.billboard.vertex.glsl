@@ -8,11 +8,11 @@ in vec4 a_position;
 in vec2 a_texCoord0;
 
 // Uniforms
-uniform mat4 u_projTrans;
+uniform mat4 u_projView;
 uniform vec4 u_color;
-uniform vec4 u_quaternion;
 uniform vec3 u_pos;
 uniform float u_size;
+uniform vec3 u_camUp;
 uniform float u_apparent_angle;
 uniform float u_th_angle_point;
 uniform float u_vrScale;
@@ -39,8 +39,6 @@ void main() {
     v_color = vec4(u_color.rgb, u_color.a * alpha);
     v_texCoords = a_texCoord0;
 
-    mat4 transform = u_projTrans;
-
     vec3 pos = u_pos;
     float dist = length(pos);
 
@@ -52,58 +50,23 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    // Compute quaternion
-    vec4 quat = u_quaternion;
+    // Use billboard snippet
+    vec4 s_vert_pos = a_position;
+    vec3 s_obj_pos = pos;
+    vec3 s_cam_up = u_camUp;
+    mat4 s_proj_view = u_projView;
+    float s_size = u_size;
+    #include shader/snip_billboard.glsl
 
-    // Translate
-    mat4 translate = mat4(1.0);
-
-    translate[3][0] = pos.x;
-    translate[3][1] = pos.y;
-    translate[3][2] = pos.z;
-    transform *= translate;
-
-    // Rotate
-    mat4 rotation = mat4(0.0);
-    float xx = quat.x * quat.x;
-    float xy = quat.x * quat.y;
-    float xz = quat.x * quat.z;
-    float xw = quat.x * quat.w;
-    float yy = quat.y * quat.y;
-    float yz = quat.y * quat.z;
-    float yw = quat.y * quat.w;
-    float zz = quat.z * quat.z;
-    float zw = quat.z * quat.w;
-
-    rotation[0][0] = 1.0 - 2.0 * (yy + zz);
-    rotation[1][0] = 2.0 * (xy - zw);
-    rotation[2][0] = 2.0 * (xz + yw);
-    rotation[0][1] = 2.0 * (xy + zw);
-    rotation[1][1] = 1.0 - 2.0 * (xx + zz);
-    rotation[2][1] = 2.0 * (yz - xw);
-    rotation[3][1] = 0.0;
-    rotation[0][2] = 2.0 * (xz - yw);
-    rotation[1][2] = 2.0 * (yz + xw);
-    rotation[2][2] = 1.0 - 2.0 * (xx + yy);
-    rotation[3][3] = 1.0;
-    transform *= rotation;
-
-    // Scale
-    transform[0][0] *= u_size;
-    transform[1][1] *= u_size;
-    transform[2][2] *= u_size;
-
-    // Position
-    vec4 gpos = transform * a_position;
     gl_Position = gpos;
 
     #ifdef velocityBufferFlag
     vec3 prevPos = u_pos + u_dCamPos;
     mat4 ptransform = u_prevProjView;
-    translate[3][0] = prevPos.x;
-    translate[3][1] = prevPos.y;
-    translate[3][2] = prevPos.z;
-    ptransform *= translate;
+    translation[3][0] = prevPos.x;
+    translation[3][1] = prevPos.y;
+    translation[3][2] = prevPos.z;
+    ptransform *= translation;
     ptransform *= rotation;
     ptransform[0][0] *= u_size;
     ptransform[1][1] *= u_size;

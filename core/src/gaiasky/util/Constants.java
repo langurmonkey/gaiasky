@@ -156,13 +156,13 @@ public class Constants {
      * *texture* size
      **/
     public static final double STAR_POINT_SIZE_FACTOR = 1.31526e-6;
-    public static final double STAR_QUAD_SIZE_FACTOR = 1.0e1;
+    public static final double STAR_QUAD_SIZE_FACTOR = 2e2;
 
     /** Threshold radius/distance where star size remains constant. **/
     public static final double THRESHOLD_DOWN = 5e-7;
     public static final double THRESHOLD_UP = 1e-2;
 
-    /**
+    /*
      *
      * MAXIMUM AND MINIMUM VALUES FOR SEVERAL PARAMETERS - THESE SHOULD BE
      * ENFORCED

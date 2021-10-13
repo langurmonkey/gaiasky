@@ -705,7 +705,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
         double pseudoL = Math.pow(10, -0.4 * absMag);
         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-        return Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+        return Math.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
     }
 
     @Override

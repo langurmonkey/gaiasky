@@ -97,7 +97,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     private boolean inGpu;
 
     // Offset and count for this group
-    public int offset, count;
+    public int offset = -1, count = -1;
 
     /**
      * This flag indicates whether the mean position is already given by the

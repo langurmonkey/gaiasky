@@ -13,9 +13,10 @@ in vec2 a_texCoord;
 
 // time in days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
+uniform vec3 u_camUp;
 uniform vec4 u_quaternion;
 
 uniform vec2 u_pointAlpha;
@@ -37,8 +38,9 @@ uniform float u_vrScale;
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
-// w - rc primitive scale factor
-uniform vec4 u_alphaSizeFovBr;
+uniform vec3 u_alphaSizeBr;
+// Brightness power
+uniform float u_brightnessPower;
 
 // OUTPUT
 out vec4 v_col;
@@ -56,7 +58,6 @@ void main() {
 	float l0 = len0 * u_vrScale;
 	float l1 = l0 * 1e3;
 
-    mat4 transform = u_projModelView;
     vec3 pos = a_starPos - u_camPos;
 
     // Proper motion using 64-bit emulated arithmetics:
@@ -75,8 +76,6 @@ void main() {
     // Distance to star
     float dist = length(pos);
 
-    float sizefactor = 1.0;
-
     #ifdef relativisticEffects
     	pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -85,54 +84,20 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan((a_size * u_alphaSizeFovBr.z) / dist);
-    float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y);
+    float viewAngleApparent = atan(a_size / dist);
+    float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, u_pointAlpha.x, u_pointAlpha.y) * (u_alphaSizeBr.z - 0.4f) / 7.6;
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb, clamp(opacity * u_alphaSizeFovBr.x * boundaryFade, 0.0, 1.0));
-    float quadSize = max(3.3 * u_alphaSizeFovBr.w, pow(viewAngleApparent * .5e8, u_brPow) * u_alphaSizeFovBr.y * sizefactor);
+    v_col = vec4(a_color.rgb * clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0), opacity * u_alphaSizeBr.x);
+    float quadSize = a_size * pow(viewAngleApparent, u_brightnessPower) * (u_alphaSizeBr.y * 0.05f);
 
-    // Compute quaternion
-    vec4 quat = u_quaternion;
+    // Use billboard snippet
+    vec4 s_vert_pos = a_position;
+    vec3 s_obj_pos = pos;
+    vec3 s_cam_up = u_camUp;
+    mat4 s_proj_view = u_projView;
+    float s_size = quadSize;
+    #include shader/snip_billboard.glsl
 
-    // Translate
-    mat4 translate = mat4(1.0);
-
-    translate[3][0] = pos.x;
-    translate[3][1] = pos.y;
-    translate[3][2] = pos.z;
-    transform *= translate;
-
-    // Rotate
-    mat4 rotation = mat4(0.0);
-    float xx = quat.x * quat.x;
-    float xy = quat.x * quat.y;
-    float xz = quat.x * quat.z;
-    float xw = quat.x * quat.w;
-    float yy = quat.y * quat.y;
-    float yz = quat.y * quat.z;
-    float yw = quat.y * quat.w;
-    float zz = quat.z * quat.z;
-    float zw = quat.z * quat.w;
-
-    rotation[0][0] = 1.0 - 2.0 * (yy + zz);
-    rotation[1][0] = 2.0 * (xy - zw);
-    rotation[2][0] = 2.0 * (xz + yw);
-    rotation[0][1] = 2.0 * (xy + zw);
-    rotation[1][1] = 1.0 - 2.0 * (xx + zz);
-    rotation[2][1] = 2.0 * (yz - xw);
-    rotation[3][1] = 0.0;
-    rotation[0][2] = 2.0 * (xz - yw);
-    rotation[1][2] = 2.0 * (yz + xw);
-    rotation[2][2] = 1.0 - 2.0 * (xx + yy);
-    rotation[3][3] = 1.0;
-    transform *= rotation;
-
-    // Scale
-    transform[0][0] *= quadSize;
-    transform[1][1] *= quadSize;
-    transform[2][2] *= quadSize;
-
-    vec4 gpos = transform * a_position;
     gl_Position = gpos;
 
     v_uv = a_texCoord;
@@ -140,10 +105,10 @@ void main() {
     #ifdef velocityBufferFlag
     vec3 prevPos = a_starPos + u_dCamPos;
     mat4 ptransform = u_prevProjView;
-    translate[3][0] = prevPos.x;
-    translate[3][1] = prevPos.y;
-    translate[3][2] = prevPos.z;
-    ptransform *= translate;
+    translation[3][0] = prevPos.x;
+    translation[3][1] = prevPos.y;
+    translation[3][2] = prevPos.z;
+    ptransform *= translation;
     ptransform *= rotation;
     ptransform[0][0] *= a_size;
     ptransform[1][1] *= a_size;

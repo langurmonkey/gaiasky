@@ -52,10 +52,8 @@ public class Star extends Particle {
     /** Model used to represent the star **/
     private ModelComponent mc;
 
-    /** HIP number, negative if non existent **/
+    /** HIP number, negative if non-existent **/
     public int hip = -1;
-    /** TYCHO2 identifier string **/
-    public String tycho = null;
 
 
     double modelDistance;
@@ -121,31 +119,10 @@ public class Star extends Particle {
      * @param hip     The HIP identifier
      * @param source  Catalog source. See {#Particle}
      */
-    public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, String tycho, byte source) {
+    public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, byte source) {
         super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
         this.hip = hip;
         this.catalogSource = source;
-        this.tycho = tycho;
-    }
-
-    /**
-     * Creates a new Star object
-     *
-     * @param pos     The position of the star in equatorial cartesian coordinates
-     * @param appmag  The apparent magnitude
-     * @param absmag  The absolute magnitude
-     * @param colorbv The B-V color index
-     * @param names   The proper names of the star, if any
-     * @param ra      in degrees
-     * @param dec     in degrees
-     * @param starid  The star id
-     * @param hip     The HIP identifier
-     * @param tycho   The TYC identifier
-     * @param source  Catalog source. See {#Particle}
-     */
-    public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, String tycho, byte source) {
-        this(pos, appmag, absmag, colorbv, names, ra, dec, starid, hip, source);
-        this.tycho = tycho;
     }
 
     /**

@@ -19,6 +19,7 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IQuadRenderable;
 import gaiasky.render.IRenderable;
+import gaiasky.render.SGRCubemap;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.DecalUtils;
@@ -71,7 +72,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         mesh.getIndicesBuffer().position(0);
         mesh.getIndicesBuffer().limit(6);
 
-        int[] indices = new int[]{0, 1, 2, 0, 2, 3};
+        int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
         mesh.setIndices(indices);
 
         quaternion = new Quaternion();
@@ -130,9 +131,6 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 
-            // Calculate billboard rotation quaternion ONCE
-            DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
-
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
@@ -143,8 +141,8 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
             }
 
             // General uniforms
-            shaderProgram.setUniformMatrix("u_projTrans", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+            shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux));
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);

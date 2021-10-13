@@ -5,10 +5,8 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -22,16 +20,14 @@ import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.DecalUtils;
+import gaiasky.util.Constants;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import org.lwjgl.opengl.GL30;
 
 /**
  * Renders star groups using quads.
@@ -42,12 +38,11 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
     private final Vector3 aux1;
     private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private float[] pointAlpha;
-    private final float[] alphaSizeFovBr;
+    private final float[] alphaSizeBr;
     private final float[] pointAlphaHl;
     private final Colormap cmap;
 
     private Texture starTex;
-    private Quaternion quaternion;
 
     // Positions per vertex index
     private Pair<Float, Float>[] vertPos;
@@ -58,10 +53,9 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
         this.comp = new DistToCameraComparator<>();
-        this.alphaSizeFovBr = new float[4];
+        this.alphaSizeBr = new float[3];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
-        this.quaternion = new Quaternion();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
@@ -87,9 +81,6 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
-        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
-
         pointAlpha = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
         ExtShaderProgram shaderProgram = getShaderProgram();
@@ -134,18 +125,14 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
-            float starPointSize = StarSettings.getStarPointSize();
-
-            // Billboard quaternion
-            DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
+            float starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
 
             shaderProgram.begin();
             // Global uniforms
-            shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
-            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-            shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
-            shaderProgram.setUniformf("u_brPow", Settings.settings.scene.star.power);
+            shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
+            shaderProgram.setUniformf("u_brPow", 0.4f + Settings.settings.scene.star.power * 0.3f);
             shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
             // Update projection if fovMode is 3
@@ -155,19 +142,21 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
                 FovCamera cam = ((CameraManager) camera).fovCamera;
                 // Update combined
                 PerspectiveCamera[] cams = camera.getFrontCameras();
-                shaderProgram.setUniformMatrix("u_projModelView", cams[cam.dirIndex].combined);
+                shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
             }
-            alphaSizeFovBr[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
-            alphaSizeFovBr[3] = rc.scaleFactor;
+            alphaSizeBr[2] = Settings.settings.scene.star.brightness;
+            shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power/1.1f) - 0.1f) * 2.0f - 1.0f);
 
             renderables.forEach(r -> {
                 final StarGroup starGroup = (StarGroup) r;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                        if (!starGroup.inGpu()) {
+                        if (!starGroup.inGpu() ) {
                             int n = starGroup.size();
-                            starGroup.offset = addMeshData(n * 4, n * 6);
+                            if (starGroup.offset < 0) {
+                                starGroup.offset = addMeshData(n * 4, n * 6);
+                            }
                             curr = meshes.get(starGroup.offset);
                             ensureTempVertsSize(n * 4 * curr.vertexSize);
                             ensureTempIndicesSize(n * 6);
@@ -194,11 +183,10 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
                                         }
 
                                         // SIZE
-                                        double sizeFac = 6e1;
                                         if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * sizeFac) * starGroup.highlightedSizeFactor());
+                                            tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
                                         } else {
-                                            tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * sizeFac) * starGroup.highlightedSizeFactor();
+                                            tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                         }
 
                                         // Vertex POSITION [u]
@@ -253,9 +241,9 @@ public class StarGroupQuadRenderSystem extends ImmediateRenderSystem implements 
 
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
 
-                            alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
-                            shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
+                            alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
+                            alphaSizeBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) * 0.3f;
+                            shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility

@@ -98,12 +98,7 @@ public class ParticleDataBinaryIO {
                     data_out.writeFloat(s.pm.z);
                     data_out.writeLong(s.id);
                     data_out.writeInt(s instanceof Star ? ((Star) s).hip : -1);
-                    if (((Star) s).tycho != null && ((Star) s).tycho.length() > 0) {
-                        data_out.writeInt(((Star) s).tycho.length());
-                        data_out.writeChars(((Star) s).tycho);
-                    } else {
-                        data_out.writeInt(0);
-                    }
+                    data_out.writeInt(0);
                     data_out.writeByte(s.catalogSource);
                     data_out.writeInt(s.octantId.intValue());
                     // TODO Legacy type, remove
@@ -167,7 +162,6 @@ public class ParticleDataBinaryIO {
                     for (int i = 0; i < tychoLength; i++) {
                         sb.append(data_in.readChar());
                     }
-                    String tycho = sb.toString();
 
                     byte source = data_in.readByte();
                     long pageId = data_in.readInt();
@@ -184,7 +178,7 @@ public class ParticleDataBinaryIO {
                         cc = new float[] { r, g, b, a };
                     }
 
-                    Star s = new Star(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, id, hip, tycho, source);
+                    Star s = new Star(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, id, hip, source);
                     s.cc = cc;
                     s.octantId = pageId;
                     s.initialize();

@@ -110,7 +110,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
 
             shaderProgram.begin();
             // Global uniforms
-            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
@@ -124,7 +124,7 @@ public class StarGroupRenderSystem extends ImmediateRenderSystem implements IObs
                 FovCamera cam = ((CameraManager) camera).fovCamera;
                 // Update combined
                 PerspectiveCamera[] cams = camera.getFrontCameras();
-                shaderProgram.setUniformMatrix("u_projModelView", cams[cam.dirIndex].combined);
+                shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
             }
             alphaSizeFovBr[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
             alphaSizeFovBr[3] = rc.scaleFactor;

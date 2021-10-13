@@ -142,65 +142,69 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         STAR_GROUP(16),
         /**
+         * Star group (quads)
+         **/
+        STAR_GROUP_QUAD(17),
+        /**
          * Shapes
          **/
-        SHAPE(17),
+        SHAPE(18),
         /**
          * Regular billboard sprite
          **/
-        BILLBOARD_SPRITE(18),
+        BILLBOARD_SPRITE(19),
         /**
          * Line GPU
          **/
-        LINE_GPU(19),
+        LINE_GPU(20),
         /**
          * Particle positions from orbital elements
          **/
-        PARTICLE_ORBIT_ELEMENTS(20),
+        PARTICLE_ORBIT_ELEMENTS(21),
         /**
          * Transparent additive-blended meshes
          **/
-        MODEL_VERT_ADDITIVE(21),
+        MODEL_VERT_ADDITIVE(22),
         /**
          * Grids shader
          **/
-        MODEL_VERT_GRID(22),
+        MODEL_VERT_GRID(23),
         /**
          * Clouds
          **/
-        MODEL_CLOUD(23),
+        MODEL_CLOUD(24),
         /**
          * Point
          **/
-        POINT(24),
+        POINT(25),
         /**
          * Point GPU
          **/
-        POINT_GPU(25),
+        POINT_GPU(26),
         /**
          * Opaque meshes (dust, etc.)
          **/
-        MODEL_PIX_DUST(26),
+        MODEL_PIX_DUST(27),
         /**
          * Tessellated model
          **/
-        MODEL_PIX_TESS(27),
+        MODEL_PIX_TESS(28),
         /**
          * Only diffuse
          **/
-        MODEL_DIFFUSE(28),
+        MODEL_DIFFUSE(29),
         /**
          * Recursive grid
          */
-        MODEL_VERT_RECGRID(29),
+        MODEL_VERT_RECGRID(30),
         /**
          * Thrusters
          */
-        MODEL_VERT_THRUSTER(30),
+        MODEL_VERT_THRUSTER(31),
         /**
          * Variable star group
          **/
-        VARIABLE_GROUP(31),
+        VARIABLE_GROUP(32),
         /**
          * None
          **/
@@ -745,7 +749,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP QUAD
-        AbstractRenderSystem starGroupQuadProc = new StarGroupQuadRenderSystem(STAR_GROUP, alphas, starGroupQuadShaders);
+        AbstractRenderSystem starGroupQuadProc = new StarGroupQuadRenderSystem(STAR_GROUP_QUAD, alphas, starGroupQuadShaders);
         starGroupQuadProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupQuadProc.addPostRunnables(regularBlendR, depthWritesR);
 
@@ -807,6 +811,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Stars, particles
         addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupProc);
+        addRenderSystem(starGroupQuadProc);
         addRenderSystem(variableGroupProc);
         addRenderSystem(orbitElemProc);
 

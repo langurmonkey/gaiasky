@@ -56,8 +56,6 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         float[] vertices = new float[20];
         fillVertices(vertices, w, h);
 
-        // We wont need indices if we use GL_TRIANGLE_FAN to draw our quad
-        // TRIANGLE_FAN will draw the verts in this order: 0, 1, 2; 0, 2, 3
         mesh = new IntMesh(true, 4, 6, new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
 
         mesh.setVertices(vertices, 0, vertices.length);

@@ -10,10 +10,12 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.math.Vector3d;
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * This class provides utils to use Sprites and Fonts as if they were Decals,
@@ -78,6 +80,7 @@ public class DecalUtils {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
+
 
         Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 
@@ -151,10 +154,26 @@ public class DecalUtils {
 
     }
 
+    private static void lookAtRotation(Quaternion quaternion, Vector3 direction, Vector3 up) {
+        // Orthonormalize
+        direction.nor();
+        up = up.sub(direction.scl(up.dot(direction)));
+        up.nor();
+
+        Vector3 right = up.crs(direction);
+
+        quaternion.w = (float) Math.sqrt(1.0f + right.x + up.y + direction.z) * 0.5f;
+
+        double w4Recip = 1.0 / (4.0 * quaternion.w);
+        quaternion.x = (float) ((up.z - direction.y) * w4Recip);
+        quaternion.y = (float) ((direction.x - right.z) * w4Recip);
+        quaternion.z = (float) ((right.y - up.x) * w4Recip);
+    }
     /**
      * Gets the billboard rotation using the parameters of the given camera
      *
      * @param camera The camera
+     *
      * @return The quaternion with the rotation
      */
     public static Quaternion getBillboardRotation(Camera camera) {
@@ -167,6 +186,7 @@ public class DecalUtils {
      *
      * @param direction The direction vector
      * @param up        The up vector
+     *
      * @return The quaternion with the rotation
      */
     public static Quaternion getBillboardRotation(Vector3 direction, Vector3 up) {
@@ -187,6 +207,9 @@ public class DecalUtils {
         tmp.set(up).crs(direction).nor();
         tmp2.set(direction).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, direction.x, tmp.y, tmp2.y, direction.y, tmp.z, tmp2.z, direction.z);
+        //tmp.set(direction);
+        //tmp2.set(up);
+        //lookAtRotation(rotation, tmp, tmp2);
     }
 
     /**
@@ -200,6 +223,9 @@ public class DecalUtils {
         tmp.set((float) up.x, (float) up.y, (float) up.z).crs((float) direction.x, (float) direction.y, (float) direction.z).nor();
         tmp2.set((float) direction.x, (float) direction.y, (float) direction.z).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, (float) direction.x, tmp.y, tmp2.y, (float) direction.y, tmp.z, tmp2.z, (float) direction.z);
+        //direction.put(tmp);
+        //up.put(tmp2);
+        //lookAtRotation(rotation, tmp, tmp2);
     }
 
 }
