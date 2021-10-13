@@ -144,6 +144,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         STAR_GROUP(17),
         /**
+         * Star group (quads)
+         **/
+        STAR_GROUP_QUAD(17),
+        /**
          * Shapes
          **/
         SHAPE(19),

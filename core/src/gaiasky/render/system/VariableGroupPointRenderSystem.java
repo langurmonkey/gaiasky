@@ -5,7 +5,6 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
@@ -28,18 +27,15 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import org.lwjgl.opengl.GL30;
 
 /**
  * Renders variable stars which have periodical light curve data
  */
 public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
-    private final double BRIGHTNESS_FACTOR;
-
     private final Vector3 aux1;
     private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset;
     private float[] pointAlpha;
-    private final float[] alphaSizeFovBr;
+    private final float[] alphaSizeBr;
     private final float[] pointAlphaHl;
     private final Colormap cmap;
 
@@ -47,8 +43,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
 
     public VariableGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        BRIGHTNESS_FACTOR = 10;
-        this.alphaSizeFovBr = new float[4];
+        this.alphaSizeBr = new float[3];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
@@ -64,9 +59,6 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
-        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
-
         pointAlpha = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
         ExtShaderProgram shaderProgram = getShaderProgram();
@@ -127,17 +119,17 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                 FovCamera cam = ((CameraManager) camera).fovCamera;
                 // Update combined
                 PerspectiveCamera[] cams = camera.getFrontCameras();
-                shaderProgram.setUniformMatrix("u_projModelView", cams[cam.dirIndex].combined);
+                shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
             }
-            alphaSizeFovBr[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
-            alphaSizeFovBr[3] = rc.scaleFactor;
+            alphaSizeBr[2] = Settings.settings.scene.star.brightness;
+            shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power/1.1f) - 0.1f) * 2.0f - 1.0f);
 
             renderables.forEach(r -> {
                 final StarGroup starGroup = (StarGroup) r;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                        if (!starGroup.inGpu()) {
+                        if (!starGroup.inGpu() ) {
                             int n = starGroup.size();
                             starGroup.offset = addMeshData(n);
                             curr = meshes.get(starGroup.offset);
@@ -205,9 +197,9 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
 
                             shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
 
-                            alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
-                            shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
+                            alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
+                            alphaSizeBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) * 0.3f;
+                            shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility
