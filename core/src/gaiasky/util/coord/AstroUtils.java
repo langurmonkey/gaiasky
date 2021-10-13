@@ -84,7 +84,7 @@ public class AstroUtils {
      * distance from the Sun to the Earth in Km
      *
      * @param date The date
-     * @return The distancee from the Sun to the Earth in Km
+     * @return The distance from the Sun to the Earth in Km
      */
     public static double getSunDistance(Instant date) {
         return getSunDistance(getJulianDateCache(date));
