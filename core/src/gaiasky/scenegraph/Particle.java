@@ -341,7 +341,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= Settings.settings.scene.star.brightness * 0.15f;
+        computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
         return (float) computedSize;
     }
 
@@ -364,7 +364,6 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             // Convert to cartesian coordinates and put them in aux3 vector
             if (pos.len2d() == 0) {
                 // Sun!
-
             } else {
                 Coordinates.cartesianToSpherical(pos, aux3);
                 posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));

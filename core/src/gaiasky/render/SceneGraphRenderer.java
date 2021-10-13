@@ -144,10 +144,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         STAR_GROUP(17),
         /**
-         * Star group (quads)
-         **/
-        STAR_GROUP_QUAD(17),
-        /**
          * Shapes
          **/
         SHAPE(19),
@@ -538,7 +534,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram[] starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
 
         /*
-         * VARIABLE GROUP (TRI) - default and relativistic
+         * VARIABLE GROUP - default and relativistic
          */
         ExtShaderProgram[] variableGroupShaders = fetchShaderProgram(manager, variableGroupDesc, TextUtils.concatAll("variable.group", names));
 
