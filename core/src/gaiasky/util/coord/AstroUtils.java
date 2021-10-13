@@ -191,7 +191,7 @@ public class AstroUtils {
      */
     public static Vector3b moonEclipticCoordinates(Instant date, Vector3b out) {
         Vector3d outd = new Vector3d();
-        moonEclipticCoordinates(getDaysSinceJ2000(date), outd);
+        moonEclipticCoordinates(getJulianDateCache(date), outd);
         return out.set(outd);
     }
 
@@ -215,7 +215,7 @@ public class AstroUtils {
         double T3 = T2 * T;
         double T4 = T3 * T;
         // Moon's mean longitude, referred to the mean equinox of the date
-        double Lp = 218.316447 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841.0 - T4 / 65194000.0;
+        double Lp = 218.3164477 + 481267.88123421 * T - 0.0015786 * T2 + T3 / 538841.0 - T4 / 65194000.0;
         Lp = prettyAngle(Lp);
         // Mean elongation of the Moon
         double D = 297.8501921 + 445267.1114034 * T - 0.0018819 * T2 + T3 / 545868.0 - T4 / 113065000.0;
@@ -409,19 +409,12 @@ public class AstroUtils {
     }
 
     private static double prettyAngle(double angle) {
-        return angle % 360 + (angle < 0 ? 360 : 0);
+        return angle - 360d * (int) (angle / 360d);
     }
 
     /**
      * Gets the Julian date number given the Gregorian calendar quantities.
      *
-     * @param year
-     * @param month
-     * @param day
-     * @param hour
-     * @param min
-     * @param sec
-     * @param nanos
      * @param gregorian Whether to use the Gregorian or the Julian calendar
      * @return The julian date number
      */
