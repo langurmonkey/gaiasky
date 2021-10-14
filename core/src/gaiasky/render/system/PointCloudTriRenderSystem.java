@@ -31,9 +31,11 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Contains some common code to all point cloud renderers.
+ * Adds some utils to build quads as a couple of triangles. This should
+ * be used by point clouds that render their particles as
+ * GL_TRIANGLES.
  */
-public abstract class PointCloudTriRenderSystem extends ImmediateRenderSystem implements IObserver {
+public abstract class PointCloudTriRenderSystem extends PointCloudRenderSystem implements IObserver {
 
     // Positions per vertex index
     protected Pair<Float, Float>[] vertPos;
@@ -56,81 +58,22 @@ public abstract class PointCloudTriRenderSystem extends ImmediateRenderSystem im
         vertUV[3] = new Pair<>(0f, 1f);
     }
 
-    @Override
-    protected void initVertices() {
-        meshes = new Array<>();
-    }
-
-    protected abstract void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera);
-
-    protected abstract void renderObject(ExtShaderProgram shaderProgram, IRenderable r);
-
-    @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
-            ExtShaderProgram shaderProgram = getShaderProgram();
-
-            shaderProgram.begin();
-            // Global uniforms
-            globalUniforms(shaderProgram, camera);
-            // Render
-            renderables.forEach((r) -> renderObject(shaderProgram, r));
-            shaderProgram.end();
-        }
-    }
-
     protected void index(int idx) {
         tempIndices[curr.indexIdx++] = idx;
     }
 
     /**
-     * Adds the required vertex attributes for this renderer to the given list
-     * @param attributes The list of attributes
+     * Adds the indices to make two triangles into
+     * a quad, given the four vertices in vertPos.
+     * @param current The current mesh.
      */
-    protected abstract void addVertexAttributes(Array<VertexAttribute> attributes);
+    protected void quadIndices(MeshData current) {
+        index(current.numVertices - 4);
+        index(current.numVertices - 3);
+        index(current.numVertices - 2);
 
-    /**
-     * Builds the vertex attributes array and returns it
-     * @return The vertex attributes array
-     */
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attributes = new Array<>();
-        addVertexAttributes(attributes);
-
-        VertexAttribute[] array = new VertexAttribute[attributes.size];
-        for (int i = 0; i < attributes.size; i++)
-            array[i] = attributes.get(i);
-        return array;
+        index(current.numVertices - 2);
+        index(current.numVertices - 1);
+        index(current.numVertices - 4);
     }
-    /**
-     * Computes the offset for each vertex attribute. The offsets will be
-     * used later in the render stage.
-     * @param curr The current mesh data
-     */
-    protected abstract void offsets(MeshData curr);
-
-    /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     *
-     * @param maxVerts   The max number of vertices this mesh data can hold
-     * @param maxIndices The maximum number of indices this mesh data can hold
-     *
-     * @return The index of the new mesh data
-     */
-    protected int addMeshData(int maxVerts, int maxIndices) {
-        int mdi = createMeshData();
-        curr = meshes.get(mdi);
-
-        VertexAttribute[] attributes = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, maxVerts, maxIndices, attributes);
-
-        curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
-
-        offsets(curr);
-
-        return mdi;
-    }
-
-
-
 }

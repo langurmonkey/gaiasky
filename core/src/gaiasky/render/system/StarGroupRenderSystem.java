@@ -107,8 +107,8 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power / 1.1f) - 0.1f) * 2.0f - 1.0f);
     }
 
-    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable r) {
-        final StarGroup starGroup = (StarGroup) r;
+    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+        final StarGroup starGroup = (StarGroup) renderable;
         synchronized (starGroup) {
             if (!starGroup.disposed) {
                 boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
@@ -172,13 +172,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                                 numVerticesAdded++;
                             }
                             // Indices
-                            index(curr.numVertices - 4);
-                            index(curr.numVertices - 3);
-                            index(curr.numVertices - 2);
-
-                            index(curr.numVertices - 2);
-                            index(curr.numVertices - 1);
-                            index(curr.numVertices - 4);
+                            quadIndices(curr);
                             numStarsAdded++;
                         }
                     }

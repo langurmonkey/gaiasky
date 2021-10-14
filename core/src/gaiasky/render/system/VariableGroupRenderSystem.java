@@ -194,13 +194,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
                                 numVerticesAdded++;
                             }
                             // Indices
-                            index(curr.numVertices - 4);
-                            index(curr.numVertices - 3);
-                            index(curr.numVertices - 2);
-
-                            index(curr.numVertices - 2);
-                            index(curr.numVertices - 1);
-                            index(curr.numVertices - 4);
+                            quadIndices(curr);
                             numStarsAdded++;
                         }
                     }

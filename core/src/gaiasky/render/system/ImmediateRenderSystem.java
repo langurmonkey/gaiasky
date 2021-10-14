@@ -65,6 +65,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         public static final int VariableTimes = 4096;
         public static final int StarPosition = 8192;
         public static final int ProperMotion = 16384;
+        public static final int Additional = 20000;
     }
 
     /**
