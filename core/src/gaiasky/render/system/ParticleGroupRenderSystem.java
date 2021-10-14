@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -33,7 +32,7 @@ import java.util.Random;
 
 public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private final Vector3 aux1;
-    private int additionalOffset, particlePosOffset, uvOffset;
+    private int posOffset, sizeOffset, particlePosOffset, uvOffset;
     private final Random rand;
     private final Colormap cmap;
     private boolean stereoHalfWidth;
@@ -52,19 +51,20 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
         // Empty
     }
 
-    protected void offsets(MeshData curr) {
-        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        additionalOffset = curr.mesh.getVertexAttribute(OwnUsage.Additional) != null ? curr.mesh.getVertexAttribute(OwnUsage.Additional).offset / 4 : 0;
-        particlePosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
-        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
-    }
-
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
-        attributes.add(new VertexAttribute(OwnUsage.Additional, 2, "a_additional"));
+        attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
+    }
+
+    protected void offsets(MeshData curr) {
+        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+        posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
+        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
+        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
+        particlePosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
     protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
@@ -133,12 +133,12 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                                     tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                                 }
 
-                                // SIZE, CMAP_VALUE
-                                tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
+                                // SIZE
+                                tempVerts[curr.vertexIdx + sizeOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
 
                                 // Vertex POSITION
-                                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
+                                tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                                tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
                                 // UV coordinates
                                 tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
@@ -165,6 +165,9 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                     particleGroup.inGpu(true);
                 }
 
+                /*
+                 * RENDER
+                 */
                 curr = meshes.get(particleGroup.offset);
                 if (curr != null) {
                     float meanDist = (float) (particleGroup.getMeanDistance());
@@ -175,8 +178,11 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                     shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                     shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] * s), (float) (particleGroup.particleSizeLimits[1] * s));
 
-                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-
+                    try {
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                    } catch (IllegalArgumentException e) {
+                        logger.error(e, "Render exception");
+                    }
                 }
             }
         }

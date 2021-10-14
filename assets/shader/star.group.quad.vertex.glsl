@@ -6,10 +6,10 @@
 
 in vec4 a_position;
 in vec3 a_starPos;
-in vec3 a_pm;
-in vec4 a_color;
-in float a_size;
 in vec2 a_texCoord;
+in vec4 a_color;
+in vec3 a_pm;
+in float a_size;
 
 // time in days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
@@ -20,15 +20,6 @@ uniform vec2 u_thAnglePoint;
 
 // VR scale factor
 uniform float u_vrScale;
-
-#ifdef relativisticEffects
-#include shader/lib_relativity.glsl
-#endif // relativisticEffects
-
-#ifdef gravitationalWaves
-#include shader/lib_gravwaves.glsl
-#endif // gravitationalWaves
-
 // x - alpha
 // y - point size/fov factor
 // z - star brightness
@@ -37,6 +28,14 @@ uniform vec3 u_alphaSizeBr;
 uniform float u_brightnessPower;
 // Minimum solid anlge of the quads
 uniform float u_minSolidAngle;
+
+#ifdef relativisticEffects
+    #include shader/lib_relativity.glsl
+#endif // relativisticEffects
+
+#ifdef gravitationalWaves
+    #include shader/lib_gravwaves.glsl
+#endif // gravitationalWaves
 
 // OUTPUT
 out vec4 v_col;
