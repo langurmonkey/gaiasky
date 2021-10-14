@@ -6,6 +6,7 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.util.Logger;
@@ -58,9 +59,12 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     }
 
     protected static class OwnUsage {
-        public static final int VariableMagnitudes = 400;
-        public static final int VariableTimes = 500;
-        public static final int StarPosition = 600;
+        public static final int Size = 512;
+        public static final int NumVariablePoints = 1024;
+        public static final int VariableMagnitudes = 2048;
+        public static final int VariableTimes = 4096;
+        public static final int StarPosition = 8192;
+        public static final int ProperMotion = 16384;
     }
 
     /**

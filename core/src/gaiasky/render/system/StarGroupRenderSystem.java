@@ -34,7 +34,6 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     private final Vector3 aux1;
     private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private final float[] alphaSizeBr;
-    private final float[] pointAlphaHl;
     private final Colormap cmap;
 
     private float starPointSize;
@@ -46,10 +45,10 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         super(rg, alphas, shaders);
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeBr = new float[3];
-        this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
+        minSolidAngle = (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f));
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
@@ -61,7 +60,6 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
 
     @Override
     protected void initShaderProgram() {
-
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
         // Uniforms that rarely change
@@ -72,17 +70,17 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Tangent, 3, "a_pm"));
+        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Generic, 1, "a_size"));
+        attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
         attributes.add(new VertexAttribute(OwnUsage.StarPosition, 3, "a_starPos"));
     }
 
     protected void offsets(MeshData curr) {
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
-        pmOffset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
+        pmOffset = curr.mesh.getVertexAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getVertexAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
+        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
         starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.StarPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.StarPosition).offset / 4 : 0;
     }
 
@@ -93,7 +91,6 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
-        shaderProgram.setUniformf("u_brPow", 0.4f + Settings.settings.scene.star.power * 0.3f);
         shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
         shaderProgram.setUniformf("u_minSolidAngle", minSolidAngle);
         addEffectsUniforms(shaderProgram, camera);
@@ -152,7 +149,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                                     tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                 }
 
-                                // Vertex POSITION [u]
+                                // Vertex POSITION
                                 tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
                                 tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
 
@@ -215,7 +212,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
                     } catch (IllegalArgumentException e) {
-                        logger.error(e);
+                        logger.error(e, "Render exception");
                     }
                 }
             }
@@ -225,18 +222,14 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD:
-            minSolidAngle = (float) Math.tan(Math.toRadians(((float) data[0]) * 0.3f));
-            break;
-        case DISPOSE_STAR_GROUP_GPU_MESH:
+        case STAR_MIN_OPACITY_CMD -> minSolidAngle = (float) Math.tan(Math.toRadians(((float) data[0]) * 0.3f));
+        case DISPOSE_STAR_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
-            break;
-        case STAR_TEXTURE_IDX_CMD:
-            GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
-            break;
-        default:
-            break;
+        }
+        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        default -> {
+        }
         }
     }
 

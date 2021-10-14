@@ -69,7 +69,6 @@ public abstract class PointCloudTriRenderSystem extends ImmediateRenderSystem im
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
         if (renderables.size > 0) {
             ExtShaderProgram shaderProgram = getShaderProgram();
-            float starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
 
             shaderProgram.begin();
             // Global uniforms

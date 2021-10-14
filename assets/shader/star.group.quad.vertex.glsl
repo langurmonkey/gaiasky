@@ -15,13 +15,8 @@ in vec2 a_texCoord;
 uniform vec2 u_t;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
-uniform vec3 u_camDir;
 uniform vec3 u_camUp;
-uniform vec4 u_quaternion;
-
 uniform vec2 u_thAnglePoint;
-
-uniform float u_brPow;
 
 // VR scale factor
 uniform float u_vrScale;

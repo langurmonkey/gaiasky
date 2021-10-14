@@ -759,4 +759,15 @@ public class AstroUtils {
         return (out.set(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
 
     }
+
+    /**
+     * Converts an apparent magnitude to an absolute magnitude given the distance in parsecs.
+     * @param distPc The distance to the star in parsecs
+     * @param appMag The apparent magnitude
+     * @return The absolute magnitude
+     */
+    public static double apparentToAbsoluteMagnitude(double distPc, double appMag) {
+        final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
+        return appMag - v + 5.0;
+    }
 }
