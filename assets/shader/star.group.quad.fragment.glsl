@@ -40,7 +40,7 @@ void main() {
     fragColor = clamp(alpha * (v_col + core * 2.0), 0.0, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
-    // Add star outlines
+    // Add outline
     //if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
     //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
     //}

@@ -70,10 +70,10 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
         attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
+        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
-        attributes.add(new VertexAttribute(OwnUsage.StarPosition, 3, "a_starPos"));
     }
 
     protected void offsets(MeshData curr) {
@@ -81,13 +81,12 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getVertexAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
-        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.StarPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.StarPosition).offset / 4 : 0;
+        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
     protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
-
         starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
-        // Global uniforms
+
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));

@@ -134,81 +134,85 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         MODEL_VERT_BEAM(14),
         /**
-         * Particle group
+         * Particle group (points)
          **/
-        PARTICLE_GROUP(15),
+        PARTICLE_GROUP_POINT(15),
         /**
-         * Star group
+         * Particle group (triangles)
          **/
-        STAR_GROUP_POINT(16),
+        PARTICLE_GROUP(16),
         /**
-         * Star group (quads)
+         * Star group (points)
          **/
-        STAR_GROUP(17),
+        STAR_GROUP_POINT(17),
+        /**
+         * Star group (triangles)
+         **/
+        STAR_GROUP(18),
         /**
          * Shapes
          **/
-        SHAPE(18),
+        SHAPE(19),
         /**
          * Regular billboard sprite
          **/
-        BILLBOARD_SPRITE(19),
+        BILLBOARD_SPRITE(20),
         /**
          * Line GPU
          **/
-        LINE_GPU(20),
+        LINE_GPU(21),
         /**
          * Particle positions from orbital elements
          **/
-        PARTICLE_ORBIT_ELEMENTS(21),
+        PARTICLE_ORBIT_ELEMENTS(22),
         /**
          * Transparent additive-blended meshes
          **/
-        MODEL_VERT_ADDITIVE(22),
+        MODEL_VERT_ADDITIVE(23),
         /**
          * Grids shader
          **/
-        MODEL_VERT_GRID(23),
+        MODEL_VERT_GRID(24),
         /**
          * Clouds
          **/
-        MODEL_CLOUD(24),
+        MODEL_CLOUD(25),
         /**
          * Point
          **/
-        POINT(25),
+        POINT(26),
         /**
          * Point GPU
          **/
-        POINT_GPU(26),
+        POINT_GPU(27),
         /**
          * Opaque meshes (dust, etc.)
          **/
-        MODEL_PIX_DUST(27),
+        MODEL_PIX_DUST(28),
         /**
          * Tessellated model
          **/
-        MODEL_PIX_TESS(28),
+        MODEL_PIX_TESS(29),
         /**
          * Only diffuse
          **/
-        MODEL_DIFFUSE(29),
+        MODEL_DIFFUSE(30),
         /**
          * Recursive grid
          */
-        MODEL_VERT_RECGRID(30),
+        MODEL_VERT_RECGRID(31),
         /**
          * Thrusters
          */
-        MODEL_VERT_THRUSTER(31),
+        MODEL_VERT_THRUSTER(32),
         /**
          * Variable star group
          **/
-        VARIABLE_GROUP(32),
+        VARIABLE_GROUP(33),
         /**
          * Variable star group
          **/
-        VARIABLE_GROUP_POINT(33),
+        VARIABLE_GROUP_POINT(34),
         /**
          * None
          **/
@@ -272,7 +276,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private ExtShaderProgram[] lineShaders;
     private ExtShaderProgram[] lineQuadShaders;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupPointDesc, starGroupDesc, particleGroupDesc, variableGroupPointDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupPointDesc, starGroupDesc, particleGroupPointDesc, particleGroupDesc, variableGroupPointDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
      * Render lists for all render groups
@@ -370,7 +374,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
-        particleGroupDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
+        particleGroupPointDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("particle.group.point", namesCmap), definesCmap);
+        particleGroupDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
         starGroupPointDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.group.point", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
         variableGroupPointDesc = loadShader(manager, "shader/variable.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("variable.group.point", namesCmap), definesCmap);
@@ -530,7 +535,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram[] particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, TextUtils.concatAll("particle.effect", names));
 
         /*
-         * PARTICLE GROUP - default and relativistic
+         * PARTICLE GROUP POINT - default and relativistic
+         */
+        ExtShaderProgram[] particleGroupPointShaders = fetchShaderProgram(manager, particleGroupPointDesc, TextUtils.concatAll("particle.group.point", names));
+
+        /*
+         * PARTICLE GROUP (TRI) - default and relativistic
          */
         ExtShaderProgram[] particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, TextUtils.concatAll("particle.group", names));
 
@@ -748,6 +758,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         particleEffectsProc.addPostRunnables(regularBlendR);
 
+        // PARTICLE GROUP (POINTS)
+        AbstractRenderSystem particleGroupPointProc = new ParticleGroupPointRenderSystem(PARTICLE_GROUP_POINT, alphas, particleGroupPointShaders);
+        particleGroupPointProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        particleGroupPointProc.addPostRunnables(regularBlendR, depthWritesR);
+
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
@@ -824,6 +839,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(billboardStarsProc);
 
         // Stars, particles
+        addRenderSystem(particleGroupPointProc);
         addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupPointProc);
         addRenderSystem(starGroupProc);

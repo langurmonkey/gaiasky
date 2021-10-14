@@ -19,7 +19,6 @@ import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
@@ -76,7 +75,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
         attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.StarPosition, 3, "a_starPos"));
+        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
 
         attributes.add(new VertexAttribute(OwnUsage.NumVariablePoints, 1, "a_nVari"));
         attributes.add(new VertexAttribute(OwnUsage.VariableMagnitudes, 4, "a_vmags1"));
@@ -96,7 +95,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
         uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         pmOffset = curr.mesh.getVertexAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getVertexAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
-        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.StarPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.StarPosition).offset / 4 : 0;
+        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
         nVariOffset = curr.mesh.getVertexAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getVertexAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
         variMagsOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
         variTimesOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
