@@ -8,8 +8,9 @@ package gaiasky.render.system;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Pixmap.Format;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -30,11 +31,10 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
-import org.lwjgl.opengl.GL30;
 
 import java.util.List;
 
-public class MWModelRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private static final String texFolder = "data/galaxy/sprites/";
 
     private final Vector3 aux3f1;
@@ -110,12 +110,14 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
             this.maxSizes[PType.GAS.ordinal()] = 100f;
             this.maxSizes[PType.HII.ordinal()] = 60f;
         }
+        float scale = 1e8f;
+        for (int i = 0; i < this.maxSizes.length; i++) {
+            this.maxSizes[i] *= scale;
+        }
     }
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
-        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
         for (ExtShaderProgram shaderProgram : programs) {
             shaderProgram.begin();
@@ -136,8 +138,8 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
         FileHandle d03 = unpack("dust-03" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d04 = unpack("dust-04" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d05 = unpack("dust-05" + Constants.STAR_SUBSTITUTE + ".png", gq);
-        ta = new TextureArray(true, Pixmap.Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
-        ta.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
+        ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
     }
 
     private FileHandle unpack(String texName, GraphicsQuality gq) {
@@ -164,12 +166,13 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                 md.dispose();
             }
             md = new MeshData();
-            VertexAttribute[] attribs = buildVertexAttributes();
-            md.mesh = new IntMesh(true, ad.vertices.length / 6, 0, attribs);
+            VertexAttribute[] attributes = buildVertexAttributes();
+            md.mesh = new IntMesh(true, ad.vertices.length / 6, ad.indices.length, attributes);
             md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
             md.colorOffset = md.mesh.getVertexAttribute(Usage.ColorPacked) != null ? md.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
             md.vertexIdx = ad.vertexIdx;
-            md.mesh.setVertices(ad.vertices, 0, md.vertexIdx);
+            md.mesh.setVertices(ad.vertices, 0, ad.vertices.length);
+            md.mesh.setIndices(ad.indices, 0, ad.indices.length);
 
             ad.vertices = null;
             return md;
@@ -188,43 +191,62 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
      * @param data List with the particle records
      * @param cg   The color generator
      * @param type The type
+     *
      * @return The GPU data object
      */
     private GpuData convertDataToGpu(List<IParticleRecord> data, ColorGenerator cg, PType type) {
         GpuData ad = new GpuData();
 
-        int vertexSize = 3 + 1 + 3;
-        int colorOffset = 3;
-        int additionalOffset = 4;
-        ad.vertices = new float[data.size() * vertexSize];
+        // vert_pos + col + uv + obj_pos + additional
+        int vertexSize = 2 + 1 + 2 + 3 + 3;
+        // Offsets
+        int posOffset = 0;
+        int colorOffset = 2;
+        int uvOffset = 3;
+        int particlePosOffset = 5;
+        int additionalOffset = 8;
+        ad.vertices = new float[data.size() * vertexSize * 4];
+        ad.indices = new int[data.size() * 6];
 
         int nLayers = type.layers.length;
 
         int i = 0;
         for (IParticleRecord particle : data) {
             if (type.modulus == 0 || i % type.modulus == 0) {
-                // COLOR
-                double[] doubleData = particle.rawDoubleData();
-                float[] col = doubleData.length >= 7 ? new float[] { (float) doubleData[4], (float) doubleData[5], (float) doubleData[6] } : cg.generateColor();
-                col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
-                col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
-                col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
-                ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
+                int layer = StdRandom.uniform(nLayers);
+                for (int vert = 0; vert < 4; vert++) {
+                    // Vertex POSITION
+                    ad.vertices[ad.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                    ad.vertices[ad.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
-                // SIZE, TYPE, TEX LAYER
-                double starSize = particle.size();
-                ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
-                ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
-                ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[StdRandom.uniform(nLayers)];
+                    // COLOR
+                    double[] doubleData = particle.rawDoubleData();
+                    float[] col = doubleData.length >= 7 ? new float[] { (float) doubleData[4], (float) doubleData[5], (float) doubleData[6] } : cg.generateColor();
+                    col[0] = MathUtilsd.clamp(col[0], 0f, 1f);
+                    col[1] = MathUtilsd.clamp(col[1], 0f, 1f);
+                    col[2] = MathUtilsd.clamp(col[2], 0f, 1f);
+                    ad.vertices[ad.vertexIdx + colorOffset] = Color.toFloatBits(col[0], col[1], col[2], 1f);
 
-                // POSITION
-                aux3f1.set((float) particle.x(), (float) particle.y(), (float) particle.z());
-                final int idx = ad.vertexIdx;
-                ad.vertices[idx] = aux3f1.x;
-                ad.vertices[idx + 1] = aux3f1.y;
-                ad.vertices[idx + 2] = aux3f1.z;
+                    // UV coordinates
+                    ad.vertices[ad.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                    ad.vertices[ad.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
-                ad.vertexIdx += vertexSize;
+                    // SIZE, TYPE, TEX LAYER
+                    double starSize = particle.size();
+                    ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
+                    ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
+                    ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[layer];
+
+                    // OBJECT POSITION
+                    final int idx = ad.vertexIdx;
+                    ad.vertices[idx + particlePosOffset] = (float) particle.x();
+                    ad.vertices[idx + particlePosOffset + 1] = (float) particle.y();
+                    ad.vertices[idx + particlePosOffset + 2] = (float) particle.z();
+
+                    ad.vertexIdx += vertexSize;
+                    ad.numVertices++;
+                }
+                ad.quadIndices();
             }
             i++;
         }
@@ -261,6 +283,7 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        initializeMaxSizes(Settings.settings.graphics.quality);
         if (renderables.size > 0) {
             MilkyWay mw = (MilkyWay) renderables.get(0);
 
@@ -290,12 +313,13 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     ta.bind(0);
                     shaderProgram.setUniformi("u_textures", 0);
 
-                    shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-                    shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux3f1));
+                    shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+                    shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
+                    shaderProgram.setUniformf("u_camUp", aux3f1.set(0, 1, 0));
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
                     shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
                     shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
-                    double pointScaleFactor = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * rc.scaleFactor) / camera.getFovFactor();
+                    double pointScaleFactor = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * rc.scaleFactor) * 1e7;
 
                     // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);
@@ -310,9 +334,9 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.6e13 * pointScaleFactor));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.6e-6 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 2.2f);
-                    dust.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                    dust.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
                     Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
@@ -322,25 +346,25 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
                     shaderProgram.setUniformf("u_sizeFactor", (float) (7e11 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 1.2f);
-                    hii.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                    hii.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.9e12 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 0.8f);
-                    gas.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (3.9e12 * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", 1.2f);
+                    gas.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // Bulge
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.BULGE.ordinal()]);
                     shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 0.5f);
-                    bulge.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                    bulge.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // Stars
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
                     shaderProgram.setUniformf("u_sizeFactor", (float) (0.3e11 * pointScaleFactor));
                     shaderProgram.setUniformf("u_intensity", 2.5f);
-                    stars.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                    stars.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     shaderProgram.end();
 
@@ -351,16 +375,27 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     }
 
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Generic, 3, "a_additional"));
+    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
+        attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
+        attributes.add(new VertexAttribute(OwnUsage.Additional, 3, "a_additional"));
+    }
 
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
-        return array;
+    @Override
+    protected void offsets(MeshData curr) {
+        // Empty, do not use mesh data
+    }
+
+    @Override
+    protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+        // Not using this either
+    }
+
+    @Override
+    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+        // Empty too
     }
 
     @Override
@@ -402,6 +437,22 @@ public class MWModelRenderSystem extends ImmediateRenderSystem implements IObser
 
     private static class GpuData {
         float[] vertices;
+        int[] indices;
         int vertexIdx;
+        int indexIdx;
+        int numVertices;
+
+        public void quadIndices(){
+                index(numVertices - 4);
+                index(numVertices - 3);
+                index(numVertices - 2);
+
+                index(numVertices - 2);
+                index(numVertices - 1);
+                index(numVertices - 4);
+        }
+        private void index(int idx) {
+            indices[indexIdx++] = idx;
+        }
     }
 }

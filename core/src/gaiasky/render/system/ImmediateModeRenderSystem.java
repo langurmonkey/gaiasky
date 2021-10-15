@@ -6,7 +6,6 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.util.Logger;
@@ -14,8 +13,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
-    protected static final Log logger = Logger.getLogger(ImmediateRenderSystem.class);
+public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
+    protected static final Log logger = Logger.getLogger(ImmediateModeRenderSystem.class);
 
     protected int meshIdx;
     protected Array<MeshData> meshes;
@@ -117,11 +116,11 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         }
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+    protected ImmediateModeRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         this(rg, alphas, programs, -1);
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
+    protected ImmediateModeRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
         super(rg, alphas, programs);
         initShaderProgram();
         initVertices();

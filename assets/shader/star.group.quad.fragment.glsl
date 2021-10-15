@@ -41,7 +41,7 @@ void main() {
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     // Add outline
-    //if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
+    //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
     //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
     //}
 

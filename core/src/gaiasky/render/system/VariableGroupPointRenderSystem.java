@@ -34,7 +34,7 @@ import org.lwjgl.opengl.GL30;
 /**
  * Renders variable stars which have periodical light curve data
  */
-public class VariableGroupPointRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;

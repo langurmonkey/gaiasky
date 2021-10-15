@@ -6,23 +6,20 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.Pair;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import org.lwjgl.system.CallbackI.V;
 
 /**
  * Contains some common code to all point cloud renderers and some
  * scaffolding to make life easier. Should be used by point
  * clouds that render their particles as GL_POINTS.
  */
-public abstract class PointCloudRenderSystem extends ImmediateRenderSystem implements IObserver {
+public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
     public PointCloudRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);

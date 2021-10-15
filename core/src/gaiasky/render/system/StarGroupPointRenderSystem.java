@@ -31,7 +31,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class StarGroupPointRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;

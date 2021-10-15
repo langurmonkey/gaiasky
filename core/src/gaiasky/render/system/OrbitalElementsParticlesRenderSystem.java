@@ -32,7 +32,7 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
 import org.lwjgl.opengl.GL30;
 
-public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class OrbitalElementsParticlesRenderSystem extends ImmediateModeRenderSystem implements IObserver {
     private final Vector3 aux1;
     private final Matrix4 maux;
     private int elems01Offset, elems02Offset, sizeOffset, count;

@@ -26,7 +26,7 @@ import org.lwjgl.opengl.GL30;
 /**
  * Renders vertices using a VBO.
  */
-public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateRenderSystem {
+public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateModeRenderSystem {
     protected ICamera camera;
     protected boolean lines;
     protected int coordOffset;
