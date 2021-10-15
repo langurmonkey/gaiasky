@@ -74,7 +74,6 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
         shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
-        shaderProgram.setUniformf("u_minSolidAngle", (float) Math.tan(Math.toRadians(0.1)));
         addEffectsUniforms(shaderProgram, camera);
     }
 
@@ -172,11 +171,11 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                 if (curr != null) {
                     float meanDist = (float) (particleGroup.getMeanDistance());
 
-                    double s = 1e3;
+                    double s = 1e-4f;
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
                     shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] * s), (float) (particleGroup.particleSizeLimits[1] * s));
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0]), (float) (particleGroup.particleSizeLimits[1]));
 
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);

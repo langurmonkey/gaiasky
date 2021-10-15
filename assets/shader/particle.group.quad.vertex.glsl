@@ -15,8 +15,6 @@ uniform vec3 u_camPos;
 uniform vec3 u_camUp;
 uniform float u_sizeFactor;
 uniform vec2 u_sizeLimits;
-// Minimum solid anlge of the quads
-uniform float u_minSolidAngle;
 uniform float u_vrScale;
 
 #ifdef relativisticEffects
@@ -68,7 +66,7 @@ void main() {
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
     float viewAngle = a_size / dist;
-    float quadSize = max(u_minSolidAngle * dist, min(max(viewAngle * u_sizeFactor, u_sizeLimits.x), u_sizeLimits.y));
+    float quadSize = min(max(viewAngle * u_sizeFactor * dist, u_sizeLimits.x * dist), u_sizeLimits.y * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = vec4(a_position, 0.0, 1.0);

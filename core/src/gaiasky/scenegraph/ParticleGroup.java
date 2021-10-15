@@ -87,9 +87,14 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float colorNoise = 0;
 
     /**
-     * Particle size limits, in pixels
+     * Particle size limits for the GL_POINTS renderer, in pixels
      */
-    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
+    public double[] particleSizeLimitsPoint = new double[] { 3.5d, 800d };
+    /**
+     * Particle size limits for the GL_TRIANGLES renderer. This will be multiplied by
+     * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
+     */
+    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.08)), Math.tan(Math.toRadians(0.4)) };
 
     /**
      * Are the data of this group in the GPU memory?
@@ -728,6 +733,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         if (sizeLimits[0] > sizeLimits[1])
             sizeLimits[0] = sizeLimits[1];
         this.particleSizeLimits = sizeLimits;
+        this.particleSizeLimitsPoint = sizeLimits;
     }
 
     /**

@@ -30,20 +30,20 @@ void main() {
     float profile = starTexture(uv);
     float alpha = v_col.a * profile;
 
-    if(alpha <= 0.0) {
-        //discard;
+    if(alpha <= 0.0){
+        discard;
     }
 
     // White core
     float core = 1.0 - smoothstep(0.0, 0.04, distance(vec2(0.5), uv) * 2.0);
     // Final color
-    fragColor = vec4(v_col.rgb * core * 2.0, 1.0) * v_col.a * alpha;
+    fragColor = clamp(alpha * (v_col + core * 2.0), 0.0, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     // Add outline
-    if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
-        fragColor = vec4(1.0, 1.0, 0.0, 1.0);
-    }
+    //if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
+    //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    //}
 
     #ifdef velocityBufferFlag
     velocityBuffer();
