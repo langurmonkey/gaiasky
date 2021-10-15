@@ -6,9 +6,9 @@
 
 in vec4 a_position;
 in vec3 a_starPos;
+in vec3 a_pm;
 in vec2 a_texCoord;
 in vec4 a_color;
-in vec3 a_pm;
 in float a_size;
 
 // time in days since epoch, as a 64-bit double encoded with two floats
@@ -26,8 +26,8 @@ uniform float u_vrScale;
 uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
-// Minimum solid anlge of the quads
-uniform float u_minSolidAngle;
+// Clamp values for the solid anlge of the quads
+uniform vec2 u_solidAngleLimits;
 
 #ifdef relativisticEffects
     #include shader/lib_relativity.glsl
@@ -82,8 +82,8 @@ void main() {
     float viewAngleApparent = atan(a_size / dist);
     float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, 0.0, 1.0) * (u_alphaSizeBr.z - 0.4f) / 7.6;
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb * clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0), opacity * u_alphaSizeBr.x);
-    float quadSize = max(u_minSolidAngle * dist, a_size * pow(viewAngleApparent, u_brightnessPower) * (u_alphaSizeBr.y * 0.05f));
+    v_col = vec4(a_color.rgb * clamp(opacity * u_alphaSizeBr.x, 0.0, 1.0), opacity * u_alphaSizeBr.x) * boundaryFade;
+    float quadSize = clamp(a_size * pow(viewAngleApparent, u_brightnessPower) * (u_alphaSizeBr.y * 0.05f), u_solidAngleLimits.x * dist, u_solidAngleLimits.y * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
@@ -113,7 +113,7 @@ void main() {
     v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
     #endif
 
-    if(dist < l0){
+    if (dist < l0) {
         // The pixels of this star will be discarded in the fragment shader
         v_col = vec4(0.0, 0.0, 0.0, 0.0);
     }

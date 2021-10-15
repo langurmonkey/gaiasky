@@ -27,20 +27,27 @@ uniform float u_vrScale;
 
 // Varyings
 out vec4 v_color;
-out vec2 v_texCoords;
+out vec2 v_uv;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
-void main() {
-    float alpha = min(1.0, lint(u_apparent_angle, u_th_angle_point, u_th_angle_point * 4.0, 0.0, 1.0));
+#define LEN0 20000.0
 
-    v_color = vec4(u_color.rgb, u_color.a * alpha);
-    v_texCoords = a_texCoord0;
+void main() {
+    // Lengths
+    float l0 = LEN0 * u_vrScale;
+    float l1 = l0 * 1e3;
+
 
     vec3 pos = u_pos;
     float dist = length(pos);
+
+    float boundaryFade = 1.0 - smoothstep(l0, l1, dist);
+    float alpha = min(1.0, lint(u_apparent_angle, u_th_angle_point, u_th_angle_point * 4.0, 0.0, 1.0));
+    v_color = vec4(u_color.rgb * boundaryFade, u_color.a * alpha);
+    v_uv = a_texCoord0;
 
     #ifdef relativisticEffects
     pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);

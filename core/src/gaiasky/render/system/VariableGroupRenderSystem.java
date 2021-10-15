@@ -40,7 +40,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     private final Colormap cmap;
 
     private float starPointSize;
-    private float minSolidAngle;
+    private float[] solidAngleLimits;
     private int fovMode;
     private Texture starTex;
 
@@ -51,7 +51,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
-        minSolidAngle = (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f));
+        solidAngleLimits = new float[]{(float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f)), (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[1]) * 50f))};
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
@@ -104,12 +104,12 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
 
         starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
-        // Global uniforms
+
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
         shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
-        shaderProgram.setUniformf("u_minSolidAngle", minSolidAngle);
+        shaderProgram.setUniform2fv("u_solidAngleLimits", solidAngleLimits, 0, 2);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         fovMode = camera.getMode().getGaiaFovMode();
@@ -240,7 +240,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD -> minSolidAngle = (float) Math.tan(Math.toRadians(((float) data[0]) * 0.3f));
+        case STAR_MIN_OPACITY_CMD -> solidAngleLimits[0] = (float) Math.tan(Math.toRadians(((float) data[0]) * 0.3f));
         case DISPOSE_STAR_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);

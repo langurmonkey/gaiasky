@@ -306,7 +306,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     Color c = new Color();
 
-    private void renderCloseupStar(int idx, float fovFactor, Vector3d cposd, ExtShaderProgram shader, IntMesh mesh, double thpointTimesFovfactor, double thupOverFovfactor, double thdownOverFovfactor, float alpha) {
+    private void renderCloseupStar(int idx, float fovFactor, Vector3d cPosD, ExtShaderProgram shader, IntMesh mesh, double thPointTimesFovFactor, double thUpOverFovFactor, double thDownOverFovFactor, float alpha) {
         if (filter(idx) && isVisible(idx)) {
             IParticleRecord star = pointData.get(idx);
             double varScl = getVariableSizeScaling(idx);
@@ -314,13 +314,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             double sizeOriginal = getSize(idx);
             double size = sizeOriginal * varScl;
             double radius = size * Constants.STAR_POINT_SIZE_FACTOR;
-            Vector3d starPos = fetchPosition(star, cposd, aux3d1.get(), currDeltaYears);
+            Vector3d starPos = fetchPosition(star, cPosD, aux3d1.get(), currDeltaYears);
             double distToCamera = starPos.len();
             double viewAngle = (sizeOriginal * Constants.STAR_POINT_SIZE_FACTOR / distToCamera) / fovFactor;
 
             Color.abgr8888ToColor(c, getColor(idx));
-            if (viewAngle >= thpointTimesFovfactor) {
-                double fuzzySize = getFuzzyRenderSize(sizeOriginal, radius, distToCamera, viewAngle, thdownOverFovfactor, thupOverFovfactor);
+            if (viewAngle >= thPointTimesFovFactor) {
+                double fuzzySize = getFuzzyRenderSize(sizeOriginal, radius, distToCamera, viewAngle, thDownOverFovFactor, thUpOverFovFactor);
 
                 Vector3 pos = starPos.put(aux3f3.get());
                 shader.setUniformf("u_pos", pos);

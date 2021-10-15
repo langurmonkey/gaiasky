@@ -11,7 +11,6 @@ uniform float u_k;
 // INPUT
 in vec4 v_col;
 in vec2 v_uv;
-in vec4 v_vcol;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -40,9 +39,9 @@ void main() {
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
     // Add outline
-    if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
-        //fragColor = v_vcol;
-    }
+    //if(uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
+    //    fragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    //}
 
     #ifdef velocityBufferFlag
     velocityBuffer(profile);
