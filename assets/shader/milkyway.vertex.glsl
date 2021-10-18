@@ -64,14 +64,13 @@ void main() {
     
 
     float dscale = smoothstep(u_edges.y, u_edges.x, dist);
-    float viewAngle = a_additional.x / dist;
 
     v_col = vec4(a_color.rgb, a_color.a * u_intensity * dscale);
     v_type = int(a_additional.y);
     v_layer = int(a_additional.z);
     v_uv = a_texCoord;
 
-    float quadSize = min(a_additional.x * u_sizeFactor * u_ar * u_vrScale, u_maxPointSize);
+    float quadSize = min(a_additional.x * u_sizeFactor * u_ar * u_vrScale, u_maxPointSize * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

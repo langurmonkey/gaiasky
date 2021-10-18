@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
@@ -33,6 +34,7 @@ import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private static final String texFolder = "data/galaxy/sprites/";
@@ -40,6 +42,8 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
     private final Vector3 aux3f1;
     private MeshData dust, bulge, stars, hii, gas;
     private GpuData dustA, bulgeA, starsA, hiiA, gasA;
+
+    private AtomicBoolean reloadDataFlag = new AtomicBoolean(false);
 
     private TextureArray ta;
     // Max sizes for dust, star, bulge, gas and hii
@@ -86,33 +90,29 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
      */
     private void initializeMaxSizes(GraphicsQuality gq) {
         if (gq.isUltra()) {
-            this.maxSizes[PType.DUST.ordinal()] = 4000f;
-            this.maxSizes[PType.STAR.ordinal()] = 150f;
-            this.maxSizes[PType.BULGE.ordinal()] = 300f;
-            this.maxSizes[PType.GAS.ordinal()] = 4000f;
-            this.maxSizes[PType.HII.ordinal()] = 4000f;
+            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(30f));
+            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.15f));
+            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(10f));
+            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(8f));
         } else if (gq.isHigh()) {
-            this.maxSizes[PType.DUST.ordinal()] = 1000f;
-            this.maxSizes[PType.STAR.ordinal()] = 20f;
-            this.maxSizes[PType.BULGE.ordinal()] = 250f;
-            this.maxSizes[PType.GAS.ordinal()] = 1200f;
-            this.maxSizes[PType.HII.ordinal()] = 400f;
+            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(20f));
+            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(8f));
+            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(2f));
         } else if (gq.isNormal()) {
-            this.maxSizes[PType.DUST.ordinal()] = 60f;
-            this.maxSizes[PType.STAR.ordinal()] = 10f;
-            this.maxSizes[PType.BULGE.ordinal()] = 60f;
-            this.maxSizes[PType.GAS.ordinal()] = 120f;
-            this.maxSizes[PType.HII.ordinal()] = 70f;
+            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(13f));
+            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(2.3f));
+            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(1.5f));
         } else if (gq.isLow()) {
-            this.maxSizes[PType.DUST.ordinal()] = 50f;
-            this.maxSizes[PType.STAR.ordinal()] = 10f;
-            this.maxSizes[PType.BULGE.ordinal()] = 50f;
-            this.maxSizes[PType.GAS.ordinal()] = 100f;
-            this.maxSizes[PType.HII.ordinal()] = 60f;
-        }
-        float scale = 1e8f;
-        for (int i = 0; i < this.maxSizes.length; i++) {
-            this.maxSizes[i] *= scale;
+            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(13f));
+            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
+            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(2f));
+            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(1.5f));
         }
     }
 
@@ -140,6 +140,14 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         FileHandle d05 = unpack("dust-05" + Constants.STAR_SUBSTITUTE + ".png", gq);
         ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
         ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+
+
+        for (ExtShaderProgram shaderProgram : programs) {
+            shaderProgram.begin();
+            ta.bind(0);
+            shaderProgram.setUniformi("u_textures", 0);
+        }
+
     }
 
     private FileHandle unpack(String texName, GraphicsQuality gq) {
@@ -150,9 +158,28 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         ta.dispose();
     }
 
+    private void disposeMeshes() {
+        dust.dispose();
+        dust = null;
+        dustA = null;
+        bulge.dispose();
+        bulge = null;
+        bulgeA = null;
+        stars.dispose();
+        stars = null;
+        starsA = null;
+        hii.dispose();
+        hii = null;
+        hiiA = null;
+        gas.dispose();
+        gas = null;
+        gasA = null;
+    }
+
     @Override
     public void dispose() {
         super.dispose();
+        disposeMeshes();
         disposeTextureArray();
     }
 
@@ -283,9 +310,13 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        initializeMaxSizes(Settings.settings.graphics.quality);
         if (renderables.size > 0) {
             MilkyWay mw = (MilkyWay) renderables.get(0);
+
+            if (reloadDataFlag.get()) {
+                mw.status = LoadStatus.NOT_LOADED;
+                reloadDataFlag.set(false);
+            }
 
             switch (mw.status) {
             case NOT_LOADED:
@@ -310,9 +341,6 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
 
                     shaderProgram.begin();
 
-                    ta.bind(0);
-                    shaderProgram.setUniformi("u_textures", 0);
-
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
                     shaderProgram.setUniformf("u_camUp", aux3f1.set(0, 1, 0));
@@ -334,8 +362,8 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
 
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1.6e-6 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 2.2f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (3e2 * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", 1.2f);
                     dust.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
@@ -344,26 +372,26 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
 
                     // HII
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (7e11 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 1.2f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (1e2 * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", 0.5f);
                     hii.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // Gas
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (3.9e12 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 1.2f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (4e1 * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", 0.5f);
                     gas.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // Bulge
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.BULGE.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (2e12 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 0.5f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (3e1f * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", 10f);
                     bulge.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // Stars
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (0.3e11 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 2.5f);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (.2e1 * pointScaleFactor));
+                    shaderProgram.setUniformf("u_intensity", 8f);
                     stars.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     shaderProgram.end();
@@ -403,9 +431,18 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         if (event == Events.GRAPHICS_QUALITY_UPDATED) {
             GraphicsQuality gq = (GraphicsQuality) data[0];
             GaiaSky.postRunnable(() -> {
-                disposeTextureArray();
+                // Dispose textures and meshes
+                dispose();
+
+                // Initialize textures
                 initializeTextureArray(gq);
+
+                // Initialize maximum sizes
                 initializeMaxSizes(gq);
+
+                // Mark data for reload
+                reloadDataFlag.set(true);
+
             });
         }
     }

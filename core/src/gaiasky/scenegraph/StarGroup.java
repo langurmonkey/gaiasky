@@ -399,7 +399,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             Vector3d pm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(currDeltaYears);
             // Rest of attributes
             float distToCamera = (float) lPos.len();
-            float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness);
+            float viewAngle = ((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness;
             if (viewAngle >= thPointTimesFovFactor / Settings.settings.scene.properMotion.number && (star.pmx() != 0 || star.pmy() != 0 || star.pmz() != 0)) {
                 Vector3d p1 = aux3d1.get().set(star.x() + pm.x, star.y() + pm.y, star.z() + pm.z).sub(camera.getPos());
                 Vector3d ppm = aux3d2.get().set(star.pmx(), star.pmy(), star.pmz()).scl(Settings.settings.scene.properMotion.length);
@@ -517,15 +517,15 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         float thOverFactor = (float) (Settings.settings.scene.star.threshold.point / Settings.settings.scene.label.number / camera.getFovFactor());
 
-        Vector3d auxd = aux3d1.get();
+        Vector3d starPosition = aux3d1.get();
         int n = Math.min(pointData.size(), Settings.settings.scene.star.group.numLabel);
         if (camera.getCurrent() instanceof FovCamera) {
             for (int i = 0; i < n; i++) {
                 IParticleRecord star = pointData.get(active[i]);
-                Vector3d starPosition = fetchPosition(star, cPosD, auxd, currDeltaYears);
+                starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
                 double distToCamera = starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 6f);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness);
 
                 if (camera.isVisible(viewAngle, starPosition, distToCamera)) {
                     render2DLabel(batch, shader, rc, sys.font2d, camera, star.names()[0], starPosition);
@@ -534,7 +534,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         } else {
             for (int i = 0; i < n; i++) {
                 IParticleRecord star = pointData.get(active[i]);
-                Vector3d starPosition = fetchPosition(star, cPosD, auxd, currDeltaYears);
+                starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
                 double distToCamera = starPosition.len();
                 float radius = (float) getRadius(active[i]);
                 float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
@@ -746,7 +746,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    protected Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d destination, double deltaYears) {
+    protected Vector3d fetchPosition(IParticleRecord pb, Vector3d campos, Vector3d out, double deltaYears) {
         Vector3d pm = aux3d2.get().set(pb.pmx(), pb.pmy(), pb.pmz()).scl(deltaYears);
         Vector3d dest = aux3d3.get().set(pb.x(), pb.y(), pb.z());
         if (campos != null && !campos.hasNaN())
@@ -754,7 +754,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         else
             dest.add(pm);
 
-        return destination.set(dest);
+        return out.set(dest);
     }
 
     @Override
