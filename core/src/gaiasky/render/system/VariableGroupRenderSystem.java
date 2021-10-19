@@ -51,7 +51,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
-        solidAngleLimits = new float[]{(float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f)), (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[1]) * 50f))};
+        solidAngleLimits = new float[] { (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f)), (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[1]) * 50f)) };
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_VARIABLE_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
@@ -131,9 +131,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
                 boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
                 if (!starGroup.inGpu()) {
                     int n = starGroup.size();
-                    if (starGroup.offset < 0) {
-                        starGroup.offset = addMeshData(n * 4, n * 6);
-                    }
+                    starGroup.offset = addMeshData(n * 4, n * 6);
                     curr = meshes.get(starGroup.offset);
                     ensureTempVertsSize(n * 4 * curr.vertexSize);
                     ensureTempIndicesSize(n * 6);

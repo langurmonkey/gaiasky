@@ -85,9 +85,7 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                 boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
                 if (!particleGroup.inGpu()) {
                     int n = particleGroup.size();
-                    if(particleGroup.offset < 0) {
-                        particleGroup.offset = addMeshData(n * 4, n * 6);
-                    }
+                    particleGroup.offset = addMeshData(n * 4, n * 6);
                     curr = meshes.get(particleGroup.offset);
                     ensureTempVertsSize(n * 4 * curr.vertexSize);
                     ensureTempIndicesSize(n * 6);
@@ -175,7 +173,7 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
                     shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
-                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0]), (float) (particleGroup.particleSizeLimits[1]));
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] * particleGroup.highlightedSizeFactor()), (float) (particleGroup.particleSizeLimits[1] * particleGroup.highlightedSizeFactor()));
 
                     try {
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);

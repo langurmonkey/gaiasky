@@ -87,7 +87,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float colorNoise = 0;
 
     /**
-     * Particle size limits for the GL_POINTS renderer, in pixels
+     * Particle size limits
      */
     public double[] particleSizeLimitsPoint = new double[] { 3.5d, 800d };
     /**

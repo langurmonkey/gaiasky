@@ -107,7 +107,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             List<IParticleRecord> l = provider.loadData(datafile, factor);
             this.setData(l);
 
-            variableStars = this.pointData.size() > 0 && this.pointData.get(0) instanceof VariableRecord;
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
@@ -121,6 +120,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     public void doneLoading(final AssetManager manager) {
         super.doneLoading(manager);
+        // Is it variable?
+        variableStars = this.pointData.size() > 0 && this.pointData.get(0) instanceof VariableRecord;
         initSortingData();
         // Load model in main thread
         GaiaSky.postRunnable(() -> initModel(manager));
