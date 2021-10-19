@@ -53,7 +53,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         setStarTexture(Settings.settings.scene.star.getStarTexture());
         solidAngleLimits = new float[]{(float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f)), (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[1]) * 50f))};
 
-        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_VARIABLE_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -241,7 +241,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     public void notify(final Events event, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> solidAngleLimits[0] = (float) Math.tan(Math.toRadians(((float) data[0]) * 0.3f));
-        case DISPOSE_STAR_GROUP_GPU_MESH -> {
+        case DISPOSE_VARIABLE_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
         }

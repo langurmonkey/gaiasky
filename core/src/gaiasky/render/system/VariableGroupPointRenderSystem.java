@@ -56,7 +56,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_VARIABLE_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -261,7 +261,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
     public void notify(final Events event, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> pointAlpha[0] = (float) data[0];
-        case DISPOSE_STAR_GROUP_GPU_MESH -> {
+        case DISPOSE_VARIABLE_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
         }

@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30100
+configVersion: 30107
 
 #
 # Data configuration
@@ -117,11 +117,11 @@ scene:
   # Star settings
   star:
     # Star brightness factor
-    brightness: 2.0
+    brightness: 8.0
     # Modulate the brightness of stars with this power
-    power: 0.75
+    power: 0.6
     # Size scaling of stars
-    pointSize: 8.2
+    pointSize: 3.0
     # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
     # 1 - horizontal spike
     # 2 - god rays

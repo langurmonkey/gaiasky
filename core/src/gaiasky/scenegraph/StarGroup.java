@@ -82,6 +82,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     private double modelDist;
 
+    /** Does this contain variable stars? **/
+    private boolean variableStars = false;
+
     public StarGroup() {
         super();
         this.lastSortTime = -1;
@@ -103,6 +106,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             // Set data, generate index
             List<IParticleRecord> l = provider.loadData(datafile, factor);
             this.setData(l);
+
+            variableStars = this.pointData.size() > 0 && this.pointData.get(0) instanceof VariableRecord;
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
@@ -255,7 +260,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
-            if (pointData.get(0) instanceof VariableRecord) {
+            if (variableStars) {
                 addToRender(this, RenderGroup.VARIABLE_GROUP);
             } else {
                 addToRender(this, RenderGroup.STAR_GROUP);
@@ -909,5 +914,13 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 metadata[i] = filter(i) ? (-(((d.size() * Constants.STAR_POINT_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) : Double.MAX_VALUE;
             }
         }
+    }
+
+    public void setInGpu(boolean inGpu) {
+        if (this.inGpu() && !inGpu) {
+            // Dispose of GPU data
+            EventManager.instance.post(variableStars ? Events.DISPOSE_VARIABLE_GROUP_GPU_MESH : Events.DISPOSE_STAR_GROUP_GPU_MESH, this.offset);
+        }
+        this.inGpu(inGpu);
     }
 }

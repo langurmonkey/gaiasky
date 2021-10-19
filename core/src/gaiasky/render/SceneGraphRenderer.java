@@ -276,7 +276,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private ExtShaderProgram[] lineShaders;
     private ExtShaderProgram[] lineQuadShaders;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupPointDesc, starGroupDesc, particleGroupPointDesc, particleGroupDesc, variableGroupPointDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, galaxyPointDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
      * Render lists for all render groups
@@ -374,11 +374,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
-        particleGroupPointDesc = loadShader(manager, "shader/particle.group.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("particle.group.point", namesCmap), definesCmap);
         particleGroupDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
-        starGroupPointDesc = loadShader(manager, "shader/star.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("star.group.point", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
-        variableGroupPointDesc = loadShader(manager, "shader/variable.group.vertex.glsl", "shader/star.group.fragment.glsl", TextUtils.concatAll("variable.group.point", namesCmap), definesCmap);
         variableGroupDesc = loadShader(manager, "shader/variable.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
 
@@ -535,29 +532,14 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram[] particleEffectShaders = fetchShaderProgram(manager, particleEffectDesc, TextUtils.concatAll("particle.effect", names));
 
         /*
-         * PARTICLE GROUP POINT - default and relativistic
-         */
-        ExtShaderProgram[] particleGroupPointShaders = fetchShaderProgram(manager, particleGroupPointDesc, TextUtils.concatAll("particle.group.point", names));
-
-        /*
          * PARTICLE GROUP (TRI) - default and relativistic
          */
         ExtShaderProgram[] particleGroupShaders = fetchShaderProgram(manager, particleGroupDesc, TextUtils.concatAll("particle.group", names));
 
         /*
-         * STAR GROUP POINT - default and relativistic
-         */
-        ExtShaderProgram[] starGroupPointShaders = fetchShaderProgram(manager, starGroupPointDesc, TextUtils.concatAll("star.group.point", names));
-
-        /*
          * STAR GROUP (TRI) - default and relativistic
          */
         ExtShaderProgram[] starGroupShaders = fetchShaderProgram(manager, starGroupDesc, TextUtils.concatAll("star.group", names));
-
-        /*
-         * VARIABLE GROUP POINT - default and relativistic
-         */
-        ExtShaderProgram[] variableGroupPointShaders = fetchShaderProgram(manager, variableGroupPointDesc, TextUtils.concatAll("variable.group.point", names));
 
         /*
          * VARIABLE GROUP (TRI) - default and relativistic
@@ -758,30 +740,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectsProc.addPreRunnables(additiveBlendR, noDepthTestR);
         particleEffectsProc.addPostRunnables(regularBlendR);
 
-        // PARTICLE GROUP (POINTS)
-        AbstractRenderSystem particleGroupPointProc = new ParticleGroupPointRenderSystem(PARTICLE_GROUP_POINT, alphas, particleGroupPointShaders);
-        particleGroupPointProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-        particleGroupPointProc.addPostRunnables(regularBlendR, depthWritesR);
-
         // PARTICLE GROUP
         AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
-        // STAR GROUP (POINTS)
-        AbstractRenderSystem starGroupPointProc = new StarGroupPointRenderSystem(STAR_GROUP_POINT, alphas, starGroupPointShaders);
-        starGroupPointProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-        starGroupPointProc.addPostRunnables(regularBlendR, depthWritesR);
-
         // STAR GROUP
         AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders);
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
-
-        // VARIABLE GROUP (POINTS)
-        AbstractRenderSystem variableGroupPointProc = new VariableGroupPointRenderSystem(VARIABLE_GROUP_POINT, alphas, variableGroupPointShaders);
-        variableGroupPointProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-        variableGroupPointProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
@@ -839,11 +806,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(billboardStarsProc);
 
         // Stars, particles
-        addRenderSystem(particleGroupPointProc);
         addRenderSystem(particleGroupProc);
-        addRenderSystem(starGroupPointProc);
         addRenderSystem(starGroupProc);
-        addRenderSystem(variableGroupPointProc);
         addRenderSystem(variableGroupProc);
         addRenderSystem(orbitElemProc);
 

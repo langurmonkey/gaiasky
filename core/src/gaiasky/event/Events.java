@@ -342,14 +342,18 @@ public enum Events {
     DISPOSE,
 
     /**
-     * Contains an index to the particle group mesh to be cleared
+     * Contains the index to the particle group mesh to be cleared
      **/
     DISPOSE_PARTICLE_GROUP_GPU_MESH,
 
     /**
-     * Contains an the index of the star group mesh to be cleared
+     * Contains the index of the star group mesh to be cleared
      **/
     DISPOSE_STAR_GROUP_GPU_MESH,
+    /**
+     * Contains the index of the variable group mesh to be cleared
+     **/
+    DISPOSE_VARIABLE_GROUP_GPU_MESH,
 
     /**
      * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}]

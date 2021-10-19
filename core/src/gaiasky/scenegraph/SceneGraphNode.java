@@ -1147,7 +1147,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             // Enable or disable blending
             ((I3DTextRenderable) this).textDepthBuffer();
 
-            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
+            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }
     }
 

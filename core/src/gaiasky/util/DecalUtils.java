@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
+import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.math.Vector3d;
@@ -48,11 +49,11 @@ public class DecalUtils {
      * @param position The 3D position.
      * @param camera   The camera.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, ICamera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, position, 1f, camera, faceCamera);
     }
 
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float size, float rotationCenter, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, float size, float rotationCenter, ICamera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, x, y, z, size, rotationCenter, camera, faceCamera, -1, -1);
     }
 
@@ -71,17 +72,18 @@ public class DecalUtils {
      * @param z              The z coordinate.
      * @param size           The scale of the font.
      * @param rotationCenter Angles to rotate around center.
-     * @param camera         The camera.
+     * @param cam         The camera.
      * @param faceCamera     Whether to apply bill-boarding.
      * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
      * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, double size, float rotationCenter, Camera camera, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, float x, float y, float z, double size, float rotationCenter, ICamera cam, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
         // Store batch matrices
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
 
 
+        Camera camera = cam.getCamera();
         Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 
         if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
@@ -117,7 +119,7 @@ public class DecalUtils {
      * @param camera   The camera.
      * @param scale    The scale of the font.
      */
-    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, float scale, Camera camera, boolean faceCamera) {
+    public static void drawFont3D(BitmapFont font, ExtSpriteBatch batch, String text, Vector3 position, float scale, ICamera camera, boolean faceCamera) {
         drawFont3D(font, batch, text, position.x, position.y, position.z, scale, 0, camera, faceCamera);
     }
 
