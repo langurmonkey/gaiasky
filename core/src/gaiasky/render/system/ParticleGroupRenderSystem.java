@@ -67,7 +67,7 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
         particlePosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
-    protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -106,6 +106,14 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                             double[] p = pb.rawDoubleData();
                             // 4 vertices per particle
                             for (int vert = 0; vert < 4; vert++) {
+                                // Vertex POSITION
+                                tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                                tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
+
+                                // UV coordinates
+                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+
                                 // COLOR
                                 if (particleGroup.isHighlighted()) {
                                     if (hlCmap) {
@@ -134,14 +142,6 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
 
                                 // SIZE
                                 tempVerts[curr.vertexIdx + sizeOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
-
-                                // Vertex POSITION
-                                tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
-
-                                // UV coordinates
-                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
                                 // PARTICLE POSITION
                                 tempVerts[curr.vertexIdx + particlePosOffset] = (float) p[0];

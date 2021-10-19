@@ -3,31 +3,33 @@
 #include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
+// UNIFORMS
+uniform mat4 u_projView;
+uniform vec3 u_camPos;
+uniform vec3 u_camUp;
+uniform float u_alpha;
+uniform float u_sizeFactor;
+uniform vec2 u_sizeLimits;
+uniform float u_vrScale;
+
+// INPUT
 in vec4 a_position;
 in vec3 a_particlePos;
 in vec2 a_texCoord;
 in vec4 a_color;
 in float a_size;
 
-uniform float u_alpha;
-uniform mat4 u_projView;
-uniform vec3 u_camPos;
-uniform vec3 u_camUp;
-uniform float u_sizeFactor;
-uniform vec2 u_sizeLimits;
-uniform float u_vrScale;
-
-#ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
-#endif // relativisticEffects
-
-#ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
-#endif // gravitationalWaves
-
 // OUTPUT
 out vec4 v_col;
 out vec2 v_uv;
+
+#ifdef relativisticEffects
+#include shader/lib_relativity.glsl
+#endif // relativisticEffects
+
+#ifdef gravitationalWaves
+#include shader/lib_gravwaves.glsl
+#endif // gravitationalWaves
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -50,8 +52,7 @@ void main() {
     
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
-    float viewAngle = a_size / dist;
-    float quadSize = clamp(viewAngle * u_sizeFactor * dist, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
+    float quadSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

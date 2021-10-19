@@ -67,7 +67,7 @@ public class ParticleGroupPointRenderSystem extends PointCloudRenderSystem imple
         attributes.add(new VertexAttribute(OwnUsage.Additional, 2, "a_additional"));
     }
 
-    protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera){
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera){
         stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
         this.camera = camera;
 

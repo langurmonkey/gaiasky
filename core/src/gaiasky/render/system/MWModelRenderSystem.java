@@ -417,16 +417,6 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
-        // Not using this either
-    }
-
-    @Override
-    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
-        // Empty too
-    }
-
-    @Override
     public void notify(final Events event, final Object... data) {
         if (event == Events.GRAPHICS_QUALITY_UPDATED) {
             GraphicsQuality gq = (GraphicsQuality) data[0];

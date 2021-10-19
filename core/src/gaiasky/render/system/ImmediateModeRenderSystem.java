@@ -65,6 +65,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         public static final int ObjectPosition = 8192;
         public static final int ProperMotion = 16384;
         public static final int Additional = 20000;
+        public static final int OrbitElems1 = 21000;
+        public static final int OrbitElems2 = 22000;
     }
 
     /**

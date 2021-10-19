@@ -84,7 +84,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
     }
 
-    protected void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -130,6 +130,14 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                             }
                             // 4 vertices per star
                             for (int vert = 0; vert < 4; vert++) {
+                                // Vertex POSITION
+                                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
+                                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
+
+                                // UV coordinates
+                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+
                                 // COLOR
                                 if (hlCmap) {
                                     // Color map
@@ -146,14 +154,6 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                                 } else {
                                     tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                 }
-
-                                // Vertex POSITION
-                                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
-
-                                // UV coordinates
-                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
                                 // PROPER MOTION [u/yr]
                                 tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();

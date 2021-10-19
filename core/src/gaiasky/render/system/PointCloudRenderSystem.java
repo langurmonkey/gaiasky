@@ -90,9 +90,17 @@ public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem i
         return mdi;
     }
 
-    protected abstract void globalUniforms(ExtShaderProgram shaderProgram, ICamera camera);
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
+        // Empty, override if needed
+    }
 
-    protected abstract void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable);
+    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+        // Empty, override if needed
+    }
+
+    protected void postRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
+        // Empty, override if needed
+    }
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
@@ -100,10 +108,12 @@ public abstract class PointCloudRenderSystem extends ImmediateModeRenderSystem i
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
-            // Global uniforms
-            globalUniforms(shaderProgram, camera);
+            // Pre-render
+            preRenderObjects(shaderProgram, camera);
             // Render
             renderables.forEach((r) -> renderObject(shaderProgram, r));
+            // Post-render
+            postRenderObjects(shaderProgram, camera);
             shaderProgram.end();
         }
     }

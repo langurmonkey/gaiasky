@@ -377,7 +377,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleGroupDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
         variableGroupDesc = loadShader(manager, "shader/variable.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
-        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
+        orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
