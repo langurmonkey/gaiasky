@@ -142,7 +142,6 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-                shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_ar", stereoHw ? 2f : 1f);
                 shaderProgram.setUniformf("u_falloff", 2.5f);

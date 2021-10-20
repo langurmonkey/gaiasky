@@ -72,7 +72,6 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-        shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
         shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
         addEffectsUniforms(shaderProgram, camera);
     }

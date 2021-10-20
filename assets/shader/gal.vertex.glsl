@@ -1,6 +1,5 @@
 #version 330 core
 
-#include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
 in vec4 a_position;
@@ -68,18 +67,6 @@ void main() {
     gl_Position = gpos;
 
     #ifdef velocityBufferFlag
-    vec3 prevPos = u_pos + u_dCamPos;
-    mat4 ptransform = u_prevProjView;
-    translation[3][0] = prevPos.x;
-    translation[3][1] = prevPos.y;
-    translation[3][2] = prevPos.z;
-    ptransform *= translation;
-    ptransform *= rotation;
-    ptransform[0][0] *= size;
-    ptransform[1][1] *= size;
-    ptransform[2][2] *= size;
-
-    vec4 gprevpos = ptransform * a_position;
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
     #endif// velocityBufferFlag
 }

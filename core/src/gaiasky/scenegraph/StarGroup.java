@@ -531,7 +531,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
                 double distToCamera = starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 0.5f);
 
                 if (camera.isVisible(viewAngle, starPosition, distToCamera)) {
                     render2DLabel(batch, shader, rc, sys.font2d, camera, star.names()[0], starPosition);
@@ -543,7 +543,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
                 double distToCamera = starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 0.4f);
 
                 if (viewAngle >= thOverFactor && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
                     textPosition(camera, starPosition, distToCamera, radius);

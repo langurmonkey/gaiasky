@@ -24,7 +24,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     private IntMesh mesh;
-    private Quaternion quaternion;
     private final int ctIndex;
 
     public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int ctIndex, float w, float h) {
@@ -65,7 +64,6 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
         mesh.setIndices(indices);
 
-        quaternion = new Quaternion();
         aux = new Vector3();
 
     }
@@ -115,23 +113,18 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 
-            // Calculate billobard rotation quaternion ONCE
-            DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
-
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 
-            // General uniforms
-            shaderProgram.setUniformMatrix("u_projTrans", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+            // Global uniforms
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+            shaderProgram.setUniformf("u_time", (float) t);
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
-            // Global uniforms
-            shaderProgram.setUniformf("u_time", (float) t);
-
+            // Render each sprite
             renderables.forEach(r -> {
                 IQuadRenderable s = (IQuadRenderable) r;
                 s.render(shaderProgram, getAlpha(s), mesh, camera);

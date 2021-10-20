@@ -11,8 +11,9 @@ uniform float u_vrScale;
 out vec4 v_col;
 out vec2 v_uv;
 
-#ifdef relativisticEffects
 #include shader/lib_geometry.glsl
+
+#ifdef relativisticEffects
 #include shader/lib_relativity.glsl
 #endif// relativisticEffects
 

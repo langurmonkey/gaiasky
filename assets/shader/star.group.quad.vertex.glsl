@@ -15,7 +15,6 @@ in float a_size;
 uniform vec2 u_t;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
-uniform vec3 u_camUp;
 uniform vec2 u_thAnglePoint;
 
 // VR scale factor
@@ -88,7 +87,6 @@ void main() {
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
     vec3 s_obj_pos = pos;
-    vec3 s_cam_up = u_camUp;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
     #include shader/snip_billboard.glsl
@@ -98,19 +96,7 @@ void main() {
     v_uv = a_texCoord;
 
     #ifdef velocityBufferFlag
-    vec3 prevPos = a_starPos + u_dCamPos;
-    mat4 ptransform = u_prevProjView;
-    translation[3][0] = prevPos.x;
-    translation[3][1] = prevPos.y;
-    translation[3][2] = prevPos.z;
-    ptransform *= translation;
-    ptransform *= rotation;
-    ptransform[0][0] *= a_size;
-    ptransform[1][1] *= a_size;
-    ptransform[2][2] *= a_size;
-
-    vec4 gprevpos = ptransform * a_position;
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    velocityBufferBillboard(gpos, a_starPos, s_size, a_position, s_quat, s_quat_conj);
     #endif
 
     if (dist < l0) {

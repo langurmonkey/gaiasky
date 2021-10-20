@@ -89,7 +89,6 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-        shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux1));
         shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
         shaderProgram.setUniform2fv("u_solidAngleLimits", solidAngleLimits, 0, 2);
         addEffectsUniforms(shaderProgram, camera);

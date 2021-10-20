@@ -9,6 +9,20 @@ uniform vec3 u_dCamPos;
 // Velocity for next stage
 out vec2 v_vel;
 
+void velocityBufferBillboard(vec4 gpos, vec3 obj_pos, float size, vec4 vert_pos, vec4 s_quat, vec4 s_quat_conj) {
+    vec3 prev_obj_pos = obj_pos + u_dCamPos;
+    // Scaling
+    vec4 prev_vert_pos = vec4(vert_pos.x * size, vert_pos.y * size, vert_pos.z * size, vert_pos.w);
+    // Rotation
+    vec4 q_tmp = quat_mult(s_quat, prev_vert_pos);
+    prev_vert_pos = quat_mult(q_tmp, s_quat_conj);
+    // Translation
+    prev_vert_pos = prev_vert_pos + vec4(prev_obj_pos, 0.0);
+
+    vec4 gprevpos = u_prevProjView * prev_vert_pos;
+    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+}
+
 // This version accepts all parameters
 void velocityBuffer(vec4 gpos, vec3 pos, float dist, vec3 pm, mat4 prevTrans, vec2 fadepc, float fadeScale){
     vec3 prevPos = pos - u_prevCamPos;

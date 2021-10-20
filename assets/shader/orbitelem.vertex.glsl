@@ -1,13 +1,11 @@
 #version 330 core
 
-#include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 #include shader/lib_doublefloat.glsl
 
 // UNIFORMS
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
-uniform vec3 u_camUp;
 uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform mat4 u_eclToEq;
@@ -129,7 +127,6 @@ void main() {
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
     vec3 s_obj_pos = pos;
-    vec3 s_cam_up = u_camUp;
     mat4 s_proj_view = u_projView;
     float s_size = quadSize;
     #include shader/snip_billboard.glsl
@@ -139,6 +136,6 @@ void main() {
     v_uv = a_texCoord;
 
     #ifdef velocityBufferFlag
-    velocityBuffer(gpos, pos.xyz, dist);
+    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
     #endif
 }

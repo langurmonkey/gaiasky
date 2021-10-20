@@ -140,7 +140,6 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
 
             // General uniforms
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_camUp", camera.getUp().put(aux));
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);

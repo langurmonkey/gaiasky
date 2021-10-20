@@ -8,13 +8,14 @@ uniform float u_vrScale;
 
 out vec4 v_col;
 
+#include shader/lib_geometry.glsl
+
 #ifdef relativisticEffects
-    #include shader/lib_geometry.glsl
-    #include shader/lib_relativity.glsl
+#include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+#include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
 #ifdef velocityBufferFlag
