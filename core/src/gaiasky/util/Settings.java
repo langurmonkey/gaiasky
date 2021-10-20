@@ -879,6 +879,8 @@ public class Settings {
             }
 
             public void setDistanceUnits(String distanceUnits) {
+                if (distanceUnits == null)
+                    distanceUnits = "PC";
                 this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase());
             }
 
@@ -1594,14 +1596,15 @@ public class Settings {
         // Factor to apply to kilometers to get this unit
         public final double fromKm;
         private final String unitString;
-        DistanceUnits(double toKm, double fromKm, String unitString){
+
+        DistanceUnits(double toKm, double fromKm, String unitString) {
             this.toKm = toKm;
             this.fromKm = fromKm;
             this.unitString = unitString;
         }
 
-        public String getUnitString(){
-           return I18n.txt("gui.unit." + this.unitString);
+        public String getUnitString() {
+            return I18n.txt("gui.unit." + this.unitString);
         }
     }
 }
