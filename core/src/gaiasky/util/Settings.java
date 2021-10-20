@@ -879,7 +879,7 @@ public class Settings {
             }
 
             public void setDistanceUnits(String distanceUnits) {
-                this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase(Locale.ROOT));
+                this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase());
             }
 
         }
