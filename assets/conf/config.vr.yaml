@@ -466,11 +466,11 @@ postprocess:
   # Bloom settings
   bloom:
     # Intensity of bloom
-    intensity: 0.1
+    intensity: 0.0
   # Unsharp mask effect
   unsharpMask:
     # Sharpen factor, in [0,3]
-    factor: 0.1
+    factor: 0.0
   # Activate/deactivate motion blur effect
   motionBlur: false
   # Activate/deactivate lens flare effect
