@@ -38,8 +38,7 @@ vec4 quat_conj(vec4 q) {
 
 vec3 rotate_vertex_position(vec3 position, vec3 axis, float angle) {
   vec4 q = get_quat_rotation(axis, angle);
-  vec3 v = position.xyz;
-  return v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v);
+  return position.xyz + 2.0 * cross(q.xyz, cross(q.xyz, position.xyz) + q.w * position.xyz);
 }
 
 // Gets the billboard quaternion from the direction and up vectors
