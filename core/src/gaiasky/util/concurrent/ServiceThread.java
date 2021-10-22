@@ -62,7 +62,7 @@ public class ServiceThread extends Thread {
         while (this.awake) {
             // Busy wait
         }
-        synchronized(this.threadLock) {
+        synchronized (this.threadLock) {
             this.task = task;
             this.threadLock.notify();
         }

@@ -10,6 +10,9 @@ import gaiasky.GaiaSky;
 import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.orbit.OrbitSamplerDataProvider;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -17,7 +20,7 @@ import gaiasky.util.Logger.Log;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-public class OrbitRefresher {
+public class OrbitRefresher implements IObserver {
     private static final Log logger = Logger.getLogger(OrbitRefresher.class);
 
     // Maximum size of load queue.
@@ -44,6 +47,8 @@ public class OrbitRefresher {
         daemon.setName("gaiasky-worker-orbitupdate");
         daemon.setPriority(Thread.MIN_PRIORITY);
         daemon.start();
+
+        EventManager.instance.subscribe(this, Events.DISPOSE);
     }
 
     public void queue(OrbitDataLoaderParameter param) {
@@ -64,6 +69,13 @@ public class OrbitRefresher {
             synchronized (threadLock) {
                 threadLock.notifyAll();
             }
+        }
+    }
+
+    @Override
+    public void notify(Events event, Object... data) {
+        if (event == Events.DISPOSE && daemon != null) {
+            daemon.stopDaemon();
         }
     }
 
@@ -126,8 +138,6 @@ public class OrbitRefresher {
                                             orbit.refreshing = false;
                                         });
 
-                                    } else {
-                                        // Error, need orbit
                                     }
                                 }
                             } catch (Exception e) {

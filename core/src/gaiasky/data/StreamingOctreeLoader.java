@@ -131,7 +131,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     @Override
     public void initialize(String[] files) throws RuntimeException {
         if (files == null || files.length < 2) {
-            throw new RuntimeException("Error loading octree files: " + files.length);
+            throw new RuntimeException("Error loading octree files: " + (files != null ? files.length : "files array is null"));
         }
         particles = files[0];
         metadata = files[1];

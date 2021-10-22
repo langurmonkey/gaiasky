@@ -30,7 +30,7 @@ vec4 q_tmp = quat_mult(s_quat, vert_pos);
 vert_pos = quat_mult(q_tmp, s_quat_conj);
 
 // Translation
-vert_pos = vert_pos + vec4(s_obj_pos, 0.0);
+vert_pos += vec4(s_obj_pos, 0.0);
 
 // Compute final position and return
 vec4 gpos = s_proj_view * vert_pos;
