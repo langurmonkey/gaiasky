@@ -29,7 +29,8 @@ import java.util.Map;
 public class VisualEffectsComponent extends GuiComponent implements IObserver {
     private static final Logger.Log logger = Logger.getLogger(VisualEffectsComponent.class);
 
-    private OwnSliderPlus starBrightness, starBrightnessPower, starSize, starMinOpacity, ambientLight, labelSize, lineWidth, elevMult;
+    private OwnSliderPlus starBrightness, starBrightnessPower, starSize, starMinOpacity;
+    private OwnSliderPlus ambientLight, labelSize, lineWidth, elevMult;
 
     boolean flag = true;
 

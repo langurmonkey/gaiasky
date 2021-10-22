@@ -189,6 +189,10 @@ scene:
     fade: true
   # Renderer settings
   renderer:
+    # Point cloud mode, one of [GL_TRIANGLES|GL_POINTS]
+    # GL_POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes
+    # GL_TRIANGLES is the new mode. Faster on newer hardware and geometrically correct.
+    pointCloud: GL_TRIANGLES
     # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]
     line: GL_LINES
     # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO]

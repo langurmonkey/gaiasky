@@ -70,7 +70,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
-    private OwnSelectBox<ComboBoxBean> gquality, aa, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> gquality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recgridOrigin;
@@ -333,6 +333,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.aa.info"), skin));
 
+        // POINT CLOUD
+        OwnLabel pointCloudLabel = new OwnLabel(I18n.txt("gui.pointcloud"), skin);
+        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.GL_TRIANGLES.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.GL_POINTS.ordinal()) };
+        pointCloudRenderer = new OwnSelectBox<>(skin);
+        pointCloudRenderer.setItems(pointCloudItems);
+        pointCloudRenderer.setWidth(textWidth * 3f);
+        pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
+        OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
+        pointCloudTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.pointcloud.info"), skin));
+        OwnLabel restart = new OwnLabel(I18n.txt("gui.restart"), skin, "default-pink");
+
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.txt("gui.linerenderer"), skin);
         ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.linerenderer.normal"), LineMode.GL_LINES.ordinal()), new ComboBoxBean(I18n.txt("gui.linerenderer.quad"), LineMode.POLYLINE_QUADSTRIP.ordinal()) };
@@ -424,6 +435,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(aa).left().padRight(pad10).padBottom(pad5);
         graphics.add(aaTooltip).left().padBottom(pad5).row();
+        graphics.add(pointCloudLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(pointCloudRenderer).left().padBottom(pad5);
+        graphics.add(pointCloudTooltip).left().padRight(pad20).padBottom(pad5);
+        graphics.add(restart).left().padRight(pad20).padBottom(pad5).row();
         graphics.add(lrLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(lineRenderer).left().padBottom(pad5).row();
         graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
@@ -1970,6 +1985,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         } else {
             EventManager.instance.post(Events.LIMIT_FPS_CMD, 0.0);
         }
+
+        // Point cloud renderer
+        settings.scene.renderer.pointCloud = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
 
         // Line renderer
         boolean reloadLineRenderer = settings.scene.renderer.line != LineMode.values()[lineRenderer.getSelected().value];

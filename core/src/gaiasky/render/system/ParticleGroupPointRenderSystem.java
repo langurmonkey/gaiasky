@@ -154,7 +154,7 @@ public class ParticleGroupPointRenderSystem extends PointCloudRenderSystem imple
 
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.05)) * particleGroup.highlightedSizeFactor() * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.5)) * particleGroup.highlightedSizeFactor() * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
                     shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimitsPoint[0] / camera.getFovFactor()), (float) (particleGroup.particleSizeLimitsPoint[1] / camera.getFovFactor()));
 
                     curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());

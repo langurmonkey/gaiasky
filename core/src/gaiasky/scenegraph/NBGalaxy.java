@@ -50,7 +50,11 @@ public class NBGalaxy extends Particle {
     /** Alternative name **/
     String altname;
 
+    /** Scale for point clouds **/
+    private final float pointCloudRenderScale;
+
     public NBGalaxy() {
+        this.pointCloudRenderScale = Settings.settings.scene.renderer.pointCloud.isPoints() ? 0.15f : 0.3f;
     }
 
     public NBGalaxy(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, float bmag, float a26, float ba, int hrv, int i, int tt, String mcl, long starid) {
@@ -62,6 +66,7 @@ public class NBGalaxy extends Particle {
         this.i = i;
         this.tt = tt;
         this.mcl = mcl;
+        this.pointCloudRenderScale = Settings.settings.scene.renderer.pointCloud.isPoints() ? 0.15f : 0.3f;
     }
 
     @Override
@@ -142,7 +147,7 @@ public class NBGalaxy extends Particle {
 
         shader.setUniformf("u_color", ccPale[0], ccPale[1], ccPale[2], alpha);
         shader.setUniformf("u_alpha", alpha * opacity);
-        shader.setUniformf("u_distance", (float) distToCamera);
+        shader.setUniformf("u_distance",(float) (distToCamera * pointCloudRenderScale));
         shader.setUniformf("u_apparent_angle", (float) viewAngleApparent);
         shader.setUniformf("u_time", (float) GaiaSky.instance.getT() / 5f);
 

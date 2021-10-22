@@ -40,6 +40,7 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.PointCloudMode;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntRenderableSorter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -134,21 +135,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         MODEL_VERT_BEAM(14),
         /**
-         * Particle group (points)
-         **/
-        PARTICLE_GROUP_POINT(15),
-        /**
-         * Particle group (triangles)
+         * Particle group
          **/
         PARTICLE_GROUP(16),
         /**
-         * Star group (points)
+         * Star group
          **/
-        STAR_GROUP_POINT(17),
-        /**
-         * Star group (triangles)
-         **/
-        STAR_GROUP(18),
+        STAR_GROUP(17),
         /**
          * Shapes
          **/
@@ -209,10 +202,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          * Variable star group
          **/
         VARIABLE_GROUP(33),
-        /**
-         * Variable star group
-         **/
-        VARIABLE_GROUP_POINT(34),
         /**
          * None
          **/
@@ -374,10 +363,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         lineGpuDesc = loadShader(manager, "shader/line.gpu.vertex.glsl", "shader/line.gpu.fragment.glsl", TextUtils.concatAll("line.gpu", names), defines);
         galDesc = loadShader(manager, "shader/gal.vertex.glsl", "shader/gal.fragment.glsl", TextUtils.concatAll("gal", names), defines);
         particleEffectDesc = loadShader(manager, "shader/particle.effect.vertex.glsl", "shader/particle.effect.fragment.glsl", TextUtils.concatAll("particle.effect", names), defines);
-        particleGroupDesc = loadShader(manager, "shader/particle.group.quad.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
-        starGroupDesc = loadShader(manager, "shader/star.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
-        variableGroupDesc = loadShader(manager, "shader/variable.group.quad.vertex.glsl", "shader/star.group.quad.fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
         orbitElemDesc = loadShader(manager, "shader/orbitelem.vertex.glsl", "shader/particle.group.quad.fragment.glsl", TextUtils.concatAll("orbitelem", names), defines);
+
+        // Initialize point cloud shaders - depends on point cloud mode
+        final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
+        particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffix + ".vertex.glsl", "shader/particle.group" + pointTriSuffix +".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
+        starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
+        variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
 
         // Add shaders to load (with providers)
         manager.load("per-vertex-lighting", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/default.vertex.glsl", "shader/default.fragment.glsl"));
@@ -664,6 +656,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          *
          */
 
+        final PointCloudMode pcm = Settings.settings.scene.renderer.pointCloud;
+
         // POINTS
         AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
@@ -741,17 +735,23 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectsProc.addPostRunnables(regularBlendR);
 
         // PARTICLE GROUP
-        AbstractRenderSystem particleGroupProc = new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
+        AbstractRenderSystem particleGroupProc = pcm.isTriangles() ?
+                new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders) :
+                new ParticleGroupPointRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders) ;
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
-        AbstractRenderSystem starGroupProc = new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders);
+        AbstractRenderSystem starGroupProc = pcm.isTriangles() ?
+                new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders) :
+                new StarGroupPointRenderSystem(STAR_GROUP, alphas, starGroupShaders);
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
-        AbstractRenderSystem variableGroupProc = new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+        AbstractRenderSystem variableGroupProc = pcm.isTriangles() ?
+                new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders):
+                new VariableGroupPointRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 

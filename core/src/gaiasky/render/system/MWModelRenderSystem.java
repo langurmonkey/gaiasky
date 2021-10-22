@@ -362,7 +362,7 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
                     //  Dust
                     shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
                     shaderProgram.setUniformf("u_sizeFactor", (float) (3e2 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 1.2f);
+                    shaderProgram.setUniformf("u_intensity", 2.0f);
                     dust.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
 
                     // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes

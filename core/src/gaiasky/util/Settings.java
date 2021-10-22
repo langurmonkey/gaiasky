@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.event.EventManager;
@@ -326,6 +327,7 @@ public class Settings {
                 EventManager.instance.subscribe(this, Events.CAMERA_CINEMATIC_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD);
             }
 
+            @JsonProperty("speedLimitIndex")
             public void setSpeedLimitIndex(int index) {
                 this.speedLimitIndex = index;
                 updateSpeedLimit();
@@ -588,6 +590,7 @@ public class Settings {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
+            public PointCloudMode pointCloud = PointCloudMode.GL_TRIANGLES;
             public LineMode line;
             public double ambient;
             public ShadowSettings shadow;
@@ -613,6 +616,15 @@ public class Settings {
                 public void setType(final String typeString) {
                     this.type = ElevationType.valueOf(typeString.toUpperCase());
                 }
+            }
+
+            @JsonProperty("pointCloud")
+            public void setPointCloud(String pointCloud) {
+                if (pointCloud == null || pointCloud.isEmpty()) {
+                    // Default
+                    pointCloud = "GL_TRIANGLES";
+                }
+                this.pointCloud = PointCloudMode.valueOf(pointCloud.toUpperCase(Locale.ROOT));
             }
 
             @JsonIgnore
@@ -910,9 +922,12 @@ public class Settings {
                 return scale > 1.5;
             }
 
+            @JsonProperty("distanceUnits")
             public void setDistanceUnits(String distanceUnits) {
-                if (distanceUnits == null)
+                if (distanceUnits == null || distanceUnits.isEmpty()) {
+                    // Default
                     distanceUnits = "PC";
+                }
                 this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase());
             }
 
@@ -1623,6 +1638,19 @@ public class Settings {
         UNCHARTED,
         FILMIC,
         NONE
+    }
+
+    public enum PointCloudMode {
+        GL_TRIANGLES,
+        GL_POINTS;
+
+        public boolean isPoints() {
+            return this.equals(GL_POINTS);
+        }
+
+        public boolean isTriangles() {
+            return this.equals(GL_TRIANGLES);
+        }
     }
 
     public enum LineMode {
