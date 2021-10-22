@@ -29,9 +29,11 @@ import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
 import org.lwjgl.glfw.GLFW;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 /**
  * Manages the Graphical User Interfaces of Gaia Sky
@@ -78,7 +80,7 @@ public class GuiRegistry implements IObserver {
         this.guis = new Array<>(true, 2);
         this.catalogManager = catalogManager;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
+        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION, Events.SHOW_RESTART_ACTION);
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -560,6 +562,70 @@ public class GuiRegistry implements IObserver {
                     // Add processor
                     inputMultiplexer.addProcessor(0, current.getGuiStage());
                 }
+                break;
+            case SHOW_RESTART_ACTION:
+                String text;
+                if (data.length > 0) {
+                    text = (String) data[0];
+                } else {
+                    text = I18n.txt("gui.restart.default");
+                }
+                GenericDialog restart = new GenericDialog(I18n.txt("gui.restart.title"), skin, ui) {
+
+                    @Override
+                    protected void build() {
+                        content.clear();
+                        content.add(new OwnLabel(text, skin)).left().padBottom(pad10 * 2f).row();
+                    }
+
+                    @Override
+                    protected void accept() {
+                        // Shut down
+                        GaiaSky.postRunnable(() -> {
+                            Gdx.app.exit();
+                            // Attempt restart
+                            Path workingDir = Path.of(System.getProperty("user.dir"));
+                            Path[] scripts = new Path[] { workingDir.resolve("gaiasky"), workingDir.resolve("gaiasky.bat"), workingDir.resolve("gaiasky.exe"), workingDir.resolve("gradlew"), workingDir.resolve("gradlew.bat") };
+                            for (Path file : scripts) {
+                                if (Files.exists(file) && Files.isRegularFile(file) && Files.isExecutable(file)) {
+                                    try {
+                                        if (file.getFileName().toString().contains("gaiasky")) {
+                                            // Just use the script
+                                            final ArrayList<String> command = new ArrayList<>();
+                                            command.add(file.toString());
+                                            final ProcessBuilder builder = new ProcessBuilder(command);
+                                            builder.start();
+                                        } else if (file.getFileName().toString().contains("gradlew")) {
+                                            // Gradle script
+                                            final ArrayList<String> command = new ArrayList<>();
+                                            command.add(file.toString());
+                                            command.add("core:run");
+                                            final ProcessBuilder builder = new ProcessBuilder(command);
+                                            builder.start();
+                                        }
+                                        break;
+                                    } catch (IOException e) {
+                                        logger.error(e, "Error running Gaia Sky");
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    @Override
+                    protected void cancel() {
+                        // Nothing
+                    }
+
+                    @Override
+                    public void dispose() {
+                        // Nothing
+                    }
+                };
+                restart.setAcceptText(I18n.txt("gui.yes"));
+                restart.setCancelText(I18n.txt("gui.no"));
+                restart.buildSuper();
+                restart.show(ui);
                 break;
             case UI_RELOAD_CMD:
                 reloadUI((GlobalResources) data[0]);

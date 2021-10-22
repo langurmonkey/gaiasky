@@ -79,7 +79,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Profile decay of the particles in the shader
      */
-    public float profileDecay = 4.0f;
+    public float profileDecay = 0.2f;
 
     /**
      * Noise factor for the color in [0,1]
@@ -94,7 +94,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * Particle size limits for the GL_TRIANGLES renderer. This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
      */
-    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.08)), Math.tan(Math.toRadians(3.0)) };
+    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) };
 
     /**
      * Are the data of this group in the GPU memory?

@@ -649,7 +649,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
         int nToneMapping = ToneMapping.values().length;
         ComboBoxBean[] toneMappingTypes = new ComboBoxBean[nToneMapping];
-        for(int itm = 0; itm < nToneMapping; itm++){
+        for (int itm = 0; itm < nToneMapping; itm++) {
             ToneMapping tm = ToneMapping.values()[itm];
             toneMappingTypes[itm] = new ComboBoxBean(I18n.txt("gui.tonemapping." + tm.name().toLowerCase(Locale.ROOT)), tm.ordinal());
         }
@@ -808,7 +808,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         distUnitsLabel.setWidth(labelWidth);
         DistanceUnits[] dus = DistanceUnits.values();
         ComboBoxBean[] distUnits = new ComboBoxBean[dus.length];
-        for(int idu = 0; idu < dus.length; idu++){
+        for (int idu = 0; idu < dus.length; idu++) {
             DistanceUnits du = dus[idu];
             distUnits[idu] = new ComboBoxBean(I18n.txt("gui.ui.distance.units." + du.name().toLowerCase(Locale.ROOT)), du.ordinal());
         }
@@ -852,7 +852,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // CROSSHAIR HOME
         crosshairHomeCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.home"), skin, pad10);
         crosshairHomeCb.setName("ch home");
-        crosshairHomeCb.setChecked(settings.scene.crosshair.home );
+        crosshairHomeCb.setChecked(settings.scene.crosshair.home);
 
         // Add to table
         ch.add(crosshairFocusCb).left().padBottom(pad5).row();
@@ -1987,7 +1987,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         }
 
         // Point cloud renderer
-        settings.scene.renderer.pointCloud = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
+        PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
+        boolean restartDialog = newPointCloudMode != settings.scene.renderer.pointCloud;
+        settings.scene.renderer.pointCloud = newPointCloudMode;
 
         // Line renderer
         boolean reloadLineRenderer = settings.scene.renderer.line != LineMode.values()[lineRenderer.getSelected().value];
@@ -2170,6 +2172,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             reloadUI(globalResources);
         }
 
+        if (restartDialog) {
+            showRestartDialog(I18n.txt("gui.restart.setting"));
+
+        }
+
     }
 
     private void unsubscribe() {
@@ -2197,6 +2204,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private void reloadUI(final GlobalResources globalResources) {
         EventManager.instance.post(Events.UI_RELOAD_CMD, globalResources);
+    }
+
+    private void showRestartDialog(String text) {
+        EventManager.instance.post(Events.SHOW_RESTART_ACTION, text);
     }
 
     private void selectFullscreen(boolean fullscreen, OwnTextField widthField, OwnTextField heightField, SelectBox<DisplayMode> fullScreenResolutions, OwnLabel widthLabel, OwnLabel heightLabel) {

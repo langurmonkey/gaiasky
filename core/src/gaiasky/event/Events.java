@@ -1299,6 +1299,10 @@ public enum Events {
      */
     UI_RELOAD_CMD,
     /**
+     * Displays a dialog to restart. Contains the text, or nothing.
+     */
+    SHOW_RESTART_ACTION,
+    /**
      * Informs the UI theme has been reloaded. Contains the new skin.
      */
     UI_THEME_RELOAD_INFO,
