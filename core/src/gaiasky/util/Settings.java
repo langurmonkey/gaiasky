@@ -591,7 +591,7 @@ public class Settings {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
-            public PointCloudMode pointCloud = PointCloudMode.TRIANGLES;
+            public PointCloudMode pointCloud = PointCloudMode.POINTS;
             public LineMode line;
             public double ambient;
             public ShadowSettings shadow;
@@ -623,7 +623,7 @@ public class Settings {
             public void setPointCloud(String pointCloud) {
                 if (pointCloud == null || pointCloud.isEmpty()) {
                     // Default
-                    pointCloud = "TRIANGLES";
+                    pointCloud = "POINTS";
                 }
                 if (pointCloud.startsWith("GL_")) {
                     pointCloud = pointCloud.substring(3);
