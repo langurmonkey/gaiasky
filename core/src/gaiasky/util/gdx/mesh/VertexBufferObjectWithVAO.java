@@ -149,7 +149,7 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
 
 		gl.glBindVertexArray(vaoHandle);
 
-		bindAttributes(shader, locations);
+		bindAttributes(shader, locations, -1);
 
 		//if our data has changed upload it:
 		bindData(gl);
@@ -158,11 +158,20 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
 	}
 
 	@Override
-	public void bind(ExtShaderProgram shader, int[] locations, int[] divisors) {
-		// No instanced rendering in this mode
+	public void bind(ExtShaderProgram shader, int[] locations, int divisor) {
+		GL30 gl = Gdx.gl30;
+
+		gl.glBindVertexArray(vaoHandle);
+
+		bindAttributes(shader, locations, divisor);
+
+		//if our data has changed upload it:
+		bindData(gl);
+
+		isBound = true;
 	}
 
-	private void bindAttributes (ExtShaderProgram shader, int[] locations) {
+	private void bindAttributes (ExtShaderProgram shader, int[] locations, int divisor) {
 		boolean stillValid = this.cachedLocations.size != 0;
 		final int numAttributes = attributes.size();
 
@@ -201,6 +210,9 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
 
 				shader.enableVertexAttribute(location);
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized, attributes.vertexSize, attribute.offset);
+				if(divisor >= 0) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisor);
+				}
 			}
 		}
 	}

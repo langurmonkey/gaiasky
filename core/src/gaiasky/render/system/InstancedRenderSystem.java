@@ -21,6 +21,11 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  */
 public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
+    // Auxiliary array that holds vertices temporarily
+    // This buffer will be used with divisor=1, so each instance
+    // gets one
+    protected float[] divisor1Verts;
+
     public InstancedRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
     }
@@ -28,6 +33,12 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     @Override
     protected void initVertices() {
         meshes = new Array<>();
+    }
+
+    protected void ensureDivisor1VertsSize(int size){
+        if(divisor1Verts == null || divisor1Verts.length < size) {
+            divisor1Verts = new float[size];
+        }
     }
 
     /**
@@ -87,29 +98,18 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
-     * @param maxVerts The max number of vertices this mesh data can hold
+     * @param maxVerts0   The max number of vertices the divisor 0 mesh data can hold
+     * @param maxVerts1   The max number of vertices the divisor 1 mesh data can hold
      *
      * @return The index of the new mesh data
      */
-    protected int addMeshData(int maxVerts) {
-        return addMeshData(maxVerts, 0);
-    }
-
-    /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     *
-     * @param maxVerts   The max number of vertices this mesh data can hold
-     * @param maxIndices The maximum number of indices this mesh data can hold
-     *
-     * @return The index of the new mesh data
-     */
-    protected int addMeshData(int maxVerts, int maxIndices) {
+    protected int addMeshData(int maxVerts0, int maxVerts1) {
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
         VertexAttribute[] attributes0 = buildAttributesDivisor0();
         VertexAttribute[] attributes1 = buildAttributesDivisor1();
-        curr.mesh = new IntMesh(false, maxVerts, maxIndices, true, attributes0, attributes1);
+        curr.mesh = new IntMesh(false, maxVerts0, maxVerts1, 0, true, attributes0, attributes1);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.divisor1Size = curr.mesh.getInstancedAttributes().vertexSize / 4;

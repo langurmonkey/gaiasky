@@ -74,7 +74,7 @@ public interface IntVertexData extends Disposable {
 
 	/** Binds this VertexData for instanced rendering via glDrawArraysInstanced
 	 * @param locations array containing the attribute locations. */
-	void bind(ExtShaderProgram shader, int[] locations, int[] divisors);
+	void bind(ExtShaderProgram shader, int[] locations, int divisor);
 
 	/** Unbinds this VertexData. */
     void unbind(ExtShaderProgram shader);

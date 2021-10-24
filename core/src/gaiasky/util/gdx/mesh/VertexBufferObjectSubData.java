@@ -160,11 +160,11 @@ public class VertexBufferObjectSubData implements IntVertexData {
 
 	@Override
 	public void bind (final ExtShaderProgram shader, final int[] locations) {
-		bind(shader, locations, null);
+		bind(shader, locations, -1);
 	}
 
 	@Override
-	public void bind(ExtShaderProgram shader, int[] locations, int[] divisors) {
+	public void bind(ExtShaderProgram shader, int[] locations, int divisor) {
 		final GL20 gl = Gdx.gl20;
 
 		gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
@@ -184,8 +184,8 @@ public class VertexBufferObjectSubData implements IntVertexData {
 
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized, attributes.vertexSize,
 						attribute.offset);
-				if(divisors != null) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisors[i]);
+				if(divisor >= 0) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisor);
 				}
 			}
 		} else {
@@ -197,8 +197,8 @@ public class VertexBufferObjectSubData implements IntVertexData {
 
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized, attributes.vertexSize,
 						attribute.offset);
-				if(divisors != null) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisors[i]);
+				if(divisor >= 0) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisor);
 				}
 			}
 		}

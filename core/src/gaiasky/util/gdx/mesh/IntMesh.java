@@ -84,7 +84,7 @@ public class IntMesh implements Disposable {
     // Indices
     final IntIndexData indices;
     // Attributes buffer for instanced rendering
-    IntVertexData instancedBuffer;
+    IntVertexData divisor1Buff;
     boolean autoBind = true;
     final boolean isVertexArray;
     final boolean isInstanced;
@@ -101,25 +101,50 @@ public class IntMesh implements Disposable {
     public IntMesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttribute[] attributes) {
         this(isStatic, maxVertices, maxIndices, new VertexAttributes(attributes));
     }
+
     /**
      * Creates a new Mesh with the given attributes.
      *
-     * @param isStatic    whether this mesh is static or not. Allows for internal optimizations.
-     * @param maxVertices the maximum number of vertices this mesh can hold
-     * @param maxIndices  the maximum number of indices this mesh can hold
-     * @param isInstanced whether this mesh is instanced or not. Requires OpenGL 3.0+
-     * @param attributes  the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
-     *                    normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
+     * @param isStatic            whether this mesh is static or not. Allows for internal optimizations.
+     * @param maxVertices         the maximum number of vertices this mesh can hold
+     * @param maxIndices          the maximum number of indices this mesh can hold
+     * @param isInstanced         whether this mesh is instanced or not. Requires OpenGL 3.0+
+     * @param attributes          the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
+     *                            normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
      * @param attributesInstanced vertex attributes for instanced mode. These have a divisor of 1
      */
     public IntMesh(boolean isStatic, int maxVertices, int maxIndices, boolean isInstanced, VertexAttribute[] attributes, VertexAttribute[] attributesInstanced) {
+        this.isInstanced = isInstanced;
         this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes));
         this.indices = new IntIndexBufferObject(isStatic, maxIndices);
         this.isVertexArray = false;
-        this.isInstanced = isInstanced;
 
-        if(isInstanced)
-            instancedBuffer = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributesInstanced));
+        if (isInstanced)
+            divisor1Buff = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributesInstanced));
+
+        addManagedMesh(Gdx.app, this);
+    }
+
+    /**
+     * Creates a new Mesh with the given attributes.
+     *
+     * @param isStatic            whether this mesh is static or not. Allows for internal optimizations.
+     * @param maxVertices0        the maximum number of vertices this mesh can hold
+     * @param maxVertices1        the maximum number of vertices this mesh can hold
+     * @param maxIndices          the maximum number of indices this mesh can hold
+     * @param isInstanced         whether this mesh is instanced or not. Requires OpenGL 3.0+
+     * @param attributes          the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
+     *                            normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
+     * @param attributesInstanced vertex attributes for instanced mode. These have a divisor of 1
+     */
+    public IntMesh(boolean isStatic, int maxVertices0, int maxVertices1, int maxIndices, boolean isInstanced, VertexAttribute[] attributes, VertexAttribute[] attributesInstanced) {
+        this.isInstanced = isInstanced;
+        this.vertices = makeVertexBuffer(isStatic, maxVertices0, new VertexAttributes(attributes));
+        this.indices = new IntIndexBufferObject(isStatic, maxIndices);
+        this.isVertexArray = false;
+
+        if (isInstanced)
+            divisor1Buff = makeVertexBuffer(isStatic, maxVertices1, new VertexAttributes(attributesInstanced));
 
         addManagedMesh(Gdx.app, this);
     }
@@ -334,6 +359,32 @@ public class IntMesh implements Disposable {
     }
 
     /**
+     * Sets the vertices of this Mesh. The attributes are assumed to be given in float format.
+     *
+     * @param divisor1Buff the vertices.
+     * @return the mesh for invocation chaining.
+     */
+    public IntMesh setDivisor1Buff(float[] divisor1Buff) {
+        this.divisor1Buff.setVertices(divisor1Buff, 0, divisor1Buff.length);
+
+        return this;
+    }
+
+    /**
+     * Sets the vertices of this Mesh. The attributes are assumed to be given in float format.
+     *
+     * @param divisor1Buff the vertices.
+     * @param offset       the offset into the vertices array
+     * @param count        the number of floats to use
+     * @return the mesh for invocation chaining.
+     */
+    public IntMesh setDivisor1Buff(float[] divisor1Buff, int offset, int count) {
+        this.divisor1Buff.setVertices(divisor1Buff, offset, count);
+
+        return this;
+    }
+
+    /**
      * Sets the indices of this Mesh
      *
      * @param indices the indices
@@ -469,21 +520,14 @@ public class IntMesh implements Disposable {
      * @param locations array containing the attribute locations.
      */
     public void bind(final ExtShaderProgram shader, final int[] locations) {
-        vertices.bind(shader, locations);
-        if (indices.getNumIndices() > 0)
-            indices.bind();
-    }
-
-    /**
-     * Binds the underlying {@link VertexBufferObject} for instanced rendering using the divisors array. Use this with OpenGL
-     * 3.0 and when auto-bind is disabled.
-     *
-     * @param shader    the shader (does not bind the shader)
-     * @param locations array containing the attribute locations.
-     * @param divisors array with divisors (per order in attributes)
-     */
-    public void bind(final ExtShaderProgram shader, final int[] locations, final int[] divisors) {
-        vertices.bind(shader, locations, divisors);
+        if (divisor1Buff != null && isInstanced) {
+            vertices.bind(shader, locations, 0);
+            divisor1Buff.bind(shader, null, 1);
+        } else {
+            vertices.bind(shader, locations);
+            if (indices.getNumIndices() > 0)
+                indices.bind();
+        }
     }
 
     /**
@@ -507,6 +551,8 @@ public class IntMesh implements Disposable {
         vertices.unbind(shader, locations);
         if (indices.getNumIndices() > 0)
             indices.unbind();
+        if (divisor1Buff != null && isInstanced)
+            divisor1Buff.unbind(shader, null);
     }
 
     /**
@@ -575,10 +621,9 @@ public class IntMesh implements Disposable {
      * @param offset        the offset into the vertex or index buffer
      * @param count         number of vertices or indices to use
      * @param instanceCount number of instances
-     * @param divisors      divisors for each attribute
      */
-    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, int instanceCount, int[] divisors) {
-        render(shader, primitiveType, offset, count, instanceCount, divisors, autoBind);
+    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, int instanceCount) {
+        render(shader, primitiveType, offset, count, instanceCount, autoBind);
     }
 
     /**
@@ -655,15 +700,15 @@ public class IntMesh implements Disposable {
      * @param offset        the offset into the vertex or index buffer
      * @param count         number of vertices or indices to use
      * @param instanceCount number of instances
-     * @param divisors      divisors for each attribute (instanced rendering)
      * @param autoBind      overrides the autoBind member of this Mesh
      */
-    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, int instanceCount, int[] divisors, boolean autoBind) {
+    public void render(ExtShaderProgram shader, int primitiveType, int offset, int count, int instanceCount, boolean autoBind) {
         if (count == 0)
             return;
 
         if (autoBind)
-            bind(shader, null, divisors);
+            bind(shader);
+
         Gdx.gl30.glDrawArraysInstanced(primitiveType, offset, count, instanceCount);
 
         if (autoBind)
@@ -676,6 +721,9 @@ public class IntMesh implements Disposable {
             meshes.get(Gdx.app).removeValue(this, true);
         vertices.dispose();
         indices.dispose();
+        if (divisor1Buff != null) {
+            divisor1Buff.dispose();
+        }
     }
 
     /**
@@ -693,8 +741,9 @@ public class IntMesh implements Disposable {
 
         return null;
     }
+
     public VertexAttribute getInstancedAttribute(int usage) {
-        VertexAttributes attributes = instancedBuffer.getAttributes();
+        VertexAttributes attributes = divisor1Buff.getAttributes();
         int len = attributes.size();
         for (int i = 0; i < len; i++)
             if (attributes.get(i).usage == usage)
@@ -707,9 +756,10 @@ public class IntMesh implements Disposable {
     public VertexAttributes getVertexAttributes() {
         return vertices.getAttributes();
     }
+
     /** @return the vertex attributes of this Mesh */
     public VertexAttributes getInstancedAttributes() {
-        return instancedBuffer.getAttributes();
+        return divisor1Buff.getAttributes();
     }
 
     /** @return the backing FloatBuffer holding the vertices. Does not have to be a direct buffer on Android! */

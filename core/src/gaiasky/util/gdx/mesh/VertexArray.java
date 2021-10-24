@@ -109,11 +109,11 @@ public class VertexArray implements IntVertexData {
 
 	@Override
 	public void bind (final ExtShaderProgram shader, final int[] locations) {
-		bind(shader, locations, null);
+		bind(shader, locations, -1);
 	}
 
 	@Override
-	public void bind (final ExtShaderProgram shader, final int[] locations, final int[] divisors) {
+	public void bind (final ExtShaderProgram shader, final int[] locations, final int divisor) {
 		final int numAttributes = attributes.size();
 		byteBuffer.limit(buffer.limit() * 4);
 		if (locations == null) {
@@ -132,8 +132,8 @@ public class VertexArray implements IntVertexData {
 					shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
 						attributes.vertexSize, byteBuffer);
 				}
-				if(divisors != null) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisors[i]);
+				if(divisor >= 0) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisor);
 				}
 			}
 		} else {
@@ -152,8 +152,8 @@ public class VertexArray implements IntVertexData {
 					shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
 						attributes.vertexSize, byteBuffer);
 				}
-				if(divisors != null) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisors[i]);
+				if(divisor >= 0) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisor);
 				}
 			}
 		}
