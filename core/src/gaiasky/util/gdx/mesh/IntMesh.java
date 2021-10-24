@@ -79,8 +79,12 @@ public class IntMesh implements Disposable {
     /** list of all meshes **/
     static final Map<Application, Array<IntMesh>> meshes = new HashMap<>();
 
+    // Vertices with attributes
     final IntVertexData vertices;
+    // Indices
     final IntIndexData indices;
+    // Attributes buffer for instanced rendering
+    IntVertexData instancedBuffer;
     boolean autoBind = true;
     final boolean isVertexArray;
     final boolean isInstanced;
@@ -91,30 +95,33 @@ public class IntMesh implements Disposable {
      * @param isStatic    whether this mesh is static or not. Allows for internal optimizations.
      * @param maxVertices the maximum number of vertices this mesh can hold
      * @param maxIndices  the maximum number of indices this mesh can hold
-     * @param isInstanced whether this mesh is instanced or not. Requires OpenGL 3.0+
      * @param attributes  the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
-     *                    normal or texture coordinate
+     *                    normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
      */
-    public IntMesh(boolean isStatic, int maxVertices, int maxIndices, boolean isInstanced, VertexAttribute... attributes) {
-        this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes));
-        this.indices = new IntIndexBufferObject(isStatic, maxIndices);
-        this.isVertexArray = false;
-        this.isInstanced = isInstanced;
-
-        addManagedMesh(Gdx.app, this);
+    public IntMesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttribute[] attributes) {
+        this(isStatic, maxVertices, maxIndices, new VertexAttributes(attributes));
     }
-
     /**
      * Creates a new Mesh with the given attributes.
      *
      * @param isStatic    whether this mesh is static or not. Allows for internal optimizations.
      * @param maxVertices the maximum number of vertices this mesh can hold
      * @param maxIndices  the maximum number of indices this mesh can hold
+     * @param isInstanced whether this mesh is instanced or not. Requires OpenGL 3.0+
      * @param attributes  the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
-     *                    normal or texture coordinate
+     *                    normal or texture coordinate. In instanced mode, these are the common attributes (divisor=1)
+     * @param attributesInstanced vertex attributes for instanced mode. These have a divisor of 1
      */
-    public IntMesh(boolean isStatic, int maxVertices, int maxIndices, VertexAttribute... attributes) {
-        this(isStatic, maxVertices, maxIndices, false, attributes);
+    public IntMesh(boolean isStatic, int maxVertices, int maxIndices, boolean isInstanced, VertexAttribute[] attributes, VertexAttribute[] attributesInstanced) {
+        this.vertices = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributes));
+        this.indices = new IntIndexBufferObject(isStatic, maxIndices);
+        this.isVertexArray = false;
+        this.isInstanced = isInstanced;
+
+        if(isInstanced)
+            instancedBuffer = makeVertexBuffer(isStatic, maxVertices, new VertexAttributes(attributesInstanced));
+
+        addManagedMesh(Gdx.app, this);
     }
 
     /**
@@ -173,7 +180,7 @@ public class IntMesh implements Disposable {
      * @param attributes  the {@link VertexAttribute}s. Each vertex attribute defines one property of a vertex such as position,
      *                    normal or texture coordinate
      */
-    public IntMesh(VertexDataType type, boolean isStatic, int maxVertices, int maxIndices, VertexAttribute... attributes) {
+    public IntMesh(VertexDataType type, boolean isStatic, int maxVertices, int maxIndices, VertexAttribute[] attributes) {
         this(type, isStatic, maxVertices, maxIndices, new VertexAttributes(attributes));
     }
 
@@ -686,10 +693,23 @@ public class IntMesh implements Disposable {
 
         return null;
     }
+    public VertexAttribute getInstancedAttribute(int usage) {
+        VertexAttributes attributes = instancedBuffer.getAttributes();
+        int len = attributes.size();
+        for (int i = 0; i < len; i++)
+            if (attributes.get(i).usage == usage)
+                return attributes.get(i);
+
+        return null;
+    }
 
     /** @return the vertex attributes of this Mesh */
     public VertexAttributes getVertexAttributes() {
         return vertices.getAttributes();
+    }
+    /** @return the vertex attributes of this Mesh */
+    public VertexAttributes getInstancedAttributes() {
+        return instancedBuffer.getAttributes();
     }
 
     /** @return the backing FloatBuffer holding the vertices. Does not have to be a direct buffer on Android! */

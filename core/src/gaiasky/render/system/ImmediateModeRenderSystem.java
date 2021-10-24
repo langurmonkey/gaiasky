@@ -37,6 +37,10 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         // Vertex array, this usually is just a reference to an external temp array
         protected float[] vertices;
 
+        protected int divisor1Idx;
+        protected int divisor1Size;
+        protected float[] divisor1;
+
         protected int indexIdx;
         protected int indexVert;
         protected int[] indices;
@@ -44,6 +48,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         protected int capacity;
 
         public void clear() {
+            divisor1Idx = 0;
             vertexIdx = 0;
             indexIdx = 0;
             indexVert = 0;

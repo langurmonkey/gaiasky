@@ -63,9 +63,10 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
         // We won't need indices if we use GL_TRIANGLE_FAN to draw our quad
         // TRIANGLE_FAN will draw the vertices in this order: 0, 1, 2; 0, 2, 3
         mesh = new IntMesh(true, 4, 6,
+                new VertexAttribute[]{
                 new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE),
                 new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE),
-                new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
+                new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE + "0")});
 
         mesh.setVertices(vertices, 0, vertices.length);
         mesh.getIndicesBuffer().position(0);
