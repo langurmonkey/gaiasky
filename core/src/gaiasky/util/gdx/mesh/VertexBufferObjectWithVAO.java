@@ -157,6 +157,11 @@ public class VertexBufferObjectWithVAO implements IntVertexData {
 		isBound = true;
 	}
 
+	@Override
+	public void bind(ExtShaderProgram shader, int[] locations, int[] divisors) {
+		// No instanced rendering in this mode
+	}
+
 	private void bindAttributes (ExtShaderProgram shader, int[] locations) {
 		boolean stillValid = this.cachedLocations.size != 0;
 		final int numAttributes = attributes.size();

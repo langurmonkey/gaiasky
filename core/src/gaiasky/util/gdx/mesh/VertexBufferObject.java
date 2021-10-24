@@ -177,6 +177,11 @@ public class VertexBufferObject implements IntVertexData {
 
 	@Override
 	public void bind (ExtShaderProgram shader, int[] locations) {
+		bind(shader, locations, null);
+	}
+
+	@Override
+	public void bind(ExtShaderProgram shader, int[] locations, int[] divisors) {
 		final GL20 gl = Gdx.gl20;
 
 		gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
@@ -195,7 +200,10 @@ public class VertexBufferObject implements IntVertexData {
 				shader.enableVertexAttribute(location);
 
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
-					attributes.vertexSize, attribute.offset);
+						attributes.vertexSize, attribute.offset);
+				if(divisors != null) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisors[i]);
+				}
 			}
 
 		} else {
@@ -206,7 +214,10 @@ public class VertexBufferObject implements IntVertexData {
 				shader.enableVertexAttribute(location);
 
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
-					attributes.vertexSize, attribute.offset);
+						attributes.vertexSize, attribute.offset);
+				if(divisors != null) {
+					Gdx.gl30.glVertexAttribDivisor(location, divisors[i]);
+				}
 			}
 		}
 		isBound = true;
