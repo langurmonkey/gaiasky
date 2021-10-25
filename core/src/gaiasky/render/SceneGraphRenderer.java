@@ -750,7 +750,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // VARIABLE GROUP
         AbstractRenderSystem variableGroupProc = pcm.isTriangles() ?
-                new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders):
+                new VariableGroupInstRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders):
                 new VariableGroupPointRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);

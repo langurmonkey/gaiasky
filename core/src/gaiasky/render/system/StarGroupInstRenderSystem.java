@@ -53,6 +53,11 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
 
+    public void setStarTexture(String starTexture) {
+        starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
+        starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+    }
+
     @Override
     protected void addAttributesDivisor0(Array<VertexAttribute> attributes) {
         // Vertex position and texture coordinates are global
@@ -80,11 +85,6 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
         pmOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
         sizeOffset = curr.mesh.getInstancedAttribute(OwnUsage.Size) != null ? curr.mesh.getInstancedAttribute(OwnUsage.Size).offset / 4 : 0;
         starPosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
-    }
-
-    public void setStarTexture(String starTexture) {
-        starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
-        starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     @Override
@@ -125,10 +125,8 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                 int n = starGroup.size();
                 if (!starGroup.inGpu()) {
                     starGroup.offset = addMeshData(6, n);
-                    // Get mesh, reset indices
                     curr = meshes.get(starGroup.offset);
-                    ensureDivisor1VertsSize(n * curr.instanceSize);
-                    int numVerticesAdded = 0;
+                    ensureInstanceAttribsSize(n * curr.instanceSize);
                     int numStarsAdded = 0;
 
                     for (int i = 0; i < n; i++) {
@@ -168,15 +166,13 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
 
                             curr.instanceIdx += curr.instanceSize;
                             curr.numVertices++;
-                            numVerticesAdded++;
-                            // Indices
                             numStarsAdded++;
                         }
                     }
                     // Global (divisor=0) vertices (position, uv)
                     curr.mesh.setVertices(tempVerts, 0, 24);
                     // Per instance (divisor=1) vertices
-                    starGroup.count = numVerticesAdded * curr.instanceSize;
+                    starGroup.count = numStarsAdded * curr.instanceSize;
                     curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, starGroup.count);
 
                     starGroup.inGpu(true);

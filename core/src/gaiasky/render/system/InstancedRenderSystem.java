@@ -36,7 +36,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
         initializeModel();
     }
 
-    protected void ensureDivisor1VertsSize(int size) {
+    protected void ensureInstanceAttribsSize(int size) {
         if (tempInstanceAttribs == null || tempInstanceAttribs.length < size) {
             tempInstanceAttribs = new float[size];
         }

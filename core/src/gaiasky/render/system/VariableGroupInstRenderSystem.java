@@ -28,14 +28,14 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders variable star groups using regular arrays via billboards with geometry (quads as two triangles).
+ * Renders variable star groups using instancing via billboards with geometry (quads as two triangles).
  */
-public class VariableGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+public class VariableGroupInstRenderSystem extends InstancedRenderSystem implements IObserver {
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
 
     private final Vector3 aux1;
-    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, uvOffset, starPosOffset;
+    private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset, starPosOffset;
     private final float[] alphaSizeBr;
     private final Colormap cmap;
 
@@ -44,7 +44,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     private int fovMode;
     private Texture starTex;
 
-    public VariableGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public VariableGroupInstRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         this.comp = new DistToCameraComparator<>();
         this.alphaSizeBr = new float[3];
@@ -62,19 +62,17 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     }
 
     @Override
-    protected void initShaderProgram() {
-        ExtShaderProgram shaderProgram = getShaderProgram();
-        shaderProgram.begin();
-        // Uniforms that rarely change
-        shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
-        shaderProgram.end();
-    }
-
-    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
+    protected void addAttributesDivisor0(Array<VertexAttribute> attributes) {
+        // Vertex position and texture coordinates are global
         attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
         attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
-        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
+    }
+
+    @Override
+    protected void addAttributesDivisor1(Array<VertexAttribute> attributes) {
+        // Color, object position, proper motion and time series are per instance
         attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.ProperMotion, 3, "a_pm"));
         attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_starPos"));
 
         attributes.add(new VertexAttribute(OwnUsage.NumVariablePoints, 1, "a_nVari"));
@@ -88,21 +86,33 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 2, 4, "a_vtimes3"));
         attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 3, 4, "a_vtimes4"));
         attributes.add(new VertexAttribute(OwnUsage.VariableTimes + 4, 4, "a_vtimes5"));
-
     }
 
-    protected void offsets(MeshData curr) {
-        curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
-        pmOffset = curr.mesh.getVertexAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getVertexAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
-        starPosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
-        nVariOffset = curr.mesh.getVertexAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getVertexAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
-        variMagsOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
-        variTimesOffset = curr.mesh.getVertexAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getVertexAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
+    @Override
+    protected void offsets0(MeshData curr) {
+        // Not needed
+    }
+
+    @Override
+    protected void offsets1(MeshData curr) {
+        curr.colorOffset = curr.mesh.getInstancedAttribute(Usage.ColorPacked) != null ? curr.mesh.getInstancedAttribute(Usage.ColorPacked).offset / 4 : 0;
+        pmOffset = curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ProperMotion).offset / 4 : 0;
+        starPosOffset = curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getInstancedAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+        nVariOffset = curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints) != null ? curr.mesh.getInstancedAttribute(OwnUsage.NumVariablePoints).offset / 4 : 0;
+        variMagsOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableMagnitudes).offset / 4 : 0;
+        variTimesOffset = curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes) != null ? curr.mesh.getInstancedAttribute(OwnUsage.VariableTimes).offset / 4 : 0;
+    }
+
+    @Override
+    protected void initShaderProgram() {
+        ExtShaderProgram shaderProgram = getShaderProgram();
+        shaderProgram.begin();
+        // Uniforms that rarely change
+        shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
+        shaderProgram.end();
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
-
         starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
@@ -128,13 +138,11 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         synchronized (starGroup) {
             if (!starGroup.disposed) {
                 boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
+                int n = starGroup.size();
                 if (!starGroup.inGpu()) {
-                    int n = starGroup.size();
-                    starGroup.offset = addMeshData(n * 4, n * 6);
+                    starGroup.offset = addMeshData(6, n);
                     curr = meshes.get(starGroup.offset);
-                    ensureTempVertsSize(n * 4 * curr.vertexSize);
-                    ensureTempIndicesSize(n * 6);
-                    int numVerticesAdded = 0;
+                    ensureInstanceAttribsSize(n * curr.instanceSize);
                     int numStarsAdded = 0;
 
                     for (int i = 0; i < n; i++) {
@@ -144,59 +152,48 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
                                 logger.debug("Star " + particle.id() + " has a non-finite size");
                                 continue;
                             }
-                            // 4 vertices per star
-                            for (int vert = 0; vert < 4; vert++) {
-                                // Vertex POSITION
-                                tempVerts[curr.vertexIdx] = vertPos[vert].getFirst();
-                                tempVerts[curr.vertexIdx + 1] = vertPos[vert].getSecond();
 
-                                // UV coordinates
-                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
-
-                                // COLOR
-                                if (hlCmap) {
-                                    // Color map
-                                    double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                } else {
-                                    // Plain
-                                    tempVerts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
-                                }
-
-                                // VARIABLE STARS (magnitudes and times)
-                                tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari;
-                                for (int k = 0; k < particle.nVari; k++) {
-                                    if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                                    } else {
-                                        tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                    }
-                                    tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) particle.variTime(k);
-                                }
-
-                                // PROPER MOTION [u/yr]
-                                tempVerts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
-
-                                // STAR POSITION [u]
-                                tempVerts[curr.vertexIdx + starPosOffset] = (float) particle.x();
-                                tempVerts[curr.vertexIdx + starPosOffset + 1] = (float) particle.y();
-                                tempVerts[curr.vertexIdx + starPosOffset + 2] = (float) particle.z();
-
-                                curr.vertexIdx += curr.vertexSize;
-                                curr.numVertices++;
-                                numVerticesAdded++;
+                            // COLOR
+                            if (hlCmap) {
+                                // Color map
+                                double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                            } else {
+                                // Plain
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = starGroup.getColor(i);
                             }
-                            // Indices
-                            quadIndices(curr);
+
+                            // VARIABLE STARS (magnitudes and times)
+                            tempInstanceAttribs[curr.instanceIdx + nVariOffset] = particle.nVari;
+                            for (int k = 0; k < particle.nVari; k++) {
+                                if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
+                                    tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                } else {
+                                    tempInstanceAttribs[curr.instanceIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                }
+                                tempInstanceAttribs[curr.instanceIdx + variTimesOffset + k] = (float) particle.variTime(k);
+                            }
+
+                            // PROPER MOTION [u/yr]
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 1] = (float) particle.pmy();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 2] = (float) particle.pmz();
+
+                            // STAR POSITION [u]
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset] = (float) particle.x();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 1] = (float) particle.y();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 2] = (float) particle.z();
+
+                            curr.instanceIdx += curr.instanceSize;
+                            curr.numVertices++;
                             numStarsAdded++;
                         }
                     }
-                    starGroup.count = numVerticesAdded * curr.vertexSize;
-                    curr.mesh.setVertices(tempVerts, 0, starGroup.count);
-                    curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
+                    // Global (divisor=0) vertices (position, uv)
+                    curr.mesh.setVertices(tempVerts, 0, 24);
+                    // Per instance (divisor=1) vertices
+                    starGroup.count = numStarsAdded * curr.instanceSize;
+                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, starGroup.count);
 
                     starGroup.inGpu(true);
                 }
@@ -225,7 +222,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
                     shaderProgram.setUniformf("u_s", (float) curRt);
 
                     try {
-                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");
                     }
