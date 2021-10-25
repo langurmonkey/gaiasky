@@ -28,11 +28,11 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders star groups using quads.
+ * Renders star groups using instancing via billboards with geometry (quads as two triangles).
  */
 public class StarGroupInstRenderSystem extends InstancedRenderSystem implements IObserver {
     private final Vector3 aux1;
-    private int posOffset, sizeOffset, pmOffset, uvOffset, starPosOffset;
+    private int sizeOffset, pmOffset, starPosOffset;
     private final float[] alphaSizeBr;
     private final Colormap cmap;
 
@@ -71,8 +71,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
 
     @Override
     protected void offsets0(MeshData curr) {
-        posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
-        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
+        // Not needed
     }
 
     @Override
@@ -95,39 +94,6 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
         // Uniforms that rarely change
         shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
         shaderProgram.end();
-
-        // Fill in divisor0 vertices (vertex position and UV)
-        ensureTempVertsSize(6 * 4);
-        // 0 (0)
-        tempVerts[0] = 1; // pos
-        tempVerts[1] = 1;
-        tempVerts[2] = 1; // uv
-        tempVerts[3] = 1;
-        // 1 (1)
-        tempVerts[4] = 1; // pos
-        tempVerts[5] = -1;
-        tempVerts[6] = 1; // uv
-        tempVerts[7] = 0;
-        // 2 (2)
-        tempVerts[8] = -1; // pos
-        tempVerts[9] = -1;
-        tempVerts[10] = 0; // uv
-        tempVerts[11] = 0;
-        // 3 (2)
-        tempVerts[12] = -1; // pos
-        tempVerts[13] = -1;
-        tempVerts[14] = 0; // uv
-        tempVerts[15] = 0;
-        // 4 (3)
-        tempVerts[12] = -1; // pos
-        tempVerts[13] = 1;
-        tempVerts[14] = 0; // uv
-        tempVerts[15] = 1;
-        // 5 (0)
-        tempVerts[12] = 1; // pos
-        tempVerts[13] = 1;
-        tempVerts[14] = 1; // uv
-        tempVerts[15] = 1;
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
@@ -161,7 +127,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     starGroup.offset = addMeshData(6, n);
                     // Get mesh, reset indices
                     curr = meshes.get(starGroup.offset);
-                    ensureDivisor1VertsSize(n * curr.divisor1Size);
+                    ensureDivisor1VertsSize(n * curr.instanceSize);
                     int numVerticesAdded = 0;
                     int numStarsAdded = 0;
 
@@ -177,30 +143,30 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                             if (hlCmap) {
                                 // Color map
                                 double[] color = cmap.colormap(starGroup.getHlcmi(), starGroup.getHlcma().get(particle), starGroup.getHlcmmin(), starGroup.getHlcmmax());
-                                divisor1Verts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                             } else {
                                 // Plain
-                                divisor1Verts[curr.vertexIdx + curr.colorOffset] = starGroup.getColor(i);
+                                tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = starGroup.getColor(i);
                             }
 
                             // SIZE
                             if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                divisor1Verts[curr.vertexIdx + sizeOffset] = Math.max(10E8f, (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = Math.max(10E8f, (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
                             } else {
-                                divisor1Verts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                             }
 
                             // PROPER MOTION [u/yr]
-                            divisor1Verts[curr.vertexIdx + pmOffset] = (float) particle.pmx();
-                            divisor1Verts[curr.vertexIdx + pmOffset + 1] = (float) particle.pmy();
-                            divisor1Verts[curr.vertexIdx + pmOffset + 2] = (float) particle.pmz();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 1] = (float) particle.pmy();
+                            tempInstanceAttribs[curr.instanceIdx + pmOffset + 2] = (float) particle.pmz();
 
                             // STAR POSITION [u]
-                            divisor1Verts[curr.vertexIdx + starPosOffset] = (float) particle.x();
-                            divisor1Verts[curr.vertexIdx + starPosOffset + 1] = (float) particle.y();
-                            divisor1Verts[curr.vertexIdx + starPosOffset + 2] = (float) particle.z();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset] = (float) particle.x();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 1] = (float) particle.y();
+                            tempInstanceAttribs[curr.instanceIdx + starPosOffset + 2] = (float) particle.z();
 
-                            curr.divisor1Idx += curr.divisor1Size;
+                            curr.instanceIdx += curr.instanceSize;
                             curr.numVertices++;
                             numVerticesAdded++;
                             // Indices
@@ -210,8 +176,8 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     // Global (divisor=0) vertices (position, uv)
                     curr.mesh.setVertices(tempVerts, 0, 24);
                     // Per instance (divisor=1) vertices
-                    starGroup.count = numVerticesAdded * curr.divisor1Size;
-                    curr.mesh.setDivisor1Buff(divisor1Verts, 0, starGroup.count);
+                    starGroup.count = numVerticesAdded * curr.instanceSize;
+                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, starGroup.count);
 
                     starGroup.inGpu(true);
                 }

@@ -21,7 +21,6 @@
 
 package gaiasky.util.gdx.mesh;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
@@ -109,11 +108,6 @@ public class VertexArray implements IntVertexData {
 
 	@Override
 	public void bind (final ExtShaderProgram shader, final int[] locations) {
-		bind(shader, locations, -1);
-	}
-
-	@Override
-	public void bind (final ExtShaderProgram shader, final int[] locations, final int divisor) {
 		final int numAttributes = attributes.size();
 		byteBuffer.limit(buffer.limit() * 4);
 		if (locations == null) {
@@ -132,9 +126,6 @@ public class VertexArray implements IntVertexData {
 					shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
 						attributes.vertexSize, byteBuffer);
 				}
-				if(divisor >= 0) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisor);
-				}
 			}
 		} else {
 			for (int i = 0; i < numAttributes; i++) {
@@ -151,9 +142,6 @@ public class VertexArray implements IntVertexData {
 					byteBuffer.position(attribute.offset);
 					shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
 						attributes.vertexSize, byteBuffer);
-				}
-				if(divisor >= 0) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisor);
 				}
 			}
 		}

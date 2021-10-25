@@ -4,25 +4,8 @@
 #include shader/lib_geometry.glsl
 #include shader/lib_doublefloat.glsl
 
-in vec4 a_position;
-in vec3 a_starPos;
-in vec3 a_pm;
-in vec2 a_texCoord;
-in vec4 a_color;
-in float a_nVari;
-// Magnitudes
-in vec4 a_vmags1;
-in vec4 a_vmags2;
-in vec4 a_vmags3;
-in vec4 a_vmags4;
-in vec4 a_vmags5;
-// Times
-in vec4 a_vtimes1;
-in vec4 a_vtimes2;
-in vec4 a_vtimes3;
-in vec4 a_vtimes4;
-in vec4 a_vtimes5;
 
+// UNIFORMS
 // time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
 // time in julian days since variablity epoch
@@ -30,7 +13,6 @@ uniform float u_s;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec2 u_thAnglePoint;
-
 // VR scale factor
 uniform float u_vrScale;
 // x - alpha
@@ -42,6 +24,32 @@ uniform float u_brightnessPower;
 // Clamp values for the solid anlge of the quads
 uniform vec2 u_solidAngleLimits;
 
+// INPUT
+// Regular attributes
+layout (location=0) in vec4 a_position;
+layout (location=1) in vec2 a_texCoord;
+// Instanced attributes
+layout (location=2) in vec3 a_starPos;
+layout (location=3) in vec3 a_pm;
+layout (location=4) in vec4 a_color;
+layout (location=5) in float a_nVari;
+// Magnitudes
+layout (location=6) in vec4 a_vmags1;
+layout (location=7) in vec4 a_vmags2;
+layout (location=8) in vec4 a_vmags3;
+layout (location=9) in vec4 a_vmags4;
+layout (location=10) in vec4 a_vmags5;
+// Times
+layout (location=11) in vec4 a_vtimes1;
+layout (location=12) in vec4 a_vtimes2;
+layout (location=13) in vec4 a_vtimes3;
+layout (location=14) in vec4 a_vtimes4;
+layout (location=15) in vec4 a_vtimes5;
+
+// OUTPUT
+out vec4 v_col;
+out vec2 v_uv;
+
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
 #endif // relativisticEffects
@@ -49,10 +57,6 @@ uniform vec2 u_solidAngleLimits;
 #ifdef gravitationalWaves
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
-
-// OUTPUT
-out vec4 v_col;
-out vec2 v_uv;
 
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25

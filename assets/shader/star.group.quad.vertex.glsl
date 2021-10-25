@@ -4,19 +4,12 @@
 #include shader/lib_geometry.glsl
 #include shader/lib_doublefloat.glsl
 
-in vec4 a_position;
-in vec3 a_starPos;
-in vec3 a_pm;
-in vec2 a_texCoord;
-in vec4 a_color;
-in float a_size;
-
+// UNIFORMS
 // time in days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec2 u_thAnglePoint;
-
 // VR scale factor
 uniform float u_vrScale;
 // x - alpha
@@ -28,6 +21,20 @@ uniform float u_brightnessPower;
 // Clamp values for the solid anlge of the quads
 uniform vec2 u_solidAngleLimits;
 
+// INPUT
+// Regular attributes
+layout (location=0) in vec4 a_position;
+layout (location=1) in vec2 a_texCoord;
+// Instanced attributes
+layout (location=2) in vec3 a_starPos;
+layout (location=3) in vec3 a_pm;
+layout (location=4) in vec4 a_color;
+layout (location=5) in float a_size;
+
+// OUTPUT
+out vec4 v_col;
+out vec2 v_uv;
+
 #ifdef relativisticEffects
     #include shader/lib_relativity.glsl
 #endif // relativisticEffects
@@ -35,10 +42,6 @@ uniform vec2 u_solidAngleLimits;
 #ifdef gravitationalWaves
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
-
-// OUTPUT
-out vec4 v_col;
-out vec2 v_uv;
 
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25

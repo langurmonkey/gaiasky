@@ -28,7 +28,7 @@ import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Renders star groups using quads.
+ * Renders star groups using regular arrays via billboards with geometry (quads as two triangles).
  */
 public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private final Vector3 aux1;

@@ -11,11 +11,13 @@ uniform vec2 u_sizeLimits;
 uniform float u_vrScale;
 
 // INPUT
-in vec4 a_position;
-in vec3 a_particlePos;
-in vec2 a_texCoord;
-in vec4 a_color;
-in float a_size;
+// Regular attributes
+layout (location=0) in vec4 a_position;
+layout (location=1) in vec2 a_texCoord;
+// Instanced attributes
+layout (location=2) in vec3 a_particlePos;
+layout (location=3) in vec4 a_color;
+layout (location=4) in float a_size;
 
 // OUTPUT
 out vec4 v_col;

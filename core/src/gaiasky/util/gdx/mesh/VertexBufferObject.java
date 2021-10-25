@@ -23,7 +23,6 @@ package gaiasky.util.gdx.mesh;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.glutils.VertexData;
@@ -178,12 +177,7 @@ public class VertexBufferObject implements IntVertexData {
 
 	@Override
 	public void bind (ExtShaderProgram shader, int[] locations) {
-		bind(shader, locations, -1);
-	}
-
-	@Override
-	public void bind(ExtShaderProgram shader, int[] locations, int divisor) {
-		final GL30 gl = Gdx.gl30;
+		final GL20 gl = Gdx.gl20;
 
 		gl.glBindBuffer(GL20.GL_ARRAY_BUFFER, bufferHandle);
 		if (isDirty) {
@@ -201,10 +195,7 @@ public class VertexBufferObject implements IntVertexData {
 				shader.enableVertexAttribute(location);
 
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
-						attributes.vertexSize, attribute.offset);
-				if(divisor >= 0) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisor);
-				}
+					attributes.vertexSize, attribute.offset);
 			}
 
 		} else {
@@ -215,10 +206,7 @@ public class VertexBufferObject implements IntVertexData {
 				shader.enableVertexAttribute(location);
 
 				shader.setVertexAttribute(location, attribute.numComponents, attribute.type, attribute.normalized,
-						attributes.vertexSize, attribute.offset);
-				if(divisor >= 0) {
-					Gdx.gl30.glVertexAttribDivisor(location, divisor);
-				}
+					attributes.vertexSize, attribute.offset);
 			}
 		}
 		isBound = true;

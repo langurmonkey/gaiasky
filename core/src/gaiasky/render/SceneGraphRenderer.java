@@ -743,7 +743,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // STAR GROUP
         AbstractRenderSystem starGroupProc = pcm.isTriangles() ?
-                new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders) :
+                new StarGroupInstRenderSystem(STAR_GROUP, alphas, starGroupShaders) :
                 new StarGroupPointRenderSystem(STAR_GROUP, alphas, starGroupShaders);
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);

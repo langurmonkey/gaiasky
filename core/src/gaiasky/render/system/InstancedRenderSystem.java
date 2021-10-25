@@ -24,7 +24,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     // Auxiliary array that holds vertices temporarily
     // This buffer will be used with divisor=1, so each instance
     // gets one
-    protected float[] divisor1Verts;
+    protected float[] tempInstanceAttribs;
 
     public InstancedRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -33,29 +33,73 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     @Override
     protected void initVertices() {
         meshes = new Array<>();
+        initializeModel();
     }
 
-    protected void ensureDivisor1VertsSize(int size){
-        if(divisor1Verts == null || divisor1Verts.length < size) {
-            divisor1Verts = new float[size];
+    protected void ensureDivisor1VertsSize(int size) {
+        if (tempInstanceAttribs == null || tempInstanceAttribs.length < size) {
+            tempInstanceAttribs = new float[size];
         }
+    }
+
+    // By default, the model is initialized as two triangles (6 vertices)
+    // with texture coordinates (uv).
+    // This method fills in the tempVerts array.
+    protected void initializeModel() {
+        // Fill in divisor0 vertices (vertex position and UV)
+        ensureTempVertsSize(6 * 4);
+        int i = 0;
+        // 0 (0)
+        tempVerts[i++] = 1; // pos
+        tempVerts[i++] = 1;
+        tempVerts[i++] = 1; // uv
+        tempVerts[i++] = 1;
+        // 1 (1)
+        tempVerts[i++] = 1; // pos
+        tempVerts[i++] = -1;
+        tempVerts[i++] = 1; // uv
+        tempVerts[i++] = 0;
+        // 2 (2)
+        tempVerts[i++] = -1; // pos
+        tempVerts[i++] = -1;
+        tempVerts[i++] = 0; // uv
+        tempVerts[i++] = 0;
+        // 3 (2)
+        tempVerts[i++] = -1; // pos
+        tempVerts[i++] = -1;
+        tempVerts[i++] = 0; // uv
+        tempVerts[i++] = 0;
+        // 4 (3)
+        tempVerts[i++] = -1; // pos
+        tempVerts[i++] = 1;
+        tempVerts[i++] = 0; // uv
+        tempVerts[i++] = 1;
+        // 5 (0)
+        tempVerts[i++] = 1; // pos
+        tempVerts[i++] = 1;
+        tempVerts[i++] = 1; // uv
+        tempVerts[i] = 1;
     }
 
     /**
      * Adds the required vertex attributes for this renderer to the given list. These
      * attributes are added only once for all instances (divisor=0)
+     *
      * @param attributes The list of attributes with divisor=0
      */
     protected abstract void addAttributesDivisor0(Array<VertexAttribute> attributes);
+
     /**
      * Adds the required vertex attributes for this renderer to the given list. These
      * attributes are added for every instance (divisor=1)
+     *
      * @param attributes The list of attributes with divisor=1
      */
     protected abstract void addAttributesDivisor1(Array<VertexAttribute> attributes);
 
     /**
      * Builds the vertex attributes with divisor=0 array and returns it
+     *
      * @return The vertex attributes array
      */
     protected VertexAttribute[] buildAttributesDivisor0() {
@@ -67,8 +111,10 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             array[i] = attributes.get(i);
         return array;
     }
+
     /**
      * Builds the vertex attributes with divisor=1 array and returns it
+     *
      * @return The vertex attributes array
      */
     protected VertexAttribute[] buildAttributesDivisor1() {
@@ -84,6 +130,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     /**
      * Computes the offset for each vertex attribute. The offsets will be
      * used later in the render stage.
+     *
      * @param curr The current mesh data
      */
     protected abstract void offsets0(MeshData curr);
@@ -91,6 +138,7 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     /**
      * Computes the offset for each vertex attribute in the instanced array. The offsets will be
      * used later in the render stage.
+     *
      * @param curr The current mesh data
      */
     protected abstract void offsets1(MeshData curr);
@@ -98,8 +146,8 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
     /**
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
-     * @param maxVerts0   The max number of vertices the divisor 0 mesh data can hold
-     * @param maxVerts1   The max number of vertices the divisor 1 mesh data can hold
+     * @param maxVerts0 The max number of vertices the divisor 0 mesh data can hold
+     * @param maxVerts1 The max number of vertices the divisor 1 mesh data can hold
      *
      * @return The index of the new mesh data
      */
@@ -109,10 +157,10 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
 
         VertexAttribute[] attributes0 = buildAttributesDivisor0();
         VertexAttribute[] attributes1 = buildAttributesDivisor1();
-        curr.mesh = new IntMesh(false, maxVerts0, maxVerts1, 0, true, attributes0, attributes1);
+        curr.mesh = new IntMesh(true, maxVerts0, maxVerts1, attributes0, attributes1);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
-        curr.divisor1Size = curr.mesh.getInstancedAttributes().vertexSize / 4;
+        curr.instanceSize = curr.mesh.getInstanceAttributes().vertexSize / 4;
 
         offsets0(curr);
         offsets1(curr);
@@ -147,6 +195,5 @@ public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem im
             shaderProgram.end();
         }
     }
-
 
 }
