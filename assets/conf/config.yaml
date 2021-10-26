@@ -189,7 +189,6 @@ scene:
     fade: true
   # Renderer settings
   renderer:
-<<<<<<< HEAD
     # Point cloud mode, one of [TRIANGLES|TRIANGLES_INSTANCED|POINTS]
     # TRIANGLES is the new mode. Triangles are sent to the GPU in VBOs with VAOs. Faster on newer hardware and geometrically correct.
     # TRIANGLES_INSTANCED is a variation of TRIANGLES. Saves x4 graphics memory. Your mileage may vary with this one.
