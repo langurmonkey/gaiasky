@@ -23,7 +23,6 @@ import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -46,7 +45,6 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
 
     public VariableGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        this.comp = new DistToCameraComparator<>();
         this.alphaSizeBr = new float[3];
         this.aux1 = new Vector3();
         cmap = new Colormap();

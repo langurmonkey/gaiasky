@@ -335,7 +335,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // POINT CLOUD
         OwnLabel pointCloudLabel = new OwnLabel(I18n.txt("gui.pointcloud"), skin);
-        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.GL_TRIANGLES.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.GL_POINTS.ordinal()) };
+        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] {
+                                                            new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()),
+                                                            new ComboBoxBean(I18n.txt("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()),
+                                                            new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
         pointCloudRenderer = new OwnSelectBox<>(skin);
         pointCloudRenderer.setItems(pointCloudItems);
         pointCloudRenderer.setWidth(textWidth * 3f);

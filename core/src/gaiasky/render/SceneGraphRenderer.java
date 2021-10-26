@@ -35,6 +35,7 @@ import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
+import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
@@ -249,7 +250,6 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private static final Log logger = Logger.getLogger(SceneGraphRenderer.class);
 
-
     /**
      * Contains the flags representing each type's visibility
      **/
@@ -367,7 +367,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // Initialize point cloud shaders - depends on point cloud mode
         final String pointTriSuffix = Settings.settings.scene.renderer.pointCloud.isTriangles() ? ".quad" : "";
-        particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffix + ".vertex.glsl", "shader/particle.group" + pointTriSuffix +".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
+        particleGroupDesc = loadShader(manager, "shader/particle.group" + pointTriSuffix + ".vertex.glsl", "shader/particle.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("particle.group", namesCmap), definesCmap);
         starGroupDesc = loadShader(manager, "shader/star.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("star.group", namesCmap), definesCmap);
         variableGroupDesc = loadShader(manager, "shader/variable.group" + pointTriSuffix + ".vertex.glsl", "shader/star.group" + pointTriSuffix + ".fragment.glsl", TextUtils.concatAll("variable.group", namesCmap), definesCmap);
 
@@ -735,23 +735,29 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         particleEffectsProc.addPostRunnables(regularBlendR);
 
         // PARTICLE GROUP
-        AbstractRenderSystem particleGroupProc = pcm.isTriangles() ?
-                new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders) :
-                new ParticleGroupPointRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders) ;
+        AbstractRenderSystem particleGroupProc = switch (pcm) {
+            case TRIANGLES -> new ParticleGroupRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
+            case TRIANGLES_INSTANCED -> new ParticleGroupInstRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
+            case POINTS -> new ParticleGroupPointRenderSystem(PARTICLE_GROUP, alphas, particleGroupShaders);
+        };
         particleGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         particleGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // STAR GROUP
-        AbstractRenderSystem starGroupProc = pcm.isTriangles() ?
-                new StarGroupInstRenderSystem(STAR_GROUP, alphas, starGroupShaders) :
-                new StarGroupPointRenderSystem(STAR_GROUP, alphas, starGroupShaders);
+        AbstractRenderSystem starGroupProc = switch (pcm) {
+            case TRIANGLES -> new StarGroupRenderSystem(STAR_GROUP, alphas, starGroupShaders);
+            case TRIANGLES_INSTANCED -> new StarGroupInstRenderSystem(STAR_GROUP, alphas, starGroupShaders);
+            case POINTS -> new StarGroupPointRenderSystem(STAR_GROUP, alphas, starGroupShaders);
+        };
         starGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         starGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // VARIABLE GROUP
-        AbstractRenderSystem variableGroupProc = pcm.isTriangles() ?
-                new VariableGroupInstRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders):
-                new VariableGroupPointRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+        AbstractRenderSystem variableGroupProc = switch (pcm) {
+            case TRIANGLES -> new VariableGroupRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+            case TRIANGLES_INSTANCED -> new VariableGroupInstRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+            case POINTS -> new VariableGroupPointRenderSystem(VARIABLE_GROUP, alphas, variableGroupShaders);
+        };
         variableGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
@@ -1205,7 +1211,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * @param camera        The camera to use.
      * @param t             The time in seconds since the start.
      * @param renderContext The render context.
-     * @param systemClass         The class.
+     * @param systemClass   The class.
      */
     protected void renderSystem(ICamera camera, double t, RenderingContext renderContext, Class<? extends IRenderSystem> systemClass) {
         // Update time difference since last update

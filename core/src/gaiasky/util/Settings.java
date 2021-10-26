@@ -590,7 +590,7 @@ public class Settings {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
-            public PointCloudMode pointCloud = PointCloudMode.GL_TRIANGLES;
+            public PointCloudMode pointCloud = PointCloudMode.TRIANGLES;
             public LineMode line;
             public double ambient;
             public ShadowSettings shadow;
@@ -622,7 +622,10 @@ public class Settings {
             public void setPointCloud(String pointCloud) {
                 if (pointCloud == null || pointCloud.isEmpty()) {
                     // Default
-                    pointCloud = "GL_TRIANGLES";
+                    pointCloud = "TRIANGLES";
+                }
+                if (pointCloud.startsWith("GL_")) {
+                    pointCloud = pointCloud.substring(3);
                 }
                 this.pointCloud = PointCloudMode.valueOf(pointCloud.toUpperCase(Locale.ROOT));
             }
@@ -1641,15 +1644,16 @@ public class Settings {
     }
 
     public enum PointCloudMode {
-        GL_TRIANGLES,
-        GL_POINTS;
+        TRIANGLES,
+        TRIANGLES_INSTANCED,
+        POINTS;
 
         public boolean isPoints() {
-            return this.equals(GL_POINTS);
+            return this.equals(POINTS);
         }
 
         public boolean isTriangles() {
-            return this.equals(GL_TRIANGLES);
+            return this.equals(TRIANGLES) || this.equals(TRIANGLES_INSTANCED);
         }
     }
 

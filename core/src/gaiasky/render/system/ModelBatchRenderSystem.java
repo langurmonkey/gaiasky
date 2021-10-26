@@ -41,7 +41,6 @@ public class ModelBatchRenderSystem extends AbstractRenderSystem {
     public ModelBatchRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
         super(rg, alphas, null);
         this.batch = batch;
-        comp = new ModelComparator<>();
 
         this.ctAtm = new ComponentTypes(ComponentType.Atmospheres);
         this.ctClouds = new ComponentTypes(ComponentType.Clouds);

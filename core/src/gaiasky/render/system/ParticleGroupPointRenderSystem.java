@@ -25,8 +25,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
-import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
 import org.lwjgl.opengl.GL30;
@@ -43,7 +41,6 @@ public class ParticleGroupPointRenderSystem extends PointCloudRenderSystem imple
 
     public ParticleGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        comp = new DistToCameraComparator<>();
         rand = new Random(123);
         aux1 = new Vector3();
         cmap = new Colormap();

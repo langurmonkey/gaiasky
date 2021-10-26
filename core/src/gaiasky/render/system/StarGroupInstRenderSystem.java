@@ -23,7 +23,6 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -43,7 +42,6 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
 
     public StarGroupInstRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        this.comp = new DistToCameraComparator<>();
         this.alphaSizeBr = new float[3];
         this.aux1 = new Vector3();
         cmap = new Colormap();
@@ -199,7 +197,6 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
 
                     try {
-                        // Draw n instances
                         curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES, 0, 6, n);
                     } catch (IllegalArgumentException e) {
                         logger.error(e, "Render exception");

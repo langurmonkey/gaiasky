@@ -23,7 +23,6 @@ import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -43,7 +42,6 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
 
     public StarGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        this.comp = new DistToCameraComparator<>();
         this.alphaSizeBr = new float[3];
         this.aux1 = new Vector3();
         cmap = new Colormap();

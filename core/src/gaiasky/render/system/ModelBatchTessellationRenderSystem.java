@@ -27,7 +27,6 @@ public class ModelBatchTessellationRenderSystem extends AbstractRenderSystem {
     public ModelBatchTessellationRenderSystem(RenderGroup rg, float[] alphas, IntModelBatch batch) {
         super(rg, alphas, null);
         this.batch = batch;
-        comp = new ModelComparator<>();
     }
 
     @Override

@@ -25,7 +25,6 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -46,7 +45,6 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     public StarGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
-        this.comp = new DistToCameraComparator<>();
         this.alphaSizeFovBr = new float[4];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();

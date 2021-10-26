@@ -15,9 +15,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
- * Contains some common code to all point cloud renderers and some
- * scaffolding to make life easier. Should be used by point
- * clouds that render their particles as GL_POINTS.
+ * Common code to all render systems that render quads with GPU instancing.
  */
 public abstract class InstancedRenderSystem extends ImmediateModeRenderSystem implements IObserver {
 
