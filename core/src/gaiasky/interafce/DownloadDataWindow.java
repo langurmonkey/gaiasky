@@ -46,6 +46,7 @@ import java.nio.ByteOrder;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Stream;
@@ -378,8 +379,9 @@ public class DownloadDataWindow extends GenericDialog {
                                             basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
                                             baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
                                         }
-                                        File dataLoc = new File(Settings.settings.data.location);
-                                        File directory = new File(dataLoc, basePath);
+                                        Path dataPath = Paths.get(Settings.settings.data.location);
+                                        dataPath = dataPath.toRealPath();
+                                        File directory = dataPath.resolve(basePath).toFile();
                                         Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
                                         for (File file : files) {
                                             if (!file.equals(directory) && file.exists()) {
