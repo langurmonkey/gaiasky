@@ -349,4 +349,23 @@ public class SysUtils {
         }
     }
 
+    /**
+     * Gets the path to the file containing the release notes.
+     * @return Path to the release notes file
+     */
+    public static Path getReleaseNotesFile() {
+        Path workDir = Path.of(System.getProperty("user.dir"));
+        return workDir.resolve("releasenotes.txt");
+    }
+
+    /**
+     * Gets the path to the file containing the last shown
+     * release notes version. This file is typically in the
+     * configuration directory.
+     * @return Path to the release notes revision file
+     */
+    public static Path getReleaseNotesRevisionFile(){
+        return getConfigDir().resolve(".releasenotes.rev");
+    }
+
 }

@@ -994,7 +994,14 @@
     "disabled-nobg": {
       "selection": "selection",
       "font": "ui-18",
-      "fontColor": "white",
+      "fontColor": "red",
+      "messageFontColor": "dark-gray",
+      "cursor": "cursor"
+    },
+    "monospace-txt": {
+      "selection": "selection",
+      "font": "mono",
+      "fontColor": "red",
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },

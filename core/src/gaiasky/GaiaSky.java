@@ -696,6 +696,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         };
         Timer.schedule(startCapturing, 1f);
 
+        // Release notes
+        guiRegistry.publishReleaseNotes();
+
         // Go home
         goHome();
 
@@ -1089,6 +1092,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Pause the main thread for a certain amount of time to match the
      * given target frame rate.
+     *
      * @param fps The target frame rate
      */
     private void sleep(double fps) {

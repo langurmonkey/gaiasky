@@ -346,7 +346,7 @@ public class AboutWindow extends GenericDialog {
         Gdx.gl.glGetIntegerv(GL20.GL_MAX_TEXTURE_SIZE, buf);
         int maxSize = buf.get(0);
         int lines = GlobalResources.countOccurrences(extensions, '\n');
-        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "disabled-nobg");
+        OwnTextArea maxTexSize = new OwnTextArea("Max texture size: " + maxSize + '\n' + extensions, skin, "monospace-txt");
         maxTexSize.setDisabled(true);
         maxTexSize.setPrefRows(lines);
         maxTexSize.clearListeners();

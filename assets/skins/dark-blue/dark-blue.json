@@ -992,6 +992,13 @@
       "messageFontColor": "dark-gray",
       "cursor": "cursor"
     },
+    "monospace-txt": {
+      "selection": "selection",
+      "font": "mono",
+      "fontColor": "white",
+      "messageFontColor": "dark-gray",
+      "cursor": "cursor"
+    },
     "info": {
       "font": "ui-18",
       "fontColor": "sc-blue",

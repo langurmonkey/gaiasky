@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.desktop.util.SysUtils;
@@ -22,6 +24,7 @@ import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
+import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
 import org.lwjgl.glfw.GLFW;
@@ -169,6 +172,7 @@ public class GuiRegistry implements IObserver {
      * Unregisters a GUI
      *
      * @param gui The GUI to unregister
+     *
      * @return True if the GUI was unregistered
      */
     public boolean unregisterGui(IGui gui) {
@@ -232,6 +236,35 @@ public class GuiRegistry implements IObserver {
             gui.update(dt);
     }
 
+    public void publishReleaseNotes() {
+        // Check release notes if needed
+        Path releaseNotesRev = SysUtils.getReleaseNotesRevisionFile();
+        int releaseNotesVersion = 0;
+        if(Files.exists(releaseNotesRev) && Files.isRegularFile(releaseNotesRev)) {
+            try {
+                String contents = Files.readString(releaseNotesRev).trim();
+                releaseNotesVersion = Parser.parseInt(contents);
+            }catch(Exception e){
+                logger.warn(I18n.txt("error.file.read", releaseNotesRev.toString()));
+            }
+        }
+
+        if (releaseNotesVersion < Settings.settings.version.versionNumber) {
+            Path releaseNotesFile = SysUtils.getReleaseNotesFile();
+            if (Files.exists(releaseNotesFile)) {
+                final Task releaseNotesTask = new Task() {
+                    @Override
+                    public void run() {
+                        Stage ui = current.getGuiStage();
+                        ReleaseNotesWindow releaseNotesWindow = new ReleaseNotesWindow(ui, skin, releaseNotesFile);
+                        releaseNotesWindow.show(ui);
+                    }
+                };
+                Timer.schedule(releaseNotesTask, 3);
+            }
+        }
+    }
+
     private Skin skin;
 
     private PreferencesWindow preferencesWindow;
@@ -266,10 +299,9 @@ public class GuiRegistry implements IObserver {
     // Scene Graph
     protected final ISceneGraph sceneGraph;
 
-
     public void dispose() {
         EventManager.instance.removeAllSubscriptions(this);
-        if(searchDialog != null)
+        if (searchDialog != null)
             searchDialog.dispose();
     }
 
