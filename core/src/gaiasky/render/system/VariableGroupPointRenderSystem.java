@@ -113,7 +113,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
 
             shaderProgram.begin();
             // Global uniforms
-            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
@@ -164,9 +164,9 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                                     tempVerts[curr.vertexIdx + nVariOffset] = particle.nVari;
                                     for (int k = 0; k < particle.nVari; k++) {
                                         if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_POINT_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = Math.max(10f, (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
                                         } else {
-                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_POINT_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                            tempVerts[curr.vertexIdx + variMagsOffset + k] = (float) (particle.variMag(k) * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                         }
                                         tempVerts[curr.vertexIdx + variTimesOffset + k] = (float) particle.variTime(k);
                                     }

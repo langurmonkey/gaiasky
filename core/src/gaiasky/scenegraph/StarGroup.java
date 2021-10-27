@@ -319,10 +319,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
             double sizeOriginal = getSize(idx);
             double size = sizeOriginal * varScl;
-            double radius = size * Constants.STAR_POINT_SIZE_FACTOR;
+            double radius = size * Constants.STAR_SIZE_FACTOR;
             Vector3d starPos = fetchPosition(star, cPosD, aux3d1.get(), currDeltaYears);
             double distToCamera = starPos.len();
-            double viewAngle = (sizeOriginal * Constants.STAR_POINT_SIZE_FACTOR / distToCamera) / fovFactor;
+            double viewAngle = (sizeOriginal * Constants.STAR_SIZE_FACTOR / distToCamera) / fovFactor;
 
             Color.abgr8888ToColor(c, getColor(idx));
             if (viewAngle >= thPointTimesFovFactor) {
@@ -354,7 +354,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             computedSize = (size * (dist / radius) * Constants.THRESHOLD_DOWN);
         }
         // Change the factor at the end here to control the stray light of stars
-        computedSize *= Settings.settings.scene.star.pointSize * 0.4;
+        computedSize *= Settings.settings.scene.star.brightness * 0.2;
 
         return computedSize;
     }
@@ -398,7 +398,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
             IParticleRecord star = pointData.get(active[i]);
-            float radius = (float) (getSize(active[i]) * Constants.STAR_POINT_SIZE_FACTOR);
+            float radius = (float) (getSize(active[i]) * Constants.STAR_SIZE_FACTOR);
             // Position
             Vector3d lPos = fetchPosition(star, cPosD, aux3d1.get(), currDeltaYears);
             // Proper motion
@@ -531,7 +531,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
                 double distToCamera = starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 0.5f);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 6f);
 
                 if (camera.isVisible(viewAngle, starPosition, distToCamera)) {
                     render2DLabel(batch, shader, rc, sys.font2d, camera, star.names()[0], starPosition);
@@ -543,7 +543,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
                 double distToCamera = starPosition.len();
                 float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 0.4f);
+                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
 
                 if (viewAngle >= thOverFactor && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
                     textPosition(camera, starPosition, distToCamera, radius);
@@ -593,12 +593,12 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     // Radius in stars is different!
     public double getRadius() {
-        return getSize() * Constants.STAR_POINT_SIZE_FACTOR;
+        return getSize() * Constants.STAR_SIZE_FACTOR;
     }
 
     // Radius in stars is different!
     public double getRadius(int i) {
-        return getSize(i) * Constants.STAR_POINT_SIZE_FACTOR;
+        return getSize(i) * Constants.STAR_SIZE_FACTOR;
     }
 
     public float getAppmag() {
@@ -912,7 +912,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 // Pos
                 Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z()).add(dx);
 
-                metadata[i] = filter(i) ? (-(((d.size() * Constants.STAR_POINT_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) : Double.MAX_VALUE;
+                metadata[i] = filter(i) ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) : Double.MAX_VALUE;
             }
         }
     }

@@ -189,7 +189,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         ct = new ComponentTypes(ComponentType.Galaxies);
         // Relation between our star size and actual star size (normalized for
         // the Sun, 695700 Km of radius
-        radius = size * Constants.STAR_POINT_SIZE_FACTOR;
+        radius = size * Constants.STAR_SIZE_FACTOR;
     }
 
     protected void setDerivedAttributes() {
@@ -342,7 +342,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
+        computedSize *= Settings.settings.scene.star.brightness * 0.2f;
         return (float) computedSize;
     }
 

@@ -117,11 +117,11 @@ scene:
   # Star settings
   star:
     # Star brightness factor
-    brightness: 8.0
+    brightness: 2.0
     # Modulate the brightness of stars with this power
-    power: 0.6
+    power: 0.75
     # Size scaling of stars
-    pointSize: 3.0
+    pointSize: 8.2
     # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
     # 1 - horizontal spike
     # 2 - god rays

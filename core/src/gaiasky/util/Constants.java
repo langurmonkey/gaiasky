@@ -151,12 +151,7 @@ public class Constants {
         EventManager.instance.post(Events.NEW_DISTANCE_SCALE_FACTOR);
     }
 
-    /**
-     * Factor we need to use to get the real size of the star given its quad
-     * *texture* size
-     **/
-    public static final double STAR_POINT_SIZE_FACTOR = 1.31526e-6;
-    public static final double STAR_QUAD_SIZE_FACTOR = 2e2;
+    public static final double STAR_SIZE_FACTOR = 1.31526e-6;
 
     /** Threshold radius/distance where star size remains constant. **/
     public static final double THRESHOLD_DOWN = 5e-7;

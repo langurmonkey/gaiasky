@@ -36,7 +36,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     private final Colormap cmap;
 
     private float starPointSize;
-    private float[] solidAngleLimits;
+    private float[] opacityLimits;
     private int fovMode;
     private Texture starTex;
 
@@ -46,7 +46,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
-        solidAngleLimits = new float[] { (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[0]) * 0.3f)), (float) Math.tan(Math.toRadians((Settings.settings.scene.star.opacity[1]) * 50f)) };
+        opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
         EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
@@ -88,7 +88,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
-        shaderProgram.setUniform2fv("u_solidAngleLimits", solidAngleLimits, 0, 2);
+        shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         fovMode = camera.getMode().getGaiaFovMode();
@@ -99,8 +99,12 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
             PerspectiveCamera[] cams = camera.getFrontCameras();
             shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
         }
-        alphaSizeBr[2] = Settings.settings.scene.star.brightness;
-        shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power / 1.1f) - 0.1f) * 2.0f - 1.0f);
+        // Solid angle values for min brightness and full brightness
+        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-11f, 1.0e-9f);
+        // Remap brightness to [0.2,1]
+        alphaSizeBr[2] = (Settings.settings.scene.star.brightness - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 0.8f + 0.2f;
+        // Remap brightness power to [-1,1]
+        shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power - 0.1f) / 1.1f) * 1.1f - 0.5f);
     }
 
     protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
@@ -147,9 +151,9 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
 
                                 // SIZE
                                 if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10E8f, (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                    tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
                                 } else {
-                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_QUAD_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                    tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                 }
 
                                 // PROPER MOTION [u/yr]
@@ -189,7 +193,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                     }
 
                     alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                    alphaSizeBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) * 0.3f;
+                    alphaSizeBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * 1e6f * rc.scaleFactor * starGroup.highlightedSizeFactor());
                     shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
 
                     // Days since epoch
@@ -211,7 +215,7 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD -> solidAngleLimits[0] = (float) Math.tan(Math.toRadians(((float) data[0]) * 0.3f));
+        case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case DISPOSE_STAR_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);

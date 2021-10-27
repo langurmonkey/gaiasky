@@ -35,8 +35,8 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
 
     private final Vector3 aux1;
     private int sizeOffset, pmOffset;
-    private float[] sizeLimits;
-    private final float[] alphaSizeFovBr;
+    private float[] opacityLimits;
+    private final float[] alphaSizeBrRc;
     private final float[] pointAlphaHl;
     private final Colormap cmap;
 
@@ -45,7 +45,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     public StarGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         BRIGHTNESS_FACTOR = 10;
-        this.alphaSizeFovBr = new float[4];
+        this.alphaSizeBrRc = new float[4];
         this.pointAlphaHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
@@ -64,7 +64,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        sizeLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
+        opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -112,7 +112,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
-            shaderProgram.setUniformf("u_brPow", Settings.settings.scene.star.power);
+            shaderProgram.setUniformf("u_brightnessPower", Settings.settings.scene.star.power);
             shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
             // Update projection if fovMode is 3
@@ -124,8 +124,8 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                 PerspectiveCamera[] cams = camera.getFrontCameras();
                 shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
             }
-            alphaSizeFovBr[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
-            alphaSizeFovBr[3] = rc.scaleFactor;
+            alphaSizeBrRc[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
+            alphaSizeBrRc[3] = rc.scaleFactor;
 
             renderables.forEach(r -> {
                 final StarGroup starGroup = (StarGroup) r;
@@ -157,9 +157,9 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
 
                                     // SIZE
                                     if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_POINT_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                                        tempVerts[curr.vertexIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
                                     } else {
-                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_POINT_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                                        tempVerts[curr.vertexIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
                                     }
 
                                     // POSITION [u]
@@ -194,11 +194,11 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : sizeLimits, 0, 2);
+                            shaderProgram.setUniform2fv("u_opacityLimits", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : opacityLimits, 0, 2);
 
-                            alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeFovBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
-                            shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
+                            alphaSizeBrRc[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
+                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
+                            shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility
@@ -236,18 +236,14 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD:
-            sizeLimits[0] = (float) data[0];
-            break;
-        case DISPOSE_STAR_GROUP_GPU_MESH:
+        case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
+        case DISPOSE_STAR_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
-            break;
-        case STAR_TEXTURE_IDX_CMD:
-            GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
-            break;
-        default:
-            break;
+        }
+        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        default -> {
+        }
         }
     }
 

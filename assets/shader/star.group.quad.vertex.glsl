@@ -5,11 +5,11 @@
 #include shader/lib_doublefloat.glsl
 
 // UNIFORMS
-// time in days since epoch, as a 64-bit double encoded with two floats
+// time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
-uniform vec2 u_thAnglePoint;
+uniform vec2 u_solidAngleMap;
 // VR scale factor
 uniform float u_vrScale;
 // x - alpha
@@ -18,8 +18,7 @@ uniform float u_vrScale;
 uniform vec3 u_alphaSizeBr;
 // Brightness power
 uniform float u_brightnessPower;
-// Clamp values for the solid anlge of the quads
-uniform vec2 u_solidAngleLimits;
+uniform vec2 u_opacityLimits;
 
 // INPUT
 // Regular attributes
@@ -81,11 +80,12 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    float viewAngleApparent = atan(a_size / dist);
-    float opacity = lint(viewAngleApparent, u_thAnglePoint.x, u_thAnglePoint.y, 0.0, 1.0) * (u_alphaSizeBr.z - 0.4f) / 7.6;
+    float solidAngle = atan(a_size / dist);
+    float opacity = lint(solidAngle, u_solidAngleMap.x, u_solidAngleMap.y, u_opacityLimits.x, u_opacityLimits.y);
     float boundaryFade = smoothstep(l0, l1, dist);
-    v_col = vec4(a_color.rgb * clamp(opacity * u_alphaSizeBr.x, 0.0, 1.0), opacity * u_alphaSizeBr.x) * boundaryFade;
-    float quadSize = clamp(a_size * pow(viewAngleApparent, u_brightnessPower) * (u_alphaSizeBr.y * 0.05f), u_solidAngleLimits.x * dist, u_solidAngleLimits.y * dist);
+    v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
+
+    float quadSize = clamp(a_size * pow(solidAngle * 5e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.002 * dist, 0.5 * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;
