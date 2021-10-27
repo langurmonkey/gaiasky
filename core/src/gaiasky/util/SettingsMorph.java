@@ -1,6 +1,5 @@
 package gaiasky.util;
 
-import com.badlogic.gdx.Screen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;

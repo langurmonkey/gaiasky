@@ -1392,11 +1392,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Post a message to the screen
             if (stereoMode) {
+                String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
+                String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
                 final ModePopupInfo mpi = new ModePopupInfo();
-                mpi.title = "Stereoscopic mode";
-                mpi.header = "You have entered Stereoscopic mode!";
-                mpi.addMapping("Back to normal mode", "CTRL", "S");
-                mpi.addMapping("Switch stereo profile", "CTRL", "SHIFT", "S");
+                mpi.title = I18n.txt("gui.stereo.title");
+                mpi.header = I18n.txt("gui.stereo.notice.header");;
+                mpi.addMapping(I18n.txt("gui.stereo.notice.back"), keysStrToggle);
+                mpi.addMapping(I18n.txt("gui.stereo.notice.profile"), keysStrProfile);
 
                 EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "stereo", 120f);
             } else {

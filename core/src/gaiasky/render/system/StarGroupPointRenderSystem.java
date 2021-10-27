@@ -35,7 +35,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
 
     private final Vector3 aux1;
     private int sizeOffset, pmOffset;
-    private float[] pointAlpha;
+    private float[] sizeLimits;
     private final float[] alphaSizeFovBr;
     private final float[] pointAlphaHl;
     private final Colormap cmap;
@@ -64,7 +64,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
+        sizeLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -194,7 +194,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
+                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : sizeLimits, 0, 2);
 
                             alphaSizeFovBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
                             alphaSizeFovBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
@@ -237,7 +237,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     public void notify(final Events event, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD:
-            pointAlpha[0] = (float) data[0];
+            sizeLimits[0] = (float) data[0];
             break;
         case DISPOSE_STAR_GROUP_GPU_MESH:
             Integer meshIdx = (Integer) data[0];

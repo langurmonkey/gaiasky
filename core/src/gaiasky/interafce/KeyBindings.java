@@ -133,8 +133,11 @@ public class KeyBindings {
         }
         return null;
     }
-
     public String getStringKeys(String actionId) {
+        return getStringKeys(actionId, "+");
+    }
+
+    public String getStringKeys(String actionId, String join) {
         TreeSet<Integer> keys = getKeys(actionId);
         if (keys != null) {
             StringBuilder sb = new StringBuilder();
@@ -142,9 +145,24 @@ public class KeyBindings {
             while (it.hasNext()) {
                 sb.append(Keys.toString(it.next()));
                 if (it.hasNext())
-                    sb.append("+");
+                    sb.append(join);
             }
             return sb.toString();
+        } else {
+            return null;
+        }
+    }
+
+    public String[] getStringArrayKeys(String actionId) {
+        TreeSet<Integer> keys = getKeys(actionId);
+        if (keys != null) {
+            String[] result = new String[keys.size()];
+            Iterator<Integer> it = keys.descendingIterator();
+            int i = 0;
+            while (it.hasNext()) {
+                result[i++] = Keys.toString(it.next());
+            }
+            return result;
         } else {
             return null;
         }
@@ -285,9 +303,6 @@ public class KeyBindings {
             Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
             EventManager.instance.post(Events.SCREEN_MODE_CMD);
         }));
-
-        // toggle planetarium mode
-        // addAction(new ProgramAction("action.toggle/element.planetarium", () -> EventManager.instance.post(Events.FISHEYE_CMD, !Settings.settings.postprocess.POSTPROCESS_FISHEYE)));
 
         // take screenshot
         addAction(new ProgramAction("action.screenshot", () -> EventManager.instance.post(Events.SCREENSHOT_CMD, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
