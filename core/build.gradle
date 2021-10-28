@@ -488,11 +488,11 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@sha256checksum@', value: sha256Tar)
 
         // Run makepkg to create .SRCINFO
-        exec {
-            workingDir "$packageDir/arch/"
-            executable "makepkg"
-            args "--printsrcinfo",">",".SRCINFO"
-        }
+        //exec {
+        //    workingDir "$packageDir/arch/"
+        //    executable "makepkg"
+        //    args "--printsrcinfo",">",".SRCINFO"
+        //}
     }
 }
 
