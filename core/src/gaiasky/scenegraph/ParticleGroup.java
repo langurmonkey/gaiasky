@@ -931,7 +931,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public float highlightedSizeFactor() {
-        return (highlighted && catalogInfo != null) ? catalogInfo.hlSizeFactor : 1f;
+        return (highlighted && catalogInfo != null) ? catalogInfo.hlSizeFactor : getPointscaling();
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {

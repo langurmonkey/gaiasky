@@ -85,7 +85,7 @@ void main() {
     float boundaryFade = smoothstep(l0, l1, dist);
     v_col = vec4(a_color.rgb * u_alphaSizeBr.z, clamp(opacity * u_alphaSizeBr.x * boundaryFade, 0.0, 1.0));
 
-    float quadSize = clamp(a_size * pow(solidAngle * 5e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.002 * dist, 0.5 * dist);
+    float quadSize = clamp(a_size * pow(solidAngle * 5e8, u_brightnessPower) * u_alphaSizeBr.y, u_opacityLimits.x * 0.003 * dist, 0.5 * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

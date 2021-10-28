@@ -169,7 +169,7 @@ public class ParticleGroupInstRenderSystem extends InstancedRenderSystem impleme
                 if (curr != null) {
                     float meanDist = (float) (particleGroup.getMeanDistance());
 
-                    double s = 1e-4f;
+                    double s = .3e-4f;
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
                     shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
