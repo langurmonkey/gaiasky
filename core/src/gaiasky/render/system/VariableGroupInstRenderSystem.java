@@ -130,7 +130,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
         // Solid angle values for min brightness and full brightness
         shaderProgram.setUniformf("u_solidAngleMap", 1.0e-11f, 1.0e-9f);
         // Remap brightness to [0.2,1]
-        alphaSizeBr[2] = (Settings.settings.scene.star.brightness - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 0.8f + 0.2f;
+        alphaSizeBr[2] = (Settings.settings.scene.star.brightness - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 1.5f + 0.6f;
         // Remap brightness power to [-1,1]
         shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power - 0.1f) / 1.1f) * 1.1f - 0.5f);
     }
