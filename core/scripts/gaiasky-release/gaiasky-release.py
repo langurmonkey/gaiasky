@@ -19,7 +19,7 @@ def check_args(args=None):
     parser = argparse.ArgumentParser(prog='gaiasky-release', description='This script prepares Gaia Sky for a new release. It will edit the build/script files, generate a tag, update the changelog file and creates the application release packages.')
     parser.add_argument('-g', '--gs_folder', type=str, default=os.environ.get('GS'), help='Location of the Gaia Sky folder. If not present, it uses the $GS environment variable.')
     parser.add_argument('-u', '--undo', action='store_true', help='Undoes the changes to the build and script files. If this flag is not present, the default is to *do* a release.')
-    parser.add_argument('-t', '--tag', type=str, help='Tag name for the new release. If this is not present, the tag is not created, the changelog is not generated and the release is not packed.')
+    parser.add_argument('-t', '--tag', type=str, help='Tag name for the new release. If this is not present, the tag is not created, the change log is not generated and the release is not packed.')
     parser.add_argument('-a', '--tag_annotation', type=str, help='Tag annotation for the new release.')
     parser.add_argument('-p', '--def_file', type=str, help='JSON file with the action definitions.')
 

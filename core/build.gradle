@@ -237,7 +237,13 @@ task manGen(type: Exec) {
     commandLine "help2man", "--no-discard-stderr", "-N", "--section=6", "--include", "$baseDir/core/man/gaiasky.h2m", "--output=$distDir/gaiasky.6", "$distDir/gaiasky"
 }
 
-task dist(dependsOn: gaiaskyJar, description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
+task genReleaseNotes(type: Exec) {
+    println("generate-releasenotes $tag $distDir/releasenotes.txt")
+    workingDir "$baseDir/core/scripts/gaiasky-release/"
+    commandLine "generate-releasenotes", "$tag", "$distDir/releasenotes.txt"
+}
+
+task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the project, creates the jar and moves it all to releases/gaiasky-\$tag-\$rev") {
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
@@ -461,6 +467,11 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
             from "installerscripts/arch"
             into "$packageDir/arch"
         }
+        copy {
+            from "$distDir"
+            into "$packageDir/arch/"
+            include "releasenotes.txt"
+        }
 
         String md5Tar = new File("$packageDir/" + project.distName + ".tar.gz.md5").text
         md5Tar = md5Tar.replace("\n", "").replace("\r", "");
@@ -476,16 +487,12 @@ task createArch(dependsOn: createTar, description: "Copies Arch Linux AUR build 
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@md5checksum@', value: md5Tar)
         ant.replace(file: "$packageDir/arch/PKGBUILD", token: '@sha256checksum@', value: sha256Tar)
 
-        copy {
-            from "$baseDir/CHANGELOG.md"
-            into "$packageDir/arch/"
-        }
-
         // Run makepkg to create .SRCINFO
-        //exec {
-        // 	executable "makepkg"
-        //	args "--printsrcinfo",">","$packageDir/arch/.SRCINFO"
-        //}
+        exec {
+            workingDir "$packageDir/arch/"
+            executable "makepkg"
+            args "--printsrcinfo",">",".SRCINFO"
+        }
     }
 }
 

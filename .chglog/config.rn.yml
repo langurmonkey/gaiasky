@@ -1,0 +1,60 @@
+bin: git
+style: github
+template: releasenotes.tpl.txt
+info:
+    title: Gaia Sky release notes
+    repository_url: https://gitlab.com/langurmonkey/gaiasky
+
+options:
+
+    commits:
+        filters:
+            Type:
+                - feat
+                - fix
+                - style
+                - docs
+                - perf
+                - refactor
+                - build
+        sort_by: Title
+
+    commit_groups:
+        group_by: Type
+        sort_by: Title
+        title_maps:
+            feat: Features
+            fix: Bug Fixes
+            style: Style
+            docs: Documentation
+            perf: Performance Improvements
+            refactor: Code Refactoring
+            build: Build System
+
+    issues:
+        prefix: #
+
+    refs:
+        actions:
+            - Closes
+            - Fixes
+
+    header:
+        pattern: "^(\\w*)\\:\\s(.*)$"
+        pattern_maps:
+            - Type
+            - Subject
+
+    merges:
+        pattern: "^Merge branch '(\\S+)'$"
+        pattern_maps:
+            - Source
+
+    reverts:
+        pattern: "^Revert \"([\\s\\S]*)\"$"
+        pattern_maps:
+            - Header
+
+    notes:
+        keywords:
+            - BREAKING CHANGE

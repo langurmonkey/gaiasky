@@ -1,14 +1,16 @@
 #!/bin/bash
 
-# This script generates the changelog and appends the old-style changelog since 2.2.3
+# This script generates the CHANGELOG.md file and appends the old-style 
+# change log since a given version in order to have old logs in the 
+# same format and style
 
 # Utils dir, with a relative path core/utils/ to the root gaiasky directory
 UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 GSDIR=`realpath $UTILSDIR/../../../`
 
 # Use regexp to only include full versions (e.g. exclude release candidates)
-git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 3.1.3..
-cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-312.md > $GSDIR/CHANGELOG.md
+git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' -t $GSDIR/.chglog/CHANGELOG.tpl.md -c $GSDIR/.chglog/config.yml -o $GSDIR/temp.md 3.1.6..
+cat $GSDIR/temp.md $UTILSDIR/CHANGELOG-to-315.md > $GSDIR/CHANGELOG.md
 rm $GSDIR/temp.md
 
 echo "Changelog generated to $GSDIR/CHANGELOG.md"

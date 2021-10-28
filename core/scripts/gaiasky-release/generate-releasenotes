@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# This script generates the releasenotes.txt file that goes with
+# every release
+
+# Utils dir, with a relative path core/utils/ to the root gaiasky directory
+UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+GSDIR=`realpath $UTILSDIR/../../../`
+
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 VERSION OUTPUT"
+    echo
+    echo "$0: Must provide a version (tag) number and an output file."
+    exit -1
+fi
+
+VERS=$1
+OUTPUT=$2
+
+# Use regexp to only include full versions (e.g. exclude release candidates)
+git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $VERS
+
+echo "File saved to $OUTPUT"
