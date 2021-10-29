@@ -217,18 +217,18 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         // LENS FLARE
         float lensFboScale = 0.2f;
-        Texture lcol = manager.get(lensColorName);
-        lcol.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture ldirt = manager.get(lensDirtName);
-        ldirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        Texture lburst = manager.get(lensStarburstName);
-        lburst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        Texture lensColor = manager.get(lensColorName);
+        lensColor.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        Texture lensDirt = manager.get(lensDirtName);
+        lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        Texture lensStarBurst = manager.get(lensStarburstName);
+        lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         LensFlare2 lensFlare = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
         lensFlare.setGhosts(nGhosts);
         lensFlare.setHaloWidth(0.5f);
-        lensFlare.setLensColorTexture(lcol);
-        lensFlare.setLensDirtTexture(ldirt);
-        lensFlare.setLensStarburstTexture(lburst);
+        lensFlare.setLensColorTexture(lensColor);
+        lensFlare.setLensDirtTexture(lensDirt);
+        lensFlare.setLensStarburstTexture(lensStarBurst);
         lensFlare.setFlareIntesity(Settings.settings.postprocess.lensFlare ? flareIntensity : 0f);
         lensFlare.setFlareSaturation(0.8f);
         lensFlare.setBaseIntesity(1f);
@@ -383,10 +383,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     private void initCameraBlur(PostProcessBean ppb, float width, float height, GraphicsQuality gq) {
-        CameraMotion camblur = new CameraMotion(width, height);
-        camblur.setBlurScale(.8f);
-        camblur.setEnabled(!Settings.settings.program.safeMode && Settings.settings.postprocess.motionBlur && !Settings.settings.runtime.openVr);
-        ppb.set(camblur);
+        CameraMotion cameraBlur = new CameraMotion(width, height);
+        cameraBlur.setBlurScale(.8f);
+        cameraBlur.setEnabled(!Settings.settings.program.safeMode && Settings.settings.postprocess.motionBlur && !Settings.settings.runtime.openVr);
+        ppb.set(cameraBlur);
         updateCameraBlur(ppb, gq);
 
         // Add to scene graph
@@ -748,6 +748,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     PostProcessBean ppb = pps[i];
                     ppb.get(CameraMotion.class).setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
                 }
+            }
+            if(enabled && blurObjectAdded) {
+                blurObject.setVisible(true);
+            } else if (blurObject != null) {
+                blurObject.setVisible(false);
             }
             break;
         case CUBEMAP_CMD:

@@ -65,9 +65,9 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             switch (event) {
             case FOV_CHANGE_NOTIFICATION:
                 fovFactor = (Float) data[1];
-                thpointTimesFovfactor = (float) Settings.settings.scene.star.threshold.point * fovFactor;
-                thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
-                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
+                thpointTimesFovfactor = (float) Settings.settings.scene.star.threshold.point;
+                thupOverFovfactor = (float) Constants.THRESHOLD_UP;
+                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN;
                 break;
             case STAR_POINT_SIZE_CMD:
                 innerRad = (0.004f * DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f;
@@ -239,7 +239,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             }
         }
 
-        innerRad = 0.01f * DISC_FACTOR + settings.scene.star.pointSize * 0.016f;
+        innerRad = 0.01f * DISC_FACTOR + settings.scene.star.pointSize * 0.005f;
     }
 
     @Override
@@ -342,7 +342,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= Settings.settings.scene.star.brightness * 0.2f;
+        computedSize *= Settings.settings.scene.star.brightness * 0.15f;
         return (float) computedSize;
     }
 

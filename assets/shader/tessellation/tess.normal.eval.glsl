@@ -2,11 +2,15 @@
 
 layout (triangles) in;
 
+// GEOMETRY (QUATERNIONS)
+#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#include shader/lib_geometry.glsl
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
-#include shader/lib_geometry.glsl
 #include shader/lib_relativity.glsl
 #endif// relativisticEffects
 
