@@ -247,15 +247,15 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
-        boolean javaVersionOk = JavaVersion.current().isJava11Compatible()
+        boolean javaVersionOk = JavaVersion.current().isJava15Compatible()
         if (vsc.equalsIgnoreCase("false")) {
             if (!javaVersionOk) {
-                println("WARNING: Gaia Sky must be built with Java " + JavaVersion.VERSION_11 + " or compatible, you are using " + JavaVersion.current())
+                println("WARNING: Gaia Sky must be built with Java " + JavaVersion.VERSION_15 + " or compatible, you are using " + JavaVersion.current())
             }
         } else {
             if (!javaVersionOk) {
                 print("FAILURE: Do 'export GS_JAVA_VERSION_CHECK=false' to skip this check")
-                throw new GradleException("Gaia Sky must be built with java " + JavaVersion.VERSION_11 + " or compatible, you are using " + JavaVersion.current())
+                throw new GradleException("Gaia Sky must be built with java " + JavaVersion.VERSION_15 + " or compatible, you are using " + JavaVersion.current())
             }
         }
 
