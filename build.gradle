@@ -20,7 +20,6 @@ allprojects {
         jcommanderVersion = "1.81"
         slf4jVersion = "1.7.+"
         sparkjavaVersion = "2.9.+"
-        gsonVersion = "2.8.+"
         jafamaVersion = "2.3.+"
         compressVersion = "1.21"
         commonsioVersion = "2.+"
