@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.event.EventManager;
@@ -110,6 +111,7 @@ public class Settings {
     public SpacecraftSettings spacecraft;
     @JsonIgnore public RuntimeSettings runtime;
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class VersionSettings {
         public String version;
         public int versionNumber;
@@ -139,6 +141,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DataSettings {
         public String location;
         public List<String> catalogFiles;
@@ -197,6 +200,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PerformanceSettings {
         public boolean multithreading;
         public int numberThreads;
@@ -217,6 +221,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class GraphicsSettings implements IObserver {
         public GraphicsQuality quality;
         public int[] resolution;
@@ -237,6 +242,7 @@ public class Settings {
             this.quality = GraphicsQuality.valueOf(qualityString.toUpperCase());
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class FullscreenSettings {
             public boolean active;
             public int[] resolution;
@@ -270,6 +276,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SceneSettings implements IObserver {
         public String homeObject;
         public long fadeMs;
@@ -303,6 +310,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class CameraSettings implements IObserver {
             public int speedLimitIndex;
             @JsonIgnore public double speedLimit;
@@ -345,6 +353,7 @@ public class Settings {
                 }
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class FocusSettings {
                 public boolean position;
                 public boolean orientation;
@@ -387,6 +396,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class StarSettings implements IObserver {
             public float brightness;
             public float power;
@@ -447,6 +457,7 @@ public class Settings {
                 this.pointSizeBak = pointSize;
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class GroupSettings {
                 public boolean billboard;
                 public int numBillboard;
@@ -454,6 +465,7 @@ public class Settings {
                 public int numVelocityVector;
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class ThresholdSettings {
                 public double quad;
                 public double point;
@@ -506,6 +518,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LabelSettings implements IObserver {
             public float size;
             public float number;
@@ -522,6 +535,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ProperMotionSettings implements IObserver {
             public float length;
             public double number;
@@ -554,6 +568,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class OctreeSettings implements IObserver {
             public int maxStars;
             public float[] threshold;
@@ -571,6 +586,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
             public LineMode line;
             public OrbitMode orbit;
@@ -582,12 +598,14 @@ public class Settings {
                 EventManager.instance.subscribe(this, Events.AMBIENT_LIGHT_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class ShadowSettings {
                 public boolean active;
                 public int resolution;
                 public int number;
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class ElevationSettings {
                 public ElevationType type;
                 public double multiplier;
@@ -620,6 +638,7 @@ public class Settings {
 
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class CrosshairSettings implements IObserver {
             public boolean focus;
             public boolean closest;
@@ -641,6 +660,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class InitializationSettings {
             public boolean lazyTexture;
             public boolean lazyMesh;
@@ -667,6 +687,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ProgramSettings implements IObserver {
         public boolean safeMode;
         // Flag to mark whether safe mode is activated via command line argument
@@ -691,21 +712,25 @@ public class Settings {
             EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class MinimapSettings {
             public boolean active;
             public float size;
             public boolean inWindow = false;
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class FileChooserSettings {
             public boolean showHidden;
             public String lastLocation;
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class PointerSettings {
             public boolean coordinates;
             public GuidesSettings guides;
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class GuidesSettings {
                 public boolean active;
                 public float[] color;
@@ -714,6 +739,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RecursiveGridSettings {
             public OriginType origin;
             public boolean projectionLines;
@@ -723,6 +749,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ModeStereoSettings {
             public boolean active;
             public StereoProfile profile;
@@ -749,6 +776,7 @@ public class Settings {
 
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ModeCubemapSettings {
             public boolean active;
             public CubemapProjection projection;
@@ -759,6 +787,7 @@ public class Settings {
                 projection = CubemapProjection.valueOf(projectionString.toUpperCase());
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class PlanetariumSettings {
                 public float aperture;
                 public float angle;
@@ -795,16 +824,19 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class NetSettings {
             public int restPort;
             public MasterSettings master;
             public SlaveSettings slave;
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class MasterSettings {
                 public boolean active;
                 public List<String> slaves;
             }
 
+            @JsonIgnoreProperties(ignoreUnknown = true)
             public static class SlaveSettings {
                 public boolean active;
                 public String configFile;
@@ -856,6 +888,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UiSettings {
             public String theme;
             public float scale;
@@ -886,6 +919,7 @@ public class Settings {
 
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UpdateSettings {
             // Update checker time, in ms
             @JsonIgnore public static long VERSION_CHECK_INTERVAL_MS = 86400000L;
@@ -899,6 +933,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UrlSettings {
             public String versionCheck;
             public String dataMirror = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
@@ -979,9 +1014,11 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ControlsSettings {
         public GamepadSettings gamepad;
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class GamepadSettings {
             public String mappingsFile;
             public boolean invertX;
@@ -1078,6 +1115,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ScreenshotSettings {
         public static final int MIN_SCREENSHOT_SIZE = 50;
         public static final int MAX_SCREENSHOT_SIZE = 25000;
@@ -1107,6 +1145,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class FrameSettings extends ScreenshotSettings implements IObserver {
         @JsonIgnore public boolean active;
         public String prefix;
@@ -1160,6 +1199,7 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CamrecorderSettings implements IObserver {
         public double targetFps;
         public KeyframeSettings keyframe;
@@ -1176,6 +1216,7 @@ public class Settings {
             }
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class KeyframeSettings {
             public CameraKeyframeManager.PathType position;
             public CameraKeyframeManager.PathType orientation;
@@ -1195,6 +1236,7 @@ public class Settings {
 
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class PostprocessSettings implements IObserver {
         public Antialias antialias;
         public BloomSettings bloom;
@@ -1214,14 +1256,17 @@ public class Settings {
             antialias = Antialias.valueOf(antialiasString.toUpperCase());
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class BloomSettings {
             public float intensity;
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UnsharpMaskSettings {
             public float factor;
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class LevelsSettings {
             public float brightness;
             public float contrast;
@@ -1230,6 +1275,7 @@ public class Settings {
             public float gamma;
         }
 
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class ToneMappingSettings {
             public ToneMapping type;
             public float exposure;
@@ -1294,11 +1340,13 @@ public class Settings {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class SpacecraftSettings {
         public boolean velocityDirection;
         public boolean showAxes;
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RuntimeSettings implements IObserver {
         public boolean openVr = false;
         public boolean OVR = false;
