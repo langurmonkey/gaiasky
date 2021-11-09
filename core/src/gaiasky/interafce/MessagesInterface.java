@@ -20,7 +20,7 @@ import java.util.Map;
  * Widget that displays big messages on screen.
  */
 public class MessagesInterface extends TableGuiInterface implements IObserver {
-    Label headline, subhead;
+    private Label headline, subhead;
     /** Lock object for synchronization **/
     private final Object lock;
 
