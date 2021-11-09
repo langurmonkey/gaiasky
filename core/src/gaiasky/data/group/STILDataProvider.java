@@ -19,7 +19,6 @@ import gaiasky.util.color.BVToTeff_ballesteros;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3d;

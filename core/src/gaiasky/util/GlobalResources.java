@@ -52,6 +52,7 @@ import java.util.stream.Stream;
 public class GlobalResources {
     private static final Log logger = Logger.getLogger(GlobalResources.class);
 
+    private AssetManager manager;
     private ShaderProgram shapeShader;
     private ShaderProgram spriteShader;
 
@@ -76,6 +77,7 @@ public class GlobalResources {
     private static final Vector3d aux = new Vector3d();
 
     public GlobalResources(AssetManager manager) {
+        this.manager = manager;
         // Shape shader
         this.shapeShader = new ShaderProgram(Gdx.files.internal("shader/2d/shape.vertex.glsl"), Gdx.files.internal("shader/2d/shape.fragment.glsl"));
         if (!shapeShader.isCompiled()) {
@@ -97,11 +99,14 @@ public class GlobalResources {
         // Sprite batch
         this.extSpriteBatch = new ExtSpriteBatch(1000, getExtSpriteShader());
 
+        reloadDataFiles();
+        updateSkin();
+    }
+
+    public void reloadDataFiles(){
         // Star group textures
         manager.load(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
         manager.load(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
-
-        updateSkin();
     }
 
     public void updateSkin() {

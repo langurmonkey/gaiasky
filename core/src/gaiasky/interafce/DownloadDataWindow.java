@@ -201,6 +201,7 @@ public class DownloadDataWindow extends GenericDialog {
                                     // Reset datasets
                                     Settings.settings.data.catalogFiles.clear();
                                     reloadAll();
+                                    GaiaSky.instance.getGlobalResources().reloadDataFiles();
                                 });
                             } else {
                                 Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);

@@ -109,11 +109,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             pointData = null;
         }
 
-        // Textures
-        AssetManager manager = GaiaSky.instance.assetManager;
-        manager.load(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
-        manager.load(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
-
         computeMeanPosition();
         setLabelPosition();
     }
