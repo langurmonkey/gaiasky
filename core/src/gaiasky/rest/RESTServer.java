@@ -7,11 +7,13 @@ package gaiasky.rest;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import gaiasky.GaiaSky;
 import gaiasky.script.IScriptingInterface;
 import gaiasky.util.Settings;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import spark.Spark;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -28,8 +30,8 @@ import static spark.Spark.*;
  * *not checked at all* before execution! Remote command execution is generally
  * dangerous. This REST API was developed for an exhibition with an isolated network.
  * <p>
- * The API allows to call methods from the scripting interface
- * (gaiasky.script.IScriptingInterface) remotely via HTTP for remote control.
+ * The API allows calling methods from the scripting interface
+ * ({@link IScriptingInterface}) remotely via HTTP for remote control.
  * <p>
  * Syntax of API commands is set to be close to the Java method interface, but does not cover
  * it in all generality to permit simple usage. Particularly note that the REST server receives
@@ -42,7 +44,7 @@ import static spark.Spark.*;
  * are named arg0, arg1, ...).
  * <p>
  * Both GET and POST requests are accepted. Although GET requests are not supposed to have
- * side-effects, we include them for easy usage with a browser.
+ * side effects, we include them for easy usage with a browser.
  * <p>
  * Issue commands with a syntax like the following:
  * - http://localhost:8080/api/setCameraUp?up=[1.,0.,0.]
@@ -50,7 +52,7 @@ import static spark.Spark.*;
  * - http://localhost:8080/api/goToObject?name=Jupiter&angle=32.9&focusWait=2
  * <p>
  * Give booleans, ints, floats, doubles, strings as they are, vectors comma-separated with
- * square brackets around: true, 42, 3.1, 3.14, Superstring, [1,2,3], [Do,what,they,told,ya].
+ * square brackets around: true, 42, 3.1, 3.14, Super-string, [1,2,3], [Do,what,they,told,ya].
  * Note that you might need to escape or url-encode characters in a browser for this
  * (e.g. spaces or "=").
  * <p>
@@ -61,10 +63,10 @@ import static spark.Spark.*;
  * <p>
  * The 'cmd_syntax' entry you get from the 'help' command (e.g. http://localhost:8080/api/help)
  * gives a summary of permitted commands and their return type. Details on the meaning of the
- * command and its parameters need to be found from the scripting API documention:
+ * command and its parameters need to be found from the scripting API documentation:
  * https://langurmonkey.github.io/gaiasky/javadoc/gaiasky/script/IScriptingInterface.html
  * <p>
- * To examine, what happens during an API call, set the default loglevel of SimpleLogger to
+ * To examine, what happens during an API call, set the default log level of SimpleLogger to
  * 'info' or lower (in core/build.gradle).
  * <p>
  * Return values are given as JSON objects that contain key-value pairs:
@@ -86,14 +88,14 @@ import static spark.Spark.*;
  * <p>
  * This gets initialized in
  * core/src/gaiasky/desktop/GaiaSkyDesktop.java with some
- * lazy initialization since Spark wants be be used in static context.
+ * lazy initialization since Spark wants to be used in static context.
  */
 public class RESTServer {
 
     /* Class variables: */
 
     /**
-     * "Shutdown already triggered" flag. stop() can be called multiple times
+     * "Shutdown already triggered" flag. {@link Spark#stop()} can be called multiple times
      * (multiple events), but only processed once.
      */
     private static boolean shutdownTriggered = false;
@@ -101,7 +103,7 @@ public class RESTServer {
     /**
      * Activated flag. Calling API methods generally requires the GUI to be fully
      * started and all objects initialized, indicated by the "activated" flag. This
-     * flag is set true through the activate() method that needs to be called
+     * flag is set true through the {@link RESTServer#activate()} method that needs to be called
      * externally once the GUI is ready.
      */
     private static boolean activated = false;
@@ -134,7 +136,7 @@ public class RESTServer {
      */
     private static void printStartupInfo() {
         String s = System.getProperty("org.slf4j.simpleLogger.defaultLogLevel");
-        logger.info("Simple Logger defaultLogLevel = " + s);
+        logger.debug("Simple Logger defaultLogLevel = " + s);
         logger.warn("*** Warning: REST API server may permit remote code execution! " + "Only use this functionality in a trusted environment! ***");
     }
 
@@ -167,7 +169,7 @@ public class RESTServer {
         // response.header("FOO", "bar");
 
         /* request body */
-        Json json = new Json();
+        Json json = new Json(OutputType.json);
         responseString = json.toJson(ret);
         logger.debug("HTTP response body: {}.", responseString);
         return responseString;
@@ -352,7 +354,7 @@ public class RESTServer {
                 if (allParamsFound) {
                     logger.debug("  [+] method parameters ok");
                     matchMethod = m;
-                    break; // no need to continue checking: the the first match
+                    break; // no need to continue checking: the first match
                 }
             }
         }
@@ -514,7 +516,8 @@ public class RESTServer {
         }
 
         try {
-            logger.warn("Starting REST API server on http://localhost:{}", port);
+            logger.info("Starting REST API server on http://localhost:{}/api/", port);
+            logger.info("   See available calls at http://localhost:{}/api/help", port);
             port(port);
             logger.info("Setting routes");
 
