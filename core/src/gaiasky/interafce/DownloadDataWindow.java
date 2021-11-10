@@ -900,6 +900,11 @@ public class DownloadDataWindow extends GenericDialog {
         }
     }
 
+    @Override
+    public void setKeyboardFocus() {
+        stage.setKeyboardFocus(downloadButton);
+    }
+
     /**
      * Drops the current view and regenerates all window content
      */

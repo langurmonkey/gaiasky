@@ -177,6 +177,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
                                 cancelRunnable.run();
                             me.hide();
                         }
+                        // Do not propagate to parents
+                        event.stop();
                         return true;
                     case Keys.ENTER:
                         if (enterExit) {
@@ -186,6 +188,8 @@ public abstract class GenericDialog extends CollapsibleWindow {
                                 acceptRunnable.run();
                             me.hide();
                         }
+                        // Do not propagate to parents
+                        event.stop();
                         return true;
                     case Keys.TAB:
                         // Next focus, do nothing

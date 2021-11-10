@@ -24,6 +24,7 @@ import gaiasky.interafce.GenericDialog;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.TextUtils;
+import gaiasky.util.validator.DirectoryNameValidator;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -56,6 +57,7 @@ public class FileChooser extends GenericDialog {
     private Label acceptedFiles;
     private final Path baseDir;
     private OwnTextField location;
+    private OwnTextIconButton newDirectory;
     private List<FileListItem> fileList;
     private float scrollPaneWidth;
     private float maxPathLength;
@@ -200,11 +202,11 @@ public class FileChooser extends GenericDialog {
         controlsTable.add(home).left().padRight(pad5);
         controlsTable.add(back).left().padRight(pad5);
         controlsTable.add(parent).left().padRight(pad5);
-        controlsTable.add(fwd).left().padRight(pad5).padRight(pad10);
+        controlsTable.add(fwd).left().padRight(pad10);
 
         // Text input with current location
         location = new OwnTextField("", skin);
-        location.setWidth(468f);
+        location.setWidth(745f);
         location.setAlignment(Align.left);
         location.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -213,7 +215,7 @@ public class FileChooser extends GenericDialog {
                     if (Files.exists(locPath) && Files.isDirectory(locPath)) {
                         previousDir = currentDir;
                         changeDirectory(locPath);
-                        GaiaSky.postRunnable(()-> {
+                        GaiaSky.postRunnable(() -> {
                             stage.setKeyboardFocus(location);
                             location.setCursorPosition(location.getText().length());
                         });
@@ -225,7 +227,41 @@ public class FileChooser extends GenericDialog {
             }
             return false;
         });
-        controlsTable.add(location).left().pad(pad10);
+        controlsTable.add(location).left().padLeft(pad10).row();
+
+        if (target == FileChooserTarget.DIRECTORIES || target == FileChooserTarget.ALL) {
+            // New directory button
+            newDirectory = new OwnTextIconButton(I18n.txt("gui.fc.newdirectory"), skin, "add");
+            newDirectory.setWidth(245f);
+            newDirectory.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    NewDirectoryDialog newDirectoryDialog = new NewDirectoryDialog(skin, stage);
+                    newDirectoryDialog.setAcceptRunnable(() -> {
+                        if (newDirectoryDialog.name.isValid()) {
+                            String newName = newDirectoryDialog.getNewDirectoryName();
+                            Path newDir = currentDir.resolve(newName);
+                            try {
+                                // Actually create directory
+                                Files.createDirectory(newDir);
+                                // Update file chooser
+                                changeDirectory(currentDir);
+                            } catch (IOException e) {
+                                logger.error(e, I18n.txt("notif.error", e.getLocalizedMessage()));
+                            }
+
+                        } else {
+                            logger.warn(I18n.txt("gui.fc.newdirecotory.invalid"));
+                        }
+
+                    });
+                    newDirectoryDialog.show(stage);
+                    stage.setKeyboardFocus(newDirectoryDialog);
+                    return true;
+                }
+                return false;
+            });
+            controlsTable.add(newDirectory).colspan(5).right().padLeft(pad10).padTop(pad5).padBottom(pad5);
+        }
 
         // In windows, we need to be able to change drives
         HorizontalGroup driveButtonsList = new HorizontalGroup();
@@ -347,7 +383,7 @@ public class FileChooser extends GenericDialog {
                 } catch (IOException e) {
                     logger.error(e);
                 }
-                if(hiddenConsumer != null){
+                if (hiddenConsumer != null) {
                     hiddenConsumer.accept(this.showHidden);
                 }
                 return true;
@@ -397,7 +433,7 @@ public class FileChooser extends GenericDialog {
 
         DirectoryStream<Path> list = Files.newDirectoryStream(directory, filter);
         for (final Path p : list) {
-            // Only list hidden if user chose it
+            // Only list hidden if user chooses it
             if (showHidden || !p.getFileName().toString().startsWith(".")) {
                 if (pathnameFilter != null && pathnameFilter.accept(p) || Files.isDirectory(p) && directoryBrowsingEnabled) {
                     FileListItem fli = new FileListItem(p);
@@ -412,7 +448,7 @@ public class FileChooser extends GenericDialog {
             items.insert(0, new FileListItem("..", directory.getParent()));
         }
 
-        if(target != FileChooserTarget.DIRECTORIES)
+        if (target != FileChooserTarget.DIRECTORIES)
             acceptButton.setDisabled(true);
         fileList.setItems(items);
         scrollPane.layout();
@@ -460,15 +496,16 @@ public class FileChooser extends GenericDialog {
         });
     }
 
-    public void setShowHidden(boolean showHidden){
+    public void setShowHidden(boolean showHidden) {
         hidden.setChecked(showHidden);
     }
 
     /**
      * Sets a consumer that is run when the property 'showHidden' changes, whit its value.
+     *
      * @param r The consumer
      */
-    public void setShowHiddenConsumer(Consumer<Boolean> r){
+    public void setShowHiddenConsumer(Consumer<Boolean> r) {
         this.hiddenConsumer = r;
     }
 
@@ -497,6 +534,7 @@ public class FileChooser extends GenericDialog {
      * path names, use {@link FileChooser#setFileFilter(PathnameFilter)} instead.
      *
      * @param filter The new file filter
+     *
      * @return This file chooser
      */
     public FileChooser setFilter(DirectoryStream.Filter<Path> filter) {
@@ -510,6 +548,7 @@ public class FileChooser extends GenericDialog {
      * so you do not need to check whether the pathname is a file.
      *
      * @param f The file filter.
+     *
      * @return This file chooser.
      */
     public FileChooser setFileFilter(PathnameFilter f) {
@@ -549,7 +588,6 @@ public class FileChooser extends GenericDialog {
     public void setResultListener(ResultListener result) {
         this.resultListener = result;
     }
-
 
     @Override
     public void accept() {
@@ -593,6 +631,59 @@ public class FileChooser extends GenericDialog {
 
     public interface PathnameFilter {
         boolean accept(Path pathname);
+    }
+
+    private static class NewDirectoryDialog extends GenericDialog {
+
+        public OwnTextField name;
+
+        public NewDirectoryDialog(Skin skin, Stage ui) {
+            super(I18n.txt("gui.fc.newdirectory.title"), skin, ui);
+
+            setAcceptText(I18n.txt("gui.ok"));
+            setCancelText(I18n.txt("gui.cancel"));
+
+            buildSuper();
+        }
+
+        @Override
+        protected void build() {
+            content.clear();
+
+            content.add(new OwnLabel(I18n.txt("gui.fc.newdirectory.name"), skin)).left().padRight(pad10);
+
+            name = new OwnTextField("", skin);
+            name.setWidth(350f);
+            name.setMessageText(I18n.txt("gui.fc.newdirectory"));
+            name.setValidator(new DirectoryNameValidator());
+
+            content.add(name).left();
+        }
+
+        public String getNewDirectoryName() {
+            if (name != null && !name.getText().isEmpty()) {
+                return name.getText();
+            } else {
+                return I18n.txt("gui.fc.newdirectory");
+            }
+        }
+
+        @Override
+        public void setKeyboardFocus() {
+            stage.setKeyboardFocus(name);
+        }
+
+        @Override
+        protected void accept() {
+        }
+
+        @Override
+        protected void cancel() {
+        }
+
+        @Override
+        public void dispose() {
+        }
     }
 
 }

@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -106,7 +107,7 @@ public class WelcomeGui extends AbstractGui {
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
                 GaiaSky.postRunnable(() -> {
-                    // Data descriptor ok. Skip welcome screen only if flag and basedata present
+                    // Data descriptor ok. Skip welcome screen only if flag and base data present
                     if (skipWelcome && basicDataPresent()) {
                         gaiaSky();
                     } else {
@@ -131,7 +132,7 @@ public class WelcomeGui extends AbstractGui {
                 }
             }, null);
 
-            /** CAPTURE SCROLL FOCUS **/
+            /* CAPTURE SCROLL FOCUS */
             ui.addListener(event -> {
                 if (event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
