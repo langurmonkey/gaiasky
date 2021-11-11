@@ -32,28 +32,17 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 public class StarGroupInstRenderSystem extends InstancedRenderSystem implements IObserver {
     private final Vector3 aux1;
     private int sizeOffset, pmOffset, starPosOffset;
-    private final float[] alphaSizeBr;
     private final Colormap cmap;
 
-    private float starPointSize;
-    private float[] opacityLimits;
-    private int fovMode;
-    private Texture starTex;
+    private StarGroupTriComponent triComponent;
 
     public StarGroupInstRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        this.alphaSizeBr = new float[3];
         this.aux1 = new Vector3();
         cmap = new Colormap();
-        setStarTexture(Settings.settings.scene.star.getStarTexture());
-        opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
+        triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
-    }
-
-    public void setStarTexture(String starTexture) {
-        starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
-        starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
+        EventManager.instance.subscribe(this, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
     }
 
     @Override
@@ -87,36 +76,24 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
 
     @Override
     protected void initShaderProgram() {
-        ExtShaderProgram shaderProgram = getShaderProgram();
-        shaderProgram.begin();
-        // Uniforms that rarely change
-        shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
-        shaderProgram.end();
+        this.triComponent = new StarGroupTriComponent();
+        this.triComponent.initShaderProgram(getShaderProgram());
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
-        starPointSize = Settings.settings.scene.star.pointSize * 0.2f;
-
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
         shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
-        shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
-        fovMode = camera.getMode().getGaiaFovMode();
-        if (fovMode == 3) {
+        triComponent.fovMode = camera.getMode().getGaiaFovMode();
+        if (triComponent.fovMode == 3) {
             // Cam is Fov1 & Fov2
             FovCamera cam = ((CameraManager) camera).fovCamera;
             // Update combined
             PerspectiveCamera[] cams = camera.getFrontCameras();
             shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
         }
-        // Solid angle values for min brightness and full brightness
-        shaderProgram.setUniformf("u_solidAngleMap", 1.0e-11f, 1.0e-9f);
-        // Remap brightness to [0.2,1]
-        alphaSizeBr[2] = (Settings.settings.scene.star.brightness - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 1.5f + 0.6f;
-        // Remap brightness power to [-1,1]
-        shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power - 0.1f) / 1.1f) * 1.1f - 0.5f);
     }
 
     protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
@@ -149,12 +126,12 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                                 tempInstanceAttribs[curr.instanceIdx + curr.colorOffset] = starGroup.getColor(i);
                             }
 
-                                // SIZE
-                                if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
-                                    tempInstanceAttribs[curr.instanceIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
-                                } else {
-                                    tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
-                                }
+                            // SIZE
+                            if (starGroup.isHlAllVisible() && starGroup.isHighlighted()) {
+                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = Math.max(10f, (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor());
+                            } else {
+                                tempInstanceAttribs[curr.instanceIdx + sizeOffset] = (float) (particle.size() * Constants.STAR_SIZE_FACTOR) * starGroup.highlightedSizeFactor();
+                            }
 
                             // PROPER MOTION [u/yr]
                             tempInstanceAttribs[curr.instanceIdx + pmOffset] = (float) particle.pmx();
@@ -185,14 +162,14 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                  */
                 curr = meshes.get(starGroup.offset);
                 if (curr != null) {
-                    if (starTex != null) {
-                        starTex.bind(0);
+                    if (triComponent.starTex != null) {
+                        triComponent.starTex.bind(0);
                         shaderProgram.setUniformi("u_starTex", 0);
                     }
 
-                    alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                    alphaSizeBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * 1e6f * rc.scaleFactor * starGroup.highlightedSizeFactor());
-                    shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
+                    triComponent.alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
+                    triComponent.alphaSizeBr[1] = ((triComponent.fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * triComponent.starPointSize * 1e6f * rc.scaleFactor * starGroup.highlightedSizeFactor());
+                    shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                     // Days since epoch
                     // Emulate double with floats, for compatibility
@@ -213,12 +190,27 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
+        case STAR_MIN_OPACITY_CMD -> {
+            triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);
+            triComponent.touchStarParameters(getShaderProgram());
+        }
+        case STAR_BRIGHTNESS_CMD -> {
+            triComponent.updateStarBrightness((float) data[0]);
+            triComponent.touchStarParameters(getShaderProgram());
+        }
+        case STAR_BRIGHTNESS_POW_CMD -> {
+            triComponent.updateBrightnessPower((float) data[0]);
+            triComponent.touchStarParameters(getShaderProgram());
+        }
+        case STAR_POINT_SIZE_CMD -> {
+            triComponent.updateStarPointSize((float) data[0]);
+            triComponent.touchStarParameters(getShaderProgram());
+        }
         case DISPOSE_STAR_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
         }
-        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
         default -> {
         }
         }
