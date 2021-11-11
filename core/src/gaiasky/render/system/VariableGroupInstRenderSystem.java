@@ -99,7 +99,6 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-        shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
         addEffectsUniforms(shaderProgram, camera);
         // Update projection if fovMode is 3
         triComponent.fovMode = camera.getMode().getGaiaFovMode();
@@ -188,7 +187,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                     }
 
                     triComponent.alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = ((triComponent.fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * triComponent.starPointSize * 1e6f * rc.scaleFactor * starGroup.highlightedSizeFactor());
+                    triComponent.alphaSizeBr[1] = ((triComponent.fovMode == 0 ? 1f : 10f) * triComponent.starPointSize * 1e6f * starGroup.highlightedSizeFactor());
                     shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                     // Days since epoch

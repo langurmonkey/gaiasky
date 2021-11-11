@@ -4,7 +4,6 @@
 #include shader/lib_dither8x8.glsl
 #include shader/lib_logdepthbuff.glsl
 
-uniform float u_ar;
 uniform float u_alpha;
 uniform float u_zfar;
 uniform float u_k;
@@ -59,8 +58,7 @@ vec4 colorTex(float alpha, vec2 uv) {
 
 void main() {
     vec2 uv = v_uv;
-    uv.y = uv.y * u_ar;
-    float dist = min(1.0, distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0);
+    float dist = min(1.0, distance(vec2(0.5), uv) * 2.0);
     if (dist >= 1.0){
         discard;
     }

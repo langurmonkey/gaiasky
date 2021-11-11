@@ -344,9 +344,8 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
                     shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
-                    shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
                     shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
-                    double pointScaleFactor = ((Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) * rc.scaleFactor) * 1e7;
+                    double pointScaleFactor = 1.8e7;
 
                     // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);

@@ -4,7 +4,6 @@
 //#include shader/lib_star.glsl
 
 // UNIFORMS
-uniform float u_ar;
 uniform float u_zfar;
 uniform float u_k;
 uniform sampler2D u_starTex;
@@ -26,7 +25,6 @@ float starTexture(vec2 uv) {
 
 void main() {
     vec2 uv = v_uv;
-    uv.y = uv.y * u_ar;
     float profile = starTexture(uv);
     float alpha = v_col.a * profile;
 

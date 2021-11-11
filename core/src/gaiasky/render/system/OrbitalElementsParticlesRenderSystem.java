@@ -137,15 +137,12 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
             if (curr != null) {
                 ExtShaderProgram shaderProgram = getShaderProgram();
 
-                boolean stereoHw = Settings.settings.program.modeStereo.isStereoHalfWidth();
-
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
-                shaderProgram.setUniformf("u_ar", stereoHw ? 2f : 1f);
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", rc.scaleFactor * 1.5f * (stereoHw ? 2f : 1f) * .5e0f);
+                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.15f);
 
                 // VR scale
                 shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);

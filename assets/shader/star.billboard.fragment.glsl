@@ -61,7 +61,7 @@ float starTexture(vec2 uv){
 
 
 vec4 draw() {
-    float dist = clamp(distance(vec2 (0.5), v_uv.xy) * 2.0, 0.0, 1.0);
+    float dist = clamp(distance(vec2(0.5), v_uv.xy) * 2.0, 0.0, 1.0);
 
     // level = 1 if u_distance == u_radius * model_const
     // level = 0 if u_distance == radius

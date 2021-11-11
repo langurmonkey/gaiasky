@@ -9,7 +9,6 @@ uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform float u_sizeFactor;
 uniform float u_intensity;
-uniform float u_ar;
 uniform vec2 u_edges;
 uniform float u_maxPointSize;
 uniform float u_vrScale;
@@ -68,7 +67,7 @@ void main() {
     v_layer = int(a_additional.z);
     v_uv = a_texCoord;
 
-    float quadSize = min(a_additional.x * u_sizeFactor * u_ar * u_vrScale, u_maxPointSize * dist);
+    float quadSize = min(a_additional.x * u_sizeFactor * u_vrScale, u_maxPointSize * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

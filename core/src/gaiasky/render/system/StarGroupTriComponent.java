@@ -52,7 +52,7 @@ public class StarGroupTriComponent {
     }
     protected void updateStarBrightness(float br) {
         // Remap brightness to [0,2]
-        alphaSizeBr[2] = (br - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 3.5f;
+        alphaSizeBr[2] = (br - Constants.MIN_STAR_BRIGHTNESS) / (Constants.MAX_STAR_BRIGHTNESS - Constants.MIN_STAR_BRIGHTNESS) * 4f;
     }
 
     protected void updateBrightnessPower(float bp) {
@@ -61,7 +61,7 @@ public class StarGroupTriComponent {
     }
 
     protected void updateStarPointSize(float ps) {
-        starPointSize = ps * 0.2f;
+        starPointSize = ps * 0.4f;
     }
 
     protected void updateStarOpacityLimits(float min, float max) {

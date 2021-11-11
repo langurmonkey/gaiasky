@@ -114,9 +114,9 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         if (currentFocus != null) {
             // If we have focus, we adapt the eye separation
             double distToFocus = currentFocus.getDistToCamera() - currentFocus.getRadius();
-            // Lets calculate the separation
+            // Let's calculate the separation
             if (camera.getMode() == CameraMode.SPACECRAFT_MODE) {
-                // In spacecraft mode, the separation is extremely small, otherwise we see no spacecraft
+                // In spacecraft mode, the separation is tiny, otherwise we see no spacecraft
                 separation = (5000 * Constants.M_TO_U);
             } else {
                 separation = Math.tan(Math.toRadians(EYE_ANGLE_DEG)) * distToFocus;

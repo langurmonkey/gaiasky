@@ -21,7 +21,6 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
@@ -38,7 +37,6 @@ public class ParticleGroupInstRenderSystem extends InstancedRenderSystem impleme
     private int sizeOffset, particlePosOffset;
     private final Random rand;
     private final Colormap cmap;
-    private boolean stereoHalfWidth;
 
     public ParticleGroupInstRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -82,11 +80,8 @@ public class ParticleGroupInstRenderSystem extends InstancedRenderSystem impleme
     }
 
     protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
-        stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
-
         shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
         shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-        shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
         addEffectsUniforms(shaderProgram, camera);
     }
 
@@ -172,7 +167,7 @@ public class ParticleGroupInstRenderSystem extends InstancedRenderSystem impleme
                     double s = .3e-4f;
                     shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
                     shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
                     shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] * particleGroup.highlightedSizeFactor()), (float) (particleGroup.particleSizeLimits[1] * particleGroup.highlightedSizeFactor()));
 
                     try {
