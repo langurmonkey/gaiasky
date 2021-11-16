@@ -79,6 +79,8 @@ public class Orbit extends Polyline {
     protected boolean onlyBody = false;
     // Use new method for orbital elements
     public boolean newMethod = false;
+    // Current orbit completion -- current delta from t0
+    public double coord;
 
     /**
      * Refreshing state
@@ -178,6 +180,14 @@ public class Orbit extends Polyline {
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
         super.updateLocal(time, camera);
+        // Completion
+        if (pointCloudData != null) {
+            long now = time.getTime().getEpochSecond();
+            long t0 = pointCloudData.time.get(0).getEpochSecond();
+            long t1 = pointCloudData.time.get(pointCloudData.getNumPoints() - 1).getEpochSecond();
+            coord = (double) (now - t0) / (double) (t1 - t0);
+        }
+
         if (!onlyBody)
             updateLocalTransform(time.getTime());
 
@@ -213,7 +223,7 @@ public class Orbit extends Polyline {
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
             if (!onlyBody) {
-                // If overflow, return
+                // If there is overflow, return
                 if (body != null && body.coordinatesTimeOverflow)
                     return;
 
@@ -226,10 +236,10 @@ public class Orbit extends Polyline {
                         this.alpha = cc[3];
                     }
 
-                    RenderGroup rg = Settings.settings.scene.renderer.orbit.equals(Settings.OrbitMode.GPU_VBO) ? RenderGroup.LINE_GPU : RenderGroup.LINE;
+                    RenderGroup rg = Settings.settings.scene.renderer.isQuadLineRenderer() ? RenderGroup.LINE : RenderGroup.LINE_GPU;
 
                     if (body == null) {
-                        // No body, always render
+                        // There is no body, always render
                         addToRender(this, rg);
                         added = true;
                     } else if (body.distToCamera > distDown) {
@@ -258,10 +268,9 @@ public class Orbit extends Polyline {
         if (!onlyBody) {
             alpha *= this.alpha * this.opacity;
 
-            int last = 1;
             Vector3d parentPos;
             parentPos = parent.getUnrotatedPos();
-            last = parentPos != null ? 2 : 1;
+            int last = parentPos != null ? 2 : 1;
 
             float dAlpha = 0f;
             int stIdx = 0;
@@ -271,8 +280,8 @@ public class Orbit extends Polyline {
 
             Vector3d bodyPos = aux3d1.get().setZero();
             if (orbitTrail) {
-                float top = alpha * 1f;
-                float bottom = alpha * -0f;
+                float top = alpha;
+                float bottom = -0f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = pointCloudData.getWrapTimeMs(currentTime);
@@ -310,13 +319,13 @@ public class Orbit extends Polyline {
                 prev.mul(localTransformD);
                 curr.mul(localTransformD);
 
-                float calpha = MathUtils.clamp(alpha, 0f, 1f);
+                float cAlpha = MathUtils.clamp(alpha, 0f, 1f);
                 if (orbitTrail && !reverse && n == nPoints - 2) {
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], calpha * cc[3]);
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
                 } else if (orbitTrail && reverse && n == 0) {
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], calpha * cc[3]);
+                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
                 }
-                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], calpha * cc[3]);
+                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
 
                 alpha -= dAlpha;
 
@@ -337,12 +346,11 @@ public class Orbit extends Polyline {
             long currentMs = currentTime.toEpochMilli();
             if (pointCloudData == null || currentMs < orbitStartMs || currentMs > orbitEndMs) {
                 // Schedule for refresh
-
                 // Work out sample initial date
                 Date iniTime;
-                if (GaiaSky.instance.time.getWarpFactor() >= 0) {
+                if (GaiaSky.instance.time.getWarpFactor() < 0) {
                     // From (now - period) forward (reverse)
-                    iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (oc.period * 8640000l)));
+                    iniTime = Date.from(Instant.from(currentTime).minusMillis((long) (oc.period * 80000000L)));
                 } else {
                     // From now forward
                     iniTime = Date.from(currentTime);
@@ -359,8 +367,6 @@ public class Orbit extends Polyline {
 
     /**
      * Sets the absolute size of this entity
-     *
-     * @param size
      */
     public void setSize(Float size) {
         this.size = size * (float) Constants.KM_TO_U;

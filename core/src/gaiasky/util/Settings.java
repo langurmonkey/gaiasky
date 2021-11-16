@@ -589,7 +589,6 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
             public LineMode line;
-            public OrbitMode orbit;
             public double ambient;
             public ShadowSettings shadow;
             public ElevationSettings elevation;
@@ -1629,11 +1628,6 @@ public class Settings {
     public enum LineMode {
         GL_LINES,
         POLYLINE_QUADSTRIP,
-    }
-
-    public enum OrbitMode {
-        LINE_MODE_SETTING,
-        GPU_VBO
     }
 
     public enum DistanceUnits {

@@ -2,6 +2,7 @@
 
 in vec4 a_position;
 in vec4 a_color;
+in float a_coord;
 
 uniform mat4 u_worldTransform;
 uniform mat4 u_projView;
@@ -10,6 +11,7 @@ uniform float u_pointSize;
 uniform float u_vrScale;
 
 out vec4 v_col;
+out float v_coord;
 
 #ifdef relativisticEffects
 #include shader/lib_geometry.glsl
@@ -40,6 +42,7 @@ void main() {
 
     gl_PointSize = u_pointSize;
     v_col = a_color;
+    v_coord = a_coord;
 
     // Position
     vec4 gpos = u_projView * pos;

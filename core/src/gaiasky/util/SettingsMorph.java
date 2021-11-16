@@ -207,7 +207,6 @@ public class SettingsMorph {
         var renderer = new RendererSettings();
         renderer.ambient = f32("scene.ambient", p);
         renderer.line = LineMode.values()[i32("scene.renderer.line", p)];
-        renderer.orbit = OrbitMode.values()[i32("scene.renderer.orbit", p)];
         renderer.shadow = new ShadowSettings();
         renderer.shadow.active = bool("scene.shadowmapping", p);
         renderer.shadow.resolution = i32("scene.shadowmapping.resolution", p);

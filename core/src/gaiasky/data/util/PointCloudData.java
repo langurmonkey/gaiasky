@@ -114,10 +114,10 @@ public class PointCloudData {
 
     /**
      * Loads the data point at the index in the vector in the Orbit reference
-     * system
+     * system.
      *
-     * @param v
-     * @param index
+     * @param v The vector to load the data into.
+     * @param index The data index.
      */
     public void loadPoint(Vector3d v, int index) {
         v.set(x.get(index), y.get(index), z.get(index));
@@ -188,10 +188,10 @@ public class PointCloudData {
 
     /**
      * Loads the data point at the index in the vector in the world reference
-     * system
+     * system.
      *
-     * @param v
-     * @param index
+     * @param v The vector to store the result.
+     * @param index The index of the point to load.
      */
     public void loadPointF(Vector3 v, int index) {
         v.set(x.get(index).floatValue(), y.get(index).floatValue(), z.get(index).floatValue());
@@ -201,8 +201,8 @@ public class PointCloudData {
      * Returns a vector with the data point at the given time. It uses linear
      * interpolation. The time instant must be within the bounds of this point cloud's times
      *
-     * @param v       The vector
-     * @param instant The time as an instant
+     * @param v       The vector to store the result.
+     * @param instant The time as an instant.
      * @return Whether the operation completes successfully
      */
     public boolean loadPoint(Vector3d v, Instant instant) {

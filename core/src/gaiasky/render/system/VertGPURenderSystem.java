@@ -14,6 +14,7 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.render.IGPUVertsRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -28,6 +29,7 @@ import org.lwjgl.opengl.GL30;
 public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateRenderSystem {
     protected ICamera camera;
     protected boolean lines;
+    protected int coordOffset;
 
     public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(rg, alphas, shaders);
@@ -63,17 +65,19 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
      * @param nVertices The max number of vertices this mesh data can hold
+     *
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
         int mdi = createMeshData();
         curr = meshes.get(mdi);
 
-        VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attribs);
+        VertexAttribute[] attributes = buildVertexAttributes();
+        curr.mesh = new IntMesh(false, nVertices, 0, attributes);
 
         curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
+        coordOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
         return mdi;
     }
 
@@ -88,7 +92,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         }
 
         this.camera = camera;
-        renderables.forEach(r ->{
+        renderables.forEach(r -> {
             T renderable = (T) r;
 
             /*
@@ -118,18 +122,24 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                         renderable.setOffset(addMeshData(nPoints));
                     }
                 }
+                // Coord maps time
+                long t0 = od.getDate(0).getEpochSecond();
+                long t1 = od.getDate(od.getNumPoints() - 1).getEpochSecond();
+                long t01 = t1 - t0;
 
                 // Ensure vertices capacity
                 ensureTempVertsSize((nPoints + 2) * curr.vertexSize);
                 curr.vertices = tempVerts;
                 float[] cc = renderable.getColor();
                 for (int point_i = 0; point_i < nPoints; point_i++) {
+                    coord((float) ((double) (od.getDate(point_i).getEpochSecond() - t0) / (double) t01));
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) od.getX(point_i), (float) od.getY(point_i), (float) od.getZ(point_i));
                 }
 
                 // Close loop
                 if (renderable.isClosedLoop()) {
+                    coord(1f );
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) od.getX(0), (float) od.getY(0), (float) od.getZ(0));
                 }
@@ -157,9 +167,10 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
-            if(renderable.getParent() != null){
+            shaderProgram.setUniformf("u_coordPos", renderable instanceof Orbit ? (float) ((Orbit)renderable).coord : 1f);
+            if (renderable.getParent() != null) {
                 Vector3d urp = renderable.getParent().getUnrotatedPos();
-                if(urp != null)
+                if (urp != null)
                     shaderProgram.setUniformf("u_parentPos", (float) urp.x, (float) urp.y, (float) urp.z);
                 else
                     shaderProgram.setUniformf("u_parentPos", 0, 0, 0);
@@ -174,14 +185,19 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         });
     }
 
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+    private void coord(float value){
+        curr.vertices[curr.vertexIdx + coordOffset] = value;
+    }
 
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
+    protected VertexAttribute[] buildVertexAttributes() {
+        Array<VertexAttribute> attributes = new Array<>();
+        attributes.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.Generic, 1, "a_coord"));
+
+        VertexAttribute[] array = new VertexAttribute[attributes.size];
+        for (int i = 0; i < attributes.size; i++)
+            array[i] = attributes.get(i);
         return array;
     }
 

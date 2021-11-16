@@ -97,7 +97,7 @@ public class OrbitRefresher {
         public void run() {
             while (running) {
                 synchronized (threadLock) {
-                    /** ----------- PROCESS REQUESTS ----------- **/
+                    /* ----------- PROCESS REQUESTS ----------- */
                     while (!instance.toLoadQueue.isEmpty()) {
                         toLoad.clear();
                         int i = 0;
@@ -121,6 +121,7 @@ public class OrbitRefresher {
                                             // Update orbit object
                                             orbit.setPointCloudData(pcd);
                                             orbit.initOrbitMetadata();
+                                            orbit.markForUpdate();
 
                                             orbit.refreshing = false;
                                         });
@@ -136,7 +137,7 @@ public class OrbitRefresher {
                         }
                     }
 
-                    /** ----------- SLEEP UNTIL INTERRUPTED ----------- **/
+                    /* ----------- SLEEP UNTIL INTERRUPTED ----------- */
                     try {
                         awake = false;
                         threadLock.wait(Long.MAX_VALUE - 8);

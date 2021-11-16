@@ -70,7 +70,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
-    private OwnSelectBox<ComboBoxBean> gquality, aa, orbitRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
+    private OwnSelectBox<ComboBoxBean> gquality, aa, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
     private OwnSelectBox<ElevationComboBoxBean> elevationSb;
     private OwnSelectBox<String> recgridOrigin;
@@ -333,14 +333,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.aa.info"), skin));
 
-        // ORBITS
-        OwnLabel orbitsLabel = new OwnLabel(I18n.txt("gui.orbitrenderer"), skin);
-        ComboBoxBean[] orbitItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.orbitrenderer.line"), OrbitMode.LINE_MODE_SETTING.ordinal()), new ComboBoxBean(I18n.txt("gui.orbitrenderer.gpu"), OrbitMode.GPU_VBO.ordinal()) };
-        orbitRenderer = new OwnSelectBox<>(skin);
-        orbitRenderer.setItems(orbitItems);
-        orbitRenderer.setWidth(textWidth * 3f);
-        orbitRenderer.setSelected(orbitItems[settings.scene.renderer.orbit.ordinal()]);
-
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.txt("gui.linerenderer"), skin);
         ComboBoxBean[] lineRenderers = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.linerenderer.normal"), LineMode.GL_LINES.ordinal()), new ComboBoxBean(I18n.txt("gui.linerenderer.quad"), LineMode.POLYLINE_QUADSTRIP.ordinal()) };
@@ -380,7 +372,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // LABELS
-        labels.addAll(graphicsQualityLabel, aaLabel, orbitsLabel, lrLabel, bloomLabel);
+        labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel);
 
         // LENS FLARE
         lensflareBak = settings.postprocess.lensFlare;
@@ -432,8 +424,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(aa).left().padRight(pad10).padBottom(pad5);
         graphics.add(aaTooltip).left().padBottom(pad5).row();
-        graphics.add(orbitsLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(orbitRenderer).left().padBottom(pad5).row();
         graphics.add(lrLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(lineRenderer).left().padBottom(pad5).row();
         graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
@@ -1980,9 +1970,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         } else {
             EventManager.instance.post(Events.LIMIT_FPS_CMD, 0.0);
         }
-
-        // Orbit renderer
-        settings.scene.renderer.orbit = OrbitMode.values()[orbitRenderer.getSelected().value];
 
         // Line renderer
         boolean reloadLineRenderer = settings.scene.renderer.line != LineMode.values()[lineRenderer.getSelected().value];
