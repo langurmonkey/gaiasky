@@ -1028,6 +1028,34 @@ public interface IScriptingInterface {
     void setLimitFps(int limitFps);
 
     /**
+     * Configures the screenshot system, setting the resolution of the images,
+     * the output directory and the image name prefix.
+     *
+     * @param width      Width of images.
+     * @param height     Height of images.
+     * @param directory  The output directory path.
+     * @param namePrefix The file name prefix.
+     */
+    void configureScreenshots(int width, int height, String directory, String namePrefix);
+
+    /**
+     * Sets the screenshot mode. Possible values are 'simple' and 'advanced'.
+     * The <b>simple</b> mode is faster and just outputs the last frame rendered to the Gaia Sky window, with the same
+     * resolution and containing the UI elements.
+     * The <b>advanced</b> mode redraws the last frame using the resolution configured using {@link #configureScreenshots(int, int, String, String)} and
+     * it does not draw the UI.
+     *
+     * @param screenshotMode The screenshot mode. 'simple' or 'advanced'.
+     */
+    void setScreenshotsMode(String screenshotMode);
+
+    /**
+     * Takes a screenshot of the current frame and saves it to the configured
+     * location (see {@link IScriptingInterface#configureScreenshots(int, int, String, String)}).
+     */
+    void saveScreenshot();
+
+    /**
      * Configures the frame output system, setting the resolution of the images,
      * the target frames per second, the output directory and the image name
      * prefix.
