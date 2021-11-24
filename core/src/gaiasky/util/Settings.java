@@ -1140,7 +1140,7 @@ public class Settings {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class ScreenshotSettings {
+    public static class ScreenshotSettings implements IObserver {
         public static final int MIN_SCREENSHOT_SIZE = 50;
         public static final int MAX_SCREENSHOT_SIZE = 25000;
 
@@ -1149,6 +1149,10 @@ public class Settings {
         public float quality;
         public ScreenshotMode mode;
         public int[] resolution;
+
+        public ScreenshotSettings() {
+            EventManager.instance.subscribe(this, Events.CONFIG_SCREENSHOT_CMD, Events.SCREENSHOT_MODE_CMD);
+        }
 
         public void setFormat(final String formatString) {
             format = ImageFormat.valueOf(formatString.toUpperCase());
@@ -1166,6 +1170,34 @@ public class Settings {
         @JsonIgnore
         public boolean isAdvancedMode() {
             return mode.equals(ScreenshotMode.ADVANCED);
+        }
+
+        @Override
+        public void notify(Events event, Object... data) {
+            switch (event) {
+            case CONFIG_SCREENSHOT_CMD -> {
+                resolution[0] = (int) data[0];
+                resolution[1] = (int) data[1];
+                location = (String) data[3];
+            }
+            case SCREENSHOT_MODE_CMD -> {
+                Object newMode = data[0];
+                ScreenshotMode mode = null;
+                if (newMode instanceof String) {
+                    try {
+                        mode = ScreenshotMode.valueOf(((String) newMode).toUpperCase());
+                    } catch (IllegalArgumentException e) {
+                        logger.error("Given value is not a representation of ScreenshotMode (simple|advanced): '" + newMode + "'");
+                    }
+                } else {
+                    mode = (ScreenshotMode) newMode;
+                }
+                if (mode != null) {
+                    this.mode = mode;
+                }
+            }
+            }
+
         }
     }
 

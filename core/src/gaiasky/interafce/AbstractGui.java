@@ -5,6 +5,7 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -26,7 +27,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     /**
      * Graphics instance
      */
-    protected Lwjgl3Graphics graphics;
+    protected Graphics graphics;
     /**
      * The user interface stage
      */
@@ -64,7 +65,7 @@ public abstract class AbstractGui implements IObserver, IGui {
     /** Lock for sync **/
     protected Object lock;
 
-    public AbstractGui(Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public AbstractGui(Graphics graphics, Float unitsPerPixel) {
         this.graphics = graphics;
         this.unitsPerPixel = unitsPerPixel;
         lock = new Object();

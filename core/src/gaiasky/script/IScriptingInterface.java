@@ -1056,6 +1056,11 @@ public interface IScriptingInterface {
     void saveScreenshot();
 
     /**
+     * Alias to {@link IScriptingInterface#saveScreenshot()}.
+     */
+    void takeScreenshot();
+
+    /**
      * Configures the frame output system, setting the resolution of the images,
      * the target frames per second, the output directory and the image name
      * prefix.

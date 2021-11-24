@@ -6,15 +6,14 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -73,7 +72,7 @@ public class WelcomeGui extends AbstractGui {
      * @param skipWelcome Skips the welcome screen if possible
      * @param vrStatus    The status of VR
      */
-    public WelcomeGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final boolean skipWelcome, final VRStatus vrStatus) {
+    public WelcomeGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final boolean skipWelcome, final VRStatus vrStatus) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.lock = new Object();
@@ -93,9 +92,8 @@ public class WelcomeGui extends AbstractGui {
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRConnectionExit(skin, ui));
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
-
-        } else if (Settings.settings.program.net.slave.active) {
-            // If slave, data load can start
+        } else if (Settings.settings.program.net.slave.active || GaiaSky.instance.isHeadless()) {
+            // If slave or headless, data load can start
             gaiaSky();
         } else {
             dw = new DatasetsWidget(ui, skin);

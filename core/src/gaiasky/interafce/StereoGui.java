@@ -6,8 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -18,7 +18,6 @@ import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.format.INumberFormat;
 import gaiasky.util.format.NumberFormatFactory;
@@ -34,7 +33,7 @@ public class StereoGui extends AbstractGui {
 
     protected INumberFormat nf;
 
-    public StereoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
+    public StereoGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

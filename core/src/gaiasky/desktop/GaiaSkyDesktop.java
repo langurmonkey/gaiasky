@@ -110,9 +110,11 @@ public class GaiaSkyDesktop implements IObserver {
 
         @Parameter(names = { "-d", "--debug" }, description = "Launch in debug mode. Prints out debug information from Gaia Sky to the logs.", order = 9) private boolean debug = false;
 
-        @Parameter(names = { "-g", "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 9) private boolean debugGpu = false;
+        @Parameter(names = { "-g", "--gpudebug" }, description = "Activate OpenGL debug mode. Prints out debug information from OpenGL to the standard output.", order = 10) private boolean debugGpu = false;
 
-        @Parameter(names = { "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 10) private boolean safeMode = false;
+        @Parameter(names = { "-l", "--headless" }, description = "Use headless (windowless) mode, for servers.", order = 11) private boolean headless = false;
+
+        @Parameter(names = { "--safemode" }, description = "Activate safe graphics mode. This forces the creation of an OpenGL 3.2 context, and disables float buffers and tessellation.", order = 12) private boolean safeMode = false;
     }
 
     /**
@@ -333,6 +335,8 @@ public class GaiaSkyDesktop implements IObserver {
         cfg.useOpenGL3(true, DEFAULT_OPENGL_MAJOR, DEFAULT_OPENGL_MINOR);
         // Disable logical DPI modes (macOS, Windows)
         cfg.setHdpiMode(HdpiMode.Pixels);
+        // Headless mode
+        cfg.setInitialVisible(!gsArgs.headless);
         // OpenGL debug
         if (gsArgs.debugGpu) {
             cfg.enableGLDebugOutput(true, System.out);
@@ -433,7 +437,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
-        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.noScriptingServer, gsArgs.debug);
+        gs = new GaiaSky(gsArgs.skipWelcome, gsArgs.vr, gsArgs.externalView, gsArgs.headless, gsArgs.noScriptingServer, gsArgs.debug);
         new Lwjgl3Application(gs, cfg);
     }
 

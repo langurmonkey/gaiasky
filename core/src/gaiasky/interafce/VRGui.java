@@ -1,5 +1,6 @@
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -14,13 +15,13 @@ public class VRGui<T extends IGui> implements IGui {
     private T right;
     private T left;
 
-    public VRGui(Class<T> clazz, int hOffset, Skin skin, Lwjgl3Graphics graphics, Float unitsPerPixel) {
+    public VRGui(Class<T> clazz, int hOffset, Skin skin, Graphics graphics, Float unitsPerPixel) {
         super();
         try {
-            right = clazz.getDeclaredConstructor(Skin.class, Lwjgl3Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
+            right = clazz.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             right.setVr(true);
             right.setHoffset(-hOffset);
-            left = clazz.getDeclaredConstructor(Skin.class, Lwjgl3Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
+            left = clazz.getDeclaredConstructor(Skin.class, Graphics.class, Float.class, Boolean.class).newInstance(skin, graphics, unitsPerPixel, true);
             left.setVr(true);
             left.setHoffset(hOffset);
         } catch (Exception e) {

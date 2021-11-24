@@ -6,8 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -30,11 +30,11 @@ public class CrashGui extends AbstractGui {
     protected Throwable crash;
     protected CrashWindow crashWindow;
 
-    public CrashGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Throwable crash) {
+    public CrashGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Throwable crash) {
         this(skin, graphics, unitsPerPixel, crash, 0, false);
     }
 
-    public CrashGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Throwable crash, final Integer hoffset, final Boolean vr) {
+    public CrashGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Throwable crash, final Integer hoffset, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.crash = crash;

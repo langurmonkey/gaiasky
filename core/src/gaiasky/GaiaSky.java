@@ -105,7 +105,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Graphics
      **/
-    public Lwjgl3Graphics graphics;
+    public Graphics graphics;
 
     /**
      * The {@link VRContext} setup in {@link #createVR()}, may be null if no HMD is
@@ -216,6 +216,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     private final boolean vr;
 
     /**
+     * Headless mode
+     */
+    private final boolean headless;
+
+    /**
      * Skip welcome screen if possible
      */
     private final boolean skipWelcome;
@@ -280,29 +285,35 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * Creates an instance of Gaia Sky.
      */
     public GaiaSky() {
-        this(false, false, false, false, false);
+        this(false, false, false, false, false, false);
     }
 
     /**
      * Creates an instance of Gaia Sky.
      *
-     * @param skipWelcome  Skips welcome screen if possible
-     * @param vr           Launch in VR mode
-     * @param externalView Open a new window with a view of the rendered scene
-     * @param debugMode    Output debug information
+     * @param skipWelcome  Skips welcome screen if possible.
+     * @param vr           Launch in VR mode.
+     * @param externalView Open a new window with a view of the rendered scene.
+     * @param headless     Launch in headless mode, without window.
+     * @param debugMode    Output debug information.
      */
-    public GaiaSky(final boolean skipWelcome, final boolean vr, final boolean externalView, final boolean noScriptingServer, final boolean debugMode) {
+    public GaiaSky(final boolean skipWelcome, final boolean vr, final boolean externalView, final boolean headless, final boolean noScriptingServer, final boolean debugMode) {
         super();
         instance = this;
         this.settings = Settings.settings;
+
+        // Flags
         this.skipWelcome = skipWelcome;
-        this.debugMode = debugMode;
-        this.parkedRunnablesMap = new HashMap<>();
-        this.parkedRunnables = new Array<>();
         this.vr = vr;
         this.externalView = externalView;
-        this.renderProcess = runnableInitialGui;
+        this.headless = headless;
         this.noScripting = noScriptingServer;
+        this.debugMode = debugMode;
+
+        this.parkedRunnablesMap = new HashMap<>();
+        this.parkedRunnables = new Array<>();
+
+        this.renderProcess = runnableInitialGui;
     }
 
     @Override
@@ -318,8 +329,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             logger.debug("Logging level set to DEBUG");
 
         // Init graphics and window
-        graphics = (Lwjgl3Graphics) Gdx.graphics;
-        window = graphics.getWindow();
+        graphics = Gdx.graphics;
+        window = headless ? null : ((Lwjgl3Graphics) graphics).getWindow();
 
         // Basic info
         logger.info(settings.version.version, I18n.txt("gui.build", settings.version.build));
@@ -336,7 +347,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
 
         if (!settings.initialized) {
-            logger.error(new RuntimeException("FATAL: Global configuration not initlaized"));
+            logger.error(new RuntimeException(I18n.txt("notif.error", "global configuration not initialized")));
             return;
         }
 
@@ -1490,6 +1501,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     public boolean isInitialised() {
         return initialized;
+    }
+
+    public boolean isHeadless() {
+        return headless;
     }
 
     public GlobalResources getGlobalResources() {

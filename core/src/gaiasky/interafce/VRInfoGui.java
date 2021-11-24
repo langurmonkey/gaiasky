@@ -1,7 +1,7 @@
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -21,7 +21,7 @@ public class VRInfoGui extends AbstractGui {
     protected Table contents, infoFocus, infoFree;
     protected Cell<?> infoCell;
 
-    public VRInfoGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
+    public VRInfoGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD);

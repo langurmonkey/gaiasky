@@ -258,12 +258,6 @@ public enum Events {
      * Collapses a GUI pane. Contains its name
      */
     COLLAPSE_PANE_CMD,
-
-    /**
-     * Configures the render system. Contains width, height, FPS, folder and
-     * file
-     **/
-    CONFIG_FRAME_OUTPUT_CMD,
     /**
      * Contains the contrast level (float) in [0..2] and an optional boolean
      * indicating whether this comes from the interface
@@ -437,20 +431,6 @@ public enum Events {
      **/
     FPS_INFO,
 
-    /**
-     * Issues the frame output command. Contains a boolean with the state.
-     **/
-    FRAME_OUTPUT_CMD,
-
-    /**
-     * Sets the frame output mode, either SIMPLE or ADVANCED. Gets a string or a {@link ScreenshotSettings} object.
-     */
-    FRAME_OUTPUT_MODE_CMD,
-
-    /**
-     * Informs of the new size of the frame output system
-     **/
-    FRAME_SIZE_UPDATE,
 
     /**
      * Posts the coordinates of the free mode focus.
@@ -933,24 +913,52 @@ public enum Events {
      */
     SCENE_GRAPH_REMOVE_OBJECT_CMD,
 
-    /**
-     * Contains the width, height (integers) and the folder name and filename
+    /*
+     * Takes a screenshot. contains the width, height (integers) and the folder name and filename
      * (strings)
-     **/
+     */
     SCREENSHOT_CMD,
+    /*
+     * Configures the screenshots. Contains the width, height (integers) and the folder name and filename
+     * (strings)
+     */
+    CONFIG_SCREENSHOT_CMD,
+    /*
+     * Sets the screenshot mode, either SIMPLE or ADVANCED. Gets a string or a {@link ScreenshotSettings} object.
+     */
+    SCREENSHOT_MODE_CMD,
 
-    /**
+    /*
      * Contains the path where the screenshot has been saved
      */
     SCREENSHOT_INFO,
-    /**
+    /*
      * Informs of the new size of the screenshot system
-     **/
+     */
     SCREENSHOT_SIZE_UPDATE,
+
     /**
-     * Updates the screen mode according to whats in the
-     * {@link gaiasky.util.Settings#graphics} bean.
+     * Issues the frame output command. Contains a boolean with the state.
      **/
+    FRAME_OUTPUT_CMD,
+    /**
+     * Sets the frame output mode, either SIMPLE or ADVANCED. Gets a string or a {@link ScreenshotSettings} object.
+     */
+    FRAME_OUTPUT_MODE_CMD,
+    /**
+     * Configures the render system. Contains width, height, FPS, folder and
+     * file
+     **/
+    CONFIG_FRAME_OUTPUT_CMD,
+    /**
+     * Informs of the new size of the frame output system
+     **/
+    FRAME_SIZE_UPDATE,
+
+    /*
+     * Updates the screen mode according to what is in the
+     * {@link gaiasky.util.Settings#graphics} bean.
+     */
     SCREEN_MODE_CMD,
 
     /**

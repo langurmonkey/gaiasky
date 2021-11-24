@@ -6,8 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -47,11 +47,11 @@ public class LoadingGui extends AbstractGui {
     private long lastFunnyTime;
     private long lastTipTime;
 
-    public LoadingGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
+    public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         this(skin, graphics, unitsPerPixel, 0, vr);
     }
 
-    public LoadingGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final Integer hoffset, final Boolean vr) {
+    public LoadingGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Integer hoffset, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.vr = vr;
         this.hoffset = hoffset;

@@ -8,6 +8,7 @@ package gaiasky.desktop.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Graphics.Monitor;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -21,7 +22,7 @@ import gaiasky.util.Settings;
  */
 public class ScreenModeCmd implements IObserver {
     private static final Log logger = Logger.getLogger(ScreenModeCmd.class);
-    
+
     public static ScreenModeCmd instance;
 
     public static void initialize() {
@@ -72,7 +73,8 @@ public class ScreenModeCmd implements IObserver {
                 }
 
             }
-            Gdx.graphics.setVSync(Settings.settings.graphics.vsync);
+            if (!GaiaSky.instance.isHeadless())
+                Gdx.graphics.setVSync(Settings.settings.graphics.vsync);
         }
     }
 }
