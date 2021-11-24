@@ -38,6 +38,7 @@ import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.ScreenshotSettings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AbstractOrbitCoordinates;
 import gaiasky.util.coord.Coordinates;
@@ -969,6 +970,31 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setLimitFps(int limitFps) {
         setLimitFps((double) limitFps);
+    }
+
+    @Override
+    public void configureScreenshots(int width, int height, String directory, String namePrefix) {
+        if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory, "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
+            em.post(Events.SCREENSHOT_CMD, width, height, directory);
+        }
+    }
+
+    @Override
+    public void setScreenshotsMode(String screenshotMode) {
+        // Hack to keep compatibility with old scripts
+        if (screenshotMode != null && screenshotMode.equalsIgnoreCase("redraw")) {
+            screenshotMode = "ADVANCED";
+        }
+        if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode")) {
+            em.post(Events.SCREENSHOT_MODE_CMD, screenshotMode);
+            GaiaSky.postRunnable(() -> em.post(Events.SCREENSHOT_SIZE_UPDATE, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]));
+        }
+    }
+
+    @Override
+    public void saveScreenshot() {
+        ScreenshotSettings ss = Settings.settings.screenshot;
+        em.post(Events.SCREENSHOT_CMD, ss.resolution[0], ss.resolution[1], ss.location);
     }
 
     public void setMinStarOpacity(int opacity) {
