@@ -103,6 +103,11 @@ task runvr(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky VR") {
     args = ['-vr']
 }
 
+task runh(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky in headless mode") {
+    setup()
+    args = ['--headless']
+}
+
 task rund(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky showing the download manager at startup") {
     setup()
     args = ['-d']
@@ -116,57 +121,6 @@ task runc(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky showing 
 task rune(dependsOn: jar, type: GaiaSkyRun, description: "Runs Gaia Sky with an external view") {
     setup()
     args = ['-e']
-}
-
-task runCatalogFilter(dependsOn: jar, type: JavaExec, description: "Runs the catalog filter application to generate day catalogs for WebGL") {
-    mainClass = 'gaiasky.data.GaiaCatalogFilter'
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-}
-
-task runOctreeGenerator(dependsOn: jar, type: JavaExec, description: "Runs the octree generator with star groups to create the lod structure from a base catalog") {
-    mainClass = 'gaiasky.data.OctreeGeneratorRun'
-    systemProperties['properties.file'] = ''
-    systemProperties['assets.location'] = './assets/'
-    args = [
-            "-l",
-            "CsvCatalogDataProvider",
-            "--input",
-            "/home/tsagrista/Projects/gaiasky-catgen/data/gaia/",
-            "--output",
-            "/home/tsagrista/Projects/gaiasky-catgen/output/java/",
-            "--columns",
-            "source_id,ra,dec,plx,ra_err,dec_err,plx_err,pmra,pmdec,radvel,gmag,bpmag,rpmag,ruwe,ref_epoch",
-            "--hip",
-            "/home/tsagrista/Projects/gaiasky-catgen/data/hip/hipparcos.vot",
-            "--xmatchfile",
-            "/home/tsagrista/Projects/gaiasky-catgen/data/hip-gaia-xm/xmatch.csv",
-            "--additional",
-            "/home/tsagrista/Projects/gaiasky-catgen/data/ag-e/edr3-ag-e-s.csv.gz",
-            "--maxpart",
-            "100000",
-            "--parallelism",
-            "1"
-    ]
-
-    minHeapSize = "512m"
-    maxHeapSize = "4g"
-
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
-}
-
-task runGalaxyGenerator(dependsOn: jar, type: JavaExec, description: "Runs the galaxy generator to procedurally generate a galaxy") {
-    mainClass = 'gaiasky.data.galaxy.GalaxyGenerator'
-    systemProperties['properties.file'] = '../assets/conf/config.yaml'
-    classpath = sourceSets.main.runtimeClasspath
-    classpath += files(project.assetsDir)
-    standardInput = System.in
-    workingDir = project.workDir
 }
 
 task createDistDir(description: "Creates the releases/dist folder") {
