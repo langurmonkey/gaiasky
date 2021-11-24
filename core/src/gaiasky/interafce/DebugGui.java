@@ -5,15 +5,14 @@
 
 package gaiasky.interafce;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import gaiasky.util.GlobalResources;
 
 /**
  * This GUI shows debug information in the top-right corner of the screen
@@ -22,7 +21,7 @@ public class DebugGui extends AbstractGui {
     protected DebugInterface debugInterface;
     private Container<Actor> di;
 
-    public DebugGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel) {
+    public DebugGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
     }

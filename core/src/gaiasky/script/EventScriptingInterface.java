@@ -997,6 +997,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         em.post(Events.SCREENSHOT_CMD, ss.resolution[0], ss.resolution[1], ss.location);
     }
 
+    @Override
+    public void takeScreenshot() {
+        saveScreenshot();
+    }
+
     public void setMinStarOpacity(int opacity) {
         setMinStarOpacity((float) opacity);
     }

@@ -6,8 +6,8 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
@@ -41,8 +41,6 @@ import gaiasky.util.update.VersionChecker;
 
 import java.nio.file.Files;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Full OpenGL GUI with all the controls and whistles.
@@ -82,7 +80,7 @@ public class FullGui extends AbstractGui {
     private final GlobalResources globalResources;
     private final CatalogManager catalogManager;
 
-    public FullGui(final Skin skin, final Lwjgl3Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources, final CatalogManager catalogManager) {
+    public FullGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final GlobalResources globalResources, final CatalogManager catalogManager) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
         this.globalResources = globalResources;
