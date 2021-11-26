@@ -143,7 +143,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux));
 
             alphaSizeFovBr[0] = alphas[ct.ordinal()];
-            alphaSizeFovBr[1] = fovMode == 0 ? StarSettings.getStarPointSize() * rc.scaleFactor * (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1 : 2) : Settings.settings.scene.star.pointSize * rc.scaleFactor * 10;
+            alphaSizeFovBr[1] = fovMode == 0 ? (10 * StarSettings.getStarPointSize() * rc.scaleFactor * (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1 : 2)) : (Settings.settings.scene.star.pointSize * rc.scaleFactor * 10);
             alphaSizeFovBr[2] = camera.getFovFactor();
             alphaSizeFovBr[3] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
             shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
@@ -156,7 +156,7 @@ public class StarPointRenderSystem extends ImmediateRenderSystem implements IObs
             addEffectsUniforms(shaderProgram, camera);
 
             curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
-            curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+            curr.mesh.render(shaderProgram, GL30.GL_POINTS);
             shaderProgram.end();
         }
 

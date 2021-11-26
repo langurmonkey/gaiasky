@@ -100,7 +100,7 @@ public class SearchDialog extends GenericDialog {
 
         // Info message
         searchInput = new OwnTextField("", skin);
-        searchInput.setWidth(680f);
+        searchInput.setWidth(480f);
         searchInput.setMessageText(I18n.txt("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {
