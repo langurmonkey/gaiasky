@@ -210,7 +210,10 @@ public class PointParticleRecord implements IParticleRecord{
 
     @Override
     public Vector3d pos(Vector3d aux) {
-        return null;
+        aux.x = data[0];
+        aux.y = data[1];
+        aux.z = data[2];
+        return aux;
     }
 
     @Override

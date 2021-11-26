@@ -53,6 +53,7 @@ public class AstroUtils {
      * Get julian date from a double reference epoch
      *
      * @param refEpoch The reference epoch
+     *
      * @return The julian date
      */
     public static double getJulianDate(double refEpoch) {
@@ -111,6 +112,7 @@ public class AstroUtils {
      * Caches the last Sun's longitude for future use.
      *
      * @param date The time for which the longitude must be calculated
+     *
      * @return The Sun's longitude in [deg]
      */
     public static double getSunLongitude(Instant date) {
@@ -131,8 +133,10 @@ public class AstroUtils {
      * Wikipedia.
      *
      * @param jd The Julian date for which to calculate the latitude.
+     *
      * @return The ecliptic longitude of the Sun at the given Julian date, in
      * degrees.
+     *
      * @see <a href=
      * "http://en.wikipedia.org/wiki/Position_of_the_Sun">http://en.wikipedia.org/wiki/Position_of_the_Sun</a>
      */
@@ -175,24 +179,27 @@ public class AstroUtils {
      *
      * @param date
      * @param out  The output vector.
+     *
      * @return The output vector, for chaining.
      */
     public static Vector3d moonEclipticCoordinates(Instant date, Vector3d out) {
         return moonEclipticCoordinates(getJulianDateCache(date), out);
     }
+
     /**
      * Algorithm in "Astronomical Algorithms" book by Jean Meeus. Returns a
      * vector with the ecliptic longitude (&lambda;) in radians, the ecliptic
      * latitude (&beta;) in radians and the distance in kilometers.
      *
-     * @param date
+     * @param date The instant date.
+     * @param aux  Auxiliary double vector.
      * @param out  The output vector.
+     *
      * @return The output vector, for chaining.
      */
-    public static Vector3b moonEclipticCoordinates(Instant date, Vector3b out) {
-        Vector3d outd = new Vector3d();
-        moonEclipticCoordinates(getJulianDateCache(date), outd);
-        return out.set(outd);
+    public static Vector3b moonEclipticCoordinates(Instant date, Vector3d aux, Vector3b out) {
+        moonEclipticCoordinates(getJulianDateCache(date), aux);
+        return out.set(aux);
     }
 
     /**
@@ -201,10 +208,11 @@ public class AstroUtils {
      * latitude (&beta;) in radians and the distance between the centers of the
      * Earth and the Moon in kilometers.
      *
-     * @param julianDate
+     * @param julianDate The julian days since J2000.
      * @param out        The output vector with geocentric longitude (lambda) [rad],
      *                   geocentric latitude (beta) [rad], distance between the centers
      *                   of the Earth and the Moon [km]
+     *
      * @return The output vector, for chaining.
      */
     public static Vector3d moonEclipticCoordinates(double julianDate, Vector3d out) {
@@ -248,18 +256,18 @@ public class AstroUtils {
         double sumb = calculateSumb(D, M, Mp, F, E, A1, A3, Lp);
 
         double lambda = prettyAngle(Lp + suml * 0.000001);
-        double beta = prettyAngle((sumb * 0.000001));
+        double beta = declination(prettyAngle((sumb * 0.000001)));
         double dist = 385000.56 + sumr * 0.001;
 
         return out.set(Math.toRadians(lambda), Math.toRadians(beta), dist);
     }
-
 
     /**
      * Ecliptic coordinates of pluto at the given date
      *
      * @param date The date
      * @param out  The out vector
+     *
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
     public static Vector3b plutoEclipticCoordinates(Instant date, Vector3b out) {
@@ -274,6 +282,7 @@ public class AstroUtils {
      *
      * @param d   Julian date
      * @param out The out vector
+     *
      * @return Ecliptic coordinates of Pluto at the given julian date
      */
     private static Vector3b plutoEclipticCoordinates(double d, Vector3b out) {
@@ -306,6 +315,7 @@ public class AstroUtils {
      * @param A1 Term due to action of Venus
      * @param A2 Term due to Jupiter
      * @param Lp Moon's mean longitude, referring to the equinox of the date
+     *
      * @return Suml and Sumr
      */
     private static double[] calculateSumlSumr(double D, double M, double Mp, double F, double E, double A1, double A2, double Lp) {
@@ -391,6 +401,7 @@ public class AstroUtils {
      * @param out          The output vector
      * @param highAccuracy Whether to use the full precision algorithms or skip some
      *                     terms for speed
+     *
      * @return The output vector with L, B and R, for chaining.
      */
     public static Vector3b getEclipticCoordinates(String body, Instant instant, Vector3b out, boolean highAccuracy) {
@@ -412,10 +423,15 @@ public class AstroUtils {
         return angle - 360d * (int) (angle / 360d);
     }
 
+    private static double declination(double angle) {
+        return Math.abs(angle) <= 90 ? angle : angle - 360d;
+    }
+
     /**
      * Gets the Julian date number given the Gregorian calendar quantities.
      *
      * @param gregorian Whether to use the Gregorian or the Julian calendar
+     *
      * @return The julian date number
      */
     public static double getJulianDate(int year, int month, int day, int hour, int min, int sec, int nanos, boolean gregorian) {
@@ -430,6 +446,7 @@ public class AstroUtils {
      * Gets the Julian Date for the given date. It uses a cache.
      *
      * @param instant The date.
+     *
      * @return The Julian Date.
      */
     public static synchronized double getJulianDateCache(Instant instant) {
@@ -437,7 +454,7 @@ public class AstroUtils {
         if (jdcache.containsKey(time)) {
             return jdcache.get(time);
         } else {
-            Double jd = getJulianDate(instant);
+            double jd = getJulianDate(instant);
             jdcache.put(time, jd);
             return jd;
         }
@@ -458,9 +475,10 @@ public class AstroUtils {
 
     /**
      * Returns the elapsed milliseconds since the epoch J2010 until the given
-     * date. Can be negavite.
+     * date. Can be negative.
      *
      * @param date The date
+     *
      * @return The elapsed milliseconds
      */
     public static double getMsSinceJ2010(Instant date) {
@@ -472,6 +490,7 @@ public class AstroUtils {
      * date. Can be negavite.
      *
      * @param date The date
+     *
      * @return The elapsed milliseconds
      */
     public static double getMsSinceJ2000(Instant date) {
@@ -480,9 +499,10 @@ public class AstroUtils {
 
     /**
      * Returns the elapsed days since the epoch J2000 until the given date. Can
-     * be negavite.
+     * be negative.
      *
      * @param date The date
+     *
      * @return The elapsed days
      */
     public static double getDaysSinceJ2000(Instant date) {
@@ -491,9 +511,10 @@ public class AstroUtils {
 
     /**
      * Returns the elapsed milliseconds since the epoch J2015 until the given
-     * date. Can be negavite.
+     * date. Can be negative.
      *
      * @param date The date
+     *
      * @return The elapsed milliseconds
      */
     public static double getMsSinceJ2015(Instant date) {
@@ -502,10 +523,11 @@ public class AstroUtils {
 
     /**
      * Returns the elapsed milliseconds since the given julian date jd until the
-     * given date. Can be negative
+     * given date. Can be negative.
      *
      * @param date     The date
      * @param epoch_jd The reference epoch in julian days
+     *
      * @return The elapsed milliseconds
      */
     public static double getMsSince(Instant date, double epoch_jd) {
@@ -518,6 +540,7 @@ public class AstroUtils {
      *
      * @param date     The date
      * @param epoch_jd The reference epoch in julian days
+     *
      * @return The elapsed days
      */
     public static double getDaysSince(Instant date, double epoch_jd) {
@@ -528,10 +551,11 @@ public class AstroUtils {
      * Gets the Gregorian calendar quantities given the Julian date.
      *
      * @param julianDate The Julian date
+     *
      * @return Vector with {year, month, day, hour, min, sec, nanos}
      */
     public static long[] getCalendarDay(double julianDate) {
-        /**
+        /*
          * y 4716 v 3 j 1401 u 5 m 2 s 153 n 12 w 2 r 4 B 274277 p 1461 C −38
          *
          * 1. f = J + j + (((4 * J + B)/146097) * 3)/4 + C 2. e = r * f + v 3. g
@@ -541,8 +565,8 @@ public class AstroUtils {
 
         // J is the julian date number
         long J = (int) julianDate;
-        long y = 4716l, j = 1401l, m = 2l, n = 12l, r = 4l, p = 1461l, v = 3l, u = 5l, s = 153l, w = 2l, B = 274277l, C = -38l;
-        long f = J + j + (((4l * J + B) / 146097l) * 3l) / 4l + C;
+        long y = 4716L, j = 1401L, m = 2L, n = 12L, r = 4L, p = 1461L, v = 3L, u = 5L, s = 153L, w = 2L, B = 274277L, C = -38L;
+        long f = J + j + (((4L * J + B) / 146097L) * 3L) / 4L + C;
         long e = r * f + v;
         long g = (e % p) / r;
         long h = u * g + w;
@@ -564,7 +588,9 @@ public class AstroUtils {
      * @param year  The year
      * @param month The month in [1:12]
      * @param day   The day in the month, starting at 1
+     *
      * @return The Julian date
+     *
      * @deprecated This does not work well!
      */
     @Deprecated
@@ -583,16 +609,18 @@ public class AstroUtils {
      * @param year  The year
      * @param month The month in [1:12]
      * @param day   The day in the month, starting at 1
+     *
      * @return The Julian date
+     *
      * @see <a href=
      * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaGregorianCalendar(int year, int month, int day) {
-        long a = (14l - month) / 12l;
-        long y = year + 4800l - a;
-        long m = month + 12l * a - 3l;
+        long a = (14L - month) / 12L;
+        long y = year + 4800L - a;
+        long m = month + 12L * a - 3L;
 
-        return day + ((153l * m + 2l) / 5l) + 365l * y + (y / 4l) - (y / 100l) + (y / 400l) - 32045.5d;
+        return day + ((153d * m + 2d) / 5d) + 365L * y + (y / 4d) - (y / 100d) + (y / 400d) - 32045.5d;
     }
 
     /**
@@ -602,16 +630,18 @@ public class AstroUtils {
      * @param year  The year
      * @param month The month in [1:12]
      * @param day   The day in the month, starting at 1
+     *
      * @return The Julian date
+     *
      * @see <a href=
      * "http://en.wikipedia.org/wiki/Julian_day">http://en.wikipedia.org/wiki/Julian_day</a>
      */
     public static double getJulianDayNumberWikipediaJulianCalendar(int year, int month, int day) {
-        long a = (14l - month) / 12l;
-        long y = year + 4800l - a;
-        long m = month + 12l * a - 3l;
+        long a = (14L - month) / 12L;
+        long y = year + 4800L - a;
+        long m = month + 12L * a - 3L;
 
-        return day + ((153l * m + 2l) / 5l) + 365l * y + (y / 4l) - 32083.5d;
+        return day + ((153d * m + 2d) / 5d) + 365d * y + (y / 4d) - 32083.5d;
     }
 
     public static Instant julianDateToInstant(double jd) {
@@ -627,6 +657,7 @@ public class AstroUtils {
      * @param min   The minute in 0-1440
      * @param sec   The second in 0-86400
      * @param nanos The nanoseconds
+     *
      * @return The day fraction
      */
     public static double getDayFraction(int hour, int min, int sec, int nanos) {
@@ -637,6 +668,7 @@ public class AstroUtils {
      * Gets the day quantities from the day fraction
      *
      * @param dayFraction
+     *
      * @return [hours, minutes, seconds, nanos]
      */
     public static long[] getDayQuantities(double dayFraction) {
@@ -673,6 +705,7 @@ public class AstroUtils {
      * Time T measured in Julian centuries from the Epoch J2000.0
      *
      * @param julianDate The julian date
+     *
      * @return The time in julian centuries
      */
     public static double T(double julianDate) {
@@ -693,6 +726,7 @@ public class AstroUtils {
      * @param ra          Right ascension in radians
      * @param dec         Declination in radians
      * @param distpc      Distance in parsecs to the star
+     *
      * @return The proper motion vector in internal_units/year
      */
     public static Vector3d properMotionsToCartesian(double mualphastar, double mudelta, double radvel, double ra, double dec, double distpc, Vector3d out) {
@@ -724,5 +758,16 @@ public class AstroUtils {
 
         return (out.set(vy, vz, vx)).scl(Constants.KM_TO_U / Nature.S_TO_Y);
 
+    }
+
+    /**
+     * Converts an apparent magnitude to an absolute magnitude given the distance in parsecs.
+     * @param distPc The distance to the star in parsecs
+     * @param appMag The apparent magnitude
+     * @return The absolute magnitude
+     */
+    public static double apparentToAbsoluteMagnitude(double distPc, double appMag) {
+        final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
+        return appMag - v + 5.0;
     }
 }

@@ -60,7 +60,7 @@ public class Positions2DExtractor {
     double Mm = 7.34767309e22;
 
     int steps = 1000;
-    long MS_IN_YEAR = (long) Nature.Y_TO_S * 1000l;
+    long MS_IN_YEAR = (long) Nature.Y_TO_S * 1000L;
 
     public void process() throws IOException {
 

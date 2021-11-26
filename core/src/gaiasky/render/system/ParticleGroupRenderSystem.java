@@ -5,11 +5,10 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -22,26 +21,24 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
-import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.StdRandom;
-import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
 
-public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements IObserver {
+/**
+ * Renders particle groups using regular arrays via billboards with geometry (quads as two triangles).
+ */
+public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private final Vector3 aux1;
-    private int additionalOffset;
+    private int posOffset, sizeOffset, particlePosOffset, uvOffset;
     private final Random rand;
     private final Colormap cmap;
 
     public ParticleGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        comp = new DistToCameraComparator<>();
         rand = new Random(123);
         aux1 = new Vector3();
         cmap = new Colormap();
@@ -50,133 +47,136 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
-        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+        // Empty
     }
 
-    @Override
-    protected void initVertices() {
-        // STARS
-        meshes = new Array<>();
+    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
+        attributes.add(new VertexAttribute(Usage.Position, 2, ExtShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ExtShaderProgram.TEXCOORD_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.ObjectPosition, 3, "a_particlePos"));
+        attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
     }
 
-    /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     *
-     * @param nVertices The max number of vertices this mesh data can hold
-     * @return The index of the new mesh data
-     */
-    private int addMeshData(int nVertices) {
-        int mdi = createMeshData();
-        curr = meshes.get(mdi);
-
-        VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attribs);
-
-        curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
+    protected void offsets(MeshData curr) {
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        additionalOffset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
-        return mdi;
+        posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
+        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
+        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
+        particlePosOffset = curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition) != null ? curr.mesh.getVertexAttribute(OwnUsage.ObjectPosition).offset / 4 : 0;
+    }
+
+    protected void preRenderObjects(ExtShaderProgram shaderProgram, ICamera camera) {
+        shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+        shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
+        addEffectsUniforms(shaderProgram, camera);
     }
 
     @Override
-    public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
-            boolean stereoHalfWidth = Settings.settings.program.modeStereo.isStereoHalfWidth();
-            ExtShaderProgram shaderProgram = getShaderProgram();
-            shaderProgram.begin();
-            // Global uniforms
-            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_ar", stereoHalfWidth ? 2f : 1f);
-            shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
-            shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
-            shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
-            addEffectsUniforms(shaderProgram, camera);
+    protected void renderObject(ExtShaderProgram shaderProgram, IRenderable renderable) {
+        final ParticleGroup particleGroup = (ParticleGroup) renderable;
+        synchronized (particleGroup) {
+            if (!particleGroup.disposed) {
+                boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
+                if (!particleGroup.inGpu()) {
+                    int n = particleGroup.size();
+                    particleGroup.offset = addMeshData(n * 4, n * 6);
+                    curr = meshes.get(particleGroup.offset);
+                    ensureTempVertsSize(n * 4 * curr.vertexSize);
+                    ensureTempIndicesSize(n * 6);
 
-            renderables.forEach(rend -> {
-                final ParticleGroup particleGroup = (ParticleGroup) rend;
-                synchronized (particleGroup) {
-                    if (!particleGroup.disposed) {
-                        boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
-                        if (!particleGroup.inGpu()) {
-                            particleGroup.offset = addMeshData(particleGroup.size());
-                            curr = meshes.get(particleGroup.offset);
+                    float[] c = particleGroup.getColor();
+                    float[] colorMin = particleGroup.getColorMin();
+                    float[] colorMax = particleGroup.getColorMax();
+                    double minDistance = particleGroup.getMinDistance();
+                    double maxDistance = particleGroup.getMaxDistance();
 
-                            float[] c = particleGroup.getColor();
-                            float[] cmin = particleGroup.getColorMin();
-                            float[] cmax = particleGroup.getColorMax();
-                            double dmin = particleGroup.getMinDistance();
-                            double dmax = particleGroup.getMaxDistance();
+                    int numVerticesAdded = 0;
+                    int numParticlesAdded = 0;
+                    for (int i = 0; i < n; i++) {
+                        if (particleGroup.filter(i) && particleGroup.isVisible(i)) {
+                            IParticleRecord particle = particleGroup.get(i);
+                            double[] p = particle.rawDoubleData();
+                            // 4 vertices per particle
+                            for (int vert = 0; vert < 4; vert++) {
+                                // Vertex POSITION
+                                tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                                tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
-                            ensureTempVertsSize(particleGroup.size() * curr.vertexSize);
-                            int n = particleGroup.data().size();
-                            int nadded = 0;
-                            for (int i = 0; i < n; i++) {
-                                if (particleGroup.filter(i) && particleGroup.isVisible(i)) {
-                                    IParticleRecord pb = particleGroup.get(i);
-                                    double[] p = pb.rawDoubleData();
-                                    // COLOR
-                                    if (particleGroup.isHighlighted()) {
-                                        if (hlCmap) {
-                                            // Color map
-                                            double[] color = cmap.colormap(particleGroup.getHlcmi(), particleGroup.getHlcma().get(pb), particleGroup.getHlcmmin(), particleGroup.getHlcmmax());
-                                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
-                                        } else {
-                                            // Plain
-                                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
-                                        }
+                                // UV coordinates
+                                tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                                tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+
+                                // COLOR
+                                if (particleGroup.isHighlighted()) {
+                                    if (hlCmap) {
+                                        // Color map
+                                        double[] color = cmap.colormap(particleGroup.getHlcmi(), particleGroup.getHlcma().get(particle), particleGroup.getHlcmmin(), particleGroup.getHlcmmax());
+                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits((float) color[0], (float) color[1], (float) color[2], 1.0f);
                                     } else {
-                                        if (cmin != null && cmax != null) {
-                                            double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
-                                            // fac = 0 -> cmin,  fac = 1 -> cmax
-                                            double fac = (dist - dmin) / (dmax - dmin);
-                                            interpolateColor(cmin, cmax, c, fac);
-                                        }
-                                        float r = 0, g = 0, b = 0;
-                                        if (particleGroup.colorNoise != 0) {
-                                            r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                                            g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                                            b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
-                                        }
-                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
+                                        // Plain
+                                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
                                     }
-
-                                    // SIZE, CMAP_VALUE
-                                    tempVerts[curr.vertexIdx + additionalOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
-
-                                    // POSITION
-                                    final int idx = curr.vertexIdx;
-                                    tempVerts[idx] = (float) p[0];
-                                    tempVerts[idx + 1] = (float) p[1];
-                                    tempVerts[idx + 2] = (float) p[2];
-
-                                    curr.vertexIdx += curr.vertexSize;
-                                    nadded++;
+                                } else {
+                                    if (colorMin != null && colorMax != null) {
+                                        double dist = Math.sqrt(p[0] * p[0] + p[1] * p[1] + p[2] * p[2]);
+                                        // fac = 0 -> colorMin,  fac = 1 -> colorMax
+                                        double fac = (dist - minDistance) / (maxDistance - minDistance);
+                                        interpolateColor(colorMin, colorMax, c, fac);
+                                    }
+                                    float r = 0, g = 0, b = 0;
+                                    if (particleGroup.colorNoise != 0) {
+                                        r = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                        g = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                        b = (float) ((StdRandom.uniform() - 0.5) * 2.0 * particleGroup.colorNoise);
+                                    }
+                                    tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(MathUtils.clamp(c[0] + r, 0, 1), MathUtils.clamp(c[1] + g, 0, 1), MathUtils.clamp(c[2] + b, 0, 1), MathUtils.clamp(c[3], 0, 1));
                                 }
+
+                                // SIZE
+                                tempVerts[curr.vertexIdx + sizeOffset] = (particleGroup.size + (float) (rand.nextGaussian() * particleGroup.size / 5d)) * particleGroup.highlightedSizeFactor();
+
+                                // PARTICLE POSITION
+                                tempVerts[curr.vertexIdx + particlePosOffset] = (float) p[0];
+                                tempVerts[curr.vertexIdx + particlePosOffset + 1] = (float) p[1];
+                                tempVerts[curr.vertexIdx + particlePosOffset + 2] = (float) p[2];
+
+                                curr.vertexIdx += curr.vertexSize;
+                                curr.numVertices++;
+                                numVerticesAdded++;
                             }
-                            particleGroup.count = nadded * curr.vertexSize;
-                            curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
-
-                            particleGroup.inGpu(true);
-
-                        }
-
-                        curr = meshes.get(particleGroup.offset);
-                        if (curr != null) {
-                            float meanDist = (float) (particleGroup.getMeanDistance());
-
-                            shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
-                            shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
-                            shaderProgram.setUniformf("u_sizeFactor", (float) ((((stereoHalfWidth ? 2.0 : 1.0) * rc.scaleFactor * StarSettings.getStarPointSize() * 0.05)) * particleGroup.highlightedSizeFactor() * meanDist / (camera.getFovFactor() * Constants.DISTANCE_SCALE_FACTOR)));
-                            shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] / camera.getFovFactor()), (float) (particleGroup.particleSizeLimits[1] / camera.getFovFactor()));
-
-                            curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
-
+                            // Indices
+                            quadIndices(curr);
+                            numParticlesAdded++;
                         }
                     }
+                    particleGroup.count = numVerticesAdded * curr.vertexSize;
+                    curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
+                    curr.mesh.setIndices(tempIndices, 0, numParticlesAdded * 6);
+
+                    particleGroup.inGpu(true);
                 }
-            });
-            shaderProgram.end();
+
+                /*
+                 * RENDER
+                 */
+                curr = meshes.get(particleGroup.offset);
+                if (curr != null) {
+                    float meanDist = (float) (particleGroup.getMeanDistance());
+
+                    double s = .3e-4f;
+                    shaderProgram.setUniformf("u_alpha", alphas[particleGroup.ct.getFirstOrdinal()] * particleGroup.getOpacity());
+                    shaderProgram.setUniformf("u_falloff", particleGroup.profileDecay);
+                    shaderProgram.setUniformf("u_sizeFactor", (float) (((StarSettings.getStarPointSize() * s)) * particleGroup.highlightedSizeFactor() * meanDist / Constants.DISTANCE_SCALE_FACTOR));
+                    shaderProgram.setUniformf("u_sizeLimits", (float) (particleGroup.particleSizeLimits[0] * particleGroup.highlightedSizeFactor()), (float) (particleGroup.particleSizeLimits[1] * particleGroup.highlightedSizeFactor()));
+
+                    try {
+                        curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                    } catch (IllegalArgumentException e) {
+                        logger.error(e, "Render exception");
+                    }
+                }
+            }
         }
     }
 
@@ -186,18 +186,6 @@ public class ParticleGroupRenderSystem extends ImmediateRenderSystem implements 
         result[1] = (1 - f) * c0[1] + f * c1[1];
         result[2] = (1 - f) * c0[2] + f * c1[2];
         result[3] = (1 - f) * c0[3] + f * c1[3];
-    }
-
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attribs = new Array<>();
-        attribs.add(new VertexAttribute(Usage.Position, 3, ExtShaderProgram.POSITION_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.ColorPacked, 4, ExtShaderProgram.COLOR_ATTRIBUTE));
-        attribs.add(new VertexAttribute(Usage.Generic, 2, "a_additional"));
-
-        VertexAttribute[] array = new VertexAttribute[attribs.size];
-        for (int i = 0; i < attribs.size; i++)
-            array[i] = attribs.get(i);
-        return array;
     }
 
     @Override

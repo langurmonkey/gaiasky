@@ -29,7 +29,7 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.Random;
 
-public class ParticleEffectsRenderSystem extends ImmediateRenderSystem {
+public class ParticleEffectsRenderSystem extends ImmediateModeRenderSystem {
     private static final int N_PARTICLES = (Settings.settings.graphics.quality.ordinal() + 1) * 100;
 
     private final Random rand;

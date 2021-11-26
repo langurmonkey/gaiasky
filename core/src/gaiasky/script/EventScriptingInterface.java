@@ -1302,11 +1302,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 boolean distanceNotMet = (object.getDistToCamera() - object.getRadius()) > target;
                 boolean viewNotMet = Math.abs(dir.angle(camObj)) < 90;
 
-                long prevtime = TimeUtils.millis();
+                long prevTime = TimeUtils.millis();
                 while ((distanceNotMet || viewNotMet) && (stop == null || !stop.get())) {
                     // dt in ms
-                    long dt = TimeUtils.timeSinceMillis(prevtime);
-                    prevtime = TimeUtils.millis();
+                    long dt = TimeUtils.timeSinceMillis(prevTime);
+                    prevTime = TimeUtils.millis();
 
                     if (distanceNotMet)
                         em.post(Events.CAMERA_FWD, 0.1d * dt);
@@ -2655,11 +2655,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, DatasetOptions dops, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
         Path p = Paths.get(path);
         if (Files.exists(p) && Files.isReadable(p)) {
             try {
-                return loadDatasetImmediate(dsName, new FileDataSource(p.toFile()), type, dops, sync);
+                return loadDatasetImmediate(dsName, new FileDataSource(p.toFile()), type, datasetOptions, sync);
             } catch (Exception e) {
                 logger.error("Error loading file: " + p, e);
             }
@@ -2669,9 +2669,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return false;
     }
 
-    private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions dops) {
+    private List<IParticleRecord> loadParticleBeans(DataSource ds, DatasetOptions datasetOptions) {
         STILDataProvider provider = new STILDataProvider();
-        provider.setDatasetOptions(dops);
+        provider.setDatasetOptions(datasetOptions);
         return provider.loadData(ds, 1.0f, () -> {
             // Show progress bar
             EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
@@ -2708,7 +2708,6 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? "stars" : "variable stars";
 
-                            assert data != null;
                             logger.info(data.size() + " " + typeStr + " loaded");
                         });
                         // Sync waiting until the node is in the scene graph

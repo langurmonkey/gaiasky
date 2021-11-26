@@ -15,6 +15,7 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.ColormapPicker;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.DatasetPreferencesWindow;
+import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
 
@@ -163,6 +164,22 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(nObjects).left();
         }
 
+        if (ci.object instanceof ParticleGroup) {
+            OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.txt("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
+            sizeScaling.setName("star brightness");
+            sizeScaling.setWidth(320f);
+            sizeScaling.setMappedValue(ci.object.getPointscaling());
+            sizeScaling.addListener((event) -> {
+                if (event instanceof ChangeEvent) {
+                    float val = sizeScaling.getMappedValue();
+                    ci.object.setPointscaling(val);
+                }
+                return false;
+            });
+            t.row();
+            t.add(sizeScaling).left().colspan(2).padTop(pad9);
+        }
+
         VerticalGroup ciGroup = new VerticalGroup();
         ciGroup.space(pad * 2f);
         ciGroup.align(Align.left);
@@ -175,9 +192,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
         scroll.setWidth(ControlsWindow.getContentWidth() * 0.96f);
-        scroll.setHeight(130f);
+        scroll.setHeight(170f);
 
-        //ciGroup.addActor(controls);
         ciGroup.addActor(scroll);
 
         group.addActor(ciGroup);

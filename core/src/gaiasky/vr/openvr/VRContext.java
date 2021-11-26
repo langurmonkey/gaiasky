@@ -645,7 +645,7 @@ public class VRContext implements Disposable {
             RenderModelTextureMap renderModelTexture = new RenderModelTextureMap(texturePointer.getByteBuffer(RenderModelTextureMap.SIZEOF));
 
             // convert to a Model
-            IntMesh mesh = new IntMesh(true, renderModel.unVertexCount(), renderModel.unTriangleCount() * 3, VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0));
+            IntMesh mesh = new IntMesh(true, renderModel.unVertexCount(), renderModel.unTriangleCount() * 3, new VertexAttribute[]{VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0)});
             IntMeshPart meshPart = new IntMeshPart(name, mesh, 0, renderModel.unTriangleCount() * 3, GL20.GL_TRIANGLES);
             RenderModelVertex.Buffer vertices = renderModel.rVertexData();
             float[] packedVertices = new float[8 * renderModel.unVertexCount()];

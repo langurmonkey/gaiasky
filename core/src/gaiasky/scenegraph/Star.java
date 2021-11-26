@@ -231,10 +231,10 @@ public class Star extends Particle {
         if (checkHitCondition()) {
             Vector3 pos = aux3f1.get();
             Vector3b aux = aux3b1.get();
-            Vector3b posd = getAbsolutePosition(aux).add(camera.getInversePos());
-            pos.set(posd.valuesf());
+            Vector3b posD = getAbsolutePosition(aux).add(camera.getInversePos());
+            pos.set(posD.valuesf());
 
-            if (camera.direction.dot(posd) > 0) {
+            if (camera.direction.dot(posD) > 0) {
                 // The object is in front of us
                 double angle = computeViewAngle(camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1e3f;
 

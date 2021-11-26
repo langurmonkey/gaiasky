@@ -11,7 +11,7 @@ in vec2 a_additional;
 
 uniform float u_alpha;
 
-uniform mat4 u_projModelView;
+uniform mat4 u_projView;
 uniform vec3 u_camPos;
 uniform vec3 u_camDir;
 uniform float u_sizeFactor;
@@ -60,9 +60,9 @@ void main() {
 
     float viewAngle = a_additional.x / dist;
 
-    vec4 gpos = u_projModelView * vec4(pos, 1.0);
+    vec4 gpos = u_projView * vec4(pos, 1.0);
 
-    gl_Position = u_projModelView * vec4(pos, 0.0);
+    gl_Position = u_projView * vec4(pos, 0.0);
     gl_PointSize = min(max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_sizeLimits.x), u_sizeLimits.y);
 
     #ifdef velocityBufferFlag

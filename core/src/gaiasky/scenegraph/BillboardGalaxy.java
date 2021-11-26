@@ -29,9 +29,8 @@ public class BillboardGalaxy extends Billboard {
 
     protected static double TH_ANGLE_POINT_M = Math.toRadians(0.9);
 
-
     public BillboardGalaxy(){
-        super();
+       super();
     }
 
     public BillboardGalaxy(String[] names, double alpha, double delta, double dist, double sizePc, String tex) {

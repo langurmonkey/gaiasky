@@ -151,17 +151,13 @@ public class Constants {
         EventManager.instance.post(Events.NEW_DISTANCE_SCALE_FACTOR);
     }
 
-    /**
-     * Factor we need to use to get the real size of the star given its quad
-     * *texture* size
-     **/
     public static final double STAR_SIZE_FACTOR = 1.31526e-6;
 
     /** Threshold radius/distance where star size remains constant. **/
     public static final double THRESHOLD_DOWN = 5e-7;
     public static final double THRESHOLD_UP = 1e-2;
 
-    /**
+    /*
      *
      * MAXIMUM AND MINIMUM VALUES FOR SEVERAL PARAMETERS - THESE SHOULD BE
      * ENFORCED
@@ -180,6 +176,9 @@ public class Constants {
     public static final float SLIDER_STEP_SMALL = 0.1f;
     /** Default step value for sliders (tiny) **/
     public static final float SLIDER_STEP_TINY = 0.01f;
+
+    public static final float MIN_POINT_SIZE_SCALE = 0.2f;
+    public static final float MAX_POINT_SIZE_SCALE = 3f;
 
     /** Maximum fov value, in degrees **/
     public static final float MAX_FOV = 95f;
@@ -222,7 +221,7 @@ public class Constants {
     /** Minimum star pixel size **/
     public static final float MIN_STAR_POINT_SIZE = 0.1f;
     /** Maximum star pixel size **/
-    public static final float MAX_STAR_POINT_SIZE = 40f;
+    public static final float MAX_STAR_POINT_SIZE = 20f;
 
     /** Minimum star minimum opacity **/
     public static final float MIN_STAR_MIN_OPACITY = 0.0f;

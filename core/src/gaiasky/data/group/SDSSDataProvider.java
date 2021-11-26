@@ -27,7 +27,9 @@ import java.util.Map;
 
 /**
  * Loads SDSS data from a text file with a series of [ra, dec, z]
+ * @deprecated Use {@link STILDataProvider} with VOTable instead.
  */
+@Deprecated
 public class SDSSDataProvider implements IParticleGroupDataProvider {
     private static final Log logger = Logger.getLogger(SDSSDataProvider.class);
 

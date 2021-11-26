@@ -40,7 +40,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
     protected static TLV3B aux3b1 = new TLV3B(), aux3b2 = new TLV3B(), aux3b3 = new TLV3B(), aux3b4 = new TLV3B();
-    protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3();
+    protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3(), aux3f5 = new TLV3();
 
     /**
      * Inserts the given node into the default scene graph, if it exists.
@@ -1147,7 +1147,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
             // Enable or disable blending
             ((I3DTextRenderable) this).textDepthBuffer();
 
-            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera.getCamera(), !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
+            DecalUtils.drawFont3D(font, batch, label, (float) pos.x, (float) pos.y, (float) pos.z, size, rot, camera, !rc.isCubemap(), minSizeDegrees, maxSizeDegrees);
         }
     }
 

@@ -13,6 +13,7 @@ public class ModePopupInfo {
     public String title;
     public String header;
     public Array<Pair<String[], String>> mappings;
+    public String warn;
 
 
     public void initMappings(){

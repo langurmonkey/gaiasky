@@ -79,7 +79,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Profile decay of the particles in the shader
      */
-    public float profileDecay = 4.0f;
+    public float profileDecay = 0.2f;
 
     /**
      * Noise factor for the color in [0,1]
@@ -87,9 +87,14 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public float colorNoise = 0;
 
     /**
-     * Particle size limits, in pixels
+     * Particle size limits
      */
-    public double[] particleSizeLimits = new double[] { 3.5d, 800d };
+    public double[] particleSizeLimitsPoint = new double[] { 3.5d, 800d };
+    /**
+     * Particle size limits for the GL_TRIANGLES renderer. This will be multiplied by
+     * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
+     */
+    public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) };
 
     /**
      * Are the data of this group in the GPU memory?
@@ -97,7 +102,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     private boolean inGpu;
 
     // Offset and count for this group
-    public int offset, count;
+    public int offset = -1, count = -1;
 
     /**
      * This flag indicates whether the mean position is already given by the
@@ -926,7 +931,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     public float highlightedSizeFactor() {
-        return (highlighted && catalogInfo != null) ? catalogInfo.hlSizeFactor : 1f;
+        return (highlighted && catalogInfo != null) ? catalogInfo.hlSizeFactor : getPointscaling();
     }
 
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {

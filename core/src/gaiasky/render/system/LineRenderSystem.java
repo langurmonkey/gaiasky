@@ -22,7 +22,7 @@ import org.lwjgl.opengl.GL30;
 
 import java.util.Comparator;
 
-public class LineRenderSystem extends ImmediateRenderSystem {
+public class LineRenderSystem extends ImmediateModeRenderSystem {
     protected ICamera camera;
     protected Vector3 aux2;
 

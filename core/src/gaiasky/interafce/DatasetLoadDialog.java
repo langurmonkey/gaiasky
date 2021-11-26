@@ -414,33 +414,33 @@ public class DatasetLoadDialog extends GenericDialog {
     }
 
     public DatasetOptions generateDatasetOptions() {
-        DatasetOptions dops = new DatasetOptions();
+        DatasetOptions datasetOptions = new DatasetOptions();
 
         if (stars.isChecked()) {
-            dops.type = DatasetLoadType.STARS;
-            dops.magnitudeScale = magnitudeScale.getDoubleValue(0);
+            datasetOptions.type = DatasetLoadType.STARS;
+            datasetOptions.magnitudeScale = magnitudeScale.getDoubleValue(0);
         } else if (particles.isChecked()) {
-            dops.type = DatasetLoadType.PARTICLES;
-            dops.ct = componentType.getSelected();
-            dops.profileDecay = profileDecay.getDoubleValue(5d);
-            dops.particleColor = particleColor.getPickedColorDouble();
-            dops.particleColorNoise = colorNoise.getValue();
-            dops.particleSize = particleSize.getValue();
-            dops.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * dops.particleSize) };
+            datasetOptions.type = DatasetLoadType.PARTICLES;
+            datasetOptions.ct = componentType.getSelected();
+            datasetOptions.profileDecay = profileDecay.getDoubleValue(5d);
+            datasetOptions.particleColor = particleColor.getPickedColorDouble();
+            datasetOptions.particleColorNoise = colorNoise.getValue();
+            datasetOptions.particleSize = particleSize.getValue();
+            datasetOptions.particleSizeLimits = new double[] { 2.5d, Math.min(100d, 5d * datasetOptions.particleSize) };
         } else if (clusters.isChecked()) {
-            dops.type = DatasetLoadType.CLUSTERS;
-            dops.ct = componentType.getSelected();
-            dops.particleColor = particleColor.getPickedColorDouble();
+            datasetOptions.type = DatasetLoadType.CLUSTERS;
+            datasetOptions.ct = componentType.getSelected();
+            datasetOptions.particleColor = particleColor.getPickedColorDouble();
         } else if (variables.isChecked()) {
-            dops.type = DatasetLoadType.VARIABLES;
-            dops.magnitudeScale = magnitudeScale.getDoubleValue(0);
+            datasetOptions.type = DatasetLoadType.VARIABLES;
+            datasetOptions.magnitudeScale = magnitudeScale.getDoubleValue(0);
         }
         // Common properties
-        dops.catalogName = dsName.getText();
-        dops.labelColor = labelColor.getPickedColorDouble();
-        addFadeInfo(dops);
+        datasetOptions.catalogName = dsName.getText();
+        datasetOptions.labelColor = labelColor.getPickedColorDouble();
+        addFadeInfo(datasetOptions);
 
-        return dops;
+        return datasetOptions;
     }
 
     private void addFadeInfo(DatasetOptions dops) {

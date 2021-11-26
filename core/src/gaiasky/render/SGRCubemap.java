@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -19,6 +20,7 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.contrib.postprocess.effects.Mosaic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +41,8 @@ public abstract class SGRCubemap extends SGRAbstract {
     // Angle from zenith, for planetarium mode
     protected float angleFromZenith = 0;
 
+    private final Mosaic mosaic;
+
     // Frame buffers
     protected FrameBuffer zPosFb, zNegFb, xPosFb, xNegFb, yPosFb, yNegFb;
     // Flags
@@ -53,6 +57,8 @@ public abstract class SGRCubemap extends SGRAbstract {
         upBak = new Vector3();
         dirUpCrs = new Vector3();
         stretchViewport = new StretchViewport(Gdx.graphics.getHeight(), Gdx.graphics.getHeight());
+
+        mosaic = new Mosaic(0, 0);
 
         xPosFlag = true;
         xNegFlag = true;
@@ -176,10 +182,95 @@ public abstract class SGRCubemap extends SGRAbstract {
     }
 
     protected void renderFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
-        renderRegularFace(fb, camera, sgr, ppb, rw, rh, wh, t);
+        renderRegularFace90(fb, camera, sgr, ppb, rw, rh, wh, t);
     }
 
-    protected void renderRegularFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+    protected void renderRegularFace45(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+
+        // -----------------
+        // |       |       |
+        // |  TL   |   TR  |
+        // |       |       |
+        // -----------------
+        // |       |       |
+        // |  BL   |   BR  |
+        // |       |       |
+        // -----------------
+
+        wh = wh / 2;
+
+        FrameBuffer tlFb = getFrameBuffer(wh, wh, 10);
+        FrameBuffer blFb = getFrameBuffer(wh, wh, 11);
+        FrameBuffer trFb = getFrameBuffer(wh, wh, 12);
+        FrameBuffer brFb = getFrameBuffer(wh, wh, 13);
+
+        float fov = 45f;
+        float fov2 = fov / 2f;
+
+        EventManager.instance.post(Events.FOV_CHANGED_CMD, fov);
+
+        PerspectiveCamera cam = camera.getCamera();
+
+        Vector3 upBak = aux2.set(cam.up);
+        Vector3 dirBak = aux3.set(cam.direction);
+
+        // TL
+        cam.direction.rotate(upBak, fov2);
+        Vector3 dirUpX = aux1.set(cam.direction).crs(upBak);
+        cam.direction.rotate(dirUpX, fov2);
+        cam.up.rotate(dirUpX, fov2);
+        cam.update();
+
+        renderFacePart(tlFb, camera, sgr, ppb, rw, rh, wh, t);
+
+        // BL
+        cam.direction.rotate(dirUpX, -fov);
+        cam.up.rotate(dirUpX, -fov);
+        cam.update();
+
+        renderFacePart(blFb, camera, sgr, ppb, rw, rh, wh, t);
+
+        // Reset
+        cam.direction.set(dirBak);
+        cam.up.set(upBak);
+
+        // TR
+        cam.direction.rotate(upBak, -fov2);
+        dirUpX = aux1.set(cam.direction).crs(upBak);
+        cam.direction.rotate(dirUpX, fov2);
+        cam.up.rotate(dirUpX, fov2);
+        cam.update();
+
+        renderFacePart(trFb, camera, sgr, ppb, rw, rh, wh, t);
+
+        // BR
+        cam.direction.rotate(dirUpX, -fov);
+        cam.up.rotate(dirUpX, -fov);
+        cam.update();
+
+        renderFacePart(brFb, camera, sgr, ppb, rw, rh, wh, t);
+
+        // Render mosaic to fb
+        mosaic.setViewportSize(wh, wh);
+        mosaic.setTiles(tlFb, blFb, trFb, brFb);
+        mosaic.render(null, fb, null);
+
+        // Reset camera
+        cam.direction.set(dirBak);
+        cam.up.set(upBak);
+        cam.update();
+    }
+
+    private void renderFacePart(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
+        sgr.renderGlowPass(camera, null);
+
+        boolean postProcess = postProcessCapture(ppb, fb, wh, wh);
+        sgr.renderScene(camera, t, rc);
+        sendOrientationUpdate(camera.getCamera(), rw, rh);
+        postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+    }
+
+    protected void renderRegularFace90(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
         sgr.renderGlowPass(camera, null);
 
         boolean postProcess = postProcessCapture(ppb, fb, wh, wh);

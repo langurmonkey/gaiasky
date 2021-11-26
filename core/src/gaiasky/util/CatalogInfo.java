@@ -46,7 +46,7 @@ public class CatalogInfo {
     public double hlCmapMin = 0, hlCmapMax = 0;
 
 
-    // The filter object. May be null
+    // The filtering object. May be null
     public Filter filter;
 
     // Catalog type

@@ -13,14 +13,16 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
-public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
-    protected static final Log logger = Logger.getLogger(ImmediateRenderSystem.class);
+public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
+    protected static final Log logger = Logger.getLogger(ImmediateModeRenderSystem.class);
 
     protected int meshIdx;
     protected Array<MeshData> meshes;
     protected MeshData curr;
     // Auxiliary array that holds vertices temporarily
     protected float[] tempVerts;
+    // Auxiliary array that holds indices temporarily
+    protected int[] tempIndices;
 
     protected static class MeshData {
 
@@ -35,6 +37,10 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         // Vertex array, this usually is just a reference to an external temp array
         protected float[] vertices;
 
+        protected int instanceIdx;
+        protected int instanceSize;
+        protected float[] instance;
+
         protected int indexIdx;
         protected int indexVert;
         protected int[] indices;
@@ -42,6 +48,7 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         protected int capacity;
 
         public void clear() {
+            instanceIdx = 0;
             vertexIdx = 0;
             indexIdx = 0;
             indexVert = 0;
@@ -53,6 +60,18 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
             vertices = null;
             indices = null;
         }
+    }
+
+    protected static class OwnUsage {
+        public static final int Size = 512;
+        public static final int NumVariablePoints = 1024;
+        public static final int VariableMagnitudes = 2048;
+        public static final int VariableTimes = 4096;
+        public static final int ObjectPosition = 8192;
+        public static final int ProperMotion = 16384;
+        public static final int Additional = 20000;
+        public static final int OrbitElems1 = 21000;
+        public static final int OrbitElems2 = 22000;
     }
 
     /**
@@ -104,11 +123,11 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
         }
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
+    protected ImmediateModeRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs) {
         this(rg, alphas, programs, -1);
     }
 
-    protected ImmediateRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
+    protected ImmediateModeRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int tempVertsSize) {
         super(rg, alphas, programs);
         initShaderProgram();
         initVertices();
@@ -136,6 +155,18 @@ public abstract class ImmediateRenderSystem extends AbstractRenderSystem {
     protected void ensureTempVertsSize(int size){
         if(tempVerts == null || tempVerts.length < size) {
             tempVerts = new float[size];
+        }
+    }
+
+    /**
+     * This function makes sure that the tempIndices array has at least
+     * the given size. After calling this function, the elements of tempIndices
+     * may have been cleared.
+     * @param size The size to ensure
+     */
+    protected void ensureTempIndicesSize(int size) {
+        if(tempIndices == null || tempIndices.length < size) {
+            tempIndices = new int[size];
         }
     }
 

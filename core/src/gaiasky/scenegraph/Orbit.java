@@ -281,7 +281,7 @@ public class Orbit extends Polyline {
             Vector3d bodyPos = aux3d1.get().setZero();
             if (orbitTrail) {
                 float top = alpha;
-                float bottom = -0f;
+                float bottom = 0f;
                 dAlpha = (top - bottom) / nPoints;
                 Instant currentTime = GaiaSky.instance.time.getTime();
                 long wrapTime = pointCloudData.getWrapTimeMs(currentTime);

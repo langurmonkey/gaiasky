@@ -26,6 +26,7 @@ import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.coord.AstroUtils;
+import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.math.Vector2d;
 import gaiasky.util.math.Vector3b;
@@ -64,9 +65,9 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             switch (event) {
             case FOV_CHANGE_NOTIFICATION:
                 fovFactor = (Float) data[1];
-                thpointTimesFovfactor = (float) Settings.settings.scene.star.threshold.point * fovFactor;
-                thupOverFovfactor = (float) Constants.THRESHOLD_UP / fovFactor;
-                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN / fovFactor;
+                thpointTimesFovfactor = (float) Settings.settings.scene.star.threshold.point;
+                thupOverFovfactor = (float) Constants.THRESHOLD_UP;
+                thdownOverFovfactor = (float) Constants.THRESHOLD_DOWN;
                 break;
             case STAR_POINT_SIZE_CMD:
                 innerRad = (0.004f * DISC_FACTOR + (Float) data[0] * 0.008f) * 1.5f;
@@ -238,7 +239,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             }
         }
 
-        innerRad = 0.01f * DISC_FACTOR + settings.scene.star.pointSize * 0.016f;
+        innerRad = 0.01f * DISC_FACTOR + settings.scene.star.pointSize * 0.005f;
     }
 
     @Override
@@ -340,7 +341,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             computedSize *= (dist / this.radius) * Constants.THRESHOLD_DOWN;
         }
 
-        computedSize *= Settings.settings.scene.star.brightness * 0.15f;
+        computedSize *= Settings.settings.scene.star.pointSize * 0.2f;
         return (float) computedSize;
     }
 
@@ -361,8 +362,12 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
             // Convert to cartesian coordinates and put them in aux3 vector
-            //Coordinates.cartesianToSpherical(pos, aux3);
-            posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+            if (pos.len2d() == 0) {
+                // Sun!
+            } else {
+                Coordinates.cartesianToSpherical(pos, aux3);
+                posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
+            }
             // Update angle
             if (rc != null)
                 rc.update(time);

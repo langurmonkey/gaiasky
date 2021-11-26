@@ -4,13 +4,14 @@
 #include shader/lib_dither8x8.glsl
 #include shader/lib_logdepthbuff.glsl
 
-uniform float u_ar;
 uniform float u_alpha;
 uniform float u_zfar;
 uniform float u_k;
 uniform sampler2DArray u_textures;
 
+// INPUT
 in vec4 v_col;
+in vec2 v_uv;
 // 0 - dust
 // 1 - star
 // 2 - bulge
@@ -25,6 +26,7 @@ flat in int v_layer;
 #define T_GAS 3
 #define T_HII 4
 
+// OUTPUT
 layout (location = 0) out vec4 fragColor;
 
 #ifdef velocityBufferFlag
@@ -55,9 +57,8 @@ vec4 colorTex(float alpha, vec2 uv) {
 }
 
 void main() {
-    vec2 uv = vec2(gl_PointCoord.x, gl_PointCoord.y);
-    uv.y = uv.y * u_ar;
-    float dist = min(1.0, distance(vec2(0.5, 0.5 * u_ar), uv) * 2.0);
+    vec2 uv = v_uv;
+    float dist = min(1.0, distance(vec2(0.5), uv) * 2.0);
     if (dist >= 1.0){
         discard;
     }
@@ -65,19 +66,26 @@ void main() {
     if (v_type == T_DUST){
         //fragColor = colorDust(u_alpha, dist);
         fragColor = colorDustTex(u_alpha, uv);
-        if (fragColor.a < 1.0){
-            if (dither(gl_FragCoord.xy, fragColor.a) < 0.5)
-            discard;
+        if (fragColor.a < 1.0) {
+            if (dither(gl_FragCoord.xy, fragColor.a) < 0.5) {
+                discard;
+            }
         }
     } else {
         fragColor = colorTex(u_alpha, uv);
     }
-    //else {
+    //} else {
     //    fragColor = colorStar(u_alpha, dist);
     //}
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    // Add outline
+    //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
+    //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    //}
+
 
     #ifdef velocityBufferFlag
     velocityBuffer(programmatic(dist));

@@ -8,11 +8,13 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
@@ -326,6 +328,7 @@ public class Settings {
                 EventManager.instance.subscribe(this, Events.CAMERA_CINEMATIC_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD);
             }
 
+            @JsonProperty("speedLimitIndex")
             public void setSpeedLimitIndex(int index) {
                 this.speedLimitIndex = index;
                 updateSpeedLimit();
@@ -402,8 +405,8 @@ public class Settings {
             public float power;
             public float pointSize;
             @JsonIgnore private float pointSizeBak;
-            public int textureIndex;
             public float[] opacity;
+            public int textureIndex;
             public GroupSettings group;
             public ThresholdSettings threshold;
             @JsonIgnore public boolean colorTransit;
@@ -478,15 +481,15 @@ public class Settings {
                     pointSize = (float) data[0];
                     break;
                 case STAR_POINT_SIZE_INCREASE_CMD:
-                    float size = Math.min(pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
+                    float size = Math.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
                     EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
                     break;
                 case STAR_POINT_SIZE_DECREASE_CMD:
-                    size = Math.max(pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
+                    size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
                     EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
                     break;
                 case STAR_POINT_SIZE_RESET_CMD:
-                    pointSize = pointSizeBak;
+                    this.pointSize = pointSizeBak;
                     break;
                 case STAR_MIN_OPACITY_CMD:
                     opacity[0] = (float) data[0];
@@ -588,6 +591,7 @@ public class Settings {
 
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class RendererSettings implements IObserver {
+            public PointCloudMode pointCloud = PointCloudMode.POINTS;
             public LineMode line;
             public double ambient;
             public ShadowSettings shadow;
@@ -613,6 +617,18 @@ public class Settings {
                 public void setType(final String typeString) {
                     this.type = ElevationType.valueOf(typeString.toUpperCase());
                 }
+            }
+
+            @JsonProperty("pointCloud")
+            public void setPointCloud(String pointCloud) {
+                if (pointCloud == null || pointCloud.isEmpty()) {
+                    // Default
+                    pointCloud = "POINTS";
+                }
+                if (pointCloud.startsWith("GL_")) {
+                    pointCloud = pointCloud.substring(3);
+                }
+                this.pointCloud = PointCloudMode.valueOf(pointCloud.toUpperCase(Locale.ROOT));
             }
 
             @JsonIgnore
@@ -910,9 +926,12 @@ public class Settings {
                 return scale > 1.5;
             }
 
+            @JsonProperty("distanceUnits")
             public void setDistanceUnits(String distanceUnits) {
-                if (distanceUnits == null)
+                if (distanceUnits == null || distanceUnits.isEmpty()) {
+                    // Default
                     distanceUnits = "PC";
+                }
                 this.distanceUnits = DistanceUnits.valueOf(distanceUnits.toUpperCase());
             }
 
@@ -962,14 +981,20 @@ public class Settings {
                     // Post a message to the screen
                     ModePopupInfo mpi = new ModePopupInfo();
                     if (modeCubemap.projection.isPanorama()) {
-                        mpi.title = "Panorama mode";
-                        mpi.header = "You have entered Panorama mode!";
-                        mpi.addMapping("Back to normal mode", "CTRL", "K");
-                        mpi.addMapping("Switch projection type", "CTRL", "SHIFT", "K");
+                        String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.360");
+                        String[] keysStrProj = KeyBindings.instance.getStringArrayKeys("action.toggle/element.projection");
+                        mpi.title = I18n.txt("gui.360.title");
+                        mpi.header = I18n.txt("gui.360.notice.header");
+                        mpi.addMapping(I18n.txt("gui.360.notice.back"), keysStrToggle);
+                        mpi.addMapping(I18n.txt("gui.360.notice.projection"), keysStrProj);
+                        if(settings.scene.renderer.pointCloud.isPoints()){
+                            mpi.warn = I18n.txt("gui.360.notice.renderer");
+                        }
                     } else if (modeCubemap.projection.isPlanetarium()) {
-                        mpi.title = "Planetarium mode";
-                        mpi.header = "You have entered Planetarium mode!";
-                        mpi.addMapping("Back to normal mode", "CTRL", "P");
+                        String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
+                        mpi.title = I18n.txt("gui.planetarium.title");
+                        mpi.header = I18n.txt("gui.planetarium.notice.header");
+                        mpi.addMapping(I18n.txt("gui.planetarium.notice.back"), keysStr);
                     }
 
                     EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "cubemap", 120f);
@@ -979,7 +1004,7 @@ public class Settings {
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 modeCubemap.projection = (CubemapProjections.CubemapProjection) data[0];
-                logger.info("Cubemap projection set to " + modeCubemap.projection.toString());
+                logger.info(I18n.txt("gui.360.projection",modeCubemap.projection.toString()));
                 break;
             case CUBEMAP_RESOLUTION_CMD:
                 modeCubemap.faceResolution = (int) data[0];
@@ -1339,11 +1364,11 @@ public class Settings {
 
                 // Post a message to the screen
                 if (fisheye) {
+                    String[] keysStr = KeyBindings.instance.getStringArrayKeys("action.toggle/element.planetarium");
                     ModePopupInfo mpi = new ModePopupInfo();
-                    mpi.title = "Planetarium mode";
-                    mpi.header = "You have entered Planetarium mode!";
-                    mpi.addMapping("Back to normal mode", "CTRL", "P");
-                    mpi.addMapping("Switch planetarium mode type", "CTRL", "SHIFT", "P");
+                    mpi.title = I18n.txt("gui.planetarium.title");
+                    mpi.header = I18n.txt("gui.planetarium.notice.header");
+                    mpi.addMapping(I18n.txt("gui.planetarium.notice.back"), keysStr);
 
                     EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "planetarium", 120f);
                 } else {
@@ -1655,6 +1680,20 @@ public class Settings {
         UNCHARTED,
         FILMIC,
         NONE
+    }
+
+    public enum PointCloudMode {
+        TRIANGLES,
+        TRIANGLES_INSTANCED,
+        POINTS;
+
+        public boolean isPoints() {
+            return this.equals(POINTS);
+        }
+
+        public boolean isTriangles() {
+            return this.equals(TRIANGLES) || this.equals(TRIANGLES_INSTANCED);
+        }
     }
 
     public enum LineMode {

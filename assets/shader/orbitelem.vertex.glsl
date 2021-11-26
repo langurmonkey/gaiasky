@@ -3,23 +3,28 @@
 #include shader/lib_geometry.glsl
 #include shader/lib_doublefloat.glsl
 
+// UNIFORMS
+uniform mat4 u_projView;
+uniform vec3 u_camPos;
+uniform float u_alpha;
+uniform float u_sizeFactor;
+uniform mat4 u_eclToEq;
+// Current julian date, in days, emulates a double in vec2
+uniform vec2 u_t;
+// VR scale factor
+uniform float u_vrScale;
+
+// INPUT
+in vec4 a_position;
+in vec2 a_texCoord;
 in vec4 a_color;
 in vec4 a_orbitelems01;
 in vec4 a_orbitelems02;
 in float a_size;
 
-uniform mat4 u_projView;
-uniform mat4 u_eclToEq;
-uniform vec3 u_camPos;
-uniform vec3 u_camDir;
-uniform float u_alpha;
-uniform float u_size;
-uniform float u_scaleFactor;
-uniform int u_cubemap;
-// Current julian date, in days, emulates a double in vec2
-uniform vec2 u_t;
-// VR scale factor
-uniform float u_vrScale;
+// OUTPUT
+out vec4 v_col;
+out vec2 v_uv;
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
@@ -28,8 +33,6 @@ uniform float u_vrScale;
 #ifdef gravitationalWaves
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
-    
-out vec4 v_col;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -109,14 +112,6 @@ void main() {
     // Distance to point
     float dist = length(pos);
 
-    float cubemapSizeFactor = 1.0;
-    if(u_cubemap == 1) {
-        // Cosine of angle between star position and camera direction
-        // Correct point primitive size error due to perspective projection
-        float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);
-        cubemapSizeFactor = 1.0 - cosphi * 0.65;
-    }
-
     #ifdef relativisticEffects
         pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -125,14 +120,22 @@ void main() {
         pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
     
-    v_col = a_color * u_alpha;
+    v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
-    vec4 gpos = u_projView * vec4(pos, 0.0);
+    float quadSize = a_size * u_sizeFactor;
+
+    // Use billboard snippet
+    vec4 s_vert_pos = a_position;
+    vec3 s_obj_pos = pos;
+    mat4 s_proj_view = u_projView;
+    float s_size = quadSize;
+    #include shader/snip_billboard.glsl
+
     gl_Position = gpos;
-    float distNorm = dist / 300.0;
-    gl_PointSize = clamp(u_size / distNorm, 1.5, 3.5) * u_scaleFactor * cubemapSizeFactor * a_size;
+
+    v_uv = a_texCoord;
 
     #ifdef velocityBufferFlag
-    velocityBuffer(gpos, pos4.xyz, dist);
+    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
     #endif
 }

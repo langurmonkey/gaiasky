@@ -336,14 +336,18 @@ public enum Events {
     DISPOSE,
 
     /**
-     * Contains an index to the particle group mesh to be cleared
+     * Contains the index to the particle group mesh to be cleared
      **/
     DISPOSE_PARTICLE_GROUP_GPU_MESH,
 
     /**
-     * Contains an the index of the star group mesh to be cleared
+     * Contains the index of the star group mesh to be cleared
      **/
     DISPOSE_STAR_GROUP_GPU_MESH,
+    /**
+     * Contains the index of the variable group mesh to be cleared
+     **/
+    DISPOSE_VARIABLE_GROUP_GPU_MESH,
 
     /**
      * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}]
@@ -1302,6 +1306,10 @@ public enum Events {
      * Issues the command to reload the UI, contains the {@link gaiasky.util.GlobalResources} instance.
      */
     UI_RELOAD_CMD,
+    /**
+     * Displays a dialog to restart. Contains the text, or nothing.
+     */
+    SHOW_RESTART_ACTION,
     /**
      * Informs the UI theme has been reloaded. Contains the new skin.
      */

@@ -7,7 +7,7 @@ package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.IPostProcessor.PostProcessBean;
-import gaiasky.render.system.StarGroupRenderSystem;
+import gaiasky.render.system.StarGroupPointRenderSystem;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -33,12 +33,12 @@ public class SGRFov extends SGRAbstract implements ISGR {
         int fovMode = camera.getMode().getGaiaFovMode();
         if (fovMode == 1 || fovMode == 3) {
             cam.dirIndex = 0;
-            sgr.renderSystem(camera, t, rc, StarGroupRenderSystem.class);
+            sgr.renderSystem(camera, t, rc, StarGroupPointRenderSystem.class);
         }
 
         if (fovMode == 2 || fovMode == 3) {
             cam.dirIndex = 1;
-            sgr.renderSystem(camera, t, rc, StarGroupRenderSystem.class);
+            sgr.renderSystem(camera, t, rc, StarGroupPointRenderSystem.class);
         }
 
         sendOrientationUpdate(camera.getCamera(), rw, rh);

@@ -173,11 +173,17 @@ void main() {
     pixelColor = unchartedToneMapping(pixelColor);
     #endif //toneMappingUncharted
 
+
     // Gamma correction
     pixelColor = pow(pixelColor, vec3(1.0 / u_gamma));
 
     // Final color
     fragColor = vec4(pixelColor, 1.0);
+
+    // Mark edges of screen in yellow
+    //if(v_texCoords.x > 0.999 || v_texCoords.x < 0.001 || v_texCoords.y > 0.999 || v_texCoords.y < 0.001) {
+    //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    //}
 
     // Saturation in red
     //if(brightness(fragColor) > 1.0){

@@ -1,14 +1,12 @@
 #version 330
 
-#include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
 in vec4 a_position;
 in vec2 a_texCoord0;
 
-uniform mat4 u_projTrans;
+uniform mat4 u_projView;
 uniform vec4 u_color;
-uniform vec4 u_quaternion;
 uniform vec3 u_pos;
 uniform float u_size;
 uniform vec3 u_camShift;
@@ -29,8 +27,6 @@ void main()
     v_color = u_color;
     v_texCoords = a_texCoord0;
 
-    mat4 transform = u_projTrans;
-
     vec3 pos = u_pos - u_camShift;
 
     #ifdef relativisticEffects
@@ -41,45 +37,12 @@ void main()
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    // Translate
-    mat4 translate = mat4(1.0);
+    // Use billboard snippet
+    vec4 s_vert_pos = a_position;
+    vec3 s_obj_pos = pos;
+    mat4 s_proj_view = u_projView;
+    float s_size = u_size;
+    #include shader/snip_billboard.glsl
 
-    translate[3][0] = pos.x;
-    translate[3][1] = pos.y;
-    translate[3][2] = pos.z;
-    translate[3][3] = 1.0;
-    transform *= translate;
-
-    // Rotate
-    mat4 rotation = mat4(0.0);
-    float xx = u_quaternion.x * u_quaternion.x;
-    float xy = u_quaternion.x * u_quaternion.y;
-    float xz = u_quaternion.x * u_quaternion.z;
-    float xw = u_quaternion.x * u_quaternion.w;
-    float yy = u_quaternion.y * u_quaternion.y;
-    float yz = u_quaternion.y * u_quaternion.z;
-    float yw = u_quaternion.y * u_quaternion.w;
-    float zz = u_quaternion.z * u_quaternion.z;
-    float zw = u_quaternion.z * u_quaternion.w;
-
-    rotation[0][0] = 1.0 - 2.0 * (yy + zz);
-    rotation[1][0] = 2.0 * (xy - zw);
-    rotation[2][0] = 2.0 * (xz + yw);
-    rotation[0][1] = 2.0 * (xy + zw);
-    rotation[1][1] = 1.0 - 2.0 * (xx + zz);
-    rotation[2][1] = 2.0 * (yz - xw);
-    rotation[3][1] = 0.0;
-    rotation[0][2] = 2.0 * (xz - yw);
-    rotation[1][2] = 2.0 * (yz + xw);
-    rotation[2][2] = 1.0 - 2.0 * (xx + yy);
-    rotation[3][3] = 1.0;
-    transform *= rotation;
-
-    // Scale
-    transform[0][0] *= u_size;
-    transform[1][1] *= u_size;
-    transform[2][2] *= u_size;
-
-    // Position
-    gl_Position =  transform * a_position;
+    gl_Position = gpos;
 }

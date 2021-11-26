@@ -68,7 +68,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     /** Colour for stars that have been observed by Gaia **/
     public float[] ccTransit;
 
-
     /**
      * The B-V color index, calculated as the magnitude in B minus the magnitude
      * in V
@@ -102,9 +101,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         compalpha = alpha;
 
         float size = getFuzzyRenderSize(camera);
-
-        Vector3 aux = aux3f1.get();
-        shader.setUniformf("u_pos", translation.put(aux));
+        shader.setUniformf("u_pos", translation.put(aux3f1.get()));
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", ccPale[0], ccPale[1], ccPale[2], alpha * opacity);
@@ -118,8 +115,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
         shader.setUniformf("u_radius", (float) getRadius());
 
-        // Sprite.render
-        mesh.render(shader, GL20.GL_TRIANGLES);
+        // Render the mesh
+        mesh.render(shader, GL20.GL_TRIANGLES, 0, 6);
     }
 
     public float getFuzzyRenderSize(ICamera camera) {
@@ -132,7 +129,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
                 size = this.size;
             }
         }
-        return (float) size / camera.getFovFactor();
+        return (float) (size / camera.getFovFactor());
     }
 
     /**
@@ -205,7 +202,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     /**
      * Adds all the children that are focusable objects to the list.
-     * 
+     *
      * @param list The list to add to.
      */
     public void addFocusableObjects(Array<IFocus> list) {
@@ -219,9 +216,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     /**
      * Sets the size of this entity in kilometers
-     * 
-     * @param size
-     *            The size in km
+     *
+     * @param size The size in km
      */
     public void setSize(Double size) {
         // Size gives us the radius, and we want the diameter
@@ -438,14 +434,13 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     @Override
-    public float getTextOpacity(){
+    public float getTextOpacity() {
         return getOpacity();
     }
 
     public void setAltname(String altname) {
         this.addName(altname);
     }
-
 
     @Override
     public IFocus getFocus(String name) {
@@ -466,12 +461,12 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     }
 
     @Override
-    public double getClosestDistToCamera(){
+    public double getClosestDistToCamera() {
         return getDistToCamera();
     }
 
     @Override
-    public Vector3b getClosestAbsolutePos(Vector3b out){
+    public Vector3b getClosestAbsolutePos(Vector3b out) {
         return getAbsolutePosition(out);
     }
 

@@ -19,7 +19,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class PointRenderSystem extends ImmediateRenderSystem {
+public class PointRenderSystem extends ImmediateModeRenderSystem {
     protected ICamera camera;
     protected int glType;
     private int sizeOffset;

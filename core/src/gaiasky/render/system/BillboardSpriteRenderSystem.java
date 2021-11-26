@@ -24,7 +24,6 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
 
     private IntMesh mesh;
-    private Quaternion quaternion;
     private final int ctIndex;
 
     public BillboardSpriteRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] programs, int ctIndex, float w, float h) {
@@ -56,9 +55,7 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         float[] vertices = new float[20];
         fillVertices(vertices, w, h);
 
-        // We wont need indices if we use GL_TRIANGLE_FAN to draw our quad
-        // TRIANGLE_FAN will draw the verts in this order: 0, 1, 2; 0, 2, 3
-        mesh = new IntMesh(true, 4, 6, new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
+        mesh = new IntMesh(true, 4, 6, new VertexAttribute[]{new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE), new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE), new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0")});
 
         mesh.setVertices(vertices, 0, vertices.length);
         mesh.getIndicesBuffer().position(0);
@@ -67,7 +64,6 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         int[] indices = new int[] { 0, 1, 2, 0, 2, 3 };
         mesh.setIndices(indices);
 
-        quaternion = new Quaternion();
         aux = new Vector3();
 
     }
@@ -79,9 +75,9 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         float height = -h;
         final float fx2 = x + width;
         final float fy2 = y + height;
-        final float u = 0;
+        final float u = 1;
         final float v = 1;
-        final float u2 = 1;
+        final float u2 = 0;
         final float v2 = 0;
 
         final float color = Color.WHITE.toFloatBits();
@@ -117,23 +113,18 @@ public class BillboardSpriteRenderSystem extends AbstractRenderSystem {
         if ((ctIndex < 0 || alphas[ctIndex] != 0)) {
             renderables.sort(comp);
 
-            // Calculate billobard rotation quaternion ONCE
-            DecalUtils.setBillboardRotation(quaternion, camera.getCamera().direction, camera.getCamera().up);
-
             ExtShaderProgram shaderProgram = getShaderProgram();
 
             shaderProgram.begin();
 
-            // General uniforms
-            shaderProgram.setUniformMatrix("u_projTrans", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_quaternion", quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+            // Global uniforms
+            shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+            shaderProgram.setUniformf("u_time", (float) t);
 
             // Rel, grav, z-buffer
             addEffectsUniforms(shaderProgram, camera);
 
-            // Global uniforms
-            shaderProgram.setUniformf("u_time", (float) t);
-
+            // Render each sprite
             renderables.forEach(r -> {
                 IQuadRenderable s = (IQuadRenderable) r;
                 s.render(shaderProgram, getAlpha(s), mesh, camera);

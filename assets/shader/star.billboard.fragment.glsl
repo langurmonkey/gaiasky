@@ -15,8 +15,8 @@ uniform int u_lightScattering;
 uniform float u_zfar;
 uniform float u_k;
 
-// v_texCoords are UV coordinates in [0..1]
-in vec2 v_texCoords;
+// v_uv are UV coordinates in [0..1]
+in vec2 v_uv;
 in vec4 v_color;
 
 layout (location = 0) out vec4 fragColor;
@@ -61,7 +61,7 @@ float starTexture(vec2 uv){
 
 
 vec4 draw() {
-    float dist = clamp(distance(vec2 (0.5), v_texCoords.xy) * 2.0, 0.0, 1.0);
+    float dist = clamp(distance(vec2(0.5), v_uv.xy) * 2.0, 0.0, 1.0);
 
     // level = 1 if u_distance == u_radius * model_const
     // level = 0 if u_distance == radius
@@ -82,7 +82,7 @@ vec4 draw() {
         } else {
             // No light scattering, star rays
             level = min(level, 1.0);
-            float corona = starTexture(v_texCoords);
+            float corona = starTexture(v_uv);
             float light = light(dist, light_decay * 2.0) * light_level;
             float core = core(dist, u_inner_rad);
 
@@ -93,7 +93,7 @@ vec4 draw() {
         level = min(level, 1.0);
         float level_corona = float(u_lightScattering) * level;
 
-        float corona = starTexture(v_texCoords);
+        float corona = starTexture(v_uv);
         float light = light(dist, light_decay * 2.0);
         float core = core(dist, u_inner_rad);
 

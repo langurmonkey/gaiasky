@@ -90,12 +90,14 @@ public class FadeNode extends SceneGraphNode {
     protected boolean hlallvisible = true;
     // Highlight colormap index
     protected int hlcmi;
-    // Hightlight colormap attribute
+    // Highlight colormap attribute
     protected IAttribute hlcma;
     // Highlight colormap min
     protected double hlcmmin;
     // Highlight colormap max
     protected double hlcmmax;
+    // Point size scaling
+    protected float pointscaling = 1;
 
     public FadeNode() {
         super();
@@ -333,5 +335,12 @@ public class FadeNode extends SceneGraphNode {
 
     public boolean isHlAllVisible(){
         return hlallvisible;
+    }
+
+    public float getPointscaling() {
+        return pointscaling;
+    }
+    public void setPointscaling(float pointscaling) {
+        this.pointscaling = pointscaling;
     }
 }

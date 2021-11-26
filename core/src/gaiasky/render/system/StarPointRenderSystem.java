@@ -28,7 +28,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
-public class StarPointRenderSystem extends ImmediateRenderSystem implements IObserver {
+public class StarPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR = 10;
 
     boolean starColorTransit = false;

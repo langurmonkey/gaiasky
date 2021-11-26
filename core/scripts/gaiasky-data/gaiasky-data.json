@@ -558,21 +558,6 @@
     {
       "name": "catalog-sdss-12",
       "type": "catalog-gal",
-      "version": 2,
-      "mingsversion": 20201,
-      "size": 10296142,
-      "check": "autoload-sdss-small.json",
-      "data": [
-        "autoload-sdss-small.json",
-        "sdss/sdss_dr12_small.csv"
-      ],
-      "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12 - 500000 galaxies",
-      "sha256": "bb8650412d9269f28ba97a2d73ac6442986f6163a403e52d1da765534c22b335",
-      "file": "@mirror-url@galaxies/005_20190904/sdss-12-galaxies.tar.gz"
-    },
-    {
-      "name": "catalog-sdss-12",
-      "type": "catalog-gal",
       "version": 4,
       "mingsversion": 30000,
       "size": 10296296,
@@ -589,19 +574,22 @@
       "file": "@mirror-url@galaxies/sdss12/v04_20201216/galaxies-sdss12.tar.gz"
     },
     {
-      "name": "catalog-sdss-14",
+      "name": "catalog-sdss-12",
       "type": "catalog-gal",
-      "version": 2,
-      "mingsversion": 20201,
-      "size": 79127047,
-      "check": "autoload-sdss-large.json",
+      "version": 5,
+      "mingsversion": 30107,
+      "size": 10574345,
+      "nobjects": 327835,
+      "check": "catalog-sdss-12.json",
       "data": [
-        "autoload-sdss-large.json",
-        "sdss/sdss_dr14_large.csv"
+        "catalog-sdss-12.json",
+        "particles-sdss-12.json",
+        "sdss/sdss_dr12_small.vot"
       ],
-      "description": "SDSS DR14 - Sloan Digital Sky Survey DR14 - 3.9 million galaxies",
-      "sha256": "8f37ad1c82cb31092a87fb984ce8c15c3486625963d6491c6e91c463f7cf6cfe",
-      "file": "@mirror-url@galaxies/005_20190904/sdss-14-galaxies.tar.gz"
+      "description": "SDSS DR12 - Part of Sloan Digital Sky Survey DR12",
+      "releasenotes" : "Change format to VOTable",
+      "sha256": "7e833f4ee1c9bdac05b27002d5e20598159400043c06638aa4884b4bbfe3a18d",
+      "file": "@mirror-url@galaxies/sdss12/v05_20211022/galaxies-sdss12.tar.gz"
     },
     {
       "name": "catalog-sdss-14",
@@ -620,6 +608,24 @@
       "releasenotes" : "Add type to catalog descriptor file",
       "sha256": "65198f46c45d2b593660f0a7129ff49bb17f7fab3f8e2ec9c118b427478bfa3e",
       "file": "@mirror-url@galaxies/sdss14/v04_20201216/galaxies-sdss14.tar.gz"
+    },
+    {
+      "name": "catalog-sdss-14",
+      "type": "catalog-gal",
+      "version": 5,
+      "mingsversion": 30107,
+      "size": 97425589,
+      "nobjects": 3040257,
+      "check": "catalog-sdss-14.json",
+      "data": [
+        "catalog-sdss-14.json",
+        "particles-sdss-14.json",
+        "sdss/sdss_dr14_large.vot"
+      ],
+      "description": "SDSS DR14 - Part of Sloan Digital Sky Survey DR14",
+      "releasenotes" : "Change format to VOTable",
+      "sha256": "eefc532addc0b674a370b03b6d41d5f3868dc296e20bcb76ce145a13f4f98aee",
+      "file": "@mirror-url@galaxies/sdss14/v05_20211022/galaxies-sdss14.tar.gz"
     },
     {
       "name": "catalog-ocdr2",

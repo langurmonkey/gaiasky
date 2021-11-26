@@ -78,6 +78,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The main class. Holds all the entities manages the update/draw cycle and all
@@ -829,7 +830,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
     @Override
     public void dispose() {
-        if (saveState && !crashed) {
+        // Stop
+        running.set(false);
+
+        // Dispose
+        if (saveState && !crashed.get()) {
             SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
             if (bookmarksManager != null)
                 bookmarksManager.persistBookmarks();
@@ -837,6 +842,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         if (vrContext != null)
             vrContext.dispose();
+
+        ScriptingServer.dispose();
 
         // Flush frames
         EventManager.instance.post(Events.FLUSH_FRAMES);
@@ -1032,20 +1039,22 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     // Has the application crashed?
-    private boolean crashed = false;
+    private AtomicBoolean crashed = new AtomicBoolean(false);
+    // Running state
+    private AtomicBoolean running = new AtomicBoolean(true);
 
     public void setCrashed(boolean crashed) {
-        this.crashed = crashed;
+        this.crashed.set(crashed);
     }
 
     public boolean isCrashed() {
-        return crashed;
+        return crashed.get();
     }
 
     @Override
     public void render() {
         try {
-            if (!crashed) {
+            if (running.get() && !crashed.get()) {
                 // Run the render process
                 renderProcess.run();
 
@@ -1077,7 +1086,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             crashGui.initialize(assetManager, globalResources.getSpriteBatch());
             Gdx.input.setInputProcessor(crashGui.getGuiStage());
             // Flag up
-            crashed = true;
+            crashed.set(true);
         }
 
         // Create UI window if needed
@@ -1401,11 +1410,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
             // Post a message to the screen
             if (stereoMode) {
+                String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
+                String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
                 final ModePopupInfo mpi = new ModePopupInfo();
-                mpi.title = "Stereoscopic mode";
-                mpi.header = "You have entered Stereoscopic mode!";
-                mpi.addMapping("Back to normal mode", "CTRL", "S");
-                mpi.addMapping("Switch stereo profile", "CTRL", "SHIFT", "S");
+                mpi.title = I18n.txt("gui.stereo.title");
+                mpi.header = I18n.txt("gui.stereo.notice.header");;
+                mpi.addMapping(I18n.txt("gui.stereo.notice.back"), keysStrToggle);
+                mpi.addMapping(I18n.txt("gui.stereo.notice.profile"), keysStrProfile);
 
                 EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "stereo", 120f);
             } else {

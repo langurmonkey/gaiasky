@@ -23,6 +23,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface IScriptingInterface {
 
+    /**
+     * Gets the location of the assets folder.
+     */
     String getAssetsLocation();
 
     /**

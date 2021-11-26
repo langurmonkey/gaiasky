@@ -36,14 +36,12 @@ public final class CameraMotion extends PostProcessorEffect {
     private final CameraBlur camblur;
     private final float width;
     private final float height;
-    private final Matrix4 ctp;
 
     public CameraMotion(float width, float height) {
         this.width = width;
         this.height = height;
         camblur = new CameraBlur();
         camblur.setVelocityTexture(null);
-        ctp = new Matrix4();
     }
 
     public CameraMotion(int width, int height) {

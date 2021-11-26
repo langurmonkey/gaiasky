@@ -187,15 +187,15 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         panes.put(visibilityComponent.getClass().getSimpleName(), visibility);
 
         /* ----LIGHTING GROUP---- */
-        VisualEffectsComponent visualEffectsComponent = new VisualEffectsComponent(skin, ui);
-        visualEffectsComponent.initialize();
+        VisualEffectsComponent visualSettingsComponent = new VisualEffectsComponent(skin, ui);
+        visualSettingsComponent.initialize();
 
         shortcut = KeyBindings.instance.getStringKeys("action.expandcollapse.pane/gui.lighting");
 
-        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualEffectsComponent.getActor(), getContentWidth(), skin, false, shortcut);
+        CollapsiblePane visualEffects = new CollapsiblePane(ui, I18n.txt("gui.lighting"), visualSettingsComponent.getActor(), getContentWidth(), skin, false, shortcut);
         visualEffects.align(Align.left);
         mainActors.add(visualEffects);
-        panes.put(visualEffectsComponent.getClass().getSimpleName(), visualEffects);
+        panes.put(visualSettingsComponent.getClass().getSimpleName(), visualEffects);
 
         /* ----DATASETS---- */
         DatasetsComponent datasetsComponent = new DatasetsComponent(skin, ui, catalogManager);

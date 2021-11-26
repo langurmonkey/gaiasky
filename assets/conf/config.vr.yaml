@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30100
+configVersion: 30107
 
 #
 # Data configuration
@@ -117,11 +117,11 @@ scene:
   # Star settings
   star:
     # Star brightness factor
-    brightness: 2.3
+    brightness: 8.0
     # Modulate the brightness of stars with this power
-    power: 0.75
+    power: 0.6
     # Size scaling of stars
-    pointSize: 9.5
+    pointSize: 3.0
     # Texture index, see $GS_DATA/tex/base/star-tex-xx-low.png
     # 1 - horizontal spike
     # 2 - god rays
@@ -189,6 +189,11 @@ scene:
     fade: true
   # Renderer settings
   renderer:
+    # Point cloud mode, one of [TRIANGLES|TRIANGLES_INSTANCED|POINTS]
+    # TRIANGLES is the new mode. Triangles are sent to the GPU in VBOs with VAOs. Faster on newer hardware and geometrically correct.
+    # TRIANGLES_INSTANCED is a variation of TRIANGLES. Saves x4 graphics memory. Your mileage may vary with this one.
+    # POINTS is the legacy mode. It is faster on old hardware but geometrically incorrect, especially in 360 and planetarium modes
+    pointCloud: POINTS
     # Line renderer mode, one of [GL_LINES|POLYLINE_QUADSTRIP]
     line: GL_LINES
     # Orbit renderer, one of [LINE_MODE_SETTING|GPU_VBO]

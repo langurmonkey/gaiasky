@@ -1,21 +1,18 @@
 #version 330 core
 
-#include shader/lib_math.glsl
 #include shader/lib_geometry.glsl
 
 in vec4 a_position;
 in vec2 a_texCoord0;
 
-uniform mat4 u_projTrans;
+uniform mat4 u_projView;
 uniform vec4 u_color;
-uniform vec4 u_quaternion;
 uniform vec3 u_pos;
 uniform float u_size;
+uniform vec3 u_camUp;
 // Distance in u to the star
 uniform float u_distance;
-// Apparent angle in deg
 uniform float u_apparent_angle;
-uniform vec3 u_camShift;
 uniform float u_vrScale;
 
 #ifdef relativisticEffects
@@ -40,9 +37,9 @@ void main() {
     v_color = u_color;
     v_texCoords = a_texCoord0;
 
-    mat4 transform = u_projTrans;
+    mat4 transform = u_projView;
 
-    vec3 pos = u_pos - u_camShift;
+    vec3 pos = u_pos;
     float dist = length(pos);
 
     #ifdef relativisticEffects
@@ -53,66 +50,23 @@ void main() {
     pos = computeGravitationalWaves(pos, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif// gravitationalWaves
 
-    // Translate
-    mat4 translate = mat4(1.0);
-
-    translate[3][0] = pos.x;
-    translate[3][1] = pos.y;
-    translate[3][2] = pos.z;
-    transform *= translate;
-
-    // Rotate
-    mat4 rotation = mat4(0.0);
-    float xx = u_quaternion.x * u_quaternion.x;
-    float xy = u_quaternion.x * u_quaternion.y;
-    float xz = u_quaternion.x * u_quaternion.z;
-    float xw = u_quaternion.x * u_quaternion.w;
-    float yy = u_quaternion.y * u_quaternion.y;
-    float yz = u_quaternion.y * u_quaternion.z;
-    float yw = u_quaternion.y * u_quaternion.w;
-    float zz = u_quaternion.z * u_quaternion.z;
-    float zw = u_quaternion.z * u_quaternion.w;
-
-    rotation[0][0] = 1.0 - 2.0 * (yy + zz);
-    rotation[1][0] = 2.0 * (xy - zw);
-    rotation[2][0] = 2.0 * (xz + yw);
-    rotation[0][1] = 2.0 * (xy + zw);
-    rotation[1][1] = 1.0 - 2.0 * (xx + zz);
-    rotation[2][1] = 2.0 * (yz - xw);
-    rotation[3][1] = 0.0;
-    rotation[0][2] = 2.0 * (xz - yw);
-    rotation[1][2] = 2.0 * (yz + xw);
-    rotation[2][2] = 1.0 - 2.0 * (xx + yy);
-    rotation[3][3] = 1.0;
-    transform *= rotation;
-
     // Scale
     float size = u_size;
     if(u_distance > distfacinv){
         size *= u_distance * distfac;
     }
 
-    transform[0][0] *= size;
-    transform[1][1] *= size;
-    transform[2][2] *= size;
+    // Use billboard snippet
+    vec4 s_vert_pos = a_position;
+    vec3 s_obj_pos = pos;
+    vec3 s_cam_up = u_camUp;
+    mat4 s_proj_view = u_projView;
+    float s_size = size;
+    #include shader/snip_billboard.glsl
 
-    // Position
-    vec4 gpos = transform * a_position;
     gl_Position = gpos;
 
     #ifdef velocityBufferFlag
-    vec3 prevPos = u_pos - u_camShift + u_dCamPos;
-    mat4 ptransform = u_prevProjView;
-    translate[3][0] = prevPos.x;
-    translate[3][1] = prevPos.y;
-    translate[3][2] = prevPos.z;
-    ptransform *= translate;
-    ptransform *= rotation;
-    ptransform[0][0] *= size;
-    ptransform[1][1] *= size;
-    ptransform[2][2] *= size;
-
-    vec4 gprevpos = ptransform * a_position;
-    v_vel = ((gpos.xy / gpos.w) - (gprevpos.xy / gprevpos.w));
+    velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);
     #endif// velocityBufferFlag
 }

@@ -5,12 +5,11 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -27,15 +26,15 @@ import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
-import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.MathUtilsd;
-import org.lwjgl.opengl.GL30;
 
-public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem implements IObserver {
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private final Vector3 aux1;
     private final Matrix4 maux;
-    private int elems01Offset, elems02Offset, sizeOffset, count;
+    private int posOffset, uvOffset, elems01Offset, elems02Offset, sizeOffset, count;
     private boolean forceAdd = false;
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
@@ -47,36 +46,28 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
     @Override
     protected void initShaderProgram() {
-        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
-        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
     }
 
     @Override
-    protected void initVertices() {
-        meshes = new Array<>();
+    protected void addVertexAttributes(Array<VertexAttribute> attributes) {
+        attributes.add(new VertexAttribute(Usage.Position, 2, ShaderProgram.POSITION_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE));
+        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
+        attributes.add(new VertexAttribute(OwnUsage.OrbitElems1, 4, "a_orbitelems01"));
+        attributes.add(new VertexAttribute(OwnUsage.OrbitElems2, 4, "a_orbitelems02"));
+        attributes.add(new VertexAttribute(OwnUsage.Size, 1, "a_size"));
     }
 
-    /**
-     * Adds a new mesh data to the meshes list and increases the mesh data index
-     *
-     * @param nVertices The max number of vertices this mesh data can hold
-     *
-     * @return The index of the new mesh data
-     */
-    private int addMeshData(int nVertices) {
-        int mdi = createMeshData();
-        curr = meshes.get(mdi);
-
-        VertexAttribute[] attribs = buildVertexAttributes();
-        curr.mesh = new IntMesh(false, nVertices, 0, attribs);
-
-        curr.vertexSize = curr.mesh.getVertexAttributes().vertexSize / 4;
+    @Override
+    protected void offsets(MeshData curr) {
+        posOffset = curr.mesh.getVertexAttribute(Usage.Position) != null ? curr.mesh.getVertexAttribute(Usage.Position).offset / 4 : 0;
+        uvOffset = curr.mesh.getVertexAttribute(Usage.TextureCoordinates) != null ? curr.mesh.getVertexAttribute(Usage.TextureCoordinates).offset / 4 : 0;
         curr.colorOffset = curr.mesh.getVertexAttribute(Usage.ColorPacked) != null ? curr.mesh.getVertexAttribute(Usage.ColorPacked).offset / 4 : 0;
-        elems01Offset = curr.mesh.getVertexAttribute(Usage.Tangent) != null ? curr.mesh.getVertexAttribute(Usage.Tangent).offset / 4 : 0;
-        elems02Offset = curr.mesh.getVertexAttribute(Usage.Generic) != null ? curr.mesh.getVertexAttribute(Usage.Generic).offset / 4 : 0;
-        sizeOffset = curr.mesh.getVertexAttribute(Usage.Normal) != null ? curr.mesh.getVertexAttribute(Usage.Normal).offset / 4 : 0;
-        return mdi;
+        elems01Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems1).offset / 4 : 0;
+        elems02Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
+        sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
     }
+
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
@@ -85,9 +76,13 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
             Orbit first = (Orbit) renderables.get(0);
             if (forceAdd || !first.elemsInGpu) {
                 forceAdd = false;
-                curr = meshes.get(addMeshData(n));
+                curr = meshes.get(addMeshData(n * 4, n * 6));
 
-                ensureTempVertsSize(n * curr.vertexSize);
+                ensureTempVertsSize(n * 4 * curr.vertexSize);
+                ensureTempIndicesSize(n * 6);
+
+                AtomicInteger numVerticesAdded = new AtomicInteger(0);
+                AtomicInteger numParticlesAdded = new AtomicInteger(0);
                 renderables.forEach(renderable -> {
                     Orbit orbitElems = (Orbit) renderable;
 
@@ -95,49 +90,60 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
 
                         OrbitComponent oc = orbitElems.oc;
 
-                        // COLOR
-                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbitElems.pointColor[0], orbitElems.pointColor[1], orbitElems.pointColor[2], orbitElems.pointColor[3]);
+                        // 4 vertices per particle
+                        for (int vert = 0; vert < 4; vert++) {
+                            // Vertex POSITION
+                            tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                            tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
-                        // ORBIT ELEMENTS 01
-                        tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
-                        tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                        tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
-                        tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
+                            // UV coordinates
+                            tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                            tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
-                        // ORBIT ELEMENTS 02
-                        tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
-                        tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
-                        tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
-                        tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+                            // COLOR
+                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbitElems.pointColor[0], orbitElems.pointColor[1], orbitElems.pointColor[2], orbitElems.pointColor[3]);
 
-                        // SIZE
-                        tempVerts[curr.vertexIdx + sizeOffset] = orbitElems.pointSize;
+                            // ORBIT ELEMENTS 01
+                            tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                            tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
+                            tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                            tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
-                        curr.vertexIdx += curr.vertexSize;
+                            // ORBIT ELEMENTS 02
+                            tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
+                            tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+
+                            // SIZE
+                            tempVerts[curr.vertexIdx + sizeOffset] = orbitElems.pointSize;
+
+                            curr.vertexIdx += curr.vertexSize;
+                            curr.numVertices++;
+                            numVerticesAdded.incrementAndGet();
+                        }
+                        // Indices
+                        quadIndices(curr);
+                        numParticlesAdded.incrementAndGet();
 
                         orbitElems.elemsInGpu = true;
                     }
                 });
-                count = n * curr.vertexSize;
+                count = numVerticesAdded.get() * curr.vertexSize;
                 curr.mesh.setVertices(tempVerts, 0, count);
+                curr.mesh.setIndices(tempIndices, 0, numParticlesAdded.get() * 6);
             }
 
             if (curr != null) {
                 ExtShaderProgram shaderProgram = getShaderProgram();
 
-                boolean stereoHw = Settings.settings.program.modeStereo.isStereoHalfWidth();
-
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+                shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
-                shaderProgram.setUniformf("u_ar", stereoHw ? 2f : 1f);
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_scaleFactor", rc.scaleFactor * 1.5f * (stereoHw ? 2f : 1f));
-                shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux1));
-                shaderProgram.setUniformf("u_camDir", camera.getCurrent().getCamera().direction);
-                shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
+                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.15f);
 
-                shaderProgram.setUniformf("u_size", rc.scaleFactor);
                 // VR scale
                 shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
                 // Emulate double, for compatibility
@@ -150,7 +156,11 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
                 // Relativistic effects
                 addEffectsUniforms(shaderProgram, camera);
 
-                curr.mesh.render(shaderProgram, ShapeType.Point.getGlType());
+                try {
+                    curr.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                } catch (IllegalArgumentException e) {
+                    logger.error(e, "Render exception");
+                }
                 shaderProgram.end();
             }
         }
@@ -160,19 +170,6 @@ public class OrbitalElementsParticlesRenderSystem extends ImmediateRenderSystem 
         clearMeshes();
         curr = null;
         forceAdd = true;
-    }
-
-    protected VertexAttribute[] buildVertexAttributes() {
-        Array<VertexAttribute> attributes = new Array<>();
-        attributes.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        attributes.add(new VertexAttribute(Usage.Tangent, 4, "a_orbitelems01"));
-        attributes.add(new VertexAttribute(Usage.Generic, 4, "a_orbitelems02"));
-        attributes.add(new VertexAttribute(Usage.Normal, 1, "a_size"));
-
-        VertexAttribute[] array = new VertexAttribute[attributes.size];
-        for (int i = 0; i < attributes.size; i++)
-            array[i] = attributes.get(i);
-        return array;
     }
 
     @Override

@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
+import gaiasky.render.system.VariableGroupPointRenderSystem;
 import gaiasky.render.system.VariableGroupRenderSystem;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;
@@ -322,11 +323,10 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                             }
                             // Scale magnitude if needed
                             double magScl = (datasetOptions != null && datasetOptions.type == DatasetOptions.DatasetLoadType.STARS || (datasetOptions != null && datasetOptions.type == DatasetLoadType.VARIABLES)) ? datasetOptions.magnitudeScale : 0f;
-                            appMag -= magScl;
+                            appMag = appMag - magScl;
 
                             // Absolute magnitude to pseudo-size
-                            final double v = 5.0 * Math.log10(distPc <= 0.0 ? 10.0 : distPc);
-                            final double absMag = appMag - v + 5.0;
+                            final double absMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, appMag);
                             final float size = (float) absoluteMagnitudeToPseudoSize(absMag);
 
                             // COLOR
@@ -386,8 +386,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 variTimes = timesList.stream().mapToDouble(Double::doubleValue).toArray();
                                 nVari = variMagsDouble.length;
 
-                                Path tmp = Path.of(System.getProperty("user.home") + "/temp/data/");
-
                                 // FOLD
                                 List<Vector2d> list = new ArrayList<>(nVari);
                                 for (int k = 0; k < nVari; k++) {
@@ -427,8 +425,8 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 // Convert magnitudes to sizes
                                 assert variMags.length == variTimes.length;
                                 for (int j = 0; j < variMagsDouble.length; j++) {
-                                    double absoluteMagnitude = variMagsDouble[j] - v + 5.0;
-                                    variMags[j] = (float) absoluteMagnitudeToPseudoSize(absoluteMagnitude);
+                                    double variAbsoluteMag = AstroUtils.apparentToAbsoluteMagnitude(distPc, variMagsDouble[j]);
+                                    variMags[j] = (float) absoluteMagnitudeToPseudoSize(variAbsoluteMag);
                                 }
                             }
 
@@ -529,23 +527,6 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
                                 dataF[ParticleRecord.I_FCOL] = col;
                                 dataF[ParticleRecord.I_FSIZE] = size;
                                 dataF[ParticleRecord.I_FHIP] = hip;
-
-                                // TODO - Variable stars
-                                //int nVari = 10 - r.nextInt(5);
-                                //double amplitude = (r.nextDouble() + 1.0) / 2.0 * 3.5;
-                                //variMags = new float[nVari - 1];
-                                //variTimes = new double[nVari - 1];
-                                //List<Double> l = r.doubles(nVari / 2, appMag - amplitude, appMag + amplitude).sorted().boxed().collect(Collectors.toList());
-                                //List<Double> mags = new ArrayList<>(l);
-                                //Collections.reverse(l);
-                                //mags.addAll(l);
-                                //double baseTime = 1714.0;
-                                //for (int j = 0; j < mags.size() - 1; j++) {
-                                //    variMags[j] = (float) magnitudeToPseudoSize(mags.get(j));
-                                //    variTimes[j] = baseTime;
-                                //    baseTime += 0.05;
-                                //}
-                                //nVari--;
 
                                 // Extra
                                 ObjectDoubleMap<UCD> extraAttributes = addExtraAttributes(ucdParser, row);
@@ -705,7 +686,7 @@ public class STILDataProvider extends AbstractStarGroupDataProvider {
         // Pseudo-luminosity. Usually L = L0 * 10^(-0.4*Mbol). We omit M0 and approximate Mbol = M
         double pseudoL = Math.pow(10, -0.4 * absMag);
         double sizeFactor = Nature.PC_TO_M * Constants.ORIGINAL_M_TO_U * 0.15;
-        return Math.min((Math.pow(pseudoL, 0.45) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
+        return Math.min((Math.pow(pseudoL, 0.5) * sizeFactor), 1e10) * Constants.DISTANCE_SCALE_FACTOR;
     }
 
     @Override
