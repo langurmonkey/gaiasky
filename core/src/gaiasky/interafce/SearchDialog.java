@@ -22,18 +22,19 @@ import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.NaturalCamera;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.CatalogManager;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
+
+import java.util.Optional;
 
 /**
  * The dialog to search objects. It optionally presents the user with a list of suggestions as the
@@ -99,7 +100,7 @@ public class SearchDialog extends GenericDialog {
 
         // Info message
         searchInput = new OwnTextField("", skin);
-        searchInput.setWidth(480f);
+        searchInput.setWidth(680f);
         searchInput.setMessageText(I18n.txt("gui.objects.search"));
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {
@@ -272,7 +273,9 @@ public class SearchDialog extends GenericDialog {
                     boolean timeOverflow = focus.isCoordinatesTimeOverflow();
                     boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
-                    if (!timeOverflow && canSelect && ctOn) {
+                    Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromObject(node);
+                    boolean datasetVisible = ci.map(CatalogInfo::isVisible).orElse(true);
+                    if (!timeOverflow && canSelect && ctOn && datasetVisible) {
                         GaiaSky.postRunnable(() -> {
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
                             EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
@@ -282,6 +285,8 @@ public class SearchDialog extends GenericDialog {
                         info(I18n.txt("gui.objects.search.timerange", text));
                     } else if (!canSelect) {
                         info(I18n.txt("gui.objects.search.filter", text));
+                    } else if (!datasetVisible) {
+                        info(I18n.txt("gui.objects.search.dataset.invisible", text, ci.get().name));
                     } else {
                         info(I18n.txt("gui.objects.search.invisible", text, focus.getCt().toString()));
                     }

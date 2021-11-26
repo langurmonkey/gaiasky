@@ -8,6 +8,9 @@ package gaiasky.util;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
+import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
+import gaiasky.util.tree.OctreeNode;
 
 import java.util.*;
 
@@ -47,6 +50,24 @@ public class CatalogManager implements IObserver {
             return ciMap.keySet();
         }
         return null;
+    }
+
+    public Optional<CatalogInfo> getByObject(FadeNode node) {
+        OctreeNode octant = null;
+        if (node.octant != null) {
+            octant = node.octant.getRoot();
+        }
+        for (CatalogInfo ci : cis) {
+            if(octant != null) {
+                // Octree branch
+                if(ci.object instanceof OctreeWrapper && ((OctreeWrapper)ci.object).root == octant)
+                    return Optional.of(ci);
+            } else {
+                if (ci.object == node)
+                    return Optional.of(ci);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

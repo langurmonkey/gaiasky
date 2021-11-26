@@ -1318,6 +1318,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return this.sgr.allOn(cts);
     }
 
+    public Optional<CatalogInfo> getCatalogInfoFromObject(SceneGraphNode node) {
+        if(node instanceof FadeNode) {
+            return catalogManager.getByObject((FadeNode) node);
+        }
+        return Optional.empty();
+    }
+
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
