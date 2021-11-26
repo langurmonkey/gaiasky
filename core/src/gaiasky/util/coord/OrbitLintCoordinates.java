@@ -37,8 +37,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
 
     @Override
     public Vector3b getEclipticSphericalCoordinates(Instant date, Vector3b out) {
-        getEquatorialCartesianCoordinates(date, out);
-        out.mul(Coordinates.eqToEcl());
+        getEclipticCartesianCoordinates(date, out);
 
         // To spherical
         Coordinates.cartesianToSpherical(out, out);
@@ -49,6 +48,7 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
     public Vector3b getEclipticCartesianCoordinates(Instant date, Vector3b out) {
         getEquatorialCartesianCoordinates(date, out);
         out.mul(Coordinates.eqToEcl());
+
         return out;
     }
 
@@ -85,6 +85,10 @@ public class OrbitLintCoordinates extends AbstractOrbitCoordinates {
         }
 
         out.mul(transf).scl(scaling);
+
+        // Move to center if needed
+        if(center != null && !center.isZero())
+            out.add(center);
         return out;
     }
 

@@ -246,9 +246,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
             addToRender(this, RenderGroup.POINT_STAR);
-            if (camera.getCurrent() instanceof FovCamera) {
-                // Render as point, do nothing
-            } else {
+            if (!(camera.getCurrent() instanceof FovCamera)) {
 
                 if (viewAngleApparent >= thpointTimesFovfactor) {
                     addToRender(this, RenderGroup.BILLBOARD_STAR);
@@ -257,6 +255,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
                     addToRender(this, RenderGroup.LINE);
                 }
             }
+
             if (renderText() && camera.isVisible(this)) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
@@ -348,6 +347,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     @Override
     public void doneLoading(AssetManager manager) {
+        super.doneLoading(manager);
     }
 
     @Override
@@ -358,13 +358,12 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
         if (coordinates != null && (time.getHdiff() != 0 || force)) {
             Vector3d aux3 = aux3d1.get();
-            // Load this object's equatorial cartesian coordinates into pos
+            // Load this objects' equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
             // Convert to cartesian coordinates and put them in aux3 vector
             if (pos.len2d() == 0) {
                 // Sun!
-
 
             } else {
                 Coordinates.cartesianToSpherical(pos, aux3);

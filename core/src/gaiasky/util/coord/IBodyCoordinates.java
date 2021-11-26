@@ -18,7 +18,7 @@ public interface IBodyCoordinates {
     /**
      * Initializes the coordinates object
      *
-     * @param params
+     * @param params The parameter objects.
      */
     void doneLoading(Object... params);
 
@@ -40,7 +40,7 @@ public interface IBodyCoordinates {
      * @param out     The out vector where the ecliptic cartesian coordinates will
      *                be.
      * @return The out vector for chaining, or null if the date is out of range,
-     * in case of non elliptical orbits such as Gaia.
+     * in case of non-elliptical orbits such as Gaia.
      */
     Vector3b getEclipticCartesianCoordinates(Instant instant, Vector3b out);
 
@@ -51,14 +51,14 @@ public interface IBodyCoordinates {
      * @param out     The out vector where the equatorial cartesian coordinates will
      *                be.
      * @return The out vector for chaining, or null if the date is out of range,
-     * in case of non elliptical orbits such as Gaia.
+     * in case of non-elliptical orbits such as Gaia.
      */
     Vector3b getEquatorialCartesianCoordinates(Instant instant, Vector3b out);
 
     /**
      * Gets the orbit object of these coordinates, if any.
      *
-     * @return
+     * @return The orbit object.
      */
     Orbit getOrbitObject();
 

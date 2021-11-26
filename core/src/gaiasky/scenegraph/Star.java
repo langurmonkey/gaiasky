@@ -42,7 +42,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Represents a single star. Currently only the Sun uses this class.
+ * Represents a single star. Currently, only the Sun uses this class.
  *
  * @deprecated Move Sun to star group
  */
@@ -55,72 +55,48 @@ public class Star extends Particle {
     /** HIP number, negative if non-existent **/
     public int hip = -1;
 
-
     double modelDistance;
 
     public Star() {
         super();
     }
 
-    public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, long starid) {
-        super(pos, appmag, absmag, colorbv, names, starid);
+    public Star(Vector3b pos, float appMag, float absMag, float colorBV, String[] names, long starID) {
+        super(pos, appMag, absMag, colorBV, names, starID);
     }
 
     /**
      * Creates a new Star object
      *
      * @param pos     The position of the star in equatorial cartesian coordinates
-     * @param appmag  The apparent magnitude
-     * @param absmag  The absolute magnitude
-     * @param colorbv The B-V color index
+     * @param appMag  The apparent magnitude
+     * @param absMag  The absolute magnitude
+     * @param colorBV The B-V color index
      * @param names   The proper names of the star, if any
      * @param ra      in degrees
      * @param dec     in degrees
-     * @param starid  The star id
+     * @param starID  The star id
      */
-    public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
-        super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
+    public Star(Vector3b pos, float appMag, float absMag, float colorBV, String[] names, float ra, float dec, long starID) {
+        super(pos, appMag, absMag, colorBV, names, ra, dec, starID);
     }
 
     /**
      * Creates a new Star object
      *
      * @param pos     The position of the star in equatorial cartesian coordinates
-     * @param appmag  The apparent magnitude
-     * @param absmag  The absolute magnitude
-     * @param colorbv The B-V color index
+     * @param appMag  The apparent magnitude
+     * @param absMag  The absolute magnitude
+     * @param colorBV The B-V color index
      * @param names   The proper names of the star, if any
      * @param ra      in degrees
      * @param dec     in degrees
-     * @param starid  The star id
+     * @param starID  The star id
      * @param hip     The HIP identifier
      * @param source  Catalog source. 1: Gaia, 2: HIP, 3: TYC, -1: Unknown
      */
-    public Star(Vector3b pos, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, byte source) {
-        super(pos, appmag, absmag, colorbv, names, ra, dec, starid);
-        this.hip = hip;
-        this.catalogSource = source;
-    }
-
-    /**
-     * Creates a new Star object
-     *
-     * @param pos     The position of the star in equatorial cartesian coordinates
-     * @param pm      The proper motion of the star in equatorial cartesian
-     *                coordinates.
-     * @param pmSph   The proper motion with mualpha, mudelta, radvel.
-     * @param appmag  The apparent magnitude
-     * @param absmag  The absolute magnitude
-     * @param colorbv The B-V color index
-     * @param names   The proper names of the star, if any
-     * @param ra      in degrees
-     * @param dec     in degrees
-     * @param starid  The star id
-     * @param hip     The HIP identifier
-     * @param source  Catalog source. See {#Particle}
-     */
-    public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid, int hip, byte source) {
-        super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
+    public Star(Vector3b pos, float appMag, float absMag, float colorBV, String[] names, float ra, float dec, long starID, int hip, byte source) {
+        super(pos, appMag, absMag, colorBV, names, ra, dec, starID);
         this.hip = hip;
         this.catalogSource = source;
     }
@@ -131,17 +107,40 @@ public class Star extends Particle {
      * @param pos     The position of the star in equatorial cartesian coordinates
      * @param pm      The proper motion of the star in equatorial cartesian
      *                coordinates
-     * @param pmSph   The proper motion with mualpha, mudelta, radvel.
-     * @param appmag  The apparent magnitude
-     * @param absmag  The absolute magnitude
-     * @param colorbv The B-V color index
+     * @param pmSph   The proper motion with muAlpha, muDelta, radVel.
+     * @param appMag  The apparent magnitude
+     * @param absMag  The absolute magnitude
+     * @param colorBV The B-V color index
      * @param names   The proper names of the star, if any
      * @param ra      in degrees
      * @param dec     in degrees
-     * @param starid  The star id
+     * @param starID  The star id
      */
-    public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appmag, float absmag, float colorbv, String[] names, float ra, float dec, long starid) {
-        super(pos, pm, pmSph, appmag, absmag, colorbv, names, ra, dec, starid);
+    public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appMag, float absMag, float colorBV, String[] names, float ra, float dec, long starID) {
+        super(pos, pm, pmSph, appMag, absMag, colorBV, names, ra, dec, starID);
+    }
+
+    /**
+     * Creates a new Star object
+     *
+     * @param pos     The position of the star in equatorial cartesian coordinates
+     * @param pm      The proper motion of the star in equatorial cartesian
+     *                coordinates
+     * @param pmSph   The proper motion with muAlpha, muDelta, radVel.
+     * @param appMag  The apparent magnitude
+     * @param absMag  The absolute magnitude
+     * @param colorBV The B-V color index
+     * @param names   The proper names of the star, if any
+     * @param ra      in degrees
+     * @param dec     in degrees
+     * @param starID  The star id
+     * @param hip     HIP number, if any
+     * @param source  Catalog source. 1: Gaia, 2: HIP, 3: TYC, -1: Unknown
+     */
+    public Star(Vector3b pos, Vector3 pm, Vector3 pmSph, float appMag, float absMag, float colorBV, String[] names, float ra, float dec, long starID, int hip, byte source) {
+        super(pos, pm, pmSph, appMag, absMag, colorBV, names, ra, dec, starID);
+        this.hip = hip;
+        this.catalogSource = source;
     }
 
     @Override
@@ -153,6 +152,7 @@ public class Star extends Particle {
 
     @Override
     public void doneLoading(final AssetManager manager) {
+        super.doneLoading(manager);
         initModel(manager);
     }
 
@@ -192,6 +192,7 @@ public class Star extends Particle {
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender()) {
             camera.checkClosestParticle(this);
+            addToRender(this, RenderGroup.POINT_STAR);
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
                 addToRender(this, RenderGroup.BILLBOARD_STAR);

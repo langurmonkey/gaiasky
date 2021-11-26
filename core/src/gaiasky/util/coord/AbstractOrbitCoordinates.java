@@ -9,11 +9,14 @@ import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.math.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final Log logger = Logger.getLogger(AbstractOrbitCoordinates.class);
@@ -21,6 +24,7 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final List<AbstractOrbitCoordinates> instances = new ArrayList<>();
     
     protected String orbitname;
+    protected Vector3d center;
     protected Orbit orbit;
     protected double scaling = 1d;
 
@@ -63,5 +67,21 @@ public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     @Override
     public String toString() {
         return "{" + "name='" + orbitname + '\'' + ", orbit=" + orbit + ", scaling=" + scaling + '}';
+    }
+
+    public void setCentre(double[] center) {
+        setCenter(center);
+    }
+
+    public void setCenter(double[] center) {
+        setCenterkm(center);
+    }
+
+    public void setCenterkm(double[] center){
+        this.center = new Vector3d(center[0] * Constants.KM_TO_U, center[1] * Constants.KM_TO_U, center[2] * Constants.KM_TO_U);
+    }
+
+    public void setCenterpc(double[] center){
+        this.center = new Vector3d(center[0] * Constants.PC_TO_U, center[1] * Constants.PC_TO_U, center[2] * Constants.PC_TO_U);
     }
 }

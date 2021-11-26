@@ -151,7 +151,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public Vector3b pos;
 
     /**
-     * Coordinates provider. Helps updating the position at each time step.
+     * Coordinates provider. Provides position coordinates depending on time.
      **/
     protected IBodyCoordinates coordinates;
 
