@@ -40,7 +40,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
     private int elems02Offset;
     private int sizeOffset;
     private boolean forceAdd = false;
-    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.03)), Math.tan(Math.toRadians(0.5)) };
+    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -72,7 +72,6 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
         elems02Offset = curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2) != null ? curr.mesh.getVertexAttribute(OwnUsage.OrbitElems2).offset / 4 : 0;
         sizeOffset = curr.mesh.getVertexAttribute(OwnUsage.Size) != null ? curr.mesh.getVertexAttribute(OwnUsage.Size).offset / 4 : 0;
     }
-
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
