@@ -27,7 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.*;
 
-import static gaiasky.util.Settings.StereoProfile.*;
+import static gaiasky.util.Settings.StereoProfile.values;
 
 /**
  * Contains the key mappings and the actions. This should be persisted somehow

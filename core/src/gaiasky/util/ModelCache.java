@@ -5,7 +5,6 @@
 
 package gaiasky.util;
 
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Material;
 import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;

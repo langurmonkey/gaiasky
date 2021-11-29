@@ -13,7 +13,6 @@ import gaiasky.render.IRenderable;
 import gaiasky.render.IShapeRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.GlobalResources;
 
 /**
  * System that renders shapes through a {@link ShapeRenderer}

@@ -16,7 +16,6 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public abstract class AbstractOrbitCoordinates implements IBodyCoordinates {
     protected static final Log logger = Logger.getLogger(AbstractOrbitCoordinates.class);

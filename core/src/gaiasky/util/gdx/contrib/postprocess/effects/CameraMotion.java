@@ -23,7 +23,6 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.CameraBlur;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;

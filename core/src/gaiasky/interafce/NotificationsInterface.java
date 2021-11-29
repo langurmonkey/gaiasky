@@ -21,7 +21,6 @@ import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger.LoggerLevel;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;

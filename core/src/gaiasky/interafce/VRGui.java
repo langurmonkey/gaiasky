@@ -2,7 +2,6 @@ package gaiasky.interafce;
 
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;

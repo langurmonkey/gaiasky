@@ -6,10 +6,10 @@
 package gaiasky.util.gaia;
 
 import gaiasky.util.BinarySearchTree;
-import gaiasky.util.Settings;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.math.Quaterniond;
 
 import java.util.Date;

@@ -10,7 +10,6 @@ import gaiasky.render.IModelRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.comp.ModelComparator;
 import gaiasky.util.gdx.IntModelBatch;
 import org.lwjgl.opengl.GL41;
 

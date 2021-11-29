@@ -17,23 +17,18 @@ import gaiasky.GaiaSky;
 import gaiasky.data.stars.UncertaintiesHandler;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
-import gaiasky.render.ComponentTypes;
-import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.camera.CameraUtils;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.ContextMenu;
 import gaiasky.util.scene2d.MenuItem;
 import gaiasky.util.scene2d.OwnCheckBox;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 public class GaiaSkyContextMenu extends ContextMenu {
 

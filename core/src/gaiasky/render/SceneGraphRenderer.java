@@ -35,7 +35,6 @@ import gaiasky.render.system.*;
 import gaiasky.render.system.AbstractRenderSystem.RenderSystemRunnable;
 import gaiasky.scenegraph.ModelBody;
 import gaiasky.scenegraph.Star;
-import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;

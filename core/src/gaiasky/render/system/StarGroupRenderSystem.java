@@ -5,7 +5,10 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -15,8 +18,6 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.render.system.ImmediateModeRenderSystem.MeshData;
-import gaiasky.render.system.ImmediateModeRenderSystem.OwnUsage;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;

@@ -26,8 +26,6 @@ import gaiasky.util.scene2d.OwnImageButton;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
-import javax.tools.Tool;
-
 public class MusicComponent extends GuiComponent implements IObserver {
 
     protected ImageButton prev, play, next;

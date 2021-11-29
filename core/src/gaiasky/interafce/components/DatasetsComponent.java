@@ -21,7 +21,6 @@ import gaiasky.util.scene2d.*;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 /**

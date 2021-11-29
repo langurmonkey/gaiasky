@@ -10,13 +10,11 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
-import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.math.Vector3d;
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * This class provides utils to use Sprites and Fonts as if they were Decals,

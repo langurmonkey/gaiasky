@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.LongMap;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
-import gaiasky.render.system.VariableGroupPointRenderSystem;
 import gaiasky.render.system.VariableGroupRenderSystem;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.scenegraph.particle.ParticleRecord;

@@ -16,7 +16,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.util.GlobalResources;
 
 /**
  * Head-up display GUI which only displays information and has no options

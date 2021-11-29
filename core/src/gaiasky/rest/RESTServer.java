@@ -10,9 +10,9 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 import gaiasky.GaiaSky;
 import gaiasky.script.IScriptingInterface;
-import gaiasky.util.Settings;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import spark.Spark;
 
 import java.lang.reflect.Method;

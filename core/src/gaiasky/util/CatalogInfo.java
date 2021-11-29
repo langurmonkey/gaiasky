@@ -9,7 +9,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
-import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;

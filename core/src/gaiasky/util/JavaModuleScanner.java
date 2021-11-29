@@ -1,19 +1,17 @@
 package gaiasky.util;
 
-
+import java.lang.StackWalker.Option;
+import java.lang.StackWalker.StackFrame;
 import java.lang.module.ModuleReader;
+import java.lang.module.ModuleReference;
 import java.lang.module.ResolvedModule;
 import java.net.URI;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.*;
-import java.util.stream.Stream;
-import java.lang.StackWalker;
-import java.lang.StackWalker.Option;
-import java.lang.StackWalker.StackFrame;
-import java.lang.module.ModuleReference;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Stream;
 
 /**
  * Prints used modules

@@ -18,9 +18,9 @@ import gaiasky.render.IMainRenderer;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.IPostProcessor.RenderType;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.GlobalResources;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ImageFormat;
-import gaiasky.util.GlobalResources;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

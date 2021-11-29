@@ -6,8 +6,8 @@
 package gaiasky.util.ds;
 
 import gaiasky.scenegraph.StarGroup;
-import gaiasky.util.Settings;
 import gaiasky.util.Logger;
+import gaiasky.util.Settings;
 
 import java.util.concurrent.*;
 

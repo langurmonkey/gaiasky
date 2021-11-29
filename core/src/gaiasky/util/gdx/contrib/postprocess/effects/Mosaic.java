@@ -7,8 +7,6 @@ package gaiasky.util.gdx.contrib.postprocess.effects;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
-import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
-import gaiasky.util.gdx.contrib.postprocess.filters.CubemapProjectionsFilter;
 import gaiasky.util.gdx.contrib.postprocess.filters.MosaicFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 

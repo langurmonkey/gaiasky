@@ -2,7 +2,6 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.data.ISceneGraphLoader;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;

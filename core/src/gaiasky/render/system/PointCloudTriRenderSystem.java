@@ -5,29 +5,9 @@
 
 package gaiasky.render.system;
 
-import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
-import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.StarGroup;
-import gaiasky.scenegraph.camera.CameraManager;
-import gaiasky.scenegraph.camera.FovCamera;
-import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.scenegraph.particle.IParticleRecord;
-import gaiasky.util.Constants;
 import gaiasky.util.Pair;
-import gaiasky.util.Settings;
-import gaiasky.util.color.Colormap;
-import gaiasky.util.comp.DistToCameraComparator;
-import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 /**
