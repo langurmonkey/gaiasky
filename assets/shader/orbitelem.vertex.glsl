@@ -9,6 +9,7 @@ uniform vec3 u_camPos;
 uniform float u_alpha;
 uniform float u_sizeFactor;
 uniform mat4 u_eclToEq;
+uniform vec2 u_sizeLimits;
 // Current julian date, in days, emulates a double in vec2
 uniform vec2 u_t;
 // VR scale factor
@@ -122,7 +123,7 @@ void main() {
     
     v_col = vec4(a_color.rgb, a_color.a * u_alpha);
 
-    float quadSize = a_size * u_sizeFactor;
+    float quadSize = clamp(a_size * u_sizeFactor, u_sizeLimits.x * dist, u_sizeLimits.y * dist);
 
     // Use billboard snippet
     vec4 s_vert_pos = a_position;

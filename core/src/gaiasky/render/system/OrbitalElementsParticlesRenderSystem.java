@@ -34,8 +34,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private final Vector3 aux1;
     private final Matrix4 maux;
-    private int posOffset, uvOffset, elems01Offset, elems02Offset, sizeOffset, count;
+    private int posOffset;
+    private int uvOffset;
+    private int elems01Offset;
+    private int elems02Offset;
+    private int sizeOffset;
     private boolean forceAdd = false;
+    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.03)), Math.tan(Math.toRadians(0.5)) };
 
     public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -129,7 +134,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
                         orbitElems.elemsInGpu = true;
                     }
                 });
-                count = numVerticesAdded.get() * curr.vertexSize;
+                int count = numVerticesAdded.get() * curr.vertexSize;
                 curr.mesh.setVertices(tempVerts, 0, count);
                 curr.mesh.setIndices(tempIndices, 0, numParticlesAdded.get() * 6);
             }
@@ -142,7 +147,8 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.15f);
+                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f);
+                shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                 // VR scale
                 shaderProgram.setUniformf("u_vrScale", (float) Constants.DISTANCE_SCALE_FACTOR);
