@@ -372,7 +372,7 @@ void main() {
             // Perturb the normal to get reflect direction
             pullNormal();
             mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-			vec3 reflectDir = normalize(reflect(-v_data.fragPosWorld, normalize(TBN * N)));
+			vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalize(TBN * N)));
 		#endif // environmentCubemapFlag
     #else
 	    // Normal in tangent space
