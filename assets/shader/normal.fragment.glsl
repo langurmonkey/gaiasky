@@ -8,43 +8,26 @@ in vec4 v_atmosphereColor;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
-////////// COLOR ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-in vec4 v_color;
-
-////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-in vec3 v_normal;
 vec3 g_normal = vec3(0.0, 0.0, 1.0);
-#define pullNormal() g_normal = v_normal
+#define pullNormal() g_normal = v_data.normal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// BINORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-in vec3 v_binormal;
 vec3 g_binormal = vec3(0.0, 0.0, 1.0);
-#define pullBinormal() g_binormal = v_binormal
+#define pullBinormal() g_binormal = v_data.binormal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
-in vec3 v_tangent;
 vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-#define pullTangent() g_tangent = v_tangent
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// TEXCOORD0 ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-
-in vec2 v_texCoord0;
+#define pullTangent() g_tangent = v_data.tangent
 
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
-
-// Varyings computed in the vertex shader
-in float v_opacity;
 
 #ifdef timeFlag
 uniform float u_time;
@@ -116,7 +99,6 @@ uniform sampler2D u_reflectionTexture;
 #define bias 0.006
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
-in vec3 v_shadowMapUv;
 
 float getShadowness(vec2 uv, vec2 offset, float compare){
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
@@ -139,30 +121,22 @@ float textureShadowLerp(vec2 size, vec2 uv, float compare){
     return c;
 }
 
-float getShadow(){
+float getShadow(vec3 shadowMapUv) {
     // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
     float result = 0.0;
-    for(int x=-2; x<=2; x++){
-        for(int y=-2; y<=2; y++){
+    for(int x=-2; x<=2; x++) {
+        for(int y=-2; y<=2; y++) {
             vec2 offset = vec2(float(x), float(y)) / size;
-            result += textureShadowLerp(size, v_shadowMapUv.xy + offset, v_shadowMapUv.z);
+            result += textureShadowLerp(size, shadowMapUv.xy + offset, shadowMapUv.z);
         }
     }
     return result / 25.0;
 
     // Simple lookup
-    //return getShadowness(v_shadowMapUv.xy, vec2(0.0), v_shadowMapUv.z);
-}
-#else
-float getShadow() {
-    return 1.0;
+    //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
 }
 #endif //shadowMapFlag
-
-
-// AMBIENT LIGHT
-in vec3 v_ambientLight;
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
@@ -183,11 +157,11 @@ in vec3 v_ambientLight;
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5 + u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) + u_emissiveColor
 #elif defined(emissiveTextureFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
-    #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissiveTextureFlag && emissiveColorFlag
 
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
@@ -212,25 +186,11 @@ in vec3 v_ambientLight;
 #endif // numDirectionalLights
 
 #ifdef directionalLightsFlag
-struct DirectionalLight
-{
+struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
-// Directional lights vector
-in DirectionalLight v_directionalLights[numDirectionalLights];
 #endif // directionalLightsFlag
-
-// View direction in world space
-in vec3 v_viewDir;
-// Logarithmic depth
-in float v_depth;
-// Fragment position in world space
-in vec3 v_fragPosWorld;
-
-#ifdef environmentCubemapFlag
-in vec3 v_reflect;
-#endif
 
 #ifdef environmentCubemapFlag
 uniform samplerCube u_environmentCubemap;
@@ -240,10 +200,37 @@ uniform samplerCube u_environmentCubemap;
 uniform vec4 u_reflectionColor;
 #endif
 
+// INPUT
+struct VertexData {
+    vec2 texCoords;
+    vec3 normal;
+    #ifdef directionalLightsFlag
+    DirectionalLight directionalLights[numDirectionalLights];
+    #endif // directionalLightsFlag
+    vec3 viewDir;
+    vec3 ambientLight;
+    float opacity;
+    vec4 color;
+    #ifdef shadowMapFlag
+    vec3 shadowMapUv;
+    #endif // shadowMapFlag
+    vec3 fragPosWorld;
+    #ifdef binormalFlag
+    vec3 binormal;
+    #endif // binormalFlag
+    #ifdef tangentFlag
+    vec3 tangent;
+    #endif // tangentFlag
+    #ifdef environmentCubemapFlag
+    vec3 reflect;
+    #endif // environmentCubemapFlag
+};
+in VertexData v_data;
+
+// OUTPUT
 layout (location = 0) out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
-
 #define PI 3.1415926535
 
 #ifdef heightFlag
@@ -330,7 +317,7 @@ float luma(vec3 color){
 }
 
 void main() {
-    vec2 texCoords = v_texCoord0;
+    vec2 texCoords = v_data.texCoords;
 
     vec3 viewDir;
 
@@ -338,31 +325,31 @@ void main() {
     #ifdef heightFlag
     // Compute tangent space
     pullNormal();
-    mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-    viewDir = normalize(v_viewDir * TBN);
+    mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+    viewDir = normalize(v_data.viewDir * TBN);
     // Parallax occlusion mapping
     texCoords = parallaxMapping(texCoords, viewDir);
     #else // heightFlag
-    viewDir = v_viewDir;
+    viewDir = v_data.viewDir;
     #endif // heightFlag
 
     #ifdef directionalLightsFlag
     vec3 lightDir[numDirectionalLights], lightCol[numDirectionalLights];
     for(int i = 0; i < numDirectionalLights; i++) {
         #ifdef heightFlag
-        lightDir[i] = normalize(v_directionalLights[i].direction * TBN);
-        lightCol[i] = v_directionalLights[i].color;
+        lightDir[i] = normalize(v_data.directionalLights[i].direction * TBN);
+        lightCol[i] = v_data.directionalLights[i].color;
         #else // heightFlag
-        lightDir[i] = v_directionalLights[i].direction;
-        lightCol[i] = v_directionalLights[i].color;
+        lightDir[i] = v_data.directionalLights[i].direction;
+        lightCol[i] = v_data.directionalLights[i].color;
         #endif // heightFlag
     }
     #endif // directionalLightsFlag
 
-    vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
+    vec4 diffuse = fetchColorDiffuse(v_data.color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
-    vec3 ambient = v_ambientLight;
+    vec3 ambient = v_data.ambientLight;
     #ifdef atmosphereGround
     vec3 night = emissive.rgb;
     emissive = vec4(0.0);
@@ -384,19 +371,23 @@ void main() {
 		#ifdef environmentCubemapFlag
             // Perturb the normal to get reflect direction
             pullNormal();
-            mat3 TBN = cotangentFrame(g_normal, -v_viewDir, texCoords);
-			vec3 reflectDir = normalize(reflect(-v_fragPosWorld, normalize(TBN * N)));
+            mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+			vec3 reflectDir = normalize(reflect(-v_data.fragPosWorld, normalize(TBN * N)));
 		#endif // environmentCubemapFlag
     #else
 	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
 		#ifdef environmentCubemapFlag
-			vec3 reflectDir = normalize(v_reflect);
+			vec3 reflectDir = normalize(v_data.reflect);
 		#endif // environmentCubemapFlag
     #endif // normalTextureFlag
 
     // Shadow
-    float shdw = clamp(getShadow(), 0.0, 1.0);
+    #ifdef shadowMapFlag
+    float shdw = clamp(getShadow(v_data.shadowMapUv), 0.0, 1.0);
+    #else
+    float shdw = 1.0;
+    #endif
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
@@ -416,6 +407,7 @@ void main() {
 
     // Loop for directional light contributitons
     #ifdef directionalLightsFlag
+    // Loop for directional light contributitons
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];
         // Skip non-lights
@@ -438,7 +430,7 @@ void main() {
     #endif // directionalLightsFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_opacity);
+    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_data.opacity);
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround

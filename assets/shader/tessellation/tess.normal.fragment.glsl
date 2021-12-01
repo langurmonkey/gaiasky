@@ -85,19 +85,20 @@ float textureShadowLerp(vec2 size, vec2 uv, float compare){
     return c;
 }
 
-float getShadow(){
+float getShadow(vec3 shadowMapUv) {
+    // Complex lookup: PCF + interpolation (see http://codeflow.org/entries/2013/feb/15/soft-shadow-mapping/)
     vec2 size = vec2(1.0 / (2.0 * u_shadowPCFOffset));
     float result = 0.0;
-    for(int x=-2; x<=2; x++){
-        for(int y=-2; y<=2; y++){
+    for(int x=-2; x<=2; x++) {
+        for(int y=-2; y<=2; y++) {
             vec2 offset = vec2(float(x), float(y)) / size;
-            result += textureShadowLerp(size, o_data.shadowMapUv.xy + offset, o_data.shadowMapUv.z);
+            result += textureShadowLerp(size, shadowMapUv.xy + offset, shadowMapUv.z);
+        }
     }
     return result / 25.0;
-}
-#else
-float getShadow(){
-    return 1.0;
+
+    // Simple lookup
+    //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
 }
 #endif //shadowMapFlag
 
@@ -167,7 +168,7 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
-    #endif
+    #endif // shadowMapFlag
 };
 in VertexData o_data;
 #ifdef atmosphereGround
@@ -188,6 +189,7 @@ uniform samplerCube u_environmentCubemap;
 uniform vec4 u_reflectionColor;
 #endif
 
+// OUTPUT
 layout (location = 0) out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
@@ -228,7 +230,11 @@ void main() {
     #endif // environmentCubemapFlag
 
     // Shadow
-    float shdw = clamp(getShadow(), 0.0, 1.0);
+    #ifdef shadowMapFlag
+    float shdw = clamp(getShadow(o_data.shadowMapUv), 0.0, 1.0);
+    #else
+    float shdw = 1.0;
+    #endif
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
@@ -288,7 +294,7 @@ void main() {
     // Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-    if (fragColor.a <= 0.0){
+    if (fragColor.a <= 0.0) {
         discard;
     }
     // Logarithmic depth buffer

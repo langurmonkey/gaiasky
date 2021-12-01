@@ -242,15 +242,15 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         unsharp.setEnabled(Settings.settings.postprocess.unsharpMask.factor > 0);
         ppb.set(unsharp);
 
-        // ANTIALIAS
+        // ANTI-ALIAS
         initAntiAliasing(Settings.settings.postprocess.antialias, width, height, ppb);
 
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
         bloom.setBloomIntesnity(Settings.settings.postprocess.bloom.intensity);
-        bloom.setBlurPasses(40);
-        bloom.setBlurAmount(20);
-        bloom.setThreshold(0.15f);
+        bloom.setBlurPasses(20);
+        bloom.setBlurAmount(10);
+        bloom.setThreshold(0f);
         bloom.setEnabled(Settings.settings.postprocess.bloom.intensity > 0);
         ppb.set(bloom);
 

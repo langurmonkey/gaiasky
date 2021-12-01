@@ -297,10 +297,8 @@ public class ExtShaderProgram implements Disposable {
             // if (infoLogLength > 1) {
             log = Gdx.gl20.glGetProgramInfoLog(program);
             // }
-            return log;
-        } else {
-            return log;
         }
+        return log;
     }
 
     /** @return whether this ShaderProgram compiled successfully. */
