@@ -35,6 +35,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 
@@ -173,14 +174,14 @@ public class Star extends Particle {
         mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
         mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
         // Only to activate view vector (camera position)
-        mat.set(new TextureAttribute(TextureAttribute.Specular, lut));
+        mat.set(new ColorAttribute(ColorAttribute.Specular));
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         Matrix4 modelTransform = new Matrix4();
         mc = new ModelComponent(false);
         mc.initialize();
         mc.env = new Environment();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
+        mc.env.set(new FloatExtAttribute(FloatExtAttribute.Time, 0f));
         mc.instance = new IntModelInstance(model, modelTransform);
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)
@@ -193,6 +194,7 @@ public class Star extends Particle {
         if (this.shouldRender()) {
             camera.checkClosestParticle(this);
             addToRender(this, RenderGroup.POINT_STAR);
+
             if (camera.getCurrent() instanceof FovCamera) {
                 // Render as point, do nothing
                 addToRender(this, RenderGroup.BILLBOARD_STAR);
@@ -218,9 +220,8 @@ public class Star extends Particle {
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext renderContext, RenderGroup group) {
         float opacity = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
-        float[] col = Settings.settings.scene.star.colorTransit ? ccTransit : cc;
-        ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
-        ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;
+        ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(cc[0], cc[1], cc[2], 1f);
+        ((FloatExtAttribute) mc.env.get(FloatExtAttribute.Time)).value = (float) t;
         mc.update(alpha * opacity);
         // Local transform
         translation.getMatrix(mc.instance.transform).scl((float) (getRadius() * 2d));

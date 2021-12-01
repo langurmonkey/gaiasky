@@ -7,41 +7,43 @@ layout(vertices = N_VERTICES) out;
 // Tessellation quality in [1,7]
 uniform float u_tessQuality = 4.0;
 
-in vec2 v_texCoords[gl_MaxPatchVertices];
-out vec2 l_texCoords[N_VERTICES];
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+#define directionalLightsFlag
+#endif // numDirectionalLights
 
-in vec3 v_normal[gl_MaxPatchVertices];
-out vec3 l_normal[N_VERTICES];
+#ifdef directionalLightsFlag
+struct DirectionalLight {
+    vec3 color;
+    vec3 direction;
+};
+#endif // directionalLightsFlag
 
-in vec3 v_lightDir[gl_MaxPatchVertices];
-out vec3 l_lightDir[N_VERTICES];
+struct VertexData {
+    vec2 texCoords;
+    vec3 normal;
+    #ifdef directionalLightsFlag
+    DirectionalLight directionalLights[numDirectionalLights];
+    #endif
+    vec3 viewDir;
+    vec3 ambientLight;
+    float opacity;
+    vec4 color;
+    #ifdef shadowMapFlag
+    vec3 shadowMapUv;
+    #endif
+};
 
-in vec3 v_lightCol[gl_MaxPatchVertices];
-out vec3 l_lightCol[N_VERTICES];
-
-in vec3 v_viewDir[gl_MaxPatchVertices];
-out vec3 l_viewDir[N_VERTICES];
-
-in vec3 v_ambientLight[gl_MaxPatchVertices];
-out vec3 l_ambientLight[N_VERTICES];
-
-in float v_opacity[gl_MaxPatchVertices];
-out float l_opacity[N_VERTICES];
-
-in vec4 v_color[gl_MaxPatchVertices];
-out vec4 l_color[N_VERTICES];
-
+// INPUT
+in VertexData v_data[gl_MaxPatchVertices];
 #ifdef atmosphereGround
 in vec4 v_atmosphereColor[gl_MaxPatchVertices];
-out vec4 l_atmosphereColor[N_VERTICES];
-
 in float v_fadeFactor[gl_MaxPatchVertices];
-out float l_fadeFactor[N_VERTICES];
 #endif
-
-#ifdef shadowMapFlag
-in vec3 v_shadowMapUv[gl_MaxPatchVertices];
-out vec3 l_shadowMapUv[N_VERTICES];
+// OUTPUT
+out VertexData l_data[N_VERTICES];
+#ifdef atmosphereGround
+out vec4 l_atmosphereColor[N_VERTICES];
+out float l_fadeFactor[N_VERTICES];
 #endif
 
 #define U_TO_KM 1.0E6
@@ -80,14 +82,18 @@ void main(){
     // Plumbing
     gl_out[id].gl_Position = gl_in[id].gl_Position;
 
-    l_texCoords[id] = v_texCoords[id];
-    l_normal[id] = v_normal[id];
-    l_viewDir[id] = v_viewDir[id];
-    l_lightDir[id] = v_lightDir[id];
-    l_lightCol[id] = v_lightCol[id];
-    l_ambientLight[id] = v_ambientLight[id];
-    l_opacity[id] = v_opacity[id];
-    l_color[id] = v_color[id];
+    l_data[id].texCoords = v_data[id].texCoords;
+    l_data[id].normal = v_data[id].normal;
+    l_data[id].viewDir = v_data[id].viewDir;
+    #ifdef directionalLightsFlag
+    for (int i = 0; i < numDirectionalLights; i++) {
+        l_data[id].directionalLights[i].color = v_data[id].directionalLights[i].color;
+        l_data[id].directionalLights[i].direction = v_data[id].directionalLights[i].direction;
+    }
+    #endif
+    l_data[id].ambientLight = v_data[id].ambientLight;
+    l_data[id].opacity = v_data[id].opacity;
+    l_data[id].color = v_data[id].color;
 
     #ifdef atmosphereGround
     l_atmosphereColor[id] = v_atmosphereColor[id];
@@ -95,6 +101,6 @@ void main(){
     #endif
 
     #ifdef shadowMapFlag
-    l_shadowMapUv[id] = v_shadowMapUv[id];
+    l_data[id].shadowMapUv = v_data[id].shadowMapUv;
     #endif
 }

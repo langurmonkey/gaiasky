@@ -164,7 +164,8 @@ public abstract class BaseIntShader implements IntShader {
 	/** Initialize this shader, causing all registered uniforms/attributes to be fetched. */
 	public void init (final ExtShaderProgram program, final IntRenderable renderable) {
 		if (locations != null) throw new GdxRuntimeException("Already initialized");
-		if (!program.isCompiled()) throw new GdxRuntimeException(program.getLog());
+		if (!program.isCompiled())
+			throw new GdxRuntimeException(program.getLog());
 		this.program = program;
 
 		final int n = uniforms.size;

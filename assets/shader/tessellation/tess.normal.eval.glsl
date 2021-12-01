@@ -30,59 +30,60 @@ uniform vec2 u_heightSize;
 uniform sampler2D u_heightTexture;
 uniform float u_vrScale;
 
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+#define directionalLightsFlag
+#endif // numDirectionalLights
+
+#ifdef directionalLightsFlag
+struct DirectionalLight {
+    vec3 color;
+    vec3 direction;
+};
+#endif // directionalLightsFlag
+
+struct VertexData {
+    vec2 texCoords;
+    vec3 normal;
+    #ifdef directionalLightsFlag
+    DirectionalLight directionalLights[numDirectionalLights];
+    #endif // directionalLightsFlag
+    vec3 viewDir;
+    vec3 ambientLight;
+    float opacity;
+    vec4 color;
+    #ifdef shadowMapFlag
+    vec3 shadowMapUv;
+    #endif
+};
+// INPUT
+in VertexData l_data[gl_MaxPatchVertices];
+#ifdef atmosphereGround
+in vec4 l_atmosphereColor[gl_MaxPatchVertices];
+in float l_fadeFactor[gl_MaxPatchVertices];
+#endif // atmosphereGround
+
+// OUTPUT
+out VertexData o_data;
+#ifdef atmosphereGround
+out vec4 o_atmosphereColor;
+out float o_fadeFactor;
+#endif
 out vec3 o_normalTan;
 out vec3 o_fragPosition;
 out float o_fragHeight;
-
-in float l_opacity[gl_MaxPatchVertices];
-out float o_opacity;
-
-in vec2 l_texCoords[gl_MaxPatchVertices];
-out vec2 o_texCoords;
-
-in vec3 l_normal[gl_MaxPatchVertices];
-out vec3 o_normal;
-
-in vec3 l_viewDir[gl_MaxPatchVertices];
-out vec3 o_viewDir;
-
-in vec3 l_lightCol[gl_MaxPatchVertices];
-out vec3 o_lightCol;
-
-in vec3 l_lightDir[gl_MaxPatchVertices];
-out vec3 o_lightDir;
-
-in vec3 l_ambientLight[gl_MaxPatchVertices];
-out vec3 o_ambientLight;
-
-in vec4 l_color[gl_MaxPatchVertices];
-out vec4 o_color;
-
-#ifdef atmosphereGround
-in vec4 l_atmosphereColor[gl_MaxPatchVertices];
-out vec4 o_atmosphereColor;
-
-in float l_fadeFactor[gl_MaxPatchVertices];
-out float o_fadeFactor;
-#endif
-
-#ifdef shadowMapFlag
-in vec3 l_shadowMapUv[gl_MaxPatchVertices];
-out vec3 o_shadowMapUv;
-#endif
 
 #include shader/lib_sampleheight.glsl
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
-    #ifdef normalTextureFlag
+#ifdef normalTextureFlag
 // Use normal map
 uniform sampler2D u_normalTexture;
 vec3 calcNormal(vec2 p, vec2 dp){
     return normalize(texture(u_normalTexture, p).rgb * 2.0 - 1.0);
 }
-    #else
+#else
 // maps the height scale in internal units to a normal strength
 float computeNormalStrength(float heightScale){
     // to [0,100] km
@@ -111,23 +112,26 @@ vec3 calcNormal(vec2 p, vec2 dp){
     vec3 n = cross(va, vb);
     return normalize(n);
 }
-
-    #endif
+#endif // normalTextureFlag
 
 void main(void){
-    vec4 pos = (gl_TessCoord.x * gl_in[0].gl_Position +
-    gl_TessCoord.y * gl_in[1].gl_Position +
-    gl_TessCoord.z * gl_in[2].gl_Position);
+    float u = gl_TessCoord.x;
+    float v = gl_TessCoord.y;
+    float w = gl_TessCoord.z;
 
-    o_texCoords = (gl_TessCoord.x * l_texCoords[0] + gl_TessCoord.y * l_texCoords[1] + gl_TessCoord.z * l_texCoords[2]);
+    vec4 pos = (u * gl_in[0].gl_Position +
+    v * gl_in[1].gl_Position +
+    w * gl_in[2].gl_Position);
+
+    o_data.texCoords = (u * l_data[0].texCoords + v * l_data[1].texCoords + w * l_data[2].texCoords);
 
     // Normal to apply height
-    o_normal = normalize(gl_TessCoord.x * l_normal[0] + gl_TessCoord.y * l_normal[1] + gl_TessCoord.z * l_normal[2]);
+    o_data.normal = normalize(u * l_data[0].normal + v * l_data[1].normal + w * l_data[2].normal);
 
     // Use height texture to move vertex along normal
-    float h = 1.0 - sampleHeight(u_heightTexture, o_texCoords).r;
+    float h = 1.0 - sampleHeight(u_heightTexture, o_data.texCoords).r;
     o_fragHeight = h * u_heightScale;
-    vec3 dh = o_normal * o_fragHeight;
+    vec3 dh = o_data.normal * o_fragHeight;
     pos += vec4(dh, 0.0);
 
 
@@ -148,20 +152,24 @@ void main(void){
 
     // Plumbing
     o_fragPosition = pos.xyz;
-    o_normalTan = calcNormal(o_texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
-    o_opacity = l_opacity[0];
-    o_color = l_color[0];
-    o_viewDir = (gl_TessCoord.x * l_viewDir[0] + gl_TessCoord.y * l_viewDir[1] + gl_TessCoord.z * l_viewDir[2]);
-    o_lightCol = (gl_TessCoord.x * l_lightCol[0] + gl_TessCoord.y * l_lightCol[1] + gl_TessCoord.z * l_lightCol[2]);
-    o_lightDir = (gl_TessCoord.x * l_lightDir[0] + gl_TessCoord.y * l_lightDir[1] + gl_TessCoord.z * l_lightDir[2]);
-    o_ambientLight = (gl_TessCoord.x * l_ambientLight[0] + gl_TessCoord.y * l_ambientLight[1] + gl_TessCoord.z * l_ambientLight[2]);
+    o_normalTan = calcNormal(o_data.texCoords, vec2(1.0 / u_heightSize.x, 1.0 / u_heightSize.y));
+    o_data.opacity = (u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity);
+    o_data.color = (u * l_data[0].color + v * l_data[1].color + w * l_data[2].color);
+    o_data.viewDir = (u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir);
+    #ifdef directionalLightsFlag
+    for (int i = 0; i < numDirectionalLights; i++){
+        o_data.directionalLights[i].direction = (u * l_data[0].directionalLights[i].direction + v * l_data[1].directionalLights[i].direction + w * l_data[2].directionalLights[i].direction);
+        o_data.directionalLights[i].color = (u * l_data[0].directionalLights[i].color + v * l_data[1].directionalLights[i].color + w * l_data[2].directionalLights[i].color);
+    }
+    #endif // directionalLightsFlag
+    o_data.ambientLight = (u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight);
 
     #ifdef atmosphereGround
-    o_atmosphereColor = (gl_TessCoord.x * l_atmosphereColor[0] + gl_TessCoord.y * l_atmosphereColor[1] + gl_TessCoord.z * l_atmosphereColor[2]);
-    o_fadeFactor = (gl_TessCoord.x * l_fadeFactor[0] + gl_TessCoord.y * l_fadeFactor[1] + gl_TessCoord.z * l_fadeFactor[2]);
+    o_atmosphereColor = (u * l_atmosphereColor[0] + v * l_atmosphereColor[1] + w * l_atmosphereColor[2]);
+    o_fadeFactor = (u * l_fadeFactor[0] + v * l_fadeFactor[1] + w * l_fadeFactor[2]);
     #endif
 
     #ifdef shadowMapFlag
-    o_shadowMapUv = (gl_TessCoord.x * l_shadowMapUv[0] + gl_TessCoord.y * l_shadowMapUv[1] + gl_TessCoord.z * l_shadowMapUv[2]);
+    o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
     #endif
 }

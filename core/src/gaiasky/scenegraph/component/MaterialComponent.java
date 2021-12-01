@@ -76,12 +76,16 @@ public class MaterialComponent implements IObserver {
 
     // TEXTURES
     public boolean texInitialised, texLoading;
-    public String base, specular, normal, night, ring, height, ringnormal;
-    public String baseUnpacked, specularUnpacked, normalUnpacked, nightUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked;
+    public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
+    public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
+
+    // Material properties
+    public Float albedo;
+    public float[] reflection;
+    public float[] emissiveColor;
 
     // SPECULAR
     public float specularIndex = -1;
-    public float[] reflection;
 
     // HEIGHT
     public Float heightScale = 0.005f;
@@ -102,12 +106,15 @@ public class MaterialComponent implements IObserver {
 
     public void initialize(AssetManager manager) {
         // Add textures to load
-        baseUnpacked = addToLoad(base, getTP(base, true), manager);
+        diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
         normalUnpacked = addToLoad(normal, getTP(normal), manager);
         specularUnpacked = addToLoad(specular, getTP(specular, true), manager);
-        nightUnpacked = addToLoad(night, getTP(night, true), manager);
+        emissiveUnpacked = addToLoad(emissive, getTP(emissive, true), manager);
         ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
+        roughnessUnapcked = addToLoad(roughness, getTP(roughness, true), manager);
+        metallicUnpacked = addToLoad(metallic, getTP(metallic, true), manager);
+        aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
         if (height != null)
             if (!height.endsWith(GEN_HEIGHT_KEYWORD))
                 heightUnpacked = addToLoad(height, getTP(height, true), manager);
@@ -115,19 +122,22 @@ public class MaterialComponent implements IObserver {
 
     public void initialize() {
         // Add textures to load
-        baseUnpacked = addToLoad(base, getTP(base, true));
+        diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true));
         normalUnpacked = addToLoad(normal, getTP(normal));
         specularUnpacked = addToLoad(specular, getTP(specular, true));
-        nightUnpacked = addToLoad(night, getTP(night, true));
+        emissiveUnpacked = addToLoad(emissive, getTP(emissive, true));
         ringUnpacked = addToLoad(ring, getTP(ring, true));
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
+        roughnessUnapcked = addToLoad(roughness, getTP(roughness, true));
+        metallicUnpacked = addToLoad(metallic, getTP(metallic, true));
+        aoUnapcked = addToLoad(ao, getTP(ao, true));
         if (height != null)
             if (!height.endsWith(GEN_HEIGHT_KEYWORD))
                 heightUnpacked = addToLoad(height, getTP(height, true));
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(baseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(nightUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager);
+        return isFL(diffuseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(emissiveUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager) && isFL(roughnessUnapcked, manager) && isFL(metallicUnpacked, manager) && isFL(aoUnapcked, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -179,11 +189,11 @@ public class MaterialComponent implements IObserver {
     public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] cc, boolean culling) {
         SkyboxComponent.prepareSkybox();
         this.material = mat;
-        if (base != null && material.get(TextureAttribute.Diffuse) == null) {
-            Texture tex = manager.get(baseUnpacked, Texture.class);
+        if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
+            Texture tex = manager.get(diffuseUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
         }
-        if (cc != null && (coloriftex || base == null)) {
+        if (cc != null && (coloriftex || diffuse == null)) {
             // Add diffuse colour
             material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
         }
@@ -206,9 +216,12 @@ public class MaterialComponent implements IObserver {
                 material.set(new ColorAttribute(ColorAttribute.Specular, 0, 0, 0, 1f));
             }
         }
-        if (night != null && material.get(TextureExtAttribute.Night) == null) {
-            Texture tex = manager.get(nightUnpacked, Texture.class);
-            material.set(new TextureExtAttribute(TextureExtAttribute.Night, tex));
+        if (emissive != null && material.get(TextureAttribute.Emissive) == null) {
+            Texture tex = manager.get(emissiveUnpacked, Texture.class);
+            material.set(new TextureExtAttribute(TextureAttribute.Emissive, tex));
+        }
+        if (emissiveColor != null) {
+            material.set(new ColorAttribute(ColorAttribute.Emissive, emissiveColor[0], emissiveColor[1], emissiveColor[2], 1f));
         }
         if (height != null && material.get(TextureExtAttribute.Height) == null) {
             if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
@@ -241,6 +254,21 @@ public class MaterialComponent implements IObserver {
             material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
             material.set(new ColorAttribute(ColorAttribute.Reflection, reflection[0], reflection[1], reflection[2], 1f));
         }
+        if (roughness != null && material.get(TextureExtAttribute.Roughness) == null) {
+            Texture tex = manager.get(roughnessUnapcked, Texture.class);
+            material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, tex));
+        }
+        if (metallic != null && material.get(TextureExtAttribute.Metallic) == null) {
+            Texture tex = manager.get(metallicUnpacked, Texture.class);
+            material.set(new TextureExtAttribute(TextureExtAttribute.Metallic, tex));
+        }
+        if (albedo != null) {
+            material.set(new FloatExtAttribute(FloatExtAttribute.Albedo, albedo));
+        }
+        if (ao != null && material.get(TextureExtAttribute.AO) == null) {
+            Texture tex = manager.get(aoUnapcked, Texture.class);
+            material.set(new TextureExtAttribute(TextureExtAttribute.AO, tex));
+        }
 
         return material;
     }
@@ -264,7 +292,6 @@ public class MaterialComponent implements IObserver {
                 material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
                 material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
                 material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
-                //material.set(new FloatExtAttribute(FloatExtAttribute.HeightNoiseSize, noiseSize));
                 material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
             });
         });
@@ -307,8 +334,16 @@ public class MaterialComponent implements IObserver {
         material.remove(FloatExtAttribute.TessQuality);
     }
 
-    public void setBase(String base) {
-        this.base = Settings.settings.data.dataFile(base);
+    /**
+     * @deprecated use {@link MaterialComponent#setDiffuse(String)} instead
+     */
+    @Deprecated
+    public void setBase(String diffuse) {
+        this.setDiffuse(diffuse);
+    }
+
+    public void setDiffuse(String diffuse) {
+        this.diffuse = Settings.settings.data.dataFile(diffuse);
     }
 
     public void setSpecular(String specular) {
@@ -323,8 +358,30 @@ public class MaterialComponent implements IObserver {
         this.normal = Settings.settings.data.dataFile(normal);
     }
 
-    public void setNight(String night) {
-        this.night = Settings.settings.data.dataFile(night);
+    /**
+     * @deprecated use {@link MaterialComponent#setEmissive(String)} instead
+     */
+    @Deprecated
+    public void setNight(String emissive) {
+        this.setEmissive(emissive);
+    }
+
+    public void setEmissive(String emissive) {
+        this.emissive = Settings.settings.data.dataFile(emissive);
+    }
+
+    public void setEmissive(Double emissive) {
+        float r = emissive.floatValue();
+        this.emissiveColor = new float[] { r, r, r };
+    }
+
+    public void setEmissive(double[] emissive) {
+        if (emissive.length > 1) {
+            this.emissiveColor = new float[] { (float) emissive[0], (float) emissive[1], (float) emissive[2] };
+        } else {
+            float r = (float) emissive[0];
+            this.emissiveColor = new float[] { r, r, r };
+        }
     }
 
     public void setRing(String ring) {
@@ -365,6 +422,23 @@ public class MaterialComponent implements IObserver {
         }
     }
 
+    public void setRoughness(String roughness) {
+        this.roughness = Settings.settings.data.dataFile(roughness);
+    }
+
+
+    public void setAlbedo(Double albedo){
+        this.albedo = albedo.floatValue();
+    }
+
+    public void setMetallic(String metallic) {
+        this.metallic = Settings.settings.data.dataFile(metallic);
+    }
+
+    public void setAo(String ao) {
+        this.ao = Settings.settings.data.dataFile(ao);
+    }
+
     public boolean hasHeight() {
         return this.height != null && !this.height.isEmpty();
     }
@@ -375,9 +449,9 @@ public class MaterialComponent implements IObserver {
      * @param manager The asset manager
      **/
     public void disposeTextures(AssetManager manager) {
-        if (base != null && manager.isLoaded(baseUnpacked)) {
-            manager.unload(baseUnpacked);
-            baseUnpacked = null;
+        if (diffuse != null && manager.isLoaded(diffuseUnpacked)) {
+            manager.unload(diffuseUnpacked);
+            diffuseUnpacked = null;
             unload(material, TextureAttribute.Diffuse);
         }
         if (normal != null && manager.isLoaded(normalUnpacked)) {
@@ -390,10 +464,10 @@ public class MaterialComponent implements IObserver {
             specularUnpacked = null;
             unload(material, TextureAttribute.Specular);
         }
-        if (night != null && manager.isLoaded(nightUnpacked)) {
-            manager.unload(nightUnpacked);
-            nightUnpacked = null;
-            unload(material, TextureExtAttribute.Night);
+        if (emissive != null && manager.isLoaded(emissiveUnpacked)) {
+            manager.unload(emissiveUnpacked);
+            emissiveUnpacked = null;
+            unload(material, TextureAttribute.Emissive);
         }
         if (ring != null && manager.isLoaded(ringUnpacked)) {
             manager.unload(ringUnpacked);
@@ -410,6 +484,21 @@ public class MaterialComponent implements IObserver {
             heightUnpacked = null;
             heightMap = null;
             unload(material, TextureExtAttribute.Height);
+        }
+        if (metallic != null && manager.isLoaded(metallicUnpacked)) {
+            manager.unload(metallicUnpacked);
+            metallicUnpacked = null;
+            unload(material, TextureExtAttribute.Metallic);
+        }
+        if (roughness != null && manager.isLoaded(roughnessUnapcked)) {
+            manager.unload(roughnessUnapcked);
+            roughnessUnapcked = null;
+            unload(material, TextureExtAttribute.Roughness);
+        }
+        if (ao != null && manager.isLoaded(aoUnapcked)) {
+            manager.unload(aoUnapcked);
+            aoUnapcked = null;
+            unload(material, TextureExtAttribute.AO);
         }
         texLoading = false;
         texInitialised = false;
@@ -478,14 +567,14 @@ public class MaterialComponent implements IObserver {
 
     public String getTexturesString() {
         StringBuilder sb = new StringBuilder();
-        if (base != null)
-            sb.append(base);
+        if (diffuse != null)
+            sb.append(diffuse);
         if (normal != null)
             sb.append(",").append(normal);
         if (specular != null)
             sb.append(",").append(specular);
-        if (night != null)
-            sb.append(",").append(night);
+        if (emissive != null)
+            sb.append(",").append(emissive);
         if (ring != null)
             sb.append(",").append(ring);
         if (ringnormal != null)
@@ -497,6 +586,6 @@ public class MaterialComponent implements IObserver {
 
     @Override
     public String toString(){
-        return base;
+        return diffuse;
     }
 }

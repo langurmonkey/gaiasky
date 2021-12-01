@@ -658,11 +658,6 @@ public enum Events {
      **/
     OCTREE_PARTICLE_FADE_CMD,
     /**
-     * Contains the name, the boolean value, and a boolean indicating if this
-     * comes from the interface
-     **/
-    ONLY_OBSERVED_STARS_CMD,
-    /**
      * Passes the OrbitData and the file name
      **/
     ORBIT_DATA_LOADED,
@@ -1291,12 +1286,6 @@ public enum Events {
     TOUCH_DOWN,
     TOUCH_DRAGGED,
     TOUCH_UP,
-
-    /**
-     * Contains the name, the boolean value, and a boolean indicating if this
-     * comes from the interface
-     **/
-    TRANSIT_COLOUR_CMD,
 
     /**
      * Contains the new turning speed.

@@ -46,6 +46,7 @@ import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -144,14 +145,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         mat.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
         mat.set(new TextureAttribute(TextureAttribute.Normal, lut));
         // Only to activate view vector (camera position)
-        mat.set(new TextureAttribute(TextureAttribute.Specular, lut));
+        mat.set(new ColorAttribute(ColorAttribute.Specular));
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         Matrix4 modelTransform = new Matrix4();
         mc = new ModelComponent(false);
         mc.initialize();
         mc.env = new Environment();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0f));
+        mc.env.set(new FloatExtAttribute(FloatExtAttribute.Time, 0f));
         mc.instance = new IntModelInstance(model, modelTransform);
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)
@@ -371,7 +372,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 mc.setTransparency(alpha * opacity);
                 float[] col = proximity.updating[0].col;
                 ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
-                ((FloatAttribute) mc.env.get(FloatAttribute.Shininess)).value = (float) t;
+                ((FloatAttribute) mc.env.get(FloatExtAttribute.Time)).value = (float) t;
                 // Local transform
                 double variableScaling = getVariableSizeScaling(proximity.updating[0].index);
                 mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d * variableScaling));

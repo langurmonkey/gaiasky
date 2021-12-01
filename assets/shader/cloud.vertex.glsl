@@ -152,13 +152,6 @@ out float v_alphaTest;
     const float u_alphaTest = 0.0;
 #endif
 
-#ifdef shininessFlag
-    uniform float u_shininess;
-#else
-    const float u_shininess = 20.0;
-#endif
-
-
 #ifdef diffuseTextureFlag
     uniform sampler2D u_diffuseTexture;
 #endif

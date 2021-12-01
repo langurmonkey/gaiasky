@@ -24,10 +24,9 @@ public class TessellationShaderProvider extends DefaultIntShaderProvider {
         }
     }
 
-    public final Config config;
 
     public TessellationShaderProvider(final Config config) {
-        this.config = (config == null) ? new Config() : config;
+        super(config);
     }
 
     public TessellationShaderProvider(final String vertexShader, final String controlShader, final String evaluationShader, final String fragmentShader) {
@@ -44,6 +43,6 @@ public class TessellationShaderProvider extends DefaultIntShaderProvider {
 
     @Override
     protected IntShader createShader(final IntRenderable renderable) {
-        return new TessellationShader(renderable, config);
+        return new TessellationShader(renderable, (Config) config);
     }
 }

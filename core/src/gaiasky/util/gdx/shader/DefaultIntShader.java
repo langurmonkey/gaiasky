@@ -56,13 +56,13 @@ public class DefaultIntShader extends BaseIntShader {
         /** The uber fragment shader to use, null to use the default fragment shader. */
         public String fragmentShaderCode = null;
         /** The number of directional lights to use */
-        public int numDirectionalLights = 2;
+        public int numDirectionalLights = 3;
         /** The number of point lights to use */
-        public int numPointLights = 5;
-        /** The number of spot lights to use */
+        public int numPointLights = 0;
+        /** The number of spotlights to use */
         public int numSpotLights = 0;
         /** The number of bones to use */
-        public int numBones = 12;
+        public int numBones = 0;
         /**
          *
          */
@@ -107,17 +107,20 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform bones = new Uniform("u_bones");
         public final static Uniform vrOffset = new Uniform("u_vroffset");
 
-        public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
         public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
+        public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
+        public final static Uniform metallicTexture = new Uniform("u_metallicTexture", TextureExtAttribute.Metallic);
+        public final static Uniform albedo = new Uniform("u_albedo", FloatExtAttribute.Albedo);
+        public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureExtAttribute.AO);
         public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
         public final static Uniform diffuseTexture = new Uniform("u_diffuseTexture", TextureAttribute.Diffuse);
         public final static Uniform specularColor = new Uniform("u_specularColor", ColorAttribute.Specular);
         public final static Uniform specularTexture = new Uniform("u_specularTexture", TextureAttribute.Specular);
         public final static Uniform emissiveColor = new Uniform("u_emissiveColor", ColorAttribute.Emissive);
         public final static Uniform emissiveTexture = new Uniform("u_emissiveTexture", TextureAttribute.Emissive);
-        public final static Uniform nightTexture = new Uniform("u_nightTexture", TextureExtAttribute.Night);
         public final static Uniform reflectionColor = new Uniform("u_reflectionColor", ColorAttribute.Reflection);
         public final static Uniform reflectionTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
+
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureExtAttribute.Height);
@@ -127,6 +130,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatExtAttribute.TessQuality);
         public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
+        public final static Uniform time = new Uniform("u_time", FloatExtAttribute.Time);
         public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
         public final static Uniform dirLights = new Uniform("u_dirLights");
         public final static Uniform pointLights = new Uniform("u_pointLights");
@@ -252,10 +256,37 @@ public class DefaultIntShader extends BaseIntShader {
             }
         }
 
-        public final static Setter shininess = new LocalSetter() {
+        public final static Setter roughnessTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Shininess))).value);
+                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Roughness))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter metallicTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Metallic))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter aoTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.AO))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter albedo = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Albedo))).value);
+            }
+        };
+        public final static Setter time = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Time))).value);
             }
         };
         public final static Setter diffuseColor = new LocalSetter() {
@@ -294,13 +325,6 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Emissive))).textureDescription);
-                shader.set(inputID, unit);
-            }
-        };
-        public final static Setter nightTexture = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Night))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -433,7 +457,7 @@ public class DefaultIntShader extends BaseIntShader {
         return defaultFragmentShader;
     }
 
-    protected static long implementedFlags = BlendingAttribute.Type | TextureAttribute.Diffuse | ColorAttribute.Diffuse | ColorAttribute.Specular | FloatAttribute.Shininess;
+    protected static long implementedFlags = BlendingAttribute.Type | TextureAttribute.Diffuse | ColorAttribute.Diffuse | ColorAttribute.Specular;
 
     /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
     @Deprecated public static int defaultCullFace = GL20.GL_BACK;
@@ -461,7 +485,10 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_normalMatrix;
     public final int u_bones;
     // Material uniforms
-    public final int u_shininess;
+    public final int u_aoTexture;
+    public final int u_metallicTexture;
+    public final int u_roughnessTexture;
+    public final int u_albedo;
     public final int u_opacity;
     public final int u_diffuseColor;
     public final int u_diffuseTexture;
@@ -469,7 +496,6 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_specularTexture;
     public final int u_emissiveColor;
     public final int u_emissiveTexture;
-    public final int u_nightTexture;
     public final int u_reflectionColor;
     public final int u_reflectionTexture;
     public final int u_normalTexture;
@@ -483,25 +509,24 @@ public class DefaultIntShader extends BaseIntShader {
     // Lighting uniforms
     protected final int u_ambientCubemap;
     protected final int u_environmentCubemap;
-    protected final int u_dirLights0color = register(new Uniform("u_dirLights[0].color"));
-    protected final int u_dirLights0direction = register(new Uniform("u_dirLights[0].direction"));
-    protected final int u_dirLights1color = register(new Uniform("u_dirLights[1].color"));
-    protected final int u_pointLights0color = register(new Uniform("u_pointLights[0].color"));
-    protected final int u_pointLights0position = register(new Uniform("u_pointLights[0].position"));
-    protected final int u_pointLights0intensity = register(new Uniform("u_pointLights[0].intensity"));
-    protected final int u_pointLights1color = register(new Uniform("u_pointLights[1].color"));
-    protected final int u_spotLights0color = register(new Uniform("u_spotLights[0].color"));
-    protected final int u_spotLights0position = register(new Uniform("u_spotLights[0].position"));
-    protected final int u_spotLights0intensity = register(new Uniform("u_spotLights[0].intensity"));
-    protected final int u_spotLights0direction = register(new Uniform("u_spotLights[0].direction"));
-    protected final int u_spotLights0cutoffAngle = register(new Uniform("u_spotLights[0].cutoffAngle"));
-    protected final int u_spotLights0exponent = register(new Uniform("u_spotLights[0].exponent"));
-    protected final int u_spotLights1color = register(new Uniform("u_spotLights[1].color"));
-    protected final int u_fogColor = register(new Uniform("u_fogColor"));
-    protected final int u_shadowMapProjViewTrans = register(new Uniform("u_shadowMapProjViewTrans"));
-    protected final int u_shadowTexture = register(new Uniform("u_shadowTexture"));
-    protected final int u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
-    // FIXME Cache vertex attribute locations...
+    protected final int u_dirLights0color;
+    protected final int u_dirLights0direction;
+    protected final int u_dirLights1color;
+    protected final int u_pointLights0color;
+    protected final int u_pointLights0position;
+    protected final int u_pointLights0intensity;
+    protected final int u_pointLights1color;
+    protected final int u_spotLights0color;
+    protected final int u_spotLights0position ;
+    protected final int u_spotLights0intensity;
+    protected final int u_spotLights0direction;
+    protected final int u_spotLights0cutoffAngle;
+    protected final int u_spotLights0exponent;
+    protected final int u_spotLights1color;
+    protected final int u_fogColor;
+    protected final int u_shadowMapProjViewTrans;
+    protected final int u_shadowTexture;
+    protected final int u_shadowPCFOffset;
 
     protected int dirLightsLoc;
     protected int dirLightsColorOffset;
@@ -579,6 +604,24 @@ public class DefaultIntShader extends BaseIntShader {
             throw new GdxRuntimeException("Some attributes not implemented yet (" + attributesMask + ")");
 
         // Global uniforms
+        u_dirLights0color = register(new Uniform("u_dirLights[0].color"));
+        u_dirLights0direction = register(new Uniform("u_dirLights[0].direction"));
+        u_dirLights1color = register(new Uniform("u_dirLights[1].color"));
+        u_pointLights0color = register(new Uniform("u_pointLights[0].color"));
+        u_pointLights0position = register(new Uniform("u_pointLights[0].position"));
+        u_pointLights0intensity = register(new Uniform("u_pointLights[0].intensity"));
+        u_pointLights1color = register(new Uniform("u_pointLights[1].color"));
+        u_spotLights0color = register(new Uniform("u_spotLights[0].color"));
+        u_spotLights0position = register(new Uniform("u_spotLights[0].position"));
+        u_spotLights0intensity = register(new Uniform("u_spotLights[0].intensity"));
+        u_spotLights0direction = register(new Uniform("u_spotLights[0].direction"));
+        u_spotLights0cutoffAngle = register(new Uniform("u_spotLights[0].cutoffAngle"));
+        u_spotLights0exponent = register(new Uniform("u_spotLights[0].exponent"));
+        u_spotLights1color = register(new Uniform("u_spotLights[1].color"));
+        u_fogColor = register(new Uniform("u_fogColor"));
+        u_shadowMapProjViewTrans = register(new Uniform("u_shadowMapProjViewTrans"));
+        u_shadowTexture = register(new Uniform("u_shadowTexture"));
+        u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
         u_projTrans = register(Inputs.projTrans, Setters.projTrans);
         u_viewTrans = register(Inputs.viewTrans, Setters.viewTrans);
         u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
@@ -587,7 +630,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_cameraUp = register(Inputs.cameraUp, Setters.cameraUp);
         u_cameraNearFar = register(Inputs.cameraNearFar, Setters.cameraNearFar);
         u_cameraK = register(Inputs.cameraK, Setters.cameraK);
-        u_time = register(new Uniform("u_time"));
+        u_time = register(Inputs.time, Setters.time);
         u_prevProjView = register(Inputs.prevProjView, Setters.prevProjView);
         u_dCamPos = register(Inputs.dCamPos, Setters.dCamPos);
         u_vrScale = register(Inputs.vrScale, Setters.vrScale);
@@ -598,7 +641,10 @@ public class DefaultIntShader extends BaseIntShader {
         u_normalMatrix = register(Inputs.normalMatrix, Setters.normalMatrix);
         u_bones = (renderable.bones != null && config.numBones > 0) ? register(Inputs.bones, new Setters.Bones(config.numBones)) : -1;
 
-        u_shininess = register(Inputs.shininess, Setters.shininess);
+        u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
+        u_metallicTexture = register(Inputs.metallicTexture, Setters.metallicTexture);
+        u_aoTexture = register(Inputs.aoTexture, Setters.aoTexture);
+        u_albedo = register(Inputs.albedo, Setters.albedo);
         u_opacity = register(Inputs.opacity);
         u_diffuseColor = register(Inputs.diffuseColor, Setters.diffuseColor);
         u_diffuseTexture = register(Inputs.diffuseTexture, Setters.diffuseTexture);
@@ -606,7 +652,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_specularTexture = register(Inputs.specularTexture, Setters.specularTexture);
         u_emissiveColor = register(Inputs.emissiveColor, Setters.emissiveColor);
         u_emissiveTexture = register(Inputs.emissiveTexture, Setters.emissiveTexture);
-        u_nightTexture = register(Inputs.nightTexture, Setters.nightTexture);
         u_reflectionColor = register(Inputs.reflectionColor, Setters.reflectionColor);
         u_reflectionTexture = register(Inputs.reflectionTexture, Setters.reflectionTexture);
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
@@ -628,7 +673,6 @@ public class DefaultIntShader extends BaseIntShader {
         this.program = null;
         init(program, renderable);
         renderable = null;
-
         dirLightsLoc = loc(u_dirLights0color);
         dirLightsColorOffset = loc(u_dirLights0color) - dirLightsLoc;
         dirLightsDirectionOffset = loc(u_dirLights0direction) - dirLightsLoc;
@@ -738,18 +782,32 @@ public class DefaultIntShader extends BaseIntShader {
         if ((attributesMask & TextureAttribute.Emissive) == TextureAttribute.Emissive) {
             prefix += "#define " + TextureAttribute.EmissiveAlias + "Flag\n";
         }
-        if ((attributesMask & TextureExtAttribute.Night) == TextureExtAttribute.Night) {
-            prefix += "#define " + TextureExtAttribute.NightAlias + "Flag\n";
-        }
         if ((attributesMask & TextureAttribute.Reflection) == TextureAttribute.Reflection) {
             prefix += "#define " + TextureAttribute.ReflectionAlias + "Flag\n";
         }
         if ((attributesMask & TextureExtAttribute.Height) == TextureExtAttribute.Height) {
             prefix += "#define " + TextureExtAttribute.HeightAlias + "Flag\n";
         }
+        if ((attributesMask & TextureExtAttribute.AO) == TextureExtAttribute.AO) {
+            prefix += "#define " + TextureExtAttribute.AOAlias + "Flag\n";
+        }
+        if ((attributesMask & TextureExtAttribute.Roughness) == TextureExtAttribute.Roughness) {
+            prefix += "#define " + TextureExtAttribute.RoughnessAlias + "Flag\n";
+        }
+        if ((attributesMask & TextureExtAttribute.Metallic) == TextureExtAttribute.Metallic) {
+            prefix += "#define " + TextureExtAttribute.MetallicAlias + "Flag\n";
+        }
+
+        if ((attributesMask & FloatExtAttribute.Albedo) == FloatExtAttribute.Albedo) {
+            prefix += "#define " + FloatExtAttribute.AlbedoAlias + "Flag\n";
+        }
+        if ((attributesMask & FloatExtAttribute.Time) == FloatExtAttribute.Time) {
+            prefix += "#define " + FloatExtAttribute.TimeAlias + "Flag\n";
+        }
         if ((attributesMask & FloatExtAttribute.HeightNoiseSize) == FloatExtAttribute.HeightNoiseSize) {
             prefix += "#define heightFlag\n";
         }
+
         if ((attributesMask & Matrix4Attribute.PrevProjView) == Matrix4Attribute.PrevProjView) {
             prefix += "#define velocityBufferFlag\n";
         }
@@ -764,8 +822,6 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define " + ColorAttribute.EmissiveAlias + "Flag\n";
         if ((attributesMask & ColorAttribute.Reflection) == ColorAttribute.Reflection)
             prefix += "#define " + ColorAttribute.ReflectionAlias + "Flag\n";
-        if ((attributesMask & FloatAttribute.Shininess) == FloatAttribute.Shininess)
-            prefix += "#define " + FloatAttribute.ShininessAlias + "Flag\n";
         if ((attributesMask & FloatAttribute.AlphaTest) == FloatAttribute.AlphaTest)
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
         if (renderable.bones != null && config.numBones > 0)
@@ -812,8 +868,10 @@ public class DefaultIntShader extends BaseIntShader {
             spotLight.set(0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0);
         lightsSet = false;
 
-        if (has(u_time))
-            set(u_time, time += GaiaSky.instance.getT());
+        if (has(u_time)) {
+            time = (float) GaiaSky.instance.getT();
+            set(u_time, time);
+        }
     }
 
     @Override

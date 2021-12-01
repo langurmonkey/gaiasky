@@ -32,11 +32,17 @@ out vec2 v_texCoords0;
 uniform mat4 u_worldTrans;
 uniform float u_vrScale;
 
-#ifdef shininessFlag
-uniform float u_shininess;
+#ifdef roughnessFlag
+uniform float u_roughness;
 #else
-const float u_shininess = 20.0;
-#endif // shininessFlag
+const float u_roughness = 0.0;
+#endif // roughnessFlag
+
+#ifdef timeFlag
+uniform float u_time;
+#else
+const float u_time = 0.0;
+#endif // timeFlag
 out float v_time;
 
 #ifdef blendedFlag
@@ -142,7 +148,7 @@ out vec3 v_ambientLight;
 void main() {
 	computeAtmosphericScatteringGround();
 
-	v_time = u_shininess;
+	v_time = u_time;
 	v_texCoords0 = a_texCoord0;
 
 	#if defined(colorFlag)
@@ -251,7 +257,7 @@ void main() {
 
 				#ifdef specularFlag
 					float halfDotView = max(0.0, dot(normal, normalize(lightDir + viewVec)));
-					v_lightSpecular += value * pow(halfDotView, u_shininess);
+					v_lightSpecular += value * pow(halfDotView, 20.0);
 				#endif // specularFlag
 			}
 		#endif // numDirectionalLights
@@ -266,7 +272,7 @@ void main() {
 				v_lightDiffuse += value;
 				#ifdef specularFlag
 					float halfDotView = max(0.0, dot(normal, normalize(lightDir + viewVec)));
-					v_lightSpecular += value * pow(halfDotView, u_shininess);
+					v_lightSpecular += value * pow(halfDotView, 20.0);
 				#endif // specularFlag
 			}
 		#endif // numPointLights

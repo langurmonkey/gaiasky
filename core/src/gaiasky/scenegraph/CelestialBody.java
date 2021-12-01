@@ -65,8 +65,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     public float appmag;
     /** Red, green and blue colors and their revamped cousins **/
     public float[] ccPale;
-    /** Colour for stars that have been observed by Gaia **/
-    public float[] ccTransit;
 
     /**
      * The B-V color index, calculated as the magnitude in B minus the magnitude
@@ -170,7 +168,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     protected void setColor2Data() {
         final float plus = .1f;
         ccPale = new float[] { Math.min(1, cc[0] + plus), Math.min(1, cc[1] + plus), Math.min(1, cc[2] + plus) };
-        ccTransit = new float[] { ccPale[0], ccPale[1], ccPale[2], cc[3] };
     }
 
     public abstract float getInnerRad();

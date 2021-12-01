@@ -50,7 +50,7 @@ public class BillboardGalaxy extends Billboard {
         params.put("diameter", 1.0);
         mc.setParams(params);
         MaterialComponent mtc = new MaterialComponent();
-        mtc.setBase(tex);
+        mtc.setDiffuse(tex);
         mc.setMaterial(mtc);
         setModel(mc);
     }

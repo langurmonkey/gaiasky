@@ -196,7 +196,7 @@ public class Constants {
     public static final float MIN_CAM_SPEED = 0.1f;
 
     /** Maximum rotation speed **/
-    public static final float MAX_ROT_SPEED = 0.5e4f;
+    public static final float MAX_ROT_SPEED = 1e4f;
     /** Minimum rotation speed **/
     public static final float MIN_ROT_SPEED = 2e2f;
 

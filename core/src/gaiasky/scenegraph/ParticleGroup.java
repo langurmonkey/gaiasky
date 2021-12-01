@@ -89,7 +89,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     /**
      * Particle size limits
      */
-    public double[] particleSizeLimitsPoint = new double[] { 3.5d, 800d };
+    public double[] particleSizeLimitsPoint = new double[] { 2d, 50d };
     /**
      * Particle size limits for the GL_TRIANGLES renderer. This will be multiplied by
      * the distance to the particle in the shader, so that <code>size = tan(angle) * dist</code>
@@ -1325,7 +1325,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
         double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
-        double[] minParticleSize = datasetOptions == null ? new double[] { 2d, 200d } : datasetOptions.particleSizeLimits;
+        double[] particleSizeLimits = datasetOptions == null ? new double[] { Math.toRadians(0.1), Math.toRadians(6.0) } : datasetOptions.particleSizeLimits;
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
         String ct = datasetOptions == null || datasetOptions.ct == null ? ComponentType.Galaxies.toString() : datasetOptions.ct.toString();
 
@@ -1339,7 +1339,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         pg.setColornoise(colorNoise);
         pg.setLabelcolor(labelColor);
         pg.setSize(particleSize);
-        pg.setParticlesizelimits(minParticleSize);
+        pg.setParticlesizelimits(particleSizeLimits);
         pg.setCt(ct);
         pg.setData(data);
         pg.initialize(false, false);

@@ -18,6 +18,8 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings.SceneSettings.*;
+import gaiasky.util.Settings.SceneSettings.StarSettings.*;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
@@ -409,11 +411,9 @@ public class Settings {
             public int textureIndex;
             public GroupSettings group;
             public ThresholdSettings threshold;
-            @JsonIgnore public boolean colorTransit;
-            @JsonIgnore public boolean onlyObserved;
 
             public StarSettings() {
-                EventManager.instance.subscribe(this, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
+                EventManager.instance.subscribe(this, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
             }
 
             @JsonIgnore
@@ -510,12 +510,6 @@ public class Settings {
                     break;
                 case STAR_BRIGHTNESS_POW_CMD:
                     power = (float) data[0];
-                    break;
-                case TRANSIT_COLOUR_CMD:
-                    colorTransit = (boolean) data[1];
-                    break;
-                case ONLY_OBSERVED_STARS_CMD:
-                    onlyObserved = (boolean) data[1];
                     break;
                 }
             }

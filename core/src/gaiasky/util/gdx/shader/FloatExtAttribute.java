@@ -36,6 +36,13 @@ public class FloatExtAttribute extends FloatAttribute {
     public static final String TessQualityAlias = "tessQuality";
     public static final long TessQuality = register(TessQualityAlias);
 
+    public static final String AlbedoAlias = "albedo";
+    public static final long Albedo = register(AlbedoAlias);
+
+    public static final String TimeAlias = "time";
+    public static final long Time = register(TimeAlias);
+
+
     @Override
     public Attribute copy() {
         return new FloatExtAttribute(type, value);

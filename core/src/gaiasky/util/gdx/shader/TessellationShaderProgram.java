@@ -26,18 +26,10 @@ import java.nio.*;
 public class TessellationShaderProgram extends ExtShaderProgram {
     /** default name for position attributes **/
     public static final String POSITION_ATTRIBUTE = "a_position";
-    /** default name for normal attributes **/
-    public static final String NORMAL_ATTRIBUTE = "a_normal";
     /** default name for color attributes **/
     public static final String COLOR_ATTRIBUTE = "a_color";
-    /** default name for texcoords attributes, append texture unit number **/
+    /** default name for texture coordinates attributes, append texture unit number **/
     public static final String TEXCOORD_ATTRIBUTE = "a_texCoord";
-    /** default name for tangent attribute **/
-    public static final String TANGENT_ATTRIBUTE = "a_tangent";
-    /** default name for binormal attribute **/
-    public static final String BINORMAL_ATTRIBUTE = "a_binormal";
-    /** default name for boneweight attribute **/
-    public static final String BONEWEIGHT_ATTRIBUTE = "a_boneWeight";
 
     /** flag indicating whether attributes & uniforms must be present at all times **/
     public static boolean pedantic = true;
@@ -96,9 +88,6 @@ public class TessellationShaderProgram extends ExtShaderProgram {
     private int vertexShaderHandle, fragmentShaderHandle;
     private int tesselationControlShaderHandle, tessellationEvaluationShaderHandle;
 
-    /** matrix float buffer **/
-    private final FloatBuffer matrix;
-
     /** vertex shader source **/
     private final String vertexShaderSource;
 
@@ -136,7 +125,6 @@ public class TessellationShaderProgram extends ExtShaderProgram {
         this.tessellationControlShaderSource = tessellationControlShader;
         this.tessellationEvaluationShaderSource = tessellationEvaluationShader;
         this.fragmentShaderSource = fragmentShader;
-        this.matrix = BufferUtils.newFloatBuffer(16);
 
         compileShaders(vertexShader, tessellationControlShader, tessellationEvaluationShader, fragmentShader);
         if (isCompiled()) {
@@ -240,21 +228,13 @@ public class TessellationShaderProgram extends ExtShaderProgram {
         return program;
     }
 
-    final static IntBuffer intbuf = BufferUtils.newIntBuffer(1);
-
     /** @return the log info for the shader compilation and program linking stage. The shader needs to be bound for this method to
      *         have an effect. */
     public String getLog () {
         if (isCompiled) {
-            // Gdx.gl.glGetProgramiv(program, GL20.GL_INFO_LOG_LENGTH, intbuf);
-            // int infoLogLength = intbuf.get(0);
-            // if (infoLogLength > 1) {
             log = Gdx.gl.glGetProgramInfoLog(program);
-            // }
-            return log;
-        } else {
-            return log;
         }
+        return log;
     }
 
     /** @return whether this ShaderProgram compiled successfully. */

@@ -58,16 +58,11 @@ out vec3 v_normal;
 #endif //binormalFlag
 
 out vec3 v_binormal;
-#define pushBinormalValue(value) v_binormal = (value)
 #if defined(binormalFlag)
     vec3 g_binormal = a_binormal;
-    #define passBinormalValue(value) pushBinormalValue(value)
 #else
     vec3 g_binormal = vec3(0.0, 1.0, 0.0);
-    #define passBinormalValue(value) nop()
 #endif // binormalFlag
-#define passBinormal() passBinormalValue(g_binormal)
-#define pushBinormal() pushBinormalValue(g_binormal)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - VERTEX
@@ -77,16 +72,11 @@ out vec3 v_binormal;
 #endif //tangentFlagvec3
 
 out vec3 v_tangent;
-#define pushTangentValue(value) v_tangent = (value)
 #if defined(tangentFlag)
     vec3 g_tangent = a_tangent;
-    #define passTangentValue(value) pushTangentValue(value)
 #else
     vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-    #define passTangentValue(value) nop()
 #endif // tangentFlag
-#define passTangent() passTangentValue(g_tangent)
-#define pushTangent() pushTangentValue(g_tangent)
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TEXCOORD0 ATTRIBUTE - VERTEX
@@ -107,6 +97,11 @@ out vec2 v_texCoord0;
     vec2 g_texCoord0 = vec2(0.0, 0.0);
 #endif // texCoord0Flag
 
+// Uniforms which are always available
+uniform mat4 u_projViewTrans;
+uniform mat4 u_worldTrans;
+uniform mat3 u_normalMatrix;
+uniform float u_vrScale;
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -141,24 +136,10 @@ out vec3 v_shadowMapUv;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-// Uniforms which are always available
-uniform mat4 u_projViewTrans;
-uniform mat4 u_worldTrans;
-uniform mat3 u_normalMatrix;
-uniform float u_vrScale;
-
-// Other uniforms
-out float v_opacity;
 #ifdef blendedFlag
     uniform float u_opacity;
 #else
     const float u_opacity = 1.0;
-#endif
-
-#ifdef shininessFlag
-    uniform float u_shininess;
-#else
-    const float u_shininess = 20.0;
 #endif
 
 #ifdef diffuseColorFlag
@@ -220,7 +201,7 @@ out float v_opacity;
         void calculateTangentVectors() {
             g_binormal = vec3(0, g_normal.z, -g_normal.y);
             g_tangent = normalize(cross(g_normal, g_binormal));
-}
+        }
     #elif defined(binormalFlag)
         void calculateTangentVectors() {
             g_tangent = vec3(-g_binormal.z, 0, g_binormal.x);
@@ -262,39 +243,33 @@ out vec3 v_ambientLight;
 #endif //lightingFlag
 
 #ifdef pointLightsFlag
-    struct PointLight
-    {
+struct PointLight {
 	vec3 color;
 	vec3 position;
 	float intensity;
-    };
-    uniform PointLight u_pointLights[numPointLights];
+};
+uniform PointLight u_pointLights[numPointLights];
 #endif
 
 //////////////////////////////////////////////////////
 ////// DIRECTIONAL LIGHTS
 //////////////////////////////////////////////////////
-#ifdef lightingFlag
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
 #endif // numDirectionalLights
-#endif //lightingFlag
 
-struct DirectionalLight
-{
+#ifdef directionalLightsFlag
+struct DirectionalLight {
     vec3 color;
     vec3 direction;
 };
-#ifdef directionalLightsFlag
 uniform DirectionalLight u_dirLights[numDirectionalLights];
-#endif
+out DirectionalLight v_directionalLights[numDirectionalLights];
+#endif // directionalLightsFlag
 
-#define N_LIGHTS 3
-flat out int v_numDirectionalLights;
-out vec3 v_directionalLightDir[N_LIGHTS];
-out vec3 v_directionalLightColor[N_LIGHTS];
 out vec3 v_viewDir;
 out vec3 v_fragPosWorld;
+out float v_opacity;
 
 #ifdef environmentCubemapFlag
 out vec3 v_reflect;
@@ -358,26 +333,14 @@ void main() {
 	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
-    #if defined(numDirectionalLights)
-        v_numDirectionalLights = numDirectionalLights;
-        for (int i = 0; i < N_LIGHTS; i++) {
-            if(i >= numDirectionalLights){
-                v_directionalLightDir[i] = vec3(0.0, 0.0, 0.0);
-                v_directionalLightColor[i] = vec3(0.0);
-            } else {
-                #ifdef heightFlag
-                v_directionalLightDir[i] = normalize(-u_dirLights[i].direction);
-                #else
-                v_directionalLightDir[i] = normalize(-u_dirLights[i].direction * TBN);
-                #endif
-                v_directionalLightColor[i] = u_dirLights[i].color;
-                }
-        }
-    #else
-        v_numDirectionalLights = 0;
-        for (int i = 0; i < N_LIGHTS; i++) {
-            v_directionalLightDir[i] = vec3(0.0, 0.0, 0.0);
-            v_directionalLightColor[i] = vec3(0.0);
+    #ifdef directionalLightsFlag
+        for (int i = 0; i < numDirectionalLights; i++) {
+            #ifdef heightFlag
+            v_directionalLights[i].direction = normalize(-u_dirLights[i].direction);
+            #else
+            v_directionalLights[i].direction = normalize(-u_dirLights[i].direction * TBN);
+            #endif
+            v_directionalLights[i].color = u_dirLights[i].color;
         }
     #endif // directionalLightsFlag
 

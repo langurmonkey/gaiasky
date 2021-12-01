@@ -46,11 +46,10 @@ uniform float u_cameraK;
 // Varyings computed in the vertex shader
 in float v_opacity;
 
-// Other uniforms
-#ifdef shininessFlag
-uniform float u_shininess;
+#ifdef timeFlag
+uniform float u_time;
 #else
-const float u_shininess = 20.0;
+const float u_time = 0.0;
 #endif
 
 #ifdef diffuseColorFlag
@@ -81,14 +80,9 @@ uniform vec4 u_emissiveColor;
 uniform sampler2D u_emissiveTexture;
 #endif
 
-#ifdef nightTextureFlag
-uniform sampler2D u_nightTexture;
-#endif
-
 #ifdef reflectionTextureFlag
 uniform sampler2D u_reflectionTexture;
 #endif
-
 
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
@@ -99,7 +93,7 @@ uniform sampler2D u_reflectionTexture;
 #endif
 
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-#define specularFlag
+#define emissiveFlag
 #endif
 
 #if defined(specularFlag) || defined(fogFlag)
@@ -153,7 +147,6 @@ float getShadow(){
         for(int y=-2; y<=2; y++){
             vec2 offset = vec2(float(x), float(y)) / size;
             result += textureShadowLerp(size, v_shadowMapUv.xy + offset, v_shadowMapUv.z);
-            //result += getShadowness(v_shadowMapUv.xy, offset, v_shadowMapUv.z);
         }
     }
     return result / 25.0;
@@ -162,7 +155,7 @@ float getShadow(){
     //return getShadowness(v_shadowMapUv.xy, vec2(0.0), v_shadowMapUv.z);
 }
 #else
-float getShadow(){
+float getShadow() {
     return 1.0;
 }
 #endif //shadowMapFlag
@@ -214,19 +207,20 @@ in vec3 v_ambientLight;
     #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
 
-// COLOR NIGHT
-#if defined(nightTextureFlag)
-    #define fetchColorNight(texCoord) texture(u_nightTexture, texCoord).rgb
-#else
-    #define fetchColorNight(texCoord) vec3(0.0)
-#endif // nightTextureFlag
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+#define directionalLightsFlag
+#endif // numDirectionalLights
 
-#define N_LIGHTS 3
-flat in int v_numDirectionalLights;
-// Light directions in world space
-in vec3 v_directionalLightDir[N_LIGHTS];
-// Light colors
-in vec3 v_directionalLightColor[N_LIGHTS];
+#ifdef directionalLightsFlag
+struct DirectionalLight
+{
+    vec3 color;
+    vec3 direction;
+};
+// Directional lights vector
+in DirectionalLight v_directionalLights[numDirectionalLights];
+#endif // directionalLightsFlag
+
 // View direction in world space
 in vec3 v_viewDir;
 // Logarithmic depth
@@ -263,7 +257,7 @@ uniform float u_heightNoiseSize;
 
 #include shader/lib_sampleheight.glsl
 
-vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
+vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 
     // number of depth layers
     const float minLayers = 8;
@@ -304,13 +298,6 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir){
 
     return finalTexCoords;
 }
-
-vec2 parallaxMappingSimple(vec2 texCoords, vec3 viewDir){
-    float height = texture(u_heightTexture, texCoords).r;
-    vec3 displacement = viewDir * (height * u_heightScale * HEIGHT_FACTOR);
-    vec2 p = displacement.xy;
-    return texCoords - p;
-}
 #endif // heightFlag
 
 // http://www.thetenthplanet.de/archives/1180
@@ -345,7 +332,7 @@ float luma(vec3 color){
 void main() {
     vec2 texCoords = v_texCoord0;
 
-    vec3 lightDir[N_LIGHTS], lightCol[N_LIGHTS], viewDir;
+    vec3 viewDir;
 
     // TBN and viewDir do not depend on light
     #ifdef heightFlag
@@ -359,23 +346,29 @@ void main() {
     viewDir = v_viewDir;
     #endif // heightFlag
 
-    int nLights = v_numDirectionalLights;
-
-    for(int i = 0; i < nLights; i++) {
+    #ifdef directionalLightsFlag
+    vec3 lightDir[numDirectionalLights], lightCol[numDirectionalLights];
+    for(int i = 0; i < numDirectionalLights; i++) {
         #ifdef heightFlag
-        lightDir[i] = normalize(v_directionalLightDir[i] * TBN);
-        lightCol[i] = v_directionalLightColor[i];
+        lightDir[i] = normalize(v_directionalLights[i].direction * TBN);
+        lightCol[i] = v_directionalLights[i].color;
         #else // heightFlag
-        lightDir[i] = v_directionalLightDir[i];
-        lightCol[i] = v_directionalLightColor[i];
+        lightDir[i] = v_directionalLights[i].direction;
+        lightCol[i] = v_directionalLights[i].color;
         #endif // heightFlag
     }
+    #endif // directionalLightsFlag
 
     vec4 diffuse = fetchColorDiffuse(v_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
     vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
-    vec3 night = fetchColorNight(texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = v_ambientLight;
+    #ifdef atmosphereGround
+    vec3 night = emissive.rgb;
+    emissive = vec4(0.0);
+    #else
+    vec3 night = vec3(0.0);
+    #endif
 
     // Alpha value from textures
     float texAlpha = 1.0;
@@ -405,13 +398,15 @@ void main() {
     // Shadow
     float shdw = clamp(getShadow(), 0.0, 1.0);
     // Cubemap
-    vec3 env = vec3(0.0);
+    vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
-    env = texture(u_environmentCubemap, reflectDir).rgb;
-    #ifdef reflectionColorFlag
-    env = env * u_reflectionColor.rgb;
-    #endif // reflectionColorFlag
-    env = pow(env * diffuse.rgb, vec3(0.5));
+        reflectionColor = texture(u_environmentCubemap, reflectDir).rgb;
+        #ifdef reflectionTextureFlag
+            reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
+        #elif defined(reflectionColorFlag)
+            reflectionColor = reflectionColor * u_reflectionColor.rgb;
+        #endif // reflectionColorFlag
+        reflectionColor += reflectionColor * diffuse.rgb;
     #endif // environmentCubemapFlag
 
     vec3 shadowColor = vec3(0.0);
@@ -420,10 +415,11 @@ void main() {
     float selfShadow = 1.0;
 
     // Loop for directional light contributitons
-    for(int i = 0; i < nLights; i++) {
+    #ifdef directionalLightsFlag
+    for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];
         // Skip non-lights
-        if (i > 0 && col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+        if (i >= 0 && col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
@@ -436,12 +432,13 @@ void main() {
         selfShadow *= saturate(4.0 * NL);
 
         specularColor += specular * min(1.0, pow(NH, 40.0));
-        shadowColor += lightCol[i] * night * max(0.0, 1.0 - NL) * shdw;
-        diffuseColor += (lightCol[i] * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
+        shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
+        diffuseColor += (col * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
     }
+    #endif // directionalLightsFlag
 
     // Final color equation
-    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + env, texAlpha * v_opacity);
+    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * v_opacity);
     fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
@@ -450,9 +447,9 @@ void main() {
     #endif
 
     // Prevent saturation
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.99);
+    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-    if(fragColor.a <= 0.0){
+    if (fragColor.a <= 0.0) {
         discard;
     }
     // Logarithmic depth buffer

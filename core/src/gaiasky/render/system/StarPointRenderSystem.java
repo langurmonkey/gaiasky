@@ -6,8 +6,7 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -19,6 +18,8 @@ import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.CelestialBody;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
@@ -30,20 +31,28 @@ import org.lwjgl.opengl.GL30;
 public class StarPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
     private final double BRIGHTNESS_FACTOR = 10;
 
-    boolean starColorTransit = false;
     Vector3 aux;
     int sizeOffset, pmOffset;
     ComponentType ct;
-    float[] pointAlpha, alphaSizeFovBr;
+    private float[] opacityLimits;
+    private float[] alphaSizeBrRc;
+
+    private Texture starTex;
 
     boolean initializing;
 
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this, Events.TRANSIT_COLOUR_CMD, Events.ONLY_OBSERVED_STARS_CMD, Events.STAR_MIN_OPACITY_CMD);
+        EventManager.instance.subscribe(this,  Events.STAR_MIN_OPACITY_CMD, Events.STAR_TEXTURE_IDX_CMD);
         this.ct = ct;
-        this.alphaSizeFovBr = new float[4];
+        this.alphaSizeBrRc = new float[4];
         initializing = true;
+        setStarTexture(Settings.settings.scene.star.getStarTexture());
+    }
+
+    public void setStarTexture(String starTexture) {
+        starTex = new Texture(Settings.settings.data.dataFileHandle(starTexture), true);
+        starTex.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear);
     }
 
     @Override
@@ -51,15 +60,13 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
         Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
         Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
 
-        pointAlpha = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1]};
+        opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
-        for (ExtShaderProgram p : programs) {
-            if (p != null) {
-                p.begin();
-                p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                p.end();
-            }
-        }
+        ExtShaderProgram shaderProgram = getShaderProgram();
+        shaderProgram.begin();
+        // Uniforms that rarely change
+        shaderProgram.setUniformf("u_thAnglePoint", 1e-10f, 1.5e-8f);
+        shaderProgram.end();
 
     }
 
@@ -98,15 +105,16 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
+        POINT_UPDATE_FLAG = true;
         if (POINT_UPDATE_FLAG) {
             // Reset variables
             curr.clear();
-            
+
             ensureTempVertsSize(renderables.size * curr.vertexSize);
-            renderables.forEach(r->{
+            renderables.forEach(r -> {
                 // 2 FPS gain
                 CelestialBody cb = (CelestialBody) r;
-                float[] col = starColorTransit ? cb.ccTransit : cb.cc;
+                float[] col = cb.cc;
 
                 // COLOR
                 tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(col[0], col[1], col[2], cb.opacity);
@@ -122,70 +130,70 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
                 tempVerts[idx + 2] = aux.z;
 
                 // PROPER MOTION
-                tempVerts[curr.vertexIdx + pmOffset] = (float) cb.getPmX() * 0f;
-                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) cb.getPmY() * 0f;
-                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ() * 0f;
+                tempVerts[curr.vertexIdx + pmOffset] = (float) cb.getPmX();
+                tempVerts[curr.vertexIdx + pmOffset + 1] = (float) cb.getPmY();
+                tempVerts[curr.vertexIdx + pmOffset + 2] = (float) cb.getPmZ();
 
                 curr.vertexIdx += curr.vertexSize;
 
             });
+            curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
             // Put flag down
             POINT_UPDATE_FLAG = false;
         }
-        if (!camera.getMode().isGaiaFov()) {
-            int fovMode = camera.getMode().getGaiaFovMode();
+        ExtShaderProgram shaderProgram = getShaderProgram();
 
-            ExtShaderProgram shaderProgram = getShaderProgram();
-
-            shaderProgram.begin();
-            shaderProgram.setUniformMatrix("u_projModelView", camera.getCamera().combined);
-            shaderProgram.setUniformf("u_camPos", camera.getCurrent().getPos().put(aux));
-
-            alphaSizeFovBr[0] = alphas[ct.ordinal()];
-            alphaSizeFovBr[1] = fovMode == 0 ? (10 * StarSettings.getStarPointSize() * rc.scaleFactor * (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1 : 2)) : (Settings.settings.scene.star.pointSize * rc.scaleFactor * 10);
-            alphaSizeFovBr[2] = camera.getFovFactor();
-            alphaSizeFovBr[3] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
-            shaderProgram.setUniform4fv("u_alphaSizeFovBr", alphaSizeFovBr, 0, 4);
-
-            shaderProgram.setUniformf("u_t", (float) AstroUtils.getMsSinceJ2000(GaiaSky.instance.time.getTime()));
-            shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 0.5f : 1f);
-            shaderProgram.setUniformf("u_thAnglePoint", (float) Settings.settings.scene.star.threshold.point);
-
-            // Relativistic effects
-            addEffectsUniforms(shaderProgram, camera);
-
-            curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
-            curr.mesh.render(shaderProgram, GL30.GL_POINTS);
-            shaderProgram.end();
+        shaderProgram.begin();
+        shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
+        shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux));
+        shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
+        shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
+        shaderProgram.setUniformf("u_brightnessPower", Settings.settings.scene.star.power);
+        shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
+        addEffectsUniforms(shaderProgram, camera);
+        // Update projection if fovMode is 3
+        int fovMode = camera.getMode().getGaiaFovMode();
+        if (fovMode == 3) {
+            // Cam is Fov1 & Fov2
+            FovCamera cam = ((CameraManager) camera).fovCamera;
+            // Update combined
+            PerspectiveCamera[] cams = camera.getFrontCameras();
+            shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
+        }
+        alphaSizeBrRc[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
+        alphaSizeBrRc[3] = rc.scaleFactor;
+        if (starTex != null) {
+            starTex.bind(0);
+            shaderProgram.setUniformi("u_starTex", 0);
         }
 
-    }
+        shaderProgram.setUniform2fv("u_opacityLimits", opacityLimits, 0, 2);
 
+        alphaSizeBrRc[0] = alphas[ComponentType.Stars.ordinal()];
+        alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * StarSettings.getStarPointSize() * rc.scaleFactor) / camera.getFovFactor();
+        shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
+
+        // Days since epoch
+        // Emulate double with floats, for compatibility
+        double curRt = AstroUtils.getDaysSince(GaiaSky.instance.time.getTime(), AstroUtils.JD_J2015);
+        float curRt2 = (float) (curRt - (double) ((float) curRt));
+        shaderProgram.setUniformf("u_t", (float) curRt, curRt2);
+
+        try {
+            curr.mesh.render(shaderProgram, GL20.GL_POINTS);
+        } catch (IllegalArgumentException e) {
+            logger.error("Render exception");
+        }
+        shaderProgram.end();
+
+    }
 
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case TRANSIT_COLOUR_CMD:
-            starColorTransit = (boolean) data[1];
-            POINT_UPDATE_FLAG = true;
-            break;
-        case ONLY_OBSERVED_STARS_CMD:
-            POINT_UPDATE_FLAG = true;
-            break;
-        case STAR_MIN_OPACITY_CMD:
-            for (ExtShaderProgram p : programs) {
-                if (p != null && p.isCompiled()) {
-                    pointAlpha[0] = (float) data[0];
-                    GaiaSky.postRunnable(() -> {
-                        p.begin();
-                        p.setUniform2fv("u_pointAlpha", pointAlpha, 0, 2);
-                        p.end();
-                    });
-                }
-            }
-            break;
-        default:
-            break;
+        case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
+        case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        default ->{}
         }
     }
 }

@@ -1,43 +1,8 @@
-#version 410 core
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// GROUND ATMOSPHERIC SCATTERING - FRAGMENT
-////////////////////////////////////////////////////////////////////////////////////
-#ifdef atmosphereGround
-in vec4 o_atmosphereColor;
-in float o_fadeFactor;
-#endif
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// COLOR ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-in vec4 o_color;
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// NORMAL ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-in vec3 o_normal;
-in vec3 o_normalTan;
-
-////////////////////////////////////////////////////////////////////////////////////
-////////// TEXCOORD0 ATTRIBUTE - FRAGMENT
-///////////////////////////////////////////////////////////////////////////////////
-
-in vec2 o_texCoords;
+#version 330 core
 
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
-
-// Varyings computed in the vertex shader
-in float o_opacity;
-
-// Other uniforms
-#ifdef shininessFlag
-uniform float u_shininess;
-#else
-const float u_shininess = 20.0;
-#endif
 
 #ifdef diffuseColorFlag
 uniform vec4 u_diffuseColor;
@@ -67,10 +32,6 @@ uniform vec4 u_emissiveColor;
 uniform sampler2D u_emissiveTexture;
 #endif
 
-#ifdef nightTextureFlag
-uniform sampler2D u_nightTexture;
-#endif
-
 #ifdef reflectionTextureFlag
 uniform sampler2D u_reflectionTexture;
 #endif
@@ -84,7 +45,7 @@ uniform sampler2D u_reflectionTexture;
 #endif
 
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-#define specularFlag
+#define emissiveFlag
 #endif
 
 #if defined(specularFlag) || defined(fogFlag)
@@ -102,7 +63,6 @@ uniform sampler2D u_reflectionTexture;
 #define bias 0.030
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
-in vec3 o_shadowMapUv;
 
 float getShadowness(vec2 uv, vec2 offset, float compare){
     const vec4 bitShifts = vec4(1.0, 1.0 / 255.0, 1.0 / 65025.0, 1.0 / 160581375.0);
@@ -131,9 +91,7 @@ float getShadow(){
     for(int x=-2; x<=2; x++){
         for(int y=-2; y<=2; y++){
             vec2 offset = vec2(float(x), float(y)) / size;
-            //result += textureShadowLerp(size, o_shadowMapUv.xy + offset, o_shadowMapUv.z);
-            result += getShadowness(o_shadowMapUv.xy, offset, o_shadowMapUv.z);
-        }
+            result += textureShadowLerp(size, o_data.shadowMapUv.xy + offset, o_data.shadowMapUv.z);
     }
     return result / 25.0;
 }
@@ -143,67 +101,80 @@ float getShadow(){
 }
 #endif //shadowMapFlag
 
-
-// AMBIENT LIGHT
-in vec3 o_ambientLight;
-
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
 #elif defined(diffuseTextureFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
 #elif defined(diffuseColorFlag)
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
 #else
-#define fetchColorDiffuseTD(tex, texCoord, defaultValue) defaultValue
+    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) defaultValue
 #endif // diffuseTextureFlag && diffuseColorFlag
 
 #if defined(diffuseTextureFlag) || defined(diffuseColorFlag)
-#define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(tex, texCoord, defaultValue)
+    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(tex, texCoord, defaultValue)
 #else
-#define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor
+    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor
 #endif // diffuseTextureFlag || diffuseColorFlag
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) + u_emissiveColor
 #elif defined(emissiveTextureFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
+    #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(texCoord) u_emissiveColor * 2.0
+    #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
 #endif // emissiveTextureFlag && emissiveColorFlag
 
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-#define fetchColorEmissive(texCoord) fetchColorEmissiveTD(texCoord)
+    #define fetchColorEmissive(emissiveTex, texCoord) fetchColorEmissiveTD(emissiveTex, texCoord)
 #else
-#define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
+    #define fetchColorEmissive(emissiveTex, texCoord) vec4(0.0, 0.0, 0.0, 0.0)
 #endif // emissiveTextureFlag || emissiveColorFlag
 
 // COLOR SPECULAR
 #if defined(specularTextureFlag) && defined(specularColorFlag)
-#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
-#define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
 #elif defined(specularColorFlag)
-#define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
+    #define fetchColorSpecular(texCoord, defaultValue) u_specularColor.rgb
 #else
-#define fetchColorSpecular(texCoord, defaultValue) defaultValue
+    #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
 
-// COLOR NIGHT
-#if defined(nightTextureFlag)
-#define fetchColorNight(texCoord) texture(u_nightTexture, texCoord).rgb
-#else
-#define fetchColorNight(texCoord) vec3(0.0)
-#endif // nightTextureFlag
+#if defined(numDirectionalLights) && (numDirectionalLights > 0)
+#define directionalLightsFlag
+#endif // numDirectionalLights
 
-// Light direction in world space
-in vec3 o_lightDir;
-// View direction in world space
-in vec3 o_viewDir;
-// Light color
-in vec3 o_lightCol;
+#ifdef directionalLightsFlag
+struct DirectionalLight {
+    vec3 color;
+    vec3 direction;
+};
+#endif // directionalLightsFlag
 
+struct VertexData {
+    vec2 texCoords;
+    vec3 normal;
+    #ifdef directionalLightsFlag
+    DirectionalLight directionalLights[numDirectionalLights];
+    #endif // directionalLightsFlag
+    vec3 viewDir;
+    vec3 ambientLight;
+    float opacity;
+    vec4 color;
+    #ifdef shadowMapFlag
+    vec3 shadowMapUv;
+    #endif
+};
+in VertexData o_data;
+#ifdef atmosphereGround
+in vec4 o_atmosphereColor;
+in float o_fadeFactor;
+#endif
+in vec3 o_normalTan;
 
 #ifdef environmentCubemapFlag
 in vec3 v_reflect;
@@ -230,57 +201,96 @@ layout (location = 0) out vec4 fragColor;
 
 // MAIN
 void main() {
-    vec2 texCoords = o_texCoords;
+    vec2 texCoords = o_data.texCoords;
 
-    vec4 diffuse = fetchColorDiffuse(o_color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
-    vec4 emissive = fetchColorEmissive(texCoords);
-    vec3 night = fetchColorNight(texCoords);
+    vec4 diffuse = fetchColorDiffuse(o_data.color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
+    vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
-    vec3 ambient = o_ambientLight;
+    vec3 ambient = o_data.ambientLight;
+    #ifdef atmosphereGround
+    vec3 night = emissive.rgb;
+    emissive = vec4(0.0);
+    #else
+    vec3 night = vec3(0.0);
+    #endif
+
+    // Alpha value from textures
+    float texAlpha = 1.0;
+    #if defined(diffuseTextureFlag)
+    texAlpha = diffuse.a;
+    #elif defined(emissiveTextureFlag)
+    texAlpha = luma(emissive.rgb);
+    #endif
 
     vec3 N = o_normalTan;
     #ifdef environmentCubemapFlag
     vec3 reflectDir = normalize(v_reflect + (vec3(0.0, 0.0, 1.0) - N.xyz));
     #endif // environmentCubemapFlag
 
-    // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
-    vec3 L = o_lightDir;
-    vec3 V = o_viewDir;
-    vec3 H = normalize(L + V);
-    float NL = max(0.0, dot(N, L));
-    float NH = max(0.0, dot(N, H));
-
-    specular *= min(1.0, pow(NH, 40.0));
-    float selfShadow = saturate(4.0 * NL);
-
-    vec3 env = vec3(0.0);
+    // Shadow
+    float shdw = clamp(getShadow(), 0.0, 1.0);
+    // Cubemap
+    vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
-    env = texture(u_environmentCubemap, reflectDir).rgb;
-    #ifdef reflectionColorFlag
-    env = env * u_reflectionColor.rgb;
-    #endif // reflectionColorFlag
-    env = pow(env * diffuse.rgb, vec3(0.5));
+        reflectionColor = texture(u_environmentCubemap, reflectDir).rgb;
+        #ifdef reflectionTextureFlag
+            reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
+        #elif defined(reflectionColorFlag)
+            reflectionColor = reflectionColor * u_reflectionColor.rgb;
+        #endif // reflectionColorFlag
+        reflectionColor += reflectionColor * diffuse.rgb;
     #endif // environmentCubemapFlag
 
-    float shdw = clamp(getShadow(), 0.2, 1.0);
-    vec3 nightColor = o_lightCol * night * max(0.0, 0.6 - NL) * shdw;
-    vec3 dayColor = (o_lightCol * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
-    fragColor = vec4(dayColor + nightColor + emissive.rgb + env, diffuse.a * o_opacity);
-    fragColor.rgb += selfShadow * specular;
+    vec3 shadowColor = vec3(0.0);
+    vec3 diffuseColor = vec3(0.0);
+    vec3 specularColor = vec3(0.0);
+    float selfShadow = 1.0;
+    vec3 fog = vec3(0.0);
+
+    float NL0;
+
+    #ifdef directionalLightsFlag
+    // Loop for directional light contributitons
+    for (int i = 0; i < numDirectionalLights; i++) {
+        vec3 col = o_data.directionalLights[i].color;
+        // Skip non-lights
+        if (i >= 0 && col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+            continue;
+        }
+        // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
+        vec3 L = o_data.directionalLights[i].direction;
+        vec3 V = o_data.viewDir;
+        vec3 H = normalize(L + V);
+        float NL = max(0.0, dot(N, L));
+        float NH = max(0.0, dot(N, H));
+        if (i == 0){
+            NL0 = NL;
+        }
+
+        selfShadow *= saturate(4.0 * NL);
+
+        specularColor += specular * min(1.0, pow(NH, 40.0));
+        shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
+        diffuseColor += (col * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
+    }
+    #endif // directionalLightsFlag
+
+    // Final color equation
+    fragColor = vec4(diffuseColor + shadowColor + emissive.rgb + reflectionColor, texAlpha * o_data.opacity);
+    fragColor.rgb += selfShadow * specularColor;
 
     #ifdef atmosphereGround
-    #define exposure 5.0
+    #define exposure 4.0
     fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
-    fragColor.rgb = applyFog(fragColor.rgb, NL);
+    fragColor.rgb = applyFog(fragColor.rgb, NL0);
     #endif
 
     // Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
-    if(fragColor.a == 0.0){
+    if (fragColor.a <= 0.0){
         discard;
     }
-
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
@@ -288,4 +298,3 @@ void main() {
     velocityBuffer();
     #endif
 }
-

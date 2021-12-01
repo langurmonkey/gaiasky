@@ -46,12 +46,12 @@ uniform sampler2D u_specularTexture;
 uniform sampler2D u_normalTexture;
 #endif
 
-#ifdef emissiveTextureFlag
-uniform sampler2D u_emissiveTexture;
+#ifdef emissiveColorFlag
+uniform vec4 u_emissiveColor;
 #endif
 
-#ifdef nightTextureFlag
-uniform sampler2D u_nightTexture;
+#ifdef emissiveTextureFlag
+uniform sampler2D u_emissiveTexture;
 #endif
 
 #ifdef lightingFlag
@@ -61,9 +61,22 @@ in vec3 v_lightDiffuse;
 #define ambientFlag
 #endif //ambientFlag
 
+#if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
+#define emissiveFlag
+#endif
+
 #ifdef specularFlag
 in vec3 v_lightSpecular;
 #endif //specularFlag
+
+// COLOR EMISSIVE
+#if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
+#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5 + u_emissiveColor * 2.0
+#elif defined(emissiveTextureFlag)
+#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5
+#elif defined(emissiveColorFlag)
+#define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
+#endif // emissiveTextureFlag && emissiveColorFlag
 
 #ifdef shadowMapFlag
 uniform sampler2D u_shadowTexture;
@@ -98,13 +111,6 @@ uniform vec4 u_fogColor;
 in float v_fog;
 #endif // fogFlag
 
-// COLOR NIGHT
-#if defined(nightTextureFlag)
-	#define fetchColorNight(texCoord) texture(u_nightTexture, texCoord, TEXTURE_LOD_BIAS)
-#else
-	#define fetchColorNight(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
-#endif // nightTextureFlag
-
 #include shader/lib_logdepthbuff.glsl
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
@@ -116,7 +122,13 @@ layout (location = 0) out vec4 fragColor;
 #endif
 
 void main() {
-	vec4 night = fetchColorNight(v_texCoords0);
+	vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
+	#ifdef atmosphereGround
+	vec3 night = emissive.rgb;
+	emissive = vec4(0.0);
+	#else
+	vec3 night = vec3(0.0);
+	#endif
 
 	#if defined(normalFlag) 
 		vec3 normal = v_normal;
@@ -169,15 +181,15 @@ void main() {
 
 		#if defined(ambientFlag) && defined(separateAmbientFlag)
 			#ifdef shadowMapFlag
-			fragColor.rgb = (diffuse.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + specular;
+				fragColor.rgb = (diffuse.rgb * (getShadow() * v_lightDiffuse + v_ambientLight)) + emissive.rgb + specular;
 			#else
-				fragColor.rgb = (diffuse.rgb * (v_lightDiffuse + v_ambientLight)) + specular;
+				fragColor.rgb = (diffuse.rgb * (v_lightDiffuse + v_ambientLight)) + emissive.rgb + specular;
 			#endif //shadowMapFlag
 		#else
 			#ifdef shadowMapFlag
-				fragColor.rgb = getShadow() * ((diffuse.rgb * v_lightDiffuse) + specular);
+				fragColor.rgb = getShadow() * ((diffuse.rgb * v_lightDiffuse) + specular) + emissive.rgb;
 			#else
-				fragColor.rgb = (diffuse.rgb * v_lightDiffuse) + (night.rgb * (max(0.0, (0.6 - length(v_lightDiffuse))))) + specular;
+				fragColor.rgb = (diffuse.rgb * v_lightDiffuse) + (night.rgb * (max(0.0, (0.6 - length(v_lightDiffuse))))) + emissive.rgb + specular;
 			#endif //shadowMapFlag
 		#endif
 	#endif //lightingFlag

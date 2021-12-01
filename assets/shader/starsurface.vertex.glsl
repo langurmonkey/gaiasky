@@ -1,14 +1,14 @@
 #version 330 core
 
-#if defined(diffuseTextureFlag) || defined(specularTextureFlag)
+#if defined(diffuseTextureFlag)
 #define textureFlag
 #endif
 
-#if defined(specularTextureFlag) || defined(specularColorFlag)
+#if defined(specularColorFlag)
 #define specularFlag
 #endif
 
-#if defined(specularFlag) || defined(fogFlag)
+#if defined(specularFlag)
 #define cameraPositionFlag
 #endif
 
@@ -34,11 +34,11 @@ out vec2 v_texCoords0;
 uniform mat4 u_worldTrans;
 uniform float u_vrScale;
 
-#ifdef shininessFlag
-uniform float u_shininess;
+#ifdef timeFlag
+uniform float u_time;
 #else
-const float u_shininess = 20.0;
-#endif // shininessFlag
+const float u_time = 0.0;
+#endif // timeFlag
 out float v_time;
 
 #ifdef blendedFlag
@@ -66,17 +66,9 @@ uniform vec3 u_ambientCubemap[6];
 uniform vec3 u_sphericalHarmonics[9];
 #endif //sphericalHarmonicsFlag
 
-#ifdef specularFlag
-out vec3 v_lightSpecular;
-#endif // specularFlag
-
 #ifdef cameraPositionFlag
 uniform vec4 u_cameraPosition;
 #endif // cameraPositionFlag
-
-#ifdef fogFlag
-out float v_fog;
-#endif // fogFlag
 
 out vec3 v_viewVec;
 
@@ -137,7 +129,7 @@ out float v_depth;
 #endif
 
 void main() {
-	v_time = u_shininess;
+	v_time = u_time;
 	#ifdef textureFlag
 		v_texCoords0 = a_texCoord0;
 	#endif // textureFlag
@@ -181,12 +173,6 @@ void main() {
 		v_normal = normal;
 	#endif // normalFlag
 
-    #ifdef fogFlag
-        vec3 flen = u_cameraPosition.xyz - pos.xyz;
-        float fog = dot(flen, flen) * u_cameraPosition.w;
-        v_fog = min(fog, 1.0);
-    #endif
-
 	#ifdef lightingFlag
 		#if	defined(ambientLightFlag)
         	vec3 ambientLight = u_ambientLight;
@@ -194,7 +180,7 @@ void main() {
         	vec3 ambientLight = vec3(0.0);
 		#endif
 
-		#ifdef ambientCubemapFlag 		
+		#ifdef ambientCubemapFlag
 			vec3 squaredNormal = normal * normal;
 			vec3 isPositive  = step(0.0, normal);
 			ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
@@ -227,7 +213,6 @@ void main() {
 
 
 		#ifdef specularFlag
-			v_lightSpecular = vec3(0.0);
 			vec3 viewVec = normalize(u_cameraPosition.xyz - pos.xyz);
 			v_viewVec = viewVec;
 		#endif // specularFlag
@@ -238,11 +223,6 @@ void main() {
 				float NdotL = clamp(dot(normal, lightDir), 0.0, 1.0);
 				vec3 value = u_dirLights[i].color * NdotL;
 				v_lightDiffuse += value;
-                                
-				#ifdef specularFlag
-					float halfDotView = max(0.0, dot(normal, normalize(lightDir + viewVec)));
-					v_lightSpecular += value * pow(halfDotView, u_shininess);
-				#endif // specularFlag
 			}
 		#endif // numDirectionalLights
 
@@ -254,10 +234,6 @@ void main() {
 				float NdotL = clamp(dot(normal, lightDir), 0.0, 1.0);
 				vec3 value = u_pointLights[i].color * (NdotL / (1.0 + dist2));
 				v_lightDiffuse += value;
-				#ifdef specularFlag
-					float halfDotView = max(0.0, dot(normal, normalize(lightDir + viewVec)));
-					v_lightSpecular += value * pow(halfDotView, u_shininess);
-				#endif // specularFlag
 			}
 		#endif // numPointLights
 	#endif // lightingFlag

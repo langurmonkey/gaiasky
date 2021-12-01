@@ -237,12 +237,6 @@ uniform float u_alphaTest;
 const float u_alphaTest = 0.0;
 #endif
 
-#ifdef shininessFlag
-uniform float u_shininess;
-#else
-const float u_shininess = 20.0;
-#endif
-
 #ifdef diffuseColorFlag
 uniform vec4 u_diffuseColor;
 #endif

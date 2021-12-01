@@ -11,15 +11,20 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 
 public class TextureExtAttribute extends TextureAttribute {
+    public final static String AOAlias = "AOTexture";
+    public final static long AO = register(AOAlias);
+
+    public final static String RoughnessAlias = "roughnessTexture";
+    public final static long Roughness = register(RoughnessAlias);
+
+    public final static String MetallicAlias = "metallicTexture";
+    public final static long Metallic = register(MetallicAlias);
 
     public final static String HeightAlias = "heightTexture";
     public final static long Height = register(HeightAlias);
 
-    public final static String NightAlias = "nightTexture";
-    public final static long Night = register(NightAlias);
-
     static {
-        TextureAttribute.Mask |= Height | Night;
+        TextureAttribute.Mask |= Height;
     }
 
     public static TextureExtAttribute createHeight(final Texture texture) {
@@ -28,14 +33,6 @@ public class TextureExtAttribute extends TextureAttribute {
 
     public static TextureExtAttribute createHeight(final TextureRegion region) {
         return new TextureExtAttribute(Height, region);
-    }
-
-    public static TextureExtAttribute createNight(final Texture texture) {
-        return new TextureExtAttribute(Night, texture);
-    }
-
-    public static TextureExtAttribute createNight(final TextureRegion region) {
-        return new TextureExtAttribute(Night, region);
     }
 
     public TextureExtAttribute(final long type) {

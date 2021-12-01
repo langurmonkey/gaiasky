@@ -126,7 +126,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         c1 = this.add(message1).left();
 
         this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
-        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TIME_STATE_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.ONLY_OBSERVED_STARS_CMD, Events.TRANSIT_COLOUR_CMD, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
+        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TIME_STATE_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
     }
 
     public void unsubscribe() {
@@ -249,8 +249,6 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
             case FOCUS_LOCK_CMD:
             case ORIENTATION_LOCK_CMD:
             case TOGGLE_AMBIENT_LIGHT:
-            case ONLY_OBSERVED_STARS_CMD:
-            case TRANSIT_COLOUR_CMD:
             case OCTREE_PARTICLE_FADE_CMD:
                 addMessage(data[0] + (((Boolean) data[1]) ? " on" : " off"));
                 break;
