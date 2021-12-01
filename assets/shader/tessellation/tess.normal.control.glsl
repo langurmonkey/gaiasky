@@ -23,14 +23,18 @@ struct VertexData {
     vec3 normal;
     #ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
-    #endif
+    #endif // directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
-    #endif
+    #endif // shadowMapFlag
+    vec3 fragPosWorld;
+    #ifdef environmentCubemapFlag
+    vec3 reflect;
+    #endif // environmentCubemapFlag
 };
 
 // INPUT
@@ -94,6 +98,10 @@ void main(){
     l_data[id].ambientLight = v_data[id].ambientLight;
     l_data[id].opacity = v_data[id].opacity;
     l_data[id].color = v_data[id].color;
+    l_data[id].fragPosWorld = v_data[id].fragPosWorld;
+    #ifdef environmentCubemapFlag
+    l_data[id].reflect = v_data[id].reflect;
+    #endif // environmentCubemapFlag
 
     #ifdef atmosphereGround
     l_atmosphereColor[id] = v_atmosphereColor[id];

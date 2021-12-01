@@ -272,12 +272,6 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef binormalFlag
-    vec3 binormal;
-    #endif // binormalFlag
-    #ifdef tangentFlag
-    vec3 tangent;
-    #endif // tangentFlag
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -316,7 +310,6 @@ void main() {
 	vec4 spos = u_shadowMapProjViewTrans * pos;
 	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
     #endif //shadowMapFlag
-
 
     // Tangent space transform
     calculateTangentVectors();

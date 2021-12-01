@@ -17,13 +17,11 @@ vec3 g_normal = vec3(0.0, 0.0, 1.0);
 ////////// BINORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
 vec3 g_binormal = vec3(0.0, 0.0, 1.0);
-#define pullBinormal() g_binormal = v_data.binormal
 
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// TANGENT ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
 vec3 g_tangent = vec3(1.0, 0.0, 0.0);
-#define pullTangent() g_tangent = v_data.tangent
 
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
@@ -215,12 +213,6 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef binormalFlag
-    vec3 binormal;
-    #endif // binormalFlag
-    #ifdef tangentFlag
-    vec3 tangent;
-    #endif // tangentFlag
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -310,7 +302,7 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
-#endif
+#endif // velocityBufferFlag
 
 float luma(vec3 color){
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
@@ -323,14 +315,14 @@ void main() {
 
     // TBN and viewDir do not depend on light
     #ifdef heightFlag
-    // Compute tangent space
-    pullNormal();
-    mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-    viewDir = normalize(v_data.viewDir * TBN);
-    // Parallax occlusion mapping
-    texCoords = parallaxMapping(texCoords, viewDir);
+        // Compute tangent space
+        pullNormal();
+        mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+        viewDir = normalize(v_data.viewDir * TBN);
+        // Parallax occlusion mapping
+        texCoords = parallaxMapping(texCoords, viewDir);
     #else // heightFlag
-    viewDir = v_data.viewDir;
+        viewDir = v_data.viewDir;
     #endif // heightFlag
 
     #ifdef directionalLightsFlag

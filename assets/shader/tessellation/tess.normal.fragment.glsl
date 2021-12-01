@@ -1,5 +1,21 @@
 #version 330 core
 
+////////////////////////////////////////////////////////////////////////////////////
+////////// NORMAL ATTRIBUTE - FRAGMENT
+///////////////////////////////////////////////////////////////////////////////////
+vec3 g_normal = vec3(0.0, 0.0, 1.0);
+#define pullNormal() g_normal = o_data.normal
+
+////////////////////////////////////////////////////////////////////////////////////
+////////// BINORMAL ATTRIBUTE - FRAGMENT
+///////////////////////////////////////////////////////////////////////////////////
+vec3 g_binormal = vec3(0.0, 0.0, 1.0);
+
+////////////////////////////////////////////////////////////////////////////////////
+////////// TANGENT ATTRIBUTE - FRAGMENT
+///////////////////////////////////////////////////////////////////////////////////
+vec3 g_tangent = vec3(1.0, 0.0, 0.0);
+
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
@@ -169,6 +185,10 @@ struct VertexData {
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
     #endif // shadowMapFlag
+    vec3 fragPosWorld;
+    #ifdef environmentCubemapFlag
+    vec3 reflect;
+    #endif // environmentCubemapFlag
 };
 in VertexData o_data;
 #ifdef atmosphereGround
@@ -176,10 +196,6 @@ in vec4 o_atmosphereColor;
 in float o_fadeFactor;
 #endif
 in vec3 o_normalTan;
-
-#ifdef environmentCubemapFlag
-in vec3 v_reflect;
-#endif
 
 #ifdef environmentCubemapFlag
 uniform samplerCube u_environmentCubemap;
@@ -196,6 +212,25 @@ layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_atmfog.glsl
 #include shader/lib_logdepthbuff.glsl
+
+// http://www.thetenthplanet.de/archives/1180
+mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
+    // get edge vectors of the pixel triangle
+    vec3 dp1 = dFdx( p );
+    vec3 dp2 = dFdy( p );
+    vec2 duv1 = dFdx( uv );
+    vec2 duv2 = dFdy( uv );
+
+    // solve the linear system
+    vec3 dp2perp = cross( dp2, N );
+    vec3 dp1perp = cross( N, dp1 );
+    vec3 T = dp2perp * duv1.x + dp1perp * duv2.x;
+    vec3 B = dp2perp * duv1.y + dp1perp * duv2.y;
+
+    // construct a scale-invariant frame
+    float invmax = inversesqrt( max( dot(T,T), dot(B,B) ) );
+    return mat3( T * invmax, B * invmax, N );
+}
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
@@ -225,9 +260,18 @@ void main() {
     #endif
 
     vec3 N = o_normalTan;
-    #ifdef environmentCubemapFlag
-    vec3 reflectDir = normalize(v_reflect + (vec3(0.0, 0.0, 1.0) - N.xyz));
-    #endif // environmentCubemapFlag
+    #ifdef normalTextureFlag
+        #ifdef environmentCubemapFlag
+            // Perturb the normal to get reflect direction
+            pullNormal();
+            mat3 TBN = cotangentFrame(g_normal, -o_data.viewDir, texCoords);
+            vec3 reflectDir = normalize(reflect(o_data.fragPosWorld, normalize(TBN * N)));
+        #endif // environmentCubemapFlag
+    #else
+        #ifdef environmentCubemapFlag
+            vec3 reflectDir = normalize(o_data.reflect);
+        #endif // environmentCubemapFlag
+    #endif // normalTextureFlag
 
     // Shadow
     #ifdef shadowMapFlag

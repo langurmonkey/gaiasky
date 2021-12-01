@@ -55,7 +55,6 @@
     in vec3 a_binormal;
 #endif //binormalFlag
 
-out vec3 v_binormal;
 #if defined(binormalFlag)
     vec3 g_binormal = a_binormal;
 #else
@@ -69,7 +68,6 @@ out vec3 v_binormal;
     in vec3 a_tangent;
 #endif //tangentFlagvec3
 
-out vec3 v_tangent;
 #if defined(tangentFlag)
     vec3 g_tangent = a_tangent;
 #else
@@ -241,12 +239,12 @@ struct VertexData {
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
     #endif
+    vec3 fragPosWorld;
+    #ifdef environmentCubemapFlag
+    vec3 reflect;
+    #endif
 };
 out VertexData v_data;
-
-#ifdef environmentCubemapFlag
-out vec3 v_reflect;
-#endif
 
 void main() {
     computeAtmosphericScatteringGround();
@@ -256,6 +254,7 @@ void main() {
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
 
+    v_data.fragPosWorld = pos.xyz;
     //gl_Position = u_projViewTrans * pos;
     // We pass the position in world coordinates
     gl_Position = pos;
@@ -264,7 +263,6 @@ void main() {
     vec4 spos = u_shadowMapProjViewTrans * pos;
     v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
     #endif //shadowMapFlag
-
 
     // Tangent space transform
     calculateTangentVectors();
@@ -275,7 +273,7 @@ void main() {
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
 
     #ifdef ambientLightFlag
-    v_data.v_ambientLight = u_ambientLight;
+    v_data.ambientLight = u_ambientLight;
     #else
     v_data.ambientLight = vec3(0.0);
     #endif // ambientLightFlag
@@ -302,7 +300,7 @@ void main() {
     #ifdef environmentCubemapFlag
     #ifndef normalTextureFlag
         // Only if normal map not present, otherwise we perturb the normal in the fragment shader
-    	v_reflect = reflect(-pos.xyz, g_normal);
+    	v_data.reflect = reflect(-pos.xyz, g_normal);
     #endif // normalTextureFlag
     #endif // environmentCubemapFlag
 

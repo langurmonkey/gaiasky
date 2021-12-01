@@ -53,7 +53,11 @@ struct VertexData {
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
-    #endif
+    #endif // shadowMapFlag
+    vec3 fragPosWorld;
+    #ifdef environmentCubemapFlag
+    vec3 reflect;
+    #endif // environmentCubemapFlag
 };
 // INPUT
 in VertexData l_data[gl_MaxPatchVertices];
@@ -156,6 +160,7 @@ void main(void){
     o_data.opacity = (u * l_data[0].opacity + v * l_data[1].opacity + w * l_data[2].opacity);
     o_data.color = (u * l_data[0].color + v * l_data[1].color + w * l_data[2].color);
     o_data.viewDir = (u * l_data[0].viewDir + v * l_data[1].viewDir + w * l_data[2].viewDir);
+    o_data.fragPosWorld = (u * l_data[0].fragPosWorld + v * l_data[1].fragPosWorld + w * l_data[2].fragPosWorld);
     #ifdef directionalLightsFlag
     for (int i = 0; i < numDirectionalLights; i++){
         o_data.directionalLights[i].direction = (u * l_data[0].directionalLights[i].direction + v * l_data[1].directionalLights[i].direction + w * l_data[2].directionalLights[i].direction);
@@ -163,6 +168,9 @@ void main(void){
     }
     #endif // directionalLightsFlag
     o_data.ambientLight = (u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight);
+    #ifdef environmentCubemapFlag
+    o_data.reflect = (u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect);
+    #endif // environmentCubemapFlag
 
     #ifdef atmosphereGround
     o_atmosphereColor = (u * l_atmosphereColor[0] + v * l_atmosphereColor[1] + w * l_atmosphereColor[2]);
@@ -171,5 +179,5 @@ void main(void){
 
     #ifdef shadowMapFlag
     o_data.shadowMapUv = (u * l_data[0].shadowMapUv + v * l_data[1].shadowMapUv + w * l_data[2].shadowMapUv);
-    #endif
+    #endif // shadowMapFlag
 }
