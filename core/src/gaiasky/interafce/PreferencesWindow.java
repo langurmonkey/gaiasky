@@ -12,6 +12,7 @@ import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -356,7 +357,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lineRenderer.setSelected(lineRenderers[settings.scene.renderer.line.ordinal()]);
 
         // BLOOM
-        bloomBak = settings.postprocess.bloom.intensity;
         OwnLabel bloomLabel = new OwnLabel(I18n.txt("gui.bloom"), skin, "default");
         Slider bloomEffect = new OwnSlider(Constants.MIN_SLIDER, Constants.MAX_SLIDER * 0.2f, Constants.SLIDER_STEP, skin);
         bloomEffect.setName("bloom effect");
@@ -371,7 +371,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // UNSHARP MASK
-        unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         OwnLabel unsharpMaskLabel = new OwnLabel(I18n.txt("gui.unsharpmask"), skin, "default");
         Slider unsharpMaskFactor = new OwnSlider(Constants.MIN_UNSHARP_MASK_FACTOR, Constants.MAX_UNSHARP_MASK_FACTOR, Constants.SLIDER_STEP_TINY, skin);
         unsharpMaskFactor.setName("unsharp mask factor");
@@ -389,7 +388,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel);
 
         // LENS FLARE
-        lensflareBak = settings.postprocess.lensFlare;
         CheckBox lensFlare = new OwnCheckBox(I18n.txt("gui.lensflare"), skin, pad5);
         lensFlare.setName("lens flare");
         lensFlare.addListener(event -> {
@@ -402,7 +400,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lensFlare.setChecked(settings.postprocess.lensFlare);
 
         // LIGHT GLOW
-        lightGlowBak = settings.postprocess.lightGlow;
         CheckBox lightGlow = new OwnCheckBox(I18n.txt("gui.lightscattering"), skin, pad5);
         lightGlow.setName("light scattering");
         lightGlow.setChecked(settings.postprocess.lightGlow);
@@ -415,7 +412,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // MOTION BLUR
-        motionblurBak = settings.postprocess.motionBlur;
         CheckBox motionBlur = new OwnCheckBox(I18n.txt("gui.motionblur"), skin, pad5);
         motionBlur.setName("motion blur");
         motionBlur.setChecked(!settings.program.safeMode && settings.postprocess.motionBlur);
@@ -556,13 +552,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Label titleDisplay = new OwnLabel(I18n.txt("gui.graphics.imglevels"), skin, "header");
         Table display = new Table();
 
-        brightnessBak = settings.postprocess.levels.brightness;
-        contrastBak = settings.postprocess.levels.contrast;
-        hueBak = settings.postprocess.levels.hue;
-        saturationBak = settings.postprocess.levels.saturation;
-        gammaBak = settings.postprocess.levels.gamma;
-        toneMappingBak = settings.postprocess.toneMapping.type;
-        exposureBak = settings.postprocess.toneMapping.exposure;
 
         /* Brightness */
         OwnLabel brightnessl = new OwnLabel(I18n.txt("gui.brightness"), skin, "default");
@@ -1685,7 +1674,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel titleStats = new OwnLabel(I18n.txt("gui.system.reporting"), skin, "header");
         Table stats = new Table(skin);
 
-        debugInfoBak = settings.program.debugInfo;
         debugInfo = new OwnCheckBox(I18n.txt("gui.system.debuginfo"), skin, pad5);
         debugInfo.setChecked(settings.program.debugInfo);
         debugInfo.addListener((event) -> {
@@ -1815,6 +1803,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (lastTab != null)
             tabs.setChecked(lastTab.getText().toString());
 
+    }
+
+    @Override
+    public GenericDialog show(Stage stage, Action action) {
+        GenericDialog result =  super.show(stage, action);
+        updateBackupValues();
+        return result;
+    }
+
+    private void updateBackupValues(){
+        bloomBak = settings.postprocess.bloom.intensity;
+        unsharpMaskBak = settings.postprocess.unsharpMask.factor;
+        lensflareBak = settings.postprocess.lensFlare;
+        lightGlowBak = settings.postprocess.lightGlow;
+        motionblurBak = settings.postprocess.motionBlur;
+        brightnessBak = settings.postprocess.levels.brightness;
+        contrastBak = settings.postprocess.levels.contrast;
+        hueBak = settings.postprocess.levels.hue;
+        saturationBak = settings.postprocess.levels.saturation;
+        gammaBak = settings.postprocess.levels.gamma;
+        toneMappingBak = settings.postprocess.toneMapping.type;
+        exposureBak = settings.postprocess.toneMapping.exposure;
+        debugInfoBak = settings.program.debugInfo;
     }
 
     protected void reloadControllerMappings(Path selectedFile) {
