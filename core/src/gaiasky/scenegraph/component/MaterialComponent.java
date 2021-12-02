@@ -5,18 +5,17 @@
 
 package gaiasky.scenegraph.component;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.EventManager;
@@ -30,6 +29,11 @@ import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.gdx.shader.TextureExtAttribute;
 import gaiasky.util.gdx.shader.Vector2Attribute;
+import gaiasky.util.math.MathUtilsd;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 /**
  * A basic component that contains the info on a material
@@ -64,14 +68,14 @@ public class MaterialComponent implements IObserver {
     }
 
     private static TextureParameter getTP(String tex, boolean mipmap) {
-            if (tex != null && tex.endsWith(".pfm")) {
-                return pfmTextureParams;
-            } else {
-                if (mipmap)
-                    return textureParamsMipMap;
-                else
-                    return textureParams;
-            }
+        if (tex != null && tex.endsWith(".pfm")) {
+            return pfmTextureParams;
+        } else {
+            if (mipmap)
+                return textureParamsMipMap;
+            else
+                return textureParams;
+        }
     }
 
     // TEXTURES
@@ -81,7 +85,7 @@ public class MaterialComponent implements IObserver {
 
     // Material properties
     public Float albedo;
-    public float[] reflection;
+    public float[] metallicColor;
     public float[] emissiveColor;
 
     // SPECULAR
@@ -95,6 +99,12 @@ public class MaterialComponent implements IObserver {
 
     /** The actual material **/
     private Material material, ringMaterial;
+
+    // Noise seed
+    private long noiseSeed = 0L;
+
+    // Biome lookup texture
+    private String biomelookup = "data/tex/base/biome-lookup.png";
 
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
@@ -151,6 +161,7 @@ public class MaterialComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -169,6 +180,7 @@ public class MaterialComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -206,7 +218,7 @@ public class MaterialComponent implements IObserver {
             Texture tex = manager.get(specularUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Specular, tex));
             if (specularIndex < 0)
-                material.set(new ColorAttribute(ColorAttribute.Specular, 0.5f, 0.5f, 0.5f, 1f));
+                material.set(new ColorAttribute(ColorAttribute.Specular, 0.7f, 0.7f, 0.7f, 1f));
         }
         if (material.get(ColorAttribute.Specular) == null) {
             if (specularIndex >= 0) {
@@ -249,18 +261,22 @@ public class MaterialComponent implements IObserver {
         if (!culling) {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
-        if (reflection != null) {
+        if (metallic != null || metallicColor != null) {
             SkyboxComponent.prepareSkybox();
+            // Use reflection texture
             material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
-            material.set(new ColorAttribute(ColorAttribute.Reflection, reflection[0], reflection[1], reflection[2], 1f));
+            if (metallic != null && material.get(TextureAttribute.Reflection) == null) {
+                Texture tex = manager.get(metallicUnpacked, Texture.class);
+                material.set(new TextureExtAttribute(TextureAttribute.Reflection, tex));
+            }
+            // Use reflection color
+            if (metallicColor != null) {
+                material.set(new ColorAttribute(ColorAttribute.Reflection, metallicColor[0], metallicColor[1], metallicColor[2], 1f));
+            }
         }
         if (roughness != null && material.get(TextureExtAttribute.Roughness) == null) {
             Texture tex = manager.get(roughnessUnapcked, Texture.class);
             material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, tex));
-        }
-        if (metallic != null && material.get(TextureExtAttribute.Metallic) == null) {
-            Texture tex = manager.get(metallicUnpacked, Texture.class);
-            material.set(new TextureExtAttribute(TextureExtAttribute.Metallic, tex));
         }
         if (albedo != null) {
             material.set(new FloatExtAttribute(FloatExtAttribute.Albedo, albedo));
@@ -278,24 +294,110 @@ public class MaterialComponent implements IObserver {
             final int N = Settings.settings.graphics.quality.texWidthTarget;
             final int M = Settings.settings.graphics.quality.texHeightTarget;
 
-            Pair<float[][], Pixmap> pair = ec.generateElevation(N, M, heightScale);
-            float[][] data = pair.getFirst();
-            Pixmap pixmap = pair.getSecond();
+            Trio<float[][], float[][], Pixmap> trio = ec.generateElevation(N, M, heightScale, noiseSeed);
+            float[][] elevationData = trio.getFirst();
+            float[][] moistureData = trio.getSecond();
+            Pixmap heightPixmap = trio.getThird();
 
-            GaiaSky.postRunnable(() -> {
-                // Create texture, populate material
-                heightMap = data;
-                Texture tex = new Texture(pixmap, true);
-                tex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+            try {
+                BufferedImage lut = ImageIO.read(Settings.settings.data.dataFileHandle(biomelookup).file());
+                int iw = lut.getWidth() - 1;
+                int ih = lut.getHeight() - 1;
 
-                heightSize.set(tex.getWidth(), tex.getHeight());
-                material.set(new TextureExtAttribute(TextureExtAttribute.Height, tex));
-                material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
-                material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
-                material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
-            });
+                final Pixmap diffusePixmap;
+                final Pixmap specularPixmap;
+                if (diffuse == null) {
+                    diffusePixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+                } else {
+                    diffusePixmap = null;
+                }
+                if (specular == null) {
+                    specularPixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+                } else {
+                    specularPixmap = null;
+                }
+                Color col = new Color();
+                for (int i = 0; i < N; i++) {
+                    for (int j = 0; j < M; j++) {
+                        // Normalize height
+                        float height = elevationData[i][j] / heightScale;
+                        float moisture = moistureData[i][j];
+
+                        int x = (int) (iw * MathUtilsd.clamp(moisture, 0, 1));
+                        int y = (int) (ih - ih * MathUtilsd.clamp(height, 0, 1));
+
+                        java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
+                        col.set(argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f, 1f);
+
+                        diffusePixmap.drawPixel(i, j, Color.rgba8888(col));
+                        boolean water = height <= 0.02f;
+                        boolean snow = height > 0.85f;
+                        if (water) {
+                            if (specularPixmap != null) {
+                                // White
+                                specularPixmap.drawPixel(i, j, Color.rgba8888(1f, 1f, 1f, 1f));
+                            }
+                        } else if (snow) {
+                            if (specularPixmap != null) {
+                                // Whitish
+                                specularPixmap.drawPixel(i, j, Color.rgba8888(0.5f, 0.5f, 0.5f, 1f));
+                            }
+                        } else {
+                            if (specularPixmap != null) {
+                                // Black
+                                specularPixmap.drawPixel(i, j, Color.rgba8888(0f, 0f, 0f, 1f));
+                            }
+                        }
+                    }
+                }
+                // Write to disk if necessary
+                if (Settings.settings.runtime.saveProceduralTextures) {
+                    long timestamp = TimeUtils.millis();
+                    savePixmap(heightPixmap, timestamp, "height");
+                    savePixmap(diffusePixmap, timestamp, "albedo");
+                    savePixmap(specularPixmap, timestamp, "specular");
+                }
+
+                GaiaSky.postRunnable(() -> {
+                    if (heightPixmap != null) {
+                        // Create texture, populate material
+                        heightMap = elevationData;
+                        Texture heightTex = new Texture(heightPixmap, true);
+                        heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+
+                        heightSize.set(heightTex.getWidth(), heightTex.getHeight());
+                        material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+                        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
+                        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
+                        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
+                    }
+                    if (diffusePixmap != null) {
+                        Texture diffuseTex = new Texture(diffusePixmap, true);
+                        diffuseTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                        material.set(new TextureAttribute(TextureAttribute.Diffuse, diffuseTex));
+                    }
+                    if (specularPixmap != null) {
+                        Texture specularTex = new Texture(specularPixmap, true);
+                        specularTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                        material.set(new TextureAttribute(TextureAttribute.Specular, specularTex));
+                        if (specularIndex < 0)
+                            material.set(new ColorAttribute(ColorAttribute.Specular, 0.7f, 0.7f, 0.7f, 1f));
+                    }
+                });
+            } catch (IOException e) {
+                logger.error(e);
+            }
         });
         t.start();
+    }
+
+    private void savePixmap(Pixmap p, long timestamp, String name) {
+        if (p != null) {
+            FileHandle imgFile = Gdx.files.absolute("/tmp/" + timestamp + "-" + name + ".png");
+            PixmapIO.writePNG(imgFile, p);
+            logger.info(TextUtils.capitalise(name) + " texture written to " + imgFile.path());
+        }
+
     }
 
     private void initializeElevationData(Texture tex) {
@@ -408,17 +510,33 @@ public class MaterialComponent implements IObserver {
         this.ec = ec;
     }
 
-    public void setReflection(Double reflection) {
-        float r = reflection.floatValue();
-        this.reflection = new float[] { r, r, r };
+    public void setBiomelookup(String biomeLookupTex) {
+        this.biomelookup = biomeLookupTex;
     }
 
-    public void setReflection(double[] reflection) {
-        if (reflection.length > 1) {
-            this.reflection = new float[] { (float) reflection[0], (float) reflection[1], (float) reflection[2] };
+    /**
+     * @deprecated use {@link MaterialComponent#setMetallic(String)} instead
+     */
+    @Deprecated
+    public void setReflection(Double metallicColor) {
+        this.setMetallic(metallicColor);
+    }
+
+    public void setMetallic(Double metallicColor) {
+        float r = metallicColor.floatValue();
+        this.metallicColor = new float[] { r, r, r };
+    }
+
+    public void setMetallic(String metallic) {
+        this.metallic = Settings.settings.data.dataFile(metallic);
+    }
+
+    public void setReflection(double[] metallic) {
+        if (metallic.length > 1) {
+            this.metallicColor = new float[] { (float) metallic[0], (float) metallic[1], (float) metallic[2] };
         } else {
-            float r = (float) reflection[0];
-            this.reflection = new float[] { r, r, r };
+            float r = (float) metallic[0];
+            this.metallicColor = new float[] { r, r, r };
         }
     }
 
@@ -426,17 +544,16 @@ public class MaterialComponent implements IObserver {
         this.roughness = Settings.settings.data.dataFile(roughness);
     }
 
-
-    public void setAlbedo(Double albedo){
+    public void setAlbedo(Double albedo) {
         this.albedo = albedo.floatValue();
-    }
-
-    public void setMetallic(String metallic) {
-        this.metallic = Settings.settings.data.dataFile(metallic);
     }
 
     public void setAo(String ao) {
         this.ao = Settings.settings.data.dataFile(ao);
+    }
+
+    public void setSeed(Long seed) {
+        this.noiseSeed = seed;
     }
 
     public boolean hasHeight() {
@@ -488,7 +605,7 @@ public class MaterialComponent implements IObserver {
         if (metallic != null && manager.isLoaded(metallicUnpacked)) {
             manager.unload(metallicUnpacked);
             metallicUnpacked = null;
-            unload(material, TextureExtAttribute.Metallic);
+            unload(material, TextureAttribute.Reflection);
         }
         if (roughness != null && manager.isLoaded(roughnessUnapcked)) {
             manager.unload(roughnessUnapcked);
@@ -585,7 +702,7 @@ public class MaterialComponent implements IObserver {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return diffuse;
     }
 }

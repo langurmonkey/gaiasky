@@ -18,8 +18,6 @@ import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.ModePopupInfo;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings.SceneSettings.*;
-import gaiasky.util.Settings.SceneSettings.StarSettings.*;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
@@ -1412,6 +1410,7 @@ public class Settings {
         public boolean relativisticAberration = false;
         public boolean gravitationalWaves = false;
         public boolean displayVrGui = false;
+        public boolean saveProceduralTextures = false;
 
         // Max clock time, 5 Myr by default
         public long maxTimeMs = 5000000L * (long) Nature.Y_TO_MS;

@@ -14,6 +14,6 @@ vec4 sampleHeight(sampler2D tex, vec2 tc){
         return vec4(n);
     } else {
         // Use texture
-        return texture(tex, tc);
+        return vec4(vec3(1.0) - texture(tex, tc).rgb, 1.0);
     }
 }

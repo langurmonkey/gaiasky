@@ -17,9 +17,6 @@ public class TextureExtAttribute extends TextureAttribute {
     public final static String RoughnessAlias = "roughnessTexture";
     public final static long Roughness = register(RoughnessAlias);
 
-    public final static String MetallicAlias = "metallicTexture";
-    public final static long Metallic = register(MetallicAlias);
-
     public final static String HeightAlias = "heightTexture";
     public final static long Height = register(HeightAlias);
 

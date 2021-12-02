@@ -109,7 +109,6 @@ public class DefaultIntShader extends BaseIntShader {
 
         public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
-        public final static Uniform metallicTexture = new Uniform("u_metallicTexture", TextureExtAttribute.Metallic);
         public final static Uniform albedo = new Uniform("u_albedo", FloatExtAttribute.Albedo);
         public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureExtAttribute.AO);
         public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
@@ -260,13 +259,6 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Roughness))).textureDescription);
-                shader.set(inputID, unit);
-            }
-        };
-        public final static Setter metallicTexture = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Metallic))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -486,7 +478,6 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_bones;
     // Material uniforms
     public final int u_aoTexture;
-    public final int u_metallicTexture;
     public final int u_roughnessTexture;
     public final int u_albedo;
     public final int u_opacity;
@@ -642,7 +633,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_bones = (renderable.bones != null && config.numBones > 0) ? register(Inputs.bones, new Setters.Bones(config.numBones)) : -1;
 
         u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
-        u_metallicTexture = register(Inputs.metallicTexture, Setters.metallicTexture);
         u_aoTexture = register(Inputs.aoTexture, Setters.aoTexture);
         u_albedo = register(Inputs.albedo, Setters.albedo);
         u_opacity = register(Inputs.opacity);
@@ -793,9 +783,6 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if ((attributesMask & TextureExtAttribute.Roughness) == TextureExtAttribute.Roughness) {
             prefix += "#define " + TextureExtAttribute.RoughnessAlias + "Flag\n";
-        }
-        if ((attributesMask & TextureExtAttribute.Metallic) == TextureExtAttribute.Metallic) {
-            prefix += "#define " + TextureExtAttribute.MetallicAlias + "Flag\n";
         }
 
         if ((attributesMask & FloatExtAttribute.Albedo) == FloatExtAttribute.Albedo) {

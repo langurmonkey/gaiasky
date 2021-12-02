@@ -7,13 +7,14 @@ package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.math.Vector2;
+import com.sudoplay.joise.module.Module;
+import com.sudoplay.joise.module.*;
+import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
+import com.sudoplay.joise.module.ModuleBasisFunction.InterpolationType;
+import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Pair;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.noise.NoiseUtils;
-import gaiasky.util.noise.OpenSimplexNoise;
+import gaiasky.util.Trio;
 
 /**
  * Contains the parameters and functions for procedural elevation
@@ -21,93 +22,119 @@ import gaiasky.util.noise.OpenSimplexNoise;
 public class ElevationComponent {
     private static final Log logger = Logger.getLogger(ElevationComponent.class);
 
-    public enum NoiseType {
-        PERLIN,
-        OPENSIMPLEX
-    }
+    // Size of the sampled area will be (noiseSize*2 x noiseSize)
+    private double noiseSize = 10.0;
+    private double noisePower = 1.0;
+    private int octaves = 4;
+    private double frequency = 2.34;
+    private double[] noiseRange = new double[] { 0.0, 1.0 };
+    private BasisType noiseType = BasisType.SIMPLEX;
+    private FractalType fractalType = FractalType.RIDGEMULTI;
 
-    private NoiseType noiseType;
-    private Float noiseSize = 10f;
-    /* Octave frequencies and amplitudes */
-    private double[][] noiseOctaves;
-    private double noisePower = 1d;
-
-    private OpenSimplexNoise osn;
+    private Module elevationNoise, moistureNoise;
 
     public ElevationComponent() {
         super();
     }
 
-    private void initNoise() {
-        switch (noiseType) {
-        case OPENSIMPLEX:
-            if (osn == null)
-                osn = new OpenSimplexNoise(12345l);
-            break;
-        }
+    private Module getModule(long seed) {
+        ModuleFractal fractal = new ModuleFractal();
+        fractal.setAllSourceBasisTypes(noiseType);
+        fractal.setAllSourceInterpolationTypes(InterpolationType.CUBIC);
+        fractal.setNumOctaves(octaves);
+        fractal.setFrequency(frequency);
+        fractal.setType(fractalType);
+        fractal.setSeed(seed);
+
+        ModuleAutoCorrect autoCorrect = new ModuleAutoCorrect();
+        autoCorrect.setSource(fractal);
+        autoCorrect.setRange(noiseRange[0], noiseRange[1]);
+        autoCorrect.setSamples(10000);
+        autoCorrect.calculate3D();
+
+        ModuleClamp clamp = new ModuleClamp();
+        clamp.setSource(autoCorrect);
+        clamp.setRange(0.0, 1.0);
+
+        ModulePow pow = new ModulePow();
+        pow.setSource(clamp);
+        pow.setPower(noisePower);
+
+        ModuleScaleDomain scaleDomain = new ModuleScaleDomain();
+        scaleDomain.setSource(clamp);
+        scaleDomain.setScaleX(noiseSize);
+        scaleDomain.setScaleY(noiseSize);
+        scaleDomain.setScaleZ(noiseSize);
+
+        return scaleDomain;
     }
 
+    private void initNoise(long seed, int N, int M) {
+        elevationNoise = getModule(seed);
+        moistureNoise = getModule(seed + 23443);
+    }
 
-    public Pair<float[][], Pixmap> generateElevation(int N, int M, float heightScale) {
+    public Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale, long seed) {
         // Construct RAM height map from noise algorithms
         logger.info("Generating procedural " + N + "x" + M + " elevation data");
-        initNoise();
-        initOctaves();
-        double[] freqs = noiseOctaves[0];
-        double[] amps = noiseOctaves[1];
+        initNoise(seed, N, M);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-        float[][] partialData = new float[N][M];
-        float wsize = 0f / (float) N;
-        float hsize = 0f / (float) M;
-        Vector2 size = new Vector2(noiseSize * 2f, noiseSize);
-        Vector2 coord = new Vector2();
-        for (int i = 0; i < N; i++) {
-            float u = (i + wsize / 2f) / (float) N;
-            for (int j = 0; j < M; j++) {
-                float v = (j + hsize / 2f) / (float) M;
+        float[][] elevation = new float[N][M];
+        float[][] moisture = new float[N][M];
 
-                coord.set(u * size.x, v * size.y);
-                double frequency = 6.0d;
-                double n = 0.0f;
+        // Sample 3D noise using spherical coordinates on the surface of the sphere
+        float pi_times_two = (float) (2 * Math.PI);
+        float pi_div_two = (float) (Math.PI / 2.0f);
+        float theta = 0.0f;
+        float phi = pi_div_two * -1.0f;
+        int x = 0;
+        int y = 0;
 
-                for (int o = 0; o < freqs.length; o++) {
-                    float f = (float) (frequency * freqs[o]);
-                    if (noiseType.equals(ElevationComponent.NoiseType.OPENSIMPLEX)) {
-                        // Open simplex noise
-                        n += amps[o] * Math.abs(osn.eval(coord.x * f, coord.y * f) * 1.25);
-                    } else if (noiseType.equals(ElevationComponent.NoiseType.PERLIN)) {
-                        // Perlin noise
-                        n += amps[o] * Math.abs(NoiseUtils.psnoise(new Vector2(coord.x * f, coord.y * f), new Vector2(size.x * f, size.y * f)));
-                    }
-                }
+        while (phi <= pi_div_two) {
+            while (theta <= pi_times_two) {
+                double n = elevationNoise.get(
+                        Math.cos(phi) * Math.cos(theta),
+                        Math.cos(phi) * Math.sin(theta),
+                        Math.sin(phi)
+                );
+                double m = moistureNoise.get(
+                        Math.cos(phi) * Math.cos(theta),
+                        Math.cos(phi) * Math.sin(theta),
+                        Math.sin(phi)
+                );
 
-                n = MathUtilsd.clamp(1d - Math.pow(1d - MathUtilsd.clamp(n, 0d, 1d), noisePower), 0d, 1d);
+                elevation[x][y] = (float) (n * heightScale);
+                moisture[x][y] = (float) m;
+
                 float nf = (float) n;
-
-                partialData[i][j] = (1.0f - nf) * heightScale;
-
                 // Pixamp
-                pixmap.drawPixel(i, j, Color.rgba8888(nf, nf, nf, 1f));
+                pixmap.drawPixel(x, y, Color.rgba8888(nf, nf, nf, 1f));
+
+                theta += (pi_times_two / N);
+                x += 1;
             }
+            phi += (Math.PI / (M - 1));
+            y += 1;
+            x = 0;
+            theta = 0.0f;
         }
-        return new Pair<>(partialData, pixmap);
+
+        return new Trio<>(elevation, moisture, pixmap);
     }
 
-    /**
-     * Initialize the octave frequencies and amplitudes with the default values if needed
-     */
-    public void initOctaves() {
-        if (noiseOctaves == null) {
-            // Frequencies, amplitudes
-            noiseOctaves = new double[][] { { 1d, 4d, 8d }, { 1d, 0.25d, 0.125d } };
-        }
-    }
-
-    public void setNoiseType(String noiseType) {
+    public void setNoisetype(String noiseType) {
         try {
-            this.noiseType = NoiseType.valueOf(noiseType.toUpperCase());
+            this.noiseType = BasisType.valueOf(noiseType.toUpperCase());
         } catch (Exception e) {
-            this.noiseType = NoiseType.OPENSIMPLEX;
+            this.noiseType = BasisType.SIMPLEX;
+        }
+    }
+
+    public void setFractaltype(String fractalType) {
+        try {
+            this.fractalType = FractalType.valueOf(fractalType.toUpperCase());
+        } catch (Exception e) {
+            this.fractalType = FractalType.RIDGEMULTI;
         }
     }
 
@@ -116,20 +143,28 @@ public class ElevationComponent {
      *
      * @param noiseSize Size of the sampling area
      */
-    public void setNoiseSize(Double noiseSize) {
-        this.noiseSize = noiseSize.floatValue();
+    public void setNoisesize(Double noiseSize) {
+        this.noiseSize = noiseSize;
     }
 
     /**
-     * Sets the noiseOctaves as a matrix of [frequency,amplitude]
+     * Sets the number of octaves
      *
-     * @param octaves The noiseOctaves
+     * @param octaves The octaves
      */
-    public void setNoiseOctaves(double[][] octaves) {
-        this.noiseOctaves = octaves;
+    public void setOctaves(Long octaves) {
+        this.octaves = Math.min(9, octaves.intValue());
     }
 
-    public void setNoisePower(Double power) {
+    public void setFrequency(Double frequency) {
+        this.frequency = frequency;
+    }
+
+    public void setNoisepower(Double power) {
         this.noisePower = power;
+    }
+
+    public void setNoiserange(double[] range) {
+        this.noiseRange = range;
     }
 }
