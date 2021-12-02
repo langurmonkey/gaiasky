@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
@@ -34,6 +35,8 @@ import gaiasky.util.math.MathUtilsd;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.stream.IntStream;
 
 /**
  * A basic component that contains the info on a material
@@ -84,7 +87,7 @@ public class MaterialComponent implements IObserver {
     public String diffuseUnpacked, specularUnpacked, normalUnpacked, emissiveUnpacked, ringUnpacked, heightUnpacked, ringnormalUnpacked, roughnessUnapcked, metallicUnpacked, aoUnapcked;
 
     // Material properties
-    public Float albedo;
+    public float[] diffuseColor;
     public float[] metallicColor;
     public float[] emissiveColor;
 
@@ -116,34 +119,46 @@ public class MaterialComponent implements IObserver {
 
     public void initialize(AssetManager manager) {
         // Add textures to load
-        diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
-        normalUnpacked = addToLoad(normal, getTP(normal), manager);
-        specularUnpacked = addToLoad(specular, getTP(specular, true), manager);
-        emissiveUnpacked = addToLoad(emissive, getTP(emissive, true), manager);
+        if (diffuse != null && !diffuse.endsWith(GEN_HEIGHT_KEYWORD))
+            diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
+        if (normal != null && !normal.endsWith(GEN_HEIGHT_KEYWORD))
+            normalUnpacked = addToLoad(normal, getTP(normal), manager);
+        if (specular != null && !specular.endsWith(GEN_HEIGHT_KEYWORD))
+            specularUnpacked = addToLoad(specular, getTP(specular, true), manager);
+        if (emissive != null && !emissive.endsWith(GEN_HEIGHT_KEYWORD))
+            emissiveUnpacked = addToLoad(emissive, getTP(emissive, true), manager);
+        if (roughness != null && !roughness.endsWith(GEN_HEIGHT_KEYWORD))
+            roughnessUnapcked = addToLoad(roughness, getTP(roughness, true), manager);
+        if (metallic != null && !metallic.endsWith(GEN_HEIGHT_KEYWORD))
+            metallicUnpacked = addToLoad(metallic, getTP(metallic, true), manager);
+        if (ao != null && !ao.endsWith(GEN_HEIGHT_KEYWORD))
+            aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
+        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
+            heightUnpacked = addToLoad(height, getTP(height, true), manager);
         ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
-        roughnessUnapcked = addToLoad(roughness, getTP(roughness, true), manager);
-        metallicUnpacked = addToLoad(metallic, getTP(metallic, true), manager);
-        aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
-        if (height != null)
-            if (!height.endsWith(GEN_HEIGHT_KEYWORD))
-                heightUnpacked = addToLoad(height, getTP(height, true), manager);
     }
 
     public void initialize() {
         // Add textures to load
-        diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true));
-        normalUnpacked = addToLoad(normal, getTP(normal));
-        specularUnpacked = addToLoad(specular, getTP(specular, true));
-        emissiveUnpacked = addToLoad(emissive, getTP(emissive, true));
+        if (diffuse != null && !diffuse.endsWith(GEN_HEIGHT_KEYWORD))
+            diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true));
+        if (normal != null && !normal.endsWith(GEN_HEIGHT_KEYWORD))
+            normalUnpacked = addToLoad(normal, getTP(normal));
+        if (specular != null && !specular.endsWith(GEN_HEIGHT_KEYWORD))
+            specularUnpacked = addToLoad(specular, getTP(specular, true));
+        if (emissive != null && !emissive.endsWith(GEN_HEIGHT_KEYWORD))
+            emissiveUnpacked = addToLoad(emissive, getTP(emissive, true));
+        if (roughness != null && !roughness.endsWith(GEN_HEIGHT_KEYWORD))
+            roughnessUnapcked = addToLoad(roughness, getTP(roughness, true));
+        if (metallic != null && !metallic.endsWith(GEN_HEIGHT_KEYWORD))
+            metallicUnpacked = addToLoad(metallic, getTP(metallic, true));
+        if (ao != null && !ao.endsWith(GEN_HEIGHT_KEYWORD))
+            aoUnapcked = addToLoad(ao, getTP(ao, true));
+        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
+            heightUnpacked = addToLoad(height, getTP(height, true));
         ringUnpacked = addToLoad(ring, getTP(ring, true));
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
-        roughnessUnapcked = addToLoad(roughness, getTP(roughness, true));
-        metallicUnpacked = addToLoad(metallic, getTP(metallic, true));
-        aoUnapcked = addToLoad(ao, getTP(ao, true));
-        if (height != null)
-            if (!height.endsWith(GEN_HEIGHT_KEYWORD))
-                heightUnpacked = addToLoad(height, getTP(height, true));
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -161,7 +176,6 @@ public class MaterialComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -180,7 +194,6 @@ public class MaterialComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -194,31 +207,45 @@ public class MaterialComponent implements IObserver {
         return tex;
     }
 
-    public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] cc, boolean culling) {
-        return initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, cc, culling);
+    public Material initMaterial(AssetManager manager, IntModelInstance instance, float[] diffuseCol, boolean culling) {
+        return initMaterial(manager, instance.materials.get(0), instance.materials.size > 1 ? instance.materials.get(1) : null, diffuseCol, culling);
     }
 
-    public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] cc, boolean culling) {
+    public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
         SkyboxComponent.prepareSkybox();
         this.material = mat;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
-            Texture tex = manager.get(diffuseUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+            if (!diffuse.endsWith(GEN_HEIGHT_KEYWORD)) {
+                Texture tex = manager.get(diffuseUnpacked, Texture.class);
+                material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+            }
         }
-        if (cc != null && (coloriftex || diffuse == null)) {
-            // Add diffuse colour
-            material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
+        // Copy diffuse color
+        if (diffuseCol != null) {
+            diffuseColor = new float[4];
+            diffuseColor[0] = diffuseCol[0];
+            diffuseColor[1] = diffuseCol[1];
+            diffuseColor[2] = diffuseCol[2];
+            diffuseColor[3] = diffuseCol[3];
+            if (diffuseColor != null && (coloriftex || diffuse == null)) {
+                // Add diffuse colour
+                material.set(new ColorAttribute(ColorAttribute.Diffuse, diffuseColor[0], diffuseColor[1], diffuseColor[2], diffuseColor[3]));
+            }
         }
 
         if (normal != null && material.get(TextureAttribute.Normal) == null) {
-            Texture tex = manager.get(normalUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Normal, tex));
+            if (!normal.endsWith(GEN_HEIGHT_KEYWORD)) {
+                Texture tex = manager.get(normalUnpacked, Texture.class);
+                material.set(new TextureAttribute(TextureAttribute.Normal, tex));
+            }
         }
         if (specular != null && material.get(TextureAttribute.Specular) == null) {
-            Texture tex = manager.get(specularUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Specular, tex));
-            if (specularIndex < 0)
-                material.set(new ColorAttribute(ColorAttribute.Specular, 0.7f, 0.7f, 0.7f, 1f));
+            if (!specular.endsWith(GEN_HEIGHT_KEYWORD)) {
+                Texture tex = manager.get(specularUnpacked, Texture.class);
+                material.set(new TextureAttribute(TextureAttribute.Specular, tex));
+                if (specularIndex < 0)
+                    material.set(new ColorAttribute(ColorAttribute.Specular, 0.7f, 0.7f, 0.7f, 1f));
+            }
         }
         if (material.get(ColorAttribute.Specular) == null) {
             if (specularIndex >= 0) {
@@ -229,8 +256,10 @@ public class MaterialComponent implements IObserver {
             }
         }
         if (emissive != null && material.get(TextureAttribute.Emissive) == null) {
-            Texture tex = manager.get(emissiveUnpacked, Texture.class);
-            material.set(new TextureExtAttribute(TextureAttribute.Emissive, tex));
+            if (!emissive.endsWith(GEN_HEIGHT_KEYWORD)) {
+                Texture tex = manager.get(emissiveUnpacked, Texture.class);
+                material.set(new TextureExtAttribute(TextureAttribute.Emissive, tex));
+            }
         }
         if (emissiveColor != null) {
             material.set(new ColorAttribute(ColorAttribute.Emissive, emissiveColor[0], emissiveColor[1], emissiveColor[2], 1f));
@@ -262,12 +291,14 @@ public class MaterialComponent implements IObserver {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
         if (metallic != null || metallicColor != null) {
-            SkyboxComponent.prepareSkybox();
-            // Use reflection texture
-            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
-            if (metallic != null && material.get(TextureAttribute.Reflection) == null) {
-                Texture tex = manager.get(metallicUnpacked, Texture.class);
-                material.set(new TextureExtAttribute(TextureAttribute.Reflection, tex));
+            if (!metallic.endsWith(GEN_HEIGHT_KEYWORD)) {
+                SkyboxComponent.prepareSkybox();
+                // Use reflection texture
+                material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
+                if (metallic != null && material.get(TextureAttribute.Reflection) == null) {
+                    Texture tex = manager.get(metallicUnpacked, Texture.class);
+                    material.set(new TextureExtAttribute(TextureAttribute.Reflection, tex));
+                }
             }
             // Use reflection color
             if (metallicColor != null) {
@@ -275,15 +306,16 @@ public class MaterialComponent implements IObserver {
             }
         }
         if (roughness != null && material.get(TextureExtAttribute.Roughness) == null) {
-            Texture tex = manager.get(roughnessUnapcked, Texture.class);
-            material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, tex));
-        }
-        if (albedo != null) {
-            material.set(new FloatExtAttribute(FloatExtAttribute.Albedo, albedo));
+            if (!roughness.endsWith(GEN_HEIGHT_KEYWORD)) {
+                Texture tex = manager.get(roughnessUnapcked, Texture.class);
+                material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, tex));
+            }
         }
         if (ao != null && material.get(TextureExtAttribute.AO) == null) {
-            Texture tex = manager.get(aoUnapcked, Texture.class);
-            material.set(new TextureExtAttribute(TextureExtAttribute.AO, tex));
+            if (!ao.endsWith(GEN_HEIGHT_KEYWORD)) {
+                Texture tex = manager.get(aoUnapcked, Texture.class);
+                material.set(new TextureExtAttribute(TextureExtAttribute.AO, tex));
+            }
         }
 
         return material;
@@ -299,93 +331,136 @@ public class MaterialComponent implements IObserver {
             float[][] moistureData = trio.getSecond();
             Pixmap heightPixmap = trio.getThird();
 
-            try {
-                BufferedImage lut = ImageIO.read(Settings.settings.data.dataFileHandle(biomelookup).file());
-                int iw = lut.getWidth() - 1;
-                int ih = lut.getHeight() - 1;
+            boolean cDiffuse = diffuse != null && diffuse.endsWith(GEN_HEIGHT_KEYWORD);
+            boolean cSpecular = specular != null && specular.endsWith(GEN_HEIGHT_KEYWORD);
+            boolean cNormal = normal != null && normal.endsWith(GEN_HEIGHT_KEYWORD);
+            boolean cEmissive = emissive != null && emissive.endsWith(GEN_HEIGHT_KEYWORD);
+            boolean cMetallic = metallic != null && metallic.endsWith(GEN_HEIGHT_KEYWORD);
+            long timestamp = TimeUtils.millis();
 
-                final Pixmap diffusePixmap;
-                final Pixmap specularPixmap;
-                if (diffuse == null) {
-                    diffusePixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-                } else {
-                    diffusePixmap = null;
-                }
-                if (specular == null) {
-                    specularPixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
-                } else {
-                    specularPixmap = null;
-                }
-                Color col = new Color();
-                for (int i = 0; i < N; i++) {
-                    for (int j = 0; j < M; j++) {
-                        // Normalize height
-                        float height = elevationData[i][j] / heightScale;
-                        float moisture = moistureData[i][j];
+            // Create diffuse and specular textures
+            if (cDiffuse || cSpecular) {
+                try {
+                    BufferedImage lut = ImageIO.read(Settings.settings.data.dataFileHandle(biomelookup).file());
+                    int iw = lut.getWidth() - 1;
+                    int ih = lut.getHeight() - 1;
 
-                        int x = (int) (iw * MathUtilsd.clamp(moisture, 0, 1));
-                        int y = (int) (ih - ih * MathUtilsd.clamp(height, 0, 1));
-
-                        java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
-                        col.set(argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f, 1f);
-
-                        diffusePixmap.drawPixel(i, j, Color.rgba8888(col));
-                        boolean water = height <= 0.02f;
-                        boolean snow = height > 0.85f;
-                        if (water) {
-                            if (specularPixmap != null) {
-                                // White
-                                specularPixmap.drawPixel(i, j, Color.rgba8888(1f, 1f, 1f, 1f));
-                            }
-                        } else if (snow) {
-                            if (specularPixmap != null) {
-                                // Whitish
-                                specularPixmap.drawPixel(i, j, Color.rgba8888(0.5f, 0.5f, 0.5f, 1f));
-                            }
-                        } else {
-                            if (specularPixmap != null) {
-                                // Black
-                                specularPixmap.drawPixel(i, j, Color.rgba8888(0f, 0f, 0f, 1f));
-                            }
-                        }
+                    final Pixmap diffusePixmap;
+                    final Pixmap specularPixmap;
+                    if (cDiffuse) {
+                        diffusePixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+                    } else {
+                        diffusePixmap = null;
                     }
+                    if (cSpecular) {
+                        specularPixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+                    } else {
+                        specularPixmap = null;
+                    }
+                    IntStream.range(0, N).parallel().forEach(i -> {
+                        final int ii = i;
+                        IntStream.range(0, M).parallel().forEach(j -> {
+                            // Normalize height
+                            float height = elevationData[ii][j] / heightScale;
+                            float moisture = moistureData[ii][j];
+
+                            int x = (int) (iw * MathUtilsd.clamp(moisture, 0, 1));
+                            int y = (int) (ih - ih * MathUtilsd.clamp(height, 0, 1));
+
+                            java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
+                            Color col = new Color(argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f, 1f);
+
+                            diffusePixmap.drawPixel(ii, j, Color.rgba8888(col));
+                            boolean water = height <= 0.02f;
+                            boolean snow = height > 0.85f;
+                            if (water) {
+                                if (specularPixmap != null) {
+                                    // White
+                                    specularPixmap.drawPixel(ii, j, Color.rgba8888(1f, 1f, 1f, 1f));
+                                }
+                            } else if (snow) {
+                                if (specularPixmap != null) {
+                                    // Whitish
+                                    specularPixmap.drawPixel(ii, j, Color.rgba8888(0.5f, 0.5f, 0.5f, 1f));
+                                }
+                            } else {
+                                if (specularPixmap != null) {
+                                    // Black
+                                    specularPixmap.drawPixel(ii, j, Color.rgba8888(0f, 0f, 0f, 1f));
+                                }
+                            }
+                        });
+                    });
+                    // Write to disk if necessary
+                    if (Settings.settings.runtime.saveProceduralTextures) {
+                        savePixmap(heightPixmap, timestamp, "height");
+                        savePixmap(diffusePixmap, timestamp, "diffuse");
+                        savePixmap(specularPixmap, timestamp, "specular");
+                    }
+
+                    GaiaSky.postRunnable(() -> {
+                        if (heightPixmap != null) {
+                            // Create texture, populate material
+                            heightMap = elevationData;
+                            Texture heightTex = new Texture(heightPixmap, true);
+                            heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+
+                            heightSize.set(heightTex.getWidth(), heightTex.getHeight());
+                            material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
+                            material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
+                            material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
+                            material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
+                        }
+                        if (diffusePixmap != null) {
+                            Texture diffuseTex = new Texture(diffusePixmap, true);
+                            diffuseTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                            material.set(new TextureAttribute(TextureAttribute.Diffuse, diffuseTex));
+                        }
+                        if (specularPixmap != null) {
+                            Texture specularTex = new Texture(specularPixmap, true);
+                            specularTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                            material.set(new TextureAttribute(TextureAttribute.Specular, specularTex));
+                            if (specularIndex < 0)
+                                material.set(new ColorAttribute(ColorAttribute.Specular, 0.7f, 0.7f, 0.7f, 1f));
+                        }
+                    });
+                } catch (IOException e) {
+                    logger.error(e);
                 }
+            }
+            // Generate normal texture from height data (only if tessellation is off)
+            if (cNormal && !Settings.settings.scene.renderer.elevation.type.isTessellation()) {
+                final Pixmap normalPixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+                float scale = 0.5f;
+                IntStream.range(0, M).forEach(j -> {
+                    IntStream.range(0, N).forEach(i -> {
+                        int im = i > 0 ? i - 1 : i;
+                        int ip = i < N - 1 ? i + 1 : i;
+                        int jm = j > 0 ? j - 1 : j;
+                        int jp = j < M - 1 ? j + 1 : j;
+                        float vtl = elevationData[im][jm] / heightScale;
+                        float vl = elevationData[im][j] / heightScale;
+                        float vbl = elevationData[im][jp] / heightScale;
+                        float vt = elevationData[i][jm] / heightScale;
+                        float vb = elevationData[i][jp] / heightScale;
+                        float vtr = elevationData[ip][jm] / heightScale;
+                        float vr = elevationData[ip][j] / heightScale;
+                        float vbr = elevationData[ip][jp] / heightScale;
+                        float dx = (vtl + vl * 2f + vbl - vtr - vr * 2f - vbr) * scale;
+                        float dy = (vtl + vt * 2f + vtr - vbl - vb * 2f - vbr) * scale;
+                        Vector3 normal = new Vector3(dx * 255f, dy * 255f, 255f).nor();
+                        normalPixmap.drawPixel(i, j, Color.rgba8888(normal.x * 0.5f + 0.5f, normal.y * 0.5f + 0.5f, normal.z, 1f));
+                    });
+                });
                 // Write to disk if necessary
                 if (Settings.settings.runtime.saveProceduralTextures) {
-                    long timestamp = TimeUtils.millis();
-                    savePixmap(heightPixmap, timestamp, "height");
-                    savePixmap(diffusePixmap, timestamp, "albedo");
-                    savePixmap(specularPixmap, timestamp, "specular");
+                    savePixmap(normalPixmap, timestamp, "normal");
                 }
-
                 GaiaSky.postRunnable(() -> {
-                    if (heightPixmap != null) {
-                        // Create texture, populate material
-                        heightMap = elevationData;
-                        Texture heightTex = new Texture(heightPixmap, true);
-                        heightTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-
-                        heightSize.set(heightTex.getWidth(), heightTex.getHeight());
-                        material.set(new TextureExtAttribute(TextureExtAttribute.Height, heightTex));
-                        material.set(new FloatExtAttribute(FloatExtAttribute.HeightScale, heightScale * (float) Settings.settings.scene.renderer.elevation.multiplier));
-                        material.set(new Vector2Attribute(Vector2Attribute.HeightSize, new Vector2(N, M)));
-                        material.set(new FloatExtAttribute(FloatExtAttribute.TessQuality, (float) Settings.settings.scene.renderer.elevation.quality));
-                    }
-                    if (diffusePixmap != null) {
-                        Texture diffuseTex = new Texture(diffusePixmap, true);
-                        diffuseTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-                        material.set(new TextureAttribute(TextureAttribute.Diffuse, diffuseTex));
-                    }
-                    if (specularPixmap != null) {
-                        Texture specularTex = new Texture(specularPixmap, true);
-                        specularTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-                        material.set(new TextureAttribute(TextureAttribute.Specular, specularTex));
-                        if (specularIndex < 0)
-                            material.set(new ColorAttribute(ColorAttribute.Specular, 0.7f, 0.7f, 0.7f, 1f));
-                    }
+                    Texture normalTex = new Texture(normalPixmap, true);
+                    normalTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                    material.set(new TextureAttribute(TextureAttribute.Normal, normalTex));
                 });
-            } catch (IOException e) {
-                logger.error(e);
             }
         });
         t.start();
@@ -393,9 +468,10 @@ public class MaterialComponent implements IObserver {
 
     private void savePixmap(Pixmap p, long timestamp, String name) {
         if (p != null) {
-            FileHandle imgFile = Gdx.files.absolute("/tmp/" + timestamp + "-" + name + ".png");
-            PixmapIO.writePNG(imgFile, p);
-            logger.info(TextUtils.capitalise(name) + " texture written to " + imgFile.path());
+            Path tempDir = Path.of(System.getProperty("java.io.tmpdir"), "gstextures");
+            Path file = tempDir.resolve(timestamp + "-" + name + ".png");
+            PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
+            logger.info(TextUtils.capitalise(name) + " texture written to " + file);
         }
 
     }
@@ -542,10 +618,6 @@ public class MaterialComponent implements IObserver {
 
     public void setRoughness(String roughness) {
         this.roughness = Settings.settings.data.dataFile(roughness);
-    }
-
-    public void setAlbedo(Double albedo) {
-        this.albedo = albedo.floatValue();
     }
 
     public void setAo(String ao) {

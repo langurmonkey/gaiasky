@@ -109,7 +109,6 @@ public class DefaultIntShader extends BaseIntShader {
 
         public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
-        public final static Uniform albedo = new Uniform("u_albedo", FloatExtAttribute.Albedo);
         public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureExtAttribute.AO);
         public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
         public final static Uniform diffuseTexture = new Uniform("u_diffuseTexture", TextureAttribute.Diffuse);
@@ -267,12 +266,6 @@ public class DefaultIntShader extends BaseIntShader {
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.AO))).textureDescription);
                 shader.set(inputID, unit);
-            }
-        };
-        public final static Setter albedo = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Albedo))).value);
             }
         };
         public final static Setter time = new LocalSetter() {
@@ -479,7 +472,6 @@ public class DefaultIntShader extends BaseIntShader {
     // Material uniforms
     public final int u_aoTexture;
     public final int u_roughnessTexture;
-    public final int u_albedo;
     public final int u_opacity;
     public final int u_diffuseColor;
     public final int u_diffuseTexture;
@@ -634,7 +626,6 @@ public class DefaultIntShader extends BaseIntShader {
 
         u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
         u_aoTexture = register(Inputs.aoTexture, Setters.aoTexture);
-        u_albedo = register(Inputs.albedo, Setters.albedo);
         u_opacity = register(Inputs.opacity);
         u_diffuseColor = register(Inputs.diffuseColor, Setters.diffuseColor);
         u_diffuseTexture = register(Inputs.diffuseTexture, Setters.diffuseTexture);
@@ -783,10 +774,6 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if ((attributesMask & TextureExtAttribute.Roughness) == TextureExtAttribute.Roughness) {
             prefix += "#define " + TextureExtAttribute.RoughnessAlias + "Flag\n";
-        }
-
-        if ((attributesMask & FloatExtAttribute.Albedo) == FloatExtAttribute.Albedo) {
-            prefix += "#define " + FloatExtAttribute.AlbedoAlias + "Flag\n";
         }
         if ((attributesMask & FloatExtAttribute.Time) == FloatExtAttribute.Time) {
             prefix += "#define " + FloatExtAttribute.TimeAlias + "Flag\n";

@@ -14,7 +14,10 @@ import com.sudoplay.joise.module.ModuleBasisFunction.InterpolationType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 import gaiasky.util.Trio;
+
+import java.util.stream.IntStream;
 
 /**
  * Contains the parameters and functions for procedural elevation
@@ -31,7 +34,8 @@ public class ElevationComponent {
     private BasisType noiseType = BasisType.SIMPLEX;
     private FractalType fractalType = FractalType.RIDGEMULTI;
 
-    private Module elevationNoise, moistureNoise;
+    // Parallel processing, since noise modules are not thread-safe
+    private Module[] elevationNoise, moistureNoise;
 
     public ElevationComponent() {
         super();
@@ -69,9 +73,14 @@ public class ElevationComponent {
         return scaleDomain;
     }
 
+    final int N_GEN = Settings.settings.performance.getNumberOfThreads();
     private void initNoise(long seed, int N, int M) {
-        elevationNoise = getModule(seed);
-        moistureNoise = getModule(seed + 23443);
+        elevationNoise = new Module[N_GEN];
+        moistureNoise = new Module[N_GEN];
+        for(int i =0; i < N_GEN; i++){
+            elevationNoise[i] = getModule(seed);
+            moistureNoise[i] = getModule(seed + 23443);
+        }
     }
 
     public Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale, long seed) {
@@ -85,38 +94,30 @@ public class ElevationComponent {
         // Sample 3D noise using spherical coordinates on the surface of the sphere
         float pi_times_two = (float) (2 * Math.PI);
         float pi_div_two = (float) (Math.PI / 2.0f);
-        float theta = 0.0f;
         float phi = pi_div_two * -1.0f;
-        int x = 0;
         int y = 0;
 
+        float theta_step = pi_times_two / N;
         while (phi <= pi_div_two) {
-            while (theta <= pi_times_two) {
-                double n = elevationNoise.get(
-                        Math.cos(phi) * Math.cos(theta),
-                        Math.cos(phi) * Math.sin(theta),
-                        Math.sin(phi)
-                );
-                double m = moistureNoise.get(
-                        Math.cos(phi) * Math.cos(theta),
-                        Math.cos(phi) * Math.sin(theta),
-                        Math.sin(phi)
-                );
-
-                elevation[x][y] = (float) (n * heightScale);
-                moisture[x][y] = (float) m;
+            final double cosPhi = Math.cos(phi);
+            final double sinPhi = Math.sin(phi);
+            final int yf = y;
+            IntStream.range(0, N).parallel().forEach(x->{
+                float theta = x * theta_step;
+                double n, m;
+                synchronized(elevationNoise[x % N_GEN]) {
+                    n = elevationNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                    m = moistureNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                }
+                elevation[x][yf] = (float) (n * heightScale);
+                moisture[x][yf] = (float) m;
 
                 float nf = (float) n;
                 // Pixamp
-                pixmap.drawPixel(x, y, Color.rgba8888(nf, nf, nf, 1f));
-
-                theta += (pi_times_two / N);
-                x += 1;
-            }
+                pixmap.drawPixel(x, yf, Color.rgba8888(nf, nf, nf, 1f));
+            });
             phi += (Math.PI / (M - 1));
             y += 1;
-            x = 0;
-            theta = 0.0f;
         }
 
         return new Trio<>(elevation, moisture, pixmap);
