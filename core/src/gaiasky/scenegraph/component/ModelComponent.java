@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ModelComponent implements Disposable, IObserver {
+public class ModelComponent extends NamedComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
 
     public boolean forceInit = false;
@@ -135,7 +135,8 @@ public class ModelComponent implements Disposable, IObserver {
         }
     }
 
-    public void initialize() {
+    public void initialize(String name, Long id) {
+        super.initialize(name, id);
         this.initialize(false);
     }
 
@@ -152,7 +153,7 @@ public class ModelComponent implements Disposable, IObserver {
         }
 
         if ((forceInit || !Settings.settings.scene.initialization.lazyTexture) && mtc != null) {
-            mtc.initialize();
+            mtc.initialize(name, id);
             mtc.texLoading = true;
         }
 
@@ -289,7 +290,7 @@ public class ModelComponent implements Disposable, IObserver {
     public void touch(Matrix4 localTransform) {
         if (Settings.settings.scene.initialization.lazyTexture && mtc != null && !mtc.texInitialised) {
             if (!mtc.texLoading) {
-                mtc.initialize(manager);
+                mtc.initialize(name, id, manager);
                 mtc.texLoading = true;
             } else if (mtc.isFinishedLoading(manager)) {
                 GaiaSky.postRunnable(() -> {

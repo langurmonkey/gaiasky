@@ -68,7 +68,7 @@ public class Planet extends ModelBody implements ILineRenderable {
     public void initialize() {
         super.initialize();
         if (clc != null)
-            clc.initialize(false);
+            clc.initialize(this.getName(), this.getId(), false);
     }
 
     protected void setColor2Data() {
@@ -185,7 +185,7 @@ public class Planet extends ModelBody implements ILineRenderable {
         ICamera cam = GaiaSky.instance.getICamera();
         clc.mc.updateRelativisticEffects(cam);
         clc.mc.updateVelocityBufferUniforms(cam);
-        clc.mc.setTransparency(alpha * opacity);
+        clc.mc.setTransparency(alpha * opacity, GL20.GL_ONE, GL20.GL_ONE_MINUS_SRC_COLOR);
         modelBatch.render(clc.mc.instance, mc.env);
     }
 

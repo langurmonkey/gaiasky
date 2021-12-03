@@ -22,26 +22,27 @@ import java.util.stream.IntStream;
 /**
  * Contains the parameters and functions for procedural elevation
  */
-public class NoiseComponent {
+public class NoiseComponent extends NamedComponent {
     private static final Log logger = Logger.getLogger(NoiseComponent.class);
 
     // Size of the sampled area will be (noiseSize*2 x noiseSize)
-    private double size = 10.0;
+    private double[] size = new double[] { 1.0, 1.0, 1.0 };
     private double power = 1.0;
     private int octaves = 4;
     private double frequency = 2.34;
     private double[] range = new double[] { 0.0, 1.0 };
     private BasisType type = BasisType.SIMPLEX;
     private FractalType fractalType = FractalType.RIDGEMULTI;
+    private long seed = 0L;
 
     // Parallel processing, since noise modules are not thread-safe
-    private Module[] elevationNoise, moistureNoise;
+    private Module[] baseNoise, secondaryNoise;
 
     public NoiseComponent() {
         super();
     }
 
-    private Module getNoiseModule(long seed, boolean moisture) {
+    private Module getNoiseModule(long seed, boolean secondary) {
         ModuleFractal fractal = new ModuleFractal();
         fractal.setAllSourceBasisTypes(type);
         fractal.setAllSourceInterpolationTypes(InterpolationType.CUBIC);
@@ -52,7 +53,7 @@ public class NoiseComponent {
 
         ModuleAutoCorrect autoCorrect = new ModuleAutoCorrect();
         autoCorrect.setSource(fractal);
-        if (moisture) {
+        if (secondary) {
             autoCorrect.setRange(range[0], range[1]);
         } else {
             autoCorrect.setRange(-0.5, 1.0);
@@ -70,29 +71,64 @@ public class NoiseComponent {
 
         ModuleScaleDomain scaleDomain = new ModuleScaleDomain();
         scaleDomain.setSource(clamp);
-        scaleDomain.setScaleX(size);
-        scaleDomain.setScaleY(size);
-        scaleDomain.setScaleZ(size);
+        scaleDomain.setScaleX(size[0]);
+        scaleDomain.setScaleY(size[1]);
+        scaleDomain.setScaleZ(size[2]);
 
         return scaleDomain;
     }
 
     final int N_GEN = Settings.settings.performance.getNumberOfThreads();
 
-    private void initNoise(long seed, int N, int M) {
-        elevationNoise = new Module[N_GEN];
-        moistureNoise = new Module[N_GEN];
+    private void initNoise(long seed, boolean secondary) {
+        baseNoise = new Module[N_GEN];
+        if (secondary)
+            secondaryNoise = new Module[N_GEN];
         for (int i = 0; i < N_GEN; i++) {
-            elevationNoise[i] = getNoiseModule(seed, true);
-            // Shift seed
-            moistureNoise[i] = getNoiseModule(seed + 23443, false);
+            baseNoise[i] = getNoiseModule(seed, true);
+            if (secondary)
+                secondaryNoise[i] = getNoiseModule(seed + 23443, false);
         }
     }
 
-    public Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale, long seed) {
+    public Pixmap generateData(int N, int M) {
+        logger.info("Generating procedural " + N + "x" + M + " texture");
+        initNoise(seed, false);
+        Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
+
+        // Sample 3D noise using spherical coordinates on the surface of the sphere
+        float pi_times_two = (float) (2 * Math.PI);
+        float pi_div_two = (float) (Math.PI / 2.0f);
+        float phi = pi_div_two * -1.0f;
+        int y = 0;
+
+        float theta_step = pi_times_two / N;
+        while (phi <= pi_div_two) {
+            final double cosPhi = Math.cos(phi);
+            final double sinPhi = Math.sin(phi);
+            final int yf = y;
+            IntStream.range(0, N).parallel().forEach(x -> {
+                float theta = x * theta_step;
+                double n;
+                synchronized (baseNoise[x % N_GEN]) {
+                    n = baseNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                }
+
+                float nf = (float) n;
+                // Pixamp
+                pixmap.drawPixel(x, yf, Color.rgba8888(nf, nf, nf, 1f));
+            });
+            phi += (Math.PI / (M - 1));
+            y += 1;
+        }
+
+        return pixmap;
+    }
+
+    public Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale) {
         // Construct RAM height map from noise algorithms
         logger.info("Generating procedural " + N + "x" + M + " elevation data");
-        initNoise(seed, N, M);
+        initNoise(seed, true);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
         float[][] elevation = new float[N][M];
         float[][] moisture = new float[N][M];
@@ -111,9 +147,9 @@ public class NoiseComponent {
             IntStream.range(0, N).parallel().forEach(x -> {
                 float theta = x * theta_step;
                 double n, m;
-                synchronized (elevationNoise[x % N_GEN]) {
-                    n = elevationNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
-                    m = moistureNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                synchronized (baseNoise[x % N_GEN]) {
+                    n = baseNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                    m = secondaryNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
                 }
                 elevation[x][yf] = (float) (n * heightScale);
                 moisture[x][yf] = (float) m;
@@ -145,12 +181,13 @@ public class NoiseComponent {
         }
     }
 
-    /**
-     * Only if height is {@link MaterialComponent#GEN_HEIGHT_KEYWORD}
-     *
-     * @param noiseSize Size of the sampling area
-     */
     public void setSize(Double noiseSize) {
+        this.size[0] = noiseSize;
+        this.size[1] = noiseSize;
+        this.size[2] = noiseSize;
+    }
+
+    public void setSize(double[] noiseSize) {
         this.size = noiseSize;
     }
 
@@ -173,5 +210,9 @@ public class NoiseComponent {
 
     public void setRange(double[] range) {
         this.range = range;
+    }
+
+    public void setSeed(Long seed) {
+        this.seed = seed;
     }
 }

@@ -326,6 +326,8 @@ public class Constants {
 
     // Asterisks must be substituted because windows does not allow them in paths
     public static final String STAR_SUBSTITUTE = "%#QUAL#%";
+    /** Generated height keyword **/
+    public static final String GEN_KEYWORD = "generate";
 
     // URLS for external queries
     public static final String URL_GAIA_JSON_SOURCE = "https://gaia.ari.uni-heidelberg.de/tap/sync?REQUEST=doQuery&LANG=ADQL&FORMAT=json&QUERY=SELECT+*+FROM+gaiaedr3.gaia_source+WHERE+source_id=";

@@ -766,7 +766,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             addPitch(deltaY, acceleration);
         } else if (parent.mode.equals(CameraMode.FOCUS_MODE)) {
             double th = 30;
-            double viewAngleDegrees = Math.toDegrees(focus.getViewAngle());
+            double solidAngleDeg = Math.toDegrees(focus.getViewAngle());
 
             if (focusLookKeyPressed) {
                 diverted = true;
@@ -774,7 +774,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 addPitch(deltaY * fovFactor, acceleration);
             } else {
                 // This factor slows the rotation as the focus gets closer and closer
-                double factor = viewAngleDegrees > th ? Math.pow(th / viewAngleDegrees, 3) : 1.0;
+                double factor = solidAngleDeg > th ? Math.pow(th / solidAngleDeg, 2d) : 1.0;
                 addHorizontal(deltaX * factor, acceleration);
                 addVertical(deltaY * factor, acceleration);
             }

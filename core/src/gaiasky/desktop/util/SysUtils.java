@@ -5,8 +5,13 @@
 
 package gaiasky.desktop.util;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.PixmapIO;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -261,6 +266,7 @@ public class SysUtils {
      * the user-configured data folder as input.
      *
      * @param dataLocation The user-defined data location.
+     *
      * @return A path that points to the temporary directory.
      */
     public static Path getTempDir(String dataLocation) {
@@ -351,6 +357,7 @@ public class SysUtils {
 
     /**
      * Gets the path to the file containing the release notes.
+     *
      * @return Path to the release notes file
      */
     public static Path getReleaseNotesFile() {
@@ -362,10 +369,26 @@ public class SysUtils {
      * Gets the path to the file containing the last shown
      * release notes version. This file is typically in the
      * configuration directory.
+     *
      * @return Path to the release notes revision file
      */
-    public static Path getReleaseNotesRevisionFile(){
+    public static Path getReleaseNotesRevisionFile() {
         return getConfigDir().resolve(".releasenotes.rev");
     }
 
+    /**
+     * Saves the given procedurally generated pixmap as a PNG image
+     * to disk using the given name and timestamp.
+     *
+     * @param p         The pixmap.
+     * @param name      The name of the pixmap.
+     */
+    public static void saveProceduralPixmap(Pixmap p, String name) {
+        if (p != null) {
+            Path proceduralDir = Settings.settings.data.dataPath("tex").resolve("procedural");
+            Path file = proceduralDir.resolve(name + ".png");
+            PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
+            logger.info(TextUtils.capitalise(name) + " texture written to " + file);
+        }
+    }
 }

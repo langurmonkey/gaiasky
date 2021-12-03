@@ -121,7 +121,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         p.put("diameter", 1d);
         mc.setParams(p);
         mc.forceInit = true;
-        mc.initialize();
+        mc.initialize(null, 0L);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], cc[3]));
         // Depth reads, no depth writes
         mc.setDepthTest(GL20.GL_LEQUAL, false);

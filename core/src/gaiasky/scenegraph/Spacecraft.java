@@ -241,7 +241,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         if (initialize) {
             // Neither loading nor initialized
             if (!this.mc.isModelLoading() && !this.mc.isModelInitialised()) {
-                this.mc.initialize();
+                this.mc.initialize(null, 0L);
             }
         }
     }

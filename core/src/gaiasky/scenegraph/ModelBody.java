@@ -91,7 +91,7 @@ public abstract class ModelBody extends CelestialBody {
 
     public void initialize() {
         if (mc != null) {
-            mc.initialize();
+            mc.initialize(this.getName(), this.getId());
         }
         setColor2Data();
     }

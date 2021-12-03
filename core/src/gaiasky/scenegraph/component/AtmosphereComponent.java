@@ -51,7 +51,7 @@ public class AtmosphereComponent {
     public AtmosphereComponent() {
         localTransform = new Matrix4();
         mc = new ModelComponent(false);
-        mc.initialize();
+        mc.initialize(null, 0L);
         aux = new Vector3();
         aux3 = new Vector3d();
         aux1 = new Vector3d();

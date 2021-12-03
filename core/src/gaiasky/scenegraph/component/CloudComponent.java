@@ -8,6 +8,7 @@ package gaiasky.scenegraph.component;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
@@ -30,7 +32,7 @@ import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
 
-public class CloudComponent {
+public class CloudComponent extends NamedComponent {
     private static final Log logger = Logger.getLogger(CloudComponent.class);
 
     /** Default texture parameters **/
@@ -46,6 +48,7 @@ public class CloudComponent {
     private AssetManager manager;
     public int quality;
     public float size;
+    public NoiseComponent nc;
     public ModelComponent mc;
     public Matrix4 localTransform;
 
@@ -62,16 +65,23 @@ public class CloudComponent {
     public CloudComponent() {
         localTransform = new Matrix4();
         mc = new ModelComponent(false);
-        mc.initialize();
+        mc.initialize(null, 0L);
         aux = new Vector3();
         aux3 = new Vector3d();
     }
 
-    public void initialize(boolean force) {
+    public void initialize(String name, Long id, boolean force){
+        super.initialize(name, id);
+        this.initialize(force);
+    }
+
+    private void initialize(boolean force) {
         if (!Settings.settings.scene.initialization.lazyTexture || force) {
-            // Add textures to load
-            cloudUnpacked = addToLoad(cloud);
-            cloudtransUnpacked = addToLoad(cloudtrans);
+            if(cloud != null && !cloud.endsWith(Constants.GEN_KEYWORD)) {
+                // Add textures to load
+                cloudUnpacked = addToLoad(cloud);
+                cloudtransUnpacked = addToLoad(cloudtrans);
+            }
         }
     }
 
@@ -88,8 +98,6 @@ public class CloudComponent {
     /**
      * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
-     *
-     * @param tex
      */
     private String addToLoad(String tex) {
         if (tex == null)
@@ -146,9 +154,14 @@ public class CloudComponent {
 
     public void initMaterial() {
         material = mc.instance.materials.first();
-        if (cloud != null && manager.isLoaded(cloudUnpacked)) {
-            Texture tex = manager.get(cloudUnpacked, Texture.class);
-            material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+
+        if (cloud != null && material.get(TextureAttribute.Diffuse) == null) {
+            if(!cloud.endsWith(Constants.GEN_KEYWORD)) {
+                Texture tex = manager.get(cloudUnpacked, Texture.class);
+                material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
+            }else{
+                initializeGenCloudData();
+            }
         }
         if (cloudtrans != null && manager.isLoaded(cloudtransUnpacked)) {
             Texture tex = manager.get(cloudtransUnpacked, Texture.class);
@@ -157,6 +170,28 @@ public class CloudComponent {
         material.set(new BlendingAttribute(1.0f));
         // Do not cull
         material.set(new IntAttribute(IntAttribute.CullFace, 0));
+    }
+
+    private void initializeGenCloudData(){
+
+        Thread t = new Thread(() -> {
+            final int N = Settings.settings.graphics.quality.texWidthTarget;
+            final int M = Settings.settings.graphics.quality.texHeightTarget;
+
+            Pixmap cloudPixmap = nc.generateData(N, M);
+            // Write to disk if necessary
+            if (Settings.settings.program.saveProceduralTextures) {
+                SysUtils.saveProceduralPixmap(cloudPixmap, this.name + "-cloud");
+            }
+            GaiaSky.postRunnable(() -> {
+                if (cloudPixmap != null) {
+                    Texture cloudTex = new Texture(cloudPixmap, true);
+                    cloudTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                    material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
+                }
+            });
+        });
+        t.start();
     }
 
     /**
@@ -220,6 +255,10 @@ public class CloudComponent {
 
     public void setCloudtrans(String cloudtrans) {
         this.cloudtrans = cloudtrans;
+    }
+
+    public void setNoise(NoiseComponent noise) {
+        this.nc = noise;
     }
 
 }

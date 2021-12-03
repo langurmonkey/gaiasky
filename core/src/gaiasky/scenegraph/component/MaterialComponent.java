@@ -19,6 +19,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
+import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
@@ -42,11 +43,9 @@ import java.util.stream.IntStream;
 /**
  * A basic component that contains the info on a material
  */
-public class MaterialComponent implements IObserver {
+public class MaterialComponent extends NamedComponent implements IObserver {
     private static final Log logger = Logger.getLogger(MaterialComponent.class);
 
-    /** Generated height keyword **/
-    public static final String GEN_HEIGHT_KEYWORD = "generate";
     /** Default texture parameters **/
     protected static final TextureParameter textureParamsMipMap, textureParams;
     protected static final PFMTextureParameter pfmTextureParams;
@@ -104,9 +103,6 @@ public class MaterialComponent implements IObserver {
     /** The actual material **/
     private Material material, ringMaterial;
 
-    // Noise seed
-    private long noiseSeed = 0L;
-
     // Biome lookup texture
     private String biomeLUT = "data/tex/base/biome-lookup.png";
     private float biomeHueShift = 0;
@@ -119,45 +115,47 @@ public class MaterialComponent implements IObserver {
         EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.TESSELLATION_QUALITY_CMD);
     }
 
-    public void initialize(AssetManager manager) {
+    public void initialize(String name, Long id, AssetManager manager) {
+        super.initialize(name, id);
         // Add textures to load
-        if (diffuse != null && !diffuse.endsWith(GEN_HEIGHT_KEYWORD))
+        if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
             diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
-        if (normal != null && !normal.endsWith(GEN_HEIGHT_KEYWORD))
+        if (normal != null && !normal.endsWith(Constants.GEN_KEYWORD))
             normalUnpacked = addToLoad(normal, getTP(normal), manager);
-        if (specular != null && !specular.endsWith(GEN_HEIGHT_KEYWORD))
+        if (specular != null && !specular.endsWith(Constants.GEN_KEYWORD))
             specularUnpacked = addToLoad(specular, getTP(specular, true), manager);
-        if (emissive != null && !emissive.endsWith(GEN_HEIGHT_KEYWORD))
+        if (emissive != null && !emissive.endsWith(Constants.GEN_KEYWORD))
             emissiveUnpacked = addToLoad(emissive, getTP(emissive, true), manager);
-        if (roughness != null && !roughness.endsWith(GEN_HEIGHT_KEYWORD))
+        if (roughness != null && !roughness.endsWith(Constants.GEN_KEYWORD))
             roughnessUnapcked = addToLoad(roughness, getTP(roughness, true), manager);
-        if (metallic != null && !metallic.endsWith(GEN_HEIGHT_KEYWORD))
+        if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD))
             metallicUnpacked = addToLoad(metallic, getTP(metallic, true), manager);
-        if (ao != null && !ao.endsWith(GEN_HEIGHT_KEYWORD))
+        if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
             aoUnapcked = addToLoad(ao, getTP(ao, true), manager);
-        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
+        if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
             heightUnpacked = addToLoad(height, getTP(height, true), manager);
         ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
     }
 
-    public void initialize() {
+    public void initialize(String name, Long id) {
+        super.initialize(name, id);
         // Add textures to load
-        if (diffuse != null && !diffuse.endsWith(GEN_HEIGHT_KEYWORD))
+        if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
             diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true));
-        if (normal != null && !normal.endsWith(GEN_HEIGHT_KEYWORD))
+        if (normal != null && !normal.endsWith(Constants.GEN_KEYWORD))
             normalUnpacked = addToLoad(normal, getTP(normal));
-        if (specular != null && !specular.endsWith(GEN_HEIGHT_KEYWORD))
+        if (specular != null && !specular.endsWith(Constants.GEN_KEYWORD))
             specularUnpacked = addToLoad(specular, getTP(specular, true));
-        if (emissive != null && !emissive.endsWith(GEN_HEIGHT_KEYWORD))
+        if (emissive != null && !emissive.endsWith(Constants.GEN_KEYWORD))
             emissiveUnpacked = addToLoad(emissive, getTP(emissive, true));
-        if (roughness != null && !roughness.endsWith(GEN_HEIGHT_KEYWORD))
+        if (roughness != null && !roughness.endsWith(Constants.GEN_KEYWORD))
             roughnessUnapcked = addToLoad(roughness, getTP(roughness, true));
-        if (metallic != null && !metallic.endsWith(GEN_HEIGHT_KEYWORD))
+        if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD))
             metallicUnpacked = addToLoad(metallic, getTP(metallic, true));
-        if (ao != null && !ao.endsWith(GEN_HEIGHT_KEYWORD))
+        if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
             aoUnapcked = addToLoad(ao, getTP(ao, true));
-        if (height != null && !height.endsWith(GEN_HEIGHT_KEYWORD))
+        if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
             heightUnpacked = addToLoad(height, getTP(height, true));
         ringUnpacked = addToLoad(ring, getTP(ring, true));
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
@@ -219,7 +217,7 @@ public class MaterialComponent implements IObserver {
         SkyboxComponent.prepareSkybox();
         this.material = mat;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
-            if (!diffuse.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!diffuse.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(diffuseUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
             }
@@ -238,13 +236,13 @@ public class MaterialComponent implements IObserver {
         }
 
         if (normal != null && material.get(TextureAttribute.Normal) == null) {
-            if (!normal.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!normal.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(normalUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Normal, tex));
             }
         }
         if (specular != null && material.get(TextureAttribute.Specular) == null) {
-            if (!specular.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!specular.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(specularUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Specular, tex));
                 if (specularIndex < 0)
@@ -260,7 +258,7 @@ public class MaterialComponent implements IObserver {
             }
         }
         if (emissive != null && material.get(TextureAttribute.Emissive) == null) {
-            if (!emissive.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!emissive.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(emissiveUnpacked, Texture.class);
                 material.set(new TextureExtAttribute(TextureAttribute.Emissive, tex));
             }
@@ -269,7 +267,7 @@ public class MaterialComponent implements IObserver {
             material.set(new ColorAttribute(ColorAttribute.Emissive, emissiveColor[0], emissiveColor[1], emissiveColor[2], 1f));
         }
         if (height != null && material.get(TextureExtAttribute.Height) == null) {
-            if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!height.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(heightUnpacked, Texture.class);
                 if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
                     initializeElevationData(tex);
@@ -298,7 +296,7 @@ public class MaterialComponent implements IObserver {
             SkyboxComponent.prepareSkybox();
             material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
         }
-        if (metallic != null && !metallic.endsWith(GEN_HEIGHT_KEYWORD)) {
+        if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD)) {
             if (material.get(TextureAttribute.Reflection) == null) {
                 Texture tex = manager.get(metallicUnpacked, Texture.class);
                 material.set(new TextureExtAttribute(TextureAttribute.Reflection, tex));
@@ -309,18 +307,17 @@ public class MaterialComponent implements IObserver {
             material.set(new ColorAttribute(ColorAttribute.Reflection, metallicColor[0], metallicColor[1], metallicColor[2], 1f));
         }
         if (roughness != null && material.get(TextureExtAttribute.Roughness) == null) {
-            if (!roughness.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!roughness.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(roughnessUnapcked, Texture.class);
                 material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, tex));
             }
         }
         if (ao != null && material.get(TextureExtAttribute.AO) == null) {
-            if (!ao.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (!ao.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(aoUnapcked, Texture.class);
                 material.set(new TextureExtAttribute(TextureExtAttribute.AO, tex));
             }
         }
-
         return material;
     }
 
@@ -329,16 +326,16 @@ public class MaterialComponent implements IObserver {
             final int N = Settings.settings.graphics.quality.texWidthTarget;
             final int M = Settings.settings.graphics.quality.texHeightTarget;
 
-            Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, noiseSeed);
+            Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale);
             float[][] elevationData = trio.getFirst();
             float[][] moistureData = trio.getSecond();
             Pixmap heightPixmap = trio.getThird();
 
-            boolean cDiffuse = diffuse != null && diffuse.endsWith(GEN_HEIGHT_KEYWORD);
-            boolean cSpecular = specular != null && specular.endsWith(GEN_HEIGHT_KEYWORD);
-            boolean cNormal = normal != null && normal.endsWith(GEN_HEIGHT_KEYWORD);
-            boolean cEmissive = emissive != null && emissive.endsWith(GEN_HEIGHT_KEYWORD);
-            boolean cMetallic = metallic != null && metallic.endsWith(GEN_HEIGHT_KEYWORD);
+            boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
+            boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
+            boolean cNormal = normal != null && normal.endsWith(Constants.GEN_KEYWORD);
+            boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
+            boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
             long timestamp = TimeUtils.millis();
 
             // Create diffuse and specular textures
@@ -403,9 +400,9 @@ public class MaterialComponent implements IObserver {
                     });
                     // Write to disk if necessary
                     if (Settings.settings.program.saveProceduralTextures) {
-                        savePixmap(heightPixmap, timestamp, "height");
-                        savePixmap(diffusePixmap, timestamp, "diffuse");
-                        savePixmap(specularPixmap, timestamp, "specular");
+                        SysUtils.saveProceduralPixmap(heightPixmap, this.name + "-height");
+                        SysUtils.saveProceduralPixmap(diffusePixmap, this.name + "-diffuse");
+                        SysUtils.saveProceduralPixmap(specularPixmap, this.name + "-specular");
                     }
 
                     GaiaSky.postRunnable(() -> {
@@ -464,7 +461,7 @@ public class MaterialComponent implements IObserver {
                 });
                 // Write to disk if necessary
                 if (Settings.settings.program.saveProceduralTextures) {
-                    savePixmap(normalPixmap, timestamp, "normal");
+                    SysUtils.saveProceduralPixmap(normalPixmap, this.name + "-normal");
                 }
                 GaiaSky.postRunnable(() -> {
                     Texture normalTex = new Texture(normalPixmap, true);
@@ -474,15 +471,6 @@ public class MaterialComponent implements IObserver {
             }
         });
         t.start();
-    }
-
-    private void savePixmap(Pixmap p, long timestamp, String name) {
-        if (p != null) {
-            Path proceduralDir = Settings.settings.data.dataPath("tex").resolve("procedural");
-            Path file = proceduralDir.resolve(timestamp + "-" + name + ".png");
-            PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
-            logger.info(TextUtils.capitalise(name) + " texture written to " + file);
-        }
     }
 
     private void initializeElevationData(Texture tex) {
@@ -637,10 +625,6 @@ public class MaterialComponent implements IObserver {
         this.ao = Settings.settings.data.dataFile(ao);
     }
 
-    public void setSeed(Long seed) {
-        this.noiseSeed = seed;
-    }
-
     public boolean hasHeight() {
         return this.height != null && !this.height.isEmpty();
     }
@@ -728,13 +712,13 @@ public class MaterialComponent implements IObserver {
                         removeElevationData();
                     } else {
                         if (heightMap == null) {
-                            if (height.endsWith(GEN_HEIGHT_KEYWORD))
+                            if (height.endsWith(Constants.GEN_KEYWORD))
                                 initializeGenElevationData();
                             else {
                                 if (this.material.has(TextureExtAttribute.Height)) {
                                     initializeElevationData(((TextureAttribute) this.material.get(TextureExtAttribute.Height)).textureDescription.texture);
                                 } else if (AssetBean.manager().isLoaded(heightUnpacked)) {
-                                    if (!height.endsWith(GEN_HEIGHT_KEYWORD)) {
+                                    if (!height.endsWith(Constants.GEN_KEYWORD)) {
                                         Texture tex = AssetBean.manager().get(heightUnpacked, Texture.class);
                                         if (!Settings.settings.scene.renderer.elevation.type.isNone()) {
                                             initializeElevationData(tex);
