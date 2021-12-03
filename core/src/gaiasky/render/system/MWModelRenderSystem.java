@@ -143,7 +143,6 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         ta = new TextureArray(true, Format.RGBA8888, s00, s01, d00, d01, d02, d03, d04, d05);
         ta.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 
-
         for (ExtShaderProgram shaderProgram : programs) {
             shaderProgram.begin();
             ta.bind(0);
@@ -161,19 +160,24 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
     }
 
     private void disposeMeshes() {
-        dust.dispose();
+        if (dust != null)
+            dust.dispose();
         dust = null;
         dustA = null;
-        bulge.dispose();
+        if (bulge != null)
+            bulge.dispose();
         bulge = null;
         bulgeA = null;
-        stars.dispose();
+        if (stars != null)
+            stars.dispose();
         stars = null;
         starsA = null;
-        hii.dispose();
+        if (hii != null)
+            hii.dispose();
         hii = null;
         hiiA = null;
-        gas.dispose();
+        if (gas != null)
+            gas.dispose();
         gas = null;
         gasA = null;
     }
@@ -469,15 +473,16 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         int indexIdx;
         int numVertices;
 
-        public void quadIndices(){
-                index(numVertices - 4);
-                index(numVertices - 3);
-                index(numVertices - 2);
+        public void quadIndices() {
+            index(numVertices - 4);
+            index(numVertices - 3);
+            index(numVertices - 2);
 
-                index(numVertices - 2);
-                index(numVertices - 1);
-                index(numVertices - 4);
+            index(numVertices - 2);
+            index(numVertices - 1);
+            index(numVertices - 4);
         }
+
         private void index(int idx) {
             indices[indexIdx++] = idx;
         }
