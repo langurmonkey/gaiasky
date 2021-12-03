@@ -25,6 +25,7 @@ import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ElevationType;
+import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
@@ -98,7 +99,7 @@ public class MaterialComponent implements IObserver {
     public Float heightScale = 0.005f;
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
-    public ElevationComponent ec;
+    public NoiseComponent nc;
 
     /** The actual material **/
     private Material material, ringMaterial;
@@ -107,7 +108,8 @@ public class MaterialComponent implements IObserver {
     private long noiseSeed = 0L;
 
     // Biome lookup texture
-    private String biomelookup = "data/tex/base/biome-lookup.png";
+    private String biomeLUT = "data/tex/base/biome-lookup.png";
+    private float biomeHueShift = 0;
 
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
@@ -176,6 +178,7 @@ public class MaterialComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -194,6 +197,7 @@ public class MaterialComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -290,20 +294,19 @@ public class MaterialComponent implements IObserver {
         if (!culling) {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
-        if (metallic != null || metallicColor != null) {
-            if (!metallic.endsWith(GEN_HEIGHT_KEYWORD)) {
-                SkyboxComponent.prepareSkybox();
-                // Use reflection texture
-                material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
-                if (metallic != null && material.get(TextureAttribute.Reflection) == null) {
-                    Texture tex = manager.get(metallicUnpacked, Texture.class);
-                    material.set(new TextureExtAttribute(TextureAttribute.Reflection, tex));
-                }
+        if(metallic != null || metallicColor != null){
+            SkyboxComponent.prepareSkybox();
+            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
+        }
+        if (metallic != null && !metallic.endsWith(GEN_HEIGHT_KEYWORD)) {
+            if (material.get(TextureAttribute.Reflection) == null) {
+                Texture tex = manager.get(metallicUnpacked, Texture.class);
+                material.set(new TextureExtAttribute(TextureAttribute.Reflection, tex));
             }
-            // Use reflection color
-            if (metallicColor != null) {
-                material.set(new ColorAttribute(ColorAttribute.Reflection, metallicColor[0], metallicColor[1], metallicColor[2], 1f));
-            }
+        }
+        if (metallicColor != null) {
+            // Reflective color
+            material.set(new ColorAttribute(ColorAttribute.Reflection, metallicColor[0], metallicColor[1], metallicColor[2], 1f));
         }
         if (roughness != null && material.get(TextureExtAttribute.Roughness) == null) {
             if (!roughness.endsWith(GEN_HEIGHT_KEYWORD)) {
@@ -326,7 +329,7 @@ public class MaterialComponent implements IObserver {
             final int N = Settings.settings.graphics.quality.texWidthTarget;
             final int M = Settings.settings.graphics.quality.texHeightTarget;
 
-            Trio<float[][], float[][], Pixmap> trio = ec.generateElevation(N, M, heightScale, noiseSeed);
+            Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, noiseSeed);
             float[][] elevationData = trio.getFirst();
             float[][] moistureData = trio.getSecond();
             Pixmap heightPixmap = trio.getThird();
@@ -341,7 +344,7 @@ public class MaterialComponent implements IObserver {
             // Create diffuse and specular textures
             if (cDiffuse || cSpecular) {
                 try {
-                    BufferedImage lut = ImageIO.read(Settings.settings.data.dataFileHandle(biomelookup).file());
+                    BufferedImage lut = ImageIO.read(Settings.settings.data.dataFileHandle(biomeLUT).file());
                     int iw = lut.getWidth() - 1;
                     int ih = lut.getHeight() - 1;
 
@@ -368,7 +371,14 @@ public class MaterialComponent implements IObserver {
                             int y = (int) (ih - ih * MathUtilsd.clamp(height, 0, 1));
 
                             java.awt.Color argb = new java.awt.Color(lut.getRGB(x, y));
-                            Color col = new Color(argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f, 1f);
+                            float[] rgb = new float[] { argb.getRed() / 255f, argb.getGreen() / 255f, argb.getBlue() / 255f };
+                            if (biomeHueShift != 0) {
+                                // Shift hue of lookup table by an amount in degrees
+                                float[] hsb = ColorUtils.rgbToHsb(rgb);
+                                hsb[0] = ((hsb[0] * 360f + biomeHueShift) % 360f) / 360f;
+                                rgb = ColorUtils.hsbToRgb(hsb);
+                            }
+                            Color col = new Color(rgb[0], rgb[1], rgb[2], 1f);
 
                             diffusePixmap.drawPixel(ii, j, Color.rgba8888(col));
                             boolean water = height <= 0.02f;
@@ -392,7 +402,7 @@ public class MaterialComponent implements IObserver {
                         });
                     });
                     // Write to disk if necessary
-                    if (Settings.settings.runtime.saveProceduralTextures) {
+                    if (Settings.settings.program.saveProceduralTextures) {
                         savePixmap(heightPixmap, timestamp, "height");
                         savePixmap(diffusePixmap, timestamp, "diffuse");
                         savePixmap(specularPixmap, timestamp, "specular");
@@ -453,7 +463,7 @@ public class MaterialComponent implements IObserver {
                     });
                 });
                 // Write to disk if necessary
-                if (Settings.settings.runtime.saveProceduralTextures) {
+                if (Settings.settings.program.saveProceduralTextures) {
                     savePixmap(normalPixmap, timestamp, "normal");
                 }
                 GaiaSky.postRunnable(() -> {
@@ -468,12 +478,11 @@ public class MaterialComponent implements IObserver {
 
     private void savePixmap(Pixmap p, long timestamp, String name) {
         if (p != null) {
-            Path tempDir = Path.of(System.getProperty("java.io.tmpdir"), "gstextures");
-            Path file = tempDir.resolve(timestamp + "-" + name + ".png");
+            Path proceduralDir = Settings.settings.data.dataPath("tex").resolve("procedural");
+            Path file = proceduralDir.resolve(timestamp + "-" + name + ".png");
             PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
             logger.info(TextUtils.capitalise(name) + " texture written to " + file);
         }
-
     }
 
     private void initializeElevationData(Texture tex) {
@@ -582,12 +591,16 @@ public class MaterialComponent implements IObserver {
         this.coloriftex = coloriftex;
     }
 
-    public void setElevation(ElevationComponent ec) {
-        this.ec = ec;
+    public void setNoise(NoiseComponent noise) {
+        this.nc = noise;
     }
 
-    public void setBiomelookup(String biomeLookupTex) {
-        this.biomelookup = biomeLookupTex;
+    public void setBiomelut(String biomeLookupTex) {
+        this.biomeLUT = biomeLookupTex;
+    }
+
+    public void setBiomehueshift(Double hueShift) {
+        this.biomeHueShift = hueShift.floatValue();
     }
 
     /**

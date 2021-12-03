@@ -40,8 +40,7 @@ public class AtmosphereComponent {
     public float m_Kr, m_Km;
     public float fogDensity = 1.0f;
     public Vector3 fogColor;
-
-    public boolean correctGround;
+    public float m_eSun = 10f;
 
     // Model parameters
     public Map<String, Object> params;
@@ -61,13 +60,13 @@ public class AtmosphereComponent {
 
     public void doneLoading(Material planetMat, float planetSize) {
         this.planetSize = planetSize;
-        setUpAtmosphericScatteringMaterial(planetMat, correctGround);
+        setUpAtmosphericScatteringMaterial(planetMat);
 
         Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
         IntModel atmosphereModel = pair.getFirst();
         Material atmMat = pair.getSecond().get("base");
         atmMat.clear();
-        setUpAtmosphericScatteringMaterial(atmMat, false);
+        setUpAtmosphericScatteringMaterial(atmMat);
         atmMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
 
         // CREATE ATMOSPHERE MODEL
@@ -85,14 +84,14 @@ public class AtmosphereComponent {
      * @param mat
      *            The material to set up.
      */
-    public void setUpAtmosphericScatteringMaterial(Material mat, boolean ground) {
+    public void setUpAtmosphericScatteringMaterial(Material mat) {
         float camHeight = 1f;
         float m_Kr4PI = m_Kr * 4.0f * (float) Math.PI;
         float m_Km4PI = m_Km * 4.0f * (float) Math.PI;
-        float m_ESun = 20.0f; // Sun brightness (almost) constant
+        float m_ESun = m_eSun; // Sun brightness (almost) constant
         float m_g = 0.97f; // The Mie phase asymmetry factor
         m_fInnerRadius = planetSize / 2f;
-        m_fOuterRadius = ground ? (float) (this.size + 150 * Constants.KM_TO_U) : this.size;
+        m_fOuterRadius = this.size;
         m_fAtmosphereHeight = m_fOuterRadius - m_fInnerRadius;
         float m_fScaleDepth = .20f;
         float m_fScale = 1.0f / (m_fAtmosphereHeight);
@@ -163,7 +162,7 @@ public class AtmosphereComponent {
 
         // Distance to planet
         float camHeight = (float) (aux3.len());
-        float m_ESun = 10f;
+        float m_ESun = m_eSun;
         float camHeightGr = camHeight - m_fInnerRadius;
         float atmFactor = (m_fAtmosphereHeight - camHeightGr) / m_fAtmosphereHeight;
 
@@ -248,12 +247,16 @@ public class AtmosphereComponent {
         this.m_Km = m_Km.floatValue();
     }
 
-    public void setParams(Map<String, Object> params) {
-        this.params = params;
+    public void setM_eSun(Double m_eSun){
+        this.m_eSun = m_eSun.floatValue();
     }
 
-    public void setCorrectground(Boolean correctGround) {
-        this.correctGround = correctGround;
+    public double[] getWavelengths() {
+        return wavelengths;
+    }
+
+    public void setParams(Map<String, Object> params) {
+        this.params = params;
     }
 
 }

@@ -22,28 +22,28 @@ import java.util.stream.IntStream;
 /**
  * Contains the parameters and functions for procedural elevation
  */
-public class ElevationComponent {
-    private static final Log logger = Logger.getLogger(ElevationComponent.class);
+public class NoiseComponent {
+    private static final Log logger = Logger.getLogger(NoiseComponent.class);
 
     // Size of the sampled area will be (noiseSize*2 x noiseSize)
-    private double noiseSize = 10.0;
-    private double noisePower = 1.0;
+    private double size = 10.0;
+    private double power = 1.0;
     private int octaves = 4;
     private double frequency = 2.34;
-    private double[] noiseRange = new double[] { 0.0, 1.0 };
-    private BasisType noiseType = BasisType.SIMPLEX;
+    private double[] range = new double[] { 0.0, 1.0 };
+    private BasisType type = BasisType.SIMPLEX;
     private FractalType fractalType = FractalType.RIDGEMULTI;
 
     // Parallel processing, since noise modules are not thread-safe
     private Module[] elevationNoise, moistureNoise;
 
-    public ElevationComponent() {
+    public NoiseComponent() {
         super();
     }
 
-    private Module getModule(long seed) {
+    private Module getNoiseModule(long seed, boolean moisture) {
         ModuleFractal fractal = new ModuleFractal();
-        fractal.setAllSourceBasisTypes(noiseType);
+        fractal.setAllSourceBasisTypes(type);
         fractal.setAllSourceInterpolationTypes(InterpolationType.CUBIC);
         fractal.setNumOctaves(octaves);
         fractal.setFrequency(frequency);
@@ -52,7 +52,11 @@ public class ElevationComponent {
 
         ModuleAutoCorrect autoCorrect = new ModuleAutoCorrect();
         autoCorrect.setSource(fractal);
-        autoCorrect.setRange(noiseRange[0], noiseRange[1]);
+        if (moisture) {
+            autoCorrect.setRange(range[0], range[1]);
+        } else {
+            autoCorrect.setRange(-0.5, 1.0);
+        }
         autoCorrect.setSamples(10000);
         autoCorrect.calculate3D();
 
@@ -62,24 +66,26 @@ public class ElevationComponent {
 
         ModulePow pow = new ModulePow();
         pow.setSource(clamp);
-        pow.setPower(noisePower);
+        pow.setPower(power);
 
         ModuleScaleDomain scaleDomain = new ModuleScaleDomain();
         scaleDomain.setSource(clamp);
-        scaleDomain.setScaleX(noiseSize);
-        scaleDomain.setScaleY(noiseSize);
-        scaleDomain.setScaleZ(noiseSize);
+        scaleDomain.setScaleX(size);
+        scaleDomain.setScaleY(size);
+        scaleDomain.setScaleZ(size);
 
         return scaleDomain;
     }
 
     final int N_GEN = Settings.settings.performance.getNumberOfThreads();
+
     private void initNoise(long seed, int N, int M) {
         elevationNoise = new Module[N_GEN];
         moistureNoise = new Module[N_GEN];
-        for(int i =0; i < N_GEN; i++){
-            elevationNoise[i] = getModule(seed);
-            moistureNoise[i] = getModule(seed + 23443);
+        for (int i = 0; i < N_GEN; i++) {
+            elevationNoise[i] = getNoiseModule(seed, true);
+            // Shift seed
+            moistureNoise[i] = getNoiseModule(seed + 23443, false);
         }
     }
 
@@ -102,10 +108,10 @@ public class ElevationComponent {
             final double cosPhi = Math.cos(phi);
             final double sinPhi = Math.sin(phi);
             final int yf = y;
-            IntStream.range(0, N).parallel().forEach(x->{
+            IntStream.range(0, N).parallel().forEach(x -> {
                 float theta = x * theta_step;
                 double n, m;
-                synchronized(elevationNoise[x % N_GEN]) {
+                synchronized (elevationNoise[x % N_GEN]) {
                     n = elevationNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
                     m = moistureNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
                 }
@@ -123,11 +129,11 @@ public class ElevationComponent {
         return new Trio<>(elevation, moisture, pixmap);
     }
 
-    public void setNoisetype(String noiseType) {
+    public void setType(String noiseType) {
         try {
-            this.noiseType = BasisType.valueOf(noiseType.toUpperCase());
+            this.type = BasisType.valueOf(noiseType.toUpperCase());
         } catch (Exception e) {
-            this.noiseType = BasisType.SIMPLEX;
+            this.type = BasisType.SIMPLEX;
         }
     }
 
@@ -144,8 +150,8 @@ public class ElevationComponent {
      *
      * @param noiseSize Size of the sampling area
      */
-    public void setNoisesize(Double noiseSize) {
-        this.noiseSize = noiseSize;
+    public void setSize(Double noiseSize) {
+        this.size = noiseSize;
     }
 
     /**
@@ -161,11 +167,11 @@ public class ElevationComponent {
         this.frequency = frequency;
     }
 
-    public void setNoisepower(Double power) {
-        this.noisePower = power;
+    public void setPower(Double power) {
+        this.power = power;
     }
 
-    public void setNoiserange(double[] range) {
-        this.noiseRange = range;
+    public void setRange(double[] range) {
+        this.range = range;
     }
 }

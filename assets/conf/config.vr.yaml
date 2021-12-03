@@ -272,6 +272,9 @@ program:
   debugInfo: false
   # Whether to display the HUD
   hud: false
+  # Save all procedurally-generated textures to the data folder
+  # WARN: watch your disk space!
+  saveProceduralTextures: false
   # Minimap settings
   minimap:
     # Display the minimap

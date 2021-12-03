@@ -701,6 +701,7 @@ public class Settings {
         @JsonIgnore public boolean safeModeFlag;
         public boolean debugInfo;
         public boolean hud;
+        public boolean saveProceduralTextures = false;
         public MinimapSettings minimap;
         public FileChooserSettings fileChooser;
         public PointerSettings pointer;
@@ -1410,7 +1411,6 @@ public class Settings {
         public boolean relativisticAberration = false;
         public boolean gravitationalWaves = false;
         public boolean displayVrGui = false;
-        public boolean saveProceduralTextures = false;
 
         // Max clock time, 5 Myr by default
         public long maxTimeMs = 5000000L * (long) Nature.Y_TO_MS;
