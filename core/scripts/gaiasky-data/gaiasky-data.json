@@ -108,8 +108,8 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "d63a412e881fab93cc00b09ca94cd87ff321e1c2ff9f507a269ecba38fd8bf2d",
-      "description": "Base data pack - Required, for Gaia Sky 3.1.7 and above. Contains the Solar System, constellations, the Milky Way, and more",
+      "sha256": "ee928da66be1c452a3cbeed8e74775c40927abd73f16ddec8c05ae1facbc9f75",
+      "description": "Base data pack - Required, for Gaia Sky 3.2.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
       "releasenotes": "Invert height textures to follow convention, add biome LUT textures, update satellites, moons and planets.",
       "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v021_20211203/basedata.tar.gz"
@@ -789,7 +789,7 @@
       ],
       "description": "Exonia System - A made-up partially procedurally generated extra-solar system with two stars and three planets.",
       "releasenotes" : "First version with two procedurally-generated planets and a manually textured one",
-      "sha256": "50610a151c5c43720634174a4b6826e1a732ba7b1b555e6137b7a0814ade5a97",
+      "sha256": "c42d0e56ce53cded97940723d0c8950d0a5d9f0157530c2b102424738b7cf474",
       "file": "@mirror-url@systems/exonia/v01_20211203/exonia-system.tar.gz"
     },
     {
