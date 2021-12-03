@@ -787,7 +787,7 @@
         "exonia-system.json",
         "tex/base/exonia*.jpg"
       ],
-      "description": "A made-up, partially procedurally generated extra-solar system with two stars and three planets.",
+      "description": "Exonia System - A made-up partially procedurally generated extra-solar system with two stars and three planets.",
       "releasenotes" : "First version with two procedurally-generated planets and a manually textured one",
       "sha256": "c17c8d019faed5e2f19b458322cc0422e0a82026fcba1f97c35f141cbe5fbcf8",
       "file": "@mirror-url@systems/exonia/v01_20211203/exonia-system.tar.gz"
