@@ -43,6 +43,7 @@ Thumbs.db
 # Vim files #
 #############
 *.swp
+.vim
 
 # Output folder #
 #################
