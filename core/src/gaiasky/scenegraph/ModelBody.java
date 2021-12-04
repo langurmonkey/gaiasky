@@ -33,6 +33,10 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Abstract class with the basic functionality of bodies represented by a 3D
  * model
@@ -83,6 +87,12 @@ public abstract class ModelBody extends CelestialBody {
      */
     public double[] shadowMapValues;
 
+    /** The seed for random components **/
+    protected List<Long> seed = Arrays.asList(1L);
+
+    /** The components to randomize---possible values are ["model", "cloud", "atmosphere"] **/
+    protected List<String> randomize;
+
     public ModelBody() {
         super();
         localTransform = new Matrix4();
@@ -90,6 +100,11 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     public void initialize() {
+        if (isRandomizeModel()) {
+            // Ignore current model component (if any) and create a random one
+            mc = new ModelComponent(true);
+            mc.randomizeAll(getSeed("model"), size);
+        }
         if (mc != null) {
             mc.initialize(this.getName(), this.getId());
         }
@@ -99,6 +114,7 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
+
         if (mc != null) {
             mc.doneLoading(manager, localTransform, cc);
         }
@@ -262,7 +278,7 @@ public abstract class ModelBody extends CelestialBody {
 
     /** Model opaque rendering. Disable shadow mapping **/
     public void render(IntModelBatch modelBatch, RenderGroup group, float alpha, double t, boolean shadowEnv) {
-        if(mc.isModelInitialised()) {
+        if (mc.isModelInitialised()) {
             if (shadowEnv)
                 prepareShadowEnvironment();
 
@@ -562,6 +578,54 @@ public abstract class ModelBody extends CelestialBody {
         this.refPlane = refplane;
         this.refPlaneTransform = refplane + "toequatorial";
         this.inverseRefPlaneTransform = "equatorialto" + refplane;
+    }
+
+    public void setSeed(Long seed) {
+        this.seed = Arrays.asList(seed);
+    }
+
+    public void setSeed(int[] seed) {
+        this.seed = new ArrayList<>(seed.length);
+        for(int s : seed){
+            this.seed.add((long) s);
+        }
+    }
+
+    public void setRandomize(String[] randomize) {
+        this.randomize = Arrays.asList(randomize);
+    }
+
+    public void setRandomize(String randomize) {
+        this.randomize = Arrays.asList(randomize);
+    }
+
+    protected boolean isRandomizeModel() {
+        return this.randomize != null && this.randomize.contains("model");
+    }
+
+    /**
+     *  Gets the seed corresponding to the given component by matching it using
+     *  the position in the randomize vector.
+     * @param component The component name.
+     * @return The seed.
+     */
+    protected long getSeed(String component) {
+        if (randomize != null && randomize.contains(component)) {
+            int idx;
+            if ((idx = randomize.indexOf(component)) >= 0 && seed.size() > idx) {
+                return seed.get(idx);
+            }
+        }
+        // Get first otherwise
+        return this.seed.get(0);
+    }
+
+    protected boolean isRandomizeAtmosphere() {
+        return this.randomize != null && this.randomize.contains("atmosphere");
+    }
+
+    protected boolean isRandomizeCloud() {
+        return this.randomize != null && this.randomize.contains("cloud");
     }
 
 }

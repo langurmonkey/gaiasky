@@ -31,6 +31,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
+import java.util.Random;
 
 public class CloudComponent extends NamedComponent {
     private static final Log logger = Logger.getLogger(CloudComponent.class);
@@ -261,4 +262,24 @@ public class CloudComponent extends NamedComponent {
         this.nc = noise;
     }
 
+    /**
+     * Creates a random cloud component using the given seed and the base
+     * body size. Generates a random cloud texture.
+     *
+     * @param seed   The seed to use.
+     * @param size The body size in internal units.
+     */
+    public void randomizeAll(long seed, double size) {
+        Random rand = new Random(seed);
+
+        // Size
+        double sizeKm = size * Constants.U_TO_KM;
+        setSize(sizeKm + gaussian(rand, 20.0, 5.0, 10.0));
+        // Cloud
+        setCloud("generate");
+        // Params
+        setParams(createModelParameters(200L, 1.0, false));
+        // Noise
+        setNoise(randomizeNoiseComponent(rand));
+    }
 }

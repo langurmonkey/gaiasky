@@ -104,7 +104,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     private Material material, ringMaterial;
 
     // Biome lookup texture
-    private String biomeLUT = "data/tex/base/biome-lookup.png";
+    private String biomeLUT = "data/tex/base/biome-lut.png";
     private float biomeHueShift = 0;
 
     /** Add also color even if texture is present **/

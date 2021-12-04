@@ -67,8 +67,19 @@ public class Planet extends ModelBody implements ILineRenderable {
     @Override
     public void initialize() {
         super.initialize();
-        if (clc != null)
+        if (isRandomizeCloud()) {
+            // Ignore current cloud component (if any) and create a random one
+            clc = new CloudComponent();
+            clc.randomizeAll(getSeed("cloud"), size);
+        }
+        if (isRandomizeAtmosphere()) {
+            // Ignore current atmosphere component (if any) and create a random one
+            ac = new AtmosphereComponent();
+            ac.randomizeAll(getSeed("atmosphere"), size);
+        }
+        if (clc != null) {
             clc.initialize(this.getName(), this.getId(), false);
+        }
     }
 
     protected void setColor2Data() {

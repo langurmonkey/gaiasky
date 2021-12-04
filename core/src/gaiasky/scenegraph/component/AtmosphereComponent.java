@@ -25,8 +25,9 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
 import java.util.Map;
+import java.util.Random;
 
-public class AtmosphereComponent {
+public class AtmosphereComponent extends NamedComponent {
 
     public int quality;
     public float size;
@@ -80,9 +81,8 @@ public class AtmosphereComponent {
 
     /**
      * Sets up the atmospheric scattering parameters to the given material
-     * 
-     * @param mat
-     *            The material to set up.
+     *
+     * @param mat The material to set up.
      */
     public void setUpAtmosphericScatteringMaterial(Material mat) {
         float camHeight = 1f;
@@ -140,15 +140,11 @@ public class AtmosphereComponent {
 
     /**
      * Updates the atmospheric scattering shader parameters
-     * 
-     * @param mat
-     *            The material to update.
-     * @param alpha
-     *            The opacity value.
-     * @param ground
-     *            Whether it is the ground shader or the atmosphere.
-     * @param planet
-     *            The planet itself, holder of this atmosphere
+     *
+     * @param mat    The material to update.
+     * @param alpha  The opacity value.
+     * @param ground Whether it is the ground shader or the atmosphere.
+     * @param planet The planet itself, holder of this atmosphere
      */
     public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vroffset) {
         Vector3b transform = planet.translation;
@@ -231,11 +227,11 @@ public class AtmosphereComponent {
         this.wavelengths = wavelengths;
     }
 
-    public void setFogcolor(double[] fogColor){
+    public void setFogcolor(double[] fogColor) {
         this.fogColor.set((float) fogColor[0], (float) fogColor[1], (float) fogColor[2]);
     }
 
-    public void setFogdensity(Double fogDensity){
+    public void setFogdensity(Double fogDensity) {
         this.fogDensity = fogDensity.floatValue();
     }
 
@@ -247,7 +243,7 @@ public class AtmosphereComponent {
         this.m_Km = m_Km.floatValue();
     }
 
-    public void setM_eSun(Double m_eSun){
+    public void setM_eSun(Double m_eSun) {
         this.m_eSun = m_eSun.floatValue();
     }
 
@@ -259,4 +255,32 @@ public class AtmosphereComponent {
         this.params = params;
     }
 
+    /**
+     * Creates a random atmosphere component using the given seed and the base
+     * body size.
+     *
+     * @param seed The seed to use.
+     * @param size The body size in internal units.
+     */
+    public void randomizeAll(long seed, double size) {
+        Random rand = new Random(seed);
+
+        // Size
+        double sizeKm = size * Constants.U_TO_KM;
+        setSize(sizeKm + gaussian(rand, 150.0, 80.0, 100.0));
+        // Wavelengths
+        setWavelengths(new double[] { gaussian(rand, 0.7, 0.1), gaussian(rand, 0.8, 0.3), gaussian(rand, 0.8, 0.3) });
+        // Kr
+        setM_Kr(0.0025);
+        // Km
+        setM_Km(0.0015);
+        // eSun
+        setM_eSun(gaussian(rand, 8.0, 4.0, 2.5));
+        // Fog density
+        setFogdensity(gaussian(rand, 4.5, 2.0, 1.0));
+        // Fog color
+        setFogcolor(new double[] { rand.nextDouble(), rand.nextDouble(), rand.nextDouble() });
+        // Params
+        setParams(createModelParameters(600L, 2.0, true));
+    }
 }

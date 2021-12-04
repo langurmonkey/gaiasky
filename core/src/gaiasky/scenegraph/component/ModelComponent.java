@@ -33,6 +33,7 @@ import gaiasky.util.gdx.shader.FloatExtAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -582,4 +583,31 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         return Objects.requireNonNullElseGet(modelFile, () -> "{" + type + ", params: " + params.toString() + "}");
     }
 
+    /**
+     * Creates a random model component using the given seed. Creates
+     * random elevation data, as well as diffuse, normal and specular textures.
+     *
+     * @param seed The seed to use.
+     * @param size The size of the base body in internal units.
+     */
+    public void randomizeAll(long seed, double size) {
+        Random rand = new Random(seed);
+        // Type
+        setType("sphere");
+        // Parameters
+        setParams(createModelParameters(400L, 1.0, false));
+        // Material
+        MaterialComponent mc = new MaterialComponent();
+        mc.setHeight("generate");
+        mc.setDiffuse("generate");
+        mc.setNormal("generate");
+        mc.setSpecular("generate");
+        mc.setBiomelut(rand.nextBoolean() ? "data/tex/base/biome-lut.png" : "data/tex/base/biome-smooth-lut.png");
+        mc.setBiomehueshift(rand.nextDouble() * 360.0);
+        double sizeKm = size * Constants.U_TO_KM;
+        mc.setHeightScale(gaussian(rand, sizeKm * 0.002, sizeKm * 0.0004, 1.0));
+        // Noise
+        mc.setNoise(randomizeNoiseComponent(rand));
+        setMaterial(mc);
+    }
 }
