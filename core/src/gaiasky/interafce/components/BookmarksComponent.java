@@ -202,7 +202,7 @@ public class BookmarksComponent extends GuiComponent implements IObserver {
                                 });
                                 cm.addItem(delete);
 
-                                cm.add(new Separator(skin, "menu")).padTop(2).padBottom(2).fill().expand().row();
+                                cm.addSeparator();
 
                                 // Move up and down
                                 MenuItem moveUp = new MenuItem(I18n.txt("gui.bookmark.context.move.up"), skin);
