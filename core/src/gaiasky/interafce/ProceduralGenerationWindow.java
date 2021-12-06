@@ -24,24 +24,27 @@ import gaiasky.util.validator.LongValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 public class ProceduralGenerationWindow extends GenericDialog {
-
+    // Selected tab persists across windows
+    private static int lastTabSelected = 0;
+    
     private final Planet target;
-    private OwnTextButton generate;
     private Random rand;
-    private MaterialComponent mtc;
-    private CloudComponent clc;
-    private AtmosphereComponent ac;
+    private MaterialComponent initMtc, mtc;
+    private CloudComponent initClc, clc;
+    private AtmosphereComponent initAc, ac;
     private float fieldWidth, fieldWidthAll, textWidth;
+    private boolean updateTabSelected = true;
 
     public ProceduralGenerationWindow(Planet target, Stage stage, Skin skin) {
         super(I18n.txt("gui.procedural.title", target.getName()), skin, stage);
         this.target = target;
+        this.initMtc = target.getMaterialComponent();
+        this.initClc = target.getCloudComponent();
+        this.initAc = target.getAtmosphereComponent();
         this.rand = new Random(1884L);
         this.setModal(false);
 
@@ -50,6 +53,11 @@ public class ProceduralGenerationWindow extends GenericDialog {
         // Build UI
         buildSuper();
 
+    }
+
+    protected void rebuild() {
+        this.content.clear();
+        build();
     }
 
     @Override
@@ -116,6 +124,14 @@ public class ProceduralGenerationWindow extends GenericDialog {
                 contentSurface.setVisible(tabSurface.isChecked());
                 contentClouds.setVisible(tabClouds.isChecked());
                 contentAtmosphere.setVisible(tabAtmosphere.isChecked());
+                if(updateTabSelected) {
+                    if (tabSurface.isChecked())
+                        lastTabSelected = 0;
+                    else if (tabClouds.isChecked())
+                        lastTabSelected = 1;
+                    else if (tabAtmosphere.isChecked())
+                        lastTabSelected = 2;
+                }
             }
         };
         tabSurface.addListener(tabListener);
@@ -126,21 +142,39 @@ public class ProceduralGenerationWindow extends GenericDialog {
         ButtonGroup<Button> tabs = new ButtonGroup<>();
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
+        updateTabSelected = false;
         tabs.add(tabSurface);
         tabs.add(tabClouds);
         tabs.add(tabAtmosphere);
+        updateTabSelected = true;
 
+        tabs.setChecked(((TextButton)tabs.getButtons().get(lastTabSelected)).getText().toString());
+
+        // Randomize button
+        OwnTextButton randomize = new OwnTextButton(I18n.txt("gui.procedural.randomize", I18n.txt("gui.procedural.all")), skin, "big");
+        randomize.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                randomize();
+            }
+        });
+        randomize.pad(pad5, pad15, pad5, pad15);
         // Generate button
-        generate = new OwnTextButton(I18n.txt("gui.procedural.generate"), skin, "big");
+        OwnTextButton generate = new OwnTextButton(I18n.txt("gui.procedural.generate", I18n.txt("gui.procedural.all")), skin, "big");
         generate.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                generate();
+                generateAll();
             }
         });
         generate.pad(pad5, pad15, pad5, pad15);
 
-        content.add(generate).center();
+        HorizontalGroup buttonGroup = new HorizontalGroup();
+        buttonGroup.space(pad15);
+        buttonGroup.addActor(randomize);
+        buttonGroup.addActor(generate);
+
+        content.add(buttonGroup).center();
 
     }
 
@@ -299,15 +333,14 @@ public class ProceduralGenerationWindow extends GenericDialog {
 
     private void buildContentSurface(Table content) {
         ModelComponent mc = target.getModelComponent();
-        MaterialComponent matComp = target.getMaterialComponent();
         if (mc != null) {
             mtc = new MaterialComponent();
-            if (matComp == null) {
+            if (initMtc == null) {
                 // Generate random material
                 mtc.randomizeAll(rand.nextLong(), target.getSize());
             } else {
                 // Copy existing
-                mtc.copyFrom(matComp);
+                mtc.copyFrom(initMtc);
             }
             // Title
             content.add(new OwnLabel(I18n.txt("gui.procedural.param.color"), skin, "header")).colspan(2).left().padBottom(pad20).row();
@@ -366,14 +399,13 @@ public class ProceduralGenerationWindow extends GenericDialog {
     }
 
     private void buildContentClouds(Table content) {
-        CloudComponent cloudComp = target.getCloudComponent();
         clc = new CloudComponent();
-        if (cloudComp == null) {
+        if (initClc == null) {
             // Generate random
             clc.randomizeAll(rand.nextLong(), target.getSize());
         } else {
             // Copy existing
-            clc.copyFrom(cloudComp);
+            clc.copyFrom(initClc);
             clc.setCloud("generate");
         }
         // Noise
@@ -381,14 +413,13 @@ public class ProceduralGenerationWindow extends GenericDialog {
     }
 
     private void buildContentAtmosphere(Table content) {
-        AtmosphereComponent atmComp = target.getAtmosphereComponent();
         ac = new AtmosphereComponent();
-        if (atmComp == null) {
+        if (initAc == null) {
             // Generate random
             ac.randomizeAll(rand.nextLong(), target.getSize());
         } else {
             // Copy existing
-            ac.copyFrom(atmComp);
+            ac.copyFrom(initAc);
         }
         // Title
         content.add(new OwnLabel(I18n.txt("gui.procedural.param.atm"), skin, "header")).colspan(2).left().padBottom(pad20).row();
@@ -471,24 +502,74 @@ public class ProceduralGenerationWindow extends GenericDialog {
         content.add(fogColor).left().expandX().padBottom(pad10).row();
     }
 
-    protected void generate() {
-        GaiaSky.postRunnable(()->{
-            // Atmosphere component
-            target.setAtmosphere(ac);
+    protected void randomizeSurface(boolean rebuild) {
+        this.initMtc = new MaterialComponent();
+        this.initMtc.randomizeAll(rand.nextLong(), target.size);
 
-            // Cloud component
-            CloudComponent cloudComponent = target.getCloudComponent();
-            if(cloudComponent != null) {
-                cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
-            }
-            clc.initialize(target.getName(), target.getId(), false);
-            target.setCloud(clc);
+        if (rebuild)
+            rebuild();
+    }
 
-            // Re-initialize
-            target.initializeAtmosphereClouds(GaiaSky.instance.assetManager);
+    protected void randomizeClouds(boolean rebuild) {
+        this.initClc = new CloudComponent();
+        this.initClc.randomizeAll(rand.nextLong(), target.size);
 
+        if (rebuild)
+            rebuild();
+    }
+
+    protected void randomizeAtmosphere(boolean rebuild) {
+        this.initAc = new AtmosphereComponent();
+        this.initAc.randomizeAll(rand.nextLong(), target.size);
+
+        if (rebuild)
+            rebuild();
+    }
+
+    protected void randomize() {
+        randomizeSurface(false);
+        randomizeClouds(false);
+        randomizeAtmosphere(false);
+        rebuild();
+    }
+
+    protected void generateSurface() {
+        GaiaSky.postRunnable(this::generateSurfaceDirect);
+    }
+
+    protected void generateSurfaceDirect() {
+
+    }
+
+    protected void generateClouds() {
+        GaiaSky.postRunnable(this::generateCloudsDirect);
+    }
+
+    protected void generateCloudsDirect() {
+        CloudComponent cloudComponent = target.getCloudComponent();
+        if (cloudComponent != null) {
+            cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
+        }
+        clc.initialize(target.getName(), target.getId(), false);
+        target.setCloud(clc);
+        target.initializeClouds(GaiaSky.instance.assetManager);
+    }
+
+    protected void generateAtmosphere() {
+        GaiaSky.postRunnable(this::generateAtmosphereDirect);
+    }
+
+    protected void generateAtmosphereDirect() {
+        target.setAtmosphere(ac);
+        target.initializeAtmosphere(GaiaSky.instance.assetManager);
+    }
+
+    protected void generateAll() {
+        GaiaSky.postRunnable(() -> {
+            generateSurfaceDirect();
+            generateCloudsDirect();
+            generateAtmosphereDirect();
         });
-
     }
 
     @Override

@@ -95,17 +95,17 @@ public class Planet extends ModelBody implements ILineRenderable {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        initializeAtmosphereClouds(manager);
+        initializeAtmosphere(manager);
+        initializeClouds(manager);
     }
 
-    public void initializeAtmosphereClouds(AssetManager manager){
-        // INITIALIZE ATMOSPHERE
+    public void initializeAtmosphere(AssetManager manager){
         if (ac != null) {
             // Initialize atmosphere model
             ac.doneLoading(mc.instance.materials.first(), this.size);
         }
-
-        // INITIALIZE CLOUDS
+    }
+    public void initializeClouds(AssetManager manager){
         if (clc != null) {
             clc.doneLoading(manager);
         }
