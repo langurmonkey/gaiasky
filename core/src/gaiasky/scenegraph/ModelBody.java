@@ -21,8 +21,10 @@ import gaiasky.render.ShadowMapImpl;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ITransform;
+import gaiasky.scenegraph.component.MaterialComponent;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.Proximity;
@@ -104,6 +106,11 @@ public abstract class ModelBody extends CelestialBody {
             // Ignore current model component (if any) and create a random one
             mc = new ModelComponent(true);
             mc.randomizeAll(getSeed("model"), size);
+            if (Settings.settings.program.debugInfo) {
+                Logger.getLogger(Planet.class).debug("::" + getName() + "::");
+                Logger.getLogger(Planet.class).debug("============MODEL===========");
+                mc.print(Logger.getLogger(Planet.class));
+            }
         }
         if (mc != null) {
             mc.initialize(this.getName(), this.getId());
@@ -348,6 +355,7 @@ public abstract class ModelBody extends CelestialBody {
      * @param latitude  The latitude in deg
      * @param distance  The distance in km
      * @param out       The vector to store the result
+     *
      * @return The cartesian position above the surface of this body
      */
     public Vector3b getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
@@ -586,7 +594,7 @@ public abstract class ModelBody extends CelestialBody {
 
     public void setSeed(int[] seed) {
         this.seed = new ArrayList<>(seed.length);
-        for(int s : seed){
+        for (int s : seed) {
             this.seed.add((long) s);
         }
     }
@@ -604,9 +612,11 @@ public abstract class ModelBody extends CelestialBody {
     }
 
     /**
-     *  Gets the seed corresponding to the given component by matching it using
-     *  the position in the randomize vector.
+     * Gets the seed corresponding to the given component by matching it using
+     * the position in the randomize vector.
+     *
      * @param component The component name.
+     *
      * @return The seed.
      */
     protected long getSeed(String component) {
@@ -626,6 +636,14 @@ public abstract class ModelBody extends CelestialBody {
 
     protected boolean isRandomizeCloud() {
         return this.randomize != null && this.randomize.contains("cloud");
+    }
+
+    public ModelComponent getModelComponent() {
+        return mc;
+    }
+
+    public MaterialComponent getMaterialComponent() {
+        return mc != null ? mc.mtc : null;
     }
 
 }

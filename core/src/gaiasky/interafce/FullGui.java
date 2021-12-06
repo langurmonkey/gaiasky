@@ -25,10 +25,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
-import gaiasky.scenegraph.CelestialBody;
-import gaiasky.scenegraph.IFocus;
-import gaiasky.scenegraph.ISceneGraph;
-import gaiasky.scenegraph.IStarFocus;
+import gaiasky.scenegraph.*;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ProgramSettings.UpdateSettings;
@@ -109,7 +106,7 @@ public class FullGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_WIKI_INFO_ACTION, Events.UPDATE_WIKI_INFO_ACTION, Events.SHOW_ARCHIVE_VIEW_ACTION, Events.UPDATE_ARCHIVE_VIEW_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS);
+        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SHOW_WIKI_INFO_ACTION, Events.UPDATE_WIKI_INFO_ACTION, Events.SHOW_ARCHIVE_VIEW_ACTION, Events.UPDATE_ARCHIVE_VIEW_ACTION, Events.SHOW_PLAYCAMERA_ACTION, Events.DISPLAY_MEM_INFO_WINDOW, Events.REMOVE_KEYBOARD_FOCUS, Events.REMOVE_GUI_COMPONENT, Events.ADD_GUI_COMPONENT, Events.SHOW_LOG_ACTION, Events.RA_DEC_UPDATED, Events.LON_LAT_UPDATED, Events.POPUP_MENU_FOCUS, Events.SHOW_LAND_AT_LOCATION_ACTION, Events.DISPLAY_POINTER_COORDS_CMD, Events.TOGGLE_MINIMAP, Events.SHOW_MINIMAP_ACTION, Events.SHOW_LOAD_PROGRESS, Events.SHOW_PROCEDURAL_GEN_ACTION);
     }
 
     protected void buildGui() {
@@ -349,6 +346,19 @@ public class FullGui extends AbstractGui {
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
+        case SHOW_PROCEDURAL_GEN_ACTION:
+            Planet planet = (Planet) data[0];
+            Actor w = findActor("procedural-window");
+            // Only one instance
+            if (w != null && w.hasParent()) {
+                if (!w.isVisible())
+                    w.setVisible(true);
+            } else {
+                ProceduralGenerationWindow proceduralWindow = new ProceduralGenerationWindow(planet, ui, skin);
+                proceduralWindow.setName("procedural-window");
+                proceduralWindow.show(ui);
+            }
+            break;
         case SHOW_LAND_AT_LOCATION_ACTION:
             CelestialBody target = (CelestialBody) data[0];
             LandAtWindow landAtLocation = new LandAtWindow(target, ui, skin);
@@ -357,7 +367,7 @@ public class FullGui extends AbstractGui {
         case SHOW_PLAYCAMERA_ACTION:
             FileChooser fc = new FileChooser(I18n.txt("gui.camera.title"), skin, ui, SysUtils.getDefaultCameraDir(), FileChooser.FileChooserTarget.FILES);
             fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-            fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
+            fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
             fc.setAcceptText(I18n.txt("gui.camera.run"));
             fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".dat") || pathname.getFileName().toString().endsWith(".gsc"));
             fc.setAcceptedFiles("*.dat, *.gsc");
@@ -390,7 +400,7 @@ public class FullGui extends AbstractGui {
                 logWindow.show(ui);
             break;
         case UPDATE_WIKI_INFO_ACTION:
-            if(wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()){
+            if (wikiInfoWindow != null && wikiInfoWindow.isVisible() && wikiInfoWindow.hasParent() && !wikiInfoWindow.isUpdating()) {
                 // Update
                 String searchName = (String) data[0];
                 wikiInfoWindow.update(searchName);
@@ -401,14 +411,14 @@ public class FullGui extends AbstractGui {
             if (wikiInfoWindow == null) {
                 wikiInfoWindow = new WikiInfoWindow(ui, skin);
             }
-            if(!wikiInfoWindow.isUpdating()) {
+            if (!wikiInfoWindow.isUpdating()) {
                 wikiInfoWindow.update(searchName);
                 if (!wikiInfoWindow.isVisible() || !wikiInfoWindow.hasParent())
                     wikiInfoWindow.show(ui);
             }
             break;
         case UPDATE_ARCHIVE_VIEW_ACTION:
-            if(archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()){
+            if (archiveViewWindow != null && archiveViewWindow.isVisible() && archiveViewWindow.hasParent()) {
                 // Update
                 IStarFocus starFocus = (IStarFocus) data[0];
                 archiveViewWindow.update(starFocus);

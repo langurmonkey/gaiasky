@@ -17,6 +17,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Trio;
 
+import java.util.Arrays;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 /**
@@ -25,15 +27,14 @@ import java.util.stream.IntStream;
 public class NoiseComponent extends NamedComponent {
     private static final Log logger = Logger.getLogger(NoiseComponent.class);
 
-    // Size of the sampled area will be (noiseSize*2 x noiseSize)
-    private double[] size = new double[] { 1.0, 1.0, 1.0 };
-    private double power = 1.0;
-    private int octaves = 4;
-    private double frequency = 2.34;
-    private double[] range = new double[] { 0.0, 1.0 };
-    private BasisType type = BasisType.SIMPLEX;
-    private FractalType fractalType = FractalType.RIDGEMULTI;
-    private long seed = 0L;
+    public double[] scale = new double[] { 1.0, 1.0, 1.0 };
+    public double power = 1.0;
+    public int octaves = 4;
+    public double frequency = 2.34;
+    public double[] range = new double[] { 0.0, 1.0 };
+    public BasisType type = BasisType.SIMPLEX;
+    public FractalType fractalType = FractalType.RIDGEMULTI;
+    public long seed = 0L;
 
     // Parallel processing, since noise modules are not thread-safe
     private Module[] baseNoise, secondaryNoise;
@@ -70,10 +71,10 @@ public class NoiseComponent extends NamedComponent {
         pow.setPower(power);
 
         ModuleScaleDomain scaleDomain = new ModuleScaleDomain();
-        scaleDomain.setSource(clamp);
-        scaleDomain.setScaleX(size[0]);
-        scaleDomain.setScaleY(size[1]);
-        scaleDomain.setScaleZ(size[2]);
+        scaleDomain.setSource(pow);
+        scaleDomain.setScaleX(scale[0]);
+        scaleDomain.setScaleY(scale[1]);
+        scaleDomain.setScaleZ(scale[2]);
 
         return scaleDomain;
     }
@@ -97,25 +98,24 @@ public class NoiseComponent extends NamedComponent {
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
 
         // Sample 3D noise using spherical coordinates on the surface of the sphere
-        float pi_times_two = (float) (2 * Math.PI);
-        float pi_div_two = (float) (Math.PI / 2.0f);
-        float phi = pi_div_two * -1.0f;
+        double piTimesTwo = 2.0 * Math.PI;
+        double piOverTwo = Math.PI / 2.0;
+        double phi = piOverTwo * -1.0;
         int y = 0;
 
-        float theta_step = pi_times_two / N;
-        while (phi <= pi_div_two) {
+        double theta_step = piTimesTwo / N;
+        while (phi <= piOverTwo) {
             final double cosPhi = Math.cos(phi);
             final double sinPhi = Math.sin(phi);
             final int yf = y;
             IntStream.range(0, N).parallel().forEach(x -> {
-                float theta = x * theta_step;
+                double theta = x * theta_step;
                 double n;
                 synchronized (baseNoise[x % N_GEN]) {
                     n = baseNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
                 }
 
                 float nf = (float) n;
-                // Pixamp
                 pixmap.drawPixel(x, yf, Color.rgba8888(nf, nf, nf, 1f));
             });
             phi += (Math.PI / (M - 1));
@@ -181,14 +181,14 @@ public class NoiseComponent extends NamedComponent {
         }
     }
 
-    public void setSize(Double noiseSize) {
-        this.size[0] = noiseSize;
-        this.size[1] = noiseSize;
-        this.size[2] = noiseSize;
+    public void setScale(Double scale) {
+        this.scale[0] = scale;
+        this.scale[1] = scale;
+        this.scale[2] = scale;
     }
 
-    public void setSize(double[] noiseSize) {
-        this.size = noiseSize;
+    public void setScale(double[] noiseScale) {
+        this.scale = noiseScale;
     }
 
     /**
@@ -214,5 +214,59 @@ public class NoiseComponent extends NamedComponent {
 
     public void setSeed(Long seed) {
         this.seed = seed;
+    }
+
+    public void copyFrom(NoiseComponent other) {
+        this.seed = other.seed;
+        this.scale = Arrays.copyOf(other.scale, other.scale.length);
+        this.type = other.type;
+        this.fractalType = other.fractalType;
+        this.frequency = other.frequency;
+        this.octaves = other.octaves;
+        this.range = Arrays.copyOf(other.range, other.scale.length);
+        this.power = other.power;
+    }
+
+    public void randomizeAll(Random rand) {
+        randomizeAll(rand, rand.nextBoolean());
+    }
+
+    public void randomizeAll(Random rand, boolean rocky) {
+        // Seed
+        setSeed(rand.nextLong());
+        // Size
+        double baseSize = Math.abs(gaussian(rand, 1.0, 0.4, 0.05));
+        if (rand.nextBoolean()) {
+            // Single scale
+            setScale(baseSize);
+        } else {
+            // Different scales
+            setScale(new double[] { baseSize + Math.abs(gaussian(rand, 0.0, 0.2)), baseSize + Math.abs(gaussian(rand, 0.0, 0.2)), baseSize + Math.abs(gaussian(rand, 0.4, 0.2)) });
+        }
+        // Type (all but WHITE)
+        setType(ModuleBasisFunction.BasisType.values()[rand.nextInt(4)].name());
+        // Fractal type
+        setFractaltype(ModuleFractal.FractalType.values()[rand.nextInt(6)].name());
+        // Frequency
+        setFrequency(gaussian(rand, 2.5, 5.0, 1.0));
+        // Octaves [1,9]
+        setOctaves(Math.abs(rand.nextLong()) % 8 + 1L);
+        // Range
+        double minRange = rocky ? 0.1 : gaussian(rand, -0.5, 0.3);
+        double maxRange = minRange + 1.0 + rand.nextDouble() * 0.3;
+        setRange(new double[] { minRange, maxRange });
+        // Power
+        setPower(rocky ? 1.0 : gaussian(rand, 5.0, 3.0, 0.2));
+    }
+
+    public void print(Log log) {
+        log.debug("Seed: " + seed);
+        log.debug("Scale: " + Arrays.toString(scale));
+        log.debug("Noise type: " + type);
+        log.debug("Fractal type: " + fractalType);
+        log.debug("Frequency: " + frequency);
+        log.debug("Octaves: " + octaves);
+        log.debug("Range: " + Arrays.toString(range));
+        log.debug("Power: " + power);
     }
 }

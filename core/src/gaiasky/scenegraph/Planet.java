@@ -21,6 +21,7 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.AtmosphereComponent;
 import gaiasky.scenegraph.component.CloudComponent;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
 import gaiasky.util.Nature;
 import gaiasky.util.Settings;
 import gaiasky.util.camera.CameraUtils;
@@ -71,11 +72,15 @@ public class Planet extends ModelBody implements ILineRenderable {
             // Ignore current cloud component (if any) and create a random one
             clc = new CloudComponent();
             clc.randomizeAll(getSeed("cloud"), size);
+            Logger.getLogger(Planet.class).debug("============CLOUD===========");
+            clc.print(Logger.getLogger(Planet.class));
         }
         if (isRandomizeAtmosphere()) {
             // Ignore current atmosphere component (if any) and create a random one
             ac = new AtmosphereComponent();
             ac.randomizeAll(getSeed("atmosphere"), size);
+            Logger.getLogger(Planet.class).debug("============ATM===========");
+            ac.print(Logger.getLogger(Planet.class));
         }
         if (clc != null) {
             clc.initialize(this.getName(), this.getId(), false);
@@ -90,7 +95,10 @@ public class Planet extends ModelBody implements ILineRenderable {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
+        initializeAtmosphereClouds(manager);
+    }
 
+    public void initializeAtmosphereClouds(AssetManager manager){
         // INITIALIZE ATMOSPHERE
         if (ac != null) {
             // Initialize atmosphere model
@@ -101,7 +109,6 @@ public class Planet extends ModelBody implements ILineRenderable {
         if (clc != null) {
             clc.doneLoading(manager);
         }
-
     }
 
     @Override
@@ -257,6 +264,14 @@ public class Planet extends ModelBody implements ILineRenderable {
     @Override
     public float getLineWidth() {
         return 1;
+    }
+
+    public CloudComponent getCloudComponent() {
+        return clc;
+    }
+
+    public AtmosphereComponent getAtmosphereComponent() {
+        return ac;
     }
 
 }

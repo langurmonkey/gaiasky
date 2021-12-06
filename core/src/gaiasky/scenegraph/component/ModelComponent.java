@@ -591,23 +591,19 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * @param size The size of the base body in internal units.
      */
     public void randomizeAll(long seed, double size) {
-        Random rand = new Random(seed);
         // Type
         setType("sphere");
         // Parameters
         setParams(createModelParameters(400L, 1.0, false));
         // Material
-        MaterialComponent mc = new MaterialComponent();
-        mc.setHeight("generate");
-        mc.setDiffuse("generate");
-        mc.setNormal("generate");
-        mc.setSpecular("generate");
-        mc.setBiomelut(rand.nextBoolean() ? "data/tex/base/biome-lut.png" : "data/tex/base/biome-smooth-lut.png");
-        mc.setBiomehueshift(rand.nextDouble() * 360.0);
-        double sizeKm = size * Constants.U_TO_KM;
-        mc.setHeightScale(gaussian(rand, sizeKm * 0.002, sizeKm * 0.0004, 1.0));
-        // Noise
-        mc.setNoise(randomizeNoiseComponent(rand));
-        setMaterial(mc);
+        MaterialComponent mtc = new MaterialComponent();
+        mtc.randomizeAll(seed, size);
+        // Set to model
+        setMaterial(mtc);
+    }
+
+    public void print(Log log){
+        if(mtc != null)
+            mtc.print(log);
     }
 }

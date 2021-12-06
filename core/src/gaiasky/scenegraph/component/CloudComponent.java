@@ -53,6 +53,8 @@ public class CloudComponent extends NamedComponent {
     public ModelComponent mc;
     public Matrix4 localTransform;
 
+    private Texture cloudTex;
+
     public String cloud, cloudtrans, cloudUnpacked, cloudtransUnpacked;
     private Material material;
 
@@ -71,14 +73,14 @@ public class CloudComponent extends NamedComponent {
         aux3 = new Vector3d();
     }
 
-    public void initialize(String name, Long id, boolean force){
+    public void initialize(String name, Long id, boolean force) {
         super.initialize(name, id);
         this.initialize(force);
     }
 
     private void initialize(boolean force) {
         if (!Settings.settings.scene.initialization.lazyTexture || force) {
-            if(cloud != null && !cloud.endsWith(Constants.GEN_KEYWORD)) {
+            if (cloud != null && !cloud.endsWith(Constants.GEN_KEYWORD)) {
                 // Add textures to load
                 cloudUnpacked = addToLoad(cloud);
                 cloudtransUnpacked = addToLoad(cloudtrans);
@@ -139,7 +141,7 @@ public class CloudComponent extends NamedComponent {
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {
-                GaiaSky.postRunnable(() -> initMaterial());
+                GaiaSky.postRunnable(this::initMaterial);
 
                 // Set to initialised
                 texInitialised = true;
@@ -157,10 +159,10 @@ public class CloudComponent extends NamedComponent {
         material = mc.instance.materials.first();
 
         if (cloud != null && material.get(TextureAttribute.Diffuse) == null) {
-            if(!cloud.endsWith(Constants.GEN_KEYWORD)) {
+            if (!cloud.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(cloudUnpacked, Texture.class);
                 material.set(new TextureAttribute(TextureAttribute.Diffuse, tex));
-            }else{
+            } else {
                 initializeGenCloudData();
             }
         }
@@ -173,7 +175,7 @@ public class CloudComponent extends NamedComponent {
         material.set(new IntAttribute(IntAttribute.CullFace, 0));
     }
 
-    private void initializeGenCloudData(){
+    private void initializeGenCloudData() {
 
         Thread t = new Thread(() -> {
             final int N = Settings.settings.graphics.quality.texWidthTarget;
@@ -186,7 +188,7 @@ public class CloudComponent extends NamedComponent {
             }
             GaiaSky.postRunnable(() -> {
                 if (cloudPixmap != null) {
-                    Texture cloudTex = new Texture(cloudPixmap, true);
+                    cloudTex = new Texture(cloudPixmap, true);
                     cloudTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
                     material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
                 }
@@ -195,22 +197,25 @@ public class CloudComponent extends NamedComponent {
         t.start();
     }
 
+    public void disposeTexture(AssetManager manager, Material material, String name, String nameUnpacked, long texAttribute, Texture tex) {
+        if (name != null && manager != null && manager.isLoaded(nameUnpacked)) {
+            unload(material, texAttribute);
+            manager.unload(nameUnpacked);
+        }
+        if (tex != null) {
+            unload(material, texAttribute);
+            tex.dispose();
+        }
+    }
+
     /**
      * Disposes and unloads all currently loaded textures immediately
      *
      * @param manager The asset manager
      **/
     public void disposeTextures(AssetManager manager) {
-        if (cloud != null && manager.isLoaded(cloudUnpacked)) {
-            manager.unload(cloudUnpacked);
-            cloudUnpacked = null;
-            unload(material, TextureAttribute.Diffuse);
-        }
-        if (cloudtrans != null && manager.isLoaded(cloudtransUnpacked)) {
-            manager.unload(cloudtransUnpacked);
-            cloudtransUnpacked = null;
-            unload(material, TextureAttribute.Normal);
-        }
+        disposeTexture(manager, material, cloud, cloudUnpacked, TextureAttribute.Diffuse, cloudTex);
+        disposeTexture(manager, material, cloudtrans, cloudtransUnpacked, TextureAttribute.Normal, null);
         texLoading = false;
         texInitialised = false;
     }
@@ -219,7 +224,7 @@ public class CloudComponent extends NamedComponent {
         if (mat != null) {
             Attribute attr = mat.get(attrMask);
             mat.remove(attrMask);
-            if (attr != null && attr instanceof TextureAttribute) {
+            if (attr instanceof TextureAttribute) {
                 Texture tex = ((TextureAttribute) attr).textureDescription.texture;
                 tex.dispose();
             }
@@ -266,7 +271,7 @@ public class CloudComponent extends NamedComponent {
      * Creates a random cloud component using the given seed and the base
      * body size. Generates a random cloud texture.
      *
-     * @param seed   The seed to use.
+     * @param seed The seed to use.
      * @param size The body size in internal units.
      */
     public void randomizeAll(long seed, double size) {
@@ -280,6 +285,27 @@ public class CloudComponent extends NamedComponent {
         // Params
         setParams(createModelParameters(200L, 1.0, false));
         // Noise
-        setNoise(randomizeNoiseComponent(rand));
+        NoiseComponent nc = new NoiseComponent();
+        nc.randomizeAll(rand);
+        setNoise(nc);
+    }
+
+    public void copyFrom(CloudComponent other) {
+        this.size = other.size;
+        this.cloud = other.cloud;
+        this.params = other.params;
+        this.nc = new NoiseComponent();
+        if (other.nc != null)
+            this.nc.copyFrom(other.nc);
+        else
+            this.nc.randomizeAll(new Random());
+    }
+
+    public void print(Log log) {
+        log.debug("Size: " + size);
+        log.debug("---Noise---");
+        if (nc != null) {
+            nc.print(log);
+        }
     }
 }

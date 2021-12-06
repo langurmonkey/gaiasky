@@ -5,40 +5,40 @@
 
 package gaiasky.util.validator;
 
-public class IntValidator extends CallbackValidator {
+public class LongValidator extends CallbackValidator {
 
-    private final int min;
-    private final int max;
+    private final long min;
+    private final long max;
 
-    public IntValidator() {
+    public LongValidator() {
         this(null);
     }
-    public IntValidator(IValidator parent) {
-        this(parent, Integer.MIN_VALUE, Integer.MAX_VALUE);
+    public LongValidator(IValidator parent) {
+        this(parent, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
-    public IntValidator(int min, int max) {
+    public LongValidator(long min, long max) {
         this(null, min, max);
     }
-    public IntValidator(IValidator parent, int min, int max) {
+    public LongValidator(IValidator parent, long min, long max) {
         super(parent);
         this.min = min;
         this.max = max;
     }
 
-    public int getMin() {
+    public long getMin() {
         return min;
     }
 
-    public int getMax() {
+    public long getMax() {
         return max;
     }
 
     @Override
     protected boolean validateLocal(String value) {
-        int val;
+        long val;
         try {
-            val = Integer.parseInt(value);
+            val = Long.parseLong(value);
         } catch (NumberFormatException e) {
             return false;
         }

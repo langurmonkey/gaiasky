@@ -18,6 +18,7 @@ import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.desktop.util.SysUtils;
@@ -38,6 +39,10 @@ import gaiasky.util.math.MathUtilsd;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -104,8 +109,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     private Material material, ringMaterial;
 
     // Biome lookup texture
-    private String biomeLUT = "data/tex/base/biome-lut.png";
-    private float biomeHueShift = 0;
+    public String biomeLUT = "data/tex/base/biome-lut.png";
+    public float biomeHueShift = 0;
 
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
@@ -176,6 +181,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -194,6 +200,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -350,7 +357,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
     }
 
-    private void initializeGenElevationData() {
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
+    }
+
+    private synchronized void initializeGenElevationData() {
         if (generated) {
             addHeightTex(heightTex);
         } else {
@@ -663,63 +674,33 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         return this.height != null && !this.height.isEmpty();
     }
 
+    public void disposeTexture(AssetManager manager, Material material, String name, String nameUnpacked, long texAttribute, Texture tex) {
+        if (name != null && manager != null && manager.isLoaded(nameUnpacked)) {
+            unload(material, texAttribute);
+            manager.unload(nameUnpacked);
+        }
+        if (tex != null) {
+            unload(material, texAttribute);
+            tex.dispose();
+        }
+    }
+
     /**
      * Disposes and unloads all currently loaded textures immediately
      *
      * @param manager The asset manager
      **/
     public void disposeTextures(AssetManager manager) {
-        if (diffuse != null && manager.isLoaded(diffuseUnpacked)) {
-            manager.unload(diffuseUnpacked);
-            diffuseUnpacked = null;
-            unload(material, TextureAttribute.Diffuse);
-        }
-        if (normal != null && manager.isLoaded(normalUnpacked)) {
-            manager.unload(normalUnpacked);
-            normalUnpacked = null;
-            unload(material, TextureAttribute.Normal);
-        }
-        if (specular != null && manager.isLoaded(specularUnpacked)) {
-            manager.unload(specularUnpacked);
-            specularUnpacked = null;
-            unload(material, TextureAttribute.Specular);
-        }
-        if (emissive != null && manager.isLoaded(emissiveUnpacked)) {
-            manager.unload(emissiveUnpacked);
-            emissiveUnpacked = null;
-            unload(material, TextureAttribute.Emissive);
-        }
-        if (ring != null && manager.isLoaded(ringUnpacked)) {
-            manager.unload(ringUnpacked);
-            ringUnpacked = null;
-            unload(ringMaterial, TextureAttribute.Diffuse);
-        }
-        if (ringnormal != null && manager.isLoaded(ringnormalUnpacked)) {
-            manager.unload(ringnormalUnpacked);
-            ringnormalUnpacked = null;
-            unload(ringMaterial, TextureAttribute.Normal);
-        }
-        if (height != null && manager.isLoaded(heightUnpacked)) {
-            manager.unload(heightUnpacked);
-            heightUnpacked = null;
-            heightMap = null;
-            unload(material, TextureExtAttribute.Height);
-        }
-        if (metallic != null && manager.isLoaded(metallicUnpacked)) {
-            manager.unload(metallicUnpacked);
-            metallicUnpacked = null;
-            unload(material, TextureAttribute.Reflection);
-        }
-        if (roughness != null && manager.isLoaded(roughnessUnapcked)) {
-            manager.unload(roughnessUnapcked);
-            roughnessUnapcked = null;
-            unload(material, TextureExtAttribute.Roughness);
-        }
-        if (ao != null && manager.isLoaded(aoUnapcked)) {
-            manager.unload(aoUnapcked);
-            aoUnapcked = null;
-            unload(material, TextureExtAttribute.AO);
-        }
+        disposeTexture(manager, material, diffuse, diffuseUnpacked, TextureAttribute.Diffuse, diffuseTex);
+        disposeTexture(manager, material, normal, normalUnpacked, TextureAttribute.Normal, normalTex);
+        disposeTexture(manager, material, specular, specularUnpacked, TextureAttribute.Specular, specularTex);
+        disposeTexture(manager, material, emissive, emissiveUnpacked, TextureAttribute.Emissive, null);
+        disposeTexture(manager, ringMaterial, ring, ringUnpacked, TextureAttribute.Diffuse, null);
+        disposeTexture(manager, ringMaterial, ringnormal, ringnormalUnpacked, TextureAttribute.Normal, null);
+        disposeTexture(manager, material, height, heightUnpacked, TextureExtAttribute.Height, heightTex);
+        disposeTexture(manager, material, metallic, metallicUnpacked, TextureAttribute.Reflection, null);
+        disposeTexture(manager, material, roughness, roughnessUnapcked, TextureExtAttribute.Roughness, null);
+        disposeTexture(manager, material, ao, aoUnapcked, TextureExtAttribute.AO, null);
         texLoading = false;
         texInitialised = false;
     }
@@ -804,5 +785,65 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     @Override
     public String toString() {
         return diffuse;
+    }
+
+    public void copyFrom(MaterialComponent other) {
+        this.height = other.height;
+        this.diffuse = other.diffuse;
+        this.normal = other.normal;
+        this.specular = other.specular;
+        this.biomeLUT = other.biomeLUT;
+        this.biomeHueShift = other.biomeHueShift;
+        this.heightScale = other.heightScale;
+        this.nc = new NoiseComponent();
+        if (other.nc != null) {
+            this.nc.copyFrom(other.nc);
+        } else {
+            this.nc.randomizeAll(new Random());
+        }
+    }
+
+    public void randomizeAll(long seed, double bodySize) {
+        Random rand = new Random(seed);
+        setHeight("generate");
+        setDiffuse("generate");
+        setNormal("generate");
+        setSpecular("generate");
+        Path dataPath = Settings.settings.data.dataPath("tex/base");
+        Array<String> luts = new Array<>();
+        try {
+            java.util.List<Path> l = Files.list(dataPath).filter(f -> f.toString().endsWith("-lut.png")).collect(Collectors.toList());
+            for (Path p : l) {
+                String name = p.toString();
+                luts.add("data" + name.substring(name.indexOf("/tex/base/")));
+            }
+        } catch (Exception ignored) {
+        }
+        if (luts.isEmpty()) {
+            luts.add("data/tex/base/biome-lut.png");
+            luts.add("data/tex/base/biome-smooth-lut.png");
+        }
+        setBiomelut(luts.get(rand.nextInt(luts.size)));
+        setBiomehueshift(rand.nextDouble() * 360.0);
+        double sizeKm = bodySize * Constants.U_TO_KM;
+        setHeightScale(gaussian(rand, sizeKm * 0.002, sizeKm * 0.0004, 1.0));
+        // Noise
+        NoiseComponent nc = new NoiseComponent();
+        nc.randomizeAll(rand);
+        setNoise(nc);
+    }
+
+    public void print(Log log) {
+        log.debug("Height: " + height);
+        log.debug("Diffuse: " + diffuse);
+        log.debug("Specular: " + specular);
+        log.debug("Normal: " + normal);
+        log.debug("LUT: " + biomeLUT);
+        log.debug("Hue shift: " + biomeHueShift);
+        log.debug("Height scale: " + heightScale);
+        log.debug("---Noise---");
+        if (nc != null) {
+            nc.print(log);
+        }
     }
 }

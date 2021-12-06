@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.Coordinates;
@@ -24,6 +25,7 @@ import gaiasky.util.gdx.shader.Vector3Attribute;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
@@ -264,23 +266,43 @@ public class AtmosphereComponent extends NamedComponent {
      */
     public void randomizeAll(long seed, double size) {
         Random rand = new Random(seed);
-
         // Size
         double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + gaussian(rand, 150.0, 80.0, 100.0));
+        setSize(sizeKm + gaussian(rand, 130.0, 30.0, 100.0));
         // Wavelengths
-        setWavelengths(new double[] { gaussian(rand, 0.7, 0.1), gaussian(rand, 0.8, 0.3), gaussian(rand, 0.8, 0.3) });
+        setWavelengths(new double[] { gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1) });
         // Kr
         setM_Kr(0.0025);
         // Km
         setM_Km(0.0015);
         // eSun
-        setM_eSun(gaussian(rand, 8.0, 4.0, 2.5));
+        setM_eSun(gaussian(rand, 6.0, 2.0, 2.5));
         // Fog density
-        setFogdensity(gaussian(rand, 4.5, 2.0, 1.0));
+        setFogdensity(gaussian(rand, 4.5, 1.0, 0.5));
         // Fog color
-        setFogcolor(new double[] { rand.nextDouble(), rand.nextDouble(), rand.nextDouble() });
+        setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
         // Params
         setParams(createModelParameters(600L, 2.0, true));
     }
+
+
+    public void copyFrom(AtmosphereComponent other) {
+        this.params = other.params;
+        this.size = other.size;
+        this.wavelengths = Arrays.copyOf(other.wavelengths, other.wavelengths.length);
+        this.m_Km = other.m_Km;
+        this.m_Kr = other.m_Kr;
+        this.m_eSun = other.m_eSun;
+        this.fogDensity = other.fogDensity;
+        this.fogColor = new Vector3(other.fogColor);
+    }
+
+    public void print(Log log){
+        log.debug("Size: " + size);
+        log.debug("Wavelengths: " + Arrays.toString(wavelengths));
+        log.debug("eSun: " + m_eSun);
+        log.debug("Fog density: " + fogDensity);
+        log.debug("Fog color: " + fogColor);
+    }
 }
+

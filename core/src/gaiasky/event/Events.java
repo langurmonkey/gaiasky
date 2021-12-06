@@ -982,6 +982,10 @@ public enum Events {
     SHOW_LOAD_CATALOG_ACTION,
     SHOW_LOG_ACTION,
     /**
+     * Procedural surface and atmosphere generation
+     */
+    SHOW_PROCEDURAL_GEN_ACTION,
+    /**
      * Shows the minimap window/interface. Contains a boolean with the state and a boolean if it comes from UI
      */
     SHOW_MINIMAP_ACTION,

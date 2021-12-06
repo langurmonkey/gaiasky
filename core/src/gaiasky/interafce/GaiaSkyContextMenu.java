@@ -229,6 +229,19 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 });
                 addItem(landOnCoord);
 
+                addSeparator();
+
+                MenuItem proceduralSurface = new MenuItem(I18n.txt("context.proceduralmenu", candidateNameShort), skin, skin.getDrawable("iconic-infinity"));
+                proceduralSurface.addListener(event -> {
+                    if (event instanceof ChangeEvent) {
+                        EventManager.instance.post(Events.SHOW_PROCEDURAL_GEN_ACTION, candidate);
+                        return true;
+                    }
+                    return false;
+                });
+                addItem(proceduralSurface);
+
+
             }
 
             if (candidate instanceof IStarFocus && uncertainties) {

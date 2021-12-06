@@ -72,23 +72,26 @@ public class OwnTextField extends TextField {
         return this.validator == null || this.validator.validate(this.getText());
     }
 
-    public float getFloatValue(float defaultValue){
+    public float getFloatValue(float defaultValue) {
         return (float) getDoubleValue(defaultValue);
     }
-    public double getDoubleValue(double defaultValue){
-        try{
+
+    public double getDoubleValue(double defaultValue) {
+        try {
             return Parser.parseFloatException(getText());
-        } catch(Exception e){
+        } catch (Exception e) {
             return defaultValue;
         }
     }
-    public long getIntValue(int defaultValue){
+
+    public long getIntValue(int defaultValue) {
         return (int) getLongValue(defaultValue);
     }
-    public long getLongValue(long defaultValue){
-        try{
+
+    public long getLongValue(long defaultValue) {
+        try {
             return Parser.parseLongException(getText());
-        }catch(Exception e){
+        } catch (Exception e) {
             return defaultValue;
         }
     }
