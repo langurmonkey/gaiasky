@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.desktop.util.SysUtils;
@@ -369,6 +370,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 generated = true;
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
+                long start = TimeUtils.millis();
+                logger.info("Generating procedural surface: " + N + "x" + M);
 
                 Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale);
                 float[][] elevationData = trio.getFirst();
@@ -511,6 +514,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                         addNormalTex(normalTex);
                     });
                 }
+                long elapsed = TimeUtils.millis() - start;
+                logger.info("Surface generated in " + elapsed / 1000d + " seconds");
             });
             t.start();
         }

@@ -93,7 +93,6 @@ public class NoiseComponent extends NamedComponent {
     }
 
     public Pixmap generateData(int N, int M) {
-        logger.info("Generating procedural " + N + "x" + M + " texture");
         initNoise(seed, false);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
 
@@ -127,7 +126,6 @@ public class NoiseComponent extends NamedComponent {
 
     public Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale) {
         // Construct RAM height map from noise algorithms
-        logger.info("Generating procedural " + N + "x" + M + " elevation data");
         initNoise(seed, true);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
         float[][] elevation = new float[N][M];

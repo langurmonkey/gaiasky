@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.desktop.util.SysUtils;
@@ -180,6 +181,8 @@ public class CloudComponent extends NamedComponent {
         Thread t = new Thread(() -> {
             final int N = Settings.settings.graphics.quality.texWidthTarget;
             final int M = Settings.settings.graphics.quality.texHeightTarget;
+            long start = TimeUtils.millis();
+            logger.info("Generating procedural clouds: " + N + "x" + M);
 
             Pixmap cloudPixmap = nc.generateData(N, M);
             // Write to disk if necessary
@@ -193,6 +196,8 @@ public class CloudComponent extends NamedComponent {
                     material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
                 }
             });
+            long elapsed = TimeUtils.millis() - start;
+            logger.info("Clouds generated in " + elapsed / 1000d + " seconds");
         });
         t.start();
     }

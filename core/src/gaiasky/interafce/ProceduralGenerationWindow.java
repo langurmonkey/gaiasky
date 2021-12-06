@@ -602,12 +602,12 @@ public class ProceduralGenerationWindow extends GenericDialog {
     }
 
     protected void generateSurfaceDirect() {
-        ///MaterialComponent materialComponent = target.getMaterialComponent();
-        ///if (materialComponent != null) {
-        ///    materialComponent.disposeTextures(GaiaSky.instance.assetManager);
-        ///}
-        ///mtc.initialize(target.getName(), target.getId());
-        ///target.getModelComponent().setMaterial(mtc);
+        MaterialComponent materialComponent = target.getMaterialComponent();
+        if (materialComponent != null) {
+            materialComponent.disposeTextures(GaiaSky.instance.assetManager);
+        }
+        mtc.initialize(target.getName(), target.getId());
+        target.getModelComponent().setMaterial(mtc);
     }
 
     protected Boolean generateClouds(Boolean ignored) {
