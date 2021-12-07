@@ -21,7 +21,6 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -31,7 +30,7 @@ public class SceneGraph implements ISceneGraph {
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
-    protected final ObjectMap<String, SceneGraphNode> stringToNode;
+    protected final ObjectMap<String, SceneGraphNode> index;
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations
@@ -59,9 +58,9 @@ public class SceneGraph implements ISceneGraph {
         objectsPerThread = new int[1];
 
         // String-to-node map
-        stringToNode = new ObjectMap<>(numNodes);
-        // HIP map
-        hipMap = new ObjectMap<>();
+        index = new ObjectMap<>((int)(numNodes * 1.25));
+        // HIP map with 121k * 1.25
+        hipMap = new ObjectMap<>(151250);
 
         aux3b1 = new Vector3b();
     }
@@ -84,7 +83,7 @@ public class SceneGraph implements ISceneGraph {
         this.hasStarGroup = hasStarGroup;
 
         // Initialize stringToNode and starMap maps
-        stringToNode.put(root.names[0].toLowerCase().trim(), root);
+        index.put(root.names[0].toLowerCase().trim(), root);
         for (SceneGraphNode node : nodes) {
             addToIndex(node);
 
@@ -216,15 +215,15 @@ public class SceneGraph implements ISceneGraph {
      */
     protected boolean addToIndex(SceneGraphNode node) {
         boolean ok = true;
-        synchronized (stringToNode) {
+        synchronized (index) {
             if (node.names != null) {
                 if (node.mustAddToIndex()) {
                     for (String name : node.names) {
                         String nameLowerCase = name.toLowerCase().trim();
-                        if (!stringToNode.containsKey(nameLowerCase)) {
-                            stringToNode.put(nameLowerCase, node);
+                        if (!index.containsKey(nameLowerCase)) {
+                            index.put(nameLowerCase, node);
                         } else if (!nameLowerCase.isEmpty()) {
-                            SceneGraphNode conflict = stringToNode.get(nameLowerCase);
+                            SceneGraphNode conflict = index.get(nameLowerCase);
                             logger.debug(I18n.txt("error.name.conflict", name + " (" + node.getClass().getSimpleName().toLowerCase() + ")", conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")"));
                             String[] names1 = node.getNames();
                             String[] names2 = conflict.getNames();
@@ -244,32 +243,32 @@ public class SceneGraph implements ISceneGraph {
                     // Id
                     if (node.id > 0) {
                         String id = String.valueOf(node.id);
-                        stringToNode.put(id, node);
+                        index.put(id, node);
                     }
                 }
 
                 // Special cases
-                node.addToIndex(stringToNode);
+                node.addToIndex(index);
             }
         }
         return ok;
     }
 
     private void removeFromIndex(SceneGraphNode node) {
-        synchronized (stringToNode) {
+        synchronized (index) {
             if (node.names != null) {
                 for (String name : node.names) {
-                    stringToNode.remove(name.toLowerCase().trim());
+                    index.remove(name.toLowerCase().trim());
                 }
 
                 // Id
                 if (node.id > 0) {
                     String id = String.valueOf(node.id);
-                    stringToNode.remove(id);
+                    index.remove(id);
                 }
 
                 // Special cases
-                node.removeFromIndex(stringToNode);
+                node.removeFromIndex(index);
             }
         }
     }
@@ -293,8 +292,8 @@ public class SceneGraph implements ISceneGraph {
     }
 
     public void matchingFocusableNodes(String name, Array<String> results, int maxResults, AtomicBoolean abort) {
-        synchronized (stringToNode) {
-            ObjectMap.Keys<String> keys = new ObjectMap.Keys<>(stringToNode);
+        synchronized (index) {
+            ObjectMap.Keys<String> keys = new ObjectMap.Keys<>(index);
             name = name.toLowerCase().trim();
 
             int i = 0;
@@ -302,7 +301,7 @@ public class SceneGraph implements ISceneGraph {
             for (String key : keys) {
                 if (abort != null && abort.get())
                     return;
-                SceneGraphNode sgn = stringToNode.get(key);
+                SceneGraphNode sgn = index.get(key);
                 if (sgn instanceof IFocus && key.startsWith(name)) {
                     results.add(key);
                     i++;
@@ -314,7 +313,7 @@ public class SceneGraph implements ISceneGraph {
             for (String key : keys) {
                 if (abort != null && abort.get())
                     return;
-                SceneGraphNode sgn = stringToNode.get(key);
+                SceneGraphNode sgn = index.get(key);
                 if (sgn instanceof IFocus && key.contains(name)) {
                     results.add(key);
                     i++;
@@ -326,15 +325,15 @@ public class SceneGraph implements ISceneGraph {
     }
 
     public boolean containsNode(String name) {
-        synchronized (stringToNode) {
-            return stringToNode.containsKey(name.toLowerCase().trim());
+        synchronized (index) {
+            return index.containsKey(name.toLowerCase().trim());
         }
     }
 
     public SceneGraphNode getNode(String name) {
-        synchronized (stringToNode) {
+        synchronized (index) {
             name = name.toLowerCase().strip();
-            SceneGraphNode node = stringToNode.get(name);
+            SceneGraphNode node = index.get(name);
             if (node instanceof StarGroup)
                 ((StarGroup) node).getFocus(name);
             return node;

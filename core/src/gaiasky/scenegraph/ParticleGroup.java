@@ -176,7 +176,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public boolean disposed = false;
 
     // Name index
-    protected Map<String, Integer> index;
+    protected ObjectMap<String, Integer> index;
 
     // Minimum amount of time [ms] between two update calls
     protected static final double UPDATE_INTERVAL_MS = 1500;
@@ -474,8 +474,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      *
      * @return An map{string,int} mapping names to indices
      */
-    public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
-        Map<String, Integer> index = new HashMap<>();
+    public ObjectMap<String, Integer> generateIndex(List<IParticleRecord> pointData) {
+        ObjectMap<String, Integer> index = new ObjectMap<>((int)(pointData.size() * 1.25));
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
             IParticleRecord pb = pointData.get(i);
@@ -490,7 +490,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
         if (index != null) {
-            Set<String> keys = index.keySet();
+            ObjectMap.Keys<String> keys = index.keys();
             for (String key : keys) {
                 map.put(key, this);
             }
@@ -500,7 +500,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
         if (index != null) {
-            Set<String> keys = index.keySet();
+            ObjectMap.Keys<String> keys = index.keys();
             for (String key : keys) {
                 map.remove(key);
             }
@@ -1130,7 +1130,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public IFocus getFocus(String name) {
-        candidateFocusIndex = index.getOrDefault(name, -1);
+        candidateFocusIndex = index.get(name, -1);
         return this;
     }
 
