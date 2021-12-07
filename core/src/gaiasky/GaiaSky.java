@@ -635,14 +635,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.post(Events.SCENE_GRAPH_LOADED, sceneGraph);
 
-        // Update whole tree to initialize positions
-        OctreeNode.LOAD_ACTIVE = false;
-        time.update(0.000000001f);
-        // Update whole scene graph
-        sceneGraph.update(time, cameraManager);
-        sgr.clearLists();
-        time.update(0);
-        OctreeNode.LOAD_ACTIVE = true;
+        touchSceneGraph();
 
         // Initialise time in GUI
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
@@ -716,6 +709,20 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         EventManager.instance.post(Events.INITIALIZED_INFO);
         initialized = true;
+    }
+
+    public void touchSceneGraph() {
+        // Update whole tree to initialize positions
+        OctreeNode.LOAD_ACTIVE = false;
+        boolean timeOnBak = settings.runtime.timeOn;
+        settings.runtime.timeOn = true;
+        time.update(1e-5);
+        // Update whole scene graph
+        sceneGraph.update(time, cameraManager);
+        sgr.clearLists();
+        time.update(0);
+        settings.runtime.timeOn = timeOnBak;
+        OctreeNode.LOAD_ACTIVE = true;
     }
 
     /**
@@ -1328,7 +1335,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     public Optional<CatalogInfo> getCatalogInfoFromObject(SceneGraphNode node) {
-        if(node instanceof FadeNode) {
+        if (node instanceof FadeNode) {
             return catalogManager.getByObject((FadeNode) node);
         }
         return Optional.empty();
@@ -1414,7 +1421,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
                 final ModePopupInfo mpi = new ModePopupInfo();
                 mpi.title = I18n.txt("gui.stereo.title");
-                mpi.header = I18n.txt("gui.stereo.notice.header");;
+                mpi.header = I18n.txt("gui.stereo.notice.header");
+                ;
                 mpi.addMapping(I18n.txt("gui.stereo.notice.back"), keysStrToggle);
                 mpi.addMapping(I18n.txt("gui.stereo.notice.profile"), keysStrProfile);
 

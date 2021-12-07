@@ -2708,7 +2708,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? "stars" : "variable stars";
 
-                            logger.info(data.size() + " " + typeStr + " loaded");
+                            logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {

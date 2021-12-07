@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
+import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
@@ -23,6 +24,7 @@ import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
 import gaiasky.util.parse.Parser;
@@ -406,17 +408,59 @@ public class GuiRegistry implements IObserver {
                 fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
                 fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                 fc.setAcceptText(I18n.txt("gui.loadcatalog"));
-                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits"));
-                fc.setAcceptedFiles("*.vot, *.csv, *.fits");
+                fc.setFileFilter(pathname -> pathname.getFileName().toString().endsWith(".vot") || pathname.getFileName().toString().endsWith(".csv") || pathname.getFileName().toString().endsWith(".fits") || pathname.getFileName().toString().endsWith(".json"));
+                fc.setAcceptedFiles("*.vot, *.csv, *.fits, *.json");
                 fc.setResultListener((success, result) -> {
                     if (success) {
                         if (Files.exists(result) && Files.exists(result)) {
                             // Load selected file
                             try {
                                 String fileName = result.getFileName().toString();
-                                final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
-                                Runnable doLoad = () -> {
-                                    try {
+                                if (fileName.endsWith(".json")) {
+                                    // Load internal JSON catalog file
+                                    Thread t = new Thread(() -> {
+                                        try {
+                                            logger.info(I18n.txt("notif.catalog.loading", fileName));
+                                            // Show progress bar
+                                            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
+                                            // Reset
+                                            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, 0.1f);
+                                            final Array<SceneGraphNode> objects = SceneGraphJsonLoader.loadJsonFile(Gdx.files.absolute(result.toAbsolutePath().toString()));
+                                            // Hide progress bar
+                                            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
+                                            logger.info(I18n.txt("notif.catalog.loaded", objects.size, I18n.txt("gui.objects")));
+                                            GaiaSky.postRunnable(() -> {
+                                                // THIS WILL BLOCK
+                                                for (SceneGraphNode node : objects) {
+                                                    node.initialize();
+                                                }
+                                                for (SceneGraphNode node : objects) {
+                                                    EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, node, true);
+                                                }
+                                                while (!GaiaSky.instance.assetManager.isFinished()) {
+                                                    // Busy wait
+                                                    try {
+                                                        Thread.sleep(100);
+                                                    } catch (InterruptedException e) {
+                                                        logger.error(e);
+                                                    }
+                                                }
+                                                for (SceneGraphNode node : objects) {
+                                                    node.doneLoading(GaiaSky.instance.assetManager);
+                                                }
+                                                GaiaSky.postRunnable(GaiaSky.instance::touchSceneGraph);
+                                            });
+                                        } catch (Exception e) {
+                                            logger.error(I18n.txt("notif.error", fileName), e);
+                                            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
+                                        }
+                                    });
+                                    t.setName("gaiasky-worker-datasetload");
+                                    t.start();
+
+                                } else {
+                                    final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
+                                    Runnable doLoad = () -> {
                                         Thread t = new Thread(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                             // Load dataset
@@ -439,22 +483,22 @@ public class GuiRegistry implements IObserver {
                                                 GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
                                             } else {
                                                 logger.info("No data loaded (did the load crash?)");
+                                                EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
                                             }
                                         });
                                         t.setName("gaiasky-worker-datasetload");
                                         t.start();
-                                    } catch (Exception e) {
-                                        logger.error(I18n.txt("notif.error", fileName), e);
-                                    }
-                                };
-                                dld.setAcceptRunnable(doLoad);
-                                dld.show(ui);
+                                    };
+                                    dld.setAcceptRunnable(doLoad);
+                                    dld.show(ui);
+                                }
 
                                 lastOpenLocation = result.getParent();
                                 Settings.settings.program.fileChooser.lastLocation = lastOpenLocation.toAbsolutePath().toString();
                                 return true;
                             } catch (Exception e) {
                                 logger.error(I18n.txt("notif.error", result.getFileName()), e);
+                                EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
                                 return false;
                             }
 

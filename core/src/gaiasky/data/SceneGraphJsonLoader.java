@@ -34,8 +34,8 @@ import java.util.Map;
 public class SceneGraphJsonLoader {
     private static final Log logger = Logger.getLogger(SceneGraphJsonLoader.class);
 
-    public static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
-        ISceneGraph sg = null;
+    public synchronized static ISceneGraph loadSceneGraph(FileHandle[] jsonFiles, ITimeFrameProvider time, boolean multithreading, int maxThreads) throws FileNotFoundException, ReflectionException {
+        ISceneGraph sg;
         logger.info(I18n.txt("notif.loading", "JSON data descriptor files:"));
         for (FileHandle fh : jsonFiles) {
             logger.info("\t" + fh.path() + " - exists: " + fh.exists());
@@ -47,87 +47,7 @@ public class SceneGraphJsonLoader {
         Array<SceneGraphNode> nodes = new Array<>(false, 20600);
 
         for (FileHandle jsonFile : jsonFiles) {
-            JsonReader jsonReader = new JsonReader();
-            JsonValue model = jsonReader.parse(jsonFile.read());
-
-            // Must have a 'data' element
-            if (model.has("data")) {
-                String name = model.get("name") != null ? model.get("name").asString() : null;
-                String desc = model.get("description") != null ? model.get("description").asString() : null;
-                Long size = model.get("size") != null ? model.get("size").asLong() : -1;
-                Long nObjects = model.get("nobjects") != null ? model.get("nobjects").asLong() : -1;
-
-                Map<String, Object> params = new HashMap<>();
-                params.put("size", size);
-                params.put("nobjects", nObjects);
-
-                JsonValue child = model.get("data").child;
-                while (child != null) {
-                    String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-                    @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
-
-                    JsonValue filesJson = child.get("files");
-                    if (filesJson != null) {
-                        String[] files = filesJson.asStringArray();
-
-                        Constructor c = ClassReflection.getConstructor(clazz);
-                        ISceneGraphLoader loader = (ISceneGraphLoader) c.newInstance();
-
-                        if (name != null)
-                            loader.setName(name);
-                        if (desc != null)
-                            loader.setDescription(desc);
-                        if (params != null && params.size() > 0)
-                            loader.setParams(params);
-
-                        // Init loader
-                        loader.initialize(files);
-
-                        JsonValue curr = filesJson;
-                        while (curr.next != null) {
-                            curr = curr.next;
-                            String nameAttr = curr.name;
-                            Object val = null;
-                            Class valueClass = null;
-                            if (curr.isDouble()) {
-                                val = curr.asDouble();
-                                valueClass = Double.class;
-                            } else if (curr.isString()) {
-                                val = curr.asString();
-                                valueClass = String.class;
-                            } else if (curr.isNumber()) {
-                                val = curr.asLong();
-                                valueClass = Long.class;
-                            }
-                            if (val != null) {
-                                String methodName = "set" + TextUtils.propertyToMethodName(nameAttr);
-                                Method m = searchMethod(methodName, valueClass, clazz);
-                                if (m != null)
-                                    m.invoke(loader, val);
-                                else
-                                    logger.error("ERROR: No method " + methodName + "(" + valueClass.getName() + ") in class " + clazz + " or its superclass/interfaces.");
-                            }
-                        }
-
-                        // Load data
-                        Array<? extends SceneGraphNode> data = loader.loadData();
-                        for (SceneGraphNode elem : data) {
-                            nodes.add(elem);
-                        }
-                    }
-
-                    child = child.next;
-                }
-            } else {
-                // Use regular JsonLoader
-                JsonLoader loader = new JsonLoader();
-                loader.initialize(new String[]{jsonFile.file().getAbsolutePath()});
-                // Load data
-                Array<? extends SceneGraphNode> data = loader.loadData();
-                for (SceneGraphNode elem : data) {
-                    nodes.add(elem);
-                }
-            }
+            nodes.addAll(loadJsonFile(jsonFile));
         }
 
         // Initialize nodes and look for octrees
@@ -156,6 +76,92 @@ public class SceneGraphJsonLoader {
         sg.initialize(nodes, time, hasOctree, hasStarGroup);
 
         return sg;
+    }
+
+    public synchronized static Array<SceneGraphNode> loadJsonFile(FileHandle jsonFile) throws ReflectionException, FileNotFoundException {
+        Array<SceneGraphNode> nodes = new Array<>(false, 20600);
+        JsonReader jsonReader = new JsonReader();
+        JsonValue model = jsonReader.parse(jsonFile.read());
+
+        // Must have a 'data' element
+        if (model.has("data")) {
+            String name = model.get("name") != null ? model.get("name").asString() : null;
+            String desc = model.get("description") != null ? model.get("description").asString() : null;
+            Long size = model.get("size") != null ? model.get("size").asLong() : -1;
+            Long nObjects = model.get("nobjects") != null ? model.get("nobjects").asLong() : -1;
+
+            Map<String, Object> params = new HashMap<>();
+            params.put("size", size);
+            params.put("nobjects", nObjects);
+
+            JsonValue child = model.get("data").child;
+            while (child != null) {
+                String clazzName = child.getString("loader").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
+                @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
+
+                JsonValue filesJson = child.get("files");
+                if (filesJson != null) {
+                    String[] files = filesJson.asStringArray();
+
+                    Constructor c = ClassReflection.getConstructor(clazz);
+                    ISceneGraphLoader loader = (ISceneGraphLoader) c.newInstance();
+
+                    if (name != null)
+                        loader.setName(name);
+                    if (desc != null)
+                        loader.setDescription(desc);
+                    if (params != null && params.size() > 0)
+                        loader.setParams(params);
+
+                    // Init loader
+                    loader.initialize(files);
+
+                    JsonValue curr = filesJson;
+                    while (curr.next != null) {
+                        curr = curr.next;
+                        String nameAttr = curr.name;
+                        Object val = null;
+                        Class valueClass = null;
+                        if (curr.isDouble()) {
+                            val = curr.asDouble();
+                            valueClass = Double.class;
+                        } else if (curr.isString()) {
+                            val = curr.asString();
+                            valueClass = String.class;
+                        } else if (curr.isNumber()) {
+                            val = curr.asLong();
+                            valueClass = Long.class;
+                        }
+                        if (val != null) {
+                            String methodName = "set" + TextUtils.propertyToMethodName(nameAttr);
+                            Method m = searchMethod(methodName, valueClass, clazz);
+                            if (m != null)
+                                m.invoke(loader, val);
+                            else
+                                logger.error("ERROR: No method " + methodName + "(" + valueClass.getName() + ") in class " + clazz + " or its superclass/interfaces.");
+                        }
+                    }
+
+                    // Load data
+                    Array<? extends SceneGraphNode> data = loader.loadData();
+                    for (SceneGraphNode elem : data) {
+                        nodes.add(elem);
+                    }
+                }
+
+                child = child.next;
+            }
+        } else {
+            // Use regular JsonLoader
+            JsonLoader loader = new JsonLoader();
+            loader.initialize(new String[] { jsonFile.file().getAbsolutePath() });
+            // Load data
+            Array<? extends SceneGraphNode> data = loader.loadData();
+            for (SceneGraphNode elem : data) {
+                nodes.add(elem);
+            }
+        }
+        return nodes;
     }
 
     /**

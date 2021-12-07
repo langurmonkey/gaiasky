@@ -206,7 +206,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Component type
         ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
-        componentType = new OwnSelectBox(skin);
+        componentType = new OwnSelectBox<>(skin);
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
         componentType.setSelected(ComponentType.Galaxies);
@@ -243,7 +243,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
         // Component type
         ComponentType[] componentTypes = new ComponentType[] { ComponentType.Others, ComponentType.Stars, ComponentType.Galaxies, ComponentType.Clusters, ComponentType.Asteroids, ComponentType.Locations };
-        componentType = new OwnSelectBox(skin);
+        componentType = new OwnSelectBox<>(skin);
         componentType.setWidth(fieldWidth);
         componentType.setItems(componentTypes);
         componentType.setSelected(ComponentType.Clusters);
@@ -300,9 +300,7 @@ public class DatasetLoadDialog extends GenericDialog {
 
     private void addParticleColor(Table container) {
         particleColor = new ColorPicker(new float[] { 0.3f, 0.3f, 1f, 1f }, stage, skin);
-        particleColor.setNewColorRunnable(() -> {
-            updateFrameBuffer();
-        });
+        particleColor.setNewColorRunnable(this::updateFrameBuffer);
         container.add(new OwnLabel(I18n.txt("gui.dsload.color"), skin, titleWidth)).left().padRight(pad10).padBottom(pad5);
         container.add(particleColor).size(cpSize).left().padBottom(pad5).row();
     }

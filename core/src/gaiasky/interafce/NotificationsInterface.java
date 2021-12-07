@@ -282,7 +282,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 }
                 break;
             case ORBIT_DATA_LOADED:
-                addMessage(I18n.txt("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()));
+                addMessage(I18n.txt("notif.orbitdata.loaded", data[1], ((PointCloudData) data[0]).getNumPoints()), false, LoggerLevel.DEBUG);
                 break;
             case SCREENSHOT_INFO:
                 addMessage(I18n.txt("notif.screenshot", data[0]));

@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -63,9 +65,10 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                 // Must have an 'objects' element.
                 if (model.has("objects")) {
                     JsonValue child = model.get("objects").child;
-                    int size = 0;
+                    final int count = model.get("objects").size;
+                    int current = 0;
                     while (child != null) {
-                        size++;
+                        current++;
                         String clazzName = child.getString("impl").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
 
                         @SuppressWarnings("unchecked") Class<Object> clazz = (Class<Object>) ClassReflection.forName(clazzName);
@@ -76,8 +79,9 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         bodies.add(object);
 
                         child = child.next;
+                        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, (float) current / (float) count);
                     }
-                    logger.info(I18n.txt("notif.nodeloader", size, filePath));
+                    logger.info(I18n.txt("notif.nodeloader", current, filePath));
                 }
             } catch (Exception e) {
                 logger.error(e);
