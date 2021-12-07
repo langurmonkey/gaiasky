@@ -21,10 +21,11 @@ import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public  class SceneGraph implements ISceneGraph {
+public class SceneGraph implements ISceneGraph {
     private static final Log logger = Logger.getLogger(SceneGraph.class);
 
     /** The root of the tree **/
@@ -122,14 +123,19 @@ public  class SceneGraph implements ISceneGraph {
 
     public void insert(SceneGraphNode node, boolean addToIndex) {
         SceneGraphNode parent = getNode(node.parentName);
+        boolean ok = true;
         if (addToIndex) {
-            addToIndex(node);
+            ok = addToIndex(node);
         }
-        if (parent != null) {
-            parent.addChild(node, true);
-            node.setUp(this);
+        if (!ok) {
+            logger.warn(I18n.txt("error.object.exists", node.getName() + "(" + node.getClass().getSimpleName().toLowerCase() +")"));
         } else {
-            throw new RuntimeException("Parent of node " + node.names[0] + " not found: " + node.parentName);
+            if (parent != null) {
+                parent.addChild(node, true);
+                node.setUp(this);
+            } else {
+                throw new RuntimeException(I18n.txt("error.parent.notfound", node.names[0], node.parentName));
+            }
         }
     }
 
@@ -156,7 +162,7 @@ public  class SceneGraph implements ISceneGraph {
                     CelestialBody s = (CelestialBody) node;
                     if (s instanceof Star && ((Star) s).hip > 0) {
                         if (hipMap.containsKey(((Star) s).hip)) {
-                            logger.debug("Duplicated HIP id: " + ((Star) s).hip);
+                            logger.debug(I18n.txt("error.id.hip.duplicate", ((Star) s).hip));
                         } else {
                             hipMap.put(((Star) s).hip, s);
                         }
@@ -200,17 +206,38 @@ public  class SceneGraph implements ISceneGraph {
         }
     }
 
-    protected void addToIndex(SceneGraphNode node) {
+    /**
+     * Adds the given node to the index. Returns false if it was not added due to a naming conflict (name already exists)
+     * with the same object (same class and same names).
+     *
+     * @param node The node to add.
+     *
+     * @return False if the object already exists.
+     */
+    protected boolean addToIndex(SceneGraphNode node) {
+        boolean ok = true;
         synchronized (stringToNode) {
             if (node.names != null) {
                 if (node.mustAddToIndex()) {
                     for (String name : node.names) {
-                        String namelc = name.toLowerCase().trim();
-                        if (!stringToNode.containsKey(namelc)) {
-                            stringToNode.put(namelc, node);
-                        } else if (!namelc.isEmpty()) {
-                            SceneGraphNode conflict = stringToNode.get(namelc);
-                            logger.warn("Name conflict: " + name + " (" + node.getClass().getSimpleName().toLowerCase() + ") conflicts with " + conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")");
+                        String nameLowerCase = name.toLowerCase().trim();
+                        if (!stringToNode.containsKey(nameLowerCase)) {
+                            stringToNode.put(nameLowerCase, node);
+                        } else if (!nameLowerCase.isEmpty()) {
+                            SceneGraphNode conflict = stringToNode.get(nameLowerCase);
+                            logger.debug(I18n.txt("error.name.conflict", name + " (" + node.getClass().getSimpleName().toLowerCase() + ")", conflict.getName() + " (" + conflict.getClass().getSimpleName().toLowerCase() + ")"));
+                            String[] names1 = node.getNames();
+                            String[] names2 = conflict.getNames();
+                            boolean same = names1.length == names2.length;
+                            if (same) {
+                                for (int i = 0; i < names1.length; i++) {
+                                    same = same && names1[i].equals(names2[i]);
+                                }
+                            }
+                            if (same) {
+                                same = node.getClass().equals(conflict.getClass());
+                            }
+                            ok = !same;
                         }
                     }
 
@@ -225,6 +252,7 @@ public  class SceneGraph implements ISceneGraph {
                 node.addToIndex(stringToNode);
             }
         }
+        return ok;
     }
 
     private void removeFromIndex(SceneGraphNode node) {
