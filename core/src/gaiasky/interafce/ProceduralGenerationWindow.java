@@ -18,17 +18,20 @@ import com.badlogic.gdx.utils.Array;
 import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.GaiaSky;
+import gaiasky.desktop.format.DesktopNumberFormat;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.*;
 import gaiasky.util.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.format.INumberFormat;
 import gaiasky.util.scene2d.*;
 import gaiasky.util.validator.LongValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.NumberFormat;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -631,9 +634,11 @@ public class ProceduralGenerationWindow extends GenericDialog {
         content.add(eSun).colspan(2).left().padBottom(pad10).padRight(pad5);
         content.add(esunTooltip).left().padBottom(pad10).row();
 
+        INumberFormat nf = new DesktopNumberFormat("#0.0000##");
         // Kr
         OwnSliderPlus kr = new OwnSliderPlus(I18n.txt("gui.procedural.kr"), 0.0f, 0.01f, 0.0001f, skin);
         kr.setWidth(fieldWidthAll);
+        kr.setNumberFormatter(nf);
         kr.setValue(ac.m_Kr);
         kr.addListener(new ChangeListener() {
             @Override
@@ -649,11 +654,12 @@ public class ProceduralGenerationWindow extends GenericDialog {
         // Kr
         OwnSliderPlus km = new OwnSliderPlus(I18n.txt("gui.procedural.km"), 0.0f, 0.01f, 0.0001f, skin);
         km.setWidth(fieldWidthAll);
-        km.setValue(ac.m_Kr);
+        km.setNumberFormatter(nf);
+        km.setValue(ac.m_Km);
         km.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                ac.m_Kr = km.getMappedValue();
+                ac.m_Km = km.getMappedValue();
             }
         });
         OwnImageButton kmTooltip = new OwnImageButton(skin, "tooltip");
