@@ -833,7 +833,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         setBiomelut(luts.get(rand.nextInt(luts.size)));
         setBiomehueshift(rand.nextDouble() * 360.0);
         double sizeKm = bodySize * Constants.U_TO_KM;
-        setHeightScale(gaussian(rand, sizeKm * 0.002, sizeKm * 0.0004, 1.0));
+        setHeightScale(gaussian(rand, sizeKm * 0.001, sizeKm * 0.0006, 1.0));
         // Noise
         NoiseComponent nc = new NoiseComponent();
         nc.randomizeAll(rand);

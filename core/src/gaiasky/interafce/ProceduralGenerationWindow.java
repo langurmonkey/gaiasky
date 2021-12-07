@@ -22,6 +22,7 @@ import gaiasky.desktop.format.DesktopNumberFormat;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.*;
+import gaiasky.util.Constants;
 import gaiasky.util.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
@@ -301,7 +302,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
         content.add(fractalTooltip).padBottom(pad10).row();
 
         // Scale
-        OwnSliderPlus scaleX = new OwnSliderPlus(I18n.txt("gui.procedural.scale", "[x]"), 0.01f, 20.0f, 0.01f, skin);
+        OwnSliderPlus scaleX = new OwnSliderPlus(I18n.txt("gui.procedural.scale", "[x]"), 0.01f, 10.0f, 0.01f, skin);
         scaleX.setWidth(fieldWidthAll / 3f - pad5 * 1.3f);
         scaleX.setValue((float) nc.scale[0]);
         scaleX.addListener(new ChangeListener() {
@@ -310,7 +311,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
                 nc.scale[0] = scaleX.getMappedValue();
             }
         });
-        OwnSliderPlus scaleY = new OwnSliderPlus(I18n.txt("gui.procedural.scale", "[y]"), 0.01f, 20.0f, 0.01f, skin);
+        OwnSliderPlus scaleY = new OwnSliderPlus(I18n.txt("gui.procedural.scale", "[y]"), 0.01f, 10.0f, 0.01f, skin);
         scaleY.setWidth(fieldWidthAll / 3f - pad5 * 1.3f);
         scaleY.setValue((float) nc.scale[1]);
         scaleY.addListener(new ChangeListener() {
@@ -319,7 +320,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
                 nc.scale[1] = scaleY.getMappedValue();
             }
         });
-        OwnSliderPlus scaleZ = new OwnSliderPlus(I18n.txt("gui.procedural.scale", "[z]"), 0.01f, 20.0f, 0.01f, skin);
+        OwnSliderPlus scaleZ = new OwnSliderPlus(I18n.txt("gui.procedural.scale", "[z]"), 0.01f, 10.0f, 0.01f, skin);
         scaleZ.setWidth(fieldWidthAll / 3f - pad5 * 1.3f);
         scaleZ.setValue((float) nc.scale[2]);
         scaleZ.addListener(new ChangeListener() {
@@ -503,8 +504,8 @@ public class ProceduralGenerationWindow extends GenericDialog {
             // Hue shift
             hueShift = new OwnSliderPlus(I18n.txt("gui.procedural.hueshift"), 0.0f, 360.0f, 0.1f, skin);
             hueShift.setWidth(fieldWidthAll);
-            hueShift.setValue(mtc.biomeHueShift);
             hueShift.setValueSuffix("°");
+            hueShift.setValue(mtc.biomeHueShift);
             hueShift.addListener(new ChangeListener() {
                 @Override
                 public void changed(ChangeEvent event, Actor actor) {
@@ -522,6 +523,23 @@ public class ProceduralGenerationWindow extends GenericDialog {
 
             // Noise
             addNoiseGroup(content, mtc.nc, "gui.procedural.param.elev");
+
+            // Height scale
+            OwnSliderPlus heightScale = new OwnSliderPlus(I18n.txt("gui.procedural.heightscale"), 1.0f, 80.0f, 0.1f, skin);
+            heightScale.setWidth(fieldWidthAll);
+            heightScale.setValueSuffix(" km");
+            heightScale.setValue((float) (mtc.heightScale * Constants.U_TO_KM));
+            heightScale.addListener(new ChangeListener() {
+                @Override
+                public void changed(ChangeEvent event, Actor actor) {
+                    mtc.heightScale = (float) (heightScale.getMappedValue() * Constants.KM_TO_U);
+                }
+            });
+            OwnImageButton heightScaleTooltip = new OwnImageButton(skin, "tooltip");
+            heightScaleTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.procedural.info.heightscale"), skin));
+            content.add(heightScale).colspan(2).left().padBottom(pad20).padRight(pad5);
+            content.add(heightScaleTooltip).left().padBottom(pad20).row();
+
 
             // Add button group
             addLocalButtons(content, "gui.procedural.surface", this::randomizeSurface, this::generateSurface);

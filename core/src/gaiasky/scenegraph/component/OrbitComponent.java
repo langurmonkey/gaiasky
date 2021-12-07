@@ -12,6 +12,7 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 
 import java.time.Instant;
+import java.util.Objects;
 
 public class OrbitComponent {
 
@@ -21,7 +22,7 @@ public class OrbitComponent {
     public double period;
     /** Base epoch **/
     public double epoch;
-    /** Semi major axis of the ellipse, a in Km.**/
+    /** Semi major axis of the ellipse, a in Km. **/
     public double semimajoraxis;
     /** Eccentricity of the ellipse. **/
     public double e;
@@ -80,7 +81,7 @@ public class OrbitComponent {
         this.mu = mu;
     }
 
-    public void loadDataPoint(Vector3d out, Instant t){
+    public void loadDataPoint(Vector3d out, Instant t) {
         double a = semimajoraxis * 1000d; // km to m
         double M0 = meananomaly * MathUtilsd.degRad;
         double omega_lan = ascendingnode * MathUtilsd.degRad;
@@ -131,12 +132,9 @@ public class OrbitComponent {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         String desc;
-        if(source != null)
-            desc = source;
-        else
-            desc = "{epoch: " + epoch + ", period: " + period + ", e: " + e + ", i: " + i + ", sma: " + semimajoraxis + "}";
+        desc = Objects.requireNonNullElseGet(source, () -> "{epoch: " + epoch + ", period: " + period + ", e: " + e + ", i: " + i + ", sma: " + semimajoraxis + "}");
         return desc;
     }
 
