@@ -32,7 +32,6 @@ import gaiasky.util.validator.LongValidator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.NumberFormat;
 import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -168,7 +167,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
         randomize.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                randomize();
+                randomizeAll();
             }
         });
         randomize.pad(pad5, pad15, pad5, pad15);
@@ -540,7 +539,6 @@ public class ProceduralGenerationWindow extends GenericDialog {
             content.add(heightScale).colspan(2).left().padBottom(pad20).padRight(pad5);
             content.add(heightScaleTooltip).left().padBottom(pad20).row();
 
-
             // Add button group
             addLocalButtons(content, "gui.procedural.surface", this::randomizeSurface, this::generateSurface);
 
@@ -725,12 +723,13 @@ public class ProceduralGenerationWindow extends GenericDialog {
         this.initMtc = new MaterialComponent();
         this.initMtc.randomizeAll(rand.nextLong(), target.size);
 
-        // Others are the same
-        this.initClc = this.clc;
-        this.initAc = this.ac;
+        if (rebuild) {
+            // Others are the same
+            this.initClc = this.clc;
+            this.initAc = this.ac;
 
-        if (rebuild)
             rebuild();
+        }
 
         return true;
     }
@@ -739,12 +738,13 @@ public class ProceduralGenerationWindow extends GenericDialog {
         this.initClc = new CloudComponent();
         this.initClc.randomizeAll(rand.nextLong(), target.size);
 
-        // Others are the same
-        this.initMtc = this.mtc;
-        this.initAc = this.ac;
+        if (rebuild) {
+            // Others are the same
+            this.initMtc = this.mtc;
+            this.initAc = this.ac;
 
-        if (rebuild)
             rebuild();
+        }
 
         return true;
     }
@@ -753,17 +753,18 @@ public class ProceduralGenerationWindow extends GenericDialog {
         this.initAc = new AtmosphereComponent();
         this.initAc.randomizeAll(rand.nextLong(), target.size);
 
-        // Others are the same
-        this.initMtc = this.mtc;
-        this.initClc = this.clc;
+        if (rebuild) {
+            // Others are the same
+            this.initMtc = this.mtc;
+            this.initClc = this.clc;
 
-        if (rebuild)
             rebuild();
+        }
 
         return true;
     }
 
-    protected void randomize() {
+    protected void randomizeAll() {
         randomizeSurface(false);
         randomizeClouds(false);
         randomizeAtmosphere(false);
