@@ -376,6 +376,10 @@ public class SysUtils {
         return getConfigDir().resolve(".releasenotes.rev");
     }
 
+    public static Path getProceduralPixmapDir(){
+        return Settings.settings.data.dataPath("tex").resolve("procedural");
+    }
+
     /**
      * Saves the given procedurally generated pixmap as a PNG image
      * to disk using the given name and timestamp.
@@ -385,7 +389,7 @@ public class SysUtils {
      */
     public static void saveProceduralPixmap(Pixmap p, String name) {
         if (p != null) {
-            Path proceduralDir = Settings.settings.data.dataPath("tex").resolve("procedural");
+            Path proceduralDir = getProceduralPixmapDir();
             Path file = proceduralDir.resolve(name + ".png");
             PixmapIO.writePNG(Gdx.files.absolute(file.toAbsolutePath().toString()), p);
             logger.info(TextUtils.capitalise(name) + " texture written to " + file);

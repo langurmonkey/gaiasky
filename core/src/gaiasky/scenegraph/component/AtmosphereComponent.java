@@ -276,7 +276,7 @@ public class AtmosphereComponent extends NamedComponent {
         // Km
         setM_Km(0.0015);
         // eSun
-        setM_eSun(gaussian(rand, 6.0, 2.0, 2.5));
+        setM_eSun(gaussian(rand, 5.0, 4.0));
         // Fog density
         setFogdensity(gaussian(rand, 4.5, 1.0, 0.5));
         // Fog color

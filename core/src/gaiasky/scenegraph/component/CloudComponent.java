@@ -31,6 +31,7 @@ import gaiasky.util.gdx.shader.AtmosphereAttribute;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
@@ -53,6 +54,9 @@ public class CloudComponent extends NamedComponent {
     public NoiseComponent nc;
     public ModelComponent mc;
     public Matrix4 localTransform;
+
+    /** RGB color of generated clouds **/
+    public float[] color = new float[] { 1f, 1f, 1f, 0.7f };
 
     private Texture cloudTex;
 
@@ -184,7 +188,7 @@ public class CloudComponent extends NamedComponent {
             long start = TimeUtils.millis();
             logger.info("Generating procedural clouds: " + N + "x" + M);
 
-            Pixmap cloudPixmap = nc.generateData(N, M);
+            Pixmap cloudPixmap = nc.generateData(N, M, color);
             // Write to disk if necessary
             if (Settings.settings.program.saveProceduralTextures) {
                 SysUtils.saveProceduralPixmap(cloudPixmap, this.name + "-cloud");
@@ -284,14 +288,28 @@ public class CloudComponent extends NamedComponent {
 
         // Size
         double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + gaussian(rand, 20.0, 5.0, 10.0));
+        setSize(sizeKm + gaussian(rand, 30.0, 8.0, 12.0));
         // Cloud
         setCloud("generate");
+        // Color
+        if (rand.nextBoolean()) {
+            // White
+            color[0] = 1f;
+            color[1] = 1f;
+            color[2] = 1f;
+            color[3] = 0.7f;
+        } else {
+            // Random
+            color[0] = rand.nextFloat();
+            color[1] = rand.nextFloat();
+            color[2] = rand.nextFloat();
+            color[3] = rand.nextFloat();
+        }
         // Params
         setParams(createModelParameters(200L, 1.0, false));
         // Noise
         NoiseComponent nc = new NoiseComponent();
-        nc.randomizeAll(rand);
+        nc.randomizeAll(rand, rand.nextBoolean(), true);
         setNoise(nc);
     }
 
@@ -300,6 +318,9 @@ public class CloudComponent extends NamedComponent {
         this.cloud = other.cloud;
         this.params = other.params;
         this.nc = new NoiseComponent();
+        if (other.color != null) {
+            this.color = Arrays.copyOf(other.color, other.color.length);
+        }
         if (other.nc != null)
             this.nc.copyFrom(other.nc);
         else

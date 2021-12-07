@@ -92,7 +92,7 @@ public class NoiseComponent extends NamedComponent {
         }
     }
 
-    public Pixmap generateData(int N, int M) {
+    public Pixmap generateData(int N, int M, float[] rgba) {
         initNoise(seed, false);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
 
@@ -109,13 +109,17 @@ public class NoiseComponent extends NamedComponent {
             final int yf = y;
             IntStream.range(0, N).parallel().forEach(x -> {
                 double theta = x * theta_step;
-                double n;
-                synchronized (baseNoise[x % N_GEN]) {
-                    n = baseNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                double n = 0;
+                int idx = x % N_GEN;
+                if (baseNoise[idx] != null) {
+                    synchronized (baseNoise[idx]) {
+                        n = baseNoise[idx].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
+                    }
                 }
 
                 float nf = (float) n;
-                pixmap.drawPixel(x, yf, Color.rgba8888(nf, nf, nf, 1f));
+                float alpha = rgba[3];
+                pixmap.drawPixel(x, yf, Color.rgba8888(nf * rgba[0] * alpha, nf * rgba[1] * alpha, nf * rgba[2] * alpha, 1f));
             });
             phi += (Math.PI / (M - 1));
             y += 1;
@@ -226,20 +230,23 @@ public class NoiseComponent extends NamedComponent {
     }
 
     public void randomizeAll(Random rand) {
-        randomizeAll(rand, rand.nextBoolean());
+        randomizeAll(rand, rand.nextBoolean(), false);
     }
 
-    public void randomizeAll(Random rand, boolean rocky) {
+    public void randomizeAll(Random rand, boolean rocky, boolean clouds) {
         // Seed
         setSeed(rand.nextLong());
         // Size
-        double baseSize = Math.abs(gaussian(rand, 1.0, 0.4, 0.05));
-        if (rand.nextBoolean()) {
+        double baseSize = Math.abs(gaussian(rand, 1.0, 1.0, 0.05));
+        if (clouds) {
+            // XY small, Z large
+            setScale(new double[] { Math.abs(rand.nextDouble()) * 0.3, Math.abs(rand.nextDouble()) * 0.3, baseSize + 2.0 * rand.nextDouble() });
+        } else if (rand.nextBoolean()) {
             // Single scale
             setScale(baseSize);
         } else {
             // Different scales
-            setScale(new double[] { baseSize + Math.abs(gaussian(rand, 0.0, 0.2)), baseSize + Math.abs(gaussian(rand, 0.0, 0.2)), baseSize + Math.abs(gaussian(rand, 0.4, 0.2)) });
+            setScale(new double[] { baseSize + rand.nextDouble() * 0.5, baseSize + rand.nextDouble() * 0.5, baseSize + 0.4 * rand.nextDouble() });
         }
         // Type (all but WHITE)
         setType(ModuleBasisFunction.BasisType.values()[rand.nextInt(4)].name());
@@ -251,7 +258,7 @@ public class NoiseComponent extends NamedComponent {
         setOctaves(Math.abs(rand.nextLong()) % 8 + 1L);
         // Range
         double minRange = rocky ? 0.1 : gaussian(rand, -0.5, 0.3);
-        double maxRange = minRange + 1.0 + rand.nextDouble() * 0.3;
+        double maxRange = 0.5 + Math.abs(rand.nextDouble());
         setRange(new double[] { minRange, maxRange });
         // Power
         setPower(rocky ? 1.0 : gaussian(rand, 5.0, 3.0, 0.2));

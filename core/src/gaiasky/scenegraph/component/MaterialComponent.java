@@ -165,6 +165,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             heightUnpacked = addToLoad(height, getTP(height, true));
         ringUnpacked = addToLoad(ring, getTP(ring, true));
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
+
+        this.generated = false;
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
