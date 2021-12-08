@@ -566,6 +566,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 if (mtc != null && mtc.texInitialised) {
                     // Remove current textures
                     mtc.disposeTextures(this.manager);
+                    // Set generated status to false
+                    mtc.setGenerated(false);
                 }
             });
         }

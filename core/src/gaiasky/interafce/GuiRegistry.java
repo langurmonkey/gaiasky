@@ -418,16 +418,10 @@ public class GuiRegistry implements IObserver {
                                 String fileName = result.getFileName().toString();
                                 if (fileName.endsWith(".json")) {
                                     // Load internal JSON catalog file
-                                    Thread t = new Thread(() -> {
+                                    GaiaSky.instance.getExecutorService().execute(() -> {
                                         try {
                                             logger.info(I18n.txt("notif.catalog.loading", fileName));
-                                            // Show progress bar
-                                            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
-                                            // Reset
-                                            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, 0.1f);
                                             final Array<SceneGraphNode> objects = SceneGraphJsonLoader.loadJsonFile(Gdx.files.absolute(result.toAbsolutePath().toString()));
-                                            // Hide progress bar
-                                            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
                                             logger.info(I18n.txt("notif.catalog.loaded", objects.size, I18n.txt("gui.objects")));
                                             GaiaSky.postRunnable(() -> {
                                                 // THIS WILL BLOCK
@@ -452,16 +446,13 @@ public class GuiRegistry implements IObserver {
                                             });
                                         } catch (Exception e) {
                                             logger.error(I18n.txt("notif.error", fileName), e);
-                                            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
                                         }
                                     });
-                                    t.setName("gaiasky-worker-datasetload");
-                                    t.start();
 
                                 } else {
                                     final DatasetLoadDialog dld = new DatasetLoadDialog(I18n.txt("gui.dsload.title") + ": " + fileName, fileName, skin, ui);
                                     Runnable doLoad = () -> {
-                                        Thread t = new Thread(() -> {
+                                        GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                             // Load dataset
                                             GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, datasetOptions, true);
@@ -483,11 +474,8 @@ public class GuiRegistry implements IObserver {
                                                 GaiaSky.instance.scripting().expandGuiComponent("DatasetsComponent");
                                             } else {
                                                 logger.info("No data loaded (did the load crash?)");
-                                                EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
                                             }
                                         });
-                                        t.setName("gaiasky-worker-datasetload");
-                                        t.start();
                                     };
                                     dld.setAcceptRunnable(doLoad);
                                     dld.show(ui);
@@ -498,7 +486,6 @@ public class GuiRegistry implements IObserver {
                                 return true;
                             } catch (Exception e) {
                                 logger.error(I18n.txt("notif.error", result.getFileName()), e);
-                                EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
                                 return false;
                             }
 

@@ -79,8 +79,9 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         bodies.add(object);
 
                         child = child.next;
-                        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, (float) current / (float) count);
+                        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, file.name(), (float) current / (float) count);
                     }
+                    EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, file.name(), 2f);
                     logger.info(I18n.txt("notif.nodeloader", current, filePath));
                 }
             } catch (Exception e) {

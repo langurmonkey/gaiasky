@@ -50,7 +50,7 @@ import gaiasky.script.ScriptingServer;
 import gaiasky.util.Logger;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.ds.DatasetUpdater;
+import gaiasky.util.ds.GaiaSkyExecutorService;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gdx.contrib.postprocess.utils.PingPongBuffer;
 import gaiasky.util.gdx.g2d.BitmapFont;
@@ -263,7 +263,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * The dataset updater -- sorts and updates dataset metadata
      */
-    private DatasetUpdater datasetUpdater;
+    private GaiaSkyExecutorService executorService;
 
     /**
      * The bookmarks manager
@@ -403,7 +403,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         SlaveManager.load(assetManager);
 
         // Initialise dataset updater
-        this.datasetUpdater = new DatasetUpdater();
+        this.executorService = new GaiaSkyExecutorService();
 
         // Bookmarks
         this.bookmarksManager = new BookmarksManager();
@@ -867,8 +867,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         ModelCache.cache.dispose();
 
         // Shutdown dataset updater thread pool
-        if (datasetUpdater != null) {
-            datasetUpdater.shutDownThreadPool();
+        if (executorService != null) {
+            executorService.shutDownThreadPool();
         }
 
         // Scripting
@@ -1294,8 +1294,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         return this.scripting;
     }
 
-    public DatasetUpdater getDatasetUpdater() {
-        return this.datasetUpdater;
+    public GaiaSkyExecutorService getExecutorService() {
+        return this.executorService;
     }
 
     public GuiRegistry getGuiRegistry() {

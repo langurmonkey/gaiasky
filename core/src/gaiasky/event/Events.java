@@ -1271,12 +1271,8 @@ public enum Events {
     TOGGLE_VISIBILITY_CMD,
 
     /**
-     * Shows the load progress bar. Contains a boolean with the state and a boolean indicating if it
-     * comes from the interface
-     */
-    SHOW_LOAD_PROGRESS,
-    /**
-     * Updates the load progress bar, contains a float in (0,1)
+     * Updates the progress bar with the given name, contains a name and a float value in (0,1)
+     * The progress bar is removed when the value is >= 1.
      */
     UPDATE_LOAD_PROGRESS,
 
@@ -1355,6 +1351,15 @@ public enum Events {
     /**
      * Broadcast a new location record, added to the location log
      */
-    NEW_LOCATION_RECORD
+    NEW_LOCATION_RECORD,
+
+    /**
+     * Informs of the material generation, contains a boolean (start, finish)
+     */
+    PROCEDURAL_GENERATION_SURFACE_INFO,
+    /**
+     * Informs of the cloud generation, contains a boolean (start, finish)
+     */
+    PROCEDURAL_GENERATION_CLOUD_INFO
 
 }

@@ -730,7 +730,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     @Override
     public IFocus getFocus(String name) {
-        candidateFocusIndex = index.get(name, -1);
+        candidateFocusIndex = index.getOrDefault(name, -1);
         return this;
     }
 

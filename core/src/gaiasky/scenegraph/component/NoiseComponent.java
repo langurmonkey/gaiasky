@@ -12,6 +12,8 @@ import com.sudoplay.joise.module.*;
 import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
 import com.sudoplay.joise.module.ModuleBasisFunction.InterpolationType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -92,7 +94,7 @@ public class NoiseComponent extends NamedComponent {
         }
     }
 
-    public Pixmap generateData(int N, int M, float[] rgba) {
+    public synchronized Pixmap generateData(int N, int M, float[] rgba, String name) {
         initNoise(seed, false);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
 
@@ -123,12 +125,17 @@ public class NoiseComponent extends NamedComponent {
             });
             phi += (Math.PI / (M - 1));
             y += 1;
+
+            // Progress bar
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, (float) y / (float) (M - 1));
         }
+        // Force end
+        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, 2f);
 
         return pixmap;
     }
 
-    public Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale) {
+    public synchronized Trio<float[][], float[][], Pixmap> generateElevation(int N, int M, float heightScale, String name) {
         // Construct RAM height map from noise algorithms
         initNoise(seed, true);
         Pixmap pixmap = new Pixmap(N, M, Pixmap.Format.RGBA8888);
@@ -162,8 +169,12 @@ public class NoiseComponent extends NamedComponent {
             });
             phi += (Math.PI / (M - 1));
             y += 1;
-        }
 
+            // Progress bar
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, (float) y / (float) (M - 1));
+        }
+        // Force end
+        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, 2f);
         return new Trio<>(elevation, moisture, pixmap);
     }
 

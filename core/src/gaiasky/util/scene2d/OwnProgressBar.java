@@ -5,6 +5,7 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
@@ -13,6 +14,7 @@ public class OwnProgressBar extends ProgressBar {
     private float prefWidth = 0;
     private float prefHeight = 0;
     private final boolean vertical;
+    private OwnLabel titleLabel;
 
     public OwnProgressBar(float min, float max, float stepSize, boolean vertical, ProgressBarStyle style) {
         super(min, max, stepSize, vertical, style);
@@ -27,6 +29,10 @@ public class OwnProgressBar extends ProgressBar {
     public OwnProgressBar(float min, float max, float stepSize, boolean vertical, Skin skin) {
         super(min, max, stepSize, vertical, skin);
         this.vertical = vertical;
+    }
+
+    public void setTitle(String title, Skin skin){
+        this.titleLabel = new OwnLabel(title, skin, "ui-13");
     }
 
     public void setPrefWidth(float prefWidth) {
@@ -51,6 +57,17 @@ public class OwnProgressBar extends ProgressBar {
             return prefHeight;
         } else {
             return super.getPrefHeight();
+        }
+    }
+
+    @Override
+    public void draw(Batch batch, float parentAlpha) {
+        super.draw(batch, parentAlpha);
+        if (titleLabel != null) {
+            float padY = 2f;
+            float padX = 10.8f;
+            titleLabel.setPosition(getX() + padX, getY() + getHeight() - titleLabel.getHeight() - padY);
+            titleLabel.draw(batch, parentAlpha);
         }
     }
 }

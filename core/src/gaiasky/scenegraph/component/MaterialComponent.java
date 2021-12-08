@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -113,6 +114,9 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public String biomeLUT = "data/tex/base/biome-lut.png";
     public float biomeHueShift = 0;
 
+    private AtomicBoolean generated = new AtomicBoolean(false);
+    private Texture heightTex, specularTex, diffuseTex, normalTex;
+
     /** Add also color even if texture is present **/
     public boolean coloriftex = false;
 
@@ -166,7 +170,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         ringUnpacked = addToLoad(ring, getTP(ring, true));
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
 
-        this.generated = false;
+        this.generated.set(false);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -327,9 +331,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         return material;
     }
 
-    boolean generated = false;
-    Texture heightTex, specularTex, diffuseTex, normalTex;
-
     private void addHeightTex(Texture heightTex) {
         if (heightTex != null && material != null) {
             heightSize.set(heightTex.getWidth(), heightTex.getHeight());
@@ -361,21 +362,24 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public void setGenerated(boolean generated) {
-        this.generated = generated;
+        this.generated.set(generated);
     }
 
     private synchronized void initializeGenElevationData() {
-        if (generated) {
+        if (generated.get()) {
             addHeightTex(heightTex);
         } else {
-            Thread t = new Thread(() -> {
-                generated = true;
+            generated.set(true);
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                // Begin
+                EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, true);
+
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
                 long start = TimeUtils.millis();
-                logger.info("Generating procedural surface: " + N + "x" + M);
+                logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), N, M));
 
-                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale);
+                Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.surface"), name));
                 float[][] elevationData = trio.getFirst();
                 float[][] moistureData = trio.getSecond();
                 Pixmap heightPixmap = trio.getThird();
@@ -383,8 +387,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 boolean cDiffuse = diffuse != null && diffuse.endsWith(Constants.GEN_KEYWORD);
                 boolean cSpecular = specular != null && specular.endsWith(Constants.GEN_KEYWORD);
                 boolean cNormal = normal != null && normal.endsWith(Constants.GEN_KEYWORD);
-                boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
-                boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
+                // TODO implement emissive texture generation
+                //boolean cEmissive = emissive != null && emissive.endsWith(Constants.GEN_KEYWORD);
+                // TODO implement metallic texture generation
+                //boolean cMetallic = metallic != null && metallic.endsWith(Constants.GEN_KEYWORD);
 
                 // Create diffuse and specular textures
                 if (cDiffuse || cSpecular) {
@@ -425,7 +431,9 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                                 }
                                 Color col = new Color(rgb[0], rgb[1], rgb[2], 1f);
 
-                                diffusePixmap.drawPixel(ii, j, Color.rgba8888(col));
+                                if (diffusePixmap != null)
+                                    diffusePixmap.drawPixel(ii, j, Color.rgba8888(col));
+
                                 boolean water = height <= 0.02f;
                                 boolean snow = height > 0.85f;
                                 if (water) {
@@ -517,9 +525,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     });
                 }
                 long elapsed = TimeUtils.millis() - start;
-                logger.info("Surface generated in " + elapsed / 1000d + " seconds");
+                logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), elapsed / 1000d));
+
+                // End
+                EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, false);
             });
-            t.start();
         }
     }
 

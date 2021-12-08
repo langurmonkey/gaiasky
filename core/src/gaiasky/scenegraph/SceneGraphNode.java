@@ -34,6 +34,7 @@ import net.jafama.FastMath;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An object in the scene graph. Serves as a top class which provides the basic functionality.
@@ -860,7 +861,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @param map The index.
      */
-    protected void addToIndex(ObjectMap<String, SceneGraphNode> map) {
+    protected void addToIndex(Map<String, SceneGraphNode> map) {
     }
 
     /**
@@ -868,7 +869,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @param map The index.
      */
-    protected void removeFromIndex(ObjectMap<String, SceneGraphNode> map) {
+    protected void removeFromIndex(Map<String, SceneGraphNode> map) {
     }
 
     /**

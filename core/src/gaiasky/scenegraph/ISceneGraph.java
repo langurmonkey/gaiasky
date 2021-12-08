@@ -12,6 +12,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -105,7 +106,7 @@ public interface ISceneGraph extends Disposable {
      *
      * @return The HIP star map
      */
-    ObjectMap<Integer, IPosition> getStarMap();
+    Map<Integer, IPosition> getStarMap();
 
     Array<SceneGraphNode> getNodes();
 

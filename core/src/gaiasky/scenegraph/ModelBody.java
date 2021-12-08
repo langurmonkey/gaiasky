@@ -47,7 +47,7 @@ public abstract class ModelBody extends CelestialBody {
     protected static final double TH_ANGLE_POINT = Math.toRadians(0.30);
 
     /**
-     * Angle limit for rendering as point. If angle is any bigger, we render
+     * Solid angle limit for rendering as point. If angle is any bigger, we render
      * with shader.
      */
     public double THRESHOLD_POINT() {

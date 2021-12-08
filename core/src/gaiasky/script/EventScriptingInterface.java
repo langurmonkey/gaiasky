@@ -2673,18 +2673,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         STILDataProvider provider = new STILDataProvider();
         provider.setDatasetOptions(datasetOptions);
         return provider.loadData(ds, 1.0f, () -> {
-            // Show progress bar
-            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, true, false);
-            // Reset
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, 0.1f);
+            // Create
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, datasetOptions.catalogName, 0.01f);
         }, (current, count) -> {
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, (float) current / (float) count);
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, datasetOptions.catalogName, (float) current / (float) count);
             if (current % 250000 == 0) {
                 logger.info(current + " objects loaded...");
             }
         }, () -> {
-            // Hide progress bar
-            EventManager.instance.post(Events.SHOW_LOAD_PROGRESS, false, false);
+            // Force remove
+            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, datasetOptions.catalogName, 2f);
         });
     }
 

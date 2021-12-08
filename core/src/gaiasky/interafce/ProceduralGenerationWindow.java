@@ -20,10 +20,15 @@ import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.format.DesktopNumberFormat;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.*;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.format.INumberFormat;
@@ -36,7 +41,8 @@ import java.util.Random;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class ProceduralGenerationWindow extends GenericDialog {
+public class ProceduralGenerationWindow extends GenericDialog implements IObserver {
+    private static final Log logger = Logger.getLogger(ProceduralGenerationWindow.class);
     // Selected tab persists across windows
     private static int lastTabSelected = 0;
 
@@ -50,6 +56,9 @@ public class ProceduralGenerationWindow extends GenericDialog {
     private OwnSliderPlus hueShift;
     private Texture currentLutTexture;
     private Cell<?> lutImageCell;
+    private OwnTextButton genCloudsButton, genSurfaceButton;
+
+    private int genCloudNum = 0, genSurfaceNum = 0;
 
     public ProceduralGenerationWindow(Planet target, Stage stage, Skin skin) {
         super(I18n.txt("gui.procedural.title", target.getName()), skin, stage);
@@ -59,6 +68,8 @@ public class ProceduralGenerationWindow extends GenericDialog {
         this.initAc = target.getAtmosphereComponent();
         this.rand = new Random(1884L);
         this.setModal(false);
+
+        EventManager.instance.subscribe(this, Events.PROCEDURAL_GENERATION_CLOUD_INFO, Events.PROCEDURAL_GENERATION_SURFACE_INFO);
 
         setAcceptText(I18n.txt("gui.close"));
 
@@ -207,7 +218,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
 
     }
 
-    private void addLocalButtons(Table content, String key, Function<Boolean, Boolean> randomizeFunc, Function<Boolean, Boolean> generateFunc) {
+    private OwnTextButton addLocalButtons(Table content, String key, Function<Boolean, Boolean> randomizeFunc, Function<Boolean, Boolean> generateFunc) {
         String name = I18n.txt(key);
         // Randomize button
         OwnTextButton randomize = new OwnTextButton(I18n.txt("gui.procedural.randomize", name), skin);
@@ -236,6 +247,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
         content.add(buttonGroup).center().colspan(2).padBottom(pad10).row();
         content.add(new Separator(skin, "menu")).center().colspan(2).growX().padBottom(pad20);
 
+        return generate;
     }
 
     private void addNoiseGroup(Table content, NoiseComponent nc, String key) {
@@ -540,7 +552,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
             content.add(heightScaleTooltip).left().padBottom(pad20).row();
 
             // Add button group
-            addLocalButtons(content, "gui.procedural.surface", this::randomizeSurface, this::generateSurface);
+            genSurfaceButton = addLocalButtons(content, "gui.procedural.surface", this::randomizeSurface, this::generateSurface);
 
         } else {
             // Error!
@@ -581,7 +593,7 @@ public class ProceduralGenerationWindow extends GenericDialog {
         addNoiseGroup(content, clc.nc, "gui.procedural.param.cloud");
 
         // Add button group
-        addLocalButtons(content, "gui.procedural.cloud", this::randomizeClouds, this::generateClouds);
+        genCloudsButton = addLocalButtons(content, "gui.procedural.cloud", this::randomizeClouds, this::generateClouds);
     }
 
     private void buildContentAtmosphere(Table content) {
@@ -777,12 +789,16 @@ public class ProceduralGenerationWindow extends GenericDialog {
     }
 
     protected void generateSurfaceDirect() {
-        MaterialComponent materialComponent = target.getMaterialComponent();
-        if (materialComponent != null) {
-            materialComponent.disposeTextures(GaiaSky.instance.assetManager);
+        if (genSurfaceNum == 0) {
+            MaterialComponent materialComponent = target.getMaterialComponent();
+            if (materialComponent != null) {
+                materialComponent.disposeTextures(GaiaSky.instance.assetManager);
+            }
+            mtc.initialize(target.getName(), target.getId());
+            target.getModelComponent().setMaterial(mtc);
+        } else {
+            logger.info(I18n.txt("gui.procedural.error.gen", I18n.txt("gui.procedural.surface")));
         }
-        mtc.initialize(target.getName(), target.getId());
-        target.getModelComponent().setMaterial(mtc);
     }
 
     protected Boolean generateClouds(Boolean ignored) {
@@ -791,13 +807,17 @@ public class ProceduralGenerationWindow extends GenericDialog {
     }
 
     protected void generateCloudsDirect() {
-        CloudComponent cloudComponent = target.getCloudComponent();
-        if (cloudComponent != null) {
-            cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
+        if (genCloudNum == 0) {
+            CloudComponent cloudComponent = target.getCloudComponent();
+            if (cloudComponent != null) {
+                cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
+            }
+            clc.initialize(target.getName(), target.getId(), false);
+            target.setCloud(clc);
+            target.initializeClouds(GaiaSky.instance.assetManager);
+        } else {
+            logger.info(I18n.txt("gui.procedural.error.gen", I18n.txt("gui.procedural.cloud")));
         }
-        clc.initialize(target.getName(), target.getId(), false);
-        target.setCloud(clc);
-        target.initializeClouds(GaiaSky.instance.assetManager);
     }
 
     protected Boolean generateAtmosphere(Boolean ignored) {
@@ -845,4 +865,31 @@ public class ProceduralGenerationWindow extends GenericDialog {
         stage.setKeyboardFocus(null);
     }
 
+    private void updateButtonStatus() {
+        genCloudsButton.setDisabled(genCloudNum > 0);
+        genSurfaceButton.setDisabled(genSurfaceNum > 0);
+    }
+
+    @Override
+    public void notify(Events event, Object... data) {
+        boolean status = (Boolean) data[0];
+        switch (event) {
+        case PROCEDURAL_GENERATION_CLOUD_INFO -> {
+            if (status) {
+                genCloudNum++;
+            } else {
+                genCloudNum = Math.max(genCloudNum - 1, 0);
+            }
+            updateButtonStatus();
+        }
+        case PROCEDURAL_GENERATION_SURFACE_INFO -> {
+            if (status) {
+                genSurfaceNum++;
+            } else {
+                genSurfaceNum = Math.max(genSurfaceNum - 1, 0);
+            }
+            updateButtonStatus();
+        }
+        }
+    }
 }

@@ -28,7 +28,6 @@ import java.util.*;
  * Widget that displays custom objects on screen. Basically used for scripting.
  */
 public class CustomInterface implements IObserver, IGuiInterface {
-    /** Lock object for synchronization **/
     private final Object lock;
     private final Skin skin;
     private final Stage ui;

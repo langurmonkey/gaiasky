@@ -23,6 +23,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
@@ -34,8 +37,9 @@ import gaiasky.util.math.Vector3d;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class CloudComponent extends NamedComponent {
+public class CloudComponent extends NamedComponent implements IObserver {
     private static final Log logger = Logger.getLogger(CloudComponent.class);
 
     /** Default texture parameters **/
@@ -58,6 +62,7 @@ public class CloudComponent extends NamedComponent {
     /** RGB color of generated clouds **/
     public float[] color = new float[] { 1f, 1f, 1f, 0.7f };
 
+    private AtomicBoolean generated = new AtomicBoolean(false);
     private Texture cloudTex;
 
     public String cloud, cloudtrans, cloudUnpacked, cloudtransUnpacked;
@@ -89,8 +94,13 @@ public class CloudComponent extends NamedComponent {
                 // Add textures to load
                 cloudUnpacked = addToLoad(cloud);
                 cloudtransUnpacked = addToLoad(cloudtrans);
+                if (cloudUnpacked != null)
+                    logger.info(I18n.txt("notif.loading", cloudUnpacked));
+                if (cloudtransUnpacked != null)
+                    logger.info(I18n.txt("notif.loading", cloudtransUnpacked));
             }
         }
+        this.generated.set(false);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -128,6 +138,9 @@ public class CloudComponent extends NamedComponent {
         if (!Settings.settings.scene.initialization.lazyTexture)
             initMaterial();
 
+        // Subscribe to new graphics quality setting event
+        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+
         // Initialised
         texInitialised = !Settings.settings.scene.initialization.lazyTexture;
         // Loading
@@ -139,10 +152,6 @@ public class CloudComponent extends NamedComponent {
 
             if (!texLoading) {
                 initialize(true);
-                if (cloud != null)
-                    logger.info(I18n.txt("notif.loading", cloudUnpacked));
-                if (cloudtrans != null)
-                    logger.info(I18n.txt("notif.loading", cloudtransUnpacked));
                 // Set to loading
                 texLoading = true;
             } else if (isFinishedLoading(manager)) {
@@ -180,30 +189,43 @@ public class CloudComponent extends NamedComponent {
         material.set(new IntAttribute(IntAttribute.CullFace, 0));
     }
 
-    private void initializeGenCloudData() {
 
-        Thread t = new Thread(() -> {
-            final int N = Settings.settings.graphics.quality.texWidthTarget;
-            final int M = Settings.settings.graphics.quality.texHeightTarget;
-            long start = TimeUtils.millis();
-            logger.info("Generating procedural clouds: " + N + "x" + M);
+    public void setGenerated(boolean generated) {
+        this.generated.set(generated);
+    }
 
-            Pixmap cloudPixmap = nc.generateData(N, M, color);
-            // Write to disk if necessary
-            if (Settings.settings.program.saveProceduralTextures) {
-                SysUtils.saveProceduralPixmap(cloudPixmap, this.name + "-cloud");
-            }
-            GaiaSky.postRunnable(() -> {
-                if (cloudPixmap != null) {
-                    cloudTex = new Texture(cloudPixmap, true);
-                    cloudTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
-                    material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
+    private synchronized void initializeGenCloudData() {
+
+        if (!generated.get()) {
+            generated.set(true);
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                // Begin
+                EventManager.instance.post(Events.PROCEDURAL_GENERATION_CLOUD_INFO, true);
+
+                final int N = Settings.settings.graphics.quality.texWidthTarget;
+                final int M = Settings.settings.graphics.quality.texHeightTarget;
+                long start = TimeUtils.millis();
+                logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.cloud"), N, M));
+
+                Pixmap cloudPixmap = nc.generateData(N, M, color, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.cloud"), name));
+                // Write to disk if necessary
+                if (Settings.settings.program.saveProceduralTextures) {
+                    SysUtils.saveProceduralPixmap(cloudPixmap, this.name + "-cloud");
                 }
+                GaiaSky.postRunnable(() -> {
+                    if (cloudPixmap != null) {
+                        cloudTex = new Texture(cloudPixmap, true);
+                        cloudTex.setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
+                        material.set(new TextureAttribute(TextureAttribute.Diffuse, cloudTex));
+                    }
+                });
+                long elapsed = TimeUtils.millis() - start;
+                logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.cloud"), elapsed / 1000d));
+
+                // End
+                EventManager.instance.post(Events.PROCEDURAL_GENERATION_CLOUD_INFO, false);
             });
-            long elapsed = TimeUtils.millis() - start;
-            logger.info("Clouds generated in " + elapsed / 1000d + " seconds");
-        });
-        t.start();
+        }
     }
 
     public void disposeTexture(AssetManager manager, Material material, String name, String nameUnpacked, long texAttribute, Texture tex) {
@@ -274,6 +296,20 @@ public class CloudComponent extends NamedComponent {
 
     public void setNoise(NoiseComponent noise) {
         this.nc = noise;
+    }
+
+    @Override
+    public void notify(final Events event, final Object... data) {
+        if (event == Events.GRAPHICS_QUALITY_UPDATED) {
+            GaiaSky.postRunnable(() -> {
+                if (texInitialised) {
+                    // Remove current textures
+                    this.disposeTextures(this.manager);
+                    // Set generated status to false
+                    this.generated.set(false);
+                }
+            });
+        }
     }
 
     /**

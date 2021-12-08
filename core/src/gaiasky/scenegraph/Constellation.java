@@ -30,6 +30,8 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
+import java.util.Map;
+
 /**
  * Represents a constellation object.
  */
@@ -108,7 +110,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
             if (lines == null) {
                 lines = new IPosition[nPairs][];
             }
-            ObjectMap<Integer, IPosition> hipMap = sceneGraph.getStarMap();
+            Map<Integer, IPosition> hipMap = sceneGraph.getStarMap();
             allLoaded = true;
             for (int i = 0; i < nPairs; i++) {
                 int[] pair = ids.get(i);

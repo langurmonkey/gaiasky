@@ -6,7 +6,6 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
@@ -20,7 +19,9 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -30,12 +31,12 @@ public class SceneGraph implements ISceneGraph {
     /** The root of the tree **/
     public SceneGraphNode root;
     /** Quick lookup map. Name to node. **/
-    protected final ObjectMap<String, SceneGraphNode> index;
+    protected final Map<String, SceneGraphNode> index;
     /**
      * Map from integer to position with all Hipparcos stars, for the
      * constellations
      **/
-    protected final ObjectMap<Integer, IPosition> hipMap;
+    protected final Map<Integer, IPosition> hipMap;
     /** Number of objects per thread **/
     protected int[] objectsPerThread;
     /** Does it contain an octree **/
@@ -58,9 +59,9 @@ public class SceneGraph implements ISceneGraph {
         objectsPerThread = new int[1];
 
         // String-to-node map
-        index = new ObjectMap<>((int)(numNodes * 1.25));
+        index = new HashMap<>((int)(numNodes * 1.25));
         // HIP map with 121k * 1.25
-        hipMap = new ObjectMap<>(151250);
+        hipMap = new HashMap<>(151250);
 
         aux3b1 = new Vector3b();
     }
@@ -293,7 +294,7 @@ public class SceneGraph implements ISceneGraph {
 
     public void matchingFocusableNodes(String name, Array<String> results, int maxResults, AtomicBoolean abort) {
         synchronized (index) {
-            ObjectMap.Keys<String> keys = new ObjectMap.Keys<>(index);
+            Set<String> keys = index.keySet();
             name = name.toLowerCase().trim();
 
             int i = 0;
@@ -374,7 +375,7 @@ public class SceneGraph implements ISceneGraph {
     }
 
     @Override
-    public ObjectMap<Integer, IPosition> getStarMap() {
+    public Map<Integer, IPosition> getStarMap() {
         return hipMap;
     }
 

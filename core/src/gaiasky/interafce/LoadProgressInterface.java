@@ -6,27 +6,29 @@
 package gaiasky.interafce;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
+import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnProgressBar;
 
 public class LoadProgressInterface extends TableGuiInterface implements IObserver {
+    private static int MAX_PROGRESS_BARS = 5;
 
-    private OwnProgressBar progress;
+    private ObjectMap<String, OwnProgressBar> progress;
+    private Skin skin;
+    private VerticalGroup stack;
+    private float width;
 
     public LoadProgressInterface(float width, Skin skin) {
         super(skin);
-        build(width, skin);
+        progress = new ObjectMap<>(10);
+        this.skin = skin;
+        this.stack = new VerticalGroup();
+        this.width = width;
+        add(this.stack).center();
         EventManager.instance.subscribe(this, Events.UPDATE_LOAD_PROGRESS);
-    }
-
-    private void build(float width, Skin skin){
-        progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
-        progress.setValue(0);
-        progress.setPrefHeight(16f);
-        progress.setPrefWidth(width);
-        add(progress);
     }
 
     @Override
@@ -39,15 +41,32 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
 
     @Override
     public void notify(Events event, Object... data) {
-        switch(event){
-        case UPDATE_LOAD_PROGRESS:
-            float val = (Float) data[0];
-            if(progress != null)
-                progress.setValue(val * 100f);
-            break;
-        default:
-            break;
-        }
+        if (event == Events.UPDATE_LOAD_PROGRESS) {
+            String name = (String) data[0];
+            float val = (Float) data[1];
 
+            OwnProgressBar p = null;
+            if (!progress.containsKey(name) && val < 1f) {
+                if(progress.size < MAX_PROGRESS_BARS) {
+                    p = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "small-horizontal");
+                    p.setTitle(name, skin);
+                    p.setPrefWidth(width);
+                    progress.put(name, p);
+                    this.stack.addActor(p);
+                    this.pack();
+                }
+            } else {
+                p = progress.get(name);
+            }
+            if(p != null) {
+                p.setValue(val * 100f);
+                if (val >= 1) {
+                    p.setVisible(false);
+                    progress.remove(name);
+                    this.stack.removeActor(p, true);
+                    this.pack();
+                }
+            }
+        }
     }
 }

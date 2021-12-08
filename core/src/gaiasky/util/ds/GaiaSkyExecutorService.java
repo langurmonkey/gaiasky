@@ -14,8 +14,8 @@ import java.util.concurrent.*;
 /**
  * Contains the infrastructure to run tasks that sort and update the dataset metadata.
  */
-public class DatasetUpdater {
-    private static final Logger.Log logger = Logger.getLogger(DatasetUpdater.class);
+public class GaiaSkyExecutorService {
+    private static final Logger.Log logger = Logger.getLogger(GaiaSkyExecutorService.class);
 
     private static class DaemonThreadFactory implements ThreadFactory {
         private int sequence = 0;
@@ -36,14 +36,14 @@ public class DatasetUpdater {
     private ThreadPoolExecutor pool;
     private BlockingQueue<Runnable> workQueue;
 
-    public DatasetUpdater() {
+    public GaiaSkyExecutorService() {
         super();
         initialize();
     }
 
     public void initialize() {
         workQueue = new LinkedBlockingQueue<>();
-        int nThreads = !Settings.settings.performance.multithreading ? 1 : Math.max(1, Settings.settings.performance.getNumberOfThreads() - 1);
+        int nThreads = !Settings.settings.performance.multithreading ? 1 : Math.max(1, Settings.settings.performance.getNumberOfThreads() + 1);
         pool = new ThreadPoolExecutor(nThreads, nThreads, 5, TimeUnit.SECONDS, workQueue);
         pool.setThreadFactory(new DaemonThreadFactory());
     }
