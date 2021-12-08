@@ -268,7 +268,7 @@ public class AtmosphereComponent extends NamedComponent {
         Random rand = new Random(seed);
         // Size
         double sizeKm = size * Constants.U_TO_KM;
-        setSize(sizeKm + gaussian(rand, 130.0, 30.0, 100.0));
+        setSize(sizeKm + gaussian(rand, 120.0, 10.0, 100.0, 150.0));
         // Wavelengths
         setWavelengths(new double[] { gaussian(rand, 0.6, 0.1), gaussian(rand, 0.54, 0.1), gaussian(rand, 0.45, 0.1) });
         // Kr
@@ -282,7 +282,7 @@ public class AtmosphereComponent extends NamedComponent {
         // Fog color
         setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
         // Params
-        setParams(createModelParameters(600L, 2.0, true));
+        setParams(createModelParameters(600L, 1.0, true));
     }
 
 

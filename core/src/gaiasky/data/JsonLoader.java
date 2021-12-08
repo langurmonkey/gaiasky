@@ -284,7 +284,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
 
     /**
      * Searches for the given method with the given class. If none is found, it looks for fitting methods
-     * with the classe's interfaces and superclasses recursively.
+     * with the class' interfaces and superclasses recursively.
      *
      * @param methodName The method name.
      * @param clazz The class.

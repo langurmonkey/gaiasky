@@ -33,6 +33,7 @@ public class NoiseComponent extends NamedComponent {
     public double power = 1.0;
     public int octaves = 4;
     public double frequency = 2.34;
+    public double lacunarity = 2.0;
     public double[] range = new double[] { 0.0, 1.0 };
     public BasisType type = BasisType.SIMPLEX;
     public FractalType fractalType = FractalType.RIDGEMULTI;
@@ -51,6 +52,7 @@ public class NoiseComponent extends NamedComponent {
         fractal.setAllSourceInterpolationTypes(InterpolationType.CUBIC);
         fractal.setNumOctaves(octaves);
         fractal.setFrequency(frequency);
+        fractal.setLacunarity(lacunarity);
         fractal.setType(fractalType);
         fractal.setSeed(seed);
 
@@ -217,6 +219,10 @@ public class NoiseComponent extends NamedComponent {
         this.frequency = frequency;
     }
 
+    public void setLacunarity(Double lacunarity) {
+        this.lacunarity = lacunarity;
+    }
+
     public void setPower(Double power) {
         this.power = power;
     }
@@ -235,6 +241,7 @@ public class NoiseComponent extends NamedComponent {
         this.type = other.type;
         this.fractalType = other.fractalType;
         this.frequency = other.frequency;
+        this.lacunarity = other.lacunarity;
         this.octaves = other.octaves;
         this.range = Arrays.copyOf(other.range, other.scale.length);
         this.power = other.power;
@@ -264,7 +271,9 @@ public class NoiseComponent extends NamedComponent {
         // Fractal type
         setFractaltype(ModuleFractal.FractalType.values()[rand.nextInt(6)].name());
         // Frequency
-        setFrequency(gaussian(rand, 2.5, 5.0, 1.0));
+        setFrequency(gaussian(rand, 2.5, 5.0, 0.1));
+        // Lacunarity
+        setLacunarity(gaussian(rand, 2.0, 5.0, 0.1));
         // Octaves [1,9]
         setOctaves(Math.abs(rand.nextLong()) % 8 + 1L);
         // Range

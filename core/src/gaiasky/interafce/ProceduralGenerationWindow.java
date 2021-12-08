@@ -366,6 +366,21 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         content.add(frequency).colspan(2).left().padBottom(pad10).padRight(pad5);
         content.add(frequencyTooltip).left().padBottom(pad10).row();
 
+        // Lacunarity
+        OwnSliderPlus lacunarity = new OwnSliderPlus(I18n.txt("gui.procedural.lacunarity"), 0.1f, 15.0f, 0.1f, skin);
+        lacunarity.setWidth(fieldWidthAll);
+        lacunarity.setValue((float) nc.lacunarity);
+        lacunarity.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                nc.lacunarity = lacunarity.getMappedValue();
+            }
+        });
+        OwnImageButton lacunarityTooltip = new OwnImageButton(skin, "tooltip");
+        lacunarityTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.procedural.info.lacunarity"), skin));
+        content.add(lacunarity).colspan(2).left().padBottom(pad10).padRight(pad5);
+        content.add(lacunarityTooltip).left().padBottom(pad10).row();
+
         // Octaves
         OwnSliderPlus octaves = new OwnSliderPlus(I18n.txt("gui.procedural.octaves"), 1, 9, 1, skin);
         octaves.setWidth(fieldWidthAll);
