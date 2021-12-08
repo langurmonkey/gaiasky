@@ -106,13 +106,13 @@ public class NoiseComponent extends NamedComponent {
         double phi = piOverTwo * -1.0;
         int y = 0;
 
-        double theta_step = piTimesTwo / N;
+        double thetaStep = piTimesTwo / N;
         while (phi <= piOverTwo) {
             final double cosPhi = Math.cos(phi);
             final double sinPhi = Math.sin(phi);
             final int yf = y;
             IntStream.range(0, N).parallel().forEach(x -> {
-                double theta = x * theta_step;
+                double theta = x * thetaStep;
                 double n = 0;
                 int idx = x % N_GEN;
                 if (baseNoise[idx] != null) {
@@ -145,18 +145,18 @@ public class NoiseComponent extends NamedComponent {
         float[][] moisture = new float[N][M];
 
         // Sample 3D noise using spherical coordinates on the surface of the sphere
-        float pi_times_two = (float) (2 * Math.PI);
-        float pi_div_two = (float) (Math.PI / 2.0f);
-        float phi = pi_div_two * -1.0f;
+        float piTimesTwo = (float) (2 * Math.PI);
+        float piDivTwo = (float) (Math.PI / 2.0f);
+        float phi = piDivTwo * -1.0f;
         int y = 0;
 
-        float theta_step = pi_times_two / N;
-        while (phi <= pi_div_two) {
+        float thetaStep = piTimesTwo / N;
+        while (phi <= piDivTwo) {
             final double cosPhi = Math.cos(phi);
             final double sinPhi = Math.sin(phi);
             final int yf = y;
             IntStream.range(0, N).parallel().forEach(x -> {
-                float theta = x * theta_step;
+                float theta = x * thetaStep;
                 double n, m;
                 synchronized (baseNoise[x % N_GEN]) {
                     n = baseNoise[x % N_GEN].get(cosPhi * Math.cos(theta), cosPhi * Math.sin(theta), sinPhi);
