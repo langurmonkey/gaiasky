@@ -188,7 +188,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -207,7 +206,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -377,7 +375,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
                 long start = TimeUtils.millis();
-                logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), Integer.toString(N), Integer.toString(M)));
+                GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), Integer.toString(N), Integer.toString(M))));
 
                 Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.surface"), name));
                 float[][] elevationData = trio.getFirst();
@@ -525,7 +523,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     });
                 }
                 long elapsed = TimeUtils.millis() - start;
-                logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), Double.toString(elapsed / 1000d)));
+                GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), Double.toString(elapsed / 1000d))));
 
                 // End
                 EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, false);
@@ -534,10 +532,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     private void initializeElevationData(Texture tex) {
-        Thread t = new Thread(() -> {
+        GaiaSky.instance.getExecutorService().execute(() -> {
             // Construct RAM height map from texture
             String heightUnpacked = GlobalResources.unpackAssetPath(height);
-            logger.info("Constructing elevation data from texture: " + heightUnpacked);
+            GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
             Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
             float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
             for (int i = 0; i < heightPixmap.getWidth(); i++) {
@@ -553,7 +551,6 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 addHeightTex(tex);
             });
         });
-        t.start();
     }
 
     private void removeElevationData() {
