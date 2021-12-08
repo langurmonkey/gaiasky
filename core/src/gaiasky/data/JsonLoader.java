@@ -149,7 +149,6 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         value = attribute.asIntArray();
                         break;
                     case object:
-                        // TransformComponent
                         valueClass = Object[].class;
                         value = new Object[attribute.size];
                         JsonValue vectorattrib = attribute.child;
@@ -163,7 +162,7 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         }
                         break;
                     case array:
-                        // Multidim array
+                        // Multi-dim array
                         Pair<Object, Class> p = toMultidimDoubleArray(attribute);
                         value = p.getFirst();
                         valueClass = p.getSecond();

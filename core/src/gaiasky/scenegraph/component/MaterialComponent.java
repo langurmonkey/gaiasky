@@ -377,7 +377,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
                 long start = TimeUtils.millis();
-                logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), N, M));
+                logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), Integer.toString(N), Integer.toString(M)));
 
                 Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.surface"), name));
                 float[][] elevationData = trio.getFirst();
@@ -525,7 +525,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                     });
                 }
                 long elapsed = TimeUtils.millis() - start;
-                logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), elapsed / 1000d));
+                logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), Double.toString(elapsed / 1000d)));
 
                 // End
                 EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, false);
