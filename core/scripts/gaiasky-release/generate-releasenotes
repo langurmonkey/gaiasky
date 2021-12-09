@@ -18,6 +18,4 @@ VERS=$1
 OUTPUT=$2
 
 # Use regexp to only include full versions (e.g. exclude release candidates)
-git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $VERS
-
-echo "File saved to $OUTPUT"
+git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $VERS && echo "File saved to $OUTPUT"
