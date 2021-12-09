@@ -377,6 +377,11 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 long start = TimeUtils.millis();
                 GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.surface"), Integer.toString(N), Integer.toString(M))));
 
+                if (nc == null) {
+                    nc = new NoiseComponent();
+                    Random noiseRandom = new Random();
+                    nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
+                }
                 Trio<float[][], float[][], Pixmap> trio = nc.generateElevation(N, M, heightScale, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.surface"), name));
                 float[][] elevationData = trio.getFirst();
                 float[][] moistureData = trio.getSecond();

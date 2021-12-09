@@ -206,6 +206,11 @@ public class CloudComponent extends NamedComponent implements IObserver {
                 long start = TimeUtils.millis();
                 GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.generate", I18n.txt("gui.procedural.cloud"), N, M)));
 
+                if (nc == null) {
+                    nc = new NoiseComponent();
+                    Random noiseRandom = new Random();
+                    nc.randomizeAll(noiseRandom, noiseRandom.nextBoolean(), true);
+                }
                 Pixmap cloudPixmap = nc.generateData(N, M, color, I18n.txt("gui.procedural.progress", I18n.txt("gui.procedural.cloud"), name));
                 // Write to disk if necessary
                 if (Settings.settings.program.saveProceduralTextures) {
