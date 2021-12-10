@@ -37,6 +37,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -182,10 +183,13 @@ public class Orbit extends Polyline {
         super.updateLocal(time, camera);
         // Completion
         if (pointCloudData != null) {
-            long now = time.getTime().getEpochSecond();
-            long t0 = pointCloudData.time.get(0).getEpochSecond();
-            long t1 = pointCloudData.time.get(pointCloudData.getNumPoints() - 1).getEpochSecond();
-            coord = (double) (now - t0) / (double) (t1 - t0);
+            long now = time.getTime().toEpochMilli();
+            long t0 = pointCloudData.time.get(0).toEpochMilli();
+            long t1 = pointCloudData.time.get(pointCloudData.getNumPoints() - 1).toEpochMilli();
+
+            long t1t0 = t1 - t0;
+            long nowt0 = now - t0;
+            this.coord = ((double) nowt0 /  (double) t1t0) % 1d;
         }
 
         if (!onlyBody)

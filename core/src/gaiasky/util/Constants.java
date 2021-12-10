@@ -139,10 +139,10 @@ public class Constants {
         AU_TO_U = Nature.AU_TO_KM * KM_TO_U;
         U_TO_AU = 1d / AU_TO_U;
         PC_TO_U = Nature.PC_TO_KM * KM_TO_U;
-        KPC_TO_U = PC_TO_U * 1000d;
-        MPC_TO_U = KPC_TO_U * 1000d;
         U_TO_PC = 1d / PC_TO_U;
+        KPC_TO_U = PC_TO_U * 1000d;
         U_TO_KPC = U_TO_PC / 1000d;
+        MPC_TO_U = KPC_TO_U * 1000d;
         C_US = C * M_TO_U;
         Ro_TO_U = Ro_TO_KM * KM_TO_U;
         U_TO_Ro = 1d / Ro_TO_U;

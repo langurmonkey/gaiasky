@@ -139,7 +139,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
                 // Close loop
                 if (renderable.isClosedLoop()) {
-                    coord(1f );
+                    coord(1f);
                     color(cc[0], cc[1], cc[2], 1.0);
                     vertex((float) od.getX(0), (float) od.getY(0), (float) od.getZ(0));
                 }
@@ -167,7 +167,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             shaderProgram.setUniformMatrix("u_worldTransform", renderable.getLocalTransform());
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
-            shaderProgram.setUniformf("u_coordPos", renderable instanceof Orbit ? (float) ((Orbit)renderable).coord : 1f);
+            shaderProgram.setUniformf("u_coordPos", renderable instanceof Orbit ? (float) ((Orbit) renderable).coord : 1f);
             if (renderable.getParent() != null) {
                 Vector3d urp = renderable.getParent().getUnrotatedPos();
                 if (urp != null)
@@ -185,7 +185,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         });
     }
 
-    private void coord(float value){
+    private void coord(float value) {
         curr.vertices[curr.vertexIdx + coordOffset] = value;
     }
 
