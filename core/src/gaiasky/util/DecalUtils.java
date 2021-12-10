@@ -6,6 +6,7 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -14,6 +15,7 @@ import gaiasky.render.RenderingContext;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.gdx.g2d.BitmapFont;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.math.Vector3d;
 
 /**
@@ -32,6 +34,55 @@ public class DecalUtils {
         idt = new Matrix4();
         aux1 = new Matrix4();
         aux2 = new Matrix4();
+    }
+
+    /**
+     * Draws the given sprite using the given font in the given 3D position using
+     * the 3D coordinate space. If faceCamera is true, the sprite is rendered
+     * always facing the camera. It assumes that {@link ExtSpriteBatch#begin()} has
+     * been called. This enables 3D techniques such as z-buffering to be applied
+     * to the text textures.
+     *
+     * @param sprite           The sprite.
+     * @param batch          The sprite batch to use.
+     * @param x              The x coordinate.
+     * @param y              The y coordinate.
+     * @param z              The z coordinate.
+     * @param size           The scale of the sprite.
+     * @param rotationCenter Angles to rotate around center.
+     * @param cam         The camera.
+     * @param faceCamera     Whether to apply bill-boarding.
+     * @param minSizeDegrees Minimum visual size of the text in degrees. Zero or negative to disable.
+     * @param maxSizeDegrees Maximum visual size of the text in degrees. Zero or negative to disable.
+     */
+    public static void drawSprite(Sprite sprite, SpriteBatch batch, float x, float y, float z, double size, float rotationCenter, ICamera cam, boolean faceCamera, float minSizeDegrees, float maxSizeDegrees) {
+        sprite.setPosition(0, 0);
+        sprite.setCenter(0, 0);
+        // Store batch matrices
+        aux1.set(batch.getTransformMatrix());
+        aux2.set(batch.getProjectionMatrix());
+
+
+        Camera camera = cam.getCamera();
+        Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
+
+        if (minSizeDegrees > 0 || maxSizeDegrees > 0) {
+            double dist = camera.position.dst(tmp3.set(x, y, z));
+            double minsize = minSizeDegrees > 0 ? Math.tan(Math.toRadians(minSizeDegrees)) * dist : 0d;
+            double maxsize = maxSizeDegrees > 0 ? Math.tan(Math.toRadians(maxSizeDegrees)) * dist : 1e20d;
+            size = MathUtils.clamp(size, (float) minsize, (float) maxsize);
+        }
+
+        float sizeF = (float) size;
+        batch.getTransformMatrix().set(camera.combined).translate(x, y, z).rotate(rotation).rotate(0, 1, 0, 180).rotate(0, 0, 1, rotationCenter).scale(sizeF, sizeF, sizeF);
+        // Force matrices to be set to shader
+        batch.setProjectionMatrix(idt);
+
+        sprite.draw(batch);
+
+        // Restore batch matrices
+        batch.setTransformMatrix(aux1);
+        batch.setProjectionMatrix(aux2);
     }
 
     /**

@@ -15,7 +15,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -36,6 +35,7 @@ import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections.CubemapProjection;
+import gaiasky.util.gdx.g2d.Sprite;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
@@ -248,11 +248,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     private SpriteBatch spriteBatch;
     private ShapeRenderer shapeRenderer;
-    private Texture crosshairFocus;
-    private Texture crosshairClosest;
-    private Texture crosshairHome;
-    private Texture crosshairArrow;
-    private Texture gravWaveCrosshair;
+
+    private Sprite spriteFocus, spriteClosest, spriteHome;
+    private Texture crosshairArrow, gravWaveCrosshair;
 
     public NaturalCamera(AssetManager assetManager, CameraManager parent, boolean vr, ShaderProgram spriteShader, ShaderProgram shapeShader) {
         super(parent);
@@ -337,16 +335,19 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         spriteBatch = new SpriteBatch(50, spriteShader);
 
         // Focus crosshair
-        crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));
+        Texture crosshairFocus = new Texture(Gdx.files.internal("img/crosshair-focus.png"));
         crosshairFocus.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        spriteFocus = new Sprite(crosshairFocus);
 
         // Closest crosshair
-        crosshairClosest = new Texture(Gdx.files.internal("img/crosshair-closest.png"));
+        Texture crosshairClosest = new Texture(Gdx.files.internal("img/crosshair-closest.png"));
         crosshairClosest.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        spriteClosest = new Sprite(crosshairClosest);
 
         // Home crosshair
-        crosshairHome = new Texture(Gdx.files.internal("img/crosshair-home.png"));
+        Texture crosshairHome = new Texture(Gdx.files.internal("img/crosshair-home.png"));
         crosshairHome.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+        spriteHome = new Sprite(crosshairHome);
 
         // Arrow crosshair
         crosshairArrow = new Texture(Gdx.files.internal("img/crosshair-arrow.png"));
@@ -1684,7 +1685,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
     @Override
     public void render(int rw, int rh) {
-        boolean draw = !Settings.settings.program.modeCubemap.active && !Settings.settings.program.modeStereo.active && !Settings.settings.postprocess.fisheye;
 
         // Pointer guides
         if (Settings.settings.program.pointer.guides.active) {
@@ -1702,61 +1702,78 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
         spriteBatch.begin();
 
-        // Renders crosshair if focus mode
-        if (draw) {
-            // Mark home in ORANGE
-            if (Settings.settings.scene.crosshair.home) {
-                if (home == null && GaiaSky.instance.sceneGraph != null)
-                    home = GaiaSky.instance.sceneGraph.findFocus(Settings.settings.scene.homeObject);
-                if (home != null) {
-                    drawCrosshair(home, false, crosshairHome, crosshairArrow, rw, rh, 1f, 0.7f, 0.1f, 1f);
-                }
+        boolean decal = Settings.settings.program.modeCubemap.active || Settings.settings.program.modeStereo.active || Settings.settings.postprocess.fisheye || Settings.settings.runtime.openVr;
+        float chScale = 1f;
+        if(Settings.settings.program.modeCubemap.active) {
+            chScale = 4f;
+        } else if(Settings.settings.postprocess.fisheye) {
+            chScale = 2f;
+        }
+        // Mark home in ORANGE
+        if (Settings.settings.scene.crosshair.home) {
+            if (home == null && GaiaSky.instance.sceneGraph != null)
+                home = GaiaSky.instance.sceneGraph.findFocus(Settings.settings.scene.homeObject);
+            if (home != null) {
+                drawCrosshair(spriteBatch, home, decal, false, spriteHome, crosshairArrow, chScale, rw, rh, 1f, 0.7f, 0.1f, 1f);
             }
+        }
 
-            // Mark closest object in BLUE
-            if (Settings.settings.scene.crosshair.closest && closest != null) {
-                drawCrosshair(closest, false, crosshairClosest, crosshairArrow, rw, rh, 0.3f, 0.5f, 1f, 1f);
-            }
+        // Mark closest object in BLUE
+        if (Settings.settings.scene.crosshair.closest && closest != null) {
+            drawCrosshair(spriteBatch, closest, decal, false, spriteClosest, crosshairArrow, chScale, rw, rh, 0.3f, 0.5f, 1f, 1f);
+        }
 
-            // Mark the focus in GREEN
-            if (Settings.settings.scene.crosshair.focus && getMode().isFocus()) {
-                // Green, focus mode
-                drawCrosshair(focus, true, crosshairFocus, crosshairArrow, rw, rh, 0.2f, 1f, 0.4f, 1f);
-            }
+        // Mark the focus in GREEN
+        if (Settings.settings.scene.crosshair.focus && getMode().isFocus()) {
+            // Green, focus mode
+            drawCrosshair(spriteBatch, focus, decal, true, spriteFocus, crosshairArrow, chScale, rw, rh, 0.2f, 1f, 0.4f, 1f);
+        }
 
-            // Gravitational waves crosshair
-            if (Settings.settings.runtime.gravitationalWaves) {
-                RelativisticEffectsManager gw = RelativisticEffectsManager.getInstance();
+        // Gravitational waves crosshair
+        if (Settings.settings.runtime.gravitationalWaves) {
+            RelativisticEffectsManager gw = RelativisticEffectsManager.getInstance();
 
-                float chw = gravWaveCrosshair.getWidth();
-                float chh = gravWaveCrosshair.getHeight();
-                float chw2 = chw / 2;
-                float chh2 = chh / 2;
+            float chw = gravWaveCrosshair.getWidth();
+            float chh = gravWaveCrosshair.getHeight();
+            float chw2 = chw / 2;
+            float chh2 = chh / 2;
 
-                aux1.set(gw.gw).nor().scl(1e12).add(posinv);
+            aux1.set(gw.gw).nor().scl(1e12).add(posinv);
 
-                GlobalResources.applyRelativisticAberration(aux1, this);
-                // GravitationalWavesManager.instance().gravitationalWavePos(aux1);
+            GlobalResources.applyRelativisticAberration(aux1, this);
+            // GravitationalWavesManager.instance().gravitationalWavePos(aux1);
 
-                boolean inside = projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
+            boolean inside = projectToScreen(aux1, auxf1, rw, rh, chw, chh, chw2, chh2);
 
-                if (inside) {
-                    // Cyan
-                    spriteBatch.setColor(0, 1, 1, 1);
-                    spriteBatch.draw(gravWaveCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
-                }
+            if (inside) {
+                // Cyan
+                spriteBatch.setColor(0, 1, 1, 1);
+                spriteBatch.draw(gravWaveCrosshair, auxf1.x - chw2, auxf1.y - chh2, chw, chh);
             }
         }
 
         spriteBatch.end();
     }
 
-    private void drawCrosshair(IFocus chFocus, boolean focusMode, Texture crosshairTex, Texture arrowTex, int rw, int rh, float r, float g, float b, float a) {
+    private void drawCrosshairDecal(SpriteBatch batch, IFocus chFocus, Sprite sprite, float r, float g, float b, float a) {
+        sprite.setColor(r, g, b, a);
+        Vector3b p = chFocus.getClosestAbsolutePos(aux1b).add(posinv);
+        Vector3d pos = aux5;
+        p.put(pos);
+        DecalUtils.drawSprite(sprite, batch, (float) pos.x, (float) pos.y, (float) pos.z, 0.0008d, 1f, this, true, 0.04f, 0.04f);
+    }
+
+    private void drawCrosshair(SpriteBatch batch, IFocus chFocus, boolean decal, boolean focusMode, Sprite crosshairSprite, Texture arrowTex, float crosshairScale, int rw, int rh, float r, float g, float b, float a) {
         if (chFocus != null) {
-            if (!focusMode) {
-                drawCrosshair(chFocus.getClosestAbsolutePos(aux1b).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
+            if (decal) {
+                crosshairSprite.setScale(crosshairScale);
+                drawCrosshairDecal(batch, chFocus, crosshairSprite, r, g, b, a);
             } else {
-                drawCrosshair(chFocus.getAbsolutePosition(aux1b).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairTex, arrowTex, rw, rh, r, g, b, a);
+                if (!focusMode) {
+                    drawCrosshair(chFocus.getClosestAbsolutePos(aux1b).add(posinv), chFocus.getClosestDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex, rw, rh, r, g, b, a);
+                } else {
+                    drawCrosshair(chFocus.getAbsolutePosition(aux1b).add(posinv), chFocus.getDistToCamera(), chFocus.getRadius(), crosshairSprite.getTexture(), arrowTex, rw, rh, r, g, b, a);
+                }
             }
         }
     }
