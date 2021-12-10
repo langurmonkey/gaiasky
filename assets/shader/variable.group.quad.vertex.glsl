@@ -49,11 +49,11 @@ out vec4 v_col;
 out vec2 v_uv;
 
 #ifdef relativisticEffects
-    #include shader/lib_relativity.glsl
+#include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
 #ifdef gravitationalWaves
-    #include shader/lib_gravwaves.glsl
+#include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
 #define LEN0 20000.0

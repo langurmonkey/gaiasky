@@ -5,6 +5,7 @@
 
 package gaiasky.render.system;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
@@ -27,24 +28,28 @@ import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import org.lwjgl.opengl.GL30;
 
 /**
  * Renders variable stars which have periodical light curve data
  */
 public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
+    private final double BRIGHTNESS_FACTOR;
+
     private final Vector3 aux1;
     private int nVariOffset, variMagsOffset, variTimesOffset, pmOffset;
-    private float[] pointAlpha;
-    private final float[] alphaSizeBr;
-    private final float[] pointAlphaHl;
+    private float[] opacityLimits;
+    private final float[] alphaSizeBrRc;
+    private final float[] opacityLimitsHl;
     private final Colormap cmap;
 
     private Texture starTex;
 
     public VariableGroupPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
-        this.alphaSizeBr = new float[3];
-        this.pointAlphaHl = new float[] { 2, 4 };
+        BRIGHTNESS_FACTOR = 10;
+        this.alphaSizeBrRc = new float[4];
+        this.opacityLimitsHl = new float[] { 2, 4 };
         this.aux1 = new Vector3();
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
@@ -59,7 +64,10 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
 
     @Override
     protected void initShaderProgram() {
-        pointAlpha = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
+        Gdx.gl.glEnable(GL30.GL_POINT_SPRITE);
+        Gdx.gl.glEnable(GL30.GL_VERTEX_PROGRAM_POINT_SIZE);
+
+        opacityLimits = new float[] { Settings.settings.scene.star.opacity[0], Settings.settings.scene.star.opacity[1] };
 
         ExtShaderProgram shaderProgram = getShaderProgram();
         shaderProgram.begin();
@@ -109,7 +117,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
             shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
             shaderProgram.setUniformf("u_camDir", camera.getCamera().direction);
             shaderProgram.setUniformi("u_cubemap", Settings.settings.program.modeCubemap.active ? 1 : 0);
-            shaderProgram.setUniformf("u_brPow", Settings.settings.scene.star.power);
+            shaderProgram.setUniformf("u_brightnessPower", Settings.settings.scene.star.power);
             shaderProgram.setUniformf("u_ar", Settings.settings.program.modeStereo.isStereoHalfWidth() ? 2f : 1f);
             addEffectsUniforms(shaderProgram, camera);
             // Update projection if fovMode is 3
@@ -121,15 +129,15 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                 PerspectiveCamera[] cams = camera.getFrontCameras();
                 shaderProgram.setUniformMatrix("u_projView", cams[cam.dirIndex].combined);
             }
-            alphaSizeBr[2] = Settings.settings.scene.star.brightness;
-            shaderProgram.setUniformf("u_brightnessPower", ((Settings.settings.scene.star.power/1.1f) - 0.1f) * 2.0f - 1.0f);
+            alphaSizeBrRc[2] = (float) (Settings.settings.scene.star.brightness * BRIGHTNESS_FACTOR);
+            alphaSizeBrRc[3] = rc.scaleFactor;
 
             renderables.forEach(r -> {
                 final StarGroup starGroup = (StarGroup) r;
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                        if (!starGroup.inGpu() ) {
+                        if (!starGroup.inGpu()) {
                             int n = starGroup.size();
                             starGroup.offset = addMeshData(n);
                             curr = meshes.get(starGroup.offset);
@@ -195,11 +203,11 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                                 shaderProgram.setUniformi("u_starTex", 0);
                             }
 
-                            shaderProgram.setUniform2fv("u_pointAlpha", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? pointAlphaHl : pointAlpha, 0, 2);
+                            shaderProgram.setUniform2fv("u_opacityLimits", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? opacityLimitsHl : opacityLimits, 0, 2);
 
-                            alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeBr[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) * 0.3f;
-                            shaderProgram.setUniform3fv("u_alphaSizeBr", alphaSizeBr, 0, 3);
+                            alphaSizeBrRc[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
+                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
+                            shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Days since epoch
                             // Emulate double with floats, for compatibility
@@ -218,7 +226,6 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                         }
                     }
                 }
-
             });
             shaderProgram.end();
         }
@@ -250,7 +257,7 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
     @Override
     public void notify(final Events event, final Object... data) {
         switch (event) {
-        case STAR_MIN_OPACITY_CMD -> pointAlpha[0] = (float) data[0];
+        case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case DISPOSE_VARIABLE_GROUP_GPU_MESH -> {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);

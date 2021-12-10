@@ -5,7 +5,7 @@
 #include shader/lib_doublefloat.glsl
 
 // UNIFORMS
-// time in days since epoch, as a 64-bit double encoded with two floats
+// time in julian days since epoch, as a 64-bit double encoded with two floats
 uniform vec2 u_t;
 uniform mat4 u_projView;
 uniform vec3 u_camPos;
@@ -70,13 +70,13 @@ void main() {
     float dist = length(pos);
 
     float cubemapFactor = 1.0;
-    if(u_cubemap == 1) {
+    if (u_cubemap == 1) {
         // Cosine of angle between star position and camera direction
         // Correct point primitive size error due to perspective projection
         float cosphi = pow(dot(u_camDir, pos) / dist, 2.0);
         cubemapFactor = 1.0 - cosphi * 0.65;
     }
-    
+
     #ifdef relativisticEffects
     	pos = computeRelativisticAberration(pos, dist, u_velDir, u_vc);
     #endif // relativisticEffects
@@ -98,7 +98,7 @@ void main() {
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);
     #endif
 
-    if(dist < l0){
+    if (dist < l0){
         // The pixels of this star will be discarded in the fragment shader
         v_col = vec4(0.0, 0.0, 0.0, 0.0);
     }
