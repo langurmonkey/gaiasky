@@ -91,7 +91,7 @@ vec3 calcNormal(vec2 p, vec2 dp){
 // maps the height scale in internal units to a normal strength
 float computeNormalStrength(float heightScale){
     // to [0,100] km
-    vec2 heightSpanKm = vec2(0.0, 80.0);
+    vec2 heightSpanKm = vec2(0.0, 100.0);
     vec2 span = vec2(0.2, 1.0);
     heightScale *= u_vrScale * 1e6;
     heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);

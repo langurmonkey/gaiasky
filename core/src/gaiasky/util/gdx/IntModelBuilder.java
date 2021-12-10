@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -43,7 +43,7 @@ import gaiasky.util.gdx.model.IntNodePart;
  * to add a part within a node. The
  * {@link #part(String, int, VertexAttributes, Material)} method will return a
  * {@link IntMeshPartBuilder} which can be used to build the node part.
- * 
+ *
  * @author Xoppa
  */
 public class IntModelBuilder {
@@ -75,9 +75,9 @@ public class IntModelBuilder {
 
     /**
      * End building the model.
-     * 
+     *
      * @return The newly created model. Call the {@link IntModel#dispose()} method
-     *         when no longer used.
+     * when no longer used.
      */
     public IntModel end() {
         if (model == null)
@@ -119,7 +119,7 @@ public class IntModelBuilder {
     /**
      * Add a node to the model. Use any of the part(...) method to add a
      * NodePart.
-     * 
+     *
      * @return The node being created.
      */
     public IntNode node() {
@@ -133,7 +133,7 @@ public class IntModelBuilder {
      * Adds the nodes of the specified model to a new node of the model being
      * build. After this method the given model can no longer be used. Do not
      * call the {@link IntModel#dispose()} method on that model.
-     * 
+     *
      * @return The newly created node containing the nodes of the given model.
      */
     public IntNode node(final String id, final IntModel model) {
@@ -173,7 +173,7 @@ public class IntModelBuilder {
      * managed by the model and disposed when the model is disposed. The
      * resources the Material might contain are not managed, use
      * {@link #manage(Disposable)} to add those to the model.
-     * 
+     *
      * @return The added IntMeshPart.
      */
     public IntMeshPart part(final String id, final IntMesh mesh, int primitiveType, int offset, int size, final Material material) {
@@ -192,7 +192,7 @@ public class IntModelBuilder {
      * managed by the model and disposed when the model is disposed. The
      * resources the Material might contain are not managed, use
      * {@link #manage(Disposable)} to add those to the model.
-     * 
+     *
      * @return The added IntMeshPart.
      */
     public IntMeshPart part(final String id, final IntMesh mesh, int primitiveType, final Material material) {
@@ -206,7 +206,7 @@ public class IntModelBuilder {
      * reused, to reduce the number of mesh binds. Therefore you can only build
      * one part at a time. The resources the Material might contain are not
      * managed, use {@link #manage(Disposable)} to add those to the model.
-     * 
+     *
      * @return The {@link IntMeshPartBuilder} you can use to build the IntMeshPart.
      */
     public IntMeshPartBuilder part(final String id, int primitiveType, final VertexAttributes attributes, final Material material) {
@@ -222,11 +222,10 @@ public class IntModelBuilder {
      * reused, to reduce the number of mesh binds. Therefore you can only build
      * one part at a time. The resources the Material might contain are not
      * managed, use {@link #manage(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      * @return The {@link IntMeshPartBuilder} you can use to build the IntMeshPart.
      */
     public IntMeshPartBuilder part(final String id, int primitiveType, final long attributes, final Material material) {
@@ -237,11 +236,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a box
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createBox(float width, float height, float depth, final Material material, final long attributes) {
         return createBox(width, height, depth, GL20.GL_TRIANGLES, material, attributes);
@@ -251,11 +249,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a box
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createBox(float width, float height, float depth, int primitiveType, final Material material, final long attributes) {
         begin();
@@ -268,11 +265,10 @@ public class IntModelBuilder {
      * rectangle shape. The resources the Material might contain are not
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createRect(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, final Material material, final long attributes) {
         return createRect(x00, y00, z00, x10, y10, z10, x11, y11, z11, x01, y01, z01, normalX, normalY, normalZ, GL20.GL_TRIANGLES, material, attributes);
@@ -283,11 +279,10 @@ public class IntModelBuilder {
      * rectangle shape. The resources the Material might contain are not
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createRect(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, float normalX, float normalY, float normalZ, int primitiveType, final Material material, final long attributes) {
         begin();
@@ -299,11 +294,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * cylinder shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCylinder(float width, float height, float depth, int divisions, final Material material, final long attributes) {
         return createCylinder(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes);
@@ -313,11 +307,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * cylinder shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCylinder(float width, float height, float depth, int divisions, int primitiveType, final Material material, final long attributes) {
         return createCylinder(width, height, depth, divisions, primitiveType, material, attributes, 0, 360);
@@ -327,11 +320,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * cylinder shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCylinder(float width, float height, float depth, int divisions, final Material material, final long attributes, float angleFrom, float angleTo) {
         return createCylinder(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes, angleFrom, angleTo);
@@ -341,11 +333,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * cylinder shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCylinder(float width, float height, float depth, int divisions, int primitiveType, final Material material, final long attributes, float angleFrom, float angleTo) {
         begin();
@@ -357,11 +348,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a cone
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCone(float width, float height, float depth, int divisions, final Material material, final long attributes) {
         return createCone(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes);
@@ -371,11 +361,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a cone
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCone(float width, float height, float depth, int divisions, int primitiveType, final Material material, final long attributes) {
         return createCone(width, height, depth, divisions, primitiveType, material, attributes, 0, 360);
@@ -385,11 +374,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a cone
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCone(float width, float height, float depth, int divisions, int hdivisions, int primitiveType, final Material material, final long attributes) {
         return createCone(width, height, depth, divisions, hdivisions, primitiveType, material, attributes, 0, 360);
@@ -399,11 +387,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a cone
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCone(float width, float height, float depth, int divisions, final Material material, final long attributes, float angleFrom, float angleTo) {
         return createCone(width, height, depth, divisions, GL20.GL_TRIANGLES, material, attributes, angleFrom, angleTo);
@@ -413,11 +400,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a cone
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCone(float width, float height, float depth, int divisions, int primitiveType, final Material material, final long attributes, float angleFrom, float angleTo) {
         begin();
@@ -429,11 +415,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a cone
      * shape. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCone(float width, float height, float depth, int divisions, int hdivisions, int primitiveType, final Material material, final long attributes, float angleFrom, float angleTo) {
         begin();
@@ -445,11 +430,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, final Material material, final long attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, GL20.GL_TRIANGLES, material, attributes);
@@ -459,11 +443,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, int primitiveType, final Material material, final long attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, primitiveType, material, attributes, 0, 360, 0, 180);
@@ -473,11 +456,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, final Material material, final long attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         return createSphere(width, height, depth, divisionsU, divisionsV, GL20.GL_TRIANGLES, material, attributes, angleUFrom, angleUTo, angleVFrom, angleVTo);
@@ -487,11 +469,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, int primitiveType, final Material material, final long attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         begin();
@@ -503,11 +484,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * capsule shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCapsule(float radius, float height, int divisions, final Material material, final long attributes) {
         return createCapsule(radius, height, divisions, GL20.GL_TRIANGLES, material, attributes);
@@ -517,11 +497,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * capsule shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCapsule(float radius, float height, int divisions, int primitiveType, final Material material, final long attributes) {
         begin();
@@ -601,17 +580,13 @@ public class IntModelBuilder {
      * Convenience method to create a model with three orthonormal vectors
      * shapes. The resources the Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param axisLength
-     *            Length of each axis.
-     * @param capLength
-     *            is the height of the cap in percentage, must be in (0,1)
-     * @param stemThickness
-     *            is the percentage of stem diameter compared to cap diameter,
-     *            must be in (0,1]
-     * @param divisions
-     *            the amount of vertices used to generate the cap and stem
-     *            ellipsoidal bases
+     *
+     * @param axisLength    Length of each axis.
+     * @param capLength     is the height of the cap in percentage, must be in (0,1)
+     * @param stemThickness is the percentage of stem diameter compared to cap diameter,
+     *                      must be in (0,1]
+     * @param divisions     the amount of vertices used to generate the cap and stem
+     *                      ellipsoidal bases
      */
     public IntModel createXYZCoordinates(float axisLength, float capLength, float stemThickness, int divisions, int primitiveType, Material material, long attributes) {
         begin();
@@ -632,20 +607,40 @@ public class IntModelBuilder {
         return createXYZCoordinates(axisLength, 0.1f, 0.1f, 5, GL20.GL_TRIANGLES, material, attributes);
     }
 
+    public IntModel createPlane(float side, int divisionsU, int divisionsV, int primitiveType, Material material, long attributes) {
+        float hs = side / 2f;
+        IntMeshPartBuilder.VertexInfo vt00 = new IntMeshPartBuilder.VertexInfo();
+        vt00.setPos(-hs, 0, -hs);
+        vt00.setNor(0, -1, 0);
+        vt00.setUV(0, 0);
+        IntMeshPartBuilder.VertexInfo vt01 = new IntMeshPartBuilder.VertexInfo();
+        vt01.setPos(hs, 0, -hs);
+        vt01.setNor(0, -1, 0);
+        vt01.setUV(0, 1);
+        IntMeshPartBuilder.VertexInfo vt11 = new IntMeshPartBuilder.VertexInfo();
+        vt11.setPos(hs, 0, hs);
+        vt11.setNor(0, -1, 0);
+        vt11.setUV(1, 1);
+        IntMeshPartBuilder.VertexInfo vt10 = new IntMeshPartBuilder.VertexInfo();
+        vt10.setPos(-hs, 0, hs);
+        vt10.setNor(0, -1, 0);
+        vt10.setUV(1, 0);
+        begin();
+        part("plane", primitiveType, attributes, material).patch(vt00, vt01, vt11, vt10, divisionsU, divisionsV);
+        return end();
+    }
+
     /**
      * Convenience method to create a model with an arrow. The resources the
      * Material might contain are not managed, use
      * {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
+     *
      * @param material
-     * @param capLength
-     *            is the height of the cap in percentage, must be in (0,1)
-     * @param stemThickness
-     *            is the percentage of stem diameter compared to cap diameter,
-     *            must be in (0,1]
-     * @param divisions
-     *            the amount of vertices used to generate the cap and stem
-     *            ellipsoidal bases
+     * @param capLength     is the height of the cap in percentage, must be in (0,1)
+     * @param stemThickness is the percentage of stem diameter compared to cap diameter,
+     *                      must be in (0,1]
+     * @param divisions     the amount of vertices used to generate the cap and stem
+     *                      ellipsoidal bases
      */
     public IntModel createArrow(float x1, float y1, float z1, float x2, float y2, float z2, float capLength, float stemThickness, int divisions, int primitiveType, Material material, long attributes) {
         begin();
@@ -666,15 +661,11 @@ public class IntModelBuilder {
      * Convenience method to create a model which represents a grid of lines on
      * the XZ plane. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param xDivisions
-     *            row count along x axis.
-     * @param zDivisions
-     *            row count along z axis.
-     * @param xSize
-     *            Length of a single row on x.
-     * @param zSize
-     *            Length of a single row on z.
+     *
+     * @param xDivisions row count along x axis.
+     * @param zDivisions row count along z axis.
+     * @param xSize      Length of a single row on x.
+     * @param zSize      Length of a single row on z.
      */
     public IntModel createLineGrid(int xDivisions, int zDivisions, float xSize, float zSize, Material material, long attributes) {
         begin();
@@ -706,11 +697,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * cylinder shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCylinder(float width, float height, float depth, int divisions, boolean flipNormals, final Material material, final long attributes) {
         return createCylinder(width, height, depth, divisions, flipNormals, GL20.GL_TRIANGLES, material, attributes);
@@ -720,11 +710,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * cylinder shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createCylinder(float width, float height, float depth, int divisions, boolean flipNormals, int primitiveType, final Material material, final long attributes) {
         begin();
@@ -737,11 +726,10 @@ public class IntModelBuilder {
      * ico-sphere shape. The resources the Material might contain are not
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createIcoSphere(float radius, int recursion, boolean flipNormals, boolean hardEdges, final Material material, final long attributes) {
         return createIcoSphere(radius, recursion, flipNormals, hardEdges, GL20.GL_TRIANGLES, material, attributes);
@@ -772,11 +760,10 @@ public class IntModelBuilder {
      * octahedron-sphere shape. The resources the Material might contain are not
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, final Material material, final long attributes) {
         return createOctahedronSphere(radius, divisions, flipNormals, hardEdges, GL20.GL_TRIANGLES, material, attributes);
@@ -784,7 +771,7 @@ public class IntModelBuilder {
 
     /**
      * Creates an octahedron-sphere
-     * 
+     *
      * @return The model
      */
     public IntModel createOctahedronSphere(float radius, int divisions, boolean flipNormals, boolean hardEdges, int primitiveType, final Material material, final long attributes) {
@@ -800,10 +787,9 @@ public class IntModelBuilder {
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
      *
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, final Material materialShpere, final Material materialRing, final long attributes) {
         begin();
@@ -817,11 +803,10 @@ public class IntModelBuilder {
      * planets such as Saturn. The resources the Materials might contain are not
      * managed, use {@link IntModel#manageDisposable(Disposable)} to add those to
      * the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphereRing(float sphereDiameter, int divisionsU, int divisionsV, float innerRingRadius, float outerRingRadius, int ringDivisions, int primitiveType, final Material materialShpere, final Material materialRing, final long attributes) {
         begin();
@@ -835,11 +820,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float diameter, int divisionsU, int divisionsV, final Material material, final long attributes) {
         return createSphere(diameter, diameter, diameter, divisionsU, divisionsV, false, GL20.GL_TRIANGLES, material, attributes);
@@ -849,11 +833,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float diameter, int divisionsU, int divisionsV, boolean flipNormals, final Material material, final long attributes) {
         return createSphere(diameter, diameter, diameter, divisionsU, divisionsV, flipNormals, GL20.GL_TRIANGLES, material, attributes);
@@ -863,11 +846,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, final Material material, final long attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, flipNormals, GL20.GL_TRIANGLES, material, attributes);
@@ -877,11 +859,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, int primitiveType, final Material material, final long attributes) {
         return createSphere(width, height, depth, divisionsU, divisionsV, flipNormals, primitiveType, material, attributes, 0, 360, 0, 180);
@@ -891,11 +872,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, final Material material, final long attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         return createSphere(width, height, depth, divisionsU, divisionsV, flipNormals, GL20.GL_TRIANGLES, material, attributes, angleUFrom, angleUTo, angleVFrom, angleVTo);
@@ -905,11 +885,10 @@ public class IntModelBuilder {
      * Convenience method to create a model with a single node containing a
      * sphere shape. The resources the Material might contain are not managed,
      * use {@link IntModel#manageDisposable(Disposable)} to add those to the model.
-     * 
-     * @param attributes
-     *            bitwise mask of the
-     *            {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
-     *            Position, Color, Normal and TextureCoordinates is supported.
+     *
+     * @param attributes bitwise mask of the
+     *                   {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only
+     *                   Position, Color, Normal and TextureCoordinates is supported.
      */
     public IntModel createSphere(float width, float height, float depth, int divisionsU, int divisionsV, boolean flipNormals, int primitiveType, final Material material, final long attributes, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         begin();

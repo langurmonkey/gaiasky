@@ -60,6 +60,14 @@ public class ModelCache {
                 model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
+            case "plane":
+            case "patch":
+                int divisionsU = ((Long) params.get("divisionsu")).intValue();
+                int divisionsV = ((Long) params.get("divisionsv")).intValue();
+                float side = ((Double) params.get("side")).floatValue();
+                model = mb.createPlane(side, divisionsU, divisionsV, primitiveType, mat, attributes);
+                modelCache.put(key, model);
+                break;
             case "disc":
                 // Prepare model
                 float diameter2 = ((Double) params.get("diameter")).floatValue() / 2f;
