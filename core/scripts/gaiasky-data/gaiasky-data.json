@@ -506,6 +506,24 @@
       "file": "@mirror-url@catalog/wd/edr3/v00_20210616/catalog-wd-edr3.tar.gz"
     },
     {
+      "name": "catalog-variablestars-dr2",
+      "type": "catalog-gaia",
+      "version": 1,
+      "size": 62218788,
+      "nobjects": 106339,
+      "check": "catalog-dr2-variable-stars.json",
+      "data": [
+        "catalog-dr2-variable-stars.json",
+        "particles-dr2-variable-stars.json",
+        "catalog/vari/variable-stars-dr2.vot"
+      ],
+      "description": "DR2 variable stars - Variable stars in the Gaia DR2 catalog, brightened up by 5 magnitudes.",
+      "link": "https://gea.esac.esa.int/archive/",
+      "releasenotes" : "First version",
+      "sha256": "94b3ec25773f95a9692923cefac2862f919019c8e0a9d9092cc6d096d1f784b2",
+      "file": "@mirror-url@catalog/variable/dr2/v01_20211210/dr2-variable-stars.tar.gz"
+    },
+    {
       "name": "catalog-gd1",
       "type": "catalog-gaia",
       "version": 1,
@@ -789,7 +807,7 @@
       ],
       "description": "Exonia System - A made-up partially procedurally generated extra-solar system with two stars, four planets and a moon.",
       "releasenotes" : "First version with two procedurally-generated planets and a manually textured one",
-      "sha256": "a6404442f7afdd369fc64590b8797a922cd87ae5665ae6d64a61060a046be057",
+      "sha256": "febbb79a5a79bd65d78b23ee711aef549fd1547bd01188a404b81104448a64cf",
       "file": "@mirror-url@systems/exonia/v01_20211203/exonia-system.tar.gz"
     },
     {
