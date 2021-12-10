@@ -19,6 +19,7 @@
 
 {{- if .MergeCommits -}}
 # Merge Requests
+
 {{ range .MergeCommits -}}
 - {{ .Header }}
 {{ end }}
