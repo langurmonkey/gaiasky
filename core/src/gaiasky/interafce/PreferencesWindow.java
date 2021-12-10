@@ -334,16 +334,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnImageButton aaTooltip = new OwnImageButton(skin, "tooltip");
         aaTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.aa.info"), skin));
 
-        // POINT CLOUD
-        OwnLabel pointCloudLabel = new OwnLabel(I18n.txt("gui.pointcloud"), skin);
-        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
-        pointCloudRenderer = new OwnSelectBox<>(skin);
-        pointCloudRenderer.setItems(pointCloudItems);
-        pointCloudRenderer.setWidth(textWidth * 3f);
-        pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
-        OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
-        pointCloudTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.pointcloud.info"), skin));
-        OwnLabel restart = new OwnLabel(I18n.txt("gui.restart"), skin, "default-pink");
+        // Only if not VR, the triangles break in VR
+        if (!settings.runtime.openVr) {
+            // POINT CLOUD
+            ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
+            pointCloudRenderer = new OwnSelectBox<>(skin);
+            pointCloudRenderer.setItems(pointCloudItems);
+            pointCloudRenderer.setWidth(textWidth * 3f);
+            pointCloudRenderer.setSelected(pointCloudItems[settings.scene.renderer.pointCloud.ordinal()]);
+        }
 
         // LINE RENDERER
         OwnLabel lrLabel = new OwnLabel(I18n.txt("gui.linerenderer"), skin);
@@ -431,10 +430,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(aa).left().padRight(pad10).padBottom(pad5);
         graphics.add(aaTooltip).left().padBottom(pad5).row();
-        graphics.add(pointCloudLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(pointCloudRenderer).left().padBottom(pad5);
-        graphics.add(pointCloudTooltip).left().padRight(pad20).padBottom(pad5);
-        graphics.add(restart).left().padRight(pad20).padBottom(pad5).row();
+        if (!settings.runtime.openVr) {
+            OwnLabel pointCloudLabel = new OwnLabel(I18n.txt("gui.pointcloud"), skin);
+            OwnImageButton pointCloudTooltip = new OwnImageButton(skin, "tooltip");
+            pointCloudTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.pointcloud.info"), skin));
+            OwnLabel restart = new OwnLabel(I18n.txt("gui.restart"), skin, "default-pink");
+            graphics.add(pointCloudLabel).left().padRight(pad20).padBottom(pad5);
+            graphics.add(pointCloudRenderer).left().padBottom(pad5);
+            graphics.add(pointCloudTooltip).left().padRight(pad20).padBottom(pad5);
+            graphics.add(restart).left().padRight(pad20).padBottom(pad5).row();
+        }
         graphics.add(lrLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(lineRenderer).left().padBottom(pad5).row();
         graphics.add(bloomLabel).left().padRight(pad20).padBottom(pad5);
@@ -1997,10 +2002,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             EventManager.instance.post(Events.LIMIT_FPS_CMD, 0.0);
         }
 
-        // Point cloud renderer
-        PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
-        boolean restartDialog = newPointCloudMode != settings.scene.renderer.pointCloud;
-        settings.scene.renderer.pointCloud = newPointCloudMode;
+        boolean restartDialog = false;
+        if (!settings.runtime.openVr) {
+            // Point cloud renderer
+            PointCloudMode newPointCloudMode = PointCloudMode.values()[pointCloudRenderer.getSelected().value];
+            restartDialog = newPointCloudMode != settings.scene.renderer.pointCloud;
+            settings.scene.renderer.pointCloud = newPointCloudMode;
+        }
 
         // Line renderer
         boolean reloadLineRenderer = settings.scene.renderer.line != LineMode.values()[lineRenderer.getSelected().value];
