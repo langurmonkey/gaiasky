@@ -630,7 +630,12 @@ public class GuiRegistry implements IObserver {
                             Gdx.app.exit();
                             // Attempt restart
                             Path workingDir = Path.of(System.getProperty("user.dir"));
-                            Path[] scripts = new Path[] { workingDir.resolve("gaiasky"), workingDir.resolve("gaiasky.bat"), workingDir.resolve("gaiasky.exe"), workingDir.resolve("gradlew"), workingDir.resolve("gradlew.bat") };
+                            Path[] scripts;
+                            if (SysUtils.isWindows()) {
+                                scripts = new Path[] { workingDir.resolve("gaiasky.exe"), workingDir.resolve("gaiasky.bat"), workingDir.resolve("gradlew.bat") };
+                            } else {
+                                scripts = new Path[] { workingDir.resolve("gaiasky"), workingDir.resolve("gradlew") };
+                            }
                             for (Path file : scripts) {
                                 if (Files.exists(file) && Files.isRegularFile(file) && Files.isExecutable(file)) {
                                     try {

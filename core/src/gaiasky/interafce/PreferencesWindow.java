@@ -336,10 +336,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // POINT CLOUD
         OwnLabel pointCloudLabel = new OwnLabel(I18n.txt("gui.pointcloud"), skin);
-        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] {
-                new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()),
-                new ComboBoxBean(I18n.txt("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()),
-                new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
+        ComboBoxBean[] pointCloudItems = new ComboBoxBean[] { new ComboBoxBean(I18n.txt("gui.pointcloud.tris"), PointCloudMode.TRIANGLES.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.instancedtris"), PointCloudMode.TRIANGLES_INSTANCED.ordinal()), new ComboBoxBean(I18n.txt("gui.pointcloud.points"), PointCloudMode.POINTS.ordinal()) };
         pointCloudRenderer = new OwnSelectBox<>(skin);
         pointCloudRenderer.setItems(pointCloudItems);
         pointCloudRenderer.setWidth(textWidth * 3f);
@@ -418,8 +415,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         motionBlur.setDisabled(settings.program.safeMode);
         motionBlur.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                GaiaSky.postRunnable(() ->
-                        EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlur.isChecked(), true));
+                GaiaSky.postRunnable(() -> EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlur.isChecked(), true));
                 return true;
             }
             return false;
@@ -1807,12 +1803,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     @Override
     public GenericDialog show(Stage stage, Action action) {
-        GenericDialog result =  super.show(stage, action);
+        GenericDialog result = super.show(stage, action);
         updateBackupValues();
         return result;
     }
 
-    private void updateBackupValues(){
+    private void updateBackupValues() {
         bloomBak = settings.postprocess.bloom.intensity;
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         lensflareBak = settings.postprocess.lensFlare;
@@ -2189,7 +2185,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         if (restartDialog) {
             showRestartDialog(I18n.txt("gui.restart.setting"));
-
         }
 
     }
