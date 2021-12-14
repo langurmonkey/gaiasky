@@ -88,7 +88,7 @@ void computeAtmosphericScatteringGround() {
 
         v3Attenuate = exp(-fScatter * (v3InvWavelength * fKr4PI + fKm4PI));
 
-        v3FrontColor += v3Attenuate * (fDepth * fScaledLength);
+        v3FrontColor += clamp(v3Attenuate * (fDepth * fScaledLength), 0.0, 1.0);
         v3SamplePoint += v3SampleRay;
     }
 

@@ -65,16 +65,20 @@ public class AtmosphereComponent extends NamedComponent {
         this.planetSize = planetSize;
         setUpAtmosphericScatteringMaterial(planetMat);
 
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
-        IntModel atmosphereModel = pair.getFirst();
-        Material atmMat = pair.getSecond().get("base");
-        atmMat.clear();
-        setUpAtmosphericScatteringMaterial(atmMat);
-        atmMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+        Material atmMat;
+        if(mc.instance == null) {
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
+            IntModel atmosphereModel = pair.getFirst();
+            atmMat = pair.getSecond().get("base");
 
-        // CREATE ATMOSPHERE MODEL
-        mc.instance = new IntModelInstance(atmosphereModel, this.localTransform);
-
+            setUpAtmosphericScatteringMaterial(atmMat);
+            atmMat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
+            // CREATE ATMOSPHERE MODEL
+            mc.instance = new IntModelInstance(atmosphereModel, this.localTransform);
+        } else {
+            atmMat = mc.instance.materials.get(0);
+            setUpAtmosphericScatteringMaterial(atmMat);
+        }
     }
 
     public void update(Vector3b transform) {

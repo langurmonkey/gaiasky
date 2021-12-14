@@ -13,10 +13,10 @@
         if (u_fogDensity > 0.0) {
             #define U_TO_KM 1.0e6
             // Distance normalization factor depends on the size of the planet (inner atmosphere radius)
-            float normFactor = fInnerRadius * U_TO_KM / 40.0;
+            float normFactor = clamp(fInnerRadius * U_TO_KM / 40.0, 20.0, 400.0);
             // Normalize distance to 100 Km
             float distance = length(o_fragPosition) * U_TO_KM / normFactor;
-            float fragHeight = 1.0 - clamp(o_fragHeight * U_TO_KM / (normFactor * 0.1), 0.0, 1.0);
+            float fragHeight = 1.0 - clamp(o_fragHeight * U_TO_KM / (normFactor * 0.08), 0.0, 1.0);
             float camHeight = 1.0 - clamp((fCameraHeight - fInnerRadius) / (fOuterRadius - fInnerRadius), 0.0, 1.0);
             float fogDensity = u_fogDensity * 0.15;
 
