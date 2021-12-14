@@ -64,10 +64,6 @@ uniform sampler2D u_reflectionTexture;
 #define emissiveFlag
 #endif
 
-#if defined(specularFlag) || defined(fogFlag)
-#define cameraPositionFlag
-#endif
-
 #if	defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
 #define ambientFlag
 #endif //ambientFlag
@@ -298,8 +294,10 @@ void main() {
     vec3 fog = vec3(0.0);
 
     float NL0;
+    vec3 L0;
 
     #ifdef directionalLightsFlag
+    vec3 V = o_data.viewDir;
     // Loop for directional light contributitons
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = o_data.directionalLights[i].color;
@@ -309,12 +307,12 @@ void main() {
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = o_data.directionalLights[i].direction;
-        vec3 V = o_data.viewDir;
         vec3 H = normalize(L + V);
         float NL = max(0.0, dot(N, L));
         float NH = max(0.0, dot(N, H));
         if (i == 0){
             NL0 = NL;
+            L0 = L;
         }
 
         selfShadow *= saturate(4.0 * NL);
@@ -332,7 +330,7 @@ void main() {
     #ifdef atmosphereGround
     #define exposure 4.0
     fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
-    fragColor.rgb = applyFog(fragColor.rgb, NL0);
+    fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
     #endif
 
     // Prevent saturation

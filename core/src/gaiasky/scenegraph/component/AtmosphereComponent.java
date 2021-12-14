@@ -278,7 +278,7 @@ public class AtmosphereComponent extends NamedComponent {
         // eSun
         setM_eSun(gaussian(rand, 5.0, 4.0));
         // Fog density
-        setFogdensity(gaussian(rand, 4.5, 1.0, 0.5));
+        setFogdensity(gaussian(rand, 4.0, 1.0, 0.5));
         // Fog color
         setFogcolor(new double[] { 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5, 0.5 + rand.nextDouble() * 0.5 });
         // Params
