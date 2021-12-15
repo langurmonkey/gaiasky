@@ -199,7 +199,7 @@ task dist(dependsOn: [gaiaskyJar, genReleaseNotes], description: "Compiles the p
     doLast {
         // Version check
         String vsc = "${System.env.GS_JAVA_VERSION_CHECK}"
-        boolean javaVersionOk = JavaVersion.current().isJava15Compatible()
+        boolean javaVersionOk = JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_15)
         if (vsc.equalsIgnoreCase("false")) {
             if (!javaVersionOk) {
                 println("WARNING: Gaia Sky must be built with Java " + JavaVersion.VERSION_15 + " or compatible, you are using " + JavaVersion.current())

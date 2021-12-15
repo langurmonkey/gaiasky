@@ -51,6 +51,10 @@ public class TextUtils {
         return in;
     }
 
+    public static long countLines(String str) {
+        return str.chars().filter(ch -> ch == '\n' || ch == '\r').count();
+    }
+
     public static String breakSpaces(CharSequence in, int breakSpaces) {
         return breakSpaces(in.toString(), breakSpaces);
     }

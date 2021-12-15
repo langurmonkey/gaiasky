@@ -59,4 +59,8 @@ public class OwnTextArea extends TextArea {
             return super.getPrefHeight();
         }
     }
+
+    public void offsets(){
+        super.calculateOffsets();
+    }
 }

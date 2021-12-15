@@ -1,9 +1,8 @@
 {{ range .Versions }}
-{{ .Tag.Name }}
-=====
+# {{ .Tag.Name }}
 
 {{ range .CommitGroups -}}
-# {{ .Title }}
+## {{ .Title }}
 
 {{ range .Commits -}}
 - {{ .Subject }} {{ if .Refs -}} {{ range .Refs }}{{ if .Action }}[#{{ .Ref }}]({{ $.Info.RepositoryURL }}/issues/{{ .Ref }}) {{ end }}{{end}}{{ end }}
@@ -11,14 +10,14 @@
 {{ end -}}
 
 {{- if .RevertCommits -}}
-# Reverts
+## Reverts
 {{ range .RevertCommits -}}
 - {{ .Revert.Header }}
 {{ end }}
 {{ end -}}
 
 {{- if .MergeCommits -}}
-# Merge Requests
+## Merge Requests
 
 {{ range .MergeCommits -}}
 - {{ .Header }}
@@ -27,11 +26,10 @@
 
 {{- if .NoteGroups -}}
 {{ range .NoteGroups -}}
-# {{ .Title }}
+## {{ .Title }}
 {{ range .Notes }}
 {{ .Body }}
 {{ end }}
 {{ end -}}
 {{ end -}}
 {{ end -}}
-

@@ -7,6 +7,7 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.TextUtils;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextArea;
@@ -34,28 +35,34 @@ public class ReleaseNotesWindow extends GenericDialog {
     @Override
     protected void build() {
 
-        int taWidth = 1400;
-        int taHeight = 900;
-        int lines = 25;
+        float taWidth = 1300f;
+        float taHeight = 900f;
 
         try {
-            String releaseNotes = Files.readString(releaseNotesFile);
+            String releaseNotes = Files.readString(releaseNotesFile).trim();
 
             OwnLabel title = new OwnLabel(Settings.getApplicationTitle(false) + "   " + Settings.settings.version.version, skin, "header");
             content.add(title).left().pad(pad10).padBottom(pad20).row();
 
-            OwnTextArea releaseNotesText = new OwnTextArea(releaseNotes, skin, "monospace-txt");
+            OwnTextArea releaseNotesText = new OwnTextArea(releaseNotes, skin, "disabled-nobg");
             releaseNotesText.setDisabled(true);
-            releaseNotesText.setPrefRows(lines);
+            releaseNotesText.setPrefRows(30);
+            releaseNotesText.setWidth(taWidth - 15f);
+            float fontHeight = releaseNotesText.getStyle().font.getLineHeight();
+            releaseNotesText.offsets();
+            releaseNotesText.setHeight((releaseNotesText.getLines() + 3) * fontHeight);
+
             releaseNotesText.clearListeners();
 
             OwnScrollPane scroll = new OwnScrollPane(releaseNotesText, skin, "default-nobg");
             scroll.setWidth(taWidth);
             scroll.setHeight(taHeight);
             scroll.setForceScroll(false, true);
-            scroll.setSmoothScrolling(true);
+            scroll.setSmoothScrolling(false);
             scroll.setFadeScrollBars(false);
             content.add(scroll).center().pad(pad10);
+            content.pack();
+
         } catch (IOException e) {
             // Show error
             OwnLabel error = new OwnLabel(I18n.txt("error.file.read", releaseNotesFile.toString()), skin);

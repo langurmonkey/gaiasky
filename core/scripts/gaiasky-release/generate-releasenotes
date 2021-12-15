@@ -14,8 +14,9 @@ if [[ $# -ne 2 ]]; then
     exit -1
 fi
 
-VERS=$1
+# The current tag
+CURRENT_TAG=$1
 OUTPUT=$2
 
-# Use regexp to only include full versions (e.g. exclude release candidates)
-git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $VERS && echo "File saved to $OUTPUT"
+# Use regexp to match x.y.z[-rcww]
+git-chglog --tag-filter-pattern '^(\d+\.)?(\d+\.)?(\*|\d+)?$' --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $CURRENT_TAG && echo "File saved to $OUTPUT"

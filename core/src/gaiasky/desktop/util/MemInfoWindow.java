@@ -31,22 +31,26 @@ public class MemInfoWindow extends GenericDialog {
     @Override
     protected void build() {
         float pad = 8f;
-        float taWidth = 800f;
+        float taWidth = 1200f;
 
         StringBuilder memInfoStr = new StringBuilder();
         for (MemoryPoolMXBean mpBean : ManagementFactory.getMemoryPoolMXBeans()) {
             memInfoStr.append(I18n.txt("gui.help.name")).append(": ").append(mpBean.getName()).append(": ").append(mpBean.getUsage()).append("\n");
         }
 
-        TextArea memInfo = new OwnTextArea(memInfoStr.toString(), skin, "no-disabled");
+        OwnTextArea memInfo = new OwnTextArea(memInfoStr.toString(), skin, "disabled-nobg");
         memInfo.setDisabled(true);
-        memInfo.setPrefRows(10);
-        memInfo.setWidth(taWidth);
+        memInfo.setPrefRows(13);
+        memInfo.setWidth(taWidth - 15f);
+        float fontHeight = memInfo.getStyle().font.getLineHeight();
+        memInfo.offsets();
+        memInfo.setHeight((memInfo.getLines() + 3) * fontHeight);
         memInfo.clearListeners();
+
 
         OwnScrollPane memInfoScroll = new OwnScrollPane(memInfo, skin, "minimalist-nobg");
         memInfoScroll.setWidth(taWidth);
-        memInfoScroll.setForceScroll(false, true);
+        memInfoScroll.setForceScroll(false, false);
         memInfoScroll.setSmoothScrolling(true);
         memInfoScroll.setFadeScrollBars(false);
 

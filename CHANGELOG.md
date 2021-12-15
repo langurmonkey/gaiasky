@@ -1,3 +1,90 @@
+<a name="unreleased"></a>
+## [Unreleased](https://gitlab.com/langurmonkey/gaiasky/tree/master)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.6...HEAD)
+
+### Bug Fixes
+- crosshair in cubemap, planetarium, stereo and VR modes
+- remove usage of deprecated Java APIs
+- do not add objects that already exist (have same names and same type) to scene graph
+- cloud rendering artifacts
+- reflections in tessellation shaders
+- reflected cubemap orientation (was upside down)
+- restore correct values on cancel in preferences dialog
+- show warn message when trying to select object from invisible dataset in search dialog
+- show warn message when trying to select object from invisible dataset in search dialog
+- getting particle position no longer results in null pointer
+- update directory permissions error message to make it easier to understand
+- default style of headline and subhead messages, as well as their positioning
+- JSON output of REST API server
+- reload data files when data path changes
+- data manager misbehavior when data location path is a symlink
+- rename old configuration files after conversion to new format
+- time offset (6711 yr) in Moon's position lookup
+- fix star clusters fade between model and billboard
+- color picker listener stops working after first click
+
+### Build System
+- remove old run targets
+- remove deprecated features from build files
+- remove old run targets
+- remove deprecated features from build files
+- update gradle wrapper version to 7.3
+- upgrade jackson library version
+- remove gson dependency version
+- Java minimum version set to 15 in build script check
+- automatically generate release notes during build
+- update appimage JDK version to `16.0.2+7`
+
+### Features
+- new non-constant-density fog shader which approximates physical fog much better than before
+- add an arbitrary number of load progress bars
+- enable loading internal JSON descriptor files from UI
+- interactive procedural generation of planetary surfaces, clouds and atmospheres
+- add interactive surface generation from the GUI
+- interactive procedural generation of cloud and atmosphere components from the GUI
+- add 'randomize all' function to totally randomize planet surfaces
+- add shift to biome LUT, improve procedural generation
+- generate normal map from elevation data if needed
+- planet generation with elevation, diffuse and specular textures
+- materials overhaul
+- get Gaia Sky ready for star systems with proper orbits
+- add `--headless` flag to run in headless mode (hidden window).
+- add API calls to configure and take screenshots
+- get Gaia Sky ready for star systems with proper orbits
+- add `--headless` flag to run in headless mode (hidden window).
+- add API calls to configure and take screenshots
+- add individual size scale factor to star/particle group datasets
+- improve mode switching dialogs with a few goodies and QOL updates
+- implement mosaic cubemaps, quad-based star group renderer
+- enable orbit trails in `GPU` VBO mode and remove the "orbit style" setting, for now the "GPU lines" line style setting uses VBOs
+- add 'New directory' button to file chooser, fix event propagation with generic dialogs
+- show release notes at startup after a version update
+- convert provider parameters to dataset options for STIL provider
+- add variability to close-up stars and star models
+- add variable stars as a new dataset type
+- add provider parameters to data providers
+- imporove CA,DE,ES translations
+- improve bookmarks, add missing i18n keys Fixes [#380](https://gitlab.com/langurmonkey/gaiasky/issues/380)
+- shapes (spheres, cones, cylinders, etc.) of arbitrary sizes can now be added around any object, with the possibility of tracking the object's size. This is an extension of [#378](https://gitlab.com/langurmonkey/gaiasky/issues/378) which includes many more options plus an API entry point
+- add shapes around objects Fixes [#378](https://gitlab.com/langurmonkey/gaiasky/issues/378)
+- add setting to select preferred units (ly/pc)
+- add the possibility to track objects
+
+### Performance Improvements
+- initially size index hash maps to avoid resize operations
+
+### Style
+- consolidate normal shader vertex data into struct
+- organize imports in whole codebase
+
+
+<a name="3.1.6"></a>
+## [3.1.6](https://gitlab.com/langurmonkey/gaiasky/tree/3.1.5) (2021-09-22)
+[Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.5...3.1.6)
+
+### Bug Fixes
+- VR GUI object initialization -- consolidate init() signature 
+
 <a name="3.1.5"></a>
 ## [3.1.5](https://gitlab.com/langurmonkey/gaiasky/tree/3.1.4) (2021-09-22)
 [Full changelog](https://gitlab.com/langurmonkey/gaiasky/compare/3.1.4...3.1.5)
