@@ -85,6 +85,7 @@ venv
 ###########
 **/openovr_log
 
-# jenv #
-########
+# extra #
+#########
 .java-version
+releasenotes.txt
