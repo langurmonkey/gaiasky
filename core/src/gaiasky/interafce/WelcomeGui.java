@@ -41,9 +41,11 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -331,6 +333,43 @@ public class WelcomeGui extends AbstractGui {
         ui.addActor(center);
         ui.addActor(topLeft);
 
+        // Base data notice
+        if (dd != null && dd.updatesAvailable ) {
+            DatasetDesc baseData = dd.findDataset("default-data");
+            if(baseData != null && baseData.myVersion < baseData.serverVersion) {
+                // We have a base data update, show notice
+
+                GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
+
+                    @Override
+                    protected void build() {
+                        content.clear();
+                        content.add(new OwnLabel(I18n.txt("gui.basedata.default", baseData.name, I18n.txt("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
+                        content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
+                        content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
+                        content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
+                    }
+
+                    @Override
+                    protected void accept() {
+                        // Nothing
+                    }
+
+                    @Override
+                    protected void cancel() {
+                        // Nothing
+                    }
+
+                    @Override
+                    public void dispose() {
+                        // Nothing
+                    }
+                };
+                baseDataNotice.setAcceptText(I18n.txt("gui.ok"));
+                baseDataNotice.buildSuper();
+                baseDataNotice.show(ui);
+            }
+        }
     }
 
     private void gaiaSky() {
