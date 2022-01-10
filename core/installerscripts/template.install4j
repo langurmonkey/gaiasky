@@ -35,7 +35,7 @@
     </launcher>
     <launcher name="gaiasky macos" id="573" excludeFromMenu="true" menuName="${compiler:sys.fullName}">
       <executable name="${compiler:sys.shortName}" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gs_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileDescription="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseShenandoahGC -Dpython.console.encoding=UTF-8 -Dassets.location=./ -XstartOnFirstThread">
         <classPath>
@@ -52,7 +52,7 @@
     </launcher>
     <launcher name="gaiasky vr" id="683" menuName="${compiler:sys.fullName}/${compiler:sys.fullName} VR">
       <executable name="${compiler:sys.shortName}vr" iconSet="true" iconFile="@gs-git-folder@/assets/icon/gsvr_icon.ico" redirectStdout="true" executableMode="gui" singleInstance="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
+        <versionInfo include="true" fileDescription="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" legalCopyright="MPL" internalName="GaiaSky" productName="${compiler:sys.fullName}" />
       </executable>
       <java mainClass="gaiasky.desktop.GaiaSkyDesktop" vmParameters="-Xms2g -Xmx6g -XX:+UseShenandoahGC -Dpython.console.encoding=UTF-8 -Dassets.location=./" arguments="-vr">
         <classPath>
@@ -1335,7 +1335,7 @@ return true;</property>
       </exclude>
       <jreBundle jreBundleSource="none" />
     </unixInstaller>
-    <linuxDeb name="Linux DEB" id="30" dependencies="openjdk-11-jre" description="Real-time, cross-platform, 3D Universe application which supports more than a billion stars" maintainerEmail="tsagrista@ari.uni-heidelberg.de">
+    <linuxDeb name="Linux DEB" id="30" description="Open source 3D universe simulator for desktop and VR with support for more than a billion objects" maintainerEmail="tsagrista@ari.uni-heidelberg.de">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>
