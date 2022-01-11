@@ -224,6 +224,12 @@
       "down": "default-round-down",
       "checked": "default-round-down",
       "up": "default-round"
+    },
+    "dataset": {
+      "down": "default-round",
+      "up": "default-round",
+      "over": "default-round-over",
+      "focused": "default-round-sel"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {

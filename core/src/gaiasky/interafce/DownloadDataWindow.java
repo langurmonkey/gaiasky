@@ -11,6 +11,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
@@ -49,6 +50,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -142,7 +144,72 @@ public class DownloadDataWindow extends GenericDialog {
         me.acceptButton.setDisabled(false);
         float pad = 3.2f;
         float padLarge = 14.4f;
-        float minW = 690f;
+        float minW = 800f;
+        float tabWidth = 240f;
+        float width = 1800f;
+
+        // Tabs
+        HorizontalGroup tabGroup = new HorizontalGroup();
+        tabGroup.align(Align.center);
+
+        final Button tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
+        tabAvail.pad(pad5);
+        tabAvail.setWidth(tabWidth);
+        final Button tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed"), skin, "toggle-big");
+        tabInstalled.pad(pad5);
+        tabInstalled.setWidth(tabWidth);
+
+        tabGroup.addActor(tabAvail);
+        tabGroup.addActor(tabInstalled);
+
+        content.add(tabGroup).center().expandX().row();
+
+        // Create the tab content. Just using images here for simplicity.
+        Stack tabContent = new Stack();
+
+        // Content
+        final Table contentAvail = new Table(skin);
+        contentAvail.align(Align.top);
+        contentAvail.pad(pad10);
+
+        final Table contentInstalled = new Table(skin);
+        contentInstalled.align(Align.top);
+        contentInstalled.pad(pad10);
+
+        /* ADD ALL CONTENT */
+        tabContent.addActor(contentAvail);
+        tabContent.addActor(contentInstalled);
+
+        content.add(tabContent).expand().fill().padBottom(pad20 * 3f).row();
+
+        // Listen to changes in the tab button checked states
+        // Set visibility of the tab content to match the checked state
+        ChangeListener tabListener = new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (tabAvail.isChecked()) {
+                    reloadAvailable(contentAvail, width);
+                }
+                if (tabInstalled.isChecked()) {
+                    reloadInstalled(contentInstalled, width);
+                }
+                contentAvail.setVisible(tabAvail.isChecked());
+                contentInstalled.setVisible(tabInstalled.isChecked());
+
+                content.pack();
+            }
+        };
+        tabAvail.addListener(tabListener);
+        tabInstalled.addListener(tabListener);
+
+        tabAvail.setChecked(true);
+
+        // Let only one tab button be checked at a time
+        ButtonGroup<Button> tabs = new ButtonGroup<>();
+        tabs.setMinCheckCount(1);
+        tabs.setMaxCheckCount(1);
+        tabs.add(tabAvail);
+        tabs.add(tabInstalled);
 
         float buttonPad = 1.6f;
         Cell<Actor> topCell = content.add((Actor) null).left().top();
@@ -152,7 +219,13 @@ public class DownloadDataWindow extends GenericDialog {
         Table downloadTable = new Table(skin);
         downloadTable.setFillParent(true);
 
-        OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location") + ":", skin);
+        OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location"), skin);
+        OwnImageButton catalogsLocTooltip = new OwnImageButton(skin, "tooltip");
+        catalogsLocTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.download.location.info"), skin));
+        HorizontalGroup catalogsLocGroup = new HorizontalGroup();
+        catalogsLocGroup.space(pad10);
+        catalogsLocGroup.addActor(catalogsLocLabel);
+        catalogsLocGroup.addActor(catalogsLocTooltip);
 
         HorizontalGroup hg = new HorizontalGroup();
         hg.space(18f);
@@ -177,7 +250,7 @@ public class DownloadDataWindow extends GenericDialog {
             OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
             dataLocationButton.pad(buttonPad * 4f);
             dataLocationButton.setMinWidth(minW);
-            downloadTable.add(catalogsLocLabel).left().padBottom(padLarge);
+            downloadTable.add(catalogsLocGroup).left().padBottom(padLarge);
             downloadTable.add(dataLocationButton).left().padLeft(pad).padBottom(padLarge).row();
             Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padLarge);
             notice.row();
@@ -186,7 +259,7 @@ public class DownloadDataWindow extends GenericDialog {
                 if (event instanceof ChangeEvent) {
                     FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
                     fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                    fc.setShowHiddenConsumer((showHidden)-> Settings.settings.program.fileChooser.showHidden = showHidden);
+                    fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
                     fc.setResultListener((success, result) -> {
                         if (success) {
                             if (Files.isReadable(result) && Files.isWritable(result)) {
@@ -478,7 +551,7 @@ public class DownloadDataWindow extends GenericDialog {
         Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
         downloadTable.add(manualDownload).center().colspan(2);
 
-        topCell.setActor(downloadTable);
+        //topCell.setActor(downloadTable);
 
         downloadTable.pack();
         datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
@@ -486,6 +559,54 @@ public class DownloadDataWindow extends GenericDialog {
 
         // Update selected
         updateDatasetsSelected();
+    }
+
+    private void reloadAvailable(Table content, float width) {
+        List<DatasetDesc> available = dd.datasets.stream().filter(d -> !d.exists).collect(Collectors.toList());
+        reloadPane(content, width, available);
+    }
+
+    private void reloadInstalled(Table content, float width) {
+        List<DatasetDesc> installed = dd.datasets.stream().filter(d -> d.exists).collect(Collectors.toList());
+        reloadPane(content, width, installed);
+    }
+
+    private void reloadPane(Table content, float width, List<DatasetDesc> datasets) {
+        content.clear();
+        Cell left = content.add().top().left().padRight(pad10);
+        Cell right = content.add().top().left();
+
+        Table leftTable = new Table(skin);
+        leftTable.align(Align.topRight);
+        OwnScrollPane leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
+        leftScroll.setScrollingDisabled(true, false);
+        leftScroll.setForceScroll(false, true);
+        leftScroll.setSmoothScrolling(false);
+        leftScroll.setFadeScrollBars(false);
+        for (DatasetDesc dd : datasets) {
+            Table t = new Table(skin);
+            t.pad(pad10);
+            OwnLabel title = new OwnLabel(dd.shortDescription, skin, "ui-23");
+            title.setWidth(width * 0.43f);
+            t.add(title).left().padRight(pad10);
+            Link link = new Link("INSTALL", skin, "https://tonisagrista.com");
+            link.setWidth(width * 0.3f);
+            t.add(link).right().row();
+            t.add(new OwnLabel(I18n.txt("gui.download.version.server", dd.serverVersion), skin, "menuitem-shortcut")).left();
+            t.pack();
+            OwnButton button = new OwnButton(t, skin, "dataset", false);
+            button.setWidth(width * 0.52f);
+            leftTable.add(button).row();
+        }
+        leftScroll.setWidth(width * 0.52f);
+        leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+        left.setActor(leftScroll);
+
+        OwnLabel desc = new OwnLabel("Here is a text\nThat is nice to have\nPlease update it\nAs long as it lasts.", skin);
+        desc.setWidth(width * 0.5f);
+        right.setActor(desc);
+
+        content.pack();
     }
 
     private void updateDatasetsSelected() {
@@ -528,7 +649,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     }
 
-    public void refresh(){
+    public void refresh() {
         content.clear();
         bottom.clear();
         build();
