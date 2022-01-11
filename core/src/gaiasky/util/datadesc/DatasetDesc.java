@@ -23,8 +23,8 @@ import java.nio.file.Paths;
 public class DatasetDesc {
     private final Log logger = Logger.getLogger(DatasetDesc.class);
 
-    private final JsonReader reader;
-    public final JsonValue source;
+    private JsonReader reader;
+    public JsonValue source;
     public String name;
     public String description;
     public String shortDescription;
@@ -79,10 +79,10 @@ public class DatasetDesc {
         this.mustDownload = (!exists || outdated) && baseData;
         this.cbDisabled = baseData || (exists && !outdated);
 
-        if(source.has("version") && this.myVersion == -1)
+        if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
 
-        if(source.has("mingsversion"))
+        if (source.has("mingsversion"))
             this.minGsVersion = source.getInt("mingsversion");
 
         if (source.has("file"))

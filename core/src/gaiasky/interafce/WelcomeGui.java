@@ -401,7 +401,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numCatalogsAvailable() {
-        return dw.datasets.size;
+        return dw.localDatasets.datasets.size();
     }
 
     private int numGaiaDRCatalogsSelected() {
@@ -421,7 +421,7 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsSelected() {
         int matches = 0;
-        if (dd == null && (dw == null || dw.datasets == null))
+        if (dd == null && (dw == null || dw.localDatasets == null || dw.localDatasets.datasets == null))
             return 0;
 
         for (String f : Settings.settings.data.catalogFiles) {

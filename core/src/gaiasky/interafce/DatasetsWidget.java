@@ -17,6 +17,7 @@ import gaiasky.util.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
+import gaiasky.util.datadesc.DataDescriptor;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.scene2d.*;
@@ -39,8 +40,7 @@ public class DatasetsWidget {
     private final Skin skin;
     public OwnCheckBox[] cbs;
     public Map<Button, String> candidates;
-    public Array<DatasetType> types;
-    public Array<DatasetDesc> datasets;
+    public DataDescriptor localDatasets;
     private float padFactor = 1f;
 
     public DatasetsWidget(final Stage ui, final Skin skin) {
@@ -51,47 +51,7 @@ public class DatasetsWidget {
     }
 
     public void reloadLocalCatalogs() {
-        // Discover data sets, add as buttons
-        Array<FileHandle> catalogLocations = new Array<>();
-        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
-
-        Array<FileHandle> catalogFiles = new Array<>();
-
-        for (FileHandle catalogLocation : catalogLocations) {
-            FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
-            catalogFiles.addAll(cfs);
-        }
-
-        JsonReader reader = new JsonReader();
-        Map<String, DatasetType> typeMap = new HashMap<>();
-        types = new Array<>();
-        datasets = new Array<>();
-        for (FileHandle catalogFile : catalogFiles) {
-            JsonValue val = reader.parse(catalogFile);
-            DatasetDesc dd = new DatasetDesc(reader, val);
-            dd.path = Path.of(catalogFile.path());
-            dd.catalogFile = catalogFile;
-
-            if (dd.description == null)
-                dd.description = dd.path.toString();
-            if (dd.name == null)
-                dd.name = dd.catalogFile.nameWithoutExtension();
-
-            DatasetType dt;
-            if (typeMap.containsKey(dd.type)) {
-                dt = typeMap.get(dd.type);
-            } else {
-                dt = new DatasetType(dd.type);
-                typeMap.put(dd.type, dt);
-                types.add(dt);
-            }
-
-            dt.datasets.add(dd);
-            datasets.add(dd);
-        }
-
-        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DownloadDataWindow.getTypeWeight(datasetType.typeStr));
-        types.sort(byType);
+        localDatasets = DownloadDataWindow.reloadLocalCatalogs();
     }
 
     public Actor buildDatasetsWidget() {
@@ -131,11 +91,11 @@ public class DatasetsWidget {
             result = datasetsTable;
         }
 
-        cbs = new OwnCheckBox[datasets.size];
+        cbs = new OwnCheckBox[localDatasets.datasets.size()];
         java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
 
         int i = 0;
-        for (DatasetType type : types) {
+        for (DatasetType type : localDatasets.types) {
             String typeKey = "gui.download.type." + type.typeStr;
             try{
                 I18n.txt(typeKey);
@@ -197,7 +157,7 @@ public class DatasetsWidget {
                     cb.getStyle().disabledFontColor = ColorUtils.gRedC;
                     gsVersionTooSmall = true;
                 } else {
-                    cb.setChecked(contains(dataset.catalogFile.path(), currentSetting));
+                    cb.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
                     cb.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
                 }
                 cb.setMinWidth(370f);
@@ -248,7 +208,7 @@ public class DatasetsWidget {
                 nObjectsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.dschooser.nobjects.tooltip"), skin, 10));
                 t.add(nObjectsLabel).left().padBottom(pad).row();
 
-                datasets.add(dataset);
+                localDatasets.datasets.add(dataset);
                 candidates.put(cb, dataset.catalogFile.path());
 
                 cbs[i++] = cb;
@@ -258,7 +218,7 @@ public class DatasetsWidget {
 
         ButtonGroup<OwnCheckBox> bg = new ButtonGroup<>();
         bg.setMinCheckCount(0);
-        bg.setMaxCheckCount(datasets.size);
+        bg.setMaxCheckCount(localDatasets.datasets.size());
         bg.add(cbs);
 
         datasetsTable.pack();
@@ -269,7 +229,7 @@ public class DatasetsWidget {
         }
 
         // No files
-        if (datasets.size == 0) {
+        if (localDatasets.datasets.size() == 0) {
             datasetsTable.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center();
         }
 
@@ -284,13 +244,6 @@ public class DatasetsWidget {
         return result;
     }
 
-    private boolean contains(String name, java.util.List<String> list) {
-        for (String candidate : list)
-            if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
-                return true;
-        return false;
-    }
-
     /**
      * Finds the dataset with the given descriptor file in the dataset descriptor list.
      *
@@ -298,8 +251,8 @@ public class DatasetsWidget {
      * @return The dataset descriptor or null if it was not found.
      */
     public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {
-        if (datasets != null && Files.exists(descriptorFile))
-            for (DatasetDesc dd : datasets) {
+        if (localDatasets != null && localDatasets.datasets != null && Files.exists(descriptorFile))
+            for (DatasetDesc dd : localDatasets.datasets) {
                 if (Files.exists(dd.path) && Files.isSameFile(dd.path, descriptorFile))
                     return dd;
             }

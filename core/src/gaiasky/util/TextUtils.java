@@ -334,6 +334,13 @@ public class TextUtils {
         return contained.get();
     }
 
+    public static boolean contains(String name, java.util.List<String> list) {
+        for (String candidate : list)
+            if (candidate != null && !candidate.isEmpty() && name.contains(candidate))
+                return true;
+        return false;
+    }
+
     public static boolean containsOrMatches(String[] list, String key, boolean ignoreCase) {
         AtomicBoolean contained = new AtomicBoolean(false);
         Arrays.stream(list).forEach(candidate -> {

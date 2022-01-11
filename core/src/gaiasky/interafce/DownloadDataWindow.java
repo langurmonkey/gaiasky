@@ -17,7 +17,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
+import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -97,7 +100,7 @@ public class DownloadDataWindow extends GenericDialog {
         return "icon-elem-others";
     }
 
-    private DataDescriptor dd;
+    private DataDescriptor serverDd, localDd;
     private OwnTextButton downloadButton;
     private OwnProgressBar downloadProgress;
     private OwnLabel currentDownloadFile, downloadSpeed;
@@ -125,7 +128,7 @@ public class DownloadDataWindow extends GenericDialog {
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
         super(I18n.txt("gui.download.title") + (dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
-        this.dd = dd;
+        this.serverDd = dd;
         this.choiceList = new LinkedList<>();
         this.rubbishes = new Array<>();
         this.highlight = ColorUtils.gYellowC;
@@ -141,6 +144,8 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void build() {
+        boolean theNew = true;
+
         me.acceptButton.setDisabled(false);
         float pad = 3.2f;
         float padLarge = 14.4f;
@@ -162,7 +167,8 @@ public class DownloadDataWindow extends GenericDialog {
         tabGroup.addActor(tabAvail);
         tabGroup.addActor(tabInstalled);
 
-        content.add(tabGroup).center().expandX().row();
+        if (theNew)
+            content.add(tabGroup).center().expandX().row();
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
@@ -180,7 +186,8 @@ public class DownloadDataWindow extends GenericDialog {
         tabContent.addActor(contentAvail);
         tabContent.addActor(contentInstalled);
 
-        content.add(tabContent).expand().fill().padBottom(pad20 * 3f).row();
+        if (theNew)
+            content.add(tabContent).expand().fill().padBottom(pad20 * 3f).row();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state
@@ -295,8 +302,8 @@ public class DownloadDataWindow extends GenericDialog {
         }
 
         // Uploads available?
-        if (dd.updatesAvailable) {
-            OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", dd.numUpdates), skin, "hud-big");
+        if (serverDd.updatesAvailable) {
+            OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", serverDd.numUpdates), skin, "hud-big");
             updates.setColor(highlight);
             downloadTable.add(updates).colspan(2).center().padBottom(padLarge).row();
         }
@@ -305,7 +312,7 @@ public class DownloadDataWindow extends GenericDialog {
         final Table datasetsTable = new Table(skin);
         datasetsTable.align(Align.topLeft);
 
-        for (DatasetType type : dd.types) {
+        for (DatasetType type : serverDd.types) {
             List<DatasetDesc> datasets = type.datasets;
             OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
             OwnImageButton expandIcon = new OwnImageButton(skin, "expand-collapse");
@@ -551,27 +558,32 @@ public class DownloadDataWindow extends GenericDialog {
         Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
         downloadTable.add(manualDownload).center().colspan(2);
 
-        //topCell.setActor(downloadTable);
+        if (!theNew)
+            topCell.setActor(downloadTable);
 
         downloadTable.pack();
         datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
-        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.7f, 1700f));
 
         // Update selected
         updateDatasetsSelected();
     }
 
     private void reloadAvailable(Table content, float width) {
-        List<DatasetDesc> available = dd.datasets.stream().filter(d -> !d.exists).collect(Collectors.toList());
-        reloadPane(content, width, available);
+        reloadPane(content, width, serverDd, DatasetMode.AVAILABLE);
     }
 
     private void reloadInstalled(Table content, float width) {
-        List<DatasetDesc> installed = dd.datasets.stream().filter(d -> d.exists).collect(Collectors.toList());
-        reloadPane(content, width, installed);
+        this.localDd = reloadLocalCatalogs();
+        reloadPane(content, width, localDd, DatasetMode.INSTALLED);
     }
 
-    private void reloadPane(Table content, float width, List<DatasetDesc> datasets) {
+    private enum DatasetMode {
+        AVAILABLE,
+        INSTALLED
+    }
+
+    private void reloadPane(Table content, float width, DataDescriptor dd, DatasetMode mode) {
         content.clear();
         Cell left = content.add().top().left().padRight(pad10);
         Cell right = content.add().top().left();
@@ -583,20 +595,83 @@ public class DownloadDataWindow extends GenericDialog {
         leftScroll.setForceScroll(false, true);
         leftScroll.setSmoothScrolling(false);
         leftScroll.setFadeScrollBars(false);
-        for (DatasetDesc dd : datasets) {
-            Table t = new Table(skin);
-            t.pad(pad10);
-            OwnLabel title = new OwnLabel(dd.shortDescription, skin, "ui-23");
-            title.setWidth(width * 0.43f);
-            t.add(title).left().padRight(pad10);
-            Link link = new Link("INSTALL", skin, "https://tonisagrista.com");
-            link.setWidth(width * 0.3f);
-            t.add(link).right().row();
-            t.add(new OwnLabel(I18n.txt("gui.download.version.server", dd.serverVersion), skin, "menuitem-shortcut")).left();
-            t.pack();
-            OwnButton button = new OwnButton(t, skin, "dataset", false);
-            button.setWidth(width * 0.52f);
-            leftTable.add(button).row();
+
+        // Current selected datasets
+        java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
+
+        for (DatasetType type : dd.types) {
+            List<DatasetDesc> datasets = type.datasets;
+            List<DatasetDesc> filtered = datasets.stream().filter(d -> mode == DatasetMode.AVAILABLE ? !d.exists : true).collect(Collectors.toList());
+            if (!filtered.isEmpty()) {
+                OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
+                leftTable.add(dsType).left().padTop(pad10).row();
+
+                for (DatasetDesc dataset : filtered) {
+                    Table t = new Table(skin);
+                    t.pad(pad10);
+
+                    // Type icon
+                    Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
+                    float scl = 0.7f;
+                    float iw = typeImage.getWidth();
+                    float ih = typeImage.getHeight();
+                    typeImage.setSize(iw * scl, ih * scl);
+                    typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
+
+                    // Title
+                    OwnLabel title = new OwnLabel(TextUtils.capString(dataset.shortDescription, 60), skin, "ui-23");
+                    title.addListener(new OwnTextTooltip(dataset.shortDescription, skin, 10));
+                    title.setWidth(width * 0.41f);
+
+                    // INSTALL or SELECT
+                    Actor installOrSelect = null;
+                    if (mode == DatasetMode.AVAILABLE) {
+                        Link link = new Link("INSTALL", skin, "https://tonisagrista.com");
+                        link.setWidth(width * 0.3f);
+                        installOrSelect = link;
+                    } else {
+                        OwnCheckBox select = new OwnCheckBox("", skin, 0f);
+                        installOrSelect = select;
+                        if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                            // TODO - CAN'T SELECT due to GS version
+                            select.setChecked(false);
+                            select.setDisabled(true);
+                            select.setColor(ColorUtils.gRedC);
+                            select.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.gs.mismatch", +dataset.minGsVersion, GaiaSkyDesktop.SOURCE_VERSION), skin, 10));
+                            select.getStyle().disabledFontColor = ColorUtils.gRedC;
+                        } else {
+                            select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
+                            select.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
+                        }
+                    }
+
+                    // Size
+                    OwnLabel size = new OwnLabel(dataset.size, skin, "menuitem-shortcut");
+                    size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+                    size.setWidth(88f);
+                    // Version
+                    OwnLabel version = null;
+                    if(mode == DatasetMode.AVAILABLE) {
+                        version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "menuitem-shortcut");
+                    }else if(mode == DatasetMode.INSTALLED) {
+                        version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "menuitem-shortcut");
+                    }
+                    HorizontalGroup versionSize = new HorizontalGroup();
+                    versionSize.space(pad20 * 2f);
+                    versionSize.addActor(version);
+                    versionSize.addActor(size);
+
+                    t.add(typeImage).left().padRight(pad10);
+                    t.add(title).left().padRight(pad10);
+                    t.add(installOrSelect).right().row();
+                    t.add();
+                    t.add(versionSize).left().padRight(pad10);
+                    t.pack();
+                    OwnButton button = new OwnButton(t, skin, "dataset", false);
+                    button.setWidth(width * 0.52f);
+                    leftTable.add(button).left().row();
+                }
+            }
         }
         leftScroll.setWidth(width * 0.52f);
         leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
@@ -1034,12 +1109,58 @@ public class DownloadDataWindow extends GenericDialog {
             choiceList.clear();
         if (toDownload != null)
             toDownload.clear();
-        dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
+        serverDd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
         backupScrollValues();
         content.clear();
         build();
         pack();
         restoreScrollValues();
+    }
+
+    public static synchronized DataDescriptor reloadLocalCatalogs() {
+        // Discover data sets, add as buttons
+        Array<FileHandle> catalogLocations = new Array<>();
+        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
+
+        Array<FileHandle> catalogFiles = new Array<>();
+
+        for (FileHandle catalogLocation : catalogLocations) {
+            FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
+            catalogFiles.addAll(cfs);
+        }
+
+        JsonReader reader = new JsonReader();
+        Map<String, DatasetType> typeMap = new HashMap<>();
+        List types = new ArrayList<>();
+        List datasets = new ArrayList<>();
+        for (FileHandle catalogFile : catalogFiles) {
+            JsonValue val = reader.parse(catalogFile);
+            DatasetDesc dd = new DatasetDesc(reader, val);
+            dd.path = Path.of(catalogFile.path());
+            dd.catalogFile = catalogFile;
+
+            if (dd.description == null)
+                dd.description = dd.path.toString();
+            if (dd.name == null)
+                dd.name = dd.catalogFile.nameWithoutExtension();
+
+            DatasetType dt;
+            if (typeMap.containsKey(dd.type)) {
+                dt = typeMap.get(dd.type);
+            } else {
+                dt = new DatasetType(dd.type);
+                typeMap.put(dd.type, dt);
+                types.add(dt);
+            }
+
+            dt.datasets.add(dd);
+            datasets.add(dd);
+        }
+
+        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DownloadDataWindow.getTypeWeight(datasetType.typeStr));
+        types.sort(byType);
+
+        return new DataDescriptor(types, datasets);
     }
 
 }
