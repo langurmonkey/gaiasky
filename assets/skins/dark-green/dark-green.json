@@ -897,6 +897,14 @@
       "font": "ui-18",
       "fontColor": "grey"
     },
+    "grey-normal": {
+      "font": "ui-18",
+      "fontColor": "grey"
+    },
+    "grey-large": {
+      "font": "ui-20",
+      "fontColor": "grey"
+    },
     "warp": {
       "font": "ui-23-bold",
       "fontColor": "theme"

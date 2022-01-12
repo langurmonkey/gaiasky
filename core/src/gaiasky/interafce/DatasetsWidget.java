@@ -51,7 +51,7 @@ public class DatasetsWidget {
     }
 
     public void reloadLocalCatalogs() {
-        localDatasets = DownloadDataWindow.reloadLocalCatalogs();
+        localDatasets = DownloadDataWindow.reloadLocalCatalogs(null);
     }
 
     public Actor buildDatasetsWidget() {

@@ -166,9 +166,9 @@
     },
     "grey": {
       "a": 1,
-      "b": 0.8,
-      "g": 0.8,
-      "r": 0.8
+      "b": 0.6,
+      "g": 0.6,
+      "r": 0.6
     },
     "disabled-font": {
       "a": 1,
@@ -230,6 +230,12 @@
       "down": "default-round-down",
       "checked": "default-round-down",
       "up": "default-round"
+    },
+    "dataset": {
+      "down": "default-round",
+      "up": "default-round",
+      "over": "default-round-over",
+      "focused": "default-round-sel"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
@@ -895,6 +901,14 @@
     },
     "menuitem-shortcut": {
       "font": "ui-18",
+      "fontColor": "grey"
+    },
+    "grey-normal": {
+      "font": "ui-18",
+      "fontColor": "grey"
+    },
+    "grey-large": {
+      "font": "ui-20",
       "fontColor": "grey"
     },
     "warp": {
