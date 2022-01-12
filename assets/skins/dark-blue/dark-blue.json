@@ -458,6 +458,9 @@
     "camera-stop": {
       "imageUp": "camera-stop"
     },
+    "install": {
+      "imageUp": "iconic-arrow-circle-bottom"
+    },
     "drive": {
       "imageUp": "iconic-hard-drive"
     },
@@ -1188,6 +1191,11 @@
       "background": "progress-s-bg",
       "knob": "progress-s-knob",
       "knobBefore": "progress-s-knob-before"
+    },
+    "tiny-horizontal": {
+      "background": "progress-t-bg",
+      "knob": "progress-t-knob",
+      "knobBefore": "progress-t-knob-before"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle": {

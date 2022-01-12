@@ -23,6 +23,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -615,7 +617,7 @@ public class DownloadDataWindow extends GenericDialog {
 
                 for (DatasetDesc dataset : filtered) {
                     Table t = new Table(skin);
-                    t.pad(pad10);
+                    t.pad(pad10, pad10, 0, pad10);
 
                     // Type icon
                     Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
@@ -633,11 +635,18 @@ public class DownloadDataWindow extends GenericDialog {
 
                     // INSTALL or SELECT
                     Actor installOrSelect;
-                    float installOrSelectWidth = 60f;
+                    float installOrSelectSize = 40f;
                     if (mode == DatasetMode.AVAILABLE) {
-                        Link link = new Link("INSTALL", skin, "https://tonisagrista.com");
-                        link.setWidth(installOrSelectWidth);
-                        installOrSelect = link;
+                        OwnTextIconButton install = new OwnTextIconButton("", skin, "install");
+                        install.setContentAlign(Align.center);
+                        install.addListener(new OwnTextTooltip(I18n.txt("gui.download.install"), skin));
+                        install.addListener((event) -> {
+                            if (event instanceof ChangeEvent) {
+                            }
+                            return false;
+                        });
+                        install.setSize(installOrSelectSize, installOrSelectSize);
+                        installOrSelect = install;
                     } else {
                         OwnCheckBox select = new OwnCheckBox("", skin, 0f);
                         installOrSelect = select;
@@ -659,7 +668,8 @@ public class DownloadDataWindow extends GenericDialog {
                             select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
                             select.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
                         }
-                        select.setWidth(installOrSelectWidth);
+                        select.setSize(installOrSelectSize, installOrSelectSize);
+                        select.setHeight(40f);
                         select.addListener(new ChangeListener() {
                             @Override
                             public void changed(ChangeEvent event, Actor actor) {
@@ -693,11 +703,18 @@ public class DownloadDataWindow extends GenericDialog {
                     versionSize.addActor(version);
                     versionSize.addActor(size);
 
+                    // Progress
+                    OwnProgressBar progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "tiny-horizontal");
+                    progress.setPrefWidth(850f);
+                    progress.setValue(60f);
+                    progress.setVisible(false);
+
                     t.add(typeImage).left().padRight(pad10);
                     t.add(title).left().padRight(pad10);
                     t.add(installOrSelect).right().row();
                     t.add();
-                    t.add(versionSize).left().padRight(pad10);
+                    t.add(versionSize).colspan(2).left().padRight(pad10).padBottom(pad5).row();
+                    t.add(progress).colspan(3).expandX();
                     t.pack();
                     OwnButton button = new OwnButton(t, skin, "dataset", false);
                     button.setWidth(width * 0.52f);
