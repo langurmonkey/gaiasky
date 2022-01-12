@@ -108,6 +108,7 @@ public class DownloadDataWindow extends GenericDialog {
     private OwnScrollPane datasetsScroll;
     private Cell<?> cancelCell;
     private float scrollX = 0f, scrollY = 0f;
+    private int selectedTab = 0;
 
     private final Color highlight;
 
@@ -210,7 +211,11 @@ public class DownloadDataWindow extends GenericDialog {
         tabAvail.addListener(tabListener);
         tabInstalled.addListener(tabListener);
 
-        tabAvail.setChecked(true);
+        if (selectedTab == 0) {
+            tabAvail.setChecked(true);
+        } else if (selectedTab == 1) {
+            tabInstalled.setChecked(true);
+        }
 
         // Let only one tab button be checked at a time
         ButtonGroup<Button> tabs = new ButtonGroup<>();
@@ -640,9 +645,16 @@ public class DownloadDataWindow extends GenericDialog {
                             // TODO - CAN'T SELECT due to GS version
                             select.setChecked(false);
                             select.setDisabled(true);
-                            select.setColor(ColorUtils.gRedC);
-                            select.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.gs.mismatch", +dataset.minGsVersion, GaiaSkyDesktop.SOURCE_VERSION), skin, 10));
+                            title.setColor(ColorUtils.gRedC);
+                            select.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.gs.mismatch", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, 10));
                             select.getStyle().disabledFontColor = ColorUtils.gRedC;
+
+                            // Remove from selected, if it is
+                            String filePath = dataset.catalogFile.path();
+                            if(Settings.settings.data.catalogFiles.contains(filePath)) {
+                                Settings.settings.data.catalogFiles.remove(filePath);
+                                logger.info(I18n.txt("gui.download.deselected.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
+                            }
                         } else {
                             select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
                             select.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
@@ -705,43 +717,45 @@ public class DownloadDataWindow extends GenericDialog {
                                             // Context menu
                                             ContextMenu datasetContext = new ContextMenu(skin, "default");
                                             if (mode == DatasetMode.INSTALLED) {
-                                                boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
-                                                if (enabled) {
-                                                    // Disable
-                                                    MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, "default");
-                                                    disable.addListener(new ChangeListener() {
-                                                        @Override
-                                                        public void changed(ChangeEvent event, Actor actor) {
-                                                            String filePath = dataset.catalogFile.path();
-                                                            Settings.settings.data.catalogFiles.remove(filePath);
-                                                            OwnCheckBox cb = (OwnCheckBox) installOrSelect;
-                                                            cb.setProgrammaticChangeEvents(false);
-                                                            cb.setChecked(false);
-                                                            cb.setProgrammaticChangeEvents(true);
-                                                            updateDatasetInfoPane(right, dataset, mode);
-                                                        }
-                                                    });
-                                                    datasetContext.addItem(disable);
-                                                } else {
-                                                    // Enable
-                                                    MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, "default");
-                                                    enable.addListener(new ChangeListener() {
-                                                        @Override
-                                                        public void changed(ChangeEvent event, Actor actor) {
-                                                            String filePath = dataset.catalogFile.path();
-                                                            if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                                                                Settings.settings.data.catalogFiles.add(filePath);
+                                                if (dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
+                                                    boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
+                                                    if (enabled) {
+                                                        // Disable
+                                                        MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, "default");
+                                                        disable.addListener(new ChangeListener() {
+                                                            @Override
+                                                            public void changed(ChangeEvent event, Actor actor) {
+                                                                String filePath = dataset.catalogFile.path();
+                                                                Settings.settings.data.catalogFiles.remove(filePath);
+                                                                OwnCheckBox cb = (OwnCheckBox) installOrSelect;
+                                                                cb.setProgrammaticChangeEvents(false);
+                                                                cb.setChecked(false);
+                                                                cb.setProgrammaticChangeEvents(true);
+                                                                updateDatasetInfoPane(right, dataset, mode);
                                                             }
-                                                            OwnCheckBox cb = (OwnCheckBox) installOrSelect;
-                                                            cb.setProgrammaticChangeEvents(false);
-                                                            cb.setChecked(true);
-                                                            cb.setProgrammaticChangeEvents(true);
-                                                            updateDatasetInfoPane(right, dataset, mode);
-                                                        }
-                                                    });
-                                                    datasetContext.addItem(enable);
+                                                        });
+                                                        datasetContext.addItem(disable);
+                                                    } else {
+                                                        // Enable
+                                                        MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, "default");
+                                                        enable.addListener(new ChangeListener() {
+                                                            @Override
+                                                            public void changed(ChangeEvent event, Actor actor) {
+                                                                String filePath = dataset.catalogFile.path();
+                                                                if (!Settings.settings.data.catalogFiles.contains(filePath)) {
+                                                                    Settings.settings.data.catalogFiles.add(filePath);
+                                                                }
+                                                                OwnCheckBox cb = (OwnCheckBox) installOrSelect;
+                                                                cb.setProgrammaticChangeEvents(false);
+                                                                cb.setChecked(true);
+                                                                cb.setProgrammaticChangeEvents(true);
+                                                                updateDatasetInfoPane(right, dataset, mode);
+                                                            }
+                                                        });
+                                                        datasetContext.addItem(enable);
+                                                    }
+                                                    datasetContext.addSeparator();
                                                 }
-                                                datasetContext.addSeparator();
                                                 // Delete
                                                 MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, "default");
                                                 delete.addListener(new ClickListener() {
@@ -811,7 +825,8 @@ public class DownloadDataWindow extends GenericDialog {
             status = new OwnLabel("Available for download", skin, "mono");
         } else if (mode == DatasetMode.INSTALLED) {
             if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
-                status = new OwnLabel(I18n.txt("gui.download.version.gs.mismatch.short", dataset.minGsVersion, GaiaSkyDesktop.SOURCE_VERSION), skin, "mono");
+                status = new OwnLabel(I18n.txt("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
+                status.setColor(ColorUtils.gRedC);
             } else {
                 java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
                 boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
