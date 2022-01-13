@@ -56,6 +56,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -105,8 +106,9 @@ public class DownloadDataWindow extends GenericDialog {
 
     private DataDescriptor serverDd, localDd;
     private OwnScrollPane leftScroll;
+    private Button firstButton = null;
     private float[] scroll;
-    private int selectedTab = 0;
+    private static int selectedTab = 1;
 
     private final Color highlight;
 
@@ -119,6 +121,8 @@ public class DownloadDataWindow extends GenericDialog {
     private final Set<DatasetWatcher> watchers;
     private DatasetWatcher rightPaneWatcher;
 
+    private AtomicBoolean initialized;
+
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
         this(stage, skin, dd, true, I18n.txt("gui.close"));
     }
@@ -130,6 +134,7 @@ public class DownloadDataWindow extends GenericDialog {
         this.highlight = ColorUtils.gYellowC;
         this.watchers = new HashSet<>();
         this.scroll = new float[] { 0f, 0f };
+        this.initialized = new AtomicBoolean(false);
 
         this.dataLocation = dataLocation;
 
@@ -141,6 +146,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void build() {
+        initialized.set(false);
         me.acceptButton.setDisabled(false);
         float tabWidth = 240f;
         float width = 1800f;
@@ -163,10 +169,10 @@ public class DownloadDataWindow extends GenericDialog {
             updatesAsterisk = " *";
         }
 
-        final Button tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
+        final OwnTextButton tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
         tabAvail.setWidth(tabWidth);
-        final Button tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed") + updatesAsterisk, skin, "toggle-big");
+        final OwnTextButton tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed") + updatesAsterisk, skin, "toggle-big");
         tabInstalled.pad(pad5);
         tabInstalled.setWidth(tabWidth);
 
@@ -199,13 +205,16 @@ public class DownloadDataWindow extends GenericDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (tabAvail.isChecked()) {
-                    selectedTab = 0;
+                    if (initialized.get())
+                        selectedTab = 0;
                     reloadAvailable(contentAvail, width);
                 }
                 if (tabInstalled.isChecked()) {
-                    selectedTab = 1;
+                    if (initialized.get())
+                        selectedTab = 1;
                     reloadInstalled(contentInstalled, width);
                 }
+                setKeyboardFocus();
                 contentAvail.setVisible(tabAvail.isChecked());
                 contentInstalled.setVisible(tabInstalled.isChecked());
 
@@ -222,15 +231,14 @@ public class DownloadDataWindow extends GenericDialog {
         tabs.add(tabAvail);
         tabs.add(tabInstalled);
 
-        if (selectedTab == 0) {
-            tabAvail.setChecked(true);
-        } else if (selectedTab == 1) {
-            tabInstalled.setChecked(true);
-        }
+        // Check
+        tabs.setChecked(selectedTab == 0 ? tabAvail.getText().toString() : tabInstalled.getText().toString());
 
         // Data location
         if (dataLocation)
             addDataLocation(content);
+
+        initialized.set(true);
     }
 
     private void addDataLocation(Table content) {
@@ -558,8 +566,10 @@ public class DownloadDataWindow extends GenericDialog {
 
                         leftTable.add(button).left().row();
 
-                        if (first == null)
+                        if (first == null) {
                             first = dataset;
+                            firstButton = button;
+                        }
 
                         // Create watcher
                         watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null));
@@ -571,6 +581,7 @@ public class DownloadDataWindow extends GenericDialog {
             left.setActor(leftScroll);
 
             updateDatasetInfoPane(right, first, mode);
+
         }
         me.pack();
     }
@@ -987,8 +998,8 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     public void setKeyboardFocus() {
-        if (this.stage != null) {
-            this.stage.setKeyboardFocus(this.acceptButton);
+        if(stage != null && firstButton != null) {
+            stage.setKeyboardFocus(firstButton);
         }
     }
 
