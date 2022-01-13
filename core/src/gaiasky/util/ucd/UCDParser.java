@@ -176,6 +176,7 @@ public class UCDParser {
         PMRA = new Array<>();
         PMDEC = new Array<>();
         RADVEL = new Array<>();
+        TEFF = new Array<>();
         VARI_TIMES = new Array<>();
         VARI_MAGS = new Array<>();
         VARI_PERIOD = new Array<>();
