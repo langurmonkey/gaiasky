@@ -1360,6 +1360,29 @@ public enum Events {
     /**
      * Informs of the cloud generation, contains a boolean (start, finish)
      */
-    PROCEDURAL_GENERATION_CLOUD_INFO
+    PROCEDURAL_GENERATION_CLOUD_INFO,
+
+    /**
+     * Signals the start of a dataset download. Contains the dataset key (String).
+     */
+    DATASET_DOWNLOAD_START_INFO,
+    /**
+     * Informs of the progress of a current download.
+     * Contains the dataset key (String), the progress value (float),
+     * the progress status with the percentage (String) and the speed (String)
+     */
+    DATASET_DOWNLOAD_PROGRESS_INFO,
+
+    /**
+     * Informs that the download has finished.
+     * Contains the dataset key (String) and the status:
+     * <ul>
+     *     <li>0 - ok</li>
+     *     <li>1 - error</li>
+     *     <li>2 - cancelled</li>
+     *     <li>3 - not found</li>
+     * </ul>
+     */
+    DATASET_DOWNLOAD_FINISH_INFO
 
 }

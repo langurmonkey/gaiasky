@@ -23,6 +23,8 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -102,12 +104,8 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private DataDescriptor serverDd, localDd;
-    private OwnTextButton downloadButton;
-    private OwnProgressBar downloadProgress;
-    private OwnLabel currentDownloadFile, downloadSpeed;
-    private OwnScrollPane datasetsScroll;
-    private Cell<?> cancelCell;
-    private float scrollX = 0f, scrollY = 0f;
+    private OwnScrollPane leftScroll;
+    private float[] scroll;
     private int selectedTab = 0;
 
     private final Color highlight;
@@ -116,12 +114,10 @@ public class DownloadDataWindow extends GenericDialog {
     private final boolean dataLocation;
 
     private final INumberFormat nf;
-    private final List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choiceList;
-    private Array<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> toDownload;
-    private final Array<OwnImageButton> rubbishes;
     private int current = -1;
 
-    private final Set<DatasetDesc> downloaded;
+    private final Set<DatasetWatcher> watchers;
+    private DatasetWatcher rightPaneWatcher;
 
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
         this(stage, skin, dd, true, I18n.txt("gui.close"));
@@ -131,10 +127,9 @@ public class DownloadDataWindow extends GenericDialog {
         super(I18n.txt("gui.download.title") + (dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.serverDd = dd;
-        this.choiceList = new LinkedList<>();
-        this.rubbishes = new Array<>();
         this.highlight = ColorUtils.gYellowC;
-        this.downloaded = new HashSet<>();
+        this.watchers = new HashSet<>();
+        this.scroll = new float[] { 0f, 0f };
 
         this.dataLocation = dataLocation;
 
@@ -204,9 +199,11 @@ public class DownloadDataWindow extends GenericDialog {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 if (tabAvail.isChecked()) {
+                    selectedTab = 0;
                     reloadAvailable(contentAvail, width);
                 }
                 if (tabInstalled.isChecked()) {
+                    selectedTab = 1;
                     reloadInstalled(contentInstalled, width);
                 }
                 contentAvail.setVisible(tabAvail.isChecked());
@@ -218,18 +215,18 @@ public class DownloadDataWindow extends GenericDialog {
         tabAvail.addListener(tabListener);
         tabInstalled.addListener(tabListener);
 
-        if (selectedTab == 0) {
-            tabAvail.setChecked(true);
-        } else if (selectedTab == 1) {
-            tabInstalled.setChecked(true);
-        }
-
         // Let only one tab button be checked at a time
         ButtonGroup<Button> tabs = new ButtonGroup<>();
         tabs.setMinCheckCount(1);
         tabs.setMaxCheckCount(1);
         tabs.add(tabAvail);
         tabs.add(tabInstalled);
+
+        if (selectedTab == 0) {
+            tabAvail.setChecked(true);
+        } else if (selectedTab == 1) {
+            tabInstalled.setChecked(true);
+        }
 
         // Data location
         if (dataLocation)
@@ -316,7 +313,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void reloadPane(Table content, float width, DataDescriptor dd, DatasetMode mode) {
         content.clear();
-        if(dd.datasets.isEmpty()) {
+        if (dd.datasets.isEmpty()) {
             content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(pad20 * 2f);
         } else {
             Cell left = content.add().top().left().padRight(pad20);
@@ -324,7 +321,7 @@ public class DownloadDataWindow extends GenericDialog {
 
             Table leftTable = new Table(skin);
             leftTable.align(Align.topRight);
-            OwnScrollPane leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
+            leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
             leftScroll.setScrollingDisabled(true, false);
             leftScroll.setForceScroll(false, true);
             leftScroll.setSmoothScrolling(false);
@@ -373,7 +370,7 @@ public class DownloadDataWindow extends GenericDialog {
                             install.addListener(new OwnTextTooltip(I18n.txt(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
                             install.addListener((event) -> {
                                 if (event instanceof ChangeEvent) {
-                                    if(dataset.outdated) {
+                                    if (dataset.outdated) {
                                         actionUpdateDataset(dataset);
                                     } else {
                                         actionDownloadDataset(dataset);
@@ -563,6 +560,9 @@ public class DownloadDataWindow extends GenericDialog {
 
                         if (first == null)
                             first = dataset;
+
+                        // Create watcher
+                        watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null));
                     }
                 }
             }
@@ -576,6 +576,11 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private void updateDatasetInfoPane(Cell cell, DatasetDesc dataset, DatasetMode mode) {
+        if (rightPaneWatcher != null) {
+            rightPaneWatcher.dispose();
+            watchers.remove(rightPaneWatcher);
+            rightPaneWatcher = null;
+        }
         cell.clearActor();
         Table t = new Table(skin);
 
@@ -674,26 +679,10 @@ public class DownloadDataWindow extends GenericDialog {
         cell.setActor(t);
         cell.top().left();
         cell.getTable().pack();
-    }
 
-    private void updateDatasetsSelected() {
-        int nSelected = 0;
-        for (Trio<DatasetDesc, OwnCheckBox, OwnLabel> choice : choiceList) {
-            if (choice.getSecond().isChecked()) {
-                nSelected++;
-            }
-        }
-
-        if (nSelected <= 0) {
-            currentDownloadFile.setText(I18n.txt("gui.download.selected.none"));
-            downloadButton.setDisabled(true);
-        } else if (nSelected == 1) {
-            currentDownloadFile.setText(I18n.txt("gui.download.selected.one"));
-            downloadButton.setDisabled(false);
-        } else {
-            currentDownloadFile.setText(I18n.txt("gui.download.selected.more", nSelected));
-            downloadButton.setDisabled(false);
-        }
+        // Create watcher
+        rightPaneWatcher = new DatasetWatcher(dataset, null, null, status);
+        watchers.add(rightPaneWatcher);
     }
 
     public void refresh() {
@@ -701,157 +690,120 @@ public class DownloadDataWindow extends GenericDialog {
         build();
     }
 
-    private void downloadDataset(DatasetDesc dataset, OwnProgressBar progressBar, OwnTextIconButton downloadButton, OwnLabel statusLabel) {
-        if (current >= 0 && current < toDownload.size) {
-            // Download next
-            Trio<DatasetDesc, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
-            DatasetDesc currentDataset = trio.getFirst();
-            String name = currentDataset.name;
-            String url = currentDataset.file.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
+    private void downloadDataset(DatasetDesc dataset) {
+        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.DATASET_DOWNLOAD_START_INFO, dataset.key));
 
-            String filename = FilenameUtils.getName(url);
-            FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/" + filename + ".part");
+        String name = dataset.name;
+        String url = dataset.file.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
 
-            ProgressRunnable progressDownload = (read, total, progress, speed) -> {
-                double readMb = (double) read / 1e6d;
-                double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.downloading", nf.format(progress));
-                double mbPerSecond = speed / 1000d;
-                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
-                // Since we are downloading on a background thread, post a runnable to touch UI
-                GaiaSky.postRunnable(() -> {
-                    downloadButton.setText(progressString);
-                    downloadProgress.setValue((float) progress);
-                    downloadSpeed.setText(speedString);
-                });
-            };
-            ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
-                double readMb = (double) read / 1e6d;
-                double totalMb = (double) total / 1e6d;
-                final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.checksumming", nf.format(progress));
-                double mbPerSecond = speed / 1000d;
-                final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB   -   " + nf.format(mbPerSecond) + " MB/s";
-                // Since we are downloading on a background thread, post a runnable to touch UI
-                GaiaSky.postRunnable(() -> {
-                    downloadButton.setText(progressString);
-                    downloadProgress.setValue((float) progress);
-                    downloadSpeed.setText(speedString);
-                });
-            };
+        String filename = FilenameUtils.getName(url);
+        FileHandle tempDownload = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/" + filename + ".part");
 
-            ChecksumRunnable finish = (digest) -> {
-                // Unpack
-                int errors = 0;
-                logger.info("Extracting: " + tempDownload.path());
-                String dataLocation = Settings.settings.data.location + File.separatorChar;
-                // Checksum
-                if (digest != null && currentDataset.sha256 != null) {
-                    String serverDigest = currentDataset.sha256;
-                    try {
-                        boolean ok = serverDigest.equals(digest);
-                        if (ok) {
-                            logger.info("SHA256 ok: " + name);
-                        } else {
-                            logger.error("SHA256 check failed: " + name);
-                            errors++;
-                        }
-                    } catch (Exception e) {
-                        logger.info("Error checking SHA256: " + name);
+        ProgressRunnable progressDownload = (read, total, progress, speed) -> {
+            double readMb = (double) read / 1e6d;
+            double totalMb = (double) total / 1e6d;
+            final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.downloading", nf.format(progress));
+            double mbPerSecond = speed / 1000d;
+            final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
+            // Since we are downloading on a background thread, post a runnable to touch UI
+            GaiaSky.postRunnable(() -> {
+                EventManager.instance.post(Events.DATASET_DOWNLOAD_PROGRESS_INFO, dataset.key, (float) progress, progressString, speedString);
+            });
+        };
+        ProgressRunnable progressHashResume = (read, total, progress, speed) -> {
+            double readMb = (double) read / 1e6d;
+            double totalMb = (double) total / 1e6d;
+            final String progressString = progress >= 100 ? I18n.txt("gui.done") : I18n.txt("gui.download.checksumming", nf.format(progress));
+            double mbPerSecond = speed / 1000d;
+            final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
+            // Since we are downloading on a background thread, post a runnable to touch UI
+            GaiaSky.postRunnable(() -> {
+                EventManager.instance.post(Events.DATASET_DOWNLOAD_PROGRESS_INFO, dataset.key, (float) progress, progressString, speedString);
+            });
+        };
+
+        ChecksumRunnable finish = (digest) -> {
+            // Unpack
+            int errors = 0;
+            logger.info("Extracting: " + tempDownload.path());
+            String dataLocation = Settings.settings.data.location + File.separatorChar;
+            // Checksum
+            if (digest != null && dataset.sha256 != null) {
+                String serverDigest = dataset.sha256;
+                try {
+                    boolean ok = serverDigest.equals(digest);
+                    if (ok) {
+                        logger.info("SHA256 ok: " + name);
+                    } else {
+                        logger.error("SHA256 check failed: " + name);
                         errors++;
                     }
-                } else {
-                    logger.info("No digest found for dataset: " + name);
+                } catch (Exception e) {
+                    logger.info("Error checking SHA256: " + name);
+                    errors++;
                 }
+            } else {
+                logger.info("No digest found for dataset: " + name);
+            }
 
-                if (errors == 0) {
-                    try {
-                        // Extract
-                        decompress(tempDownload.path(), new File(dataLocation), downloadButton, downloadProgress);
-                        // Remove archive
-                        cleanupTempFile(tempDownload.path());
-                    } catch (Exception e) {
-                        logger.error(e, "Error decompressing: " + name);
-                        errors++;
-                    }
+            if (errors == 0) {
+                try {
+                    // Extract
+                    decompress(tempDownload.path(), new File(dataLocation), dataset);
+                    // Remove archive
+                    cleanupTempFile(tempDownload.path());
+                } catch (Exception e) {
+                    logger.error(e, "Error decompressing: " + name);
+                    errors++;
                 }
+            }
 
-                // Done
-                GaiaSky.postRunnable(() -> {
-                    downloadButton.setText(I18n.txt("gui.download.download"));
-                    downloadProgress.setValue(0);
-                    downloadProgress.setVisible(false);
-                    downloadSpeed.setText("");
-                    downloadSpeed.setVisible(false);
-                    cancelCell.setActor(null);
-                    me.acceptButton.setDisabled(false);
-                    // Enable all
-                    setDisabled(choiceList, false);
-                    // Enable rubbishes
-                    setDisabled(rubbishes, false);
-                });
+            final int numErrors = errors;
+            // Done
+            GaiaSky.postRunnable(() -> {
+                me.acceptButton.setDisabled(false);
 
-                if (errors == 0) {
-                    // Add to downloaded list for later selection
-                    downloaded.add(trio.getFirst());
+                if (numErrors == 0) {
                     // Ok message
-                    setMessageOk(I18n.txt("gui.download.idle"));
-                    setStatusFound(currentDataset, trio.getThird());
-
+                    EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, dataset.key, 0);
+                    dataset.exists = true;
+                    reloadAll();
                 } else {
                     logger.info("Error getting dataset: " + name);
-                    setStatusError(currentDataset, trio.getThird());
-                    setMessageError(I18n.txt("gui.download.failed", name));
-                }
-
-            };
-
-            Runnable fail = () -> {
-                logger.error("Download failed: " + name);
-                setStatusError(currentDataset, trio.getThird());
-                setMessageError(I18n.txt("gui.download.failed", name));
-                me.acceptButton.setDisabled(false);
-                downloadProgress.setVisible(false);
-                downloadSpeed.setVisible(false);
-                cancelCell.setActor(null);
-            };
-
-            Runnable cancel = () -> {
-                logger.error(I18n.txt("gui.download.cancelled", name));
-                setStatusCancelled(currentDataset, trio.getThird());
-                setMessageError(I18n.txt("gui.download.cancelled", name));
-                me.acceptButton.setDisabled(false);
-                downloadProgress.setVisible(false);
-                downloadSpeed.setVisible(false);
-                cancelCell.setActor(null);
-            };
-
-            // Download
-            downloadButton.setDisabled(true);
-            me.acceptButton.setDisabled(true);
-            downloadProgress.setVisible(true);
-            downloadSpeed.setVisible(true);
-            setStatusProgress(trio.getThird());
-            setMessageOk(I18n.txt("gui.download.downloading.info", (current + 1), toDownload.size, currentDataset.name));
-            final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
-
-            // Cancel button
-            OwnTextButton cancelDownloadButton = new OwnTextButton(I18n.txt("gui.download.cancel"), skin);
-            cancelDownloadButton.pad(14.4f);
-            cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
-            cancelDownloadButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    if (request != null) {
-                        GaiaSky.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
-                    }
+                    setStatusError(dataset);
                 }
             });
-            cancelCell.setActor(cancelDownloadButton);
-        } else {
-            // Finished all downloads!
-            // RELOAD DATASETS VIEW
-            GaiaSky.postRunnable(this::reloadAll);
-        }
+
+        };
+
+        Runnable fail = () -> {
+            logger.error("Download failed: " + name);
+            setStatusError(dataset);
+            me.acceptButton.setDisabled(false);
+        };
+
+        Runnable cancel = () -> {
+            logger.error(I18n.txt("gui.download.cancelled", name));
+            setStatusCancelled(dataset);
+            me.acceptButton.setDisabled(false);
+        };
+
+        // Download
+        me.acceptButton.setDisabled(true);
+        final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
+
+        // Cancel button
+        OwnTextButton cancelDownloadButton = new OwnTextButton(I18n.txt("gui.download.cancel"), skin);
+        cancelDownloadButton.pad(14.4f);
+        cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
+        cancelDownloadButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                if (request != null) {
+                    GaiaSky.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
+                }
+            }
+        });
     }
 
     private void setDisabled(Array<OwnImageButton> l, boolean disabled) {
@@ -870,7 +822,7 @@ public class DownloadDataWindow extends GenericDialog {
         }
     }
 
-    private void decompress(String in, File out, OwnTextButton b, ProgressBar p) throws Exception {
+    private void decompress(String in, File out, DatasetDesc dataset) throws Exception {
         FileInfoInputStream fIs = new FileInfoInputStream(in);
         GzipCompressorInputStream gzIs = new GzipCompressorInputStream(fIs);
         TarArchiveInputStream tarIs = new TarArchiveInputStream(gzIs);
@@ -894,9 +846,9 @@ public class DownloadDataWindow extends GenericDialog {
             long elapsed = current - last;
             if (elapsed > 250) {
                 GaiaSky.postRunnable(() -> {
-                    float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb);
-                    b.setText(I18n.txt("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb"));
-                    p.setValue(val * 100);
+                    float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
+                    String progressString = I18n.txt("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
+                    EventManager.instance.post(Events.DATASET_DOWNLOAD_PROGRESS_INFO, dataset.key, val, progressString, null);
                 });
                 last = current;
             }
@@ -992,45 +944,20 @@ public class DownloadDataWindow extends GenericDialog {
         label.setColor(ColorUtils.gGreenC);
     }
 
-    private void setStatusNotFound(DatasetDesc ds, OwnLabel label) {
-        label.setText(I18n.txt("gui.download.status.notfound"));
-        label.setColor(ColorUtils.gRedC);
+    private void setStatusNotFound(DatasetDesc ds) {
+        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 3);
     }
 
-    private void setStatusError(DatasetDesc ds, OwnLabel label) {
-        label.setText("Failed");
-        label.setText(I18n.txt("gui.download.status.failed"));
-        label.setColor(ColorUtils.gRedC);
+    private void setStatusError(DatasetDesc ds) {
+        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 1);
     }
 
-    private void setStatusCancelled(DatasetDesc ds, OwnLabel label) {
-        label.setText(I18n.txt("gui.download.status.cancelled"));
-        label.setColor(ColorUtils.gRedC);
-    }
-
-    private void setStatusProgress(OwnLabel label) {
-        label.setText(I18n.txt("gui.download.status.working"));
-        label.setColor(ColorUtils.gBlueC);
-    }
-
-    private void setMessageOk(String text) {
-        currentDownloadFile.setText(text);
-        currentDownloadFile.setColor(currentDownloadFile.getStyle().fontColor);
-    }
-
-    private void setMessageError(String text) {
-        currentDownloadFile.setText(text);
-        currentDownloadFile.setColor(ColorUtils.gRedC);
+    private void setStatusCancelled(DatasetDesc ds) {
+        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 2);
     }
 
     @Override
     protected void accept() {
-        // Select downloaded catalogs
-        for (DatasetDesc dd : downloaded) {
-            if (dd.type.startsWith("catalog")) {
-                Settings.settings.data.addSelectedCatalog(dd.check);
-            }
-        }
     }
 
     @Override
@@ -1043,37 +970,45 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private void backupScrollValues() {
-        if (datasetsScroll != null) {
-            this.scrollY = datasetsScroll.getScrollY();
-            this.scrollX = datasetsScroll.getScrollX();
+        if (leftScroll != null) {
+            this.scroll[0] = leftScroll.getScrollX();
+            this.scroll[1] = leftScroll.getScrollY();
         }
     }
 
     private void restoreScrollValues() {
-        if (datasetsScroll != null) {
+        if (leftScroll != null) {
             GaiaSky.postRunnable(() -> {
-                datasetsScroll.setScrollX(scrollX);
-                datasetsScroll.setScrollY(scrollY);
+                leftScroll.setScrollX(scroll[0]);
+                leftScroll.setScrollY(scroll[1]);
             });
-
         }
     }
 
     @Override
     public void setKeyboardFocus() {
-        stage.setKeyboardFocus(downloadButton);
+        if (this.stage != null) {
+            this.stage.setKeyboardFocus(this.acceptButton);
+        }
+    }
+
+    private void cleanWatchers() {
+        for (DatasetWatcher watcher : watchers) {
+            watcher.dispose();
+        }
+        watchers.clear();
+        rightPaneWatcher = null;
     }
 
     /**
      * Drops the current view and regenerates all window content
      */
     private void reloadAll() {
-        if (choiceList != null)
-            choiceList.clear();
-        if (toDownload != null)
-            toDownload.clear();
-        serverDd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
+        cleanWatchers();
+
+        localDd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
         backupScrollValues();
+        leftScroll = null;
         content.clear();
         build();
         pack();
@@ -1081,11 +1016,11 @@ public class DownloadDataWindow extends GenericDialog {
     }
 
     private void actionDownloadDataset(DatasetDesc dataset) {
-
+        downloadDataset(dataset);
     }
 
     private void actionUpdateDataset(DatasetDesc dataset) {
-
+        downloadDataset(dataset);
     }
 
     private void actionDeleteDataset(DatasetDesc dataset) {
@@ -1101,6 +1036,8 @@ public class DownloadDataWindow extends GenericDialog {
 
             @Override
             protected void accept() {
+                DatasetDesc serverDataset = serverDd != null ? serverDd.findDatasetByKey(dataset.key) : null;
+                boolean deleted = false;
                 // Delete
                 if (dataset.filesToDelete != null) {
                     for (String fileToDelete : dataset.filesToDelete) {
@@ -1124,8 +1061,7 @@ public class DownloadDataWindow extends GenericDialog {
                                     FileUtils.forceDelete(file);
                                 }
                             }
-                            // Remove from downloaded list, if it is there
-                            downloaded.remove(dataset);
+                            deleted = true;
                         } catch (Exception e) {
                             logger.error(e);
                         }
@@ -1134,6 +1070,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Only remove "check"
                     try {
                         FileUtils.forceDelete(dataset.check.toFile());
+                        deleted = true;
                     } catch (IOException e) {
                         logger.error(e);
                     }
@@ -1141,9 +1078,14 @@ public class DownloadDataWindow extends GenericDialog {
                     // Only remove "path"
                     try {
                         FileUtils.forceDelete(dataset.path.toFile());
+                        deleted = true;
                     } catch (IOException e) {
                         logger.error(e);
                     }
+                }
+                // Update server dataset status
+                if (deleted && serverDataset != null) {
+                    serverDataset.exists = false;
                 }
                 // RELOAD DATASETS VIEW
                 GaiaSky.postRunnable(() -> reloadAll());
@@ -1167,6 +1109,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     /**
      * Constructs a list of local catalogs found in the current data location.
+     *
      * @param server The server catalog descriptors, for combining with the local catalogs.
      * @return The data descriptor containing the local catalogs.
      */
@@ -1224,6 +1167,7 @@ public class DownloadDataWindow extends GenericDialog {
                     if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
                         // Match, update local with some server info
                         local.check = remote.check;
+                        local.key = remote.key;
                         local.filesToDelete = remote.filesToDelete;
                         local.file = remote.file;
                         local.serverVersion = remote.serverVersion;

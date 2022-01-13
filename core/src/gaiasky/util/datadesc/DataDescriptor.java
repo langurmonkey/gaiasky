@@ -47,6 +47,19 @@ public class DataDescriptor {
         }
         return null;
     }
+    /**
+     * Finds the dataset with the given key in the dataset descriptor list.
+     *
+     * @param key The key of the dataset
+     * @return The dataset descriptor or null if it was not found
+     */
+    public DatasetDesc findDatasetByKey(String key) {
+        for (DatasetDesc dd : datasets) {
+            if (dd.key.equals(key))
+                return dd;
+        }
+        return null;
+    }
 
     /**
      * Checks whether the dataset with the given name is present in the

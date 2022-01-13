@@ -25,6 +25,7 @@ public class DatasetDesc {
 
     private JsonReader reader;
     public JsonValue source;
+    public String key;
     public String name;
     public String description;
     public String shortDescription;
@@ -77,6 +78,7 @@ public class DatasetDesc {
 
         this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
         this.name = source.getString("name");
+        this.key = this.name;
         this.baseData = name.equals("default-data");
         this.mustDownload = (!exists || outdated) && baseData;
         this.cbDisabled = baseData || (exists && !outdated);
