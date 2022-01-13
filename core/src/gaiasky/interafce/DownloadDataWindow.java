@@ -696,38 +696,12 @@ public class DownloadDataWindow extends GenericDialog {
         }
     }
 
-    private synchronized void downloadAndExtractFiles(List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choices) {
-        toDownload = new Array<>();
-
-        for (Trio<DatasetDesc, OwnCheckBox, OwnLabel> entry : choices) {
-            if (entry.getSecond().isChecked())
-                toDownload.add(entry);
-        }
-
-        // Disable all checkboxes
-        setDisabled(choices, true);
-        // Disable all rubbishes
-        setDisabled(rubbishes, true);
-
-        logger.info(toDownload.size + " new data files selected to download");
-
-        current = -1;
-        downloadNext();
-
-    }
-
     public void refresh() {
         content.clear();
-        bottom.clear();
         build();
     }
 
-    private void downloadNext() {
-        current++;
-        downloadCurrent();
-    }
-
-    private void downloadCurrent() {
+    private void downloadDataset(DatasetDesc dataset, OwnProgressBar progressBar, OwnTextIconButton downloadButton, OwnLabel statusLabel) {
         if (current >= 0 && current < toDownload.size) {
             // Download next
             Trio<DatasetDesc, OwnCheckBox, OwnLabel> trio = toDownload.get(current);
@@ -823,7 +797,6 @@ public class DownloadDataWindow extends GenericDialog {
                     setMessageOk(I18n.txt("gui.download.idle"));
                     setStatusFound(currentDataset, trio.getThird());
 
-                    GaiaSky.postRunnable(this::downloadNext);
                 } else {
                     logger.info("Error getting dataset: " + name);
                     setStatusError(currentDataset, trio.getThird());
@@ -840,7 +813,6 @@ public class DownloadDataWindow extends GenericDialog {
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
                 cancelCell.setActor(null);
-                GaiaSky.postRunnable(this::downloadNext);
             };
 
             Runnable cancel = () -> {
@@ -851,7 +823,6 @@ public class DownloadDataWindow extends GenericDialog {
                 downloadProgress.setVisible(false);
                 downloadSpeed.setVisible(false);
                 cancelCell.setActor(null);
-                GaiaSky.postRunnable(this::downloadNext);
             };
 
             // Download
