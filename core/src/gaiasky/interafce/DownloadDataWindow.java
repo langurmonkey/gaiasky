@@ -23,8 +23,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
-import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -126,7 +124,7 @@ public class DownloadDataWindow extends GenericDialog {
     private final Set<DatasetDesc> downloaded;
 
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
-        this(stage, skin, dd, true, I18n.txt("gui.ok"));
+        this(stage, skin, dd, true, I18n.txt("gui.close"));
     }
 
     public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
@@ -148,31 +146,39 @@ public class DownloadDataWindow extends GenericDialog {
 
     @Override
     protected void build() {
-        boolean theNew = true;
-
         me.acceptButton.setDisabled(false);
-        float pad = 3.2f;
-        float padLarge = 14.4f;
-        float minW = 800f;
         float tabWidth = 240f;
         float width = 1800f;
+
+        try {
+            Files.createDirectories(SysUtils.getLocalDataDir());
+        } catch (FileAlreadyExistsException e) {
+            // Good
+        } catch (IOException e) {
+            logger.error(e);
+            return;
+        }
 
         // Tabs
         HorizontalGroup tabGroup = new HorizontalGroup();
         tabGroup.align(Align.center);
 
+        String updatesAsterisk = "";
+        if (serverDd.updatesAvailable) {
+            updatesAsterisk = " *";
+        }
+
         final Button tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
         tabAvail.setWidth(tabWidth);
-        final Button tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed"), skin, "toggle-big");
+        final Button tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed") + updatesAsterisk, skin, "toggle-big");
         tabInstalled.pad(pad5);
         tabInstalled.setWidth(tabWidth);
 
         tabGroup.addActor(tabAvail);
         tabGroup.addActor(tabInstalled);
 
-        if (theNew)
-            content.add(tabGroup).center().expandX().row();
+        content.add(tabGroup).center().expandX().row();
 
         // Create the tab content. Just using images here for simplicity.
         Stack tabContent = new Stack();
@@ -190,8 +196,7 @@ public class DownloadDataWindow extends GenericDialog {
         tabContent.addActor(contentAvail);
         tabContent.addActor(contentInstalled);
 
-        if (theNew)
-            content.add(tabContent).expand().fill().padBottom(pad20 * 3f).row();
+        content.add(tabContent).expand().fill().padBottom(pad20).row();
 
         // Listen to changes in the tab button checked states
         // Set visibility of the tab content to match the checked state
@@ -226,13 +231,16 @@ public class DownloadDataWindow extends GenericDialog {
         tabs.add(tabAvail);
         tabs.add(tabInstalled);
 
-        float buttonPad = 1.6f;
-        Cell<Actor> topCell = content.add((Actor) null).left().top();
-        topCell.row();
+        // Data location
+        if (dataLocation)
+            addDataLocation(content);
+    }
 
-        // Offer downloads
-        Table downloadTable = new Table(skin);
-        downloadTable.setFillParent(true);
+    private void addDataLocation(Table content) {
+        float buttonPad = 1.6f;
+        String catLoc = Settings.settings.data.location;
+
+        Table dataLocTable = new Table(skin);
 
         OwnLabel catalogsLocLabel = new OwnLabel(I18n.txt("gui.download.location"), skin);
         OwnImageButton catalogsLocTooltip = new OwnImageButton(skin, "tooltip");
@@ -242,339 +250,54 @@ public class DownloadDataWindow extends GenericDialog {
         catalogsLocGroup.addActor(catalogsLocLabel);
         catalogsLocGroup.addActor(catalogsLocTooltip);
 
-        HorizontalGroup hg = new HorizontalGroup();
-        hg.space(18f);
-        Image system = new Image(skin.getDrawable("tooltip-icon"));
-        OwnLabel downloadInfo = new OwnLabel(I18n.txt("gui.download.info"), skin);
-        hg.addActor(system);
-        hg.addActor(downloadInfo);
+        OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
+        dataLocationButton.pad(buttonPad * 4f);
+        dataLocationButton.setMinWidth(800f);
 
-        downloadTable.add(hg).left().colspan(2).padBottom(padLarge).row();
+        dataLocTable.add(catalogsLocGroup).left().padBottom(pad10);
+        dataLocTable.add(dataLocationButton).left().padLeft(pad5).padBottom(pad10).row();
+        Cell<Actor> notice = dataLocTable.add((Actor) null).colspan(2).padBottom(pad10);
+        notice.row();
 
-        try {
-            Files.createDirectories(SysUtils.getLocalDataDir());
-        } catch (FileAlreadyExistsException e) {
-            // Good
-        } catch (IOException e) {
-            logger.error(e);
-            return;
-        }
-        String catLoc = Settings.settings.data.location;
+        content.add(dataLocTable).center().row();
 
-        if (dataLocation) {
-            OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
-            dataLocationButton.pad(buttonPad * 4f);
-            dataLocationButton.setMinWidth(minW);
-            downloadTable.add(catalogsLocGroup).left().padBottom(padLarge);
-            downloadTable.add(dataLocationButton).left().padLeft(pad).padBottom(padLarge).row();
-            Cell<Actor> notice = downloadTable.add((Actor) null).colspan(2).padBottom(padLarge);
-            notice.row();
-
-            dataLocationButton.addListener((event) -> {
-                if (event instanceof ChangeEvent) {
-                    FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
-                    fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
-                    fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
-                    fc.setResultListener((success, result) -> {
-                        if (success) {
-                            if (Files.isReadable(result) && Files.isWritable(result)) {
-                                // Set data location
-                                dataLocationButton.setText(result.toAbsolutePath().toString());
-                                // Change data location
-                                Settings.settings.data.location = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
-                                // Create temp dir
-                                SysUtils.mkdir(SysUtils.getTempDir(Settings.settings.data.location));
-                                me.pack();
-                                GaiaSky.postRunnable(() -> {
-                                    // Reset datasets
-                                    Settings.settings.data.catalogFiles.clear();
-                                    reloadAll();
-                                    GaiaSky.instance.getGlobalResources().reloadDataFiles();
-                                });
-                            } else {
-                                Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
-                                warn.setColor(ColorUtils.gRedC);
-                                notice.setActor(warn);
-                                return false;
-                            }
-                        }
-                        notice.clearActor();
-                        return true;
-                    });
-                    fc.show(stage);
-
-                    return true;
-                }
-                return false;
-            });
-        }
-
-        // Uploads available?
-        if (serverDd.updatesAvailable) {
-            OwnLabel updates = new OwnLabel(I18n.txt("gui.download.updates", serverDd.numUpdates), skin, "hud-big");
-            updates.setColor(highlight);
-            downloadTable.add(updates).colspan(2).center().padBottom(padLarge).row();
-        }
-
-        // Build datasets table
-        final Table datasetsTable = new Table(skin);
-        datasetsTable.align(Align.topLeft);
-
-        for (DatasetType type : serverDd.types) {
-            List<DatasetDesc> datasets = type.datasets;
-            OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
-            OwnImageButton expandIcon = new OwnImageButton(skin, "expand-collapse");
-            expandIcon.setChecked(true);
-            HorizontalGroup titleGroup = new HorizontalGroup();
-            titleGroup.space(padLarge);
-            titleGroup.addActor(expandIcon);
-            titleGroup.addActor(dsType);
-            datasetsTable.add(titleGroup).top().left().padBottom(pad * 3f).padTop(padLarge * 2f).row();
-
-            Table t = new Table(skin);
-            Cell<Table> c = datasetsTable.add(t).colspan(2).left();
-            c.row();
-
-            expandIcon.addListener((event) -> {
-                if (event instanceof ChangeEvent) {
-                    if (c.getActor() == null) {
-                        c.setActor(t);
-                    } else {
-                        c.setActor(null);
-                    }
-                    datasetsTable.pack();
-                    me.pack();
-                    return true;
-                }
-                return false;
-            });
-
-            boolean haveAll = true;
-            for (DatasetDesc dataset : datasets) {
-                haveAll = haveAll && dataset.exists && !dataset.outdated;
-                // Check if dataset requires a minimum version of Gaia Sky
-
-                // Add dataset to desc table
-                OwnCheckBox cb = new OwnCheckBox(TextUtils.capString(dataset.shortDescription, 33), skin, "large", pad * 2f);
-                cb.addListener(new OwnTextTooltip(dataset.shortDescription, skin, 10));
-                cb.left();
-                cb.setMinWidth(420f);
-                cb.setChecked(dataset.mustDownload);
-                cb.setDisabled(dataset.cbDisabled);
-                cb.addListener((event) -> {
-                    if (event instanceof ChangeEvent) {
-                        updateDatasetsSelected();
-                        return true;
-                    }
-                    return false;
-                });
-                OwnLabel haveIt = new OwnLabel("", skin);
-                haveIt.setWidth(75f);
-                if (dataset.exists) {
-                    if (dataset.outdated) {
-                        setStatusOutdated(dataset, haveIt);
-                    } else {
-                        setStatusFound(dataset, haveIt);
-                    }
-                } else {
-                    setStatusNotFound(dataset, haveIt);
-                }
-
-                // Can't proceed without base data - force download
-                if (dataset.baseData && !dataset.exists) {
-                    me.acceptButton.setDisabled(true);
-                }
-
-                // Description
-                HorizontalGroup descGroup = new HorizontalGroup();
-                descGroup.space(padLarge);
-                OwnLabel desc = new OwnLabel(dataset.name, skin);
-                desc.addListener(new OwnTextTooltip(dataset.description, skin, 10));
-                desc.setWidth(336f);
-                // Info
-                OwnImageButton imgTooltip = new OwnImageButton(skin, "tooltip");
-                imgTooltip.addListener(new OwnTextTooltip(dataset.description, skin, 10));
-                descGroup.addActor(imgTooltip);
-                descGroup.addActor(desc);
-                // Link
-                if (dataset.link != null) {
-                    String link = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
-                    LinkButton imgLink = new LinkButton(link, skin);
-                    descGroup.addActor(imgLink);
-                } else {
-                    Image emptyImg = new Image(skin, "iconic-empty");
-                    descGroup.addActor(emptyImg);
-
-                }
-
-                // Version
-                String vstring;
-                if (!dataset.exists) {
-                    vstring = "-";
-                } else if (dataset.outdated) {
-                    vstring = dataset.myVersion + " -> v-" + dataset.serverVersion;
-                } else {
-                    vstring = "v-" + dataset.myVersion;
-                }
-
-                OwnLabel vers = new OwnLabel(vstring, skin);
-                vers.setWidth(128f);
-                if (!dataset.exists) {
-                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.server", Integer.toString(dataset.serverVersion)), skin, 10));
-                } else if (dataset.outdated) {
-                    // New version!
-                    vers.setColor(highlight);
-                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, 10));
-                } else {
-                    vers.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.ok"), skin, 10));
-                }
-
-                // Type icon
-                Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
-                float scl = 0.7f;
-                float iw = typeImage.getWidth();
-                float ih = typeImage.getHeight();
-                typeImage.setSize(iw * scl, ih * scl);
-                typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
-
-                // Size
-                OwnLabel size = new OwnLabel(dataset.size, skin);
-                size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
-                size.setWidth(88f);
-
-                // Objects
-                OwnLabel nObjects = new OwnLabel(dataset.nObjectsStr, skin);
-                nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip"), skin, 10));
-                nObjects.setWidth(192f);
-
-                // Delete
-                OwnImageButton rubbish = null;
-                if (dataset.exists) {
-                    rubbish = new OwnImageButton(skin, "rubbish-bin");
-                    rubbish.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.remove"), skin));
-                    rubbish.addListener((event) -> {
-                        if (event instanceof ChangeEvent) {
-                            // Remove dataset
-                            if (dataset.filesToDelete != null) {
-                                for (String fileToDelete : dataset.filesToDelete) {
-                                    try {
-                                        if (fileToDelete.endsWith("/")) {
-                                            fileToDelete = fileToDelete.substring(0, fileToDelete.length() - 1);
-                                        }
-                                        // Expand possible wildcards
-                                        String basePath = "";
-                                        String baseName = fileToDelete;
-                                        if (fileToDelete.contains("/")) {
-                                            basePath = fileToDelete.substring(0, fileToDelete.lastIndexOf('/'));
-                                            baseName = fileToDelete.substring(fileToDelete.lastIndexOf('/') + 1);
-                                        }
-                                        Path dataPath = Paths.get(Settings.settings.data.location);
-                                        dataPath = dataPath.toRealPath();
-                                        File directory = dataPath.resolve(basePath).toFile();
-                                        Collection<File> files = FileUtils.listFilesAndDirs(directory, new WildcardFileFilter(baseName), new WildcardFileFilter(baseName));
-                                        for (File file : files) {
-                                            if (!file.equals(directory) && file.exists()) {
-                                                FileUtils.forceDelete(file);
-                                            }
-                                        }
-                                        // Remove from downloaded list, if it is there
-                                        downloaded.remove(dataset);
-                                    } catch (Exception e) {
-                                        logger.error(e);
-                                    }
-                                }
-                            } else {
-                                // Only remove "check"
-                                try {
-                                    FileUtils.forceDelete(dataset.check.toFile());
-                                } catch (IOException e) {
-                                    logger.error(e);
-                                }
-                            }
-                            // RELOAD DATASETS VIEW
-                            GaiaSky.postRunnable(this::reloadAll);
-
-                            return true;
-                        }
-                        return false;
-                    });
-                    rubbishes.add(rubbish);
-                }
-                t.add(cb).left().padLeft(padLarge * 2f).padRight(padLarge).padBottom(pad);
-                t.add(descGroup).left().padRight(padLarge).padBottom(pad);
-                t.add(vers).center().padRight(padLarge).padBottom(pad);
-                t.add(typeImage).center().padRight(padLarge).padBottom(pad);
-                t.add(size).left().padRight(padLarge).padBottom(pad);
-                t.add(nObjects).left().padRight(padLarge).padBottom(pad);
-                t.add(haveIt).left().padBottom(pad);
-                if (dataset.exists) {
-                    t.add(rubbish).center().padLeft(padLarge * 2.5f);
-                }
-                t.row();
-
-                choiceList.add(new Trio<>(dataset, cb, haveIt));
-            }
-            expandIcon.setChecked(!haveAll);
-
-        }
-
-        datasetsScroll = new OwnScrollPane(datasetsTable, skin, "minimalist-nobg");
-        datasetsScroll.setScrollingDisabled(true, false);
-        datasetsScroll.setForceScroll(false, true);
-        datasetsScroll.setSmoothScrolling(false);
-        datasetsScroll.setFadeScrollBars(false);
-
-        downloadTable.add(datasetsScroll).top().center().padLeft(pad20).padRight(pad20).padBottom(padLarge).colspan(2).row();
-
-        // Current dataset info
-        currentDownloadFile = new OwnLabel("", skin, "hotkey");
-        downloadTable.add(currentDownloadFile).center().colspan(2).padBottom(padLarge).row();
-
-        // Download button
-        downloadButton = new OwnTextButton(I18n.txt("gui.download.download"), skin, "download");
-        downloadButton.pad(buttonPad * 4f);
-        downloadButton.setMinWidth(minW);
-        downloadButton.setMinHeight(80f);
-        downloadTable.add(downloadButton).center().colspan(2).padBottom(0f).row();
-
-        // Progress bar
-        downloadProgress = new OwnProgressBar(0, 100, 0.1f, false, skin, "default-horizontal");
-        downloadProgress.setValue(0);
-        downloadProgress.setVisible(false);
-        downloadProgress.setPrefWidth(minW);
-        downloadTable.add(downloadProgress).center().colspan(2).padBottom(padLarge).row();
-
-        // Download info and cancel
-        Table infoCancel = new Table(skin);
-        downloadSpeed = new OwnLabel("", skin);
-        downloadSpeed.setVisible(false);
-        downloadSpeed.setWidth(300f);
-        infoCancel.add(downloadSpeed).center().padRight(padLarge * 2f);
-        cancelCell = infoCancel.add();
-        downloadTable.add(infoCancel).colspan(2).padBottom(padLarge).row();
-
-        downloadButton.addListener((event) -> {
+        dataLocationButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                downloadAndExtractFiles(choiceList);
+                FileChooser fc = new FileChooser(I18n.txt("gui.download.pickloc"), skin, stage, Path.of(Settings.settings.data.location), FileChooser.FileChooserTarget.DIRECTORIES);
+                fc.setShowHidden(Settings.settings.program.fileChooser.showHidden);
+                fc.setShowHiddenConsumer((showHidden) -> Settings.settings.program.fileChooser.showHidden = showHidden);
+                fc.setResultListener((success, result) -> {
+                    if (success) {
+                        if (Files.isReadable(result) && Files.isWritable(result)) {
+                            // Set data location
+                            dataLocationButton.setText(result.toAbsolutePath().toString());
+                            // Change data location
+                            Settings.settings.data.location = result.toAbsolutePath().toString().replaceAll("\\\\", "/");
+                            // Create temp dir
+                            SysUtils.mkdir(SysUtils.getTempDir(Settings.settings.data.location));
+                            me.pack();
+                            GaiaSky.postRunnable(() -> {
+                                // Reset datasets
+                                Settings.settings.data.catalogFiles.clear();
+                                reloadAll();
+                                GaiaSky.instance.getGlobalResources().reloadDataFiles();
+                            });
+                        } else {
+                            Label warn = new OwnLabel(I18n.txt("gui.download.pickloc.permissions"), skin);
+                            warn.setColor(ColorUtils.gRedC);
+                            notice.setActor(warn);
+                            return false;
+                        }
+                    }
+                    notice.clearActor();
+                    return true;
+                });
+                fc.show(stage);
+
+                return true;
             }
-            return true;
+            return false;
         });
-
-        // Progress
-
-        // External download link
-        Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "http://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
-        downloadTable.add(manualDownload).center().colspan(2);
-
-        if (!theNew)
-            topCell.setActor(downloadTable);
-
-        downloadTable.pack();
-        datasetsScroll.setWidth(Math.min(stage.getWidth() * 0.9f, 1620f));
-        datasetsScroll.setHeight(Math.min(stage.getHeight() * 0.7f, 1700f));
-
-        // Update selected
-        updateDatasetsSelected();
     }
 
     private void reloadAvailable(Table content, float width) {
@@ -593,223 +316,262 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void reloadPane(Table content, float width, DataDescriptor dd, DatasetMode mode) {
         content.clear();
-        Cell left = content.add().top().left().padRight(pad20);
-        Cell right = content.add().top().left();
+        if(dd.datasets.isEmpty()) {
+            content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(pad20 * 2f);
+        } else {
+            Cell left = content.add().top().left().padRight(pad20);
+            Cell right = content.add().top().left();
 
-        Table leftTable = new Table(skin);
-        leftTable.align(Align.topRight);
-        OwnScrollPane leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
-        leftScroll.setScrollingDisabled(true, false);
-        leftScroll.setForceScroll(false, true);
-        leftScroll.setSmoothScrolling(false);
-        leftScroll.setFadeScrollBars(false);
+            Table leftTable = new Table(skin);
+            leftTable.align(Align.topRight);
+            OwnScrollPane leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
+            leftScroll.setScrollingDisabled(true, false);
+            leftScroll.setForceScroll(false, true);
+            leftScroll.setSmoothScrolling(false);
+            leftScroll.setFadeScrollBars(false);
 
-        // Current selected datasets
-        java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
-        DatasetDesc first = null;
+            // Current selected datasets
+            java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
+            DatasetDesc first = null;
 
-        for (DatasetType type : dd.types) {
-            List<DatasetDesc> datasets = type.datasets;
-            List<DatasetDesc> filtered = datasets.stream().filter(d -> mode == DatasetMode.AVAILABLE ? !d.exists : true).collect(Collectors.toList());
-            if (!filtered.isEmpty()) {
-                OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
-                leftTable.add(dsType).left().padTop(pad10).row();
+            for (DatasetType type : dd.types) {
+                List<DatasetDesc> datasets = type.datasets;
+                List<DatasetDesc> filtered = datasets.stream().filter(d -> mode == DatasetMode.AVAILABLE ? !d.exists : true).collect(Collectors.toList());
+                if (!filtered.isEmpty()) {
+                    OwnLabel dsType = new OwnLabel(I18n.txt("gui.download.type." + type.typeStr), skin, "hud-header");
+                    leftTable.add(dsType).left().padTop(pad10).row();
 
-                for (DatasetDesc dataset : filtered) {
-                    Table t = new Table(skin);
-                    t.pad(pad10, pad10, 0, pad10);
+                    for (DatasetDesc dataset : filtered) {
+                        Table t = new Table(skin);
+                        t.pad(pad10, pad10, 0, pad10);
 
-                    // Type icon
-                    Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
-                    float scl = 0.7f;
-                    float iw = typeImage.getWidth();
-                    float ih = typeImage.getHeight();
-                    typeImage.setSize(iw * scl, ih * scl);
-                    typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
+                        String tooltipText = dataset.shortDescription;
 
-                    // Title
-                    String titleString = mode == DatasetMode.AVAILABLE ? dataset.shortDescription : dataset.name;
-                    OwnLabel title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "ui-23");
-                    title.addListener(new OwnTextTooltip(dataset.shortDescription, skin, 10));
-                    title.setWidth(width * 0.41f);
+                        // Type icon
+                        Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
+                        float scl = 0.7f;
+                        float iw = typeImage.getWidth();
+                        float ih = typeImage.getHeight();
+                        typeImage.setSize(iw * scl, ih * scl);
+                        typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
-                    // INSTALL or SELECT
-                    Actor installOrSelect;
-                    float installOrSelectSize = 40f;
-                    if (mode == DatasetMode.AVAILABLE) {
-                        OwnTextIconButton install = new OwnTextIconButton("", skin, "install");
-                        install.setContentAlign(Align.center);
-                        install.addListener(new OwnTextTooltip(I18n.txt("gui.download.install"), skin));
-                        install.addListener((event) -> {
-                            if (event instanceof ChangeEvent) {
-                            }
-                            return false;
-                        });
-                        install.setSize(installOrSelectSize, installOrSelectSize);
-                        installOrSelect = install;
-                    } else {
-                        OwnCheckBox select = new OwnCheckBox("", skin, 0f);
-                        installOrSelect = select;
-                        if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
-                            // TODO - CAN'T SELECT due to GS version
-                            select.setChecked(false);
-                            select.setDisabled(true);
-                            title.setColor(ColorUtils.gRedC);
-                            select.addListener(new OwnTextTooltip(I18n.txt("gui.download.version.gs.mismatch", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, 10));
-                            select.getStyle().disabledFontColor = ColorUtils.gRedC;
+                        // Title
+                        String titleString = mode == DatasetMode.AVAILABLE ? dataset.shortDescription : dataset.name;
+                        OwnLabel title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "ui-23");
+                        title.setWidth(width * 0.41f);
+                        if (dataset.outdated) {
+                            title.setColor(highlight);
+                            tooltipText = I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion));
+                        }
 
-                            // Remove from selected, if it is
-                            String filePath = dataset.catalogFile.path();
-                            if(Settings.settings.data.catalogFiles.contains(filePath)) {
-                                Settings.settings.data.catalogFiles.remove(filePath);
-                                logger.info(I18n.txt("gui.download.deselected.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
-                            }
+                        // Install, update or enable/disable
+                        Actor installOrSelect;
+                        float installOrSelectSize = 40f;
+                        if (mode == DatasetMode.AVAILABLE || dataset.outdated) {
+                            OwnTextIconButton install = new OwnTextIconButton("", skin, "install");
+                            install.setContentAlign(Align.center);
+                            install.addListener(new OwnTextTooltip(I18n.txt(dataset.outdated ? "gui.download.update" : "gui.download.install"), skin));
+                            install.addListener((event) -> {
+                                if (event instanceof ChangeEvent) {
+                                    if(dataset.outdated) {
+                                        actionUpdateDataset(dataset);
+                                    } else {
+                                        actionDownloadDataset(dataset);
+                                    }
+                                }
+                                return false;
+                            });
+                            install.setSize(installOrSelectSize, installOrSelectSize);
+                            installOrSelect = install;
                         } else {
-                            select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
-                            select.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
-                        }
-                        select.setSize(installOrSelectSize, installOrSelectSize);
-                        select.setHeight(40f);
-                        select.addListener(new ChangeListener() {
-                            @Override
-                            public void changed(ChangeEvent event, Actor actor) {
+                            OwnCheckBox select = new OwnCheckBox("", skin, 0f);
+                            installOrSelect = select;
+                            if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                                select.setChecked(false);
+                                select.setDisabled(true);
+                                title.setColor(ColorUtils.gRedC);
+                                tooltipText = I18n.txt("gui.download.version.gs.mismatch", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion));
+                                select.getStyle().disabledFontColor = ColorUtils.gRedC;
+
+                                // Remove from selected, if it is
                                 String filePath = dataset.catalogFile.path();
-                                if (select.isChecked()) {
-                                    if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                                        Settings.settings.data.catalogFiles.add(filePath);
-                                    }
-                                } else {
+                                if (Settings.settings.data.catalogFiles.contains(filePath)) {
                                     Settings.settings.data.catalogFiles.remove(filePath);
+                                    logger.info(I18n.txt("gui.download.deselected.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                                 }
-                                updateDatasetInfoPane(right, dataset, mode);
+                            } else {
+                                select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
+                                select.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
+                            }
+                            select.setSize(installOrSelectSize, installOrSelectSize);
+                            select.setHeight(40f);
+                            select.addListener(new ChangeListener() {
+                                @Override
+                                public void changed(ChangeEvent event, Actor actor) {
+                                    String filePath = dataset.catalogFile.path();
+                                    if (select.isChecked()) {
+                                        if (!Settings.settings.data.catalogFiles.contains(filePath)) {
+                                            Settings.settings.data.catalogFiles.add(filePath);
+                                        }
+                                    } else {
+                                        Settings.settings.data.catalogFiles.remove(filePath);
+                                    }
+                                    updateDatasetInfoPane(right, dataset, mode);
+                                }
+                            });
+                        }
+
+                        // Size
+                        OwnLabel size = new OwnLabel(dataset.size, skin, "grey-large");
+                        size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+                        size.setWidth(88f);
+
+                        // Version
+                        OwnLabel version = null;
+                        if (mode == DatasetMode.AVAILABLE) {
+                            version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
+                        } else if (mode == DatasetMode.INSTALLED) {
+                            if (dataset.outdated) {
+                                version = new OwnLabel(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                                version.setColor(highlight);
+                            } else {
+                                version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
+                            }
+                        }
+                        HorizontalGroup versionSize = new HorizontalGroup();
+                        versionSize.space(pad20 * 2f);
+                        versionSize.addActor(version);
+                        versionSize.addActor(size);
+
+                        // Progress
+                        OwnProgressBar progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "tiny-horizontal");
+                        progress.setPrefWidth(850f);
+                        progress.setValue(60f);
+                        progress.setVisible(false);
+
+                        t.add(typeImage).left().padRight(pad10);
+                        t.add(title).left().padRight(pad10);
+                        t.add(installOrSelect).right().row();
+                        t.add();
+                        t.add(versionSize).colspan(2).left().padRight(pad10).padBottom(pad5).row();
+                        t.add(progress).colspan(3).expandX();
+                        t.pack();
+                        OwnButton button = new OwnButton(t, skin, "dataset", false);
+                        button.setWidth(width * 0.52f);
+                        title.addListener(new OwnTextTooltip(tooltipText, skin, 10));
+
+                        // Clicks
+                        button.addListener(new InputListener() {
+                            @Override
+                            public boolean handle(Event event) {
+                                if (event != null && event instanceof InputEvent) {
+                                    InputEvent ie = (InputEvent) event;
+                                    InputEvent.Type type = ie.getType();
+                                    if (type == InputEvent.Type.touchDown) {
+                                        if (ie.getButton() == Input.Buttons.LEFT) {
+                                            updateDatasetInfoPane(right, dataset, mode);
+                                        } else if (ie.getButton() == Input.Buttons.RIGHT) {
+                                            GaiaSky.postRunnable(() -> {
+                                                // Context menu
+                                                ContextMenu datasetContext = new ContextMenu(skin, "default");
+                                                if (mode == DatasetMode.INSTALLED) {
+                                                    if (dataset.outdated) {
+                                                        // Update
+                                                        MenuItem update = new MenuItem(I18n.txt("gui.download.update"), skin, "default");
+                                                        update.addListener(new ChangeListener() {
+                                                            @Override
+                                                            public void changed(ChangeEvent event, Actor actor) {
+                                                                actionUpdateDataset(dataset);
+                                                            }
+                                                        });
+                                                        datasetContext.addItem(update);
+                                                    }
+                                                    if (dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
+                                                        boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
+                                                        if (enabled) {
+                                                            // Disable
+                                                            MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, "default");
+                                                            disable.addListener(new ChangeListener() {
+                                                                @Override
+                                                                public void changed(ChangeEvent event, Actor actor) {
+                                                                    String filePath = dataset.catalogFile.path();
+                                                                    Settings.settings.data.catalogFiles.remove(filePath);
+                                                                    if (installOrSelect instanceof OwnCheckBox) {
+                                                                        OwnCheckBox cb = (OwnCheckBox) installOrSelect;
+                                                                        cb.setProgrammaticChangeEvents(false);
+                                                                        cb.setChecked(false);
+                                                                        cb.setProgrammaticChangeEvents(true);
+                                                                    }
+                                                                    updateDatasetInfoPane(right, dataset, mode);
+                                                                }
+                                                            });
+                                                            datasetContext.addItem(disable);
+                                                        } else {
+                                                            // Enable
+                                                            MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, "default");
+                                                            enable.addListener(new ChangeListener() {
+                                                                @Override
+                                                                public void changed(ChangeEvent event, Actor actor) {
+                                                                    String filePath = dataset.catalogFile.path();
+                                                                    if (!Settings.settings.data.catalogFiles.contains(filePath)) {
+                                                                        Settings.settings.data.catalogFiles.add(filePath);
+                                                                    }
+                                                                    if (installOrSelect instanceof OwnCheckBox) {
+                                                                        OwnCheckBox cb = (OwnCheckBox) installOrSelect;
+                                                                        cb.setProgrammaticChangeEvents(false);
+                                                                        cb.setChecked(true);
+                                                                        cb.setProgrammaticChangeEvents(true);
+                                                                    }
+                                                                    updateDatasetInfoPane(right, dataset, mode);
+                                                                }
+                                                            });
+                                                            datasetContext.addItem(enable);
+                                                        }
+                                                        datasetContext.addSeparator();
+                                                    }
+                                                    // Delete
+                                                    MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, "default");
+                                                    delete.addListener(new ClickListener() {
+                                                        @Override
+                                                        public void clicked(InputEvent event, float x, float y) {
+                                                            actionDeleteDataset(dataset);
+                                                            super.clicked(event, x, y);
+                                                        }
+                                                    });
+                                                    datasetContext.addItem(delete);
+                                                } else if (mode == DatasetMode.AVAILABLE) {
+                                                    // Install
+                                                    MenuItem install = new MenuItem(I18n.txt("gui.download.install"), skin, "default");
+                                                    install.addListener(new ChangeListener() {
+                                                        @Override
+                                                        public void changed(ChangeEvent event, Actor actor) {
+                                                            actionDownloadDataset(dataset);
+                                                        }
+                                                    });
+                                                    datasetContext.addItem(install);
+                                                }
+                                                datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
+                                            });
+                                        }
+                                    }
+                                }
+                                return super.handle(event);
                             }
                         });
+
+                        leftTable.add(button).left().row();
+
+                        if (first == null)
+                            first = dataset;
                     }
-
-                    // Size
-                    OwnLabel size = new OwnLabel(dataset.size, skin, "grey-large");
-                    size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
-                    size.setWidth(88f);
-
-                    // Version
-                    OwnLabel version = null;
-                    if (mode == DatasetMode.AVAILABLE) {
-                        version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
-                    } else if (mode == DatasetMode.INSTALLED) {
-                        version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
-                    }
-                    HorizontalGroup versionSize = new HorizontalGroup();
-                    versionSize.space(pad20 * 2f);
-                    versionSize.addActor(version);
-                    versionSize.addActor(size);
-
-                    // Progress
-                    OwnProgressBar progress = new OwnProgressBar(0f, 100f, 0.1f, false, skin, "tiny-horizontal");
-                    progress.setPrefWidth(850f);
-                    progress.setValue(60f);
-                    progress.setVisible(false);
-
-                    t.add(typeImage).left().padRight(pad10);
-                    t.add(title).left().padRight(pad10);
-                    t.add(installOrSelect).right().row();
-                    t.add();
-                    t.add(versionSize).colspan(2).left().padRight(pad10).padBottom(pad5).row();
-                    t.add(progress).colspan(3).expandX();
-                    t.pack();
-                    OwnButton button = new OwnButton(t, skin, "dataset", false);
-                    button.setWidth(width * 0.52f);
-
-                    // Clicks
-                    button.addListener(new InputListener() {
-                        @Override
-                        public boolean handle(Event event) {
-                            if (event != null && event instanceof InputEvent) {
-                                InputEvent ie = (InputEvent) event;
-                                InputEvent.Type type = ie.getType();
-                                if (type == InputEvent.Type.touchDown) {
-                                    if (ie.getButton() == Input.Buttons.LEFT) {
-                                        updateDatasetInfoPane(right, dataset, mode);
-                                    } else if (ie.getButton() == Input.Buttons.RIGHT) {
-                                        GaiaSky.postRunnable(() -> {
-                                            // Context menu
-                                            ContextMenu datasetContext = new ContextMenu(skin, "default");
-                                            if (mode == DatasetMode.INSTALLED) {
-                                                if (dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
-                                                    boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
-                                                    if (enabled) {
-                                                        // Disable
-                                                        MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, "default");
-                                                        disable.addListener(new ChangeListener() {
-                                                            @Override
-                                                            public void changed(ChangeEvent event, Actor actor) {
-                                                                String filePath = dataset.catalogFile.path();
-                                                                Settings.settings.data.catalogFiles.remove(filePath);
-                                                                OwnCheckBox cb = (OwnCheckBox) installOrSelect;
-                                                                cb.setProgrammaticChangeEvents(false);
-                                                                cb.setChecked(false);
-                                                                cb.setProgrammaticChangeEvents(true);
-                                                                updateDatasetInfoPane(right, dataset, mode);
-                                                            }
-                                                        });
-                                                        datasetContext.addItem(disable);
-                                                    } else {
-                                                        // Enable
-                                                        MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, "default");
-                                                        enable.addListener(new ChangeListener() {
-                                                            @Override
-                                                            public void changed(ChangeEvent event, Actor actor) {
-                                                                String filePath = dataset.catalogFile.path();
-                                                                if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                                                                    Settings.settings.data.catalogFiles.add(filePath);
-                                                                }
-                                                                OwnCheckBox cb = (OwnCheckBox) installOrSelect;
-                                                                cb.setProgrammaticChangeEvents(false);
-                                                                cb.setChecked(true);
-                                                                cb.setProgrammaticChangeEvents(true);
-                                                                updateDatasetInfoPane(right, dataset, mode);
-                                                            }
-                                                        });
-                                                        datasetContext.addItem(enable);
-                                                    }
-                                                    datasetContext.addSeparator();
-                                                }
-                                                // Delete
-                                                MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, "default");
-                                                delete.addListener(new ClickListener() {
-                                                    @Override
-                                                    public void clicked(InputEvent event, float x, float y) {
-                                                        actionDeleteDataset(dataset);
-                                                        super.clicked(event, x, y);
-                                                    }
-                                                });
-                                                datasetContext.addItem(delete);
-                                            } else if (mode == DatasetMode.AVAILABLE) {
-                                                // Install
-                                                MenuItem install = new MenuItem(I18n.txt("gui.download.install"), skin, "default");
-                                                datasetContext.addItem(install);
-                                            }
-                                            datasetContext.showMenu(stage, Gdx.input.getX(ie.getPointer()) / Settings.settings.program.ui.scale, stage.getHeight() - Gdx.input.getY(ie.getPointer()) / Settings.settings.program.ui.scale);
-                                        });
-                                    }
-                                }
-                            }
-                            return super.handle(event);
-                        }
-                    });
-
-                    leftTable.add(button).left().row();
-
-                    if (first == null)
-                        first = dataset;
                 }
             }
+            leftScroll.setWidth(width * 0.52f);
+            leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+            left.setActor(leftScroll);
+
+            updateDatasetInfoPane(right, first, mode);
         }
-        leftScroll.setWidth(width * 0.52f);
-        leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
-        left.setActor(leftScroll);
-
-        updateDatasetInfoPane(right, first, mode);
-
         me.pack();
     }
 
@@ -859,7 +621,12 @@ public class DownloadDataWindow extends GenericDialog {
         if (mode == DatasetMode.AVAILABLE) {
             version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
         } else if (mode == DatasetMode.INSTALLED) {
-            version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
+            if (dataset.outdated) {
+                version = new OwnLabel(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                version.setColor(highlight);
+            } else {
+                version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
+            }
         }
 
         // Key
@@ -870,7 +637,8 @@ public class DownloadDataWindow extends GenericDialog {
         size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
 
         // Num objects
-        OwnLabel nObjects = new OwnLabel(I18n.txt("gui.dataset.nobjects", dataset.nObjects), skin, "grey-large");
+        String nObjStr = dataset.nObjects > 0 ? I18n.txt("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.txt("gui.dataset.nobjects.none");
+        OwnLabel nObjects = new OwnLabel(nObjStr, skin, "grey-large");
         nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
 
         // Link
@@ -1241,7 +1009,7 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
         label.setText(I18n.txt("gui.download.status.outdated"));
-        label.setColor(ColorUtils.gYellowC);
+        label.setColor(highlight);
         if (ds.releaseNotes != null && !ds.releaseNotes.isEmpty()) {
             label.setText(label.getText());
             label.addListener(new OwnTextTooltip(I18n.txt("gui.download.releasenotes", ds.releaseNotes), skin, 10));
@@ -1341,77 +1109,12 @@ public class DownloadDataWindow extends GenericDialog {
         restoreScrollValues();
     }
 
-    public static synchronized DataDescriptor reloadLocalCatalogs(DataDescriptor server) {
-        // Discover data sets, add as buttons
-        Array<FileHandle> catalogLocations = new Array<>();
-        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
+    private void actionDownloadDataset(DatasetDesc dataset) {
 
-        Array<FileHandle> catalogFiles = new Array<>();
+    }
 
-        for (FileHandle catalogLocation : catalogLocations) {
-            FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
-            catalogFiles.addAll(cfs);
-        }
+    private void actionUpdateDataset(DatasetDesc dataset) {
 
-        JsonReader reader = new JsonReader();
-        Map<String, DatasetType> typeMap = new HashMap<>();
-        List<DatasetType> types = new ArrayList<>();
-        List<DatasetDesc> datasets = new ArrayList<>();
-        for (FileHandle catalogFile : catalogFiles) {
-            JsonValue val = reader.parse(catalogFile);
-            DatasetDesc dd = new DatasetDesc(reader, val);
-            dd.path = Path.of(catalogFile.path());
-            dd.catalogFile = catalogFile;
-            dd.exists = true;
-
-            if (dd.description == null)
-                dd.description = dd.path.toString();
-            if (dd.name == null)
-                dd.name = dd.catalogFile.nameWithoutExtension();
-
-            dd.shortDescription = dd.description;
-
-            DatasetType dt;
-            if (typeMap.containsKey(dd.type)) {
-                dt = typeMap.get(dd.type);
-            } else {
-                dt = new DatasetType(dd.type);
-                typeMap.put(dd.type, dt);
-                types.add(dt);
-            }
-
-            dt.datasets.add(dd);
-            datasets.add(dd);
-        }
-
-        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DownloadDataWindow.getTypeWeight(datasetType.typeStr));
-        types.sort(byType);
-
-        // Combine with server data descriptor
-        if (server != null && server.datasets != null) {
-            for (DatasetDesc local : datasets) {
-                for (DatasetDesc remote : server.datasets) {
-                    if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
-                        // Match, update local with some server info
-                        local.check = remote.check;
-                        local.filesToDelete = remote.filesToDelete;
-                        local.file = remote.file;
-                        local.serverVersion = remote.serverVersion;
-                        if (local.releaseNotes == null) {
-                            local.releaseNotes = remote.releaseNotes;
-                        }
-                        if (local.datasetType == null) {
-                            local.datasetType = remote.datasetType;
-                        }
-                        if (local.link == null) {
-                            local.link = remote.link;
-                        }
-                    }
-                }
-            }
-        }
-
-        return new DataDescriptor(types, datasets);
     }
 
     private void actionDeleteDataset(DatasetDesc dataset) {
@@ -1420,7 +1123,9 @@ public class DownloadDataWindow extends GenericDialog {
             @Override
             protected void build() {
                 content.clear();
-                content.add(new OwnLabel(I18n.txt("gui.download.delete.text", dataset.shortDescription), skin)).left().padBottom(pad10 * 2f).row();
+                String title = dataset.exists ? dataset.name : dataset.shortDescription;
+                content.add(new OwnLabel(I18n.txt("gui.download.delete.text"), skin)).left().padBottom(pad10 * 2f).row();
+                content.add(new OwnLabel(title, skin, "warp")).center().padBottom(pad10 * 2f).row();
             }
 
             @Override
@@ -1487,6 +1192,86 @@ public class DownloadDataWindow extends GenericDialog {
         question.setCancelText(I18n.txt("gui.no"));
         question.buildSuper();
         question.show(stage);
+    }
+
+    /**
+     * Constructs a list of local catalogs found in the current data location.
+     * @param server The server catalog descriptors, for combining with the local catalogs.
+     * @return The data descriptor containing the local catalogs.
+     */
+    public static synchronized DataDescriptor reloadLocalCatalogs(DataDescriptor server) {
+        // Discover data sets, add as buttons
+        Array<FileHandle> catalogLocations = new Array<>();
+        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
+
+        Array<FileHandle> catalogFiles = new Array<>();
+
+        for (FileHandle catalogLocation : catalogLocations) {
+            FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
+            catalogFiles.addAll(cfs);
+        }
+
+        JsonReader reader = new JsonReader();
+        Map<String, DatasetType> typeMap = new HashMap<>();
+        List<DatasetType> types = new ArrayList<>();
+        List<DatasetDesc> datasets = new ArrayList<>();
+        for (FileHandle catalogFile : catalogFiles) {
+            JsonValue val = reader.parse(catalogFile);
+            DatasetDesc dd = new DatasetDesc(reader, val);
+            dd.path = Path.of(catalogFile.path());
+            dd.catalogFile = catalogFile;
+            dd.exists = true;
+            dd.status = DatasetDesc.DatasetStatus.INSTALLED;
+
+            if (dd.description == null)
+                dd.description = dd.path.toString();
+            if (dd.name == null)
+                dd.name = dd.catalogFile.nameWithoutExtension();
+
+            dd.shortDescription = dd.description;
+
+            DatasetType dt;
+            if (typeMap.containsKey(dd.type)) {
+                dt = typeMap.get(dd.type);
+            } else {
+                dt = new DatasetType(dd.type);
+                typeMap.put(dd.type, dt);
+                types.add(dt);
+            }
+
+            dt.datasets.add(dd);
+            datasets.add(dd);
+        }
+
+        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DownloadDataWindow.getTypeWeight(datasetType.typeStr));
+        types.sort(byType);
+
+        // Combine with server data descriptor
+        if (server != null && server.datasets != null) {
+            for (DatasetDesc local : datasets) {
+                for (DatasetDesc remote : server.datasets) {
+                    if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
+                        // Match, update local with some server info
+                        local.check = remote.check;
+                        local.filesToDelete = remote.filesToDelete;
+                        local.file = remote.file;
+                        local.serverVersion = remote.serverVersion;
+                        local.outdated = remote.outdated;
+                        if (local.releaseNotes == null) {
+                            local.releaseNotes = remote.releaseNotes;
+                        }
+                        if (local.datasetType == null) {
+                            local.datasetType = remote.datasetType;
+                        }
+                        if (local.link == null) {
+                            local.link = remote.link;
+                        }
+                    }
+                }
+            }
+        }
+
+        return new DataDescriptor(types, datasets);
     }
 
 }

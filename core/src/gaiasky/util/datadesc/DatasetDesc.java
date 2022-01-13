@@ -32,6 +32,7 @@ public class DatasetDesc {
     public String type;
     public String file;
     public DatasetType datasetType;
+    public DatasetStatus status;
 
     public Path check;
     public Path path;
@@ -74,6 +75,7 @@ public class DatasetDesc {
             }
         }
 
+        this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
         this.name = source.getString("name");
         this.baseData = name.equals("default-data");
         this.mustDownload = (!exists || outdated) && baseData;
@@ -185,5 +187,9 @@ public class DatasetDesc {
 
     public boolean isStarDataset() {
         return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
+    }
+
+    public enum DatasetStatus {
+        AVAILABLE, INSTALLED, DOWNLOADING, EXTRACTING
     }
 }
