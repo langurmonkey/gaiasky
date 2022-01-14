@@ -60,6 +60,8 @@ public class DatasetDesc {
     // In case of local datasets, this links to the server description
     public DatasetDesc server;
 
+    public DatasetDesc(){}
+
     public DatasetDesc(JsonReader reader, JsonValue source) {
         this(reader, source, false);
     }
@@ -98,6 +100,7 @@ public class DatasetDesc {
 
         if (source.has("file"))
             this.file = source.getString("file");
+
 
         // Description
         if (source.has("description")) {
@@ -207,5 +210,38 @@ public class DatasetDesc {
         INSTALLED,
         DOWNLOADING,
         EXTRACTING
+    }
+
+    public DatasetDesc copy() {
+        DatasetDesc copy = new DatasetDesc();
+        copy.reader = this.reader;
+        copy.source = this.source;
+        copy.key = this.key;
+        copy.name = this.name;
+        copy.description = this.description;
+        copy.shortDescription = this.shortDescription;
+        copy.link = this.link;
+        copy.type = this.type;
+        copy.file = this.file;
+        copy.datasetType = this.datasetType;
+        copy.status = this.status;
+        copy.check = this.check;
+        copy.path = this.path;
+        copy.catalogFile = this.catalogFile;
+        copy.size = this.size;
+        copy.sizeBytes = this.sizeBytes;
+        copy.nObjectsStr = this.nObjectsStr;
+        copy.nObjects = this.nObjects;
+        copy.sha256 = this.sha256;
+        copy.exists = this.exists;
+        copy.myVersion = this.myVersion;
+        copy.serverVersion = this.serverVersion;
+        copy.minGsVersion = this.minGsVersion;
+        copy.outdated = this.outdated;
+        copy.baseData = this.baseData;
+        copy.releaseNotes = this.releaseNotes;
+        copy.filesToDelete = this.filesToDelete;
+        copy.server = this.server;
+        return copy;
     }
 }

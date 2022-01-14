@@ -154,7 +154,7 @@ public class DatasetManagerWindow extends GenericDialog {
     protected void build() {
         initialized.set(false);
         me.acceptButton.setDisabled(false);
-        float tabWidth = 240f;
+        float tabWidth = 500f;
         float width = 1800f;
 
         try {
@@ -170,15 +170,15 @@ public class DatasetManagerWindow extends GenericDialog {
         HorizontalGroup tabGroup = new HorizontalGroup();
         tabGroup.align(Align.center);
 
-        String updatesAsterisk = "";
+        String updateCount = "";
         if (serverDd != null && serverDd.updatesAvailable) {
-            updatesAsterisk = " *";
+            updateCount = " (" + serverDd.numUpdates + ")";
         }
 
         final OwnTextButton tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
         tabAvail.setWidth(tabWidth);
-        final OwnTextButton tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed") + updatesAsterisk, skin, "toggle-big");
+        final OwnTextButton tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed") + updateCount, skin, "toggle-big");
         tabInstalled.pad(pad5);
         tabInstalled.setWidth(tabWidth);
 
@@ -698,88 +698,15 @@ public class DatasetManagerWindow extends GenericDialog {
         OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
         desc.setWidth(1000f);
 
-        t.add(titleGroup).
-
-                top().
-
-                left().
-
-                padBottom(pad5).
-
-                padTop(pad20).
-
-                row();
-        t.add(status).
-
-                top().
-
-                left().
-
-                padLeft(pad10 * 3f).
-
-                padBottom(pad20).
-
-                row();
-        t.add(type).
-
-                top().
-
-                left().
-
-                padBottom(pad5).
-
-                row();
-        t.add(version).
-
-                top().
-
-                left().
-
-                padBottom(pad5).
-
-                row();
-        t.add(key).
-
-                top().
-
-                left().
-
-                padBottom(pad5).
-
-                row();
-        t.add(size).
-
-                top().
-
-                left().
-
-                padBottom(pad5).
-
-                row();
-        t.add(nObjects).
-
-                top().
-
-                left().
-
-                padBottom(pad10).
-
-                row();
-        t.add(link).
-
-                top().
-
-                left().
-
-                padBottom(pad20 * 2f).
-
-                row();
-        t.add(desc).
-
-                top().
-
-                left();
-
+        t.add(titleGroup).top().left().padBottom(pad5).padTop(pad20).row();
+        t.add(status).top().left().padLeft(pad10 * 3f).padBottom(pad20).row();
+        t.add(type).top().left().padBottom(pad5).row();
+        t.add(version).top().left().padBottom(pad5).row();
+        t.add(key).top().left().padBottom(pad5).row();
+        t.add(size).top().left().padBottom(pad5).row();
+        t.add(nObjects).top().left().padBottom(pad10).row();
+        t.add(link).top().left().padBottom(pad20 * 2f).row();
+        t.add(desc).top().left();
         // Scroll
         OwnScrollPane scrollPane = new OwnScrollPane(t, skin, "minimalist-nobg");
         scrollPane.setScrollingDisabled(true, false);
@@ -1122,7 +1049,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private void reloadAll() {
         cleanWatchers();
 
-        localDd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
+        serverDd = DataDescriptorUtils.instance().buildDatasetsDescriptor(null);
         backupScrollValues();
         leftScroll = null;
         content.clear();
@@ -1308,12 +1235,18 @@ public class DatasetManagerWindow extends GenericDialog {
         Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
         types.sort(byType);
 
-        // Combine with server data descriptor
         if (server != null && server.datasets != null) {
+            // Combine server with local datasets
             for (DatasetDesc local : datasets) {
                 for (DatasetDesc remote : server.datasets) {
                     if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
                         // Match, update local with some server info
+                        if(local.name.equals(remote.name)) {
+                            // Update name, as ours is the remote key
+                            local.name = remote.shortDescription;
+                            local.shortDescription = remote.shortDescription;
+                            local.description = remote.description.substring(remote.description.indexOf(" - ") + 3);
+                        }
                         local.check = remote.check;
                         local.key = remote.key;
                         local.filesToDelete = remote.filesToDelete;
@@ -1336,6 +1269,46 @@ public class DatasetManagerWindow extends GenericDialog {
                             local.shortDescription = remote.shortDescription;
                         }
                         local.server = remote;
+                    }
+                }
+            }
+
+            // Add remotes on disk that are not catalogs
+            for (DatasetDesc remote : server.datasets) {
+                if (remote.exists) {
+                    boolean found = false;
+                    for (DatasetDesc local : datasets) {
+                        if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        // Add to local datasets
+                        DatasetDesc copy = remote.copy();
+                        copy.name = copy.shortDescription;
+                        copy.description = copy.description.substring(copy.description.indexOf(" - ") + 3);
+                        copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
+                        copy.path = copy.check.toAbsolutePath();
+                        datasets.add(copy);
+                        // Add to local types
+                        DatasetType remoteType = copy.datasetType;
+                        found = false;
+                        for (DatasetType localType : types) {
+                            if (localType.equals(remoteType)) {
+                                localType.datasets.add(copy);
+                                copy.datasetType = localType;
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            // No type! create it
+                            DatasetType newType = new DatasetType(remoteType.typeStr);
+                            newType.addDataset(copy);
+                            copy.datasetType = newType;
+                            types.add(newType);
+                        }
                     }
                 }
             }

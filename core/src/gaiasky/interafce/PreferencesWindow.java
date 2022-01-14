@@ -81,7 +81,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
-    private DatasetsWidget dw;
     private OwnLabel tessQualityLabel;
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
@@ -1575,10 +1574,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.setWidth(taWidth);
         dataSourceInfo.clearListeners();
 
-        dw = new DatasetsWidget(stage, skin);
-        dw.reloadLocalCatalogs();
-        final Actor dataSource = dw.buildDatasetsWidget(false, 20, 220f);
-
         final OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
         dataDownload.pad(pad20, pad20 * 2f, pad20, pad20 * 2f);
         dataDownload.setHeight(buttonHeight);
@@ -1612,7 +1607,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentDataTable.add(haGroup).left().padBottom(pad5 * 4).row();
         contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataSourceInfo).left().padBottom(pad5).row();
-        contentDataTable.add(dataSource).left().padLeft(pad5).padBottom(pad5 * 4).row();
         contentDataTable.add(dataDownload).left();
 
         /*
@@ -2083,12 +2077,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (highAccuracy != settings.data.highAccuracy) {
             // Event
             EventManager.instance.post(Events.HIGH_ACCURACY_CMD, settings.data.highAccuracy);
-        }
-        settings.data.catalogFiles.clear();
-        for (Button b : dw.cbs) {
-            if (b.isChecked()) {
-                settings.data.catalogFiles.add(dw.candidates.get(b));
-            }
         }
 
         // Screenshots
