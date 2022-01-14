@@ -39,7 +39,6 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
-import gaiasky.util.scene2d.Separator;
 import gaiasky.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
@@ -107,7 +106,7 @@ public class WelcomeGui extends AbstractGui {
             DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
                 GaiaSky.postRunnable(() -> {
                     // Data descriptor ok. Skip welcome screen only if flag and base data present
-                    if (skipWelcome && basicDataPresent()) {
+                    if (skipWelcome && baseDataPresent()) {
                         gaiaSky();
                     } else {
                         buildWelcomeUI();
@@ -117,7 +116,7 @@ public class WelcomeGui extends AbstractGui {
                 // Fail?
                 downloadError = true;
                 logger.error(I18n.txt("gui.welcome.error.nointernet"));
-                if (basicDataPresent()) {
+                if (baseDataPresent()) {
                     // Go on all in
                     GaiaSky.postRunnable(() -> {
                         GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI());
@@ -140,7 +139,7 @@ public class WelcomeGui extends AbstractGui {
                         if (ie.getKeyCode() == Input.Keys.ESCAPE) {
                             Gdx.app.exit();
                         } else if (ie.getKeyCode() == Input.Keys.ENTER) {
-                            if (basicDataPresent()) {
+                            if (baseDataPresent()) {
                                 gaiaSky();
                             } else {
                                 addDatasetManagerWindow(dd);
@@ -184,7 +183,7 @@ public class WelcomeGui extends AbstractGui {
         int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
         int numStarCatalogsSelected = numStarCatalogsSelected();
         int numTotalCatalogsSelected = numTotalCatalogsSelected();
-        boolean basicDataPresent = basicDataPresent();
+        boolean baseDataPresent = baseDataPresent();
 
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
@@ -212,7 +211,7 @@ public class WelcomeGui extends AbstractGui {
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
         startGroup.add(startLabel).top().left().padBottom(pad16).row();
-        if (!basicDataPresent) {
+        if (!baseDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
 
@@ -231,7 +230,6 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
             ready.setColor(ColorUtils.gGreenC);
             startGroup.add(ready).bottom().left();
-
         }
 
         // Dataset manager button
@@ -254,7 +252,7 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
             datasetManagerInfo.add(updates).bottom().left();
-        } else if (!basicDataPresent) {
+        } else if (!baseDataPresent) {
             datasetManagerInfo.row();
             OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
@@ -310,42 +308,46 @@ public class WelcomeGui extends AbstractGui {
         ui.addActor(center);
         ui.addActor(topLeft);
 
-        // Base data notice
-        if (dd != null && dd.updatesAvailable) {
-            DatasetDesc baseData = dd.findDataset("default-data");
-            if(baseData != null && baseData.myVersion < baseData.serverVersion) {
-                // We have a base data update, show notice
+        if (!baseDataPresent) {
+            // Open dataset manager if base data is not there
+            addDatasetManagerWindow(dd);
+        } else {
+            // Check if there is an update for the base data, and show a notice if so
+            if (dd != null && dd.updatesAvailable) {
+                DatasetDesc baseData = dd.findDataset("default-data");
+                if (baseData != null && baseData.myVersion < baseData.serverVersion) {
+                    // We have a base data update, show notice
+                    GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
 
-                GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
+                        @Override
+                        protected void build() {
+                            content.clear();
+                            content.pad(pad20, pad28 * 2f, pad20, pad28 * 2f);
+                            content.add(new OwnLabel(I18n.txt("gui.basedata.default", baseData.name, I18n.txt("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
+                            content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
+                            content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
+                            content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
+                        }
 
-                    @Override
-                    protected void build() {
-                        content.clear();
-                        content.pad(pad20, pad28 * 2f, pad20, pad28 * 2f);
-                        content.add(new OwnLabel(I18n.txt("gui.basedata.default", baseData.name, I18n.txt("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
-                        content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
-                        content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
-                        content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
-                    }
+                        @Override
+                        protected void accept() {
+                            // Nothing
+                        }
 
-                    @Override
-                    protected void accept() {
-                        // Nothing
-                    }
+                        @Override
+                        protected void cancel() {
+                            // Nothing
+                        }
 
-                    @Override
-                    protected void cancel() {
-                        // Nothing
-                    }
-
-                    @Override
-                    public void dispose() {
-                        // Nothing
-                    }
-                };
-                baseDataNotice.setAcceptText(I18n.txt("gui.ok"));
-                baseDataNotice.buildSuper();
-                baseDataNotice.show(ui);
+                        @Override
+                        public void dispose() {
+                            // Nothing
+                        }
+                    };
+                    baseDataNotice.setAcceptText(I18n.txt("gui.ok"));
+                    baseDataNotice.buildSuper();
+                    baseDataNotice.show(ui);
+                }
             }
         }
     }
@@ -452,13 +454,13 @@ public class WelcomeGui extends AbstractGui {
      *
      * @return True if basic data is found
      */
-    private boolean basicDataPresent() {
+    private boolean baseDataPresent() {
         Array<Path> required = new Array<>();
         fillBasicDataFiles(required);
 
         for (Path p : required) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
-                logger.info("Data files not found: " + p.toString());
+                logger.info("Data files not found: " + p);
                 return false;
             }
         }

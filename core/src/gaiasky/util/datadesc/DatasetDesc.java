@@ -212,6 +212,15 @@ public class DatasetDesc {
         EXTRACTING
     }
 
+    public DatasetDesc getLocalCopy(){
+        DatasetDesc copy = this.copy();
+        copy.name = copy.shortDescription;
+        copy.description = copy.description.substring(copy.description.indexOf(" - ") + 3);
+        copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
+        copy.path = copy.check.toAbsolutePath();
+        return copy;
+    }
+
     public DatasetDesc copy() {
         DatasetDesc copy = new DatasetDesc();
         copy.reader = this.reader;

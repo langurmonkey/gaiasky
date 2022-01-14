@@ -87,6 +87,8 @@ public class DatasetManagerWindow extends GenericDialog {
 
     public static int getTypeWeight(String type) {
         return switch (type) {
+            case "data-pack" -> -2;
+            case "texture-pack" -> -1;
             case "catalog-lod" -> 0;
             case "catalog-gaia" -> 1;
             case "catalog-star" -> 2;
@@ -1203,7 +1205,7 @@ public class DatasetManagerWindow extends GenericDialog {
         Array<FileHandle> catalogFiles = new Array<>();
 
         for (FileHandle catalogLocation : catalogLocations) {
-            FileHandle[] cfs = catalogLocation.list(pathname -> (pathname.getName().startsWith("catalog-") || pathname.getName().startsWith("data-main")) && pathname.getName().endsWith(".json"));
+            FileHandle[] cfs = catalogLocation.list(pathname -> (pathname.getName().startsWith("catalog-") || pathname.getName().startsWith("dataset-")) && pathname.getName().endsWith(".json"));
             catalogFiles.addAll(cfs);
         }
 
@@ -1213,7 +1215,7 @@ public class DatasetManagerWindow extends GenericDialog {
         List<DatasetDesc> datasets = new ArrayList<>();
         for (FileHandle catalogFile : catalogFiles) {
             JsonValue val = reader.parse(catalogFile);
-            DatasetDesc dd = new DatasetDesc(reader, val, catalogFile.path().endsWith("data-main.json"));
+            DatasetDesc dd = new DatasetDesc(reader, val);
             dd.path = Path.of(catalogFile.path());
             dd.catalogFile = catalogFile;
             dd.exists = true;
@@ -1231,9 +1233,6 @@ public class DatasetManagerWindow extends GenericDialog {
             dt.datasets.add(dd);
             datasets.add(dd);
         }
-
-        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
-        types.sort(byType);
 
         if (server != null && server.datasets != null) {
             // Combine server with local datasets
@@ -1285,11 +1284,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     }
                     if (!found) {
                         // Add to local datasets
-                        DatasetDesc copy = remote.copy();
-                        copy.name = copy.shortDescription;
-                        copy.description = copy.description.substring(copy.description.indexOf(" - ") + 3);
-                        copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
-                        copy.path = copy.check.toAbsolutePath();
+                        DatasetDesc copy = remote.getLocalCopy();
                         datasets.add(copy);
                         // Add to local types
                         DatasetType remoteType = copy.datasetType;
@@ -1323,6 +1318,9 @@ public class DatasetManagerWindow extends GenericDialog {
             if (dd.name == null)
                 dd.name = dd.catalogFile.nameWithoutExtension();
         }
+
+        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
+        types.sort(byType);
 
         return new DataDescriptor(types, datasets);
     }
