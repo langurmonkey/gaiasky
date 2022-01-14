@@ -39,6 +39,7 @@ import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.Separator;
 import gaiasky.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
@@ -165,6 +166,7 @@ public class WelcomeGui extends AbstractGui {
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 
+        float pad8 = 8f;
         float pad16 = 16f;
         float pad18 = 18f;
         float pad32 = 32f;
@@ -209,7 +211,7 @@ public class WelcomeGui extends AbstractGui {
         });
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel).top().left().padTop(pad16).padBottom(pad16).row();
+        startGroup.add(startLabel).top().left().padBottom(pad16).row();
         if (!basicDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
@@ -232,76 +234,47 @@ public class WelcomeGui extends AbstractGui {
 
         }
 
-        // Data manager button
-        OwnTextIconButton downloadButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
-        downloadButton.setSpace(pad18);
-        downloadButton.setContentAlign(Align.center);
-        downloadButton.align(Align.center);
-        downloadButton.setSize(bw, bh);
-        downloadButton.addListener((event) -> {
+        // Dataset manager button
+        OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
+        datasetManagerButton.setSpace(pad18);
+        datasetManagerButton.setContentAlign(Align.center);
+        datasetManagerButton.align(Align.center);
+        datasetManagerButton.setSize(bw * 0.8f, bh * 0.8f);
+        datasetManagerButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 addDatasetManagerWindow(dd);
             }
             return true;
         });
-        Table downloadGroup = new Table(skin);
+        Table datasetManagerInfo = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
-        downloadGroup.add(downloadLabel).top().left().padTop(pad16).padBottom(pad16);
+        datasetManagerInfo.add(downloadLabel).top().left().padBottom(pad16);
         if (dd != null && dd.updatesAvailable) {
-            downloadGroup.row();
+            datasetManagerInfo.row();
             OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
-            downloadGroup.add(updates).bottom().left();
+            datasetManagerInfo.add(updates).bottom().left();
         } else if (!basicDataPresent) {
-            downloadGroup.row();
+            datasetManagerInfo.row();
             OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
-            downloadGroup.add(getBasedata).bottom().left();
+            datasetManagerInfo.add(getBasedata).bottom().left();
         }
 
-        // Catalog selection button
-        OwnTextIconButton catalogButton = new OwnTextIconButton(I18n.txt("gui.welcome.catalogsel"), skin, "check");
-        catalogButton.setSpace(pad18);
-        catalogButton.setContentAlign(Align.center);
-        catalogButton.align(Align.center);
-        catalogButton.setSize(bw, bh);
-        catalogButton.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                String noticeKey;
-                if (numCatalogsAvailable() > 0 && numGaiaDRCatalogsSelected() > 1) {
-                    noticeKey = "gui.dschooser.morethanonedr";
-                } else {
-                    noticeKey = "gui.dschooser.nocatselected";
-                }
-                addCatalogSelectionWindow(noticeKey);
-            }
-            return true;
-        });
-        Table catalogGroup = new Table(skin);
-        OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
-        catalogGroup.add(catalogLabel).top().left().padTop(pad16).padBottom(pad16).row();
-        if (numCatalogsAvailable == 0) {
-            // No catalog files, disable and add notice
-            catalogButton.setDisabled(true);
-            OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
-            noCatalogs.setColor(ColorUtils.aOrangeC);
-            catalogGroup.add(noCatalogs).bottom().left();
-        } else if (numGaiaDRCatalogsSelected > 1) {
+        // Selection problems/issues
+        Table selectionInfo = new Table(skin);
+        if (numGaiaDRCatalogsSelected > 1) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
-            catalogGroup.add(tooManyDR).bottom().left();
+            selectionInfo.add(tooManyDR);
         } else if (numStarCatalogsSelected > 1) {
             OwnLabel warn2Star = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
             warn2Star.setColor(ColorUtils.aOrangeC);
-            catalogGroup.add(warn2Star).bottom().left();
+            selectionInfo.add(warn2Star);
         } else if (numStarCatalogsSelected == 0) {
             OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
             noStarCatalogs.setColor(ColorUtils.aOrangeC);
-            catalogGroup.add(noStarCatalogs).bottom().left();
-        } else {
-            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numTotalCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
-            ok.setColor(ColorUtils.gBlueC);
-            catalogGroup.add(ok).bottom().left();
+            selectionInfo.add(noStarCatalogs);
         }
 
         // Exit button
@@ -315,13 +288,20 @@ public class WelcomeGui extends AbstractGui {
             }
         });
 
-        center.add(titleGroup).center().padBottom(pad18 * 5f).colspan(2).row();
-        center.add(startButton).center().top().padBottom(pad18 * 4f).padRight(pad28);
-        center.add(startGroup).top().left().padBottom(pad18 * 4f).row();
-        center.add(downloadButton).center().top().padBottom(pad32).padRight(pad28);
-        center.add(downloadGroup).left().top().padBottom(pad32).row();
-        center.add(catalogButton).center().top().padBottom(pad18 * 8f).padRight(pad28);
-        center.add(catalogGroup).left().top().padBottom(pad18 * 8f).row();
+        // Title
+        center.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
+
+        // Start button
+        center.add(startButton).right().top().padBottom(pad18 * 10f).padRight(pad28 * 2f);
+        center.add(startGroup).top().left().padBottom(pad18 * 10f).row();
+
+        // Dataset manager
+        center.add(datasetManagerButton).right().top().padBottom(pad32).padRight(pad28 * 2f);
+        center.add(datasetManagerInfo).left().top().padBottom(pad32).row();
+
+        center.add(selectionInfo).colspan(2).center().top().padBottom(pad32 * 4f).row();
+
+        // Quit
         center.add(quitButton).center().top().colspan(2);
 
         // Version line table

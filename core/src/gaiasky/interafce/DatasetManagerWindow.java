@@ -109,7 +109,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private OwnScrollPane leftScroll;
     private DatasetDesc[] selectedDataset;
     private float[][] scroll;
-    private static int selectedTab = 1;
+    private static int selectedTab = 0;
 
     private Map<String, Button>[] buttonMap;
 
@@ -432,13 +432,10 @@ public class DatasetManagerWindow extends GenericDialog {
                             select.addListener(new ChangeListener() {
                                 @Override
                                 public void changed(ChangeEvent event, Actor actor) {
-                                    String filePath = dataset.catalogFile.path();
                                     if (select.isChecked()) {
-                                        if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                                            Settings.settings.data.catalogFiles.add(filePath);
-                                        }
+                                        actionEnableDataset(dataset);
                                     } else {
-                                        Settings.settings.data.catalogFiles.remove(filePath);
+                                        actionDisableDataset(dataset);
                                     }
                                     updateDatasetInfoPane(right, dataset, mode);
                                 }
@@ -520,8 +517,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             disable.addListener(new ChangeListener() {
                                                                 @Override
                                                                 public void changed(ChangeEvent event, Actor actor) {
-                                                                    String filePath = dataset.catalogFile.path();
-                                                                    Settings.settings.data.catalogFiles.remove(filePath);
+                                                                    actionDisableDataset(dataset);
                                                                     if (installOrSelect instanceof OwnCheckBox) {
                                                                         OwnCheckBox cb = (OwnCheckBox) installOrSelect;
                                                                         cb.setProgrammaticChangeEvents(false);
@@ -538,10 +534,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             enable.addListener(new ChangeListener() {
                                                                 @Override
                                                                 public void changed(ChangeEvent event, Actor actor) {
-                                                                    String filePath = dataset.catalogFile.path();
-                                                                    if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                                                                        Settings.settings.data.catalogFiles.add(filePath);
-                                                                    }
+                                                                    actionEnableDataset(dataset);
                                                                     if (installOrSelect instanceof OwnCheckBox) {
                                                                         OwnCheckBox cb = (OwnCheckBox) installOrSelect;
                                                                         cb.setProgrammaticChangeEvents(false);
@@ -1063,6 +1056,18 @@ public class DatasetManagerWindow extends GenericDialog {
         downloadDataset(dataset);
     }
 
+    private void actionEnableDataset(DatasetDesc dataset) {
+        String filePath = dataset.catalogFile.path();
+        if (!Settings.settings.data.catalogFiles.contains(filePath)) {
+            Settings.settings.data.catalogFiles.add(filePath);
+        }
+    }
+
+    private void actionDisableDataset(DatasetDesc dataset) {
+        String filePath = dataset.catalogFile.path();
+        Settings.settings.data.catalogFiles.remove(filePath);
+    }
+
     private void actionDeleteDataset(DatasetDesc dataset) {
         GenericDialog question = new GenericDialog(I18n.txt("gui.download.delete.title"), skin, stage) {
 
@@ -1126,7 +1131,9 @@ public class DatasetManagerWindow extends GenericDialog {
                 // Update server dataset status and selected
                 if (deleted && serverDataset != null) {
                     serverDataset.exists = false;
+                    actionEnableDataset(dataset);
                     resetSelectedDataset();
+
                 }
                 // RELOAD DATASETS VIEW
                 GaiaSky.postRunnable(() -> reloadAll());
