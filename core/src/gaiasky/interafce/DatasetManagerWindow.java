@@ -130,7 +130,7 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
-        super(I18n.txt("gui.download.title") + (dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
+        super(I18n.txt("gui.download.title") + (dd != null && dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.serverDd = dd;
         this.highlight = ColorUtils.gYellowC;
@@ -171,7 +171,7 @@ public class DatasetManagerWindow extends GenericDialog {
         tabGroup.align(Align.center);
 
         String updatesAsterisk = "";
-        if (serverDd.updatesAvailable) {
+        if (serverDd != null && serverDd.updatesAvailable) {
             updatesAsterisk = " *";
         }
 
@@ -327,8 +327,11 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private void reloadPane(Table content, float width, DataDescriptor dd, DatasetMode mode) {
         content.clear();
-        if (dd.datasets.isEmpty()) {
-            content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(pad20 * 2f);
+        if (dd == null || dd.datasets.isEmpty()) {
+            if (mode == DatasetMode.AVAILABLE) {
+                content.add(new OwnLabel(I18n.txt("gui.download.noconnection.title"), skin)).center().padTop(pad20 * 2f).padBottom(pad10).row();
+            }
+            content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
         } else {
             Cell left = content.add().top().left().padRight(pad20);
             Cell right = content.add().top().left();

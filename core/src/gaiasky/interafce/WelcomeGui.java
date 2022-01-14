@@ -238,7 +238,6 @@ public class WelcomeGui extends AbstractGui {
         downloadButton.setContentAlign(Align.center);
         downloadButton.align(Align.center);
         downloadButton.setSize(bw, bh);
-        downloadButton.setDisabled(dd == null);
         downloadButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 addDatasetManagerWindow(dd);
