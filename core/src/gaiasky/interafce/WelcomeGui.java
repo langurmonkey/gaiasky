@@ -41,11 +41,9 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,7 +56,7 @@ public class WelcomeGui extends AbstractGui {
     private final VRStatus vrStatus;
     private final boolean skipWelcome;
 
-    protected DownloadDataWindow ddw;
+    protected DatasetManagerWindow ddw;
     protected CatalogSelectionWindow cdw;
 
     private FileHandle dataDescriptor;
@@ -507,7 +505,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void addDatasetManagerWindow(DataDescriptor dd) {
         if (ddw == null) {
-            ddw = new DownloadDataWindow(ui, skin, dd);
+            ddw = new DatasetManagerWindow(ui, skin, dd);
             ddw.setAcceptRunnable(() -> {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 reloadView();

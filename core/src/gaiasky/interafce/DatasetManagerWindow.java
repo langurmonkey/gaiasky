@@ -11,6 +11,7 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -61,12 +62,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * Download manager. It gets a descriptor file from the server containing all
+ * Dataset manager. It gets a descriptor file from the server containing all
  * available datasets, detects them in the current system and offers and manages
  * their downloads.
  */
-public class DownloadDataWindow extends GenericDialog {
-    private static final Log logger = Logger.getLogger(DownloadDataWindow.class);
+public class DatasetManagerWindow extends GenericDialog {
+    private static final Log logger = Logger.getLogger(DatasetManagerWindow.class);
 
     private static final Map<String, String> iconMap;
 
@@ -106,9 +107,11 @@ public class DownloadDataWindow extends GenericDialog {
 
     private DataDescriptor serverDd, localDd;
     private OwnScrollPane leftScroll;
-    private Button firstButton = null;
-    private float[] scroll;
+    private DatasetDesc[] selectedDataset;
+    private float[][] scroll;
     private static int selectedTab = 1;
+
+    private Map<String, Button>[] buttonMap;
 
     private final Color highlight;
 
@@ -116,25 +119,28 @@ public class DownloadDataWindow extends GenericDialog {
     private final boolean dataLocation;
 
     private final INumberFormat nf;
-    private int current = -1;
 
     private final Set<DatasetWatcher> watchers;
     private DatasetWatcher rightPaneWatcher;
 
     private AtomicBoolean initialized;
 
-    public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd) {
+    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor dd) {
         this(stage, skin, dd, true, I18n.txt("gui.close"));
     }
 
-    public DownloadDataWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
+    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
         super(I18n.txt("gui.download.title") + (dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
         this.serverDd = dd;
         this.highlight = ColorUtils.gYellowC;
         this.watchers = new HashSet<>();
-        this.scroll = new float[] { 0f, 0f };
+        this.scroll = new float[][] { { 0f, 0f }, { 0f, 0f } };
+        this.selectedDataset = new DatasetDesc[2];
         this.initialized = new AtomicBoolean(false);
+        this.buttonMap = new HashMap[2];
+        this.buttonMap[0] = new HashMap<>();
+        this.buttonMap[1] = new HashMap<>();
 
         this.dataLocation = dataLocation;
 
@@ -214,11 +220,11 @@ public class DownloadDataWindow extends GenericDialog {
                         selectedTab = 1;
                     reloadInstalled(contentInstalled, width);
                 }
-                setKeyboardFocus();
                 contentAvail.setVisible(tabAvail.isChecked());
                 contentInstalled.setVisible(tabInstalled.isChecked());
 
                 content.pack();
+                setKeyboardFocus();
             }
         };
         tabAvail.addListener(tabListener);
@@ -334,10 +340,20 @@ public class DownloadDataWindow extends GenericDialog {
             leftScroll.setForceScroll(false, true);
             leftScroll.setSmoothScrolling(false);
             leftScroll.setFadeScrollBars(false);
+            leftScroll.addListener(event -> {
+                if (event instanceof InputEvent) {
+                    InputEvent ie = (InputEvent) event;
+                    if (ie.getType() == Type.scrolled) {
+                        // Save scroll position
+                        scroll[mode.ordinal()][0] = leftScroll.getScrollX();
+                        scroll[mode.ordinal()][1] = leftScroll.getScrollY();
+                    }
+                }
+                return false;
+            });
 
             // Current selected datasets
             java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
-            DatasetDesc first = null;
 
             for (DatasetType type : dd.types) {
                 List<DatasetDesc> datasets = type.datasets;
@@ -464,6 +480,7 @@ public class DownloadDataWindow extends GenericDialog {
                         OwnButton button = new OwnButton(t, skin, "dataset", false);
                         button.setWidth(width * 0.52f);
                         title.addListener(new OwnTextTooltip(tooltipText, skin, 10));
+                        buttonMap[mode.ordinal()].put(dataset.key, button);
 
                         // Clicks
                         button.addListener(new InputListener() {
@@ -475,6 +492,7 @@ public class DownloadDataWindow extends GenericDialog {
                                     if (type == InputEvent.Type.touchDown) {
                                         if (ie.getButton() == Input.Buttons.LEFT) {
                                             updateDatasetInfoPane(right, dataset, mode);
+                                            selectedDataset[mode.ordinal()] = dataset;
                                         } else if (ie.getButton() == Input.Buttons.RIGHT) {
                                             GaiaSky.postRunnable(() -> {
                                                 // Context menu
@@ -566,10 +584,8 @@ public class DownloadDataWindow extends GenericDialog {
 
                         leftTable.add(button).left().row();
 
-                        if (first == null) {
-                            first = dataset;
-                            firstButton = button;
-                        }
+                        if (selectedDataset[mode.ordinal()] == null)
+                            selectedDataset[mode.ordinal()] = dataset;
 
                         // Create watcher
                         watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null));
@@ -578,9 +594,12 @@ public class DownloadDataWindow extends GenericDialog {
             }
             leftScroll.setWidth(width * 0.52f);
             leftScroll.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+            leftScroll.layout();
+            leftScroll.setScrollX(scroll[mode.ordinal()][0]);
+            leftScroll.setScrollY(scroll[mode.ordinal()][1]);
             left.setActor(leftScroll);
 
-            updateDatasetInfoPane(right, first, mode);
+            updateDatasetInfoPane(right, selectedDataset[mode.ordinal()], mode);
 
         }
         me.pack();
@@ -778,6 +797,7 @@ public class DownloadDataWindow extends GenericDialog {
                     // Ok message
                     EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, dataset.key, 0);
                     dataset.exists = true;
+                    resetSelectedDataset();
                     reloadAll();
                 } else {
                     logger.info("Error getting dataset: " + name);
@@ -871,6 +891,7 @@ public class DownloadDataWindow extends GenericDialog {
      * Returns the file size
      *
      * @param inputFilePath A file
+     *
      * @return The size in bytes
      */
     private long fileSize(String inputFilePath) {
@@ -881,7 +902,9 @@ public class DownloadDataWindow extends GenericDialog {
      * Returns the GZ uncompressed size
      *
      * @param inputFilePath A gzipped file
+     *
      * @return The uncompressed size in bytes
+     *
      * @throws IOException If the file failed to read
      */
     private long fileSizeGZUncompressed(String inputFilePath) throws IOException {
@@ -982,24 +1005,27 @@ public class DownloadDataWindow extends GenericDialog {
 
     private void backupScrollValues() {
         if (leftScroll != null) {
-            this.scroll[0] = leftScroll.getScrollX();
-            this.scroll[1] = leftScroll.getScrollY();
+            this.scroll[0][0] = leftScroll.getScrollX();
+            this.scroll[0][1] = leftScroll.getScrollY();
         }
     }
 
     private void restoreScrollValues() {
         if (leftScroll != null) {
             GaiaSky.postRunnable(() -> {
-                leftScroll.setScrollX(scroll[0]);
-                leftScroll.setScrollY(scroll[1]);
+                leftScroll.setScrollX(scroll[0][0]);
+                leftScroll.setScrollY(scroll[0][1]);
             });
         }
     }
 
     @Override
     public void setKeyboardFocus() {
-        if(stage != null && firstButton != null) {
-            stage.setKeyboardFocus(firstButton);
+        if (stage != null && selectedDataset[selectedTab] != null) {
+            Button button = buttonMap[selectedTab].get(selectedDataset[selectedTab].key);
+            if (button != null) {
+                stage.setKeyboardFocus(button);
+            }
         }
     }
 
@@ -1094,9 +1120,10 @@ public class DownloadDataWindow extends GenericDialog {
                         logger.error(e);
                     }
                 }
-                // Update server dataset status
+                // Update server dataset status and selected
                 if (deleted && serverDataset != null) {
                     serverDataset.exists = false;
+                    resetSelectedDataset();
                 }
                 // RELOAD DATASETS VIEW
                 GaiaSky.postRunnable(() -> reloadAll());
@@ -1118,10 +1145,20 @@ public class DownloadDataWindow extends GenericDialog {
         question.show(stage);
     }
 
+    private void resetSelectedDataset() {
+        selectedDataset[0] = null;
+        selectedDataset[1] = null;
+        scroll[0][0] = 0f;
+        scroll[0][1] = 0f;
+        scroll[1][0] = 0f;
+        scroll[1][1] = 0f;
+    }
+
     /**
      * Constructs a list of local catalogs found in the current data location.
      *
      * @param server The server catalog descriptors, for combining with the local catalogs.
+     *
      * @return The data descriptor containing the local catalogs.
      */
     public static synchronized DataDescriptor reloadLocalCatalogs(DataDescriptor server) {
@@ -1168,7 +1205,7 @@ public class DownloadDataWindow extends GenericDialog {
             datasets.add(dd);
         }
 
-        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DownloadDataWindow.getTypeWeight(datasetType.typeStr));
+        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
         types.sort(byType);
 
         // Combine with server data descriptor

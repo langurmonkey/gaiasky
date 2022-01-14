@@ -1585,7 +1585,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.currentDataDescriptor != null) {
-                    DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"));
+                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"));
                     ddw.setModal(true);
                     ddw.show(stage);
                 } else {
@@ -1593,7 +1593,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(settings.data.location) + "/gaiasky-data.json");
                     DownloadHelper.downloadFile(settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
                         DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
-                        DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, dd, false, I18n.txt("gui.close"));
+                        DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.txt("gui.close"));
                         ddw.setModal(true);
                         ddw.show(stage);
                     }, () -> {

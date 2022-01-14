@@ -5,8 +5,6 @@
 
 package gaiasky.interafce;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -29,7 +27,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
-import static gaiasky.interafce.DownloadDataWindow.getIcon;
+import static gaiasky.interafce.DatasetManagerWindow.getIcon;
 
 /**
  * Widget which lists all detected catalogs and offers a way to select them.
@@ -51,7 +49,7 @@ public class DatasetsWidget {
     }
 
     public void reloadLocalCatalogs() {
-        localDatasets = DownloadDataWindow.reloadLocalCatalogs(null);
+        localDatasets = DatasetManagerWindow.reloadLocalCatalogs(null);
     }
 
     public Actor buildDatasetsWidget() {
