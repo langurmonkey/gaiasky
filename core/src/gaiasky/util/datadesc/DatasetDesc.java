@@ -55,11 +55,16 @@ public class DatasetDesc {
 
     public String releaseNotes;
 
-    public boolean mustDownload;
-    public boolean cbDisabled;
     public String[] filesToDelete;
 
+    // In case of local datasets, this links to the server description
+    public DatasetDesc server;
+
     public DatasetDesc(JsonReader reader, JsonValue source) {
+        this(reader, source, false);
+    }
+
+    public DatasetDesc(JsonReader reader, JsonValue source, boolean baseData) {
         this.reader = reader;
         this.source = source;
 
@@ -77,11 +82,13 @@ public class DatasetDesc {
         }
 
         this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
-        this.name = source.getString("name");
+        if (source.has("name")) {
+            this.name = source.getString("name");
+        } else if (baseData) {
+            this.name = "default-data";
+        }
         this.key = this.name;
-        this.baseData = name.equals("default-data");
-        this.mustDownload = (!exists || outdated) && baseData;
-        this.cbDisabled = baseData || (exists && !outdated);
+        this.baseData = baseData || name.equals("default-data");
 
         if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
@@ -93,11 +100,14 @@ public class DatasetDesc {
             this.file = source.getString("file");
 
         // Description
-        this.description = source.getString("description");
-        if (description.contains("-")) {
-            this.shortDescription = description.substring(0, description.indexOf("-"));
-        } else {
-            this.shortDescription = description;
+        if (source.has("description")) {
+            this.description = source.getString("description");
+
+            if (description.contains("-")) {
+                this.shortDescription = description.substring(0, description.indexOf("-"));
+            } else {
+                this.shortDescription = description;
+            }
         }
 
         // Release notes
@@ -162,6 +172,7 @@ public class DatasetDesc {
      * returns the default lowest version (0)
      *
      * @param path The path with the file to check
+     *
      * @return The version, if it exists, or 0
      */
     private int checkJsonVersion(Path path) throws RuntimeException {
@@ -192,6 +203,9 @@ public class DatasetDesc {
     }
 
     public enum DatasetStatus {
-        AVAILABLE, INSTALLED, DOWNLOADING, EXTRACTING
+        AVAILABLE,
+        INSTALLED,
+        DOWNLOADING,
+        EXTRACTING
     }
 }

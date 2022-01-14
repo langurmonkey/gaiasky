@@ -238,6 +238,8 @@ public class DatasetManagerWindow extends GenericDialog {
         tabs.add(tabInstalled);
 
         // Check
+        if (serverDd.updatesAvailable)
+            selectedTab = 1;
         tabs.setChecked(selectedTab == 0 ? tabAvail.getText().toString() : tabInstalled.getText().toString());
 
         // Data location
@@ -410,7 +412,10 @@ public class DatasetManagerWindow extends GenericDialog {
                         } else {
                             OwnCheckBox select = new OwnCheckBox("", skin, 0f);
                             installOrSelect = select;
-                            if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                            if (dataset.baseData) {
+                                select.setChecked(true);
+                                select.setDisabled(true);
+                            } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
                                 select.setChecked(false);
                                 select.setDisabled(true);
                                 title.setColor(ColorUtils.gRedC);
@@ -509,7 +514,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                         });
                                                         datasetContext.addItem(update);
                                                     }
-                                                    if (dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
+                                                    if (!dataset.baseData && dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
                                                         boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
                                                         if (enabled) {
                                                             // Disable
@@ -632,12 +637,17 @@ public class DatasetManagerWindow extends GenericDialog {
         // Status
         OwnLabel status = null;
         if (mode == DatasetMode.AVAILABLE) {
-            status = new OwnLabel("Available for download", skin, "mono");
+            status = new OwnLabel(I18n.txt("gui.download.available"), skin, "mono");
         } else if (mode == DatasetMode.INSTALLED) {
-            if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+            if (dataset.baseData) {
+                // Always enabled
+                status = new OwnLabel(I18n.txt("gui.download.enabled"), skin, "mono");
+            } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                // Notify version mismatch
                 status = new OwnLabel(I18n.txt("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
                 status.setColor(ColorUtils.gRedC);
             } else {
+                // Notify status
                 java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
                 boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
                 status = new OwnLabel(I18n.txt(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
@@ -665,12 +675,16 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Size
         OwnLabel size = new OwnLabel(I18n.txt("gui.download.size", dataset.size), skin, "grey-large");
-        size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+        size.addListener(new
+
+                OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
 
         // Num objects
         String nObjStr = dataset.nObjects > 0 ? I18n.txt("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.txt("gui.dataset.nobjects.none");
         OwnLabel nObjects = new OwnLabel(nObjStr, skin, "grey-large");
-        nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
+        nObjects.addListener(new
+
+                OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
 
         // Link
         Link link = null;
@@ -684,15 +698,87 @@ public class DatasetManagerWindow extends GenericDialog {
         OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
         desc.setWidth(1000f);
 
-        t.add(titleGroup).top().left().padBottom(pad5).padTop(pad20).row();
-        t.add(status).top().left().padLeft(pad10 * 3f).padBottom(pad20).row();
-        t.add(type).top().left().padBottom(pad5).row();
-        t.add(version).top().left().padBottom(pad5).row();
-        t.add(key).top().left().padBottom(pad5).row();
-        t.add(size).top().left().padBottom(pad5).row();
-        t.add(nObjects).top().left().padBottom(pad10).row();
-        t.add(link).top().left().padBottom(pad20 * 2f).row();
-        t.add(desc).top().left();
+        t.add(titleGroup).
+
+                top().
+
+                left().
+
+                padBottom(pad5).
+
+                padTop(pad20).
+
+                row();
+        t.add(status).
+
+                top().
+
+                left().
+
+                padLeft(pad10 * 3f).
+
+                padBottom(pad20).
+
+                row();
+        t.add(type).
+
+                top().
+
+                left().
+
+                padBottom(pad5).
+
+                row();
+        t.add(version).
+
+                top().
+
+                left().
+
+                padBottom(pad5).
+
+                row();
+        t.add(key).
+
+                top().
+
+                left().
+
+                padBottom(pad5).
+
+                row();
+        t.add(size).
+
+                top().
+
+                left().
+
+                padBottom(pad5).
+
+                row();
+        t.add(nObjects).
+
+                top().
+
+                left().
+
+                padBottom(pad10).
+
+                row();
+        t.add(link).
+
+                top().
+
+                left().
+
+                padBottom(pad20 * 2f).
+
+                row();
+        t.add(desc).
+
+                top().
+
+                left();
 
         // Scroll
         OwnScrollPane scrollPane = new OwnScrollPane(t, skin, "minimalist-nobg");
@@ -703,11 +789,17 @@ public class DatasetManagerWindow extends GenericDialog {
         scrollPane.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
 
         cell.setActor(t);
-        cell.top().left();
-        cell.getTable().pack();
+        cell.top().
+
+                left();
+        cell.getTable().
+
+                pack();
 
         // Create watcher
-        rightPaneWatcher = new DatasetWatcher(dataset, null, null, status);
+        rightPaneWatcher = new
+
+                DatasetWatcher(dataset, null, null, status);
         watchers.add(rightPaneWatcher);
     }
 
@@ -717,6 +809,10 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void downloadDataset(DatasetDesc dataset) {
+        downloadDataset(dataset, null);
+    }
+
+    private void downloadDataset(DatasetDesc dataset, Runnable successRunnable) {
         GaiaSky.postRunnable(() -> EventManager.instance.post(Events.DATASET_DOWNLOAD_START_INFO, dataset.key));
 
         String name = dataset.name;
@@ -793,6 +889,9 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Ok message
                     EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, dataset.key, 0);
                     dataset.exists = true;
+                    if (successRunnable != null) {
+                        successRunnable.run();
+                    }
                     resetSelectedDataset();
                     reloadAll();
                 } else {
@@ -831,22 +930,6 @@ public class DatasetManagerWindow extends GenericDialog {
                 }
             }
         });
-    }
-
-    private void setDisabled(Array<OwnImageButton> l, boolean disabled) {
-        for (OwnImageButton b : l)
-            b.setDisabled(disabled);
-    }
-
-    private void setDisabled(List<Trio<DatasetDesc, OwnCheckBox, OwnLabel>> choices, boolean disabled) {
-        for (Trio<DatasetDesc, OwnCheckBox, OwnLabel> t : choices) {
-            // Uncheck all if enabling again
-            if (!disabled)
-                t.getSecond().setChecked(false);
-            // Only enable datasets which we don't have
-            if (disabled || (!t.getThird().getText().toString().equals(I18n.txt("gui.download.status.found"))))
-                t.getSecond().setDisabled(disabled);
-        }
     }
 
     private void decompress(String in, File out, DatasetDesc dataset) throws Exception {
@@ -1053,7 +1136,21 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void actionUpdateDataset(DatasetDesc dataset) {
-        downloadDataset(dataset);
+        downloadDataset(dataset, () -> {
+            // Success!
+            dataset.outdated = false;
+            if (dataset.server != null) {
+                dataset.server.outdated = false;
+                dataset.server.myVersion = dataset.server.serverVersion;
+                dataset.myVersion = dataset.server.serverVersion;
+                if (serverDd != null) {
+                    serverDd.numUpdates = Math.max(serverDd.numUpdates - 1, 0);
+                    serverDd.updatesAvailable = serverDd.numUpdates > 0;
+                }
+            } else {
+                dataset.myVersion = dataset.serverVersion;
+            }
+        });
     }
 
     private void actionEnableDataset(DatasetDesc dataset) {
@@ -1179,7 +1276,7 @@ public class DatasetManagerWindow extends GenericDialog {
         Array<FileHandle> catalogFiles = new Array<>();
 
         for (FileHandle catalogLocation : catalogLocations) {
-            FileHandle[] cfs = catalogLocation.list(pathname -> pathname.getName().startsWith("catalog-") && pathname.getName().endsWith(".json"));
+            FileHandle[] cfs = catalogLocation.list(pathname -> (pathname.getName().startsWith("catalog-") || pathname.getName().startsWith("data-main")) && pathname.getName().endsWith(".json"));
             catalogFiles.addAll(cfs);
         }
 
@@ -1189,18 +1286,11 @@ public class DatasetManagerWindow extends GenericDialog {
         List<DatasetDesc> datasets = new ArrayList<>();
         for (FileHandle catalogFile : catalogFiles) {
             JsonValue val = reader.parse(catalogFile);
-            DatasetDesc dd = new DatasetDesc(reader, val);
+            DatasetDesc dd = new DatasetDesc(reader, val, catalogFile.path().endsWith("data-main.json"));
             dd.path = Path.of(catalogFile.path());
             dd.catalogFile = catalogFile;
             dd.exists = true;
             dd.status = DatasetDesc.DatasetStatus.INSTALLED;
-
-            if (dd.description == null)
-                dd.description = dd.path.toString();
-            if (dd.name == null)
-                dd.name = dd.catalogFile.nameWithoutExtension();
-
-            dd.shortDescription = dd.description;
 
             DatasetType dt;
             if (typeMap.containsKey(dd.type)) {
@@ -1239,9 +1329,26 @@ public class DatasetManagerWindow extends GenericDialog {
                         if (local.link == null) {
                             local.link = remote.link;
                         }
+                        if (local.description == null) {
+                            local.description = remote.description;
+                        }
+                        if (local.shortDescription == null) {
+                            local.shortDescription = remote.shortDescription;
+                        }
+                        local.server = remote;
                     }
                 }
             }
+        }
+
+        // Default values in case this is a totally offline dataset
+        for (DatasetDesc dd : datasets) {
+            if (dd.description == null)
+                dd.description = dd.path.toString();
+            if (dd.shortDescription == null)
+                dd.shortDescription = dd.description;
+            if (dd.name == null)
+                dd.name = dd.catalogFile.nameWithoutExtension();
         }
 
         return new DataDescriptor(types, datasets);

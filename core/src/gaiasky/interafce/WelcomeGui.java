@@ -311,7 +311,7 @@ public class WelcomeGui extends AbstractGui {
         ui.addActor(topLeft);
 
         // Base data notice
-        if (dd != null && dd.updatesAvailable ) {
+        if (dd != null && dd.updatesAvailable) {
             DatasetDesc baseData = dd.findDataset("default-data");
             if(baseData != null && baseData.myVersion < baseData.serverVersion) {
                 // We have a base data update, show notice
