@@ -16,6 +16,7 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
+import javax.xml.crypto.Data;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -147,6 +148,17 @@ public class DataDescriptorUtils {
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
+        // Get all server datasets that exist locally
+        List<DatasetDesc> existing = new ArrayList<>();
+        if (server != null) {
+            for (DatasetDesc dd : server.datasets) {
+                if (dd.exists) {
+                    existing.add(dd.getLocalCopy());
+                }
+            }
+        }
+
+        // Get all local catalogs
         Array<FileHandle> catalogLocations = new Array<>();
         catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
 
@@ -158,103 +170,35 @@ public class DataDescriptorUtils {
         }
 
         JsonReader reader = new JsonReader();
-        Map<String, DatasetType> typeMap = new HashMap<>();
         List<DatasetType> types = new ArrayList<>();
         List<DatasetDesc> datasets = new ArrayList<>();
         for (FileHandle catalogFile : catalogFiles) {
             JsonValue val = reader.parse(catalogFile);
-            DatasetDesc dd = new DatasetDesc(reader, val);
+            Path path = Path.of(catalogFile.path());
+
+            DatasetDesc dd = null;
+            Iterator<DatasetDesc> it = existing.iterator();
+            while(it.hasNext()) {
+                DatasetDesc remote = it.next();
+                if (remote.check.getFileName().toString().equals(path.getFileName().toString())) {
+                    // Found in remotes
+                    dd = remote;
+                    it.remove();
+                    break;
+                }
+            }
+            if (dd == null) {
+                // Not found, create it
+                dd = new DatasetDesc(reader, val);
+            }
             dd.path = Path.of(catalogFile.path());
             dd.catalogFile = catalogFile;
             dd.exists = true;
             dd.status = DatasetDesc.DatasetStatus.INSTALLED;
 
-            DatasetType dt;
-            if (typeMap.containsKey(dd.type)) {
-                dt = typeMap.get(dd.type);
-            } else {
-                dt = new DatasetType(dd.type);
-                typeMap.put(dd.type, dt);
-                types.add(dt);
-            }
-            dt.datasets.add(dd);
             datasets.add(dd);
         }
-
-        if (server != null && server.datasets != null) {
-            // Combine server with remote datasets
-            for (DatasetDesc local : datasets) {
-                for (DatasetDesc remote : server.datasets) {
-                    if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
-                        // Match, update local with some server info
-                        if (local.name.equals(remote.name)) {
-                            // Update name, as ours is the remote key
-                            local.name = remote.shortDescription;
-                            local.shortDescription = remote.shortDescription;
-                            local.description = remote.description.substring(remote.description.indexOf(" - ") + 3);
-                        }
-                        local.check = remote.check;
-                        local.key = remote.key;
-                        local.filesToDelete = remote.filesToDelete;
-                        local.file = remote.file;
-                        local.serverVersion = remote.serverVersion;
-                        local.outdated = remote.outdated;
-                        if (local.releaseNotes == null) {
-                            local.releaseNotes = remote.releaseNotes;
-                        }
-                        if (local.datasetType == null) {
-                            local.datasetType = remote.datasetType;
-                        }
-                        if (local.link == null) {
-                            local.link = remote.link;
-                        }
-                        if (local.description == null) {
-                            local.description = remote.description;
-                        }
-                        if (local.shortDescription == null) {
-                            local.shortDescription = remote.shortDescription;
-                        }
-                        local.server = remote;
-                    }
-                }
-            }
-
-            // Add remotes on disk that are not catalogs
-            for (DatasetDesc remote : server.datasets) {
-                if (remote.exists) {
-                    boolean found = false;
-                    for (DatasetDesc local : datasets) {
-                        if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        // Add to local datasets
-                        DatasetDesc copy = remote.getLocalCopy();
-                        datasets.add(copy);
-                        // Add to local types
-                        DatasetType remoteType = copy.datasetType;
-                        found = false;
-                        for (DatasetType localType : types) {
-                            if (localType.equals(remoteType)) {
-                                localType.datasets.add(copy);
-                                copy.datasetType = localType;
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            // No type! create it
-                            DatasetType newType = new DatasetType(remoteType.typeStr);
-                            newType.addDataset(copy);
-                            copy.datasetType = newType;
-                            types.add(newType);
-                        }
-                    }
-                }
-            }
-        }
+        datasets.addAll(existing);
 
         // Default values in case this is a totally offline dataset
         for (DatasetDesc dd : datasets) {
@@ -266,6 +210,21 @@ public class DataDescriptorUtils {
                 dd.name = dd.catalogFile.nameWithoutExtension();
         }
 
+        // Create types
+        Map<String, DatasetType> typeMap = new HashMap<>();
+        for (DatasetDesc dd : datasets) {
+            DatasetType dt;
+            if (typeMap.containsKey(dd.type)) {
+                dt = typeMap.get(dd.type);
+            } else {
+                dt = new DatasetType(dd.type);
+                typeMap.put(dd.type, dt);
+                types.add(dt);
+            }
+            dd.datasetType = dt;
+            dt.datasets.add(dd);
+        }
+        // Sort
         Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
         types.sort(byType);
 

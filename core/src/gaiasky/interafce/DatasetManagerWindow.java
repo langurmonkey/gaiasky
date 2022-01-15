@@ -414,7 +414,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         } else {
                             OwnCheckBox select = new OwnCheckBox("", skin, 0f);
                             installOrSelect = select;
-                            if (dataset.baseData) {
+                            if (dataset.baseData || dataset.type.equals("texture-pack")) {
                                 select.setChecked(true);
                                 select.setDisabled(true);
                             } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
@@ -516,7 +516,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                         });
                                                         datasetContext.addItem(update);
                                                     }
-                                                    if (!dataset.baseData && dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
+                                                    if (!dataset.baseData && !dataset.type.equals("texture-pack") && dataset.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
                                                         boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
                                                         if (enabled) {
                                                             // Disable
@@ -641,7 +641,7 @@ public class DatasetManagerWindow extends GenericDialog {
         if (mode == DatasetMode.AVAILABLE) {
             status = new OwnLabel(I18n.txt("gui.download.available"), skin, "mono");
         } else if (mode == DatasetMode.INSTALLED) {
-            if (dataset.baseData) {
+            if (dataset.baseData || dataset.type.equals("texture-pack")) {
                 // Always enabled
                 status = new OwnLabel(I18n.txt("gui.download.enabled"), skin, "mono");
             } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
@@ -673,7 +673,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         // Key
-        OwnLabel key = new OwnLabel(I18n.txt("gui.download.name", dataset.name), skin, "grey-large");
+        OwnLabel key = new OwnLabel(I18n.txt("gui.download.name", dataset.key), skin, "grey-large");
 
         // Size
         OwnLabel size = new OwnLabel(I18n.txt("gui.download.size", dataset.size), skin, "grey-large");
