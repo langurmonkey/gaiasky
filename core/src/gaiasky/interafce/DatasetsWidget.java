@@ -16,6 +16,7 @@ import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.datadesc.DataDescriptor;
+import gaiasky.util.datadesc.DataDescriptorUtils;
 import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.datadesc.DatasetType;
 import gaiasky.util.scene2d.*;
@@ -49,7 +50,7 @@ public class DatasetsWidget {
     }
 
     public void reloadLocalCatalogs() {
-        localDatasets = DatasetManagerWindow.reloadLocalCatalogs(null);
+        localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
     }
 
     public Actor buildDatasetsWidget() {

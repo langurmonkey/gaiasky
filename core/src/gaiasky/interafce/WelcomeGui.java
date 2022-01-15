@@ -155,7 +155,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWelcomeUI() {
-        dd = !downloadError ? DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor) : null;
+        dd = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
         // Center table
         Table center = new Table(skin);
         center.setFillParent(true);
