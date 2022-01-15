@@ -23,15 +23,18 @@ public class DataDescriptorUtils {
     private static final Log logger = Logger.getLogger(DataDescriptorUtils.class);
 
     private static DataDescriptorUtils instance;
-    public static DataDescriptorUtils instance(){
-        if(instance == null)
+
+    public static DataDescriptorUtils instance() {
+        if (instance == null) {
             instance = new DataDescriptorUtils();
+        }
         return instance;
     }
 
     private FileHandle fh;
     private final JsonReader reader;
-    private DataDescriptorUtils(){
+
+    private DataDescriptorUtils() {
         super();
         this.reader = new JsonReader();
     }
@@ -54,10 +57,11 @@ public class DataDescriptorUtils {
 
     /**
      * Constructs a data descriptor from a server JSON file.
+     *
      * @param fh The pointer to the server JSON file.
      * @return An instance of {@link DataDescriptor}.
      */
-    public synchronized DataDescriptor buildServerDatasets(FileHandle fh){
+    public synchronized DataDescriptor buildServerDatasets(FileHandle fh) {
         if (fh != null) {
             this.fh = fh;
         }
@@ -136,18 +140,13 @@ public class DataDescriptorUtils {
     /**
      * Constructs a list of local catalogs found in the current data location and combines
      * them with the server data.
+     * Local catalogs are JSON files in the data directory that start with either 'catalog-'
+     * or 'dataset-'.
      *
      * @param server The server data descriptor, for combining with the local catalogs.
-     *
      * @return An instance of {@link DataDescriptor}.
      */
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
-
-        
-
-
-
-        // Discover data sets, add as buttons
         Array<FileHandle> catalogLocations = new Array<>();
         catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
 
@@ -178,7 +177,6 @@ public class DataDescriptorUtils {
                 typeMap.put(dd.type, dt);
                 types.add(dt);
             }
-
             dt.datasets.add(dd);
             datasets.add(dd);
         }
@@ -189,7 +187,7 @@ public class DataDescriptorUtils {
                 for (DatasetDesc remote : server.datasets) {
                     if (remote.check.getFileName().toString().equals(local.path.getFileName().toString())) {
                         // Match, update local with some server info
-                        if(local.name.equals(remote.name)) {
+                        if (local.name.equals(remote.name)) {
                             // Update name, as ours is the remote key
                             local.name = remote.shortDescription;
                             local.shortDescription = remote.shortDescription;
@@ -273,5 +271,4 @@ public class DataDescriptorUtils {
 
         return new DataDescriptor(types, datasets);
     }
-
 }
