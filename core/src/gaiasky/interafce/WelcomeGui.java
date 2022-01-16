@@ -57,14 +57,13 @@ public class WelcomeGui extends AbstractGui {
     private final boolean skipWelcome;
 
     protected DatasetManagerWindow ddw;
-    protected CatalogSelectionWindow cdw;
 
     private FileHandle dataDescriptor;
 
     private boolean downloadError = false;
     private Texture bgTex;
-    private DatasetsWidget dw;
-    private DataDescriptor dd;
+    private DataDescriptor serverDatasets;
+    private DataDescriptor localDatasets;
 
     /**
      * Creates an initial GUI
@@ -96,37 +95,30 @@ public class WelcomeGui extends AbstractGui {
             // If slave or headless, data load can start
             gaiaSky();
         } else {
-            dw = new DatasetsWidget(ui, skin);
-            dw.reloadLocalCatalogs();
+            reloadLocalDatasets();
 
             // Otherwise, check for updates, etc.
             clearGui();
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
-            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
-                GaiaSky.postRunnable(() -> {
-                    // Data descriptor ok. Skip welcome screen only if flag and base data present
-                    if (skipWelcome && baseDataPresent()) {
-                        gaiaSky();
-                    } else {
-                        buildWelcomeUI();
-                    }
-                });
-            }, () -> {
+            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> GaiaSky.postRunnable(() -> {
+                // Data descriptor ok. Skip welcome screen only if flag and base data present
+                if (skipWelcome && baseDataPresent()) {
+                    gaiaSky();
+                } else {
+                    buildWelcomeUI();
+                }
+            }), () -> {
                 // Fail?
                 downloadError = true;
                 logger.error(I18n.txt("gui.welcome.error.nointernet"));
                 if (baseDataPresent()) {
                     // Go on all in
-                    GaiaSky.postRunnable(() -> {
-                        GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI());
-                    });
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI()));
                 } else {
                     // Error and exit
                     logger.error(I18n.txt("gui.welcome.error.nobasedata"));
-                    GaiaSky.postRunnable(() -> {
-                        GuiUtils.addNoConnectionExit(skin, ui);
-                    });
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, ui));
                 }
             }, null);
 
@@ -142,7 +134,7 @@ public class WelcomeGui extends AbstractGui {
                             if (baseDataPresent()) {
                                 gaiaSky();
                             } else {
-                                addDatasetManagerWindow(dd);
+                                addDatasetManagerWindow(serverDatasets);
                             }
                         }
                     }
@@ -155,7 +147,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWelcomeUI() {
-        dd = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
+        serverDatasets = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
         // Center table
         Table center = new Table(skin);
         center.setFillParent(true);
@@ -165,7 +157,6 @@ public class WelcomeGui extends AbstractGui {
         Drawable bg = new SpriteDrawable(new Sprite(bgTex));
         center.setBackground(bg);
 
-        float pad8 = 8f;
         float pad16 = 16f;
         float pad18 = 18f;
         float pad32 = 32f;
@@ -240,16 +231,16 @@ public class WelcomeGui extends AbstractGui {
         datasetManagerButton.setSize(bw * 0.8f, bh * 0.8f);
         datasetManagerButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                addDatasetManagerWindow(dd);
+                addDatasetManagerWindow(serverDatasets);
             }
             return true;
         });
         Table datasetManagerInfo = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
         datasetManagerInfo.add(downloadLabel).top().left().padBottom(pad16);
-        if (dd != null && dd.updatesAvailable) {
+        if (serverDatasets != null && serverDatasets.updatesAvailable) {
             datasetManagerInfo.row();
-            OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
+            OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
             datasetManagerInfo.add(updates).bottom().left();
         } else if (!baseDataPresent) {
@@ -310,11 +301,11 @@ public class WelcomeGui extends AbstractGui {
 
         if (!baseDataPresent) {
             // Open dataset manager if base data is not there
-            addDatasetManagerWindow(dd);
+            addDatasetManagerWindow(serverDatasets);
         } else {
             // Check if there is an update for the base data, and show a notice if so
-            if (dd != null && dd.updatesAvailable) {
-                DatasetDesc baseData = dd.findDataset("default-data");
+            if (serverDatasets != null && serverDatasets.updatesAvailable) {
+                DatasetDesc baseData = serverDatasets.findDataset("default-data");
                 if (baseData != null && baseData.myVersion < baseData.serverVersion) {
                     // We have a base data update, show notice
                     GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
@@ -363,17 +354,14 @@ public class WelcomeGui extends AbstractGui {
      * Reloads the view completely
      */
     private void reloadView() {
-        if (dw == null) {
-            dw = new DatasetsWidget(ui, skin);
-        }
-        dw.reloadLocalCatalogs();
+        reloadLocalDatasets();
         clearGui();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
     }
 
-    private boolean isCatalogSelected() {
-        return Settings.settings.data.catalogFiles != null && Settings.settings.data.catalogFiles.size() > 0;
+    private void reloadLocalDatasets() {
+        this.localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
     }
 
     private int numTotalCatalogsSelected() {
@@ -381,7 +369,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numCatalogsAvailable() {
-        return dw.localDatasets.datasets.size();
+        return this.localDatasets != null ? this.localDatasets.datasets.size() : 0;
     }
 
     private int numGaiaDRCatalogsSelected() {
@@ -401,8 +389,9 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsSelected() {
         int matches = 0;
-        if (dd == null && (dw == null || dw.localDatasets == null || dw.localDatasets.datasets == null))
+        if (serverDatasets == null && localDatasets == null) {
             return 0;
+        }
 
         for (String f : Settings.settings.data.catalogFiles) {
             // File name with no extension
@@ -411,12 +400,12 @@ public class WelcomeGui extends AbstractGui {
             try {
                 DatasetDesc dataset = null;
                 // Try with server description
-                if (dd != null) {
-                    dataset = dd.findDatasetByDescriptor(path);
+                if (serverDatasets != null) {
+                    dataset = serverDatasets.findDatasetByDescriptor(path);
                 }
                 // Try local description
-                if (dataset == null && dw != null) {
-                    dataset = dw.findDatasetByDescriptor(path);
+                if (dataset == null && localDatasets != null) {
+                    dataset = localDatasets.findDatasetByDescriptor(path);
                 }
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
                     matches++;
@@ -498,28 +487,12 @@ public class WelcomeGui extends AbstractGui {
         ddw.show(ui);
     }
 
-    private void addCatalogSelectionWindow(String noticeKey) {
-        if (cdw == null) {
-            cdw = new CatalogSelectionWindow(ui, skin, noticeKey);
-            cdw.setAcceptRunnable(() -> {
-                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                reloadView();
-            });
-        } else {
-            cdw.refresh();
-        }
-        cdw.show(ui);
-    }
-
     public void clearGui() {
         if (ui != null) {
             ui.clear();
         }
         if (ddw != null) {
             ddw.remove();
-        }
-        if (cdw != null) {
-            cdw.remove();
         }
     }
 

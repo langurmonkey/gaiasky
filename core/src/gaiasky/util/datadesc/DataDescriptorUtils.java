@@ -16,7 +16,8 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
-import javax.xml.crypto.Data;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -178,7 +179,7 @@ public class DataDescriptorUtils {
 
             DatasetDesc dd = null;
             Iterator<DatasetDesc> it = existing.iterator();
-            while(it.hasNext()) {
+            while (it.hasNext()) {
                 DatasetDesc remote = it.next();
                 if (remote.check.getFileName().toString().equals(path.getFileName().toString())) {
                     // Found in remotes
@@ -230,4 +231,5 @@ public class DataDescriptorUtils {
 
         return new DataDescriptor(types, datasets);
     }
+
 }

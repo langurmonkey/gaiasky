@@ -16,6 +16,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -253,4 +254,5 @@ public class DatasetDesc {
         copy.server = this.server;
         return copy;
     }
+
 }
