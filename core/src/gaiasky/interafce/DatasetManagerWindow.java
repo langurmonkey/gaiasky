@@ -172,15 +172,18 @@ public class DatasetManagerWindow extends GenericDialog {
         HorizontalGroup tabGroup = new HorizontalGroup();
         tabGroup.align(Align.center);
 
-        String updateCount = "";
+
+        String tabInstalledText;
         if (serverDd != null && serverDd.updatesAvailable) {
-            updateCount = " (" + serverDd.numUpdates + ")";
+            tabInstalledText = I18n.txt("gui.download.tab.installed.updates", serverDd.numUpdates);
+        } else {
+            tabInstalledText = I18n.txt("gui.download.tab.installed");
         }
 
         final OwnTextButton tabAvail = new OwnTextButton(I18n.txt("gui.download.tab.available"), skin, "toggle-big");
         tabAvail.pad(pad5);
         tabAvail.setWidth(tabWidth);
-        final OwnTextButton tabInstalled = new OwnTextButton(I18n.txt("gui.download.tab.installed") + updateCount, skin, "toggle-big");
+        final OwnTextButton tabInstalled = new OwnTextButton(tabInstalledText, skin, "toggle-big");
         tabInstalled.pad(pad5);
         tabInstalled.setWidth(tabWidth);
 
