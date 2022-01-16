@@ -48,7 +48,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Welcome screen that allows access to the main application, as well as the dataset manager and the catalog selection.
+ * Welcome screen that allows access to the main application and the dataset manager. It provides some information
+ * on possible problems with the selection, available updates and more.
  */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);

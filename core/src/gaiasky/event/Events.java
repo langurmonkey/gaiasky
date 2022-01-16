@@ -1363,7 +1363,8 @@ public enum Events {
     PROCEDURAL_GENERATION_CLOUD_INFO,
 
     /**
-     * Signals the start of a dataset download. Contains the dataset key (String).
+     * Signals the start of a dataset download. Contains the dataset key (String) and the
+     * HttpRequest object.
      */
     DATASET_DOWNLOAD_START_INFO,
     /**

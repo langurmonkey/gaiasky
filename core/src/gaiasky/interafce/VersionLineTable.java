@@ -11,6 +11,10 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextTooltip;
 
+/**
+ * Produces a table with status information (version, build, build time, OpenGL version, GLSL version, etc.)
+ * to be shown at startup.
+ */
 public class VersionLineTable extends Table {
     public VersionLineTable(Skin skin) {
         super(skin);

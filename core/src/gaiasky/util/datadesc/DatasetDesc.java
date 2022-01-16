@@ -209,8 +209,7 @@ public class DatasetDesc {
     public enum DatasetStatus {
         AVAILABLE,
         INSTALLED,
-        DOWNLOADING,
-        EXTRACTING
+        DOWNLOADING
     }
 
     public DatasetDesc getLocalCopy(){
