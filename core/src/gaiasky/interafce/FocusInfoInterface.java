@@ -42,7 +42,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected Button goTo, landOn, landAt, bookmark;
     protected OwnImageButton visibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
-    protected OwnLabel camName, camVel, camPos, camTracking, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
+    protected OwnLabel camName, camVel, camPos, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
     protected OwnLabel focusIdExpand;
 
@@ -149,6 +149,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         camName = new OwnLabel(I18n.txt("gui.camera"), skin, "hud-header");
         camTracking = new OwnLabel("-", skin, "hud");
         camVel = new OwnLabel("", skin, "hud");
+        camDistSol = new OwnLabel("", skin, "hud");
         camPos = new OwnLabel("", skin, "hud");
 
         // Ruler
@@ -328,6 +329,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         cameraInfo.row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud")).left();
         cameraInfo.add(camVel).left().padLeft(pad15);
+        cameraInfo.row();
+        cameraInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.sol"), skin, "hud")).left();
+        cameraInfo.add(camDistSol).left().padLeft(pad15);
         cameraInfo.row();
         cameraInfo.add(camPos).left().colspan(2);
 
@@ -597,6 +601,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             camVel.setText(sf.format((double) data[1]) + " " + I18n.txt("gui.unit.kmh"));
             camPos.setText(TextUtils.capString(camPosStr, 40));
             camPos.addListener(new OwnTextTooltip(camPosStr, skin));
+            Pair<Double, String> distSol = GlobalResources.doubleToDistanceString(campos.lend(), s.program.ui.distanceUnits);
+            camDistSol.setText(sf.format(Math.max(0d, distSol.getFirst())) + " " + distSol.getSecond());
         }
         case CAMERA_TRACKING_OBJECT_UPDATE -> {
             final IFocus trackingObject = (IFocus) data[0];
