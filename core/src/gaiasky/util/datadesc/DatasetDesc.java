@@ -9,11 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.I18n;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -116,11 +113,12 @@ public class DatasetDesc {
                 this.name = description.substring(0, description.indexOf("-")).trim();
                 this.description = description.substring(description.indexOf("-") + 1, description.length()).trim();
             }
+            this.description = TextUtils.unescape(this.description);
         }
 
         // Release notes
         if (source.has("releasenotes")) {
-            this.releaseNotes = source.getString("releasenotes");
+            this.releaseNotes = TextUtils.unescape(source.getString("releasenotes"));
         } else {
             this.releaseNotes = null;
         }
@@ -218,7 +216,6 @@ public class DatasetDesc {
 
     public DatasetDesc getLocalCopy() {
         DatasetDesc copy = this.copy();
-        copy.description = copy.description.substring(copy.description.indexOf(" - ") + 3);
         copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
         copy.path = copy.check.toAbsolutePath();
         return copy;

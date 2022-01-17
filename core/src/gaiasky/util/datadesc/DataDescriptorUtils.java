@@ -151,11 +151,25 @@ public class DataDescriptorUtils {
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
         // Get all server datasets that exist locally
         List<DatasetDesc> existing = new ArrayList<>();
+        Map<String, DatasetDesc> serverMap = new TreeMap<>();
         if (server != null) {
             for (DatasetDesc dd : server.datasets) {
                 if (dd.exists) {
-                    existing.add(dd.getLocalCopy());
+                    if(serverMap.containsKey(dd.key)) {
+                        DatasetDesc other = serverMap.get(dd.key);
+                        // Only keep larger version, if we can use it
+                        if(dd.serverVersion > other.serverVersion && dd.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
+                            serverMap.put(dd.key, dd);
+                        }
+                    } else {
+                        serverMap.put(dd.key, dd);
+                    }
                 }
+            }
+            // Add unique
+            Set<String> keys = serverMap.keySet();
+            for(String key : keys) {
+                existing.add(serverMap.get(key));
             }
         }
 

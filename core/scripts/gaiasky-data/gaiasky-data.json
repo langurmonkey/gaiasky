@@ -57,11 +57,12 @@
       "file": "@mirror-url@basedata/v020_20210623/basedata.tar.gz"
     },
     {
-      "name": "default-data",
+      "key" : "default-data",
+      "name": "Base data pack",
       "type": "data-pack",
-      "version": 21,
+      "version": 22,
       "mingsversion": 30200,
-      "size": 69413656,
+      "size": 69413528,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -108,11 +109,11 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "999750ca9b4921e49c2fee2d59437b546c6f2d05c2ac4c1da20abe88344da804",
-      "description": "Base data pack - Required, for Gaia Sky 3.2.0 and above. Contains the Solar System, constellations, the Milky Way, and more",
-      "releasenotes": "Invert height textures to follow convention, add biome LUT textures, update satellites, moons and planets.",
+      "sha256": "11630ed6cd4e81a0937f85d365d32403ca962822004b2b676130786864c702ec",
+      "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "Upgrade to new descriptor format introduced in 3.2.0.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v021_20211203/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v022_20220117/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -132,7 +133,7 @@
       "releasenotes": "Add high- and ultra-resolution Milky Way skymaps.",
       "sha256": "d48dcff9b47322f570cf51f80a6990d536638e185d82aaee3d31388e270b9dd5",
       "link": "@mirror-url@tex",
-      "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz",
+      "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -152,7 +153,7 @@
       "releasenotes": "Invert height textures to follow convention.",
       "sha256": "3f34f19e956f619d44f38a48a8a589ac8c6798e6bd3803a0fcd73081b5337469",
       "link": "@mirror-url@tex",
-      "file": "@mirror-url@tex/006_20211203/hi-res-texture-pack.tar.gz",
+      "file": "@mirror-url@tex/006_20211203/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "catalog-edr3-default",

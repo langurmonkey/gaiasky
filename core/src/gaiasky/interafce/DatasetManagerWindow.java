@@ -467,7 +467,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                     } else {
                                         actionDisableDataset(dataset);
                                     }
-                                    GaiaSky.postRunnable(() -> updateDatasetInfoPane(right, dataset, mode));
+                                    GaiaSky.postRunnable(() -> reloadDatasetInfo(right, dataset, mode));
                                 }
                             });
                         }
@@ -521,7 +521,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                     InputEvent.Type type = ie.getType();
                                     if (type == InputEvent.Type.touchDown) {
                                         if (ie.getButton() == Input.Buttons.LEFT) {
-                                            GaiaSky.postRunnable(() -> updateDatasetInfoPane(right, dataset, mode));
+                                            GaiaSky.postRunnable(() -> reloadDatasetInfo(right, dataset, mode));
                                             selectedDataset[mode.ordinal()] = dataset;
                                         } else if (ie.getButton() == Input.Buttons.RIGHT) {
                                             GaiaSky.postRunnable(() -> {
@@ -554,7 +554,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                         cb.setChecked(false);
                                                                         cb.setProgrammaticChangeEvents(true);
                                                                     }
-                                                                    GaiaSky.postRunnable(() -> updateDatasetInfoPane(right, dataset, mode));
+                                                                    GaiaSky.postRunnable(() -> reloadDatasetInfo(right, dataset, mode));
                                                                 }
                                                             });
                                                             datasetContext.addItem(disable);
@@ -571,7 +571,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                                         cb.setChecked(true);
                                                                         cb.setProgrammaticChangeEvents(true);
                                                                     }
-                                                                    GaiaSky.postRunnable(() -> updateDatasetInfoPane(right, dataset, mode));
+                                                                    GaiaSky.postRunnable(() -> reloadDatasetInfo(right, dataset, mode));
                                                                 }
                                                             });
                                                             datasetContext.addItem(enable);
@@ -625,13 +625,13 @@ public class DatasetManagerWindow extends GenericDialog {
             leftScroll.setScrollY(scroll[mode.ordinal()][1]);
             left.setActor(leftScroll);
 
-            updateDatasetInfoPane(right, selectedDataset[mode.ordinal()], mode);
+            reloadDatasetInfo(right, selectedDataset[mode.ordinal()], mode);
 
         }
         me.pack();
     }
 
-    private void updateDatasetInfoPane(Cell cell, DatasetDesc dataset, DatasetMode mode) {
+    private void reloadDatasetInfo(Cell cell, DatasetDesc dataset, DatasetMode mode) {
         if (rightPaneWatcher != null) {
             rightPaneWatcher.dispose();
             watchers.remove(rightPaneWatcher);
