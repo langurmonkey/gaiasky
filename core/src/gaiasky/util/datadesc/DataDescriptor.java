@@ -85,7 +85,7 @@ public class DataDescriptor {
     public DatasetDesc findDatasetByDescriptor(Path descriptorFile) throws IOException {
         if (Files.exists(descriptorFile))
             for (DatasetDesc dd : datasets) {
-                if (Files.exists(dd.check) && Files.isSameFile(dd.check, descriptorFile))
+                if (dd.check != null && Files.exists(dd.check) && Files.isSameFile(dd.check, descriptorFile))
                     return dd;
             }
         return null;
