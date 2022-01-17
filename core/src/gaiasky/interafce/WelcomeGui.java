@@ -179,12 +179,12 @@ public class WelcomeGui extends AbstractGui {
 
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad32);
-        OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", Settings.APPLICATION_NAME, Settings.settings.version.version), skin, "main-title");
-        OwnLabel gs = new OwnLabel(Settings.APPLICATION_NAME + " " + Settings.settings.version.version, skin, "main-title");
-        gs.setColor(skin.getColor("theme"));
-        titleGroup.addActor(title);
-        titleGroup.addActor(gs);
+        titleGroup.space(pad32 * 2f);
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
+        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        version.setColor(skin.getColor("theme"));
+        titleGroup.addActor(gaiaSky);
+        titleGroup.addActor(version);
 
         String textStyle = "main-title-s";
 
