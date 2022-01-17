@@ -190,7 +190,7 @@ public class DataDescriptorUtils {
             }
             if (dd == null) {
                 // Not found, create it
-                dd = new DatasetDesc(reader, val);
+                dd = new DatasetDesc(reader, val, true);
             }
             dd.path = Path.of(catalogFile.path());
             dd.catalogFile = catalogFile;
@@ -205,8 +205,6 @@ public class DataDescriptorUtils {
         for (DatasetDesc dd : datasets) {
             if (dd.description == null)
                 dd.description = dd.path.toString();
-            if (dd.shortDescription == null)
-                dd.shortDescription = dd.description;
             if (dd.name == null)
                 dd.name = dd.catalogFile.nameWithoutExtension();
         }

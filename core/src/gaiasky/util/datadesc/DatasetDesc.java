@@ -16,7 +16,6 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +28,6 @@ public class DatasetDesc {
     public String key;
     public String name;
     public String description;
-    public String shortDescription;
     public String link;
     public String type;
     public String file;
@@ -61,13 +59,14 @@ public class DatasetDesc {
     // In case of local datasets, this links to the server description
     public DatasetDesc server;
 
-    public DatasetDesc(){}
-
-    public DatasetDesc(JsonReader reader, JsonValue source) {
-        this(reader, source, false);
+    public DatasetDesc() {
     }
 
-    public DatasetDesc(JsonReader reader, JsonValue source, boolean baseData) {
+    public DatasetDesc(JsonReader reader, JsonValue source) {
+       this(reader, source, false);
+    }
+
+    public DatasetDesc(JsonReader reader, JsonValue source, boolean local) {
         this.reader = reader;
         this.source = source;
 
@@ -85,13 +84,19 @@ public class DatasetDesc {
         }
 
         this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
+        // The key marks the new version
+        boolean hasKey = source.has("key");
+        if (hasKey) {
+            this.key = source.getString("key");
+        }
+        hasKey = hasKey || local;
         if (source.has("name")) {
             this.name = source.getString("name");
-        } else if (baseData) {
-            this.name = "default-data";
         }
-        this.key = this.name;
-        this.baseData = baseData || name.equals("default-data");
+        if (this.key == null) {
+            this.key = this.name.replaceAll("\\s+", "-");
+        }
+        this.baseData = key.equals("default-data");
 
         if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
@@ -102,15 +107,14 @@ public class DatasetDesc {
         if (source.has("file"))
             this.file = source.getString("file");
 
-
         // Description
         if (source.has("description")) {
             this.description = source.getString("description");
 
-            if (description.contains("-")) {
-                this.shortDescription = description.substring(0, description.indexOf("-"));
-            } else {
-                this.shortDescription = description;
+            if (!hasKey && description.contains("-")) {
+                // Old format, description=name - desc; name=key
+                this.name = description.substring(0, description.indexOf("-")).trim();
+                this.description = description.substring(description.indexOf("-"), description.length()).trim();
             }
         }
 
@@ -212,9 +216,8 @@ public class DatasetDesc {
         DOWNLOADING
     }
 
-    public DatasetDesc getLocalCopy(){
+    public DatasetDesc getLocalCopy() {
         DatasetDesc copy = this.copy();
-        copy.name = copy.shortDescription;
         copy.description = copy.description.substring(copy.description.indexOf(" - ") + 3);
         copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
         copy.path = copy.check.toAbsolutePath();
@@ -228,7 +231,6 @@ public class DatasetDesc {
         copy.key = this.key;
         copy.name = this.name;
         copy.description = this.description;
-        copy.shortDescription = this.shortDescription;
         copy.link = this.link;
         copy.type = this.type;
         copy.file = this.file;

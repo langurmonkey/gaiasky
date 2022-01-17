@@ -388,7 +388,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         Table t = new Table(skin);
                         t.pad(pad10, pad10, 0, pad10);
 
-                        String tooltipText = dataset.shortDescription;
+                        String tooltipText = dataset.key;
 
                         // Type icon
                         Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
@@ -399,7 +399,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
                         // Title
-                        String titleString = mode == DatasetMode.AVAILABLE ? dataset.shortDescription : dataset.name;
+                        String titleString = dataset.name;
                         OwnLabel title = new OwnLabel(TextUtils.capString(titleString, 60), skin, "ui-23");
                         title.setWidth(width * 0.41f);
                         if (dataset.outdated) {
@@ -641,9 +641,9 @@ public class DatasetManagerWindow extends GenericDialog {
         typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
         // Title
-        String titleString = mode == DatasetMode.AVAILABLE ? dataset.shortDescription : dataset.name;
+        String titleString = dataset.name;
         OwnLabel title = new OwnLabel(TextUtils.breakCharacters(titleString, 45), skin, "hud-header");
-        title.addListener(new OwnTextTooltip(dataset.shortDescription, skin, 10));
+        title.addListener(new OwnTextTooltip(dataset.description, skin, 10));
 
         // Title group
         HorizontalGroup titleGroup = new HorizontalGroup();
@@ -1179,7 +1179,7 @@ public class DatasetManagerWindow extends GenericDialog {
             @Override
             protected void build() {
                 content.clear();
-                String title = dataset.exists ? dataset.name : dataset.shortDescription;
+                String title = dataset.name;
                 content.add(new OwnLabel(I18n.txt("gui.download.delete.text"), skin)).left().padBottom(pad10 * 2f).row();
                 content.add(new OwnLabel(title, skin, "warp")).center().padBottom(pad10 * 2f).row();
             }
