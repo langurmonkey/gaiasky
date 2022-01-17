@@ -114,7 +114,7 @@ public class DatasetDesc {
             if (!hasKey && description.contains("-")) {
                 // Old format, description=name - desc; name=key
                 this.name = description.substring(0, description.indexOf("-")).trim();
-                this.description = description.substring(description.indexOf("-"), description.length()).trim();
+                this.description = description.substring(description.indexOf("-") + 1, description.length()).trim();
             }
         }
 

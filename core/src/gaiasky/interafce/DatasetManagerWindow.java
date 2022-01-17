@@ -711,7 +711,7 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         // Description
-        String descriptionString = mode == DatasetMode.AVAILABLE ? dataset.description.substring(dataset.description.indexOf(" - ") + 3) : dataset.description;
+        String descriptionString = dataset.description;
         OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
         desc.setWidth(1000f);
 
@@ -943,6 +943,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the file size
      *
      * @param inputFilePath A file
+     *
      * @return The size in bytes
      */
     private long fileSize(String inputFilePath) {
@@ -953,7 +954,9 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the GZ uncompressed size
      *
      * @param inputFilePath A gzipped file
+     *
      * @return The uncompressed size in bytes
+     *
      * @throws IOException If the file failed to read
      */
     private long fileSizeGZUncompressed(String inputFilePath) throws IOException {
@@ -1059,6 +1062,9 @@ public class DatasetManagerWindow extends GenericDialog {
                         Net.HttpRequest request = currentDownloads.get(dd);
                         Gdx.net.cancelHttpRequest(request);
                     }
+                    if (this.acceptRunnable != null) {
+                        this.acceptRunnable.run();
+                    }
                     myself.hide();
                 }
 
@@ -1077,6 +1083,9 @@ public class DatasetManagerWindow extends GenericDialog {
             question.buildSuper();
             question.show(stage);
         } else {
+            if (this.acceptRunnable != null) {
+                this.acceptRunnable.run();
+            }
             myself.hide();
         }
     }
