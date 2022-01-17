@@ -426,7 +426,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 return false;
                             });
                             install.setSize(installOrSelectSize, installOrSelectSize);
-                            if(currentDownloads.containsKey(dataset.key)) {
+                            if (currentDownloads.containsKey(dataset.key)) {
                                 install.setDisabled(true);
                             }
                             installOrSelect = install;
@@ -1032,7 +1032,11 @@ public class DatasetManagerWindow extends GenericDialog {
     @Override
     protected void accept() {
         final GenericDialog myself = me;
-        if (!currentDownloads.isEmpty()) {
+        // Create a copy
+        Map<String, Pair<DatasetDesc, HttpRequest>> copy = new HashMap<>();
+        copy.putAll(currentDownloads);
+
+        if (!copy.isEmpty()) {
             GenericDialog question = new GenericDialog(I18n.txt("gui.download.close.title"), skin, stage) {
 
                 @Override
@@ -1040,8 +1044,8 @@ public class DatasetManagerWindow extends GenericDialog {
                     content.clear();
                     content.add(new OwnLabel(I18n.txt("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad20).row();
                     content.add(new OwnLabel(I18n.txt("gui.download.close.current"), skin)).left().padBottom(pad10).row();
-                    for(String key : currentDownloads.keySet()) {
-                        DatasetDesc dd = currentDownloads.get(key).getFirst();
+                    for (String key : copy.keySet()) {
+                        DatasetDesc dd = copy.get(key).getFirst();
                         content.add(new OwnLabel(dd.name, skin, "warp")).center().padBottom(pad5).row();
                     }
                 }
@@ -1049,9 +1053,9 @@ public class DatasetManagerWindow extends GenericDialog {
                 @Override
                 protected void accept() {
                     // Cancel all requests
-                    Set<String> keys = currentDownloads.keySet();
+                    Set<String> keys = copy.keySet();
                     for (String key : keys) {
-                        Net.HttpRequest request = currentDownloads.get(key).getSecond();
+                        Net.HttpRequest request = copy.get(key).getSecond();
                         Gdx.net.cancelHttpRequest(request);
                     }
                     if (this.acceptRunnable != null) {
