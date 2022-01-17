@@ -8,6 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Net;
+import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.*;
@@ -110,7 +111,7 @@ public class DatasetManagerWindow extends GenericDialog {
     private float[][] scroll;
     private static int selectedTab = 0;
 
-    private Map<DatasetDesc, Net.HttpRequest> currentDownloads;
+    private Map<String, Pair<DatasetDesc, Net.HttpRequest>> currentDownloads;
 
     private Map<String, Button>[] buttonMap;
 
@@ -425,6 +426,9 @@ public class DatasetManagerWindow extends GenericDialog {
                                 return false;
                             });
                             install.setSize(installOrSelectSize, installOrSelectSize);
+                            if(currentDownloads.containsKey(dataset.key)) {
+                                install.setDisabled(true);
+                            }
                             installOrSelect = install;
                         } else {
                             OwnCheckBox select = new OwnCheckBox("", skin, 0f);
@@ -716,8 +720,9 @@ public class DatasetManagerWindow extends GenericDialog {
         desc.setWidth(1000f);
 
         OwnTextIconButton cancelDownloadButton = null;
-        if (currentDownloads.keySet().contains(dataset)) {
-            Net.HttpRequest request = currentDownloads.get(dataset);
+        if (currentDownloads.containsKey(dataset.key)) {
+            Pair<DatasetDesc, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
+            HttpRequest request = pair.getSecond();
             cancelDownloadButton = new OwnTextIconButton(I18n.txt("gui.download.cancel"), skin, "quit");
             cancelDownloadButton.pad(14.4f);
             cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
@@ -848,7 +853,7 @@ public class DatasetManagerWindow extends GenericDialog {
             final int numErrors = errors;
             // Done
             GaiaSky.postRunnable(() -> {
-                currentDownloads.remove(dataset);
+                currentDownloads.remove(dataset.key);
 
                 if (numErrors == 0) {
                     // Ok message
@@ -875,7 +880,7 @@ public class DatasetManagerWindow extends GenericDialog {
         Runnable fail = () -> {
             logger.error(I18n.txt("gui.download.failed", name));
             setStatusError(dataset);
-            currentDownloads.remove(dataset);
+            currentDownloads.remove(dataset.key);
             resetSelectedDataset();
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
@@ -888,7 +893,7 @@ public class DatasetManagerWindow extends GenericDialog {
         Runnable cancel = () -> {
             logger.warn(I18n.txt("gui.download.cancelled", name));
             setStatusCancelled(dataset);
-            currentDownloads.remove(dataset);
+            currentDownloads.remove(dataset.key);
             resetSelectedDataset();
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
@@ -901,7 +906,7 @@ public class DatasetManagerWindow extends GenericDialog {
         // Download
         final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
         GaiaSky.postRunnable(() -> EventManager.instance.post(Events.DATASET_DOWNLOAD_START_INFO, dataset.key, request));
-        currentDownloads.put(dataset, request);
+        currentDownloads.put(dataset.key, new Pair<>(dataset, request));
 
     }
 
@@ -1016,24 +1021,6 @@ public class DatasetManagerWindow extends GenericDialog {
         }
     }
 
-    private void setStatusOutdated(DatasetDesc ds, OwnLabel label) {
-        label.setText(I18n.txt("gui.download.status.outdated"));
-        label.setColor(highlight);
-        if (ds.releaseNotes != null && !ds.releaseNotes.isEmpty()) {
-            label.setText(label.getText());
-            label.addListener(new OwnTextTooltip(I18n.txt("gui.download.releasenotes", ds.releaseNotes), skin, 10));
-        }
-    }
-
-    private void setStatusFound(DatasetDesc ds, OwnLabel label) {
-        label.setText(I18n.txt("gui.download.status.found"));
-        label.setColor(ColorUtils.gGreenC);
-    }
-
-    private void setStatusNotFound(DatasetDesc ds) {
-        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 3);
-    }
-
     private void setStatusError(DatasetDesc ds) {
         EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 1);
     }
@@ -1051,15 +1038,20 @@ public class DatasetManagerWindow extends GenericDialog {
                 @Override
                 protected void build() {
                     content.clear();
-                    content.add(new OwnLabel(I18n.txt("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad10 * 2f).row();
+                    content.add(new OwnLabel(I18n.txt("gui.download.close", currentDownloads.size()), skin)).left().padBottom(pad20).row();
+                    content.add(new OwnLabel(I18n.txt("gui.download.close.current"), skin)).left().padBottom(pad10).row();
+                    for(String key : currentDownloads.keySet()) {
+                        DatasetDesc dd = currentDownloads.get(key).getFirst();
+                        content.add(new OwnLabel(dd.name, skin, "warp")).center().padBottom(pad5).row();
+                    }
                 }
 
                 @Override
                 protected void accept() {
                     // Cancel all requests
-                    Set<DatasetDesc> keys = currentDownloads.keySet();
-                    for (DatasetDesc dd : keys) {
-                        Net.HttpRequest request = currentDownloads.get(dd);
+                    Set<String> keys = currentDownloads.keySet();
+                    for (String key : keys) {
+                        Net.HttpRequest request = currentDownloads.get(key).getSecond();
                         Gdx.net.cancelHttpRequest(request);
                     }
                     if (this.acceptRunnable != null) {
