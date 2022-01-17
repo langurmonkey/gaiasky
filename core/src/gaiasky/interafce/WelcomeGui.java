@@ -41,16 +41,15 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
 import gaiasky.vr.openvr.VRStatus;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Welcome screen that allows access to the main application, as well as the dataset manager and the catalog selection.
+ * Welcome screen that allows access to the main application and the dataset manager. It provides some information
+ * on possible problems with the selection, available updates and more.
  */
 public class WelcomeGui extends AbstractGui {
     private static final Log logger = Logger.getLogger(WelcomeGui.class);
@@ -58,15 +57,14 @@ public class WelcomeGui extends AbstractGui {
     private final VRStatus vrStatus;
     private final boolean skipWelcome;
 
-    protected DownloadDataWindow ddw;
-    protected CatalogSelectionWindow cdw;
+    protected DatasetManagerWindow ddw;
 
     private FileHandle dataDescriptor;
 
     private boolean downloadError = false;
     private Texture bgTex;
-    private DatasetsWidget dw;
-    private DataDescriptor dd;
+    private DataDescriptor serverDatasets;
+    private DataDescriptor localDatasets;
 
     /**
      * Creates an initial GUI
@@ -98,37 +96,30 @@ public class WelcomeGui extends AbstractGui {
             // If slave or headless, data load can start
             gaiaSky();
         } else {
-            dw = new DatasetsWidget(ui, skin);
-            dw.reloadLocalCatalogs();
+            reloadLocalDatasets();
 
             // Otherwise, check for updates, etc.
             clearGui();
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
-            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
-                GaiaSky.postRunnable(() -> {
-                    // Data descriptor ok. Skip welcome screen only if flag and base data present
-                    if (skipWelcome && basicDataPresent()) {
-                        gaiaSky();
-                    } else {
-                        buildWelcomeUI();
-                    }
-                });
-            }, () -> {
+            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> GaiaSky.postRunnable(() -> {
+                // Data descriptor ok. Skip welcome screen only if flag and base data present
+                if (skipWelcome && baseDataPresent()) {
+                    gaiaSky();
+                } else {
+                    buildWelcomeUI();
+                }
+            }), () -> {
                 // Fail?
                 downloadError = true;
                 logger.error(I18n.txt("gui.welcome.error.nointernet"));
-                if (basicDataPresent()) {
+                if (baseDataPresent()) {
                     // Go on all in
-                    GaiaSky.postRunnable(() -> {
-                        GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI());
-                    });
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI()));
                 } else {
                     // Error and exit
                     logger.error(I18n.txt("gui.welcome.error.nobasedata"));
-                    GaiaSky.postRunnable(() -> {
-                        GuiUtils.addNoConnectionExit(skin, ui);
-                    });
+                    GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionExit(skin, ui));
                 }
             }, null);
 
@@ -141,10 +132,10 @@ public class WelcomeGui extends AbstractGui {
                         if (ie.getKeyCode() == Input.Keys.ESCAPE) {
                             Gdx.app.exit();
                         } else if (ie.getKeyCode() == Input.Keys.ENTER) {
-                            if (basicDataPresent()) {
+                            if (baseDataPresent()) {
                                 gaiaSky();
                             } else {
-                                addDatasetManagerWindow(dd);
+                                addDatasetManagerWindow(serverDatasets);
                             }
                         }
                     }
@@ -157,7 +148,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void buildWelcomeUI() {
-        dd = !downloadError ? DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor) : null;
+        serverDatasets = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
         // Center table
         Table center = new Table(skin);
         center.setFillParent(true);
@@ -184,16 +175,16 @@ public class WelcomeGui extends AbstractGui {
         int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
         int numStarCatalogsSelected = numStarCatalogsSelected();
         int numTotalCatalogsSelected = numTotalCatalogsSelected();
-        boolean basicDataPresent = basicDataPresent();
+        boolean baseDataPresent = baseDataPresent();
 
         // Title
         HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad32);
-        OwnLabel title = new OwnLabel(I18n.txt("gui.welcome.title", Settings.APPLICATION_NAME, Settings.settings.version.version), skin, "main-title");
-        OwnLabel gs = new OwnLabel(Settings.APPLICATION_NAME + " " + Settings.settings.version.version, skin, "main-title");
-        gs.setColor(skin.getColor("theme"));
-        titleGroup.addActor(title);
-        titleGroup.addActor(gs);
+        titleGroup.space(pad32 * 2f);
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(Settings.settings.runtime.openVr), skin, "main-title");
+        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        version.setColor(skin.getColor("theme"));
+        titleGroup.addActor(gaiaSky);
+        titleGroup.addActor(version);
 
         String textStyle = "main-title-s";
 
@@ -211,8 +202,8 @@ public class WelcomeGui extends AbstractGui {
         });
         Table startGroup = new Table(skin);
         OwnLabel startLabel = new OwnLabel(I18n.txt("gui.welcome.start.desc", Settings.APPLICATION_NAME), skin, textStyle);
-        startGroup.add(startLabel).top().left().padTop(pad16).padBottom(pad16).row();
-        if (!basicDataPresent) {
+        startGroup.add(startLabel).top().left().padBottom(pad16).row();
+        if (!baseDataPresent) {
             // No basic data, can't start!
             startButton.setDisabled(true);
 
@@ -231,80 +222,49 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel ready = new OwnLabel(I18n.txt("gui.welcome.start.ready"), skin, textStyle);
             ready.setColor(ColorUtils.gGreenC);
             startGroup.add(ready).bottom().left();
-
         }
 
-        // Data manager button
-        OwnTextIconButton downloadButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
-        downloadButton.setSpace(pad18);
-        downloadButton.setContentAlign(Align.center);
-        downloadButton.align(Align.center);
-        downloadButton.setSize(bw, bh);
-        downloadButton.setDisabled(dd == null);
-        downloadButton.addListener((event) -> {
+        // Dataset manager button
+        OwnTextIconButton datasetManagerButton = new OwnTextIconButton(I18n.txt("gui.welcome.dsmanager"), skin, "cloud-download");
+        datasetManagerButton.setSpace(pad18);
+        datasetManagerButton.setContentAlign(Align.center);
+        datasetManagerButton.align(Align.center);
+        datasetManagerButton.setSize(bw * 0.8f, bh * 0.8f);
+        datasetManagerButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                addDatasetManagerWindow(dd);
+                addDatasetManagerWindow(serverDatasets);
             }
             return true;
         });
-        Table downloadGroup = new Table(skin);
+        Table datasetManagerInfo = new Table(skin);
         OwnLabel downloadLabel = new OwnLabel(I18n.txt("gui.welcome.dsmanager.desc"), skin, textStyle);
-        downloadGroup.add(downloadLabel).top().left().padTop(pad16).padBottom(pad16);
-        if (dd != null && dd.updatesAvailable) {
-            downloadGroup.row();
-            OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", dd.numUpdates), skin, textStyle);
+        datasetManagerInfo.add(downloadLabel).top().left().padBottom(pad16);
+        if (serverDatasets != null && serverDatasets.updatesAvailable) {
+            datasetManagerInfo.row();
+            OwnLabel updates = new OwnLabel(I18n.txt("gui.welcome.dsmanager.updates", serverDatasets.numUpdates), skin, textStyle);
             updates.setColor(ColorUtils.gYellowC);
-            downloadGroup.add(updates).bottom().left();
-        } else if (!basicDataPresent) {
-            downloadGroup.row();
+            datasetManagerInfo.add(updates).bottom().left();
+        } else if (!baseDataPresent) {
+            datasetManagerInfo.row();
             OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
-            downloadGroup.add(getBasedata).bottom().left();
+            datasetManagerInfo.add(getBasedata).bottom().left();
         }
 
-        // Catalog selection button
-        OwnTextIconButton catalogButton = new OwnTextIconButton(I18n.txt("gui.welcome.catalogsel"), skin, "check");
-        catalogButton.setSpace(pad18);
-        catalogButton.setContentAlign(Align.center);
-        catalogButton.align(Align.center);
-        catalogButton.setSize(bw, bh);
-        catalogButton.addListener((event) -> {
-            if (event instanceof ChangeEvent) {
-                String noticeKey;
-                if (numCatalogsAvailable() > 0 && numGaiaDRCatalogsSelected() > 1) {
-                    noticeKey = "gui.dschooser.morethanonedr";
-                } else {
-                    noticeKey = "gui.dschooser.nocatselected";
-                }
-                addCatalogSelectionWindow(noticeKey);
-            }
-            return true;
-        });
-        Table catalogGroup = new Table(skin);
-        OwnLabel catalogLabel = new OwnLabel(I18n.txt("gui.welcome.catalogsel.desc"), skin, textStyle);
-        catalogGroup.add(catalogLabel).top().left().padTop(pad16).padBottom(pad16).row();
-        if (numCatalogsAvailable == 0) {
-            // No catalog files, disable and add notice
-            catalogButton.setDisabled(true);
-            OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
-            noCatalogs.setColor(ColorUtils.aOrangeC);
-            catalogGroup.add(noCatalogs).bottom().left();
-        } else if (numGaiaDRCatalogsSelected > 1) {
+        // Selection problems/issues
+        Table selectionInfo = new Table(skin);
+        if (numGaiaDRCatalogsSelected > 1) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
-            catalogGroup.add(tooManyDR).bottom().left();
+            selectionInfo.add(tooManyDR);
         } else if (numStarCatalogsSelected > 1) {
             OwnLabel warn2Star = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
             warn2Star.setColor(ColorUtils.aOrangeC);
-            catalogGroup.add(warn2Star).bottom().left();
+            selectionInfo.add(warn2Star);
         } else if (numStarCatalogsSelected == 0) {
             OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
             noStarCatalogs.setColor(ColorUtils.aOrangeC);
-            catalogGroup.add(noStarCatalogs).bottom().left();
-        } else {
-            OwnLabel ok = new OwnLabel(I18n.txt("gui.welcome.catalogsel.selected", numTotalCatalogsSelected(), numCatalogsAvailable()), skin, textStyle);
-            ok.setColor(ColorUtils.gBlueC);
-            catalogGroup.add(ok).bottom().left();
+            selectionInfo.add(noStarCatalogs);
         }
 
         // Exit button
@@ -318,13 +278,20 @@ public class WelcomeGui extends AbstractGui {
             }
         });
 
-        center.add(titleGroup).center().padBottom(pad18 * 5f).colspan(2).row();
-        center.add(startButton).center().top().padBottom(pad18 * 4f).padRight(pad28);
-        center.add(startGroup).top().left().padBottom(pad18 * 4f).row();
-        center.add(downloadButton).center().top().padBottom(pad32).padRight(pad28);
-        center.add(downloadGroup).left().top().padBottom(pad32).row();
-        center.add(catalogButton).center().top().padBottom(pad18 * 8f).padRight(pad28);
-        center.add(catalogGroup).left().top().padBottom(pad18 * 8f).row();
+        // Title
+        center.add(titleGroup).center().padBottom(pad18 * 6f).colspan(2).row();
+
+        // Start button
+        center.add(startButton).right().top().padBottom(pad18 * 10f).padRight(pad28 * 2f);
+        center.add(startGroup).top().left().padBottom(pad18 * 10f).row();
+
+        // Dataset manager
+        center.add(datasetManagerButton).right().top().padBottom(pad32).padRight(pad28 * 2f);
+        center.add(datasetManagerInfo).left().top().padBottom(pad32).row();
+
+        center.add(selectionInfo).colspan(2).center().top().padBottom(pad32 * 4f).row();
+
+        // Quit
         center.add(quitButton).center().top().colspan(2);
 
         // Version line table
@@ -333,41 +300,46 @@ public class WelcomeGui extends AbstractGui {
         ui.addActor(center);
         ui.addActor(topLeft);
 
-        // Base data notice
-        if (dd != null && dd.updatesAvailable ) {
-            DatasetDesc baseData = dd.findDataset("default-data");
-            if(baseData != null && baseData.myVersion < baseData.serverVersion) {
-                // We have a base data update, show notice
+        if (!baseDataPresent) {
+            // Open dataset manager if base data is not there
+            addDatasetManagerWindow(serverDatasets);
+        } else {
+            // Check if there is an update for the base data, and show a notice if so
+            if (serverDatasets != null && serverDatasets.updatesAvailable) {
+                DatasetDesc baseData = serverDatasets.findDataset("default-data");
+                if (baseData != null && baseData.myVersion < baseData.serverVersion) {
+                    // We have a base data update, show notice
+                    GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
 
-                GenericDialog baseDataNotice = new GenericDialog(I18n.txt("gui.basedata.title"), skin, ui) {
+                        @Override
+                        protected void build() {
+                            content.clear();
+                            content.pad(pad20, pad28 * 2f, pad20, pad28 * 2f);
+                            content.add(new OwnLabel(I18n.txt("gui.basedata.default", baseData.name, I18n.txt("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
+                            content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
+                            content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
+                            content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
+                        }
 
-                    @Override
-                    protected void build() {
-                        content.clear();
-                        content.add(new OwnLabel(I18n.txt("gui.basedata.default", baseData.name, I18n.txt("gui.welcome.dsmanager")), skin, "msg-24")).left().colspan(3).padBottom(pad20 * 2f).row();
-                        content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.myVersion), skin, "header-large")).center().padRight(pad20);
-                        content.add(new OwnLabel("->", skin, "main-title-s")).center().padRight(pad20);
-                        content.add(new OwnLabel(I18n.txt("gui.basedata.version", baseData.serverVersion), skin, "header-large")).center().padRight(pad20);
-                    }
+                        @Override
+                        protected void accept() {
+                            // Nothing
+                        }
 
-                    @Override
-                    protected void accept() {
-                        // Nothing
-                    }
+                        @Override
+                        protected void cancel() {
+                            // Nothing
+                        }
 
-                    @Override
-                    protected void cancel() {
-                        // Nothing
-                    }
-
-                    @Override
-                    public void dispose() {
-                        // Nothing
-                    }
-                };
-                baseDataNotice.setAcceptText(I18n.txt("gui.ok"));
-                baseDataNotice.buildSuper();
-                baseDataNotice.show(ui);
+                        @Override
+                        public void dispose() {
+                            // Nothing
+                        }
+                    };
+                    baseDataNotice.setAcceptText(I18n.txt("gui.ok"));
+                    baseDataNotice.buildSuper();
+                    baseDataNotice.show(ui);
+                }
             }
         }
     }
@@ -383,17 +355,14 @@ public class WelcomeGui extends AbstractGui {
      * Reloads the view completely
      */
     private void reloadView() {
-        if (dw == null) {
-            dw = new DatasetsWidget(ui, skin);
-        }
-        dw.reloadLocalCatalogs();
+        reloadLocalDatasets();
         clearGui();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
     }
 
-    private boolean isCatalogSelected() {
-        return Settings.settings.data.catalogFiles != null && Settings.settings.data.catalogFiles.size() > 0;
+    private void reloadLocalDatasets() {
+        this.localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
     }
 
     private int numTotalCatalogsSelected() {
@@ -401,7 +370,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numCatalogsAvailable() {
-        return dw.datasets.size;
+        return this.localDatasets != null ? this.localDatasets.datasets.size() : 0;
     }
 
     private int numGaiaDRCatalogsSelected() {
@@ -421,8 +390,9 @@ public class WelcomeGui extends AbstractGui {
 
     private int numStarCatalogsSelected() {
         int matches = 0;
-        if (dd == null && (dw == null || dw.datasets == null))
+        if (serverDatasets == null && localDatasets == null) {
             return 0;
+        }
 
         for (String f : Settings.settings.data.catalogFiles) {
             // File name with no extension
@@ -431,12 +401,12 @@ public class WelcomeGui extends AbstractGui {
             try {
                 DatasetDesc dataset = null;
                 // Try with server description
-                if (dd != null) {
-                    dataset = dd.findDatasetByDescriptor(path);
+                if (serverDatasets != null) {
+                    dataset = serverDatasets.findDatasetByDescriptor(path);
                 }
                 // Try local description
-                if (dataset == null && dw != null) {
-                    dataset = dw.findDatasetByDescriptor(path);
+                if (dataset == null && localDatasets != null) {
+                    dataset = localDatasets.findDatasetByDescriptor(path);
                 }
                 if ((dataset != null && dataset.isStarDataset()) || isGaiaDRCatalogFile(filenameExt)) {
                     matches++;
@@ -474,13 +444,13 @@ public class WelcomeGui extends AbstractGui {
      *
      * @return True if basic data is found
      */
-    private boolean basicDataPresent() {
+    private boolean baseDataPresent() {
         Array<Path> required = new Array<>();
         fillBasicDataFiles(required);
 
         for (Path p : required) {
             if (!Files.exists(p) || !Files.isReadable(p)) {
-                logger.info("Data files not found: " + p.toString());
+                logger.info("Data files not found: " + p);
                 return false;
             }
         }
@@ -507,7 +477,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void addDatasetManagerWindow(DataDescriptor dd) {
         if (ddw == null) {
-            ddw = new DownloadDataWindow(ui, skin, dd);
+            ddw = new DatasetManagerWindow(ui, skin, dd);
             ddw.setAcceptRunnable(() -> {
                 Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 reloadView();
@@ -518,28 +488,12 @@ public class WelcomeGui extends AbstractGui {
         ddw.show(ui);
     }
 
-    private void addCatalogSelectionWindow(String noticeKey) {
-        if (cdw == null) {
-            cdw = new CatalogSelectionWindow(ui, skin, noticeKey);
-            cdw.setAcceptRunnable(() -> {
-                Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-                reloadView();
-            });
-        } else {
-            cdw.refresh();
-        }
-        cdw.show(ui);
-    }
-
     public void clearGui() {
         if (ui != null) {
             ui.clear();
         }
         if (ddw != null) {
             ddw.remove();
-        }
-        if (cdw != null) {
-            cdw.remove();
         }
     }
 

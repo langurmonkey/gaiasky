@@ -58,7 +58,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
     protected boolean enterExit = true, escExit = true;
 
-    private Runnable acceptRunnable, cancelRunnable;
+    protected Runnable acceptRunnable, cancelRunnable;
 
     private Actor previousKeyboardFocus, previousScrollFocus;
 
@@ -374,6 +374,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
     public void setAcceptRunnable(Runnable r) {
         this.acceptRunnable = r;
     }
+
 
     public boolean hasAcceptRunnable() {
         return acceptRunnable != null;

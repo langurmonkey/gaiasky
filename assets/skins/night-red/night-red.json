@@ -166,9 +166,9 @@
     },
     "grey": {
       "a": 1,
-      "b": 0.8,
-      "g": 0.8,
-      "r": 0.8
+      "b": 0.6,
+      "g": 0.6,
+      "r": 0.6
     },
     "disabled-font": {
       "a": 1,
@@ -230,6 +230,12 @@
       "down": "default-round-down",
       "checked": "default-round-down",
       "up": "default-round"
+    },
+    "dataset": {
+      "down": "default-round",
+      "up": "default-round",
+      "over": "default-round-over",
+      "focused": "default-round-sel"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
@@ -457,6 +463,9 @@
     },
     "camera-stop": {
       "imageUp": "camera-stop"
+    },
+    "install": {
+      "imageUp": "iconic-arrow-circle-bottom"
     },
     "drive": {
       "imageUp": "iconic-hard-drive"
@@ -897,6 +906,14 @@
       "font": "ui-18",
       "fontColor": "grey"
     },
+    "grey-normal": {
+      "font": "ui-18",
+      "fontColor": "grey"
+    },
+    "grey-large": {
+      "font": "ui-20",
+      "fontColor": "grey"
+    },
     "warp": {
       "font": "ui-23-bold",
       "fontColor": "theme"
@@ -1180,6 +1197,11 @@
       "background": "progress-s-bg",
       "knob": "progress-s-knob",
       "knobBefore": "progress-s-knob-before"
+    },
+    "tiny-horizontal": {
+      "background": "progress-t-bg",
+      "knob": "progress-t-knob",
+      "knobBefore": "progress-t-knob-before"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle": {

@@ -5,33 +5,65 @@
 
 package gaiasky.util.datadesc;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import gaiasky.desktop.GaiaSkyDesktop;
+import gaiasky.interafce.DatasetManagerWindow;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.Settings;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 public class DataDescriptorUtils {
     private static final Log logger = Logger.getLogger(DataDescriptorUtils.class);
 
     private static DataDescriptorUtils instance;
-    public static DataDescriptorUtils instance(){
-        if(instance == null)
+
+    public static DataDescriptorUtils instance() {
+        if (instance == null) {
             instance = new DataDescriptorUtils();
+        }
         return instance;
     }
 
     private FileHandle fh;
     private final JsonReader reader;
-    private DataDescriptorUtils(){
+
+    private DataDescriptorUtils() {
         super();
         this.reader = new JsonReader();
     }
 
-    public DataDescriptor buildDatasetsDescriptor(FileHandle fh){
+    public int getTypeWeight(String type) {
+        return switch (type) {
+            case "data-pack" -> -2;
+            case "texture-pack" -> -1;
+            case "catalog-lod" -> 0;
+            case "catalog-gaia" -> 1;
+            case "catalog-star" -> 2;
+            case "catalog-gal" -> 3;
+            case "catalog-cluster" -> 4;
+            case "catalog-other" -> 5;
+            case "mesh" -> 6;
+            case "other" -> 8;
+            default -> 10;
+        };
+    }
+
+    /**
+     * Constructs a data descriptor from a server JSON file.
+     *
+     * @param fh The pointer to the server JSON file.
+     * @return An instance of {@link DataDescriptor}.
+     */
+    public synchronized DataDescriptor buildServerDatasets(FileHandle fh) {
         if (fh != null) {
             this.fh = fh;
         }
@@ -105,6 +137,97 @@ public class DataDescriptorUtils {
 
         DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
         return desc;
+    }
+
+    /**
+     * Constructs a list of local catalogs found in the current data location and combines
+     * them with the server data.
+     * Local catalogs are JSON files in the data directory that start with either 'catalog-'
+     * or 'dataset-'.
+     *
+     * @param server The server data descriptor, for combining with the local catalogs.
+     * @return An instance of {@link DataDescriptor}.
+     */
+    public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
+        // Get all server datasets that exist locally
+        List<DatasetDesc> existing = new ArrayList<>();
+        if (server != null) {
+            for (DatasetDesc dd : server.datasets) {
+                if (dd.exists) {
+                    existing.add(dd.getLocalCopy());
+                }
+            }
+        }
+
+        // Get all local catalogs
+        Array<FileHandle> catalogLocations = new Array<>();
+        catalogLocations.add(Gdx.files.absolute(Settings.settings.data.location));
+
+        Array<FileHandle> catalogFiles = new Array<>();
+
+        for (FileHandle catalogLocation : catalogLocations) {
+            FileHandle[] cfs = catalogLocation.list(pathname -> (pathname.getName().startsWith("catalog-") || pathname.getName().startsWith("dataset-")) && pathname.getName().endsWith(".json"));
+            catalogFiles.addAll(cfs);
+        }
+
+        JsonReader reader = new JsonReader();
+        List<DatasetType> types = new ArrayList<>();
+        List<DatasetDesc> datasets = new ArrayList<>();
+        for (FileHandle catalogFile : catalogFiles) {
+            JsonValue val = reader.parse(catalogFile);
+            Path path = Path.of(catalogFile.path());
+
+            DatasetDesc dd = null;
+            Iterator<DatasetDesc> it = existing.iterator();
+            while (it.hasNext()) {
+                DatasetDesc remote = it.next();
+                if (remote.check.getFileName().toString().equals(path.getFileName().toString())) {
+                    // Found in remotes
+                    dd = remote;
+                    it.remove();
+                    break;
+                }
+            }
+            if (dd == null) {
+                // Not found, create it
+                dd = new DatasetDesc(reader, val, true);
+            }
+            dd.path = Path.of(catalogFile.path());
+            dd.catalogFile = catalogFile;
+            dd.exists = true;
+            dd.status = DatasetDesc.DatasetStatus.INSTALLED;
+
+            datasets.add(dd);
+        }
+        datasets.addAll(existing);
+
+        // Default values in case this is a totally offline dataset
+        for (DatasetDesc dd : datasets) {
+            if (dd.description == null)
+                dd.description = dd.path.toString();
+            if (dd.name == null)
+                dd.name = dd.catalogFile.nameWithoutExtension();
+        }
+
+        // Create types
+        Map<String, DatasetType> typeMap = new HashMap<>();
+        for (DatasetDesc dd : datasets) {
+            DatasetType dt;
+            if (typeMap.containsKey(dd.type)) {
+                dt = typeMap.get(dd.type);
+            } else {
+                dt = new DatasetType(dd.type);
+                typeMap.put(dd.type, dt);
+                types.add(dt);
+            }
+            dd.datasetType = dt;
+            dt.datasets.add(dd);
+        }
+        // Sort
+        Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
+        types.sort(byType);
+
+        return new DataDescriptor(types, datasets);
     }
 
 }

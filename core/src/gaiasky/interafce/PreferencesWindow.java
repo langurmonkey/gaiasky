@@ -81,7 +81,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
-    private DatasetsWidget dw;
     private OwnLabel tessQualityLabel;
     private Cell<?> noticeHiResCell;
     private Table controllersTable;
@@ -1575,25 +1574,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataSourceInfo.setWidth(taWidth);
         dataSourceInfo.clearListeners();
 
-        dw = new DatasetsWidget(stage, skin);
-        dw.reloadLocalCatalogs();
-        final Actor dataSource = dw.buildDatasetsWidget(false, 20, 220f);
-
         final OwnTextButton dataDownload = new OwnTextButton(I18n.txt("gui.download.title"), skin);
         dataDownload.pad(pad20, pad20 * 2f, pad20, pad20 * 2f);
         dataDownload.setHeight(buttonHeight);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.currentDataDescriptor != null) {
-                    DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"));
+                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"));
                     ddw.setModal(true);
                     ddw.show(stage);
                 } else {
                     // Try again
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(settings.data.location) + "/gaiasky-data.json");
                     DownloadHelper.downloadFile(settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
-                        DataDescriptor dd = DataDescriptorUtils.instance().buildDatasetsDescriptor(dataDescriptor);
-                        DownloadDataWindow ddw = new DownloadDataWindow(stage, skin, dd, false, I18n.txt("gui.close"));
+                        DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
+                        DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.txt("gui.close"));
                         ddw.setModal(true);
                         ddw.show(stage);
                     }, () -> {
@@ -1612,7 +1607,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentDataTable.add(haGroup).left().padBottom(pad5 * 4).row();
         contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
         contentDataTable.add(dataSourceInfo).left().padBottom(pad5).row();
-        contentDataTable.add(dataSource).left().padLeft(pad5).padBottom(pad5 * 4).row();
         contentDataTable.add(dataDownload).left();
 
         /*
@@ -2083,12 +2077,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (highAccuracy != settings.data.highAccuracy) {
             // Event
             EventManager.instance.post(Events.HIGH_ACCURACY_CMD, settings.data.highAccuracy);
-        }
-        settings.data.catalogFiles.clear();
-        for (Button b : dw.cbs) {
-            if (b.isChecked()) {
-                settings.data.catalogFiles.add(dw.candidates.get(b));
-            }
         }
 
         // Screenshots

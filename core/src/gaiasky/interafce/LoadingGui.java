@@ -88,7 +88,14 @@ public class LoadingGui extends AbstractGui {
         else if (hoffset < 0)
             center.padRight(-hoffset);
 
-        OwnLabel gaiasky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openVr), skin, "main-title");
+
+        HorizontalGroup titleGroup = new HorizontalGroup();
+        titleGroup.space(pad30 * 2f);
+        OwnLabel gaiaSky = new OwnLabel(Settings.getApplicationTitle(settings.runtime.openVr), skin, "main-title");
+        OwnLabel version = new OwnLabel(Settings.settings.version.version, skin, "main-title");
+        version.setColor(skin.getColor("theme"));
+        titleGroup.addActor(gaiaSky);
+        titleGroup.addActor(version);
 
         // Funny text
         lastFunnyTime = 0;
@@ -98,7 +105,7 @@ public class LoadingGui extends AbstractGui {
         spin = new OwnLabel("0", skin, "main-title-xs");
         spin.setColor(skin.getColor("theme"));
 
-        center.add(gaiasky).center().padBottom(pad10 * 2f).row();
+        center.add(titleGroup).center().padBottom(pad10 * 2f).row();
         center.add(spin).padBottom(pad30).row();
 
         // Tips

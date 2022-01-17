@@ -75,11 +75,11 @@ public class I18n {
         }
     }
 
-    public static String txt(String key){
+    public static synchronized String txt(String key){
         return bundle.get(key);
     }
 
-    public static String txt(String key, Object... params) {
+    public static synchronized String txt(String key, Object... params) {
         return I18n.bundle.format(key, params);
     }
 

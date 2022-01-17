@@ -23,15 +23,16 @@ import java.nio.file.Paths;
 public class DatasetDesc {
     private final Log logger = Logger.getLogger(DatasetDesc.class);
 
-    private final JsonReader reader;
-    public final JsonValue source;
+    private JsonReader reader;
+    public JsonValue source;
+    public String key;
     public String name;
     public String description;
-    public String shortDescription;
     public String link;
     public String type;
     public String file;
     public DatasetType datasetType;
+    public DatasetStatus status;
 
     public Path check;
     public Path path;
@@ -53,11 +54,19 @@ public class DatasetDesc {
 
     public String releaseNotes;
 
-    public boolean mustDownload;
-    public boolean cbDisabled;
     public String[] filesToDelete;
 
+    // In case of local datasets, this links to the server description
+    public DatasetDesc server;
+
+    public DatasetDesc() {
+    }
+
     public DatasetDesc(JsonReader reader, JsonValue source) {
+       this(reader, source, false);
+    }
+
+    public DatasetDesc(JsonReader reader, JsonValue source, boolean local) {
         this.reader = reader;
         this.source = source;
 
@@ -74,26 +83,39 @@ public class DatasetDesc {
             }
         }
 
-        this.name = source.getString("name");
-        this.baseData = name.equals("default-data");
-        this.mustDownload = (!exists || outdated) && baseData;
-        this.cbDisabled = baseData || (exists && !outdated);
+        this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
+        // The key marks the new version
+        boolean hasKey = source.has("key");
+        if (hasKey) {
+            this.key = source.getString("key");
+        }
+        hasKey = hasKey || local;
+        if (source.has("name")) {
+            this.name = source.getString("name");
+        }
+        if (this.key == null) {
+            this.key = this.name.replaceAll("\\s+", "-");
+        }
+        this.baseData = key.equals("default-data");
 
-        if(source.has("version") && this.myVersion == -1)
+        if (source.has("version") && this.myVersion == -1)
             this.myVersion = source.getInt("version");
 
-        if(source.has("mingsversion"))
+        if (source.has("mingsversion"))
             this.minGsVersion = source.getInt("mingsversion");
 
         if (source.has("file"))
             this.file = source.getString("file");
 
         // Description
-        this.description = source.getString("description");
-        if (description.contains("-")) {
-            this.shortDescription = description.substring(0, description.indexOf("-"));
-        } else {
-            this.shortDescription = description;
+        if (source.has("description")) {
+            this.description = source.getString("description");
+
+            if (!hasKey && description.contains("-")) {
+                // Old format, description=name - desc; name=key
+                this.name = description.substring(0, description.indexOf("-")).trim();
+                this.description = description.substring(description.indexOf("-") + 1, description.length()).trim();
+            }
         }
 
         // Release notes
@@ -158,6 +180,7 @@ public class DatasetDesc {
      * returns the default lowest version (0)
      *
      * @param path The path with the file to check
+     *
      * @return The version, if it exists, or 0
      */
     private int checkJsonVersion(Path path) throws RuntimeException {
@@ -186,4 +209,51 @@ public class DatasetDesc {
     public boolean isStarDataset() {
         return this.type != null && (this.type.equals("catalog-lod") || this.type.equals("catalog-gaia") || this.type.equals("catalog-star"));
     }
+
+    public enum DatasetStatus {
+        AVAILABLE,
+        INSTALLED,
+        DOWNLOADING
+    }
+
+    public DatasetDesc getLocalCopy() {
+        DatasetDesc copy = this.copy();
+        copy.description = copy.description.substring(copy.description.indexOf(" - ") + 3);
+        copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
+        copy.path = copy.check.toAbsolutePath();
+        return copy;
+    }
+
+    public DatasetDesc copy() {
+        DatasetDesc copy = new DatasetDesc();
+        copy.reader = this.reader;
+        copy.source = this.source;
+        copy.key = this.key;
+        copy.name = this.name;
+        copy.description = this.description;
+        copy.link = this.link;
+        copy.type = this.type;
+        copy.file = this.file;
+        copy.datasetType = this.datasetType;
+        copy.status = this.status;
+        copy.check = this.check;
+        copy.path = this.path;
+        copy.catalogFile = this.catalogFile;
+        copy.size = this.size;
+        copy.sizeBytes = this.sizeBytes;
+        copy.nObjectsStr = this.nObjectsStr;
+        copy.nObjects = this.nObjects;
+        copy.sha256 = this.sha256;
+        copy.exists = this.exists;
+        copy.myVersion = this.myVersion;
+        copy.serverVersion = this.serverVersion;
+        copy.minGsVersion = this.minGsVersion;
+        copy.outdated = this.outdated;
+        copy.baseData = this.baseData;
+        copy.releaseNotes = this.releaseNotes;
+        copy.filesToDelete = this.filesToDelete;
+        copy.server = this.server;
+        return copy;
+    }
+
 }

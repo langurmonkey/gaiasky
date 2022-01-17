@@ -9,33 +9,37 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 
 /**
- * A regular scene2d.ui ImageButton on steroids.
+ * A regular scene2d.ui Button on steroids.
  */
-public class OwnImageButton extends ImageButton {
-    OwnImageButton me;
+public class OwnButton extends Button {
+    OwnButton me;
     SystemCursor cursor;
+    private boolean changeCursor = true;
 
-    public OwnImageButton(Skin skin) {
+    public OwnButton(Skin skin) {
         super(skin);
         this.me = this;
         initialize();
     }
 
-    public OwnImageButton(Skin skin, String styleName) {
+    public OwnButton(Skin skin, String styleName) {
         super(skin, styleName);
         this.me = this;
         initialize();
     }
 
-    public OwnImageButton(ImageButtonStyle style) {
-        super(style);
+    public OwnButton(Actor child, Skin skin, String styleName, boolean changeCursor) {
+        super(child, skin, styleName);
         this.me = this;
+        this.changeCursor = changeCursor;
         initialize();
     }
 
@@ -50,40 +54,19 @@ public class OwnImageButton extends ImageButton {
         this.addListener(event -> {
             if (event instanceof InputEvent) {
                 Type type = ((InputEvent) event).getType();
-                if (type == Type.enter) {
+                if (changeCursor && type == Type.enter) {
                     if (!me.isDisabled())
                         Gdx.graphics.setSystemCursor(cursor);
                     return true;
-                } else if (type == Type.exit) {
+                } else if (changeCursor && type == Type.exit) {
                     Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                     return true;
+                } else if (type == Type.touchDown) {
+                    // Focus
+                    this.getStage().setKeyboardFocus(this);
                 }
             }
             return false;
         });
-    }
-
-    protected void updateImage() {
-        getImage().setDrawable(getImageDrawable());
-        Color theme;
-        try {
-            theme = getSkin().getColor("highlight");
-        } catch (Exception e) {
-            theme = null;
-        }
-
-        if (isOver()) {
-            if (theme != null)
-                getImage().setColor(theme);
-            else
-                getImage().setColor(1, 1, 1, 1);
-        } else {
-            getImage().setColor(1, 1, 1, 1);
-        }
-    }
-
-    public void draw(Batch batch, float parentAlpha) {
-        updateImage();
-        super.draw(batch, parentAlpha);
     }
 }
