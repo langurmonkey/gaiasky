@@ -83,4 +83,14 @@ public class I18n {
         return I18n.bundle.format(key, params);
     }
 
+    public static synchronized boolean hasKey(String key) {
+        try {
+            I18n.bundle.get(key);
+            return true;
+        }catch(MissingResourceException e) {
+            // Void
+        }
+        return false;
+    }
+
 }

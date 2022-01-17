@@ -947,7 +947,7 @@ public class Settings {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class UrlSettings {
             public String versionCheck;
-            public String dataMirror = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload/";
+            public String dataMirror = "https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/";
             public String dataDescriptor;
         }
 

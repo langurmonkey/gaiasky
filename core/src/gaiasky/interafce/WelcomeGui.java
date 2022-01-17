@@ -253,7 +253,12 @@ public class WelcomeGui extends AbstractGui {
 
         // Selection problems/issues
         Table selectionInfo = new Table(skin);
-        if (numGaiaDRCatalogsSelected > 1) {
+        if (numCatalogsAvailable == 0) {
+            // No catalog files, disable and add notice
+            OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
+            noCatalogs.setColor(ColorUtils.aOrangeC);
+            selectionInfo.add(noCatalogs);
+        } else if (numGaiaDRCatalogsSelected > 1) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             selectionInfo.add(tooManyDR);

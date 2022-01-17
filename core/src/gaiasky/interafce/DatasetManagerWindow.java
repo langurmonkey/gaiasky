@@ -264,6 +264,10 @@ public class DatasetManagerWindow extends GenericDialog {
         if (dataLocation)
             addDataLocation(content);
 
+        // Add manual download
+        Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+        content.add(manualDownload).center();
+
         initialized.set(true);
     }
 
@@ -447,7 +451,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 String filePath = dataset.catalogFile.path();
                                 if (Settings.settings.data.catalogFiles.contains(filePath)) {
                                     Settings.settings.data.catalogFiles.remove(filePath);
-                                    logger.info(I18n.txt("gui.download.deselected.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
+                                    logger.info(I18n.txt("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                                 }
                             } else {
                                 select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
@@ -676,7 +680,14 @@ public class DatasetManagerWindow extends GenericDialog {
         }
 
         // Type
-        OwnLabel type = new OwnLabel(I18n.txt("gui.download.type", dataset.type), skin, "grey-large");
+        String typeString;
+        if (I18n.hasKey("gui.download.type." + dataset.type)) {
+            typeString = I18n.txt("gui.download.type." + dataset.type);
+        } else {
+            typeString = dataset.type;
+        }
+        OwnLabel type = new OwnLabel(I18n.txt("gui.download.type", typeString), skin, "grey-large");
+        type.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
         // Version
         OwnLabel version = null;
@@ -696,9 +707,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Size
         OwnLabel size = new OwnLabel(I18n.txt("gui.download.size", dataset.size), skin, "grey-large");
-        size.addListener(new
-
-                OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+        size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
 
         // Num objects
         String nObjStr = dataset.nObjects > 0 ? I18n.txt("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.txt("gui.dataset.nobjects.none");
@@ -718,6 +727,16 @@ public class DatasetManagerWindow extends GenericDialog {
         String descriptionString = dataset.description;
         OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
         desc.setWidth(1000f);
+
+        // Release notes
+        String releaseNotesString = dataset.releaseNotes;
+        if(releaseNotesString == null || releaseNotesString.isEmpty()) {
+            releaseNotesString = "-";
+        }
+        releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
+        OwnLabel releaseNotes = new OwnLabel(I18n.txt("gui.download.releasenotes", releaseNotesString), skin);
+        releaseNotes.setWidth(1000f);
+
 
         OwnTextIconButton cancelDownloadButton = null;
         if (currentDownloads.containsKey(dataset.key)) {
@@ -744,7 +763,8 @@ public class DatasetManagerWindow extends GenericDialog {
         t.add(size).top().left().padBottom(pad5).row();
         t.add(nObjects).top().left().padBottom(pad10).row();
         t.add(link).top().left().padBottom(pad20 * 2f).row();
-        t.add(desc).top().left().row();
+        t.add(desc).top().left().padBottom(pad20).row();
+        t.add(releaseNotes).top().left().row();
         t.add(cancelDownloadButton).padTop(pad20).center();
 
         // Scroll

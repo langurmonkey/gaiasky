@@ -28,7 +28,7 @@ public class GuiUtils {
             @Override
             protected void build() {
                 OwnLabel info = new OwnLabel(I18n.txt("gui.download.noconnection.continue"), skin);
-                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
+                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
                 content.add(info).pad(10).row();
                 content.add(manualDownload).pad(10);
             }

@@ -40,10 +40,14 @@ public class TextUtils {
             int chars = 0;
             for (int i = 0; i < sb.length(); i++) {
                 char c = sb.charAt(i);
-                chars++;
-                if (chars > breakChars && Character.isSpaceChar(c)) {
-                    sb.setCharAt(i, '\n');
+                if (c == '\n' || c == '\r') {
                     chars = 0;
+                } else {
+                    chars++;
+                    if (chars > breakChars && Character.isSpaceChar(c)) {
+                        sb.setCharAt(i, '\n');
+                        chars = 0;
+                    }
                 }
             }
             in = sb.toString();
