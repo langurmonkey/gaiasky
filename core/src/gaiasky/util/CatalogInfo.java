@@ -78,8 +78,12 @@ public class CatalogInfo {
     }
 
     public boolean isVisible() {
+        return isVisible(false);
+    }
+
+    public boolean isVisible(boolean attributeValue) {
         if (this.object != null) {
-            return this.object.isVisibleGroup();
+            return this.object.isVisibleGroup(attributeValue);
         }
         return true;
     }

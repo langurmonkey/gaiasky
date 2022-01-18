@@ -17,8 +17,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class MtlLoader {
-    private static final Log logger = Logger.getLogger(MtlLoader.class);
+public class OwnMtlLoader {
+    private static final Log logger = Logger.getLogger(OwnMtlLoader.class);
 
     public Array<ModelMaterial> materials = new Array<>();
 

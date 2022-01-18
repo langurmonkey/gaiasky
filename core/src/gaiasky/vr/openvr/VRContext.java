@@ -17,7 +17,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
 import gaiasky.util.Settings;
-import gaiasky.util.gdx.loader.ObjLoader;
+import gaiasky.util.gdx.loader.OwnObjLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.*;
 import org.lwjgl.PointerBuffer;
@@ -699,7 +699,7 @@ public class VRContext implements Disposable {
             VRRenderModels.VRRenderModels_FreeRenderModel(renderModel);
             VRRenderModels.VRRenderModels_FreeTexture(renderModelTexture);
         } else {
-            ObjLoader ol = new ObjLoader();
+            OwnObjLoader ol = new OwnObjLoader();
             if (manufacturer.equalsIgnoreCase("Oculus")) {
                 if (isControllerLeft(name, modelNumber, role)) {
                     model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));

@@ -32,15 +32,23 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.util.Locale;
+
 public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable {
+
+    private enum MeshShading {
+        REGULAR,
+        DUST,
+        ADDITIVE
+    }
 
     private String description;
     private String transformName;
     private Matrix4 coordinateSystem;
     private Vector3 scale, axis, translate;
     private float degrees;
-    // Additive blending or opaque
-    private boolean additiveBlending = true;
+    // Shading mode
+    private MeshShading shading = MeshShading.ADDITIVE;
 
     /** MODEL **/
     public ModelComponent mc;
@@ -69,7 +77,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
         if (mc != null) {
             try {
                 mc.doneLoading(manager, localTransform, cc, true);
-                if (additiveBlending) {
+                if (shading == MeshShading.ADDITIVE) {
                     mc.setDepthTest(0, false);
                 }
             } catch (Exception e) {
@@ -81,13 +89,12 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     }
 
-    private void recomputePositioning(){
+    private void recomputePositioning() {
         if (mc != null) {
             if (coordinateSystem == null)
                 coordinateSystem = new Matrix4();
             else
                 coordinateSystem.idt();
-
 
             // REFSYS ROTATION
             if (transformName != null) {
@@ -160,10 +167,11 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     protected void addToRenderLists(ICamera camera) {
         if (this.shouldRender() && GaiaSky.instance.isInitialised()) {
-            if (!additiveBlending)
-                addToRender(this, RenderGroup.MODEL_PIX_DUST);
-            else
-                addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
+            switch (shading) {
+            case ADDITIVE -> addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
+            case REGULAR -> addToRender(this, RenderGroup.MODEL_PIX_EARLY);
+            case DUST -> addToRender(this, RenderGroup.MODEL_PIX_DUST);
+            }
 
             addToRender(this, RenderGroup.FONT_LABEL);
         }
@@ -176,7 +184,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
         if (mc != null) {
-            if (additiveBlending) {
+            if (shading == MeshShading.ADDITIVE) {
                 mc.update(localTransform, alpha * opacity, GL20.GL_ONE, GL20.GL_ONE);
                 // Depth reads, no depth writes
                 mc.setDepthTest(GL20.GL_LEQUAL, false);
@@ -221,7 +229,19 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     }
 
     public void setAdditiveblending(Boolean additive) {
-        this.additiveBlending = additive;
+        if (additive)
+            shading = MeshShading.ADDITIVE;
+        else
+            shading = MeshShading.DUST;
+    }
+
+    public void setShading(String shadingStr) {
+        shadingStr = shadingStr.toUpperCase(Locale.ROOT);
+        try {
+            shading = MeshShading.valueOf(shadingStr);
+        } catch (IllegalArgumentException e) {
+            shading = MeshShading.ADDITIVE;
+        }
     }
 
     @Override

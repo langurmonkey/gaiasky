@@ -248,7 +248,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
         // Clear base material
         assert materials != null;
-        if (materials.containsKey("base"))
+        if (materials.containsKey("base") && materials.get("base").size() < 2)
             materials.get("base").clear();
 
         return new Pair<>(model, materials);

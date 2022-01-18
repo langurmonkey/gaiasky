@@ -203,6 +203,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         VARIABLE_GROUP(33),
         /**
+         * Per-pixel lighting early
+         **/
+        MODEL_PIX_EARLY(34),
+        /**
          * None
          **/
         NONE(-1);
@@ -709,6 +713,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // MODELS DUST AND MESH
         AbstractRenderSystem modelMeshOpaqueProc = new ModelBatchRenderSystem(MODEL_PIX_DUST, alphas, mbPixelLightingDust);
         AbstractRenderSystem modelMeshAdditiveProc = new ModelBatchRenderSystem(MODEL_VERT_ADDITIVE, alphas, mbVertexLightingAdditive);
+        // MODEL PER-PIXEL-LIGHTING EARLY
+        AbstractRenderSystem modelPerPixelLightingEarly = new ModelBatchRenderSystem(MODEL_PIX_EARLY, alphas, mbPixelLighting);
 
         // MODEL DIFFUSE
         AbstractRenderSystem modelMeshDiffuse = new ModelBatchRenderSystem(MODEL_DIFFUSE, alphas, mbVertexDiffuse);
@@ -804,6 +810,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // Opaque meshes
         addRenderSystem(modelMeshOpaqueProc);
+        addRenderSystem(modelPerPixelLightingEarly);
 
         // Milky way
         addRenderSystem(milkyWayRenderSystem);

@@ -1199,7 +1199,11 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     public boolean isVisibleGroup() {
-        return isVisible();
+        return isVisibleGroup(false);
+    }
+
+    public boolean isVisibleGroup(boolean attributeValue) {
+        return isVisible(attributeValue);
     }
 
     public void setVisibleGroup(boolean visibility) {

@@ -24,14 +24,10 @@ package gaiasky.util.gdx.loader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
-import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelMaterial;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelNodePart;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
@@ -52,44 +48,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- * {@link ModelLoader} to load Wavefront OBJ files. Only intended for testing
- * basic models/meshes and educational usage. The Wavefront specification is NOT
- * fully implemented, only a subset of the specification is supported.
- * Especially the {@link Material} ({@link Attributes}), e.g. the color or
- * texture applied, might not or not correctly be loaded.
- * </p>
- * <p>
- * This {@link ModelLoader} can be used to load very basic models without having
- * to convert them to a more suitable format. Therefore it can be used for
- * educational purposes and to quickly test a basic model, but should not be
- * used in production. Instead use {@link G3dModelLoader}.
- * </p>
- * <p>
- * Because of above reasons, when an OBJ file is loaded using this loader, it
- * will log and error. To prevent this error from being logged, set the
- * {@link #logWarning} flag to false. However, it is advised not to do so.
- * </p>
- * <p>
- * An OBJ file only contains the mesh (shape). It may link to a separate MTL
- * file, which is used to describe one or more materials. In that case the MTL
- * filename (might be case-sensitive) is expected to be located relative to the
- * OBJ file. The MTL file might reference one or more texture files, in which
- * case those filename(s) are expected to be located relative to the MTL file.
- * </p>
- *
- * <p>
- * 20171024 - Added support for emissive textures and colors
- * </p>
- *
- * @author mzechner, espitz, xoppa, tsagrista
- */
-public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
-    /**
-     * Set to false to prevent a warning from being logged when this class is
-     * used. Do not change this value, unless you are absolutely sure what you
-     * are doing. Consult the documentation for more information.
-     */
+public class OwnObjLoader extends IntModelLoader<OwnObjLoader.ObjLoaderParameters> {
     public static boolean logWarning = false;
 
     public static class ObjLoaderParameters extends IntModelLoader.IntModelParameters {
@@ -110,11 +69,11 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
 
     final InputStreamProvider isp;
 
-    public ObjLoader() {
+    public OwnObjLoader() {
         this(new RegularInputStreamProvider(), null);
     }
 
-    public ObjLoader(InputStreamProvider isp, FileHandleResolver resolver) {
+    public OwnObjLoader(InputStreamProvider isp, FileHandleResolver resolver) {
         super(resolver);
         this.isp = isp;
     }
@@ -134,11 +93,11 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
 
     protected IntModelData loadModelData(FileHandle file, boolean flipV) {
         if (logWarning)
-            Gdx.app.error("ObjLoader", "Wavefront (OBJ) is not fully supported, consult the documentation for more information");
+            Gdx.app.error(OwnObjLoader.class.getSimpleName(), "Wavefront (OBJ) is not fully supported, consult the documentation for more information");
         String line;
         String[] tokens;
         char firstChar;
-        MtlLoader mtl = new MtlLoader();
+        OwnMtlLoader mtl = new OwnMtlLoader();
 
         // Create a "default" Group and set it as the active group, in case
         // there are no groups or objects defined in the OBJ file.
@@ -169,7 +128,7 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
                         norms.add(Float.parseFloat(tokens[3]));
                     } else if (tokens[0].charAt(1) == 't') {
                         uvs.add(Float.parseFloat(tokens[1]));
-                        uvs.add((flipV ? 1 - Float.parseFloat(tokens[2]) : Float.parseFloat(tokens[2])));
+                        uvs.add((flipV ? Float.parseFloat(tokens[2]) : 1f - Float.parseFloat(tokens[2])));
                     }
                 } else if (firstChar == 'f') {
                     String[] parts;
@@ -317,7 +276,7 @@ public class ObjLoader extends IntModelLoader<ObjLoader.ObjLoaderParameters> {
         // for (ModelMaterial m : mtl.materials)
         // data.materials.add(m);
 
-        // An instance of ObjLoader can be used to load more than one OBJ.
+        // An instance of OwnObjLoader can be used to load more than one OBJ.
         // Clearing the Array cache instead of instantiating new
         // Arrays should result in slightly faster load times for
         // subsequent calls to loadObj
