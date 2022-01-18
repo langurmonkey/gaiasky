@@ -5,7 +5,7 @@
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
-    <jreBundles jdkProviderId="AdoptOpenJDK" release="15/jdk-15.0.2+7" />
+    <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2" preserveSymlinks="false">
     <mountPoints>
@@ -1308,7 +1308,7 @@ return true;</property>
         <entry location="gs_icon.png" />
         <entry location="gsvr_icon.png" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.1+12" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
     </windows>
     <macos name="macOS Single Bundle" id="221" launcherId="573">
       <exclude>
@@ -1319,7 +1319,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gaiasky.desktop" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.1+12" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
     </macos>
     <unixInstaller name="Unix Installer" id="28">
       <excludedLaunchers>
@@ -1347,7 +1347,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17.0.1+12" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxDeb>
@@ -1363,7 +1363,7 @@ return true;</property>
         <entry location="gaiasky.cmd" />
         <entry location="gs_icon.ico" />
       </exclude>
-      <jreBundle jreBundleSource="none" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" overrideJdkRelease="true" />
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
