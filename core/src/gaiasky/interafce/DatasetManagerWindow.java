@@ -530,7 +530,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                 if (mode == DatasetMode.INSTALLED) {
                                                     if (dataset.outdated) {
                                                         // Update
-                                                        MenuItem update = new MenuItem(I18n.txt("gui.download.update"), skin, "default");
+                                                        MenuItem update = new MenuItem(I18n.txt("gui.download.update"), skin, skin.getDrawable("iconic-arrow-circle-bottom"));
                                                         update.addListener(new ChangeListener() {
                                                             @Override
                                                             public void changed(ChangeEvent event, Actor actor) {
@@ -543,7 +543,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                         boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
                                                         if (enabled) {
                                                             // Disable
-                                                            MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, "default");
+                                                            MenuItem disable = new MenuItem(I18n.txt("gui.download.disable"), skin, skin.getDrawable("check-off-disabled"));
                                                             disable.addListener(new ChangeListener() {
                                                                 @Override
                                                                 public void changed(ChangeEvent event, Actor actor) {
@@ -560,7 +560,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                             datasetContext.addItem(disable);
                                                         } else {
                                                             // Enable
-                                                            MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, "default");
+                                                            MenuItem enable = new MenuItem(I18n.txt("gui.download.enable"), skin, skin.getDrawable("check-on"));
                                                             enable.addListener(new ChangeListener() {
                                                                 @Override
                                                                 public void changed(ChangeEvent event, Actor actor) {
@@ -579,7 +579,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                         datasetContext.addSeparator();
                                                     }
                                                     // Delete
-                                                    MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, "default");
+                                                    MenuItem delete = new MenuItem(I18n.txt("gui.download.delete"), skin, skin.getDrawable("iconic-trash"));
                                                     delete.addListener(new ClickListener() {
                                                         @Override
                                                         public void clicked(InputEvent event, float x, float y) {
@@ -590,7 +590,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                                     datasetContext.addItem(delete);
                                                 } else if (mode == DatasetMode.AVAILABLE) {
                                                     // Install
-                                                    MenuItem install = new MenuItem(I18n.txt("gui.download.install"), skin, "default");
+                                                    MenuItem install = new MenuItem(I18n.txt("gui.download.install"), skin, skin.getDrawable("iconic-cloud-download"));
                                                     install.addListener(new ChangeListener() {
                                                         @Override
                                                         public void changed(ChangeEvent event, Actor actor) {

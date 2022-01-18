@@ -399,11 +399,11 @@ public class GaiaSkyContextMenu extends ContextMenu {
                 MenuItem cim = new MenuItem(ci.name, skin, "default");
                 cim.align(Align.right);
                 OwnCheckBox cb = new OwnCheckBox(null, skin, pad);
-                cb.setChecked(ci.isVisible());
+                cb.setChecked(ci.isVisible(true));
                 cim.add(cb).right().expand();
                 cim.addListener(event -> {
                     if (event instanceof ChangeEvent) {
-                        EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, !ci.isVisible(), false);
+                        EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, !ci.isVisible(true), false);
                         return true;
                     }
                     return false;
