@@ -122,7 +122,7 @@ layout (location = 0) out vec4 fragColor;
 #endif
 
 void main() {
-	vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
+	vec4 emissive = fetchColorEmissiveTD(u_emissiveTexture, texCoords);
 	#ifdef atmosphereGround
 	vec3 night = emissive.rgb;
 	emissive = vec4(0.0);
