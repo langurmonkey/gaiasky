@@ -730,13 +730,12 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Release notes
         String releaseNotesString = dataset.releaseNotes;
-        if(releaseNotesString == null || releaseNotesString.isEmpty()) {
+        if (releaseNotesString == null || releaseNotesString.isEmpty()) {
             releaseNotesString = "-";
         }
         releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
         OwnLabel releaseNotes = new OwnLabel(I18n.txt("gui.download.releasenotes", releaseNotesString), skin);
         releaseNotes.setWidth(1000f);
-
 
         OwnTextIconButton cancelDownloadButton = null;
         if (currentDownloads.containsKey(dataset.key)) {
@@ -879,6 +878,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Ok message
                     EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, dataset.key, 0);
                     dataset.exists = true;
+                    actionEnableDataset(dataset);
                     if (successRunnable != null) {
                         successRunnable.run();
                     }
@@ -890,7 +890,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         }
                     }, 0.5f);
                 } else {
-                    logger.error(I18n.txt("gui.download.failed", name));
+                    logger.error(I18n.txt("gui.download.failed", name + " - " + url));
                     setStatusError(dataset);
                 }
             });
@@ -898,7 +898,7 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         Runnable fail = () -> {
-            logger.error(I18n.txt("gui.download.failed", name));
+            logger.error(I18n.txt("gui.download.failed", name + " - " + url));
             setStatusError(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
@@ -911,7 +911,7 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         Runnable cancel = () -> {
-            logger.warn(I18n.txt("gui.download.cancelled", name));
+            logger.error(I18n.txt("gui.download.cancelled", name + " - " + url));
             setStatusCancelled(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
@@ -1187,15 +1187,33 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void actionEnableDataset(DatasetDesc dataset) {
-        String filePath = dataset.catalogFile.path();
-        if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-            Settings.settings.data.catalogFiles.add(filePath);
+        String filePath = null;
+        if (dataset.catalogFile != null) {
+            filePath = dataset.catalogFile.path();
+        } else if (dataset.path != null) {
+            filePath = dataset.path.toAbsolutePath().toString();
+        } else if (dataset.check != null) {
+            filePath = dataset.check.toAbsolutePath().toString();
+        }
+        if (filePath != null && !filePath.isEmpty()) {
+            if (!Settings.settings.data.catalogFiles.contains(filePath)) {
+                Settings.settings.data.catalogFiles.add(filePath);
+            }
         }
     }
 
     private void actionDisableDataset(DatasetDesc dataset) {
-        String filePath = dataset.catalogFile.path();
-        Settings.settings.data.catalogFiles.remove(filePath);
+        String filePath = null;
+        if (dataset.catalogFile != null) {
+            filePath = dataset.catalogFile.path();
+        } else if (dataset.path != null) {
+            filePath = dataset.path.toAbsolutePath().toString();
+        } else if (dataset.check != null) {
+            filePath = dataset.check.toAbsolutePath().toString();
+        }
+        if (filePath != null && !filePath.isEmpty()) {
+            Settings.settings.data.catalogFiles.remove(filePath);
+        }
     }
 
     private void actionDeleteDataset(DatasetDesc dataset) {
@@ -1261,7 +1279,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 // Update server dataset status and selected
                 if (deleted && serverDataset != null) {
                     serverDataset.exists = false;
-                    actionEnableDataset(dataset);
+                    actionDisableDataset(dataset);
                     resetSelectedDataset();
 
                 }

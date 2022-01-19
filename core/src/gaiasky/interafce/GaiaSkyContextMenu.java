@@ -26,6 +26,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.scene2d.ContextMenu;
 import gaiasky.util.scene2d.MenuItem;
 import gaiasky.util.scene2d.OwnCheckBox;
+import gaiasky.util.scene2d.OwnImage;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -398,9 +399,10 @@ public class GaiaSkyContextMenu extends ContextMenu {
             for (CatalogInfo ci : cis) {
                 MenuItem cim = new MenuItem(ci.name, skin, "default");
                 cim.align(Align.right);
-                OwnCheckBox cb = new OwnCheckBox(null, skin, pad);
-                cb.setChecked(ci.isVisible(true));
-                cim.add(cb).right().expand();
+
+                Drawable icon = ci.isVisible(true)?skin.getDrawable("eye-icon") : skin.getDrawable("eye-closed-icon");
+                OwnImage img = new OwnImage(icon);
+                cim.add(img).right().padRight(pad).expand();
                 cim.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, !ci.isVisible(true), false);

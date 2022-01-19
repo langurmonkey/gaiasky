@@ -66,14 +66,14 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         HorizontalGroup controls = new HorizontalGroup();
         controls.space(pad);
         OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
-        eye.setCheckedNoFire(!ci.isVisible());
+        eye.setCheckedNoFire(!ci.isVisible(true));
         eye.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
         eye.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
                 if (ci.object != null) {
-                    boolean newvis = !ci.isVisible();
-                    EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, newvis, true);
+                    boolean visible = !ci.isVisible(true);
+                    EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, visible, true);
                 }
                 return true;
             }

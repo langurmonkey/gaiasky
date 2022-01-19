@@ -86,9 +86,9 @@ public class DataDescriptorUtils {
                 String type = dst.getString("type");
 
                 // Check if better option already exists
-                String dsName = dst.getString("name");
-                if (bestDs.containsKey(dsName)) {
-                    JsonValue other = bestDs.get(dsName);
+                String dsKey = dst.has("key") ? dst.getString("key") : dst.getString("name");
+                if (bestDs.containsKey(dsKey)) {
+                    JsonValue other = bestDs.get(dsKey);
                     int otherVersion = other.getInt("version", 0);
                     if (otherVersion >= thisVersion) {
                         // Ignore this version
@@ -97,7 +97,7 @@ public class DataDescriptorUtils {
                     } else {
                         // Remove other version, use this
                         typeMap.get(type).remove(other);
-                        bestDs.remove(dsName);
+                        bestDs.remove(dsKey);
                     }
                 }
 
@@ -113,7 +113,7 @@ public class DataDescriptorUtils {
                 // Add to set
                 types.add(type);
                 // Add to bestDs
-                bestDs.put(dsName, dst);
+                bestDs.put(dsKey, dst);
             }
             // Next
             dst = dst.next();
@@ -151,25 +151,11 @@ public class DataDescriptorUtils {
     public synchronized DataDescriptor buildLocalDatasets(DataDescriptor server) {
         // Get all server datasets that exist locally
         List<DatasetDesc> existing = new ArrayList<>();
-        Map<String, DatasetDesc> serverMap = new TreeMap<>();
         if (server != null) {
             for (DatasetDesc dd : server.datasets) {
                 if (dd.exists) {
-                    if(serverMap.containsKey(dd.key)) {
-                        DatasetDesc other = serverMap.get(dd.key);
-                        // Only keep larger version, if we can use it
-                        if(dd.serverVersion > other.serverVersion && dd.minGsVersion <= GaiaSkyDesktop.SOURCE_VERSION) {
-                            serverMap.put(dd.key, dd);
-                        }
-                    } else {
-                        serverMap.put(dd.key, dd);
-                    }
+                    existing.add(dd.getLocalCopy());
                 }
-            }
-            // Add unique
-            Set<String> keys = serverMap.keySet();
-            for(String key : keys) {
-                existing.add(serverMap.get(key));
             }
         }
 

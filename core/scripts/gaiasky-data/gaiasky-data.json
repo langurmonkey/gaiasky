@@ -62,7 +62,7 @@
       "type": "data-pack",
       "version": 22,
       "mingsversion": 30200,
-      "size": 69413528,
+      "size": 69131270,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -78,7 +78,6 @@
         "locations-moon.json",
         "models",
         "moons.json",
-        "oort",
         "orbit",
         "orbits-asteroid.json",
         "orbits-asteroids-dr2.json",
@@ -109,9 +108,9 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "11630ed6cd4e81a0937f85d365d32403ca962822004b2b676130786864c702ec",
+      "sha256": "ab7346ccdae92ba1b99e2b91175e7884d2d05463994595534afa3a0bb918915f",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "Upgrade to new descriptor format introduced in 3.2.0.",
+      "releasenotes": "- Upgrade to new descriptor format introduced in 3.2.0.\n- Oort cloud taken to its own external dataset.",
       "link": "@mirror-url@basedata",
       "file": "@mirror-url@basedata/v022_20220117/basedata.tar.gz"
     },
@@ -810,6 +809,25 @@
       "releasenotes" : "First version with two procedurally-generated planets and a manually textured one",
       "sha256": "2bf66e7a2eef557cdd0c54be132e44dc92237f8a839cdef4869594b6d3b1401d",
       "file": "@mirror-url@systems/exonia/v01_20211203/exonia-system.tar.gz"
+    },
+    {
+      "name" : "Oort cloud",
+      "key" : "oort-cloud",
+      "type" : "catalog-other",
+      "version": 1,
+      "mingsversion" : 30200,
+      "size" : 566690,
+      "nobjects" : 10000,
+      "check" : "catalog-oortcloud.json",
+      "data": [
+        "catalog-oortcloud.json",
+        "particles-oortcloud.json",
+        "oortcloud"
+      ],
+      "description": "Oort cloud data. This simulated dataset contains 10000 particles.",
+      "releasenotes" : "This first version moves the Oort cloud out of the base data package.",
+      "sha256": "5676f84592b24780e5afc40130932913fa3f7e7164f82885a0882dc346b12355",
+      "file": "@mirror-url@extra/oortcloud/v001_20220119/oortcloud.tar.gz"
     },
     {
       "name": "mesh-dr2-dust",

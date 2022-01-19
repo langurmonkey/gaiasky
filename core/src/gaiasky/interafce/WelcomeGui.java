@@ -470,9 +470,7 @@ public class WelcomeGui extends AbstractGui {
         required.add(dataPath.resolve("planets.json"));
         required.add(dataPath.resolve("satellites.json"));
         required.add(dataPath.resolve("tex/base"));
-        required.add(dataPath.resolve("attitudexml"));
         required.add(dataPath.resolve("orbit"));
-        required.add(dataPath.resolve("oort"));
         required.add(dataPath.resolve("galaxy"));
     }
 
