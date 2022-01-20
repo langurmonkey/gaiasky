@@ -458,26 +458,33 @@ public class TextUtils {
 
             switch (cp) {
 
-            case 'r':  newstr.append('\r');
+            case 'r':
+                newstr.append('\r');
                 break; /* switch */
 
-            case 'n':  newstr.append('\n');
+            case 'n':
+                newstr.append('\n');
                 break; /* switch */
 
-            case 'f':  newstr.append('\f');
+            case 'f':
+                newstr.append('\f');
                 break; /* switch */
 
             /* PASS a \b THROUGH!! */
-            case 'b':  newstr.append("\\b");
+            case 'b':
+                newstr.append("\\b");
                 break; /* switch */
 
-            case 't':  newstr.append('\t');
+            case 't':
+                newstr.append('\t');
                 break; /* switch */
 
-            case 'a':  newstr.append('\007');
+            case 'a':
+                newstr.append('\007');
                 break; /* switch */
 
-            case 'e':  newstr.append('\033');
+            case 'e':
+                newstr.append('\033');
                 break; /* switch */
 
             /*
@@ -487,19 +494,24 @@ public class TextUtils {
              *
              * Strange but true: "\c{" is ";", "\c}" is "=", etc.
              */
-            case 'c':   {
-                if (++i == oldstr.length()) { die("trailing \\c"); }
+            case 'c': {
+                if (++i == oldstr.length()) {
+                    die("trailing \\c");
+                }
                 cp = oldstr.codePointAt(i);
                 /*
                  * don't need to grok surrogates, as next line blows them up
                  */
-                if (cp > 0x7f) { die("expected ASCII after \\c"); }
+                if (cp > 0x7f) {
+                    die("expected ASCII after \\c");
+                }
                 newstr.append(Character.toChars(cp ^ 64));
                 break; /* switch */
             }
 
             case '8':
-            case '9': die("illegal octal digit");
+            case '9':
+                die("illegal octal digit");
                 /* NOTREACHED */
 
                 /*
@@ -513,7 +525,8 @@ public class TextUtils {
             case '4':
             case '5':
             case '6':
-            case '7': --i;
+            case '7':
+                --i;
                 /* FALLTHROUGH */
 
                 /*
@@ -522,7 +535,7 @@ public class TextUtils {
                  * octal 777.
                  */
             case '0': {
-                if (i+1 == oldstr.length()) {
+                if (i + 1 == oldstr.length()) {
                     /* found \0 at end of string */
                     newstr.append(Character.toChars(0));
                     break; /* switch */
@@ -531,11 +544,11 @@ public class TextUtils {
                 int digits = 0;
                 int j;
                 for (j = 0; j <= 2; j++) {
-                    if (i+j == oldstr.length()) {
+                    if (i + j == oldstr.length()) {
                         break; /* for */
                     }
                     /* safe because will unread surrogate */
-                    int ch = oldstr.charAt(i+j);
+                    int ch = oldstr.charAt(i + j);
                     if (ch < '0' || ch > '7') {
                         break; /* for */
                     }
@@ -549,17 +562,17 @@ public class TextUtils {
                 int value = 0;
                 try {
                     value = Integer.parseInt(
-                            oldstr.substring(i, i+digits), 8);
+                            oldstr.substring(i, i + digits), 8);
                 } catch (NumberFormatException nfe) {
                     die("invalid octal value for \\0 escape");
                 }
                 newstr.append(Character.toChars(value));
-                i += digits-1;
+                i += digits - 1;
                 break; /* switch */
             } /* end case '0' */
 
-            case 'x':  {
-                if (i+2 > oldstr.length()) {
+            case 'x': {
+                if (i + 2 > oldstr.length()) {
                     die("string too short for \\x escape");
                 }
                 i++;
@@ -579,86 +592,92 @@ public class TextUtils {
                     /*
                      * ASCII test also catches surrogates
                      */
-                    int ch = oldstr.charAt(i+j);
+                    int ch = oldstr.charAt(i + j);
                     if (ch > 127) {
                         die("illegal non-ASCII hex digit in \\x escape");
                     }
 
-                    if (saw_brace && ch == '}') { break; /* for */ }
+                    if (saw_brace && ch == '}') {
+                        break; /* for */
+                    }
 
-                    if (! ( (ch >= '0' && ch <= '9')
+                    if (!((ch >= '0' && ch <= '9')
                             ||
                             (ch >= 'a' && ch <= 'f')
                             ||
                             (ch >= 'A' && ch <= 'F')
                     )
-                    )
-                    {
+                    ) {
                         die(String.format(
                                 "illegal hex digit #%d '%c' in \\x", ch, ch));
                     }
 
                 }
-                if (j == 0) { die("empty braces in \\x{} escape"); }
+                if (j == 0) {
+                    die("empty braces in \\x{} escape");
+                }
                 int value = 0;
                 try {
-                    value = Integer.parseInt(oldstr.substring(i, i+j), 16);
+                    value = Integer.parseInt(oldstr.substring(i, i + j), 16);
                 } catch (NumberFormatException nfe) {
                     die("invalid hex value for \\x escape");
                 }
                 newstr.append(Character.toChars(value));
-                if (saw_brace) { j++; }
-                i += j-1;
+                if (saw_brace) {
+                    j++;
+                }
+                i += j - 1;
                 break; /* switch */
             }
 
             case 'u': {
-                if (i+4 > oldstr.length()) {
+                if (i + 4 > oldstr.length()) {
                     die("string too short for \\u escape");
                 }
                 i++;
                 int j;
                 for (j = 0; j < 4; j++) {
                     /* this also handles the surrogate issue */
-                    if (oldstr.charAt(i+j) > 127) {
+                    if (oldstr.charAt(i + j) > 127) {
                         die("illegal non-ASCII hex digit in \\u escape");
                     }
                 }
                 int value = 0;
                 try {
-                    value = Integer.parseInt( oldstr.substring(i, i+j), 16);
+                    value = Integer.parseInt(oldstr.substring(i, i + j), 16);
                 } catch (NumberFormatException nfe) {
                     die("invalid hex value for \\u escape");
                 }
                 newstr.append(Character.toChars(value));
-                i += j-1;
+                i += j - 1;
                 break; /* switch */
             }
 
             case 'U': {
-                if (i+8 > oldstr.length()) {
+                if (i + 8 > oldstr.length()) {
                     die("string too short for \\U escape");
                 }
                 i++;
                 int j;
                 for (j = 0; j < 8; j++) {
                     /* this also handles the surrogate issue */
-                    if (oldstr.charAt(i+j) > 127) {
+                    if (oldstr.charAt(i + j) > 127) {
                         die("illegal non-ASCII hex digit in \\U escape");
                     }
                 }
                 int value = 0;
                 try {
-                    value = Integer.parseInt(oldstr.substring(i, i+j), 16);
+                    value = Integer.parseInt(oldstr.substring(i, i + j), 16);
                 } catch (NumberFormatException nfe) {
                     die("invalid hex value for \\U escape");
                 }
                 newstr.append(Character.toChars(value));
-                i += j-1;
+                i += j - 1;
                 break; /* switch */
             }
 
-            default:   newstr.append('\\');
+            default:
+                newstr.append('\\');
                 newstr.append(Character.toChars(cp));
                 /*
                  * say(String.format(

@@ -51,7 +51,7 @@ public class DatasetDesc {
 
     public String releaseNotes;
 
-    public String[] filesToDelete;
+    public String[] files;
 
     // In case of local datasets, this links to the server description
     public DatasetDesc server;
@@ -161,14 +161,19 @@ public class DatasetDesc {
             sha256 = null;
 
         // Data
-        if (source.has("data")) {
-            JsonValue data = source.get("data");
+        JsonValue dataFiles = null;
+        if(source.has("files")) {
+            dataFiles = source.get("files");
+        } else if (source.has("data") && source.get("data").isArray()) {
+            dataFiles = source.get("data");
+        }
+        if(dataFiles != null) {
             try {
-                this.filesToDelete = data.asStringArray();
+                this.files = dataFiles.asStringArray();
             } catch (Exception e) {
             }
         } else {
-            this.filesToDelete = null;
+            this.files = null;
         }
     }
 
@@ -248,7 +253,7 @@ public class DatasetDesc {
         copy.outdated = this.outdated;
         copy.baseData = this.baseData;
         copy.releaseNotes = this.releaseNotes;
-        copy.filesToDelete = this.filesToDelete;
+        copy.files = this.files;
         copy.server = this.server;
         return copy;
     }

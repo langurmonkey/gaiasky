@@ -60,7 +60,7 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 22,
+      "version": 23,
       "mingsversion": 30200,
       "size": 69131270,
       "check": "data-main.json",
@@ -108,11 +108,11 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "ab7346ccdae92ba1b99e2b91175e7884d2d05463994595534afa3a0bb918915f",
+      "sha256": "bad91d5f7b74b75100fae4ab0af1939dd07ccb7b012988c4b8722673add31f6b",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
       "releasenotes": "- Upgrade to new descriptor format introduced in 3.2.0.\n- Oort cloud taken to its own external dataset.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v022_20220117/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v023_20220120/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
