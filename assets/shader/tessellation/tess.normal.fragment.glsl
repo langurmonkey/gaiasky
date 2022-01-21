@@ -168,6 +168,7 @@ struct DirectionalLight {
 };
 #endif // directionalLightsFlag
 
+// INPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
@@ -187,6 +188,7 @@ struct VertexData {
     #endif // environmentCubemapFlag
 };
 in VertexData o_data;
+
 #ifdef atmosphereGround
 in vec4 o_atmosphereColor;
 in float o_fadeFactor;
@@ -200,6 +202,7 @@ uniform samplerCube u_environmentCubemap;
 #ifdef reflectionColorFlag
 uniform vec4 u_reflectionColor;
 #endif
+
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -230,7 +233,7 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
-#endif
+#endif // velocityBufferFlag
 
 // MAIN
 void main() {
@@ -296,13 +299,14 @@ void main() {
     float NL0;
     vec3 L0;
 
+    // Loop for directional light contributitons
     #ifdef directionalLightsFlag
     vec3 V = o_data.viewDir;
     // Loop for directional light contributitons
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = o_data.directionalLights[i].color;
         // Skip non-lights
-        if (i >= 0 && col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+        if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html

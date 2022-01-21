@@ -16,7 +16,8 @@ data:
   # List of object files to load.
   # Additionally to the files defined here, any file in the data folder with the format
   # "autoload-*.json" will also be loaded using the JsonLoader
-  objectFiles: [data/data-main.json]
+  objectFiles:
+    - data/data-main.json
   # Location of the skybox within the data folder (data/tex/skybox/[...]/)
   skyboxLocation: data/tex/skybox/gaiasky/
   # Use all terms in position algorithms (VSOP87 and moon coordinates)

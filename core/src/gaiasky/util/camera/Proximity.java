@@ -138,6 +138,7 @@ public class Proximity {
         for (NearbyRecord record : updating) {
             if (record == null) {
                 set(i, -1, object, camera);
+                return true;
             } else if (record == object) {
                 // Already in
                 return false;

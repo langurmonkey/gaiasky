@@ -109,6 +109,26 @@ uniform mat4 u_shadowMapProjViewTrans;
 
 #include shader/lib_atmscattering.glsl
 
+// GEOMETRY (QUATERNIONS)
+#if defined(velocityBufferFlag) || defined(relativisticEffects)
+    #include shader/lib_geometry.glsl
+#endif
+
+////////////////////////////////////////////////////////////////////////////////////
+//////////RELATIVISTIC EFFECTS - VERTEX
+////////////////////////////////////////////////////////////////////////////////////
+#ifdef relativisticEffects
+    #include shader/lib_relativity.glsl
+#endif // relativisticEffects
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//////////GRAVITATIONAL WAVES - VERTEX
+////////////////////////////////////////////////////////////////////////////////////
+#ifdef gravitationalWaves
+    #include shader/lib_gravwaves.glsl
+#endif // gravitationalWaves
+
 #ifdef blendedFlag
     uniform float u_opacity;
 #else
@@ -179,7 +199,7 @@ uniform mat4 u_shadowMapProjViewTrans;
         }
     #endif
 #else
-#define calculateTangentVectors() nop()
+    #define calculateTangentVectors() nop()
 #endif
 
 #ifdef ambientLightFlag
@@ -226,25 +246,30 @@ struct DirectionalLight {
 uniform DirectionalLight u_dirLights[numDirectionalLights];
 #endif // directionalLightsFlag
 
+// OUTPUT
 struct VertexData {
     vec2 texCoords;
     vec3 normal;
     #ifdef directionalLightsFlag
     DirectionalLight directionalLights[numDirectionalLights];
-    #endif
+    #endif // directionalLightsFlag
     vec3 viewDir;
     vec3 ambientLight;
     float opacity;
     vec4 color;
     #ifdef shadowMapFlag
     vec3 shadowMapUv;
-    #endif
+    #endif // shadowMapFlag
     vec3 fragPosWorld;
     #ifdef environmentCubemapFlag
     vec3 reflect;
-    #endif
+    #endif // environmentCubemapFlag
 };
 out VertexData v_data;
+
+#ifdef velocityBufferFlag
+#include shader/lib_velbuffer.vert.glsl
+#endif
 
 void main() {
     computeAtmosphericScatteringGround();
@@ -254,15 +279,25 @@ void main() {
     // Location in world coordinates (world origin is at the camera)
     vec4 pos = u_worldTrans * g_position;
 
+    #ifdef relativisticEffects
+        pos.xyz = computeRelativisticAberration(pos.xyz, length(pos.xyz), u_velDir, u_vc);
+    #endif // relativisticEffects
+
+    #ifdef gravitationalWaves
+        pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
+    #endif // gravitationalWaves
+
     v_data.fragPosWorld = pos.xyz;
-    //gl_Position = u_projViewTrans * pos;
-    // We pass the position in world coordinates
     gl_Position = pos;
 
+    #ifdef velocityBufferFlag
+    velocityBufferCam(gpos, pos);
+    #endif
+
     #ifdef shadowMapFlag
-    vec4 spos = u_shadowMapProjViewTrans * pos;
-    v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
-    #endif //shadowMapFlag
+	vec4 spos = u_shadowMapProjViewTrans * pos;
+	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
+    #endif // shadowMapFlag
 
     // Tangent space transform
     calculateTangentVectors();
@@ -273,17 +308,17 @@ void main() {
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
 
     #ifdef ambientLightFlag
-    v_data.ambientLight = u_ambientLight;
+	v_data.ambientLight = u_ambientLight;
     #else
-    v_data.ambientLight = vec3(0.0);
+	v_data.ambientLight = vec3(0.0);
     #endif // ambientLightFlag
 
     #ifdef ambientCubemapFlag
-    vec3 squaredNormal = g_normal * g_normal;
-    vec3 isPositive = step(0.0, g_normal);
-    v_data.ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
-    squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
-    squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
+	vec3 squaredNormal = g_normal * g_normal;
+	vec3 isPositive = step(0.0, g_normal);
+	v_data.ambientLight += squaredNormal.x * mix(u_ambientCubemap[0], u_ambientCubemap[1], isPositive.x) +
+	squaredNormal.y * mix(u_ambientCubemap[2], u_ambientCubemap[3], isPositive.y) +
+	squaredNormal.z * mix(u_ambientCubemap[4], u_ambientCubemap[5], isPositive.z);
     #endif // ambientCubemapFlag
 
     #ifdef directionalLightsFlag

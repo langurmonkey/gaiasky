@@ -1212,32 +1212,37 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void actionEnableDataset(DatasetDesc dataset) {
-        String filePath = null;
-        if (dataset.catalogFile != null) {
-            filePath = dataset.catalogFile.path();
-        } else if (dataset.path != null) {
-            filePath = dataset.path.toAbsolutePath().toString();
-        } else if (dataset.check != null) {
-            filePath = dataset.check.toAbsolutePath().toString();
-        }
-        if (filePath != null && !filePath.isBlank()) {
-            if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                Settings.settings.data.catalogFiles.add(filePath);
+        // Base data is not in the list of object files
+        if(!dataset.baseData) {
+            String filePath = null;
+            if (dataset.catalogFile != null) {
+                filePath = dataset.catalogFile.path();
+            } else if (dataset.path != null) {
+                filePath = dataset.path.toAbsolutePath().toString();
+            } else if (dataset.check != null) {
+                filePath = dataset.check.toAbsolutePath().toString();
+            }
+            if (filePath != null && !filePath.isBlank()) {
+                if (!Settings.settings.data.catalogFiles.contains(filePath)) {
+                    Settings.settings.data.catalogFiles.add(filePath);
+                }
             }
         }
     }
 
     private void actionDisableDataset(DatasetDesc dataset) {
-        String filePath = null;
-        if (dataset.catalogFile != null) {
-            filePath = dataset.catalogFile.path();
-        } else if (dataset.path != null) {
-            filePath = dataset.path.toAbsolutePath().toString();
-        } else if (dataset.check != null) {
-            filePath = dataset.check.toAbsolutePath().toString();
-        }
-        if (filePath != null && !filePath.isBlank()) {
-            Settings.settings.data.catalogFiles.remove(filePath);
+        if(!dataset.baseData) {
+            String filePath = null;
+            if (dataset.catalogFile != null) {
+                filePath = dataset.catalogFile.path();
+            } else if (dataset.path != null) {
+                filePath = dataset.path.toAbsolutePath().toString();
+            } else if (dataset.check != null) {
+                filePath = dataset.check.toAbsolutePath().toString();
+            }
+            if (filePath != null && !filePath.isBlank()) {
+                Settings.settings.data.catalogFiles.remove(filePath);
+            }
         }
     }
 

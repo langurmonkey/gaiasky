@@ -1,13 +1,6 @@
 #version 330 core
 
 ////////////////////////////////////////////////////////////////////////////////////
-////////// GROUND ATMOSPHERIC SCATTERING - FRAGMENT
-////////////////////////////////////////////////////////////////////////////////////
-#ifdef atmosphereGround
-in vec4 v_atmosphereColor;
-#endif
-
-////////////////////////////////////////////////////////////////////////////////////
 ////////// NORMAL ATTRIBUTE - FRAGMENT
 ///////////////////////////////////////////////////////////////////////////////////
 vec3 g_normal = vec3(0.0, 0.0, 1.0);
@@ -26,12 +19,6 @@ vec3 g_tangent = vec3(1.0, 0.0, 0.0);
 // Uniforms which are always available
 uniform vec2 u_cameraNearFar;
 uniform float u_cameraK;
-
-#ifdef timeFlag
-uniform float u_time;
-#else
-const float u_time = 0.0;
-#endif
 
 #ifdef diffuseColorFlag
 uniform vec4 u_diffuseColor;
@@ -77,10 +64,6 @@ uniform sampler2D u_reflectionTexture;
 #define emissiveFlag
 #endif
 
-#if defined(specularFlag) || defined(fogFlag)
-#define cameraPositionFlag
-#endif
-
 #if	defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
 #define ambientFlag
 #endif //ambientFlag
@@ -94,7 +77,7 @@ uniform sampler2D u_reflectionTexture;
 ////// SHADOW MAPPING
 //////////////////////////////////////////////////////
 #ifdef shadowMapFlag
-#define bias 0.006
+#define bias 0.030
 uniform sampler2D u_shadowTexture;
 uniform float u_shadowPCFOffset;
 
@@ -190,14 +173,6 @@ struct DirectionalLight {
 };
 #endif // directionalLightsFlag
 
-#ifdef environmentCubemapFlag
-uniform samplerCube u_environmentCubemap;
-#endif
-
-#ifdef reflectionColorFlag
-uniform vec4 u_reflectionColor;
-#endif
-
 // INPUT
 struct VertexData {
     vec2 texCoords;
@@ -219,11 +194,24 @@ struct VertexData {
 };
 in VertexData v_data;
 
+#ifdef atmosphereGround
+in vec4 v_atmosphereColor;
+in float v_fadeFactor;
+#endif
+
+#ifdef environmentCubemapFlag
+uniform samplerCube u_environmentCubemap;
+#endif
+
+#ifdef reflectionColorFlag
+uniform vec4 u_reflectionColor;
+#endif
+
+
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
-#define PI 3.1415926535
 
 #ifdef heightFlag
 uniform sampler2D u_heightTexture;
@@ -237,7 +225,6 @@ uniform float u_heightNoiseSize;
 #include shader/lib_sampleheight.glsl
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
-
     // number of depth layers
     const float minLayers = 8;
     const float maxLayers = 32;
@@ -279,6 +266,8 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 }
 #endif // heightFlag
 
+#include shader/lib_logdepthbuff.glsl
+
 // http://www.thetenthplanet.de/archives/1180
 mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
     // get edge vectors of the pixel triangle
@@ -298,21 +287,15 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
     return mat3( T * invmax, B * invmax, N );
 }
 
-#include shader/lib_logdepthbuff.glsl
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
 #endif // velocityBufferFlag
 
-float luma(vec3 color){
-    return dot(color, vec3(0.2126, 0.7152, 0.0722));
-}
-
+// MAIN
 void main() {
     vec2 texCoords = v_data.texCoords;
 
     vec3 viewDir;
-
     // TBN and viewDir do not depend on light
     #ifdef heightFlag
         // Compute tangent space
@@ -363,8 +346,10 @@ void main() {
 		#ifdef environmentCubemapFlag
             // Perturb the normal to get reflect direction
             pullNormal();
-            mat3 TBN2 = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
-			vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalize(TBN2 * N)));
+            #ifndef heightFlag
+            mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
+            #endif // heighFlag
+            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalize(TBN * N)));
 		#endif // environmentCubemapFlag
     #else
 	    // Normal in tangent space
@@ -399,16 +384,16 @@ void main() {
 
     // Loop for directional light contributitons
     #ifdef directionalLightsFlag
+    vec3 V = viewDir;
     // Loop for directional light contributitons
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];
         // Skip non-lights
-        if (i >= 0 && col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
+        if (col.r == 0.0 && col.g == 0.0 && col.b == 0.0) {
             continue;
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = lightDir[i];
-        vec3 V = viewDir;
         vec3 H = normalize(L + V);
         float NL = max(0.0, dot(N, L));
         float NH = max(0.0, dot(N, H));
@@ -427,7 +412,7 @@ void main() {
 
     #ifdef atmosphereGround
     #define exposure 4.0
-    fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a;
+    fragColor.rgb += (vec3(1.0) - exp(v_atmosphereColor.rgb * -exposure)) * v_atmosphereColor.a * shdw * v_fadeFactor;
     #endif
 
     // Prevent saturation

@@ -111,7 +111,7 @@ uniform mat4 u_shadowMapProjViewTrans;
 
 // GEOMETRY (QUATERNIONS)
 #if defined(velocityBufferFlag) || defined(relativisticEffects)
-#include shader/lib_geometry.glsl
+    #include shader/lib_geometry.glsl
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -210,9 +210,6 @@ uniform mat4 u_shadowMapProjViewTrans;
     #define calculateTangentVectors() nop()
 #endif
 
-//////////////////////////////////////////////////////
-////// AMBIENT LIGHT
-//////////////////////////////////////////////////////
 #ifdef ambientLightFlag
     #ifndef ambientFlag
 	#define ambientFlag
@@ -309,7 +306,7 @@ void main() {
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;
 	v_data.shadowMapUv.xyz = (spos.xyz / spos.w) * 0.5 + 0.5;
-    #endif //shadowMapFlag
+    #endif // shadowMapFlag
 
     // Tangent space transform
     calculateTangentVectors();
@@ -319,7 +316,7 @@ void main() {
 
     #ifndef heightFlag
     mat3 TBN = mat3(g_tangent, g_binormal, g_normal);
-    #endif
+    #endif // heightFlag
 
     #ifdef ambientLightFlag
 	v_data.ambientLight = u_ambientLight;
@@ -341,7 +338,7 @@ void main() {
             v_data.directionalLights[i].direction = normalize(-u_dirLights[i].direction);
             #else
             v_data.directionalLights[i].direction = normalize(-u_dirLights[i].direction * TBN);
-            #endif
+            #endif // heightFlag
             v_data.directionalLights[i].color = u_dirLights[i].color;
         }
     #endif // directionalLightsFlag
@@ -352,7 +349,7 @@ void main() {
     v_data.viewDir = normalize(-pos.xyz);
     #else
     v_data.viewDir = normalize(-pos.xyz * TBN);
-    #endif
+    #endif // heightFlag
 
     #ifdef environmentCubemapFlag
     #ifndef normalTextureFlag

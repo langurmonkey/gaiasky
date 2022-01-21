@@ -156,6 +156,9 @@ public abstract class ModelBody extends CelestialBody {
                         }
 
                     }
+                } else {
+                    // Disable light
+                   mc.directional(i).color.set(0f, 0f, 0f, 0f);
                 }
             }
         }

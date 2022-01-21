@@ -114,7 +114,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public String biomeLUT = "data/tex/base/biome-lut.png";
     public float biomeHueShift = 0;
 
-    private AtomicBoolean generated = new AtomicBoolean(false);
+    private AtomicBoolean heightGenerated = new AtomicBoolean(false);
+    private AtomicBoolean heightInitialized = new AtomicBoolean(false);
     private Texture heightTex, specularTex, diffuseTex, normalTex;
 
     /** Add also color even if texture is present **/
@@ -170,7 +171,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         ringUnpacked = addToLoad(ring, getTP(ring, true));
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
 
-        this.generated.set(false);
+        this.heightGenerated.set(false);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
@@ -360,14 +361,14 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public void setGenerated(boolean generated) {
-        this.generated.set(generated);
+        this.heightGenerated.set(generated);
     }
 
     private synchronized void initializeGenElevationData() {
-        if (generated.get()) {
+        if (heightGenerated.get()) {
             addHeightTex(heightTex);
         } else {
-            generated.set(true);
+            heightGenerated.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Begin
                 EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, true);
@@ -537,25 +538,28 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     private void initializeElevationData(Texture tex) {
-        GaiaSky.instance.getExecutorService().execute(() -> {
-            // Construct RAM height map from texture
-            String heightUnpacked = GlobalResources.unpackAssetPath(height);
-            GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
-            Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
-            float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
-            for (int i = 0; i < heightPixmap.getWidth(); i++) {
-                for (int j = 0; j < heightPixmap.getHeight(); j++) {
-                    Color col = new Color(heightPixmap.getPixel(i, j));
-                    partialData[i][j] = (1f - col.r) * heightScale;
+        if(!heightInitialized.get()) {
+            heightInitialized.set(true);
+            GaiaSky.instance.getExecutorService().execute(() -> {
+                // Construct RAM height map from texture
+                String heightUnpacked = GlobalResources.unpackAssetPath(height);
+                GaiaSky.postRunnable(() -> logger.info("Constructing elevation data from texture: " + heightUnpacked));
+                Pixmap heightPixmap = new Pixmap(new FileHandle(heightUnpacked));
+                float[][] partialData = new float[heightPixmap.getWidth()][heightPixmap.getHeight()];
+                for (int i = 0; i < heightPixmap.getWidth(); i++) {
+                    for (int j = 0; j < heightPixmap.getHeight(); j++) {
+                        Color col = new Color(heightPixmap.getPixel(i, j));
+                        partialData[i][j] = (1f - col.r) * heightScale;
+                    }
                 }
-            }
 
-            GaiaSky.postRunnable(() -> {
-                // Populate material
-                heightMap = partialData;
-                addHeightTex(tex);
+                GaiaSky.postRunnable(() -> {
+                    // Populate material
+                    heightMap = partialData;
+                    addHeightTex(tex);
+                });
             });
-        });
+        }
     }
 
     private void removeElevationData() {
