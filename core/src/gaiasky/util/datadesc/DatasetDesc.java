@@ -31,8 +31,8 @@ public class DatasetDesc {
     public DatasetType datasetType;
     public DatasetStatus status;
 
-    public Path check;
-    public Path path;
+    public Path checkPath;
+    public String checkStr;
     public FileHandle catalogFile;
 
     public String size;
@@ -60,24 +60,29 @@ public class DatasetDesc {
     }
 
     public DatasetDesc(JsonReader reader, JsonValue source) {
-       this(reader, source, false);
+       this(reader, source, null);
     }
 
-    public DatasetDesc(JsonReader reader, JsonValue source, boolean local) {
+    public DatasetDesc(JsonReader reader, JsonValue source, FileHandle localCatalogFile) {
         this.reader = reader;
         this.source = source;
 
         // Check if we have it
         if (source.has("check")) {
-            this.check = Paths.get(Settings.settings.data.location, source.getString("check"));
-            this.exists = Files.exists(check) && Files.isReadable(check);
+            this.checkStr = source.getString("check");
+            this.checkPath = Paths.get(Settings.settings.data.location, checkStr);
+            this.exists = Files.exists(checkPath) && Files.isReadable(checkPath);
             this.serverVersion = source.getInt("version", 0);
             if (this.exists) {
-                this.myVersion = checkJsonVersion(check);
+                this.myVersion = checkJsonVersion(checkPath);
                 this.outdated = serverVersion > myVersion;
             } else {
                 this.outdated = false;
             }
+        } else if (localCatalogFile != null) {
+            this.checkPath = localCatalogFile.file().toPath();
+            this.checkStr = "data/" + TextUtils.subtractPath(this.checkPath.toString(), Settings.settings.data.location);
+            this.exists = localCatalogFile.exists();
         }
 
         this.status = exists ? DatasetStatus.INSTALLED : DatasetStatus.AVAILABLE;
@@ -86,7 +91,7 @@ public class DatasetDesc {
         if (hasKey) {
             this.key = source.getString("key");
         }
-        hasKey = hasKey || local;
+        hasKey = hasKey || localCatalogFile != null;
         if (source.has("name")) {
             this.name = source.getString("name");
         }
@@ -221,8 +226,7 @@ public class DatasetDesc {
 
     public DatasetDesc getLocalCopy() {
         DatasetDesc copy = this.copy();
-        copy.catalogFile = Gdx.files.absolute(copy.check.toAbsolutePath().toString());
-        copy.path = copy.check.toAbsolutePath();
+        copy.catalogFile = Gdx.files.absolute(copy.checkPath.toAbsolutePath().toString());
         return copy;
     }
 
@@ -238,8 +242,8 @@ public class DatasetDesc {
         copy.file = this.file;
         copy.datasetType = this.datasetType;
         copy.status = this.status;
-        copy.check = this.check;
-        copy.path = this.path;
+        copy.checkStr = this.checkStr;
+        copy.checkPath = this.checkPath;
         copy.catalogFile = this.catalogFile;
         copy.size = this.size;
         copy.sizeBytes = this.sizeBytes;

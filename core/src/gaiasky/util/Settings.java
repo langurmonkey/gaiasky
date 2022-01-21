@@ -146,8 +146,7 @@ public class Settings {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DataSettings {
         public String location;
-        public List<String> catalogFiles;
-        public List<String> objectFiles;
+        public List<String> dataFiles;
         public String skyboxLocation;
         public boolean highAccuracy;
         public boolean realGaiaAttitude;
@@ -187,7 +186,7 @@ public class Settings {
             if (!Files.exists(catalog) || !Files.isReadable(catalog) || !Files.isRegularFile(catalog)) {
                 return false;
             }
-            for (String pathStr : catalogFiles) {
+            for (String pathStr : dataFiles) {
                 Path path = Path.of(pathStr);
                 try {
                     if (Files.isSameFile(path, catalog)) {
@@ -197,7 +196,7 @@ public class Settings {
                     logger.error(e);
                 }
             }
-            catalogFiles.add(catalog.toString());
+            dataFiles.add(catalog.toString());
             return true;
         }
     }

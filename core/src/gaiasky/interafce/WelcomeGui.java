@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.graphics.Texture;
@@ -371,7 +372,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private int numTotalCatalogsSelected() {
-        return Settings.settings.data.catalogFiles.size();
+        return Settings.settings.data.dataFiles.size();
     }
 
     private int numCatalogsAvailable() {
@@ -380,7 +381,7 @@ public class WelcomeGui extends AbstractGui {
 
     private int numGaiaDRCatalogsSelected() {
         int matches = 0;
-        for (String f : Settings.settings.data.catalogFiles) {
+        for (String f : Settings.settings.data.dataFiles) {
             String filename = Path.of(f).getFileName().toString();
             if (isGaiaDRCatalogFile(filename)) {
                 matches++;
@@ -399,7 +400,7 @@ public class WelcomeGui extends AbstractGui {
             return 0;
         }
 
-        for (String f : Settings.settings.data.catalogFiles) {
+        for (String f : Settings.settings.data.dataFiles) {
             // File name with no extension
             Path path = Path.of(f);
             String filenameExt = path.getFileName().toString();
@@ -426,10 +427,11 @@ public class WelcomeGui extends AbstractGui {
 
     private Set<String> removeNonExistent() {
         Set<String> toRemove = new HashSet<>();
-        for (String f : Settings.settings.data.catalogFiles) {
+        final FileHandleResolver dataResolver = fileName -> Settings.settings.data.dataFileHandle(fileName);
+        for (String f : Settings.settings.data.dataFiles) {
             // File name with no extension
-            Path path = Path.of(f);
-            if (!Files.exists(path)) {
+            FileHandle fh = dataResolver.resolve(f);
+            if (!fh.exists()) {
                 // File does not exist, remove from selected list!
                 toRemove.add(f);
             }
@@ -437,7 +439,7 @@ public class WelcomeGui extends AbstractGui {
 
         // Remove non-existent files
         for (String out : toRemove) {
-            Settings.settings.data.catalogFiles.remove(out);
+            Settings.settings.data.dataFiles.remove(out);
         }
 
         return toRemove;

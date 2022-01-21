@@ -702,4 +702,30 @@ public class TextUtils {
         throw new IllegalArgumentException(foa);
     }
 
+    /**
+     * Subtracts the short path from the long path, if the long path contains the short one.
+     * @param longPath The long path.
+     * @param shortPath The short path.
+     * @return The result.
+     */
+    public static String subtractPath(String longPath, String shortPath) {
+        if(!longPath.contains(shortPath))
+            return longPath;
+
+        java.lang.StringBuilder sb = new java.lang.StringBuilder();
+        String[] parts1 = longPath.split("/");
+        String[] parts2 = shortPath.split("/");
+        for (int i = 0; i < parts1.length; i++) {
+            if (i >= parts2.length || !parts1[i].equals(parts2[i])) {
+                for (int j = i; j < parts1.length; j++) {
+                    if (sb.length() > 0)
+                        sb.append("/");
+                    sb.append(parts1[j]);
+                }
+                break;
+            }
+        }
+        return sb.toString();
+    }
+
 }

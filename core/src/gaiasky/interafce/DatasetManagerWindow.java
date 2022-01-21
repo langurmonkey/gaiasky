@@ -313,7 +313,7 @@ public class DatasetManagerWindow extends GenericDialog {
                             me.pack();
                             GaiaSky.postRunnable(() -> {
                                 // Reset datasets
-                                Settings.settings.data.catalogFiles.clear();
+                                Settings.settings.data.dataFiles.clear();
                                 reloadAll();
                                 GaiaSky.instance.getGlobalResources().reloadDataFiles();
                             });
@@ -389,7 +389,7 @@ public class DatasetManagerWindow extends GenericDialog {
         });
 
         // Current selected datasets
-        java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
+        java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
 
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
@@ -458,13 +458,13 @@ public class DatasetManagerWindow extends GenericDialog {
 
                             // Remove from selected, if it is
                             String filePath = dataset.catalogFile.path();
-                            if (Settings.settings.data.catalogFiles.contains(filePath)) {
-                                Settings.settings.data.catalogFiles.remove(filePath);
+                            if (Settings.settings.data.dataFiles.contains(filePath)) {
+                                Settings.settings.data.dataFiles.remove(filePath);
                                 logger.info(I18n.txt("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                             }
                         } else {
                             select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
-                            select.addListener(new OwnTextTooltip(dataset.path.toString(), skin));
+                            select.addListener(new OwnTextTooltip(dataset.checkPath.toString(), skin));
                         }
                         select.setSize(installOrSelectSize, installOrSelectSize);
                         select.setHeight(40f);
@@ -677,7 +677,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 status.setColor(ColorUtils.gRedC);
             } else {
                 // Notify status
-                java.util.List<String> currentSetting = Settings.settings.data.catalogFiles;
+                java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
                 boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
                 status = new OwnLabel(I18n.txt(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
             }
@@ -1212,36 +1212,29 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void actionEnableDataset(DatasetDesc dataset) {
-        // Base data is not in the list of object files
-        if(!dataset.baseData) {
-            String filePath = null;
-            if (dataset.catalogFile != null) {
-                filePath = dataset.catalogFile.path();
-            } else if (dataset.path != null) {
-                filePath = dataset.path.toAbsolutePath().toString();
-            } else if (dataset.check != null) {
-                filePath = dataset.check.toAbsolutePath().toString();
-            }
-            if (filePath != null && !filePath.isBlank()) {
-                if (!Settings.settings.data.catalogFiles.contains(filePath)) {
-                    Settings.settings.data.catalogFiles.add(filePath);
-                }
+        // Texture packs can't be enabled
+        if(dataset.type.equals("texture-pack"))
+            return;
+        String filePath = null;
+        if (dataset.checkStr != null) {
+            filePath = "data/" + dataset.checkStr;
+        }
+        if (filePath != null && !filePath.isBlank()) {
+            if (!Settings.settings.data.dataFiles.contains(filePath)) {
+                Settings.settings.data.dataFiles.add(filePath);
             }
         }
     }
 
     private void actionDisableDataset(DatasetDesc dataset) {
-        if(!dataset.baseData) {
+        // Base data can't be disabled
+        if (!dataset.baseData) {
             String filePath = null;
-            if (dataset.catalogFile != null) {
-                filePath = dataset.catalogFile.path();
-            } else if (dataset.path != null) {
-                filePath = dataset.path.toAbsolutePath().toString();
-            } else if (dataset.check != null) {
-                filePath = dataset.check.toAbsolutePath().toString();
+            if (dataset.checkStr != null) {
+                filePath = "data/" + dataset.checkStr;
             }
             if (filePath != null && !filePath.isBlank()) {
-                Settings.settings.data.catalogFiles.remove(filePath);
+                Settings.settings.data.dataFiles.remove(filePath);
             }
         }
     }
@@ -1289,18 +1282,10 @@ public class DatasetManagerWindow extends GenericDialog {
                             logger.error(e);
                         }
                     }
-                } else if (dataset.check != null) {
+                } else if (dataset.checkPath != null) {
                     // Only remove "check"
                     try {
-                        FileUtils.forceDelete(dataset.check.toFile());
-                        deleted = true;
-                    } catch (IOException e) {
-                        logger.error(e);
-                    }
-                } else if (dataset.path != null) {
-                    // Only remove "path"
-                    try {
-                        FileUtils.forceDelete(dataset.path.toFile());
+                        FileUtils.forceDelete(dataset.checkPath.toFile());
                         deleted = true;
                     } catch (IOException e) {
                         logger.error(e);

@@ -597,7 +597,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (assetManager.isLoaded(dataLoadString)) {
             sceneGraph = assetManager.get(dataLoadString);
         } else {
-            throw new RuntimeException("Error loading scene graph from data load string: " + dataLoadString + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.catalogFiles));
+            throw new RuntimeException("Error loading scene graph from data load string: " + dataLoadString + ", and files: " + TextUtils.concatenate(File.pathSeparator, settings.data.dataFiles));
         }
 
         /*
@@ -1365,15 +1365,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             /* LOAD SCENE GRAPH */
             if (sceneGraph == null) {
                 dataLoadString = "SceneGraphData";
-                final String[] dataFilesToLoad = new String[settings.data.catalogFiles.size() + settings.data.objectFiles.size()];
+                final String[] dataFilesToLoad = new String[settings.data.dataFiles.size()];
                 int i = 0;
-                // Catalog files
-                for (String dataFile : settings.data.catalogFiles) {
-                    dataFilesToLoad[i] = dataFile;
-                    i++;
-                }
-                // Object files
-                for (String dataFile : settings.data.objectFiles) {
+                // Add data files
+                // Our resolver in the SGLoader itself will resolve their full paths
+                for (String dataFile : settings.data.dataFiles) {
                     dataFilesToLoad[i] = dataFile;
                     i++;
                 }

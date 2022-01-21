@@ -1,7 +1,7 @@
 # Gaia Sky configuration file
 
 # Configuration version number
-configVersion: 30107
+configVersion: 30200
 
 #
 # Data configuration
@@ -11,12 +11,11 @@ data:
   # Windows and macOS: in your user directory: $HOME/.gaiasky/data
   # Linux: ~/.local/share/gaiasky/data
   location: null
-  # Selected catalogs to load at startup
-  catalogFiles: []
-  # List of object files to load.
+  # Data files to load at startup, using the relative form from the data location (i.e. starting with 'data/')
+  # 'data/data-main.json' should always be there
   # Additionally to the files defined here, any file in the data folder with the format
   # "autoload-*.json" will also be loaded using the JsonLoader
-  objectFiles:
+  dataFiles:
     - data/data-main.json
   # Location of the skybox within the data folder (data/tex/skybox/[...]/)
   skyboxLocation: data/tex/skybox/gaiasky/

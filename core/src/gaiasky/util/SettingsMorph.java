@@ -1,5 +1,6 @@
 package gaiasky.util;
 
+import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -138,20 +139,24 @@ public class SettingsMorph {
         // Data
         var data = new DataSettings();
         data.location = str("data.location", p);
-        ArrayList<String> catalogFiles = new ArrayList<>();
+        ArrayList<String> dataFiles = new ArrayList<>();
         var jsonCatalog = str("data.json.catalog", p);
         if (jsonCatalog != null && !jsonCatalog.isBlank()) {
             String[] tokens = jsonCatalog.split(java.io.File.pathSeparator);
-            catalogFiles.addAll(Arrays.asList(tokens));
+            dataFiles.addAll(Arrays.asList(tokens));
         }
-        data.catalogFiles = catalogFiles;
-        ArrayList<String> objectFiles = new ArrayList<>();
         var jsonObjects = str("data.json.objects", p);
         if (jsonObjects != null && !jsonObjects.isBlank()) {
             String[] tokens = jsonObjects.split(",");
-            objectFiles.addAll(Arrays.asList(tokens));
+            dataFiles.addAll(Arrays.asList(tokens));
         }
-        data.objectFiles = objectFiles;
+        // Make paths relative to data/
+        data.dataFiles = new ArrayList<>(dataFiles.size());
+        for(String dataFile : dataFiles) {
+            String f = "data/" + TextUtils.subtractPath(dataFile, Settings.settings.data.location);
+            data.dataFiles.add(f);
+        }
+
         data.highAccuracy = bool("data.highaccuracy.positions", p);
         data.skyboxLocation = str("data.skybox.location", p);
         data.realGaiaAttitude = bool("data.attitude.real", p);

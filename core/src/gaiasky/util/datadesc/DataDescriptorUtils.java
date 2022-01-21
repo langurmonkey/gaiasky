@@ -16,8 +16,6 @@ import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -181,7 +179,7 @@ public class DataDescriptorUtils {
             Iterator<DatasetDesc> it = existing.iterator();
             while (it.hasNext()) {
                 DatasetDesc remote = it.next();
-                if (remote.check.getFileName().toString().equals(path.getFileName().toString())) {
+                if (remote.checkPath.getFileName().toString().equals(path.getFileName().toString())) {
                     // Found in remotes
                     dd = remote;
                     it.remove();
@@ -190,9 +188,8 @@ public class DataDescriptorUtils {
             }
             if (dd == null) {
                 // Not found, create it
-                dd = new DatasetDesc(reader, val, true);
+                dd = new DatasetDesc(reader, val, catalogFile);
             }
-            dd.path = Path.of(catalogFile.path());
             dd.catalogFile = catalogFile;
             dd.exists = true;
             dd.status = DatasetDesc.DatasetStatus.INSTALLED;
@@ -204,7 +201,7 @@ public class DataDescriptorUtils {
         // Default values in case this is a totally offline dataset
         for (DatasetDesc dd : datasets) {
             if (dd.description == null)
-                dd.description = dd.path.toString();
+                dd.description = dd.checkPath.toString();
             if (dd.name == null)
                 dd.name = dd.catalogFile.nameWithoutExtension();
         }

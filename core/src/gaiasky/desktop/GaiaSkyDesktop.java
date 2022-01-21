@@ -398,9 +398,9 @@ public class GaiaSkyDesktop implements IObserver {
             if (w <= 0 || h <= 0) {
                 try {
                     GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
-                    GraphicsConfiguration gc = gd.getDefaultConfiguration();
-                    w = (int) (gc.getBounds().getWidth() * 0.85f);
-                    h = (int) (gc.getBounds().getHeight() * 0.85f);
+                    java.awt.DisplayMode dm = gd.getDisplayMode();
+                    w = (int) Math.max(1600, (dm.getWidth() * 0.85f));
+                    h = (int) Math.max(900, (dm.getHeight() * 0.85f));
                     Settings.settings.graphics.resolution[0] = w;
                     Settings.settings.graphics.resolution[1] = h;
                 } catch (HeadlessException he) {
@@ -412,8 +412,8 @@ public class GaiaSkyDesktop implements IObserver {
             if (w <= 0 || h <= 0) {
                 try {
                     Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-                    w = (int) (screenSize.width * 0.85f);
-                    h = (int) (screenSize.height * 0.85f);
+                    w = (int) Math.max(1600, (screenSize.getWidth() * 0.85f));
+                    h = (int) Math.max(900, (screenSize.getHeight() * 0.85f));
                     Settings.settings.graphics.resolution[0] = w;
                     Settings.settings.graphics.resolution[1] = h;
                 } catch (Exception e) {
