@@ -208,30 +208,24 @@ public class SpacecraftGui extends AbstractGui {
         stop.setName("stop spacecraft");
         if (sc != null)
             stop.setChecked(sc.isStopping());
-        stop.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, stop.isChecked());
-                    return true;
-                }
-                return false;
+        stop.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, stop.isChecked());
+                return true;
             }
+            return false;
         });
         stop.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.stop"), skin));
 
         exit = new OwnImageButton(skin, "sc-exit");
         exit.setProgrammaticChangeEvents(false);
         exit.setName("exit spacecraft");
-        exit.addListener(new EventListener() {
-            @Override
-            public boolean handle(Event event) {
-                if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-                    return true;
-                }
-                return false;
+        exit.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
+                return true;
             }
+            return false;
         });
         exit.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.exit"), skin));
 
