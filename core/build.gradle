@@ -22,7 +22,7 @@ project.ext.assetsDir = new File(project.ext.workDir, "assets")
 project.ext.sourceSets = sourceSets
 project.ext.tmpDir = new File("/tmp/gaiasky-gradle/")
 project.ext.tmpDir.mkdirs()
-project.ext.jreArchive = "jdk16.tar.gz"
+project.ext.jdkArchive = "jdk-archive.tar.gz"
 
 task versionFile {
     doLast {
@@ -336,22 +336,22 @@ task createTar(dependsOn: dist, description: "Creates application tar package") 
     }
 }
 
-task downloadJRE(type: Download, description: "Downloads the JRE package into project.tmpDir") {
-    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17%2B35/OpenJDK17-jdk_aarch64_linux_hotspot_17_35.tar.gz"
-    dest new File("$tmpDir", "$jreArchive")
+task downloadJDK(type: Download, description: "Downloads the JDK package into project.tmpDir") {
+    src "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.1%2B12/OpenJDK17U-jdk_x64_linux_hotspot_17.0.1_12.tar.gz"
+    dest new File("$tmpDir", "$jdkArchive")
     onlyIfModified true
     overwrite false
 }
-task downloadAndExtractJRE(dependsOn: downloadJRE, description: "Extracts the downloaded JRE into project.tmpDir") {
+task downloadAndExtractJDK(dependsOn: downloadJDK, description: "Extracts the downloaded JRE into project.tmpDir") {
     doLast {
-        File jreArchivePath = new File("$tmpDir", "$jreArchive")
+        File jdkArchivePath = new File("$tmpDir", "$jdkArchive")
         // Delete pre-existing jre
         project.tmpDir.eachFile (groovy.io.FileType.DIRECTORIES) { dir ->
             delete "$dir"
         }
         // Extract
         copy {
-            from tarTree(resources.gzip(jreArchivePath))
+            from tarTree(resources.gzip(jdkArchivePath))
             into project.tmpDir
         }
 
@@ -361,7 +361,7 @@ task downloadAndExtractJRE(dependsOn: downloadJRE, description: "Extracts the do
     }
 }
 
-task createAppimage(dependsOn: [createTar, downloadAndExtractJRE], description: "Creates the appimage package for Gaia Sky") {
+task createAppimage(dependsOn: [createTar, downloadAndExtractJDK], description: "Creates the appimage package for Gaia Sky") {
     doLast{
         String gsId = "gaiasky"
         String appimgDir = "$packageDir" + "/" + "$gsId" + ".AppDir"
