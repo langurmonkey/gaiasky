@@ -173,9 +173,9 @@ public class WelcomeGui extends AbstractGui {
             logger.warn(TextUtils.setToStr(removed));
         }
         int numCatalogsAvailable = numCatalogsAvailable();
-        int numGaiaDRCatalogsSelected = numGaiaDRCatalogsSelected();
-        int numStarCatalogsSelected = numStarCatalogsSelected();
-        int numTotalCatalogsSelected = numTotalCatalogsSelected();
+        int numGaiaDRCatalogsEnabled = numGaiaDRCatalogsEnabled();
+        int numStarCatalogsEnabled = numStarCatalogsEnabled();
+        int numTotalCatalogsEnabled = numTotalCatalogsEnabled();
         boolean baseDataPresent = baseDataPresent();
 
         // Title
@@ -211,11 +211,11 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
             noBaseData.setColor(ColorUtils.gRedC);
             startGroup.add(noBaseData).bottom().left();
-        } else if (numCatalogsAvailable > 0 && numTotalCatalogsSelected == 0) {
+        } else if (numCatalogsAvailable > 1 && numTotalCatalogsEnabled == 1) {
             OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
             noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
-        } else if (numGaiaDRCatalogsSelected > 1 || numStarCatalogsSelected == 0) {
+        } else if (numGaiaDRCatalogsEnabled > 1 || numStarCatalogsEnabled == 0) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.start.check"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             startGroup.add(tooManyDR).bottom().left();
@@ -250,24 +250,34 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel getBasedata = new OwnLabel(I18n.txt("gui.welcome.dsmanager.info"), skin, textStyle);
             getBasedata.setColor(ColorUtils.gGreenC);
             datasetManagerInfo.add(getBasedata).bottom().left();
+        } else {
+            // Number selected
+            OwnLabel numCatalogsEnabled = new OwnLabel(I18n.txt("gui.welcome.enabled", numTotalCatalogsEnabled, numCatalogsAvailable), skin, textStyle);
+            numCatalogsEnabled.setColor(ColorUtils.gBlueC);
+            datasetManagerInfo.row().padBottom(pad16);
+            datasetManagerInfo.add(numCatalogsEnabled).left().padBottom(pad18);
         }
+
+
 
         // Selection problems/issues
         Table selectionInfo = new Table(skin);
+
+
         if (numCatalogsAvailable == 0) {
             // No catalog files, disable and add notice
             OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
             noCatalogs.setColor(ColorUtils.aOrangeC);
             selectionInfo.add(noCatalogs);
-        } else if (numGaiaDRCatalogsSelected > 1) {
+        } else if (numGaiaDRCatalogsEnabled > 1) {
             OwnLabel tooManyDR = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manydrcatalogs"), skin, textStyle);
             tooManyDR.setColor(ColorUtils.gRedC);
             selectionInfo.add(tooManyDR);
-        } else if (numStarCatalogsSelected > 1) {
+        } else if (numStarCatalogsEnabled > 1) {
             OwnLabel warn2Star = new OwnLabel(I18n.txt("gui.welcome.catalogsel.manystarcatalogs"), skin, textStyle);
             warn2Star.setColor(ColorUtils.aOrangeC);
             selectionInfo.add(warn2Star);
-        } else if (numStarCatalogsSelected == 0) {
+        } else if (numStarCatalogsEnabled == 0) {
             OwnLabel noStarCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nostarcatalogs"), skin, textStyle);
             noStarCatalogs.setColor(ColorUtils.aOrangeC);
             selectionInfo.add(noStarCatalogs);
@@ -371,7 +381,7 @@ public class WelcomeGui extends AbstractGui {
         this.localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
     }
 
-    private int numTotalCatalogsSelected() {
+    private int numTotalCatalogsEnabled() {
         return Settings.settings.data.dataFiles.size();
     }
 
@@ -379,11 +389,11 @@ public class WelcomeGui extends AbstractGui {
         return this.localDatasets != null ? this.localDatasets.datasets.size() : 0;
     }
 
-    private int numGaiaDRCatalogsSelected() {
+    private int numGaiaDRCatalogsEnabled() {
         int matches = 0;
         for (String f : Settings.settings.data.dataFiles) {
-            String filename = Path.of(f).getFileName().toString();
-            if (isGaiaDRCatalogFile(filename)) {
+            String path = Settings.settings.data.dataFile(f);
+            if (isGaiaDRCatalogFile(path)) {
                 matches++;
             }
         }
@@ -394,7 +404,7 @@ public class WelcomeGui extends AbstractGui {
         return name.matches("^\\S*catalog-[e]?dr\\d+(int\\d+)?-\\S+(\\.json)$");
     }
 
-    private int numStarCatalogsSelected() {
+    private int numStarCatalogsEnabled() {
         int matches = 0;
         if (serverDatasets == null && localDatasets == null) {
             return 0;
@@ -402,7 +412,7 @@ public class WelcomeGui extends AbstractGui {
 
         for (String f : Settings.settings.data.dataFiles) {
             // File name with no extension
-            Path path = Path.of(f);
+            Path path = Settings.settings.data.dataPath(f);
             String filenameExt = path.getFileName().toString();
             try {
                 DatasetDesc dataset = null;
