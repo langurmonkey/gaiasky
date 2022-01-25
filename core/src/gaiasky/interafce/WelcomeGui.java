@@ -97,8 +97,6 @@ public class WelcomeGui extends AbstractGui {
             // If slave or headless, data load can start
             gaiaSky();
         } else {
-            reloadLocalDatasets();
-
             // Otherwise, check for updates, etc.
             clearGui();
 
@@ -150,6 +148,7 @@ public class WelcomeGui extends AbstractGui {
 
     private void buildWelcomeUI() {
         serverDatasets = !downloadError ? DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor) : null;
+        reloadLocalDatasets();
         // Center table
         Table center = new Table(skin);
         center.setFillParent(true);
@@ -175,7 +174,7 @@ public class WelcomeGui extends AbstractGui {
         int numCatalogsAvailable = numCatalogsAvailable();
         int numGaiaDRCatalogsEnabled = numGaiaDRCatalogsEnabled();
         int numStarCatalogsEnabled = numStarCatalogsEnabled();
-        int numTotalCatalogsEnabled = numTotalCatalogsEnabled();
+        int numTotalCatalogsEnabled = numTotalDatasetsEnabled();
         boolean baseDataPresent = baseDataPresent();
 
         // Title
@@ -211,7 +210,7 @@ public class WelcomeGui extends AbstractGui {
             OwnLabel noBaseData = new OwnLabel(I18n.txt("gui.welcome.start.nobasedata"), skin, textStyle);
             noBaseData.setColor(ColorUtils.gRedC);
             startGroup.add(noBaseData).bottom().left();
-        } else if (numCatalogsAvailable > 1 && numTotalCatalogsEnabled == 1) {
+        } else if (numCatalogsAvailable > 0 && numTotalCatalogsEnabled == 0) {
             OwnLabel noCatsSelected = new OwnLabel(I18n.txt("gui.welcome.start.nocatalogs"), skin, textStyle);
             noCatsSelected.setColor(ColorUtils.gRedC);
             startGroup.add(noCatsSelected).bottom().left();
@@ -367,7 +366,6 @@ public class WelcomeGui extends AbstractGui {
      * Reloads the view completely
      */
     private void reloadView() {
-        reloadLocalDatasets();
         clearGui();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         buildWelcomeUI();
@@ -377,8 +375,10 @@ public class WelcomeGui extends AbstractGui {
         this.localDatasets = DataDescriptorUtils.instance().buildLocalDatasets(null);
     }
 
-    private int numTotalCatalogsEnabled() {
-        return Settings.settings.data.dataFiles.size();
+    private int numTotalDatasetsEnabled() {
+        return this.localDatasets != null ? (int) this.localDatasets.datasets.stream()
+                .filter(ds -> Settings.settings.data.dataFiles.contains(ds.checkStr))
+                .count() : 0;
     }
 
     private int numCatalogsAvailable() {

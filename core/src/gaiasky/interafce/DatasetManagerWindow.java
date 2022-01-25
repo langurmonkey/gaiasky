@@ -368,7 +368,6 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void reloadLeftPane(Cell left, Cell right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
-
         Table leftTable = new Table(skin);
         leftTable.align(Align.topRight);
         leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
@@ -463,7 +462,7 @@ public class DatasetManagerWindow extends GenericDialog {
                                 logger.info(I18n.txt("gui.download.disabled.version", dataset.name, Integer.toString(dataset.minGsVersion), Integer.toString(GaiaSkyDesktop.SOURCE_VERSION)));
                             }
                         } else {
-                            select.setChecked(TextUtils.contains(dataset.catalogFile.path(), currentSetting));
+                            select.setChecked(TextUtils.contains("data/" + dataset.checkStr, currentSetting));
                             select.addListener(new OwnTextTooltip(dataset.checkPath.toString(), skin));
                         }
                         select.setSize(installOrSelectSize, installOrSelectSize);
