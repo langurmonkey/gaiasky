@@ -464,7 +464,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         Gdx.input.setInputProcessor(welcomeGui.getGuiStage());
 
         if (settings.runtime.openVr) {
-            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (settings.graphics.backBufferResolution[0] / 4f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
+            welcomeGuiVR = new VRGui<>(WelcomeGuiVR.class, (int) (settings.graphics.backBufferResolution[0] / 2f), globalResources.getSkin(), graphics, 1f / settings.program.ui.scale);
             welcomeGuiVR.initialize(assetManager, globalResources.getSpriteBatch());
         }
 
