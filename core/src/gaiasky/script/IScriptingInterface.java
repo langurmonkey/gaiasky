@@ -659,6 +659,7 @@ public interface IScriptingInterface {
 
     /**
      * Sets the visibility of a particular object. Use this method to hide individual objects.
+     * Changes to the individual object visibility are not persisted on restart.
      *
      * @param name    The name of the object. Must be an instance of {@link gaiasky.scenegraph.IVisibilitySwitch}.
      * @param visible The visible status to set. Set to false in order to hide the object. True to make it visible.
@@ -682,6 +683,25 @@ public interface IScriptingInterface {
      * @param factor Factor in {@link Constants#MIN_LABEL_SIZE} and {@link Constants#MAX_LABEL_SIZE}.
      */
     void setLabelSizeFactor(float factor);
+
+    /**
+     * Forces the label to display for the given object, bypassing the solid angle
+     * requirements that are usually in place and determine label visibility.
+     * This setting does not override the visibility of the object itself, or of
+     * the label visibility component element.
+     * Changes to the force display label flag are not persisted on restart.
+     * @param name The object name.
+     * @param forceLabel Whether to force the label to render for this object or not.
+     */
+    void setForceDisplayLabel(String name, boolean forceLabel);
+
+    /**
+     * Gets the value of the force display label flag for the object identified with the
+     * given name.
+     * @param name The name of the object.
+     * @return The value of the force display label flag of the object, if it exists.
+     */
+    boolean getForceDisplayLabel(String name);
 
     /**
      * Sets the line width factor. The line width will be multiplied by this.

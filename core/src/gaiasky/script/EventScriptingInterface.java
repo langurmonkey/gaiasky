@@ -657,6 +657,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
+    @Override
+    public void setForceDisplayLabel(String name, boolean forceLabel) {
+        String nameLc = name.toLowerCase(Locale.ROOT).trim();
+        if(checkObjectName(nameLc)) {
+            SceneGraphNode obj = getObject(nameLc);
+            em.post(Events.FORCE_OBJECT_LABEL_CMD, obj, nameLc, forceLabel, this);
+        }
+    }
+
+    @Override
+    public boolean getForceDisplayLabel(String name) {
+        String nameLc = name.toLowerCase().trim();
+        SceneGraphNode obj = getObject(nameLc);
+        if (obj == null) {
+            logger.error("No object found with name '" + name + "'");
+            return false;
+        }
+
+        return obj.isForceLabel(nameLc);
+    }
+
     public void setLabelSizeFactor(int factor) {
         setLabelSizeFactor((float) factor);
     }

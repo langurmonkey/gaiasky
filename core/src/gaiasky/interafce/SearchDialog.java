@@ -276,7 +276,7 @@ public class SearchDialog extends GenericDialog {
                     boolean canSelect = !(focus instanceof ParticleGroup) || ((ParticleGroup) focus).canSelect();
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                     Optional<CatalogInfo> ci = GaiaSky.instance.getCatalogInfoFromObject(node);
-                    boolean datasetVisible = ci.map(CatalogInfo::isVisible).orElse(true);
+                    boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
                     if (!timeOverflow && canSelect && ctOn && datasetVisible) {
                         GaiaSky.postRunnable(() -> {
                             EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);

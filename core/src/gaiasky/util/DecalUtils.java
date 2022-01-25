@@ -131,7 +131,6 @@ public class DecalUtils {
         aux1.set(batch.getTransformMatrix());
         aux2.set(batch.getProjectionMatrix());
 
-
         Camera camera = cam.getCamera();
         Quaternion rotation = getBillboardRotation(faceCamera ? camera.direction : tmp3.set(x, y, z).nor(), camera.up);
 

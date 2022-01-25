@@ -424,10 +424,10 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             float min = 0.025f * ff;
             float max = 0.05f * ff;
             if (d01 / distToCamera > 0.1f)
-                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, distToCamera, textScale(), (float) (d01 * 1e-3d * camera.getFovFactor()), min, max);
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p01, distToCamera, textScale(), (float) (d01 * 1e-3d * camera.getFovFactor()), min, max, this.forceLabel);
             d = GlobalResources.doubleToDistanceString(d02, du);
             if (d02 / distToCamera > 0.1f)
-                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, distToCamera, textScale(), (float) (d02 * 1e-3d * camera.getFovFactor()), min, max);
+                render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, nf.format(d.getFirst()) + " " + d.getSecond(), p02, distToCamera, textScale(), (float) (d02 * 1e-3d * camera.getFovFactor()), min, max, this.forceLabel);
         }
 
     }
@@ -451,13 +451,13 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         labelPosition.set(0d, 0d, dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max, this.forceLabel);
 
         // -Z
         labelPosition.set(0d, 0d, -dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max, this.forceLabel);
     }
 
     /**

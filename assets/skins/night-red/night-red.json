@@ -621,6 +621,10 @@
       "imageUp": "eye-icon",
       "imageChecked": "eye-closed-icon"
     },
+    "label-toggle": {
+      "imageUp": "iconic-tag",
+      "imageChecked": "iconic-tag-gray"
+    },
     "highlight-ds": {
       "imageUp": "highlight-off",
       "imageChecked": "highlight-on"

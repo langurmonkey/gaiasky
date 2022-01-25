@@ -40,7 +40,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected Skin skin;
     protected OwnLabel focusName, focusType, focusId, focusRA, focusDEC, focusMuAlpha, focusMuDelta, focusRadVel, focusAngle, focusDistCam, focusDistSol, focusAppMagEarth, focusAppMagCamera, focusAbsMag, focusRadius;
     protected Button goTo, landOn, landAt, bookmark;
-    protected OwnImageButton visibility;
+    protected OwnImageButton objectVisibility, labelVisibility;
     protected OwnLabel pointerName, pointerLonLat, pointerRADEC, viewRADEC;
     protected OwnLabel camName, camVel, camPos, camTracking, camDistSol, lonLatLabel, RADECPointerLabel, RADECViewLabel, appMagEarthLabel, appMagCameraLabel, absMagLabel;
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
@@ -212,11 +212,21 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         });
         landAt.addListener(new OwnTextTooltip(I18n.txt("gui.focusinfo.landat"), skin));
 
-        visibility = new OwnImageButton(skin, "eye-toggle");
-        visibility.addListener(event -> {
+        objectVisibility = new OwnImageButton(skin, "eye-toggle");
+        objectVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, currentFocus, currentFocus.getName(), !visibility.isChecked(), this);
+                EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, currentFocus, currentFocus.getName(), !objectVisibility.isChecked(), this);
+                return true;
+            }
+            return false;
+        });
+
+        labelVisibility = new OwnImageButton(skin, "label-toggle");
+        labelVisibility.addListener(event -> {
+            if (event instanceof ChangeEvent) {
+                // Toggle visibility
+                EventManager.instance.post(Events.FORCE_OBJECT_LABEL_CMD, currentFocus, currentFocus.getName(), !labelVisibility.isChecked(), this);
                 return true;
             }
             return false;
@@ -232,7 +242,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         focusNameGroup = new HorizontalGroup();
         focusNameGroup.space(pad5);
         focusNameGroup.addActor(focusName);
-        focusNameGroup.addActor(visibility);
+        focusNameGroup.addActor(objectVisibility);
+        focusNameGroup.addActor(labelVisibility);
         focusNameGroup.addActor(bookmark);
         focusNameGroup.addActor(goTo);
         focusNameGroup.addActor(landOn);
@@ -359,7 +370,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         pos = new Vector3d();
         posb = new Vector3b();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_TRACKING_OBJECT_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST, Events.PER_OBJECT_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_TRACKING_OBJECT_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST, Events.PER_OBJECT_VISIBILITY_CMD, Events.FORCE_OBJECT_LABEL_CMD);
     }
 
     private HorizontalGroup hg(Actor... actors) {
@@ -433,8 +444,12 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             bookmark.setProgrammaticChangeEvents(true);
 
             // Visible
-            visibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
-            visibility.addListener(new OwnTextTooltip(I18n.txt("action.toggle", currentFocus.getName()), skin));
+            objectVisibility.setCheckedNoFire(!((IVisibilitySwitch) currentFocus).isVisible(true));
+            objectVisibility.addListener(new OwnTextTooltip(I18n.txt("action.visibility", currentFocus.getName()), skin));
+
+            // Force label
+            labelVisibility.setCheckedNoFire(!((SceneGraphNode) currentFocus).isForceLabel(currentFocus.getName().toLowerCase().trim()));
+            labelVisibility.addListener(new OwnTextTooltip(I18n.txt("action.forcelabel", currentFocus.getName()), skin));
 
             // Id, names
             focusId.setText(idString);
@@ -662,7 +677,18 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 String name = (String) data[1];
                 if (vs == currentFocus && currentFocus.hasName(name)) {
                     boolean visible = (boolean) data[2];
-                    visibility.setCheckedNoFire(!visible);
+                    objectVisibility.setCheckedNoFire(!visible);
+                }
+            }
+        }
+        case FORCE_OBJECT_LABEL_CMD -> {
+            Object source = data[3];
+            if (source != this) {
+                SceneGraphNode sgn = (SceneGraphNode) data[0];
+                String name = (String) data[1];
+                if (sgn == currentFocus && currentFocus.hasName(name)) {
+                    boolean forceLabel = (boolean) data[2];
+                    labelVisibility.setCheckedNoFire(forceLabel);
                 }
             }
         }

@@ -220,6 +220,8 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         if (this.shouldRender()) {
             if (this.viewAngleApparent >= TH_ANGLE) {
                 addToRender(this, RenderGroup.MODEL_VERT_ADDITIVE);
+            }
+            if (this.viewAngleApparent >= TH_ANGLE || this.forceLabel) {
                 addToRender(this, RenderGroup.FONT_LABEL);
             }
 
@@ -283,12 +285,12 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = aux3d1.get();
         textPosition(camera, pos);
-        shader.setUniformf("u_viewAngle", (float) this.viewAngle * 500f);
+        shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) this.viewAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
         shader.setUniformf("u_thOverFactor", 1f);
         shader.setUniformf("u_thOverFactorScl", 1f);
 
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
     }
 
     @Override

@@ -138,19 +138,16 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         if (camera.getCurrent() instanceof FovCamera) {
             render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(aux3d1.get()));
         } else {
-            // render2DLabel(batch, shader, font, camera, text(),
-            // transform.position);
             // 3D distance font
             Vector3d pos = aux3d1.get();
             textPosition(camera, pos);
-            shader.setUniformf("u_viewAngle", (float) viewAngleApparent);
-            shader.setUniformf("u_viewAnglePow", getViewAnglePow());
-            shader.setUniformf("u_thOverFactor", getThOverFactor(camera));
-            shader.setUniformf("u_thOverFactorScl", getThOverFactorScl());
+            shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) viewAngleApparent);
+            shader.setUniformf("u_viewAnglePow", forceLabel ? 1f : getViewAnglePow());
+            shader.setUniformf("u_thOverFactor", forceLabel ? 1f : getThOverFactor(camera));
+            shader.setUniformf("u_thOverFactorScl", forceLabel ? 1f : getThOverFactorScl());
 
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
         }
-
     }
 
     protected float getViewAnglePow() {
@@ -248,7 +245,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     @Override
     public boolean renderText() {
-        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && FastMath.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl());
+        return names != null && GaiaSky.instance.isOn(ComponentType.Labels) && (forceLabel || FastMath.pow(viewAngleApparent, getViewAnglePow()) >= (TH_OVER_FACTOR * getThOverFactorScl()));
     }
 
     @Override
@@ -274,7 +271,6 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     protected abstract float labelMax();
 
-    @Override
     public void textPosition(ICamera cam, Vector3d out) {
         translation.put(out);
         double len = out.len();

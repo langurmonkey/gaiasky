@@ -53,10 +53,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * A particle group which additionally to the xyz position, supports color and
@@ -86,12 +83,16 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     /** Does this contain variable stars? **/
     private boolean variableStars = false;
 
+    /** Stars for which forceLabel is enabled **/
+    private Set<Integer> forceLabelStars;
+
     public StarGroup() {
         super();
         this.lastSortTime = -1;
         // Default epochs
         this.epochJd = AstroUtils.JD_J2015_5;
         this.variabilityEpochJd = AstroUtils.JD_J2010;
+        this.forceLabelStars = new HashSet<>();
     }
 
     public void initialize() {
@@ -107,7 +108,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             // Set data, generate index
             List<IParticleRecord> l = provider.loadData(datafile, factor);
             this.setData(l);
-
 
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
@@ -540,26 +540,38 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             }
         } else {
             for (int i = 0; i < n; i++) {
-                IParticleRecord star = pointData.get(active[i]);
-                starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
-                double distToCamera = starPosition.len();
-                float radius = (float) getRadius(active[i]);
-                float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
-
-                if (viewAngle >= thOverFactor && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
-                    textPosition(camera, starPosition, distToCamera, radius);
-
-                    shader.setUniformf("u_viewAngle", viewAngle);
-                    shader.setUniformf("u_viewAnglePow", 1f);
-                    shader.setUniformf("u_thOverFactor", thOverFactor);
-                    shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
-                    double textSize = FastMath.tanh(viewAngle) * distToCamera * 1e5d;
-                    float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
-                    textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names()[0], starPosition, distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor());
-
-                }
+                int idx = active[i];
+                renderStarLabel(idx, starPosition, thOverFactor, batch, shader, sys, rc, camera);
             }
+            for (Integer i : forceLabelStars) {
+                renderStarLabel(i, starPosition, thOverFactor, batch, shader, sys, rc, camera);
+            }
+        }
+    }
+
+    private void renderStarLabel(int idx, Vector3d starPosition, float thOverFactor, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        boolean forceLabel = forceLabelStars.contains(idx);
+        IParticleRecord star = pointData.get(idx);
+        starPosition = fetchPosition(star, cPosD, starPosition, currDeltaYears);
+
+        double distToCamera = starPosition.len();
+        float radius = (float) getRadius(idx);
+        if(forceLabel){
+            radius = Math.max(radius, 1e4f);
+        }
+        float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
+
+        if (forceLabel || viewAngle >= thOverFactor && camera.isVisible(viewAngle, starPosition, distToCamera) && distToCamera > radius * 100) {
+            textPosition(camera, starPosition, distToCamera, radius);
+
+            shader.setUniformf("u_viewAngle", viewAngle);
+            shader.setUniformf("u_viewAnglePow", 1f);
+            shader.setUniformf("u_thOverFactor", thOverFactor);
+            shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
+            double textSize = FastMath.tanh(viewAngle) * distToCamera * 1e5d;
+            float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
+            textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, star.names()[0], starPosition, distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), forceLabel);
         }
     }
 
@@ -916,6 +928,30 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 metadata[i] = filter(i) ? (-(((d.size() * Constants.STAR_SIZE_FACTOR) / camPos.dst(x)) / camera.getFovFactor()) * Settings.settings.scene.star.brightness) : Double.MAX_VALUE;
             }
         }
+    }
+
+    @Override
+    public void setForceLabel(Boolean forceLabel, String name) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            if (forceLabelStars.contains(idx)) {
+                if (!forceLabel) {
+                    // Remove from forceLabelStars
+                    forceLabelStars.remove(idx);
+                }
+            } else if (forceLabel) {
+                // Add to forceLabelStars
+                forceLabelStars.add(idx);
+            }
+        }
+    }
+
+    public boolean isForceLabel(String name) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            return forceLabelStars.contains(idx);
+        }
+        return false;
     }
 
     public void setInGpu(boolean inGpu) {

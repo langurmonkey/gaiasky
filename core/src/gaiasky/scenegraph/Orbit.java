@@ -5,7 +5,9 @@
 
 package gaiasky.scenegraph;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -21,8 +23,12 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.event.EventManager;
 import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.I3DTextRenderable;
+import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.render.system.FontRenderSystem;
 import gaiasky.render.system.LineRenderSystem;
+import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
@@ -30,20 +36,24 @@ import gaiasky.util.GlobalResources;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.g2d.ExtSpriteBatch;
+import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+import net.jafama.FastMath;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
  * A polyline that represents a closed orbit. Contains a reference to the body and some other goodies
  */
-public class Orbit extends Polyline {
+public class Orbit extends Polyline implements I3DTextRenderable {
     private static final Log logger = Logger.getLogger(Orbit.class);
 
     private static OrbitRefresher orbitRefresher;
@@ -71,7 +81,7 @@ public class Orbit extends Polyline {
     protected CelestialBody body;
     protected Vector3d prev, curr;
     public double alpha;
-    public Matrix4d localTransformD, transformFunction;
+    public Matrix4d localTransformD, transformFunction, auxMat;
     protected String provider;
     protected Double multiplier = 1.0d;
     protected Class<? extends IOrbitDataProvider> providerClass;
@@ -122,6 +132,7 @@ public class Orbit extends Polyline {
         pointColor = new float[] { 0.8f, 0.8f, 0.8f, 1f };
         localTransform = new Matrix4();
         localTransformD = new Matrix4d();
+        auxMat = new Matrix4d();
         prev = new Vector3d();
         curr = new Vector3d();
     }
@@ -189,7 +200,7 @@ public class Orbit extends Polyline {
 
             long t1t0 = t1 - t0;
             long nowt0 = now - t0;
-            this.coord = ((double) nowt0 /  (double) t1t0) % 1d;
+            this.coord = ((double) nowt0 / (double) t1t0) % 1d;
         }
 
         if (!onlyBody)
@@ -217,10 +228,6 @@ public class Orbit extends Polyline {
             localTransformD.rotate(0, 1, 0, oc.ascendingnode);
         }
         localTransformD.putIn(localTransform);
-    }
-
-    @Override
-    public void updateLocalValues(ITimeFrameProvider time, ICamera camera) {
     }
 
     @Override
@@ -263,8 +270,162 @@ public class Orbit extends Polyline {
             if (body == null && oc != null && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
                 addToRender(this, RenderGroup.PARTICLE_ORBIT_ELEMENTS);
             }
+            if (this.forceLabel) {
+                addToRender(this, RenderGroup.FONT_LABEL);
+            }
         }
 
+    }
+
+    public String text() {
+        return getName();
+    }
+
+    @Override
+    public void textDepthBuffer() {
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthMask(false);
+    }
+
+    @Override
+    public boolean isLabel() {
+        return true;
+    }
+
+    @Override
+    public float getTextOpacity() {
+        return 1;
+    }
+
+    public float labelMax() {
+        return (float) (1e-3 / Constants.DISTANCE_SCALE_FACTOR);
+    }
+
+    public float textScale() {
+        return (float) FastMath.atan(labelMax()) * 4e3f;
+    }
+
+    public float textSize() {
+        return 0f;
+    }
+
+    public Vector3d keplerToCartesian(Vector3d out) {
+        double musola3 = Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+        double epoch = oc.epoch;
+        // Semi-major axis
+        double a = (oc.semimajoraxis * 1000d);
+        // Eccentricity
+        double e = oc.e;
+        // Inclination
+        double i = oc.i * MathUtilsd.degRad;
+        // Longitude of ascending node
+        double omega_lan = oc.ascendingnode * MathUtilsd.degRad;
+        // Argument of periapsis
+        double omega_ap = oc.argofpericenter * MathUtilsd.degRad;
+        // Mean anomaly at epoch
+        double M0 = oc.meananomaly * MathUtilsd.degRad;
+        // Time
+        double t = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
+        // 1
+        double deltat = (t - epoch) * 86400d;
+
+        double M = M0 + deltat * musola3;
+
+        // 2
+        double E = M;
+        for (int j = 0; j < 2; j++) {
+            E = E - ((E - e * Math.sin(E) - M) / (1.0 - e * Math.cos(E)));
+        }
+        double E_t = E;
+
+        // 3
+        double nu_t = 2.0 * Math.atan2(Math.sqrt(1.0 + e) * Math.sin(E_t / 2.0), Math.sqrt(1.0 - e) * Math.cos(E_t / 2.0));
+
+        // 4
+        double rc_t = a * (1.0 - e * Math.cos(E_t));
+
+        // 5
+        double ox = rc_t * Math.cos(nu_t);
+        double oy = rc_t * Math.sin(nu_t);
+
+        // 6
+        double sinomega = Math.sin(omega_ap);
+        double cosomega = Math.cos(omega_ap);
+        double sinOMEGA = Math.sin(omega_lan);
+        double cosOMEGA = Math.cos(omega_lan);
+        double cosi = Math.cos(i);
+        double sini = Math.sin(i);
+
+        double x = ox * (cosomega * cosOMEGA - sinomega * cosi * sinOMEGA) - oy * (sinomega * cosOMEGA + cosomega * cosi * sinOMEGA);
+        double y = ox * (cosomega * sinOMEGA + sinomega * cosi * cosOMEGA) + oy * (cosomega * cosi * cosOMEGA - sinomega * sinOMEGA);
+        double z = ox * (sinomega * sini) + oy * (cosomega * sini);
+
+        // 7
+        double fac = Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
+        x *= fac;
+        y *= fac;
+        z *= fac;
+
+        auxMat.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEcliptic());
+        out.set(y, z, x).traMul(auxMat);
+
+        return out;
+    }
+
+    public void textPosition(ICamera cam, Vector3d out) {
+
+    }
+    public double textPosition2(ICamera cam, Vector3d out) {
+        keplerToCartesian(out);
+        out.add(cam.getInversePos());
+        double len = out.len();
+        out.scl(0.9f);
+
+        Vector3d aux = aux3d2.get();
+        aux.set(cam.getUp());
+
+        aux.crs(out).nor();
+
+        float dist = -0.02f * cam.getFovFactor() * (float) len;
+
+        aux.add(cam.getUp()).nor().scl(dist);
+
+        out.add(aux);
+
+        GlobalResources.applyRelativisticAberration(out, cam);
+        RelativisticEffectsManager.getInstance().gravitationalWavePos(out);
+        return len;
+    }
+
+    @Override
+    public boolean renderText() {
+        return forceLabel;
+    }
+
+    /**
+     * Render label
+     */
+    public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
+        if (camera.getCurrent() instanceof FovCamera) {
+            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(aux3d1.get()));
+        } else {
+            // 3D distance font
+            Vector3d pos = aux3d3.get();
+            double dist = textPosition2(camera, pos);
+            shader.setUniformf("u_viewAngle", 2f);
+            shader.setUniformf("u_viewAnglePow", 1f);
+            shader.setUniformf("u_thOverFactor", 1f);
+            shader.setUniformf("u_thOverFactorScl", 1f);
+
+            double size = dist * camera.getFovFactor() * .5e-3f;
+            float scale = textScale() * camera.getFovFactor();
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, dist, scale, size, this.forceLabel);
+        }
+    }
+
+    @Override
+    public float[] textColour() {
+        return cc;
     }
 
     @Override

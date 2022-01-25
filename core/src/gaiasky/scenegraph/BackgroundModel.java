@@ -133,7 +133,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             shader.setUniformf("u_thOverFactor", 1);
             shader.setUniformf("u_thOverFactorScl", 1);
 
-            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale(), textSize() * camera.getFovFactor());
+            render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale(), textSize() * camera.getFovFactor(), this.forceLabel);
         }
 
     }

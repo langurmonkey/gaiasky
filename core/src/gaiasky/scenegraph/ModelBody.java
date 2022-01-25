@@ -220,10 +220,12 @@ public abstract class ModelBody extends CelestialBody {
                     addToRender(this, RenderGroup.BILLBOARD_SSO);
                     addToRenderModel();
                 }
-
                 if (renderText()) {
                     addToRender(this, RenderGroup.FONT_LABEL);
                 }
+            }
+            if(!isInRender(this, RenderGroup.FONT_LABEL) && forceLabel) {
+                addToRender(this, RenderGroup.FONT_LABEL);
             }
         }
     }

@@ -625,7 +625,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
         shader.setUniformf("u_thOverFactorScl", 1);
         shader.setUniform4fv("u_color", textColour(kf), 0, 4);
 
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, getText(kf), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor() * distToCam, this.forceLabel);
 
     }
 

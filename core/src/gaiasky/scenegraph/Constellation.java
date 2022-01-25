@@ -167,7 +167,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thOverFactor", 1);
         shader.setUniformf("u_thOverFactorScl", 1);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
     }
 
     @Override

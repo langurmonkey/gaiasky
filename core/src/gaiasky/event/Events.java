@@ -431,7 +431,6 @@ public enum Events {
      **/
     FPS_INFO,
 
-
     /**
      * Posts the coordinates of the free mode focus.
      * <ol start='0'>
@@ -1005,6 +1004,13 @@ public enum Events {
     PER_OBJECT_VISIBILITY_CMD,
 
     /**
+     * Sets the force label flag on the given object which causes the label to always be rendered regardless of the solid angle.
+     * Contains the object (instance of {@link gaiasky.scenegraph.SceneGraphNode}), the name of the object, a boolean with the new force label state, and the
+     * source object.
+     */
+    FORCE_OBJECT_LABEL_CMD,
+
+    /**
      * Quit action, can contain optional Runnable to run on accept()
      **/
     SHOW_QUIT_ACTION,
@@ -1242,7 +1248,6 @@ public enum Events {
      * Contains the new time warp factor
      **/
     TIME_WARP_CHANGED_INFO,
-
 
     /**
      * Contains the name of the check box and a boolean

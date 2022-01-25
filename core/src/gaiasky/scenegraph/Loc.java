@@ -117,14 +117,15 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
     @Override
     public boolean renderText() {
-        if (viewAngle < LOWER_LIMIT || viewAngle > UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || !GaiaSky.instance.isOn(ct.getFirstOrdinal())) {
+        if(GaiaSky.instance.isOn(ct) && (viewAngle >= LOWER_LIMIT && viewAngle <= UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || forceLabel)) {
+            Vector3d aux = aux3d1.get();
+            translation.put(aux).scl(-1);
+
+            double cosAlpha = aux.add(location3d.x, location3d.y, location3d.z).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor());
+            return cosAlpha < -0.3f;
+        } else {
             return false;
         }
-        Vector3d aux = aux3d1.get();
-        translation.put(aux).scl(-1);
-
-        double cosalpha = aux.add(location3d.x, location3d.y, location3d.z).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor());
-        return cosalpha < -0.3f;
     }
 
     /**
@@ -134,11 +135,11 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         Vector3d pos = aux3d1.get();
         textPosition(camera, pos);
-        shader.setUniformf("u_viewAngle", (float) (viewAngleApparent * ((ModelBody) parent).locVaMultiplier * Constants.U_TO_KM));
+        shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) (viewAngleApparent * ((ModelBody) parent).locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
-        shader.setUniformf("u_thOverFactor", ((ModelBody) parent).locThOverFactor / (float) Constants.DISTANCE_SCALE_FACTOR);
+        shader.setUniformf("u_thOverFactor", forceLabel ? 1f : ((ModelBody) parent).locThOverFactor / (float) Constants.DISTANCE_SCALE_FACTOR);
         shader.setUniformf("u_thOverFactorScl", 1f);
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor());
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text(), pos, distToCamera, textScale() * camera.getFovFactor(), textSize() * camera.getFovFactor(), this.forceLabel);
     }
 
     @Override

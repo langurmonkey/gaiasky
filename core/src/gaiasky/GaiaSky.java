@@ -640,7 +640,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UPDATE, Events.SCREENSHOT_SIZE_UPDATE, Events.PARK_RUNNABLE, Events.UNPARK_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD, Events.UI_SCALE_CMD, Events.PER_OBJECT_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UPDATE, Events.SCREENSHOT_SIZE_UPDATE, Events.PARK_RUNNABLE, Events.UNPARK_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD, Events.UI_SCALE_CMD, Events.PER_OBJECT_VISIBILITY_CMD, Events.FORCE_OBJECT_LABEL_CMD);
 
         // Re-enable input
         EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
@@ -1485,10 +1485,17 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case PER_OBJECT_VISIBILITY_CMD:
             final IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
-            final String name = (String) data[1];
-            final boolean state = (boolean) data[2];
+            String name = (String) data[1];
+            boolean state = (boolean) data[2];
             vs.setVisible(state, name.toLowerCase());
             logger.info(I18n.txt("notif.visibility.object.set", vs.getName(), I18n.txt("gui." + state)));
+            break;
+        case FORCE_OBJECT_LABEL_CMD:
+            final SceneGraphNode sgn = (SceneGraphNode) data[0];
+            name = (String) data[1];
+            state = (boolean) data[2];
+            sgn.setForceLabel(state, name.toLowerCase());
+            logger.info(I18n.txt("notif.object.flag", "forceLabel", sgn.getName(), I18n.txt("gui." + state)));
             break;
         case PARK_RUNNABLE:
             synchronized (parkedRunnables) {

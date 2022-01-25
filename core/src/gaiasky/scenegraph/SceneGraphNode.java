@@ -10,7 +10,6 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -51,6 +50,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @param node       The node to insert
      * @param addToIndex Whether to add to the index
+     *
      * @return True if it was inserted, false otherwise
      */
     public static boolean insert(SceneGraphNode node, boolean addToIndex) {
@@ -132,6 +132,12 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * Is this node visible?
      */
     protected boolean visible = true;
+
+    /**
+     * Force to render the label of this entity,
+     * bypassing the solid angle check
+     */
+    protected boolean forceLabel = false;
 
     /**
      * Time of last visibility change in milliseconds
@@ -499,6 +505,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * Returns the position of this entity in the internal reference system.
      *
      * @param aux The vector where the result will be put.
+     *
      * @return The aux vector with the position.
      */
     public Vector3d getPosition(Vector3d aux) {
@@ -778,6 +785,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @param renderable The renderable to add.
      * @param rg         The render group that identifies the renderable list.
+     *
      * @return True if added, false otherwise.
      */
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
@@ -794,6 +802,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @param renderable The renderable to remove.
      * @param rg         The render group to remove from.
+     *
      * @return True if removed, false otherwise.
      */
     protected boolean removeFromRender(IRenderable renderable, RenderGroup rg) {
@@ -920,6 +929,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * @param time   The time frame provider.
      * @param camera The camera.
      * @param force  Whether to force the computation if time is off.
+     *
      * @return The aux vector for chaining.
      */
     public Vector3b getPredictedPosition(Vector3b out, ITimeFrameProvider time, ICamera camera, boolean force) {
@@ -952,6 +962,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * when time is on
      *
      * @param time The current time
+     *
      * @return True if position should be recomputed for this entity
      */
     protected boolean mustUpdatePosition(ITimeFrameProvider time) {
@@ -963,6 +974,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * (equatorial system) and internal units
      *
      * @param out Auxiliary vector to put the result in
+     *
      * @return The vector with the position
      */
     public Vector3b getAbsolutePosition(Vector3b out) {
@@ -1123,16 +1135,16 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         DecalUtils.drawFont2D(font, batch, rc, label, x, y, scale, align);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size) {
-        render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1);
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, boolean forceLabel) {
+        render3DLabel(batch, shader, font, camera, rc, label, pos, distToCamera, scale, size, -1, -1, forceLabel);
     }
 
-    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, float minSizeDegrees, float maxSizeDegrees) {
+    protected void render3DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, BitmapFont font, ICamera camera, RenderingContext rc, String label, Vector3d pos, double distToCamera, float scale, double size, float minSizeDegrees, float maxSizeDegrees, boolean forceLabel) {
         // The smoothing scale must be set according to the distance
         shader.setUniformf("u_scale", Settings.settings.scene.label.size * scale / camera.getFovFactor());
 
         double r = getRadius();
-        if (r == 0 || distToCamera > r * 2d) {
+        if (forceLabel || r == 0 || distToCamera > r * 2d) {
 
             size *= Settings.settings.scene.label.size;
 
@@ -1235,5 +1247,23 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     public float[] getColor() {
         return cc;
+    }
+
+    public void setForceLabel(Boolean forceLabel) {
+        this.setForcelabel(forceLabel);
+    }
+    public void setForcelabel(Boolean forceLabel) {
+        this.forceLabel = forceLabel;
+    }
+    public void setForceLabel(Boolean forceLabel, String name) {
+        this.setForcelabel(forceLabel);
+    }
+
+    public boolean isForceLabel() {
+        return this.forceLabel;
+    }
+
+    public boolean isForceLabel(String name) {
+        return this.forceLabel;
     }
 }
