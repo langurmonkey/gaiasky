@@ -258,12 +258,8 @@ public class WelcomeGui extends AbstractGui {
             datasetManagerInfo.add(numCatalogsEnabled).left().padBottom(pad18);
         }
 
-
-
         // Selection problems/issues
         Table selectionInfo = new Table(skin);
-
-
         if (numCatalogsAvailable == 0) {
             // No catalog files, disable and add notice
             OwnLabel noCatalogs = new OwnLabel(I18n.txt("gui.welcome.catalogsel.nocatalogs"), skin, textStyle);
