@@ -88,4 +88,4 @@ venv
 # extra #
 #########
 .java-version
-releasenotes.txt
+releasenotes.*
