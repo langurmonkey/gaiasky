@@ -676,6 +676,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 EventManager.instance.post(Events.DEBUG_QUEUE, OctreeNode.nOctantsObserved, StreamingOctreeLoader.getLoadQueueSize());
                 // VRAM
                 EventManager.instance.post(Events.DEBUG_VRAM, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
+                // Threads
+                EventManager.instance.post(Events.DEBUG_THREADS, executorService.pool().getActiveCount(), executorService.pool().getPoolSize());
             }
         };
 

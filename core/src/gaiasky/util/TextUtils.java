@@ -339,6 +339,13 @@ public class TextUtils {
         return contained.get();
     }
 
+    public static String ensureStartsWith(String base, String start) {
+        if(!base.startsWith(start))
+            return start + base;
+        else
+            return base;
+    }
+
     public static boolean contains(String name, java.util.List<String> list) {
         for (String candidate : list)
             if (candidate != null && !candidate.isEmpty() && name.contains(candidate))

@@ -30,6 +30,8 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel debugRAMTotal;
     private final OwnLabel debugVRAMUsed;
     private final OwnLabel debugVRAMTotal;
+    private final OwnLabel threadsRunning;
+    private final OwnLabel threadsSize;
     private final OwnLabel debugObjectsDisplay;
     private final OwnLabel debugObjectsLoaded;
     private final OwnLabel debugOcObserved;
@@ -204,6 +206,22 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra.add(vmemoryLabel).left().padBottom(pad20);
         extra.row();
 
+        /* THREADS */
+        threadsRunning = new OwnLabel("", skin, "hud");
+        threadsSize = new OwnLabel("", skin, "hud");
+
+        Table debugThreadsTable = new Table(skin);
+        debugThreadsTable.add(new OwnLabel(I18n.txt("gui.debug.threads.running"), skin, "hud")).right().padRight(pad10);
+        debugThreadsTable.add(threadsRunning).right().row();
+        debugThreadsTable.add(new OwnLabel(I18n.txt("gui.debug.threads.poolsize"), skin, "hud")).right().padRight(pad10);
+        debugThreadsTable.add(threadsSize).right();
+
+        Label threadsLabel = new OwnLabel(I18n.txt("gui.debug.threads"), skin, "hud-big");
+        threadsLabel.addListener(new OwnTextTooltip(I18n.txt("gui.debug.threads.info"), skin));
+        threadsLabel.setColor(skin.getColor("theme"));
+        extra.add(debugThreadsTable).right().padRight(pad10).padBottom(pad20);
+        extra.add(threadsLabel).left().padBottom(pad20);
+        extra.row();
 
         /* OBJECTS */
         debugObjectsDisplay = new OwnLabel("", skin, "hud");
@@ -257,7 +275,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         this.setVisible(settings.program.debugInfo);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_VRAM, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
+        EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_VRAM, Events.DEBUG_THREADS, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
     }
 
     private void unsubscribe() {
@@ -319,6 +337,14 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                         debugVRAMUsed.setColor(getColor(used, total));
                         debugVRAMTotal.setText(memFormatter.format(total) + unit);
                     }
+                }
+                break;
+            case DEBUG_THREADS:
+                if (debug && data.length > 0) {
+                    Integer active = (Integer) data[0];
+                    Integer poolSize = (Integer) data[1];
+                    threadsRunning.setText(active);
+                    threadsSize.setText(poolSize);
                 }
                 break;
             case DEBUG_OBJECTS:

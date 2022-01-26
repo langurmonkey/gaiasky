@@ -296,7 +296,10 @@ public enum Events {
      * Debug info
      **/
     DEBUG_TIME,
+    /** Contains the used graphics memory and total graphics memory in bytes **/
     DEBUG_VRAM,
+    /** Contains the number of running background threads, and the total number of threads in the pool **/
+    DEBUG_THREADS,
     /**
      * Toggles whole GUI display. Contains the a boolean
      * with the state (display/no display) and the localised name
