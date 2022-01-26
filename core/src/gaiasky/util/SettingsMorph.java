@@ -1,6 +1,5 @@
 package gaiasky.util;
 
-import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SequenceWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -153,7 +152,9 @@ public class SettingsMorph {
         // Make paths relative to data/
         data.dataFiles = new ArrayList<>(dataFiles.size());
         for(String dataFile : dataFiles) {
-            String f = "data/" + TextUtils.subtractPath(dataFile, Settings.settings.data.location);
+            Path dataLocation = Path.of(Settings.settings.data.location);
+            String relative = dataLocation.toUri().relativize(new java.io.File(dataFile).toURI()).getPath();
+            String f = "data/" + relative;
             data.dataFiles.add(f);
         }
 

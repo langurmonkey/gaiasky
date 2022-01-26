@@ -81,7 +81,9 @@ public class DatasetDesc {
             }
         } else if (localCatalogFile != null) {
             this.checkPath = localCatalogFile.file().toPath();
-            this.checkStr = "data/" + TextUtils.subtractPath(this.checkPath.toString(), Settings.settings.data.location);
+            Path dataLocation = Path.of(Settings.settings.data.location);
+            String relative = dataLocation.toUri().relativize(this.checkPath.toUri()).getPath();
+            this.checkStr = "data/" + relative;
             this.exists = localCatalogFile.exists();
         }
 
