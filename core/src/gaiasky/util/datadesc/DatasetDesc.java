@@ -71,6 +71,7 @@ public class DatasetDesc {
         if (source.has("check")) {
             this.checkStr = source.getString("check");
             this.checkPath = Paths.get(Settings.settings.data.location, checkStr);
+            this.checkStr = "data/" + source.getString("check");
             this.exists = Files.exists(checkPath) && Files.isReadable(checkPath);
             this.serverVersion = source.getInt("version", 0);
             if (this.exists) {

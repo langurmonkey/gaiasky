@@ -256,7 +256,7 @@ public class DatasetManagerWindow extends GenericDialog {
         tabs.add(tabInstalled);
 
         // Check
-        if (serverDd.updatesAvailable)
+        if (serverDd != null && serverDd.updatesAvailable)
             selectedTab = 1;
         tabs.setChecked(selectedTab == 0 ? tabAvail.getText().toString() : tabInstalled.getText().toString());
 
@@ -1102,6 +1102,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         Net.HttpRequest request = copy.get(key).getSecond();
                         Gdx.net.cancelHttpRequest(request);
                     }
+                    checkBaseDataEnabled(serverDd);
                     if (this.acceptRunnable != null) {
                         this.acceptRunnable.run();
                     }
@@ -1123,10 +1124,28 @@ public class DatasetManagerWindow extends GenericDialog {
             question.buildSuper();
             question.show(stage);
         } else {
+            checkBaseDataEnabled(serverDd);
             if (this.acceptRunnable != null) {
                 this.acceptRunnable.run();
             }
             myself.hide();
+        }
+    }
+
+    private void checkBaseDataEnabled(DataDescriptor dd) {
+        DatasetDesc base = null;
+        if(dd != null) {
+            for (DatasetDesc dataset : dd.datasets) {
+                if (dataset.baseData) {
+                    base = dataset;
+                    break;
+                }
+            }
+            if (base != null) {
+                if (!Settings.settings.data.dataFiles.contains(base.checkStr)) {
+                    Settings.settings.data.dataFiles.add(0, base.checkStr);
+                }
+            }
         }
     }
 
@@ -1212,11 +1231,11 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private void actionEnableDataset(DatasetDesc dataset) {
         // Texture packs can't be enabled
-        if(dataset.type.equals("texture-pack"))
+        if (dataset.type.equals("texture-pack"))
             return;
         String filePath = null;
         if (dataset.checkStr != null) {
-            filePath = "data/" + dataset.checkStr;
+            filePath = TextUtils.ensureStartsWith(dataset.checkStr, "data/");
         }
         if (filePath != null && !filePath.isBlank()) {
             if (!Settings.settings.data.dataFiles.contains(filePath)) {
@@ -1230,7 +1249,7 @@ public class DatasetManagerWindow extends GenericDialog {
         if (!dataset.baseData) {
             String filePath = null;
             if (dataset.checkStr != null) {
-                filePath = "data/" + dataset.checkStr;
+                filePath = TextUtils.ensureStartsWith(dataset.checkStr, "data/");
             }
             if (filePath != null && !filePath.isBlank()) {
                 Settings.settings.data.dataFiles.remove(filePath);

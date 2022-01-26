@@ -57,7 +57,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
     @Override
     public Array<CelestialBody> loadData() {
         Array<CelestialBody> galaxies = new Array<>(false, 900);
-        long baseid = 5000;
+        long baseId = 8500000;
         long offset = 0;
         if (active)
             for (String file : files) {
@@ -97,7 +97,7 @@ public class NBGLoader extends AbstractCatalogLoader implements ISceneGraphLoade
                                 float colorbv = 0;
                                 float absmag = (float) (kmag - 2.5 * Math.log10(Math.pow(distPc / 10d, 2d)));
 
-                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, altname.isBlank() ? new String[] { name } : new String[] { name, altname }, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseid + offset);
+                                NBGalaxy gal = new NBGalaxy(pos, (float) kmag, absmag, colorbv, altname.isBlank() ? new String[] { name } : new String[] { name, altname }, (float) ra, (float) dec, (float) bmag, (float) a26, (float) ba, hrv, i, tt, Mcl, baseId + offset);
                                 gal.setParent("NBG");
                                 g = gal;
                             } else {
