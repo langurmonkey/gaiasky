@@ -196,6 +196,7 @@ public class WelcomeGui extends AbstractGui {
         startButton.setSize(bw, bh);
         startButton.addListener((event) -> {
             if (event instanceof ChangeEvent) {
+                // Check base data is enabled
                 gaiaSky();
             }
             return true;
@@ -355,7 +356,26 @@ public class WelcomeGui extends AbstractGui {
         }
     }
 
+    private void ensureBaseDataEnabled(DataDescriptor dd) {
+        if (dd != null) {
+            DatasetDesc base = null;
+            for (DatasetDesc dataset : dd.datasets) {
+                if (dataset.baseData) {
+                    base = dataset;
+                    break;
+                }
+            }
+            if (base != null) {
+                if (!Settings.settings.data.dataFiles.contains(base.checkStr)) {
+                    Settings.settings.data.dataFiles.add(0, base.checkStr);
+                }
+            }
+        }
+    }
+
     private void gaiaSky() {
+        ensureBaseDataEnabled(serverDatasets);
+
         if (bgTex != null)
             bgTex.dispose();
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);

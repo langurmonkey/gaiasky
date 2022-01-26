@@ -1102,7 +1102,6 @@ public class DatasetManagerWindow extends GenericDialog {
                         Net.HttpRequest request = copy.get(key).getSecond();
                         Gdx.net.cancelHttpRequest(request);
                     }
-                    checkBaseDataEnabled(serverDd);
                     if (this.acceptRunnable != null) {
                         this.acceptRunnable.run();
                     }
@@ -1124,28 +1123,10 @@ public class DatasetManagerWindow extends GenericDialog {
             question.buildSuper();
             question.show(stage);
         } else {
-            checkBaseDataEnabled(serverDd);
             if (this.acceptRunnable != null) {
                 this.acceptRunnable.run();
             }
             myself.hide();
-        }
-    }
-
-    private void checkBaseDataEnabled(DataDescriptor dd) {
-        DatasetDesc base = null;
-        if(dd != null) {
-            for (DatasetDesc dataset : dd.datasets) {
-                if (dataset.baseData) {
-                    base = dataset;
-                    break;
-                }
-            }
-            if (base != null) {
-                if (!Settings.settings.data.dataFiles.contains(base.checkStr)) {
-                    Settings.settings.data.dataFiles.add(0, base.checkStr);
-                }
-            }
         }
     }
 
