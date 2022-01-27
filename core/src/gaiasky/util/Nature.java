@@ -48,7 +48,9 @@ public class Nature {
     public static final double LY_TO_KM = 9.46073e12;
     /** Kilometers to light years **/
     public static final double KM_TO_LY = 1.0 / LY_TO_KM;
-    
+    /** Kilometers to metres **/
+    public static final double KM_TO_M = 1000d;
+
     /*
      * ======= TIME UNITS =======
      */

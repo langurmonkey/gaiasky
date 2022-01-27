@@ -82,7 +82,7 @@ public class OrbitComponent {
     }
 
     public void loadDataPoint(Vector3d out, Instant t) {
-        double a = semimajoraxis * 1000d; // km to m
+        double a = semimajoraxis * Nature.KM_TO_M; // km to m
         double M0 = meananomaly * MathUtilsd.degRad;
         double omega_lan = ascendingnode * MathUtilsd.degRad;
         double omega_ap = argofpericenter * MathUtilsd.degRad;

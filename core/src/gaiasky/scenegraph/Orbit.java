@@ -565,11 +565,23 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         this.oc = oc;
     }
 
+    public void setTransformName(String transformFunction) {
+        setTransformFunction(transformFunction);
+    }
+
     public void setTransformFunction(String transformFunction) {
         if (transformFunction != null && !transformFunction.isEmpty()) {
             try {
                 Method m = ClassReflection.getMethod(Coordinates.class, transformFunction);
-                this.transformFunction = (Matrix4d) m.invoke(null);
+                Object obj = m.invoke(null);
+
+                Matrix4d trf = null;
+                if (obj instanceof Matrix4) {
+                    trf = new Matrix4d(((Matrix4) obj).val);
+                } else if (obj instanceof Matrix4d) {
+                    trf = new Matrix4d((Matrix4d) obj);
+                }
+                this.transformFunction = trf;
             } catch (Exception e) {
                 logger.error(e);
             }

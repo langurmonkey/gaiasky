@@ -7,13 +7,13 @@ package gaiasky.util.math;
 
 /*******************************************************************************
  * Copyright 2011 See AUTHORS file.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
  * the License at
- * 
+ *
  * https://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
@@ -32,11 +32,11 @@ import java.io.Serializable;
  * "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
  * major</a> 4 by 4 matrix. Like the {@link Vector3d} class it allows the
  * chaining of methods by returning a reference to itself. For example:
- * 
+ *
  * <pre>
  * Matrix4d mat = new Matrix4d().trn(position).mul(camera.combined);
  * </pre>
- * 
+ *
  * @author badlogicgames@gmail.com
  */
 public class Matrix4d implements Serializable {
@@ -148,9 +148,8 @@ public class Matrix4d implements Serializable {
 
     /**
      * Constructs a matrix from the given matrix.
-     * 
-     * @param matrix
-     *            The matrix to copy. (This matrix is not modified)
+     *
+     * @param matrix The matrix to copy. (This matrix is not modified)
      */
     public Matrix4d(Matrix4d matrix) {
         this.set(matrix);
@@ -159,12 +158,11 @@ public class Matrix4d implements Serializable {
     /**
      * Constructs a matrix from the given double array. The array must have at
      * least 16 elements; the first 16 will be copied.
-     * 
-     * @param values
-     *            The double array to copy. Remember that this matrix is in
-     *            <a href=
-     *            "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
-     *            major</a> order. (The double array is not modified.)
+     *
+     * @param values The double array to copy. Remember that this matrix is in
+     *               <a href=
+     *               "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
+     *               major</a> order. (The double array is not modified.)
      */
     public Matrix4d(double[] values) {
         this.set(values);
@@ -176,9 +174,8 @@ public class Matrix4d implements Serializable {
 
     /**
      * Constructs a rotation matrix from the given {@link Quaterniond}.
-     * 
-     * @param quaternion
-     *            The quaternion to be copied. (The quaternion is not modified)
+     *
+     * @param quaternion The quaternion to be copied. (The quaternion is not modified)
      */
     public Matrix4d(Quaterniond quaternion) {
         this.set(quaternion);
@@ -186,13 +183,10 @@ public class Matrix4d implements Serializable {
 
     /**
      * Construct a matrix from the given translation, rotation and scale.
-     * 
-     * @param position
-     *            The translation
-     * @param rotation
-     *            The rotation, must be normalized
-     * @param scale
-     *            The scale
+     *
+     * @param position The translation
+     * @param rotation The rotation, must be normalized
+     * @param scale    The scale
      */
     public Matrix4d(Vector3d position, Quaterniond rotation, Vector3d scale) {
         set(position, rotation, scale);
@@ -200,29 +194,29 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to the given matrix.
-     * 
-     * @param matrix
-     *            The matrix that is to be copied. (The given matrix is not
-     *            modified)
+     *
+     * @param matrix The matrix that is to be copied. (The given matrix is not
+     *               modified)
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d set(Matrix4d matrix) {
         return this.set(matrix.val);
     }
 
-    public Matrix4d set(Matrix4 matrix){
+    public Matrix4d set(Matrix4 matrix) {
         return this.set(matrix.val);
     }
 
     /**
      * Sets the matrix to the given matrix as a double array. The double array
      * must have at least 16 elements; the first 16 will be copied.
-     * 
-     * @param values
-     *            The matrix, in double form, that is to be copied. Remember
-     *            that this matrix is in <a href=
-     *            "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
-     *            major</a> order.
+     *
+     * @param values The matrix, in double form, that is to be copied. Remember
+     *               that this matrix is in <a href=
+     *               "http://en.wikipedia.org/wiki/Row-major_order#Column-major_order">column
+     *               major</a> order.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d set(double[] values) {
@@ -239,9 +233,9 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to a rotation matrix representing the quaternion.
-     * 
-     * @param quaternion
-     *            The quaternion that is to be used to set this matrix.
+     *
+     * @param quaternion The quaternion that is to be used to set this matrix.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d set(Quaterniond quaternion) {
@@ -250,19 +244,16 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to a rotation matrix representing the quaternion.
-     * 
-     * @param quaternionX
-     *            The X component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionY
-     *            The Y component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionZ
-     *            The Z component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionW
-     *            The W component of the quaternion that is to be used to set
-     *            this matrix.
+     *
+     * @param quaternionX The X component of the quaternion that is to be used to set
+     *                    this matrix.
+     * @param quaternionY The Y component of the quaternion that is to be used to set
+     *                    this matrix.
+     * @param quaternionZ The Z component of the quaternion that is to be used to set
+     *                    this matrix.
+     * @param quaternionW The W component of the quaternion that is to be used to set
+     *                    this matrix.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d set(double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
@@ -271,11 +262,10 @@ public class Matrix4d implements Serializable {
 
     /**
      * Set this matrix to the specified translation and rotation.
-     * 
-     * @param position
-     *            The translation
-     * @param orientation
-     *            The rotation, must be normalized
+     *
+     * @param position    The translation
+     * @param orientation The rotation, must be normalized
+     *
      * @return This matrix for chaining
      */
     public Matrix4d set(Vector3d position, Quaterniond orientation) {
@@ -285,28 +275,22 @@ public class Matrix4d implements Serializable {
     /**
      * Sets the matrix to a rotation matrix representing the translation and
      * quaternion.
-     * 
-     * @param translationX
-     *            The X component of the translation that is to be used to set
-     *            this matrix.
-     * @param translationY
-     *            The Y component of the translation that is to be used to set
-     *            this matrix.
-     * @param translationZ
-     *            The Z component of the translation that is to be used to set
-     *            this matrix.
-     * @param quaternionX
-     *            The X component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionY
-     *            The Y component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionZ
-     *            The Z component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionW
-     *            The W component of the quaternion that is to be used to set
-     *            this matrix.
+     *
+     * @param translationX The X component of the translation that is to be used to set
+     *                     this matrix.
+     * @param translationY The Y component of the translation that is to be used to set
+     *                     this matrix.
+     * @param translationZ The Z component of the translation that is to be used to set
+     *                     this matrix.
+     * @param quaternionX  The X component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param quaternionY  The Y component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param quaternionZ  The Z component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param quaternionW  The W component of the quaternion that is to be used to set
+     *                     this matrix.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW) {
@@ -339,13 +323,11 @@ public class Matrix4d implements Serializable {
 
     /**
      * Set this matrix to the specified translation, rotation and scale.
-     * 
-     * @param position
-     *            The translation
-     * @param orientation
-     *            The rotation, must be normalized
-     * @param scale
-     *            The scale
+     *
+     * @param position    The translation
+     * @param orientation The rotation, must be normalized
+     * @param scale       The scale
+     *
      * @return This matrix for chaining
      */
     public Matrix4d set(Vector3d position, Quaterniond orientation, Vector3d scale) {
@@ -355,37 +337,28 @@ public class Matrix4d implements Serializable {
     /**
      * Sets the matrix to a rotation matrix representing the translation and
      * quaternion.
-     * 
-     * @param translationX
-     *            The X component of the translation that is to be used to set
-     *            this matrix.
-     * @param translationY
-     *            The Y component of the translation that is to be used to set
-     *            this matrix.
-     * @param translationZ
-     *            The Z component of the translation that is to be used to set
-     *            this matrix.
-     * @param quaternionX
-     *            The X component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionY
-     *            The Y component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionZ
-     *            The Z component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param quaternionW
-     *            The W component of the quaternion that is to be used to set
-     *            this matrix.
-     * @param scaleX
-     *            The X component of the scaling that is to be used to set this
-     *            matrix.
-     * @param scaleY
-     *            The Y component of the scaling that is to be used to set this
-     *            matrix.
-     * @param scaleZ
-     *            The Z component of the scaling that is to be used to set this
-     *            matrix.
+     *
+     * @param translationX The X component of the translation that is to be used to set
+     *                     this matrix.
+     * @param translationY The Y component of the translation that is to be used to set
+     *                     this matrix.
+     * @param translationZ The Z component of the translation that is to be used to set
+     *                     this matrix.
+     * @param quaternionX  The X component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param quaternionY  The Y component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param quaternionZ  The Z component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param quaternionW  The W component of the quaternion that is to be used to set
+     *                     this matrix.
+     * @param scaleX       The X component of the scaling that is to be used to set this
+     *                     matrix.
+     * @param scaleY       The Y component of the scaling that is to be used to set this
+     *                     matrix.
+     * @param scaleZ       The Z component of the scaling that is to be used to set this
+     *                     matrix.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d set(double translationX, double translationY, double translationZ, double quaternionX, double quaternionY, double quaternionZ, double quaternionW, double scaleX, double scaleY, double scaleZ) {
@@ -421,15 +394,11 @@ public class Matrix4d implements Serializable {
      * z-axis of the vector space this matrix creates as well as the 4th column
      * representing the translation of any point that is multiplied by this
      * matrix.
-     * 
-     * @param xAxis
-     *            The x-axis.
-     * @param yAxis
-     *            The y-axis.
-     * @param zAxis
-     *            The z-axis.
-     * @param pos
-     *            The translation vector.
+     *
+     * @param xAxis The x-axis.
+     * @param yAxis The y-axis.
+     * @param zAxis The z-axis.
+     * @param pos   The translation vector.
      */
     public Matrix4d set(Vector3d xAxis, Vector3d yAxis, Vector3d zAxis, Vector3d pos) {
         val[M00] = xAxis.x;
@@ -459,10 +428,10 @@ public class Matrix4d implements Serializable {
     /**
      * Adds a translational component to the matrix in the 4th column. The other
      * columns are untouched.
-     * 
-     * @param vector
-     *            The translation vector to add to the current matrix. (This
-     *            vector is not modified)
+     *
+     * @param vector The translation vector to add to the current matrix. (This
+     *               vector is not modified)
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d trn(Vector3d vector) {
@@ -475,13 +444,11 @@ public class Matrix4d implements Serializable {
     /**
      * Adds a translational component to the matrix in the 4th column. The other
      * columns are untouched.
-     * 
-     * @param x
-     *            The x-component of the translation vector.
-     * @param y
-     *            The y-component of the translation vector.
-     * @param z
-     *            The z-component of the translation vector.
+     *
+     * @param x The x-component of the translation vector.
+     * @param y The y-component of the translation vector.
+     * @param z The z-component of the translation vector.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d trn(double x, double y, double z) {
@@ -496,16 +463,23 @@ public class Matrix4d implements Serializable {
         return val;
     }
 
+    public float[] getValuesFloat() {
+        float[] res = new float[val.length];
+        for (int i = 0; i < val.length; i++)
+            res[i] = (float) val[i];
+        return res;
+    }
+
     /**
      * Postmultiplies this matrix with the given matrix, storing the result in
      * this matrix. For example:
-     * 
+     *
      * <pre>
      * A.mul(B) results in A := AB.
      * </pre>
-     * 
-     * @param matrix
-     *            The other matrix to multiply by.
+     *
+     * @param matrix The other matrix to multiply by.
+     *
      * @return This matrix for the purpose of chaining operations together.
      */
     public Matrix4d mul(Matrix4d matrix) {
@@ -516,13 +490,13 @@ public class Matrix4d implements Serializable {
     /**
      * Premultiplies this matrix with the given matrix, storing the result in
      * this matrix. For example:
-     * 
+     *
      * <pre>
      * A.mulLeft(B) results in A := BA.
      * </pre>
-     * 
-     * @param matrix
-     *            The other matrix to multiply by.
+     *
+     * @param matrix The other matrix to multiply by.
+     *
      * @return This matrix for the purpose of chaining operations together.
      */
     public Matrix4d mulLeft(Matrix4d matrix) {
@@ -534,7 +508,7 @@ public class Matrix4d implements Serializable {
 
     /**
      * Transposes the matrix.
-     * 
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d tra() {
@@ -559,7 +533,7 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to an identity matrix.
-     * 
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d idt() {
@@ -590,11 +564,11 @@ public class Matrix4d implements Serializable {
     /**
      * Computes the inverse of the given matrix. The matrix array is assumed to
      * hold a 4x4 column major matrix as you can get from {@link Matrix4#val}.
-     * 
-     * @param values
-     *            the matrix values.
+     *
+     * @param values the matrix values.
+     *
      * @return false in case the inverse could not be calculated, true
-     *         otherwise.
+     * otherwise.
      */
     public static boolean inv(double[] values) {
         return matrix4_inv(values);
@@ -615,15 +589,12 @@ public class Matrix4d implements Serializable {
     /**
      * Sets the matrix to a projection matrix with a near- and far plane, a
      * field of view in degrees and an aspect ratio.
-     * 
-     * @param near
-     *            The near plane
-     * @param far
-     *            The far plane
-     * @param fov
-     *            The field of view in degrees
-     * @param aspectRatio
-     *            The "width over height" aspect ratio
+     *
+     * @param near        The near plane
+     * @param far         The far plane
+     * @param fov         The field of view in degrees
+     * @param aspectRatio The "width over height" aspect ratio
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToProjection(double near, double far, double fov, double aspectRatio) {
@@ -655,15 +626,12 @@ public class Matrix4d implements Serializable {
      * Sets this matrix to an orthographic projection matrix with the origin at
      * (x,y) extending by width and height. The near plane is set to 0, the far
      * plane is set to 1.
-     * 
-     * @param x
-     *            The x-coordinate of the origin
-     * @param y
-     *            The y-coordinate of the origin
-     * @param width
-     *            The width
-     * @param height
-     *            The height
+     *
+     * @param x      The x-coordinate of the origin
+     * @param y      The y-coordinate of the origin
+     * @param width  The width
+     * @param height The height
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToOrtho2D(double x, double y, double width, double height) {
@@ -674,19 +642,14 @@ public class Matrix4d implements Serializable {
     /**
      * Sets this matrix to an orthographic projection matrix with the origin at
      * (x,y) extending by width and height, having a near and far plane.
-     * 
-     * @param x
-     *            The x-coordinate of the origin
-     * @param y
-     *            The y-coordinate of the origin
-     * @param width
-     *            The width
-     * @param height
-     *            The height
-     * @param near
-     *            The near plane
-     * @param far
-     *            The far plane
+     *
+     * @param x      The x-coordinate of the origin
+     * @param y      The y-coordinate of the origin
+     * @param width  The width
+     * @param height The height
+     * @param near   The near plane
+     * @param far    The far plane
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToOrtho2D(double x, double y, double width, double height, double near, double far) {
@@ -698,19 +661,14 @@ public class Matrix4d implements Serializable {
      * Sets the matrix to an orthographic projection like glOrtho
      * (http://www.opengl.org/sdk/docs/man/xhtml/glOrtho.xml) following the
      * OpenGL equivalent
-     * 
-     * @param left
-     *            The left clipping plane
-     * @param right
-     *            The right clipping plane
-     * @param bottom
-     *            The bottom clipping plane
-     * @param top
-     *            The top clipping plane
-     * @param near
-     *            The near clipping plane
-     * @param far
-     *            The far clipping plane
+     *
+     * @param left   The left clipping plane
+     * @param right  The right clipping plane
+     * @param bottom The bottom clipping plane
+     * @param top    The top clipping plane
+     * @param near   The near clipping plane
+     * @param far    The far clipping plane
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToOrtho(double left, double right, double bottom, double top, double near, double far) {
@@ -746,9 +704,9 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the 4th column to the translation vector.
-     * 
-     * @param vector
-     *            The translation vector
+     *
+     * @param vector The translation vector
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setTranslation(Vector3d vector) {
@@ -760,13 +718,11 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the 4th column to the translation vector.
-     * 
-     * @param x
-     *            The X coordinate of the translation vector
-     * @param y
-     *            The Y coordinate of the translation vector
-     * @param z
-     *            The Z coordinate of the translation vector
+     *
+     * @param x The X coordinate of the translation vector
+     * @param y The Y coordinate of the translation vector
+     * @param z The Z coordinate of the translation vector
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setTranslation(double x, double y, double z) {
@@ -780,9 +736,9 @@ public class Matrix4d implements Serializable {
      * Sets this matrix to a translation matrix, overwriting it first by an
      * identity matrix and then setting the 4th column to the translation
      * vector.
-     * 
-     * @param vector
-     *            The translation vector
+     *
+     * @param vector The translation vector
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToTranslation(Vector3d vector) {
@@ -805,13 +761,11 @@ public class Matrix4d implements Serializable {
      * Sets this matrix to a translation matrix, overwriting it first by an
      * identity matrix and then setting the 4th column to the translation
      * vector.
-     * 
-     * @param x
-     *            The x-component of the translation vector.
-     * @param y
-     *            The y-component of the translation vector.
-     * @param z
-     *            The z-component of the translation vector.
+     *
+     * @param x The x-component of the translation vector.
+     * @param y The y-component of the translation vector.
+     * @param z The z-component of the translation vector.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToTranslation(double x, double y, double z) {
@@ -826,11 +780,10 @@ public class Matrix4d implements Serializable {
      * Sets this matrix to a translation and scaling matrix by first overwriting
      * it with an identity and then setting the translation vector in the 4th
      * column and the scaling vector in the diagonal.
-     * 
-     * @param translation
-     *            The translation vector
-     * @param scaling
-     *            The scaling vector
+     *
+     * @param translation The translation vector
+     * @param scaling     The scaling vector
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToTranslationAndScaling(Vector3d translation, Vector3d scaling) {
@@ -848,19 +801,14 @@ public class Matrix4d implements Serializable {
      * Sets this matrix to a translation and scaling matrix by first overwriting
      * it with an identity and then setting the translation vector in the 4th
      * column and the scaling vector in the diagonal.
-     * 
-     * @param translationX
-     *            The x-component of the translation vector
-     * @param translationY
-     *            The y-component of the translation vector
-     * @param translationZ
-     *            The z-component of the translation vector
-     * @param scalingX
-     *            The x-component of the scaling vector
-     * @param scalingY
-     *            The x-component of the scaling vector
-     * @param scalingZ
-     *            The x-component of the scaling vector
+     *
+     * @param translationX The x-component of the translation vector
+     * @param translationY The y-component of the translation vector
+     * @param translationZ The z-component of the translation vector
+     * @param scalingX     The x-component of the scaling vector
+     * @param scalingY     The x-component of the scaling vector
+     * @param scalingZ     The x-component of the scaling vector
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToTranslationAndScaling(double translationX, double translationY, double translationZ, double scalingX, double scalingY, double scalingZ) {
@@ -878,11 +826,10 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to a rotation matrix around the given axis.
-     * 
-     * @param axis
-     *            The axis
-     * @param degrees
-     *            The angle in degrees
+     *
+     * @param axis    The axis
+     * @param degrees The angle in degrees
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToRotation(Vector3d axis, double degrees) {
@@ -895,11 +842,10 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to a rotation matrix around the given axis.
-     * 
-     * @param axis
-     *            The axis
-     * @param radians
-     *            The angle in radians
+     *
+     * @param axis    The axis
+     * @param radians The angle in radians
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToRotationRad(Vector3d axis, double radians) {
@@ -912,15 +858,12 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to a rotation matrix around the given axis.
-     * 
-     * @param axisX
-     *            The x-component of the axis
-     * @param axisY
-     *            The y-component of the axis
-     * @param axisZ
-     *            The z-component of the axis
-     * @param degrees
-     *            The angle in degrees
+     *
+     * @param axisX   The x-component of the axis
+     * @param axisY   The y-component of the axis
+     * @param axisZ   The z-component of the axis
+     * @param degrees The angle in degrees
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToRotation(double axisX, double axisY, double axisZ, double degrees) {
@@ -933,15 +876,12 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the matrix to a rotation matrix around the given axis.
-     * 
-     * @param axisX
-     *            The x-component of the axis
-     * @param axisY
-     *            The y-component of the axis
-     * @param axisZ
-     *            The z-component of the axis
-     * @param radians
-     *            The angle in radians
+     *
+     * @param axisX   The x-component of the axis
+     * @param axisY   The y-component of the axis
+     * @param axisZ   The z-component of the axis
+     * @param radians The angle in radians
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToRotationRad(double axisX, double axisY, double axisZ, double radians) {
@@ -954,11 +894,10 @@ public class Matrix4d implements Serializable {
 
     /**
      * Set the matrix to a rotation matrix between two vectors.
-     * 
-     * @param v1
-     *            The base vector
-     * @param v2
-     *            The target vector
+     *
+     * @param v1 The base vector
+     * @param v2 The target vector
+     *
      * @return This matrix for the purpose of chaining methods together
      */
     public Matrix4d setToRotation(final Vector3d v1, final Vector3d v2) {
@@ -967,19 +906,14 @@ public class Matrix4d implements Serializable {
 
     /**
      * Set the matrix to a rotation matrix between two vectors.
-     * 
-     * @param x1
-     *            The base vectors x value
-     * @param y1
-     *            The base vectors y value
-     * @param z1
-     *            The base vectors z value
-     * @param x2
-     *            The target vector x value
-     * @param y2
-     *            The target vector y value
-     * @param z2
-     *            The target vector z value
+     *
+     * @param x1 The base vectors x value
+     * @param y1 The base vectors y value
+     * @param z1 The base vectors z value
+     * @param x2 The target vector x value
+     * @param y2 The target vector y value
+     * @param z2 The target vector z value
+     *
      * @return This matrix for the purpose of chaining methods together
      */
     public Matrix4d setToRotation(final double x1, final double y1, final double z1, final double x2, final double y2, final double z2) {
@@ -988,13 +922,11 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets this matrix to a rotation matrix from the given euler angles.
-     * 
-     * @param yaw
-     *            the yaw in degrees
-     * @param pitch
-     *            the pitch in degrees
-     * @param roll
-     *            the roll in degrees
+     *
+     * @param yaw   the yaw in degrees
+     * @param pitch the pitch in degrees
+     * @param roll  the roll in degrees
+     *
      * @return This matrix
      */
     public Matrix4d setFromEulerAngles(double yaw, double pitch, double roll) {
@@ -1004,9 +936,9 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets this matrix to a scaling matrix
-     * 
-     * @param vector
-     *            The scaling vector
+     *
+     * @param vector The scaling vector
+     *
      * @return This matrix for chaining.
      */
     public Matrix4d setToScaling(Vector3d vector) {
@@ -1019,13 +951,11 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets this matrix to a scaling matrix
-     * 
-     * @param x
-     *            The x-component of the scaling vector
-     * @param y
-     *            The y-component of the scaling vector
-     * @param z
-     *            The z-component of the scaling vector
+     *
+     * @param x The x-component of the scaling vector
+     * @param y The y-component of the scaling vector
+     * @param z The z-component of the scaling vector
+     *
      * @return This matrix for chaining.
      */
     public Matrix4d setToScaling(double x, double y, double z) {
@@ -1046,11 +976,10 @@ public class Matrix4d implements Serializable {
     /**
      * Sets the matrix to a look at matrix with a direction and an up vector.
      * Multiply with a translation matrix to get a camera model view matrix.
-     * 
-     * @param direction
-     *            The direction vector
-     * @param up
-     *            The up vector
+     *
+     * @param direction The direction vector
+     * @param up        The up vector
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d setToLookAt(Vector3d direction, Vector3d up) {
@@ -1071,6 +1000,7 @@ public class Matrix4d implements Serializable {
 
         return this;
     }
+
     public Matrix4d setToLookAt(Vector3b direction, Vector3b up) {
         l_vezb.set(direction).nor();
         l_vexb.set(direction).nor();
@@ -1097,13 +1027,11 @@ public class Matrix4d implements Serializable {
     /**
      * Sets this matrix to a look at matrix with the given position, target and
      * up vector.
-     * 
-     * @param position
-     *            the position
-     * @param target
-     *            the target
-     * @param up
-     *            the up vector
+     *
+     * @param position the position
+     * @param target   the target
+     * @param up       the up vector
+     *
      * @return This matrix
      */
     public Matrix4d setToLookAt(Vector3d position, Vector3d target, Vector3d up) {
@@ -1113,6 +1041,7 @@ public class Matrix4d implements Serializable {
 
         return this;
     }
+
     public Matrix4d setToLookAt(Vector3b position, Vector3b target, Vector3b up) {
         tmpVecb.set(target).sub(position);
         setToLookAt(tmpVecb, up);
@@ -1141,11 +1070,10 @@ public class Matrix4d implements Serializable {
     /**
      * Linearly interpolates between this matrix and the given matrix mixing by
      * alpha
-     * 
-     * @param matrix
-     *            the matrix
-     * @param alpha
-     *            the alpha value in the range [0,1]
+     *
+     * @param matrix the matrix
+     * @param alpha  the alpha value in the range [0,1]
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d lerp(Matrix4d matrix, double alpha) {
@@ -1157,9 +1085,8 @@ public class Matrix4d implements Serializable {
     /**
      * Sets this matrix to the given 3x3 matrix. The third column of this matrix
      * is set to (0,0,1,0).
-     * 
-     * @param mat
-     *            the matrix
+     *
+     * @param mat the matrix
      */
     public Matrix4d set(Matrix3 mat) {
         val[0] = mat.val[0];
@@ -1286,11 +1213,9 @@ public class Matrix4d implements Serializable {
      * 3-component vector, with x being the first element, y being the second
      * and z being the last component. The result is stored in the vector array.
      * This is the same as {@link Vector3d#prj(Matrix4d)}.
-     * 
-     * @param mat
-     *            the matrix
-     * @param vec
-     *            the vector.
+     *
+     * @param mat the matrix
+     * @param vec the vector.
      */
     public static void prj(double[] mat, double[] vec) {
         matrix4_proj(mat, vec, 0);
@@ -1306,17 +1231,12 @@ public class Matrix4d implements Serializable {
      * parameter specifies the number of floats between subsequent vectors and
      * must be >= 3. This is the same as {@link Vector3#prj(Matrix4)} applied to
      * multiple vectors.
-     * 
-     * @param mat
-     *            the matrix
-     * @param vecs
-     *            the vectors
-     * @param offset
-     *            the offset into the vectors array
-     * @param numVecs
-     *            the number of vectors
-     * @param stride
-     *            the stride between vectors in floats
+     *
+     * @param mat     the matrix
+     * @param vecs    the vectors
+     * @param offset  the offset into the vectors array
+     * @param numVecs the number of vectors
+     * @param stride  the stride between vectors in floats
      */
     public static void prj(double[] mat, double[] vecs, int offset, int numVecs, int stride) {
         for (int i = 0; i < numVecs; i++) {
@@ -1422,11 +1342,13 @@ public class Matrix4d implements Serializable {
     }
 
     // @on
+
     /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is
      * also used by OpenGL ES' glTranslate/glRotate/glScale
-     * 
+     *
      * @param translation
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d translate(Vector3d translation) {
@@ -1434,11 +1356,13 @@ public class Matrix4d implements Serializable {
     }
 
     // @on
+
     /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is
      * also used by OpenGL ES' glTranslate/glRotate/glScale
-     * 
+     *
      * @param translation
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d translate(double[] translation) {
@@ -1448,13 +1372,11 @@ public class Matrix4d implements Serializable {
     /**
      * Postmultiplies this matrix by a translation matrix. Postmultiplication is
      * also used by OpenGL ES' 1.x glTranslate/glRotate/glScale.
-     * 
-     * @param x
-     *            Translation in the x-axis.
-     * @param y
-     *            Translation in the y-axis.
-     * @param z
-     *            Translation in the z-axis.
+     *
+     * @param x Translation in the x-axis.
+     * @param y Translation in the y-axis.
+     * @param z Translation in the z-axis.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d translate(double x, double y, double z) {
@@ -1478,16 +1400,15 @@ public class Matrix4d implements Serializable {
         matrix4_mul(val, tmp);
         return this;
     }
+
     /**
      * Multiplies the matrix mata with matrix matb, storing the result in mata.
      * The arrays are assumed to hold 4x4 column major matrices as you can get
      * from {@link Matrix4d#val}. This is the same as
      * {@link Matrix4d#mul(Matrix4d)}.
-     * 
-     * @param mata
-     *            the first matrix.
-     * @param matb
-     *            the second matrix.
+     *
+     * @param mata the first matrix.
+     * @param matb the second matrix.
      */
     public static void mul(double[] mata, double[] matb) {
         matrix4_mul(mata, matb);
@@ -1497,11 +1418,10 @@ public class Matrix4d implements Serializable {
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
      * Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * 
-     * @param axis
-     *            The vector axis to rotate around.
-     * @param degrees
-     *            The angle in degrees.
+     *
+     * @param axis    The vector axis to rotate around.
+     * @param degrees The angle in degrees.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d rotate(Vector3d axis, double degrees) {
@@ -1515,11 +1435,10 @@ public class Matrix4d implements Serializable {
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
      * Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * 
-     * @param axis
-     *            The vector axis to rotate around.
-     * @param radians
-     *            The angle in radians.
+     *
+     * @param axis    The vector axis to rotate around.
+     * @param radians The angle in radians.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d rotateRad(Vector3d axis, double radians) {
@@ -1533,15 +1452,12 @@ public class Matrix4d implements Serializable {
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
      * Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale
-     * 
-     * @param axisX
-     *            The x-axis component of the vector to rotate around.
-     * @param axisY
-     *            The y-axis component of the vector to rotate around.
-     * @param axisZ
-     *            The z-axis component of the vector to rotate around.
-     * @param degrees
-     *            The angle in degrees
+     *
+     * @param axisX   The x-axis component of the vector to rotate around.
+     * @param axisY   The y-axis component of the vector to rotate around.
+     * @param axisZ   The z-axis component of the vector to rotate around.
+     * @param degrees The angle in degrees
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d rotate(double axisX, double axisY, double axisZ, double degrees) {
@@ -1555,15 +1471,12 @@ public class Matrix4d implements Serializable {
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
      * Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale
-     * 
-     * @param axisX
-     *            The x-axis component of the vector to rotate around.
-     * @param axisY
-     *            The y-axis component of the vector to rotate around.
-     * @param axisZ
-     *            The z-axis component of the vector to rotate around.
-     * @param radians
-     *            The angle in radians
+     *
+     * @param axisX   The x-axis component of the vector to rotate around.
+     * @param axisY   The y-axis component of the vector to rotate around.
+     * @param axisZ   The z-axis component of the vector to rotate around.
+     * @param radians The angle in radians
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d rotateRad(double axisX, double axisY, double axisZ, double radians) {
@@ -1577,8 +1490,9 @@ public class Matrix4d implements Serializable {
      * Postmultiplies this matrix with a (counter-clockwise) rotation matrix.
      * Postmultiplication is also used by OpenGL ES' 1.x
      * glTranslate/glRotate/glScale.
-     * 
+     *
      * @param rotation
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d rotate(Quaterniond rotation) {
@@ -1589,11 +1503,10 @@ public class Matrix4d implements Serializable {
 
     /**
      * Postmultiplies this matrix by the rotation between two vectors.
-     * 
-     * @param v1
-     *            The base vector
-     * @param v2
-     *            The target vector
+     *
+     * @param v1 The base vector
+     * @param v2 The target vector
+     *
      * @return This matrix for the purpose of chaining methods together
      */
     public Matrix4d rotate(final Vector3d v1, final Vector3d v2) {
@@ -1603,13 +1516,11 @@ public class Matrix4d implements Serializable {
     /**
      * Postmultiplies this matrix with a scale matrix. Postmultiplication is
      * also used by OpenGL ES' 1.x glTranslate/glRotate/glScale.
-     * 
-     * @param scaleX
-     *            The scale in the x-axis.
-     * @param scaleY
-     *            The scale in the y-axis.
-     * @param scaleZ
-     *            The scale in the z-axis.
+     *
+     * @param scaleX The scale in the x-axis.
+     * @param scaleY The scale in the y-axis.
+     * @param scaleZ The scale in the z-axis.
+     *
      * @return This matrix for the purpose of chaining methods together.
      */
     public Matrix4d scale(double scaleX, double scaleY, double scaleZ) {
@@ -1637,9 +1548,8 @@ public class Matrix4d implements Serializable {
     /**
      * Copies the 4x3 upper-left sub-matrix into double array. The destination
      * array is supposed to be a column major matrix.
-     * 
-     * @param dst
-     *            the destination matrix
+     *
+     * @param dst the destination matrix
      */
     public void extract4x3Matrix(double[] dst) {
         dst[0] = val[M00];
@@ -1658,9 +1568,9 @@ public class Matrix4d implements Serializable {
 
     /**
      * Sets the given matrix to this matrix
-     * 
-     * @param aux
-     *            The out matrix
+     *
+     * @param aux The out matrix
+     *
      * @return The aux matrix
      */
     public Matrix4 putIn(Matrix4 aux) {

@@ -60,9 +60,9 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 23,
+      "version": 24,
       "mingsversion": 30200,
-      "size": 69131270,
+      "size": 69134391,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -108,11 +108,11 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "bad91d5f7b74b75100fae4ab0af1939dd07ccb7b012988c4b8722673add31f6b",
+      "sha256": "536b279bef01c163c7f6148775b908588e570874361dd749760ca9c751b94279",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- Upgrade to new descriptor format introduced in 3.2.0.\n- Oort cloud taken to its own external dataset.",
+      "releasenotes": "- Upgrade to new descriptor format introduced in 3.2.0.\n- Oort cloud taken to its own external dataset.\n- NBG hook moved to own dataset.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v023_20220120/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v024_20220126/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -563,22 +563,6 @@
     {
       "name": "catalog-nbg",
       "type": "catalog-gal",
-      "version": 3,
-      "mingsversion": 260,
-      "size": 15786547,
-      "check": "autoload-nbg.json",
-      "data": [
-        "autoload-nbg.json",
-        "nbg",
-        "tex/extragal"
-      ],
-      "description": "NBG catalog - Nearby Galaxies Catalog, contains M87 black hole - 870 galaxies",
-      "sha256": "cf1f56feb25abb964e31afc798a57179547ffa640e92894da349990e048f71f9",
-      "file": "@mirror-url@galaxies/003_20190411/nbg-galaxies.tar.gz"
-    },
-    {
-      "name": "catalog-nbg",
-      "type": "catalog-gal",
       "version": 7,
       "mingsversion": 30000,
       "size": 15786675,
@@ -586,7 +570,6 @@
       "check": "catalog-nbg.json",
       "data": [
         "catalog-nbg.json",
-        "particles-nbg.json",
         "nbg",
         "tex/extragal"
       ],
@@ -594,6 +577,26 @@
       "releasenotes" : "Update LMC and SMC names for the new Wiki connection feature",
       "sha256": "c8a4db2a3c071a57c091432e6680394a31b9e08fe3319077e4c8010131f17e0f",
       "file": "@mirror-url@galaxies/nbg/v07_20201230/galaxies-nbg.tar.gz"
+    },
+    {
+      "key": "catalog-nbg",
+      "name": "NBG catalog",
+      "type": "catalog-gal",
+      "version": 8,
+      "mingsversion": 30200,
+      "size": 15787183,
+      "nobjects": 875,
+      "check": "catalog-nbg.json",
+      "data": [
+        "catalog-nbg.json",
+        "particles-nbg-hook.json",
+        "nbg",
+        "tex/extragal"
+      ],
+      "description": "Nearby Galaxies Catalog, containing more than 800 close-by galaxies. It also contains the M87 black hole",
+      "releasenotes" : "- Add NBG hook object as part of the dataset.",
+      "sha256": "2eca28fc73eb14705aa362ddec61f0ec8b347e3373f6c844b2d852ce48cc4dc0",
+      "file": "@mirror-url@galaxies/nbg/v08_20220126/galaxies-nbg.tar.gz"
     },
     {
       "name": "catalog-sdss-12",

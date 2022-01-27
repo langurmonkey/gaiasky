@@ -29,6 +29,7 @@ import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
@@ -101,8 +102,15 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
                 Class<Coordinates> c = Coordinates.class;
                 try {
                     Method m = ClassReflection.getMethod(c, transformName);
-                    Matrix4 trf = (Matrix4) m.invoke(null);
-                    coordinateSystem.mul(trf);
+                    Object obj = m.invoke(null);
+                    Matrix4 trf = null;
+                    if (obj instanceof Matrix4) {
+                        trf = new Matrix4(((Matrix4) obj).val);
+                    } else if (obj instanceof Matrix4d) {
+                        trf = new Matrix4(((Matrix4d) obj).getValuesFloat());
+                    }
+                    if (trf != null)
+                        coordinateSystem.mul(trf);
                 } catch (ReflectionException e) {
                     Logger.getLogger(this.getClass()).error("Error getting/invoking method Coordinates." + transformName + "()");
                 }
@@ -209,6 +217,10 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
 
     public void setModel(ModelComponent mc) {
         this.mc = mc;
+    }
+
+    public void setTransformFunction(String transformName) {
+        setTransformName(transformName);
     }
 
     public void setTransformName(String transformName) {
