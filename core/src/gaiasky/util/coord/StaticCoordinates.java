@@ -25,9 +25,9 @@ import java.time.Instant;
  */
 public class StaticCoordinates implements IBodyCoordinates {
 
-    Vector3d position;
-    String transformName;
-    Matrix4d trf;
+    private Vector3d position;
+    private String transformName;
+    private Matrix4d trf;
 
     @Override
     public void doneLoading(Object... params) {
