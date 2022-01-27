@@ -585,8 +585,17 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             } catch (Exception e) {
                 logger.error(e);
             }
-
         }
+    }
+
+    /**
+     * Constructs the transformation matrix from a double array containing
+     * the values in a column-major order (first the four values of the first
+     * column, then the second, etc.). The double array
+     * must have at least 16 elements; the first 16 will be copied.
+     **/
+    public void setTransformValues(double[] transformValues) {
+        this.transformFunction = new Matrix4d(transformValues);
     }
 
     public void setMultiplier(Double multiplier) {

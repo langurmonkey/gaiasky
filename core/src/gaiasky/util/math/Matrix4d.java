@@ -1580,4 +1580,42 @@ public class Matrix4d implements Serializable {
         }
         return aux;
     }
+
+    /**
+     * Constructs a change of basis from the canonical basis to the base defined by the
+     * given x, y and z vectors. The new xyz basis must be orthogonal.
+     * @param x The x vector of the new basis.
+     * @param y The y vector of the new basis.
+     * @param z The z vector of the new basis.
+     * @return The change of basis matrix.
+     */
+    public static Matrix4d changeOfBasis(Vector3d x, Vector3d y, Vector3d z) {
+        double[] vals = new double[]{
+                x.x, y.x, z.x, 0, // x -> z
+                x.y, y.y, z.y, 0, // y -> y
+                x.z, y.z, z.z, 0, // z -> -x
+                0, 0, 0, 1
+        };
+        Matrix4d c = new Matrix4d(vals);
+        return c.tra();
+    }
+
+    /**
+     * Constructs a change of basis from the canonical basis to the base defined by the
+     * given x, y and z vectors. The new xyz basis must be orthogonal.
+     * @param x The x vector of the new basis.
+     * @param y The y vector of the new basis.
+     * @param z The z vector of the new basis.
+     * @return The change of basis matrix.
+     */
+    public static Matrix4d changeOfBasis(double[]  x, double[] y, double[] z) {
+        double[] vals = new double[]{
+                x[0], y[0], z[0], 0, // x -> z
+                x[1], y[1], z[1], 0, // y -> y
+                x[2], y[2], z[2], 0, // z -> -x
+                0, 0, 0, 1
+        };
+        Matrix4d c = new Matrix4d(vals);
+        return c.tra();
+    }
 }
