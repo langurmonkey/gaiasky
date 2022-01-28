@@ -18,13 +18,11 @@ public class Intersectord {
     /**
      * Quick check whether the given {@link Ray} and {@link BoundingBoxd}
      * intersect.
-     * 
-     * @param ray
-     *            The ray
-     * @param center
-     *            The center of the bounding box
-     * @param dimensions
-     *            The dimensions (width, height and depth) of the bounding box
+     *
+     * @param ray        The ray
+     * @param center     The center of the bounding box
+     * @param dimensions The dimensions (width, height and depth) of the bounding box
+     *
      * @return Whether the ray and the bounding box intersect.
      */
     public static boolean intersectRayBoundsFast(Rayd ray, Vector3d center, Vector3d dimensions) {
@@ -147,10 +145,12 @@ public class Intersectord {
 
     /**
      * TODO: Not working well due to aux vectors
+     *
      * @param linePoint0
      * @param linePoint1
      * @param sphereCenter
      * @param sphereRadius
+     *
      * @return
      */
     public static Array<Vector3d> intersectSegmentSphere(Vector3d linePoint0, Vector3d linePoint1, Vector3d sphereCenter, double sphereRadius) {
@@ -173,13 +173,11 @@ public class Intersectord {
 
     /**
      * Returns true if c is between a and b. Assumes c is colinear with a and b.
-     * 
-     * @param a
-     *            Point A
-     * @param b
-     *            Point B
-     * @param c
-     *            Point to check
+     *
+     * @param a Point A
+     * @param b Point B
+     * @param c Point to check
+     *
      * @return
      */
     private static boolean isBetween(Vector3d a, Vector3d b, Vector3d c) {
@@ -201,13 +199,11 @@ public class Intersectord {
      * Returns the shortest distance between the line defined by x1 and x2 and
      * the point x0. See <a href=
      * "http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html">here</a>.
-     * 
-     * @param x1
-     *            Segment first point
-     * @param x2
-     *            Segment second point
-     * @param x0
-     *            Point to test
+     *
+     * @param x1 Segment first point
+     * @param x2 Segment second point
+     * @param x0 Point to test
+     *
      * @return The minimum distance between the line and the point
      */
     public synchronized static double distanceLinePoint(Vector3d x1, Vector3d x2, Vector3d x0) {
@@ -220,13 +216,11 @@ public class Intersectord {
 
     /**
      * Calculates the euclidean distance from a point to a line segment.
-     * 
-     * @param v
-     *            the point
-     * @param a
-     *            start of line segment
-     * @param b
-     *            end of line segment
+     *
+     * @param v the point
+     * @param a start of line segment
+     * @param b end of line segment
+     *
      * @return distance from v to line segment [a,b]
      */
     public synchronized static double distanceSegmentPoint(final Vector3d a, final Vector3d b, final Vector3d v) {
@@ -247,4 +241,100 @@ public class Intersectord {
         return (ab.crs(av)).len() / ablen; // Perpendicular distance of point to segment.
     }
 
+    /**
+     * Intersects a {@link Rayd} and a {@link Planed}. The intersection point is stored in intersection in case an intersection is
+     * present.
+     *
+     * @param intersection The vector the intersection point is written to (optional)
+     *
+     * @return Whether an intersection is present.
+     */
+    public static boolean intersectRayPlane(Rayd ray, Planed plane, Vector3d intersection) {
+        double denom = ray.direction.dot(plane.getNormal());
+        if (denom != 0) {
+            double t = -(ray.origin.dot(plane.getNormal()) + plane.getD()) / denom;
+            if (t < 0)
+                return false;
+
+            if (intersection != null)
+                intersection.set(ray.origin).add(auxd1.set(ray.direction).scl(t));
+            return true;
+        } else if (plane.testPoint(ray.origin) == Planed.PlaneSide.OnPlane) {
+            if (intersection != null)
+                intersection.set(ray.origin);
+            return true;
+        } else
+            return false;
+    }
+
+    /**
+     * Intersects a line and a plane. The intersection is returned as the distance from the first point to the plane. In case an
+     * intersection happened, the return value is in the range [0,1]. The intersection point can be recovered by point1 + t *
+     * (point2 - point1) where t is the return value of this method.
+     */
+    public static double intersectLinePlane(float x, float y, float z, float x2, float y2, float z2, Planed plane,
+            Vector3d intersection) {
+        Vector3d direction = auxd1.set(x2, y2, z2).sub(x, y, z);
+        Vector3d origin = auxd2.set(x, y, z);
+        double denom = direction.dot(plane.getNormal());
+        if (denom != 0) {
+            double t = -(origin.dot(plane.getNormal()) + plane.getD()) / denom;
+            if (intersection != null)
+                intersection.set(origin).add(direction.scl(t));
+            return t;
+        } else if (plane.testPoint(origin) == Planed.PlaneSide.OnPlane) {
+            if (intersection != null)
+                intersection.set(origin);
+            return 0;
+        }
+
+        return -1;
+    }
+
+    /**
+     * @param p0           First point of the line.
+     * @param p1           Second point of the line.
+     * @param point        A point on the plane.
+     * @param normal       The normal vector defining the plane direction.
+     * @param intersection The ouput vector.
+     *
+     * @return A vector, or null.
+     */
+    public static double intersectLinePlane(Vector3d p0, Vector3d p1, Vector3d point, Vector3d normal, Vector3d intersection) {
+        double epsilon = 1e-6;
+        Vector3d u = p1.cpy().sub(p0);
+        double dot = normal.dot(u);
+        if (Math.abs(dot) > epsilon) {
+            // The factor of the point between p0 -> p1 (0 - 1)
+            // if 'fac' is between (0 - 1) the point intersects with the segment.
+            // Otherwise:
+            //  < 0.0: behind p0.
+            //  > 1.0: infront of p1.
+            Vector3d w = p0.cpy().sub(point);
+            double fac = -normal.dot(w) / dot;
+            u.scl(fac);
+            intersection.set(p0).add(u);
+            return 0;
+        }
+        // The segment is parallel to the plane
+        return -1;
+    }
+    /**
+     * Determines the point of intersection between a plane defined by a point and a normal vector and a line defined by a point and a direction vector.
+     *
+     * @param planePoint    A point on the plane.
+     * @param planeNormal   The normal vector of the plane.
+     * @param linePoint     A point on the line.
+     * @param lineDirection The direction vector of the line.
+     * @return The point of intersection between the line and the plane, null if the line is parallel to the plane.
+     */
+    public static double lineIntersection(Vector3d planePoint, Vector3d planeNormal, Vector3d linePoint, Vector3d lineDirection, Vector3d out) {
+        if (planeNormal.dot(lineDirection.nor()) == 0) {
+            return -1;
+        }
+
+        double t = (planeNormal.dot(planePoint) - planeNormal.dot(linePoint)) / planeNormal.dot(lineDirection.nor());
+        out.set(linePoint).add(lineDirection.nor().scl(t));
+        return 0;
+    }
 }

@@ -38,6 +38,7 @@ import java.util.Random;
 
 /**
  * A single point particle.
+ *
  * @deprecated Only the Sun uses this via the Star subclass. Move to star group.
  */
 @Deprecated
@@ -263,7 +264,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     }
 
     protected boolean addToRender(IRenderable renderable, RenderGroup rg) {
-        if(shouldRender()) {
+        if (shouldRender()) {
             GaiaSky.instance.sgr.renderLists().get(rg.ordinal()).add(renderable);
             return true;
         }

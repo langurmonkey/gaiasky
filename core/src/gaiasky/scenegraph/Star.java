@@ -20,6 +20,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.FovCamera;
@@ -30,6 +31,7 @@ import gaiasky.util.Constants;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.Settings;
+import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
@@ -153,6 +155,16 @@ public class Star extends Particle {
     public void doneLoading(final AssetManager manager) {
         super.doneLoading(manager);
         initModel(manager);
+
+        if (!Float.isFinite(this.absmag)) {
+            double distPc;
+            if(this.coordinates != null) {
+                distPc = this.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), aux3b1.get()).lend() * Constants.U_TO_PC;
+            } else {
+                distPc = this.getAbsolutePosition(aux3b1.get()).lend() * Constants.U_TO_PC;
+            }
+            this.absmag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, this.appmag);
+        }
     }
 
     private void initModel(final AssetManager manager) {

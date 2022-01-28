@@ -31,19 +31,14 @@ import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
-import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.Logger;
+import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
-import gaiasky.util.math.MathUtilsd;
-import gaiasky.util.math.Matrix4d;
-import gaiasky.util.math.Vector3d;
+import gaiasky.util.math.*;
 import gaiasky.util.time.ITimeFrameProvider;
 import net.jafama.FastMath;
 
@@ -57,6 +52,11 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     private static final Log logger = Logger.getLogger(Orbit.class);
 
     private static OrbitRefresher orbitRefresher;
+
+    private static enum OrientationModel {
+        DEFAULT,
+        EXTRASOLAR_SYSTEM
+    }
 
     private static void initRefresher() {
         if (orbitRefresher == null) {
@@ -92,6 +92,8 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     public boolean newMethod = false;
     // Current orbit completion -- current delta from t0
     public double coord;
+    // The orientation model
+    public OrientationModel model = OrientationModel.DEFAULT;
 
     /**
      * Refreshing state
@@ -168,6 +170,31 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         if (body != null) {
             params = new OrbitDataLoaderParameter(body.names[0], null, oc.period, 500);
             params.orbit = this;
+        }
+
+        if(model == OrientationModel.EXTRASOLAR_SYSTEM && transformFunction == null && parent != null) {
+            // Compute new transform function from the orbit's parent position
+            Vector3b barycenter = aux3b1.get();
+            if(parent.coordinates != null) {
+                parent.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), barycenter);
+            } else {
+                parent.getAbsolutePosition(barycenter);
+            }
+
+            // Up
+            Vector3b y = aux3b2.get().set(barycenter).nor();
+            Vector3d yd = y.put(aux3d1.get());
+            // Towards north - intersect y with plane
+            Vector3d zd = aux3d2.get();
+            //Intersectord.intersectLinePlane(new Vector3d(0,0,0), new Vector3d(0,1,0), barycenter.put(new Vector3d()), yd, zd);
+            //Intersectord.lineIntersection(barycenter.put(new Vector3d()), new Vector3d(yd), new Vector3d(0,0,0), new Vector3d(0,1,0), zd);
+            //zd.sub(barycenter).nor();
+            zd.set(yd).crs(0, 1, 0).nor();
+
+            // Orthogonal to ZY
+            Vector3d xd = aux3d3.get().set(zd).crs(yd);
+
+            transformFunction = Matrix4d.changeOfBasis(xd, yd, zd);
         }
     }
 
@@ -310,70 +337,17 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     }
 
     public Vector3d keplerToCartesian(Vector3d out) {
-        double musola3 = Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
-        double epoch = oc.epoch;
-        // Semi-major axis
-        double a = (oc.semimajoraxis * 1000d);
-        // Eccentricity
-        double e = oc.e;
-        // Inclination
-        double i = oc.i * MathUtilsd.degRad;
-        // Longitude of ascending node
-        double omega_lan = oc.ascendingnode * MathUtilsd.degRad;
-        // Argument of periapsis
-        double omega_ap = oc.argofpericenter * MathUtilsd.degRad;
-        // Mean anomaly at epoch
-        double M0 = oc.meananomaly * MathUtilsd.degRad;
-        // Time
-        double t = AstroUtils.getJulianDate(GaiaSky.instance.time.getTime());
-        // 1
-        double deltat = (t - epoch) * 86400d;
+        oc.loadDataPoint(out, GaiaSky.instance.time.getTime());
 
-        double M = M0 + deltat * musola3;
-
-        // 2
-        double E = M;
-        for (int j = 0; j < 2; j++) {
-            E = E - ((E - e * Math.sin(E) - M) / (1.0 - e * Math.cos(E)));
+        if(transformFunction != null) {
+            auxMat.set(transformFunction).rotate(0, 1, 0, 90);
+            out.mul(auxMat);
         }
-        double E_t = E;
-
-        // 3
-        double nu_t = 2.0 * Math.atan2(Math.sqrt(1.0 + e) * Math.sin(E_t / 2.0), Math.sqrt(1.0 - e) * Math.cos(E_t / 2.0));
-
-        // 4
-        double rc_t = a * (1.0 - e * Math.cos(E_t));
-
-        // 5
-        double ox = rc_t * Math.cos(nu_t);
-        double oy = rc_t * Math.sin(nu_t);
-
-        // 6
-        double sinomega = Math.sin(omega_ap);
-        double cosomega = Math.cos(omega_ap);
-        double sinOMEGA = Math.sin(omega_lan);
-        double cosOMEGA = Math.cos(omega_lan);
-        double cosi = Math.cos(i);
-        double sini = Math.sin(i);
-
-        double x = ox * (cosomega * cosOMEGA - sinomega * cosi * sinOMEGA) - oy * (sinomega * cosOMEGA + cosomega * cosi * sinOMEGA);
-        double y = ox * (cosomega * sinOMEGA + sinomega * cosi * cosOMEGA) + oy * (cosomega * cosi * cosOMEGA - sinomega * sinOMEGA);
-        double z = ox * (sinomega * sini) + oy * (cosomega * sini);
-
-        // 7
-        double fac = Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
-        x *= fac;
-        y *= fac;
-        z *= fac;
-
-        auxMat.setToRotation(0, 1, 0, -90).mul(Coordinates.equatorialToEcliptic());
-        out.set(y, z, x).traMul(auxMat);
 
         return out;
     }
 
     public void textPosition(ICamera cam, Vector3d out) {
-
     }
     public double textPosition2(ICamera cam, Vector3d out) {
         keplerToCartesian(out);
@@ -614,6 +588,19 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     public void setNewmethod(Boolean newMethod) {
         this.newMethod = newMethod;
+    }
+
+    /**
+     * Sets the orientation model as a string.
+     * @param model The orientation model.
+     */
+    public void setModel(String model) {
+        model = model.toUpperCase().trim();
+        try{
+            this.model = OrientationModel.valueOf(model);
+        } catch(IllegalArgumentException e){
+            logger.error(I18n.txt("notif.error", e.getLocalizedMessage()));
+        }
     }
 
     @Override

@@ -60,7 +60,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     /** NAME FOR WIKIPEDIA **/
     public String wikiname;
     /** Absolute magnitude, m = -2.5 log10(flux), with the flux at 10 pc **/
-    public float absmag;
+    public float absmag = Float.NaN;
     /** Apparent magnitude, m = -2.5 log10(flux) **/
     public float appmag;
     /** Red, green and blue colors and their revamped cousins **/

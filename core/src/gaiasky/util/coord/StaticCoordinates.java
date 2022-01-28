@@ -48,7 +48,7 @@ public class StaticCoordinates implements IBodyCoordinates {
 
     @Override
     public Vector3b getEquatorialCartesianCoordinates(Instant date, Vector3b out) {
-        return out.set(position);
+       return out.set(position);
     }
 
     public void setTransformFunction(String transformName) {

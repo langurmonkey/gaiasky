@@ -24,9 +24,9 @@ public class OrbitComponent {
     public double epoch;
     /** Semi major axis of the ellipse, a in Km. **/
     public double semimajoraxis;
-    /** Eccentricity of the ellipse. **/
+    /** Eccentricity of the ellipse, in degrees. **/
     public double e;
-    /** Inclination, angle between the reference plane (ecliptic) and the orbital plane. **/
+    /** Inclination, angle between the reference plane and the orbital plane, in degrees. **/
     public double i;
     /** Longitude of the ascending node in degrees. **/
     public double ascendingnode;
@@ -82,17 +82,21 @@ public class OrbitComponent {
     }
 
     public void loadDataPoint(Vector3d out, Instant t) {
+        double tjd = AstroUtils.getJulianDate(t);
+        loadDataPoint(out, tjd - epoch);
+    }
+
+    // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
+    public void loadDataPoint(Vector3d out, double dtDays) {
         double a = semimajoraxis * Nature.KM_TO_M; // km to m
         double M0 = meananomaly * MathUtilsd.degRad;
         double omega_lan = ascendingnode * MathUtilsd.degRad;
         double omega_ap = argofpericenter * MathUtilsd.degRad;
         double ic = i * MathUtilsd.degRad;
 
-        double tjd = AstroUtils.getJulianDate(t);
-
         // 1
-        double deltat = (tjd - epoch) * Nature.D_TO_S;
-        double M = M0 + deltat * Math.sqrt(mu / Math.pow(a, 3d));
+        double dt = dtDays * Nature.D_TO_S;
+        double M = M0 + dt * Math.sqrt(mu / Math.pow(a, 3d));
 
         // 2
         double E = M;
@@ -102,10 +106,10 @@ public class OrbitComponent {
         double E_t = E;
 
         // 3
-        double nu_t = 2d * Math.atan2(Math.sqrt(1d + e) * Math.sin(E_t / 2d), Math.sqrt(1d - e) * Math.cos(E_t / 2d));
+        double nu_t = 2d * Math.atan2(Math.sqrt(1.0 + e) * Math.sin(E_t / 2.0), Math.sqrt(1.0 - e) * Math.cos(E_t / 2.0));
 
         // 4
-        double rc_t = a * (1d - e * Math.cos(E_t));
+        double rc_t = a * (1.0 - e * Math.cos(E_t));
 
         // 5
         double ox = rc_t * Math.cos(nu_t);
@@ -124,9 +128,9 @@ public class OrbitComponent {
         double z = ox * (sinomega * sini) + oy * (cosomega * sini);
 
         // 7
-        x *= Constants.M_TO_U;
-        y *= Constants.M_TO_U;
-        z *= Constants.M_TO_U;
+        x *= Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
+        y *= Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
+        z *= Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
 
         out.set(y, z, x);
     }
