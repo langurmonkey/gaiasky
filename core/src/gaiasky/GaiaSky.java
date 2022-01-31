@@ -1501,8 +1501,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             break;
         case LABEL_COLOR_CMD:
             final SceneGraphNode labelColorObject = (SceneGraphNode) data[0];
+            name = (String) data[1];
             float[] labelColor = (float[]) data[2];
-            labelColorObject.setLabelcolor(labelColor);
+            labelColorObject.setLabelcolor(labelColor, name);
             break;
         case PARK_RUNNABLE:
             synchronized (parkedRunnables) {

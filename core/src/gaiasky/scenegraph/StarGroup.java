@@ -85,6 +85,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
     /** Stars for which forceLabel is enabled **/
     private Set<Integer> forceLabelStars;
+    /** Stars with special label colors **/
+    private Map<Integer, float[]> labelColors;
 
     public StarGroup() {
         super();
@@ -93,6 +95,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         this.epochJd = AstroUtils.JD_J2015_5;
         this.variabilityEpochJd = AstroUtils.JD_J2010;
         this.forceLabelStars = new HashSet<>();
+        this.labelColors = new HashMap<>();
     }
 
     public void initialize() {
@@ -556,7 +559,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
 
         double distToCamera = starPosition.len();
         float radius = (float) getRadius(idx);
-        if(forceLabel){
+        if (forceLabel) {
             radius = Math.max(radius, 1e4f);
         }
         float viewAngle = (float) (((radius / distToCamera) / camera.getFovFactor()) * Settings.settings.scene.star.brightness * 1.5f);
@@ -568,6 +571,8 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             shader.setUniformf("u_viewAnglePow", 1f);
             shader.setUniformf("u_thOverFactor", thOverFactor);
             shader.setUniformf("u_thOverFactorScl", camera.getFovFactor());
+            // Override object color
+            shader.setUniform4fv("u_color", textColour(star.names()[0]), 0, 4);
             double textSize = FastMath.tanh(viewAngle) * distToCamera * 1e5d;
             float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
             textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
@@ -931,6 +936,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
+    public void setLabelcolor(float[] color, String name) {
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            labelColors.put(idx, color);
+        }
+    }
+
+    @Override
     public void setForceLabel(Boolean forceLabel, String name) {
         if (index.containsKey(name)) {
             int idx = index.get(name);
@@ -952,6 +965,17 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return forceLabelStars.contains(idx);
         }
         return false;
+    }
+
+    public float[] textColour(String name) {
+        name = name.toLowerCase(Locale.ROOT).trim();
+        if (index.containsKey(name)) {
+            int idx = index.get(name);
+            if (labelColors.containsKey(idx)) {
+                return labelColors.get(idx);
+            }
+        }
+        return labelcolor;
     }
 
     public void setInGpu(boolean inGpu) {

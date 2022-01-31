@@ -524,13 +524,25 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     }
 
     @Override
+    public void setColor(double[] color) {
+        super.setColor(color);
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
+    }
+
+    @Override
+    public void setColor(float[] color) {
+        super.setColor(color);
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
+    }
+
+    @Override
     public boolean renderText() {
         return label;
     }
 
     @Override
     public float[] textColour() {
-        return this.cc;
+        return this.labelcolor;
     }
 
     @Override

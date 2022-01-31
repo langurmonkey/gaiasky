@@ -166,7 +166,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
     @Override
     public float[] textColour() {
-        return this.cc;
+        return this.labelcolor;
     }
 
     @Override

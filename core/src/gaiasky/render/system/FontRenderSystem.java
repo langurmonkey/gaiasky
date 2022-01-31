@@ -25,14 +25,12 @@ public class FontRenderSystem extends AbstractRenderSystem {
     private final ExtSpriteBatch batch;
     public BitmapFont fontDistanceField, font2d, fontTitles;
     private final Comparator<IRenderable> comp;
-    private final float[] red;
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program) {
         super(rg, alphas, new ExtShaderProgram[] { program });
         this.batch = batch;
         // Init comparator
         comp = new DistToCameraComparator<>();
-        red = new float[] { 1f, 0f, 0f, 1f };
     }
 
     public FontRenderSystem(RenderGroup rg, float[] alphas, ExtSpriteBatch batch, ExtShaderProgram program, BitmapFont fontDistanceField, BitmapFont font2d, BitmapFont fontTitles) {
@@ -71,7 +69,7 @@ public class FontRenderSystem extends AbstractRenderSystem {
             I3DTextRenderable lr = (I3DTextRenderable) r;
 
             // Label color
-            program.setUniform4fv("u_color", Settings.settings.program.ui.isUINightMode() ? red : lr.textColour(), 0, 4);
+            program.setUniform4fv("u_color", lr.textColour(), 0, 4);
             // Component alpha
             program.setUniformf("u_componentAlpha", getAlpha(lr) * (!lr.isLabel() ? 1 : alpha));
             // Font opacity multiplier, take into account element opacity

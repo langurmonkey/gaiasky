@@ -65,8 +65,6 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
      **/
     protected Vector3 pmSph;
 
-    protected float[] labelcolor;
-
     // Distance of this cluster to Sol, in internal units
     protected double dist;
 

@@ -43,7 +43,6 @@ import gaiasky.util.tree.LoadStatus;
 import java.util.List;
 
 public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObserver {
-    float[] labelColour = new float[] { 1f, 1f, 1f, 1f };
     String transformName;
     Matrix4 coordinateSystem;
 
@@ -289,7 +288,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
 
     @Override
     public float[] textColour() {
-        return labelColour;
+        return labelcolor;
     }
 
     @Override
@@ -318,11 +317,6 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
     public void textDepthBuffer() {
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
         Gdx.gl.glDepthMask(false);
-    }
-
-    public void setLabelcolor(double[] labelcolor) {
-        this.labelColour = GlobalResources.toFloatArray(labelcolor);
-
     }
 
     @Override

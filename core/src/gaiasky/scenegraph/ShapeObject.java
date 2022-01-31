@@ -52,7 +52,6 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     private ModelComponent mc;
 
     private IntModel model;
-    private Matrix4 modelTransform;
     private String modelShape;
     private Map<String, Object> modelParams;
     private int primitiveType;
@@ -113,7 +112,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
             mc.env.add(dLight);
             mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1.0f, 1.0f, 1.0f, 1f));
             mc.env.set(new FloatAttribute(FloatAttribute.Shininess, 0.2f));
-            mc.instance = new IntModelInstance(model, modelTransform);
+            mc.instance = new IntModelInstance(model, new Matrix4());
 
             // Relativistic effects
             if (Settings.settings.runtime.relativisticAberration)
@@ -234,7 +233,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
 
     @Override
     public float[] textColour() {
-        return cc;
+        return labelcolor;
     }
 
     @Override

@@ -194,7 +194,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * Base RGB color
      */
     public float[] cc;
-    public float[] labelcolor = new float[] { 1, 1, 1, 1 };
+    public float[] labelcolor = Settings.settings.program.ui.isUINightMode() ? new float[] { 1, 0, 0, 1 } : new float[] { 1, 1, 1, 1 };
 
     /**
      * Is this just a copy?
@@ -1069,6 +1069,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     /**
      * Sets the object color, as an RGBA double array.
+     *
      * @param color The color.
      */
     public void setColor(double[] color) {
@@ -1077,6 +1078,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     /**
      * Sets the object color, as an RGBA float array.
+     *
      * @param color The color.
      */
     public void setColor(float[] color) {
@@ -1089,6 +1091,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     /**
      * Sets the label color, as an RGBA double array.
+     *
      * @param color The label color.
      */
     public void setLabelcolor(double[] color) {
@@ -1097,13 +1100,18 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     /**
      * Sets the label color, as an RGBA float array.
+     *
      * @param color The label color.
      */
     public void setLabelcolor(float[] color) {
         this.labelcolor = color;
     }
 
-    public float[] getLabelcolor(){
+    public void setLabelcolor(float[] color, String name) {
+        this.setLabelcolor(color);
+    }
+
+    public float[] getLabelcolor() {
         return labelcolor;
     }
 
@@ -1275,9 +1283,11 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     public void setForceLabel(Boolean forceLabel) {
         this.setForcelabel(forceLabel);
     }
+
     public void setForcelabel(Boolean forceLabel) {
         this.forceLabel = forceLabel;
     }
+
     public void setForceLabel(Boolean forceLabel, String name) {
         this.setForcelabel(forceLabel);
     }

@@ -58,7 +58,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
 
     public Constellation() {
         super();
-        cc = new float[] { .5f, 1f, .5f, alpha };
+        setColor(new float[]{ .5f, 1f, .5f, alpha });
         this.posd = new Vector3d();
     }
 
@@ -185,8 +185,20 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     }
 
     @Override
+    public void setColor(double[] color) {
+        super.setColor(color);
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
+    }
+
+    @Override
+    public void setColor(float[] color) {
+        super.setColor(color);
+        this.labelcolor = new float[] { cc[0], cc[1], cc[2], cc[3] };
+    }
+
+    @Override
     public float[] textColour() {
-        return cc;
+        return labelcolor;
     }
 
     @Override

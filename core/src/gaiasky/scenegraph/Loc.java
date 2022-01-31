@@ -144,7 +144,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
     @Override
     public float[] textColour() {
-        return cc;
+        return labelcolor;
     }
 
     @Override
