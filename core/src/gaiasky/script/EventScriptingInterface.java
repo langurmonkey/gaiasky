@@ -667,6 +667,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void setLabelColor(String name, double[] color) {
+        String nameLc = name.toLowerCase(Locale.ROOT).trim();
+        if(checkObjectName(nameLc)) {
+            SceneGraphNode obj = getObject(nameLc);
+            em.post(Events.LABEL_COLOR_CMD, obj, nameLc, GlobalResources.toFloatArray(color), this);
+        }
+    }
+
+    public void setLabelColor(String name,final List<?> color){
+        setLabelColor(name, dArray(color));
+    }
+
+    @Override
     public boolean getForceDisplayLabel(String name) {
         String nameLc = name.toLowerCase().trim();
         SceneGraphNode obj = getObject(nameLc);

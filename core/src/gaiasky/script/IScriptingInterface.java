@@ -127,7 +127,7 @@ public interface IScriptingInterface {
      *                 left to right. This is not resolution-dependant.
      * @param y        The y coordinate of the bottom-left corner, in [0,1] from
      *                 bottom to top. This is not resolution-dependant.
-     * @param color    The color as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param color    The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fontSize The size of the font. The system will use the existing font
      *                 closest to the chosen size and scale it up or down to match
      *                 the desired size. Scaling can cause artifacts, so to ensure
@@ -218,7 +218,7 @@ public interface IScriptingInterface {
      *              left to right. This is not resolution-dependant.
      * @param y     The y coordinate of the bottom-left corner, in [0,1] from
      *              bottom to top. This is not resolution-dependant.
-     * @param color The color as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param color The color as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
     void displayImageObject(int id, final String path, double x, double y, double[] color);
 
@@ -694,6 +694,14 @@ public interface IScriptingInterface {
      * @param forceLabel Whether to force the label to render for this object or not.
      */
     void setForceDisplayLabel(String name, boolean forceLabel);
+
+    /**
+     * Sets the label color of the object identified by the given name.
+     * The label color must be an array of RGBA values in [0,1].
+     * @param name The object name.
+     * @param color The label color as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     */
+    void setLabelColor(String name, double[] color);
 
     /**
      * Gets the value of the force display label flag for the object identified with the
@@ -1366,7 +1374,7 @@ public interface IScriptingInterface {
      * @param name   The name to identify the polyline, to possibly remove it later.
      * @param points The points of the polyline. It is an array containing all the
      *               points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color  The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param color  The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      */
     void addPolyline(String name, double[] points, double[] color);
 
@@ -1379,7 +1387,7 @@ public interface IScriptingInterface {
      * @param name      The name to identify the polyline, to possibly remove it later.
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      */
     void addPolyline(String name, double[] points, double[] color, double lineWidth);
@@ -1395,7 +1403,7 @@ public interface IScriptingInterface {
      * @param name      The name to identify the polyline, to possibly remove it later.
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
      */
@@ -1409,7 +1417,7 @@ public interface IScriptingInterface {
      * @param name      The name to identify the polyline, to possibly remove it later.
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
      */
@@ -1425,7 +1433,7 @@ public interface IScriptingInterface {
      * @param name      The name to identify the polyline, to possibly remove it later.
      * @param points    The points of the polyline. It is an array containing all the
      *                  points as in [x0, y0, z0, x1, y1, z1, ..., xn, yn, zn].
-     * @param color     The color of the polyline as an array of {red, green, blue, alpha}, where each element is in [0,1].
+     * @param color     The color of the polyline as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param lineWidth The line width. Usually a value between 1 (default) and 10.
      * @param primitive The GL primitive: GL_LINES=1, GL_LINE_LOOP=2, GL_LINE_STRIP=3
      * @param arrowCaps Whether to represent arrow caps. If enabled, the line is rendered in CPU mode, which is slower.
@@ -2148,7 +2156,7 @@ public interface IScriptingInterface {
      * @param dsName         The name of the dataset.
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
-     * @param labelColor     The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync           Whether the load must happen synchronously or asynchronously.
@@ -2167,9 +2175,9 @@ public interface IScriptingInterface {
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize  The size of the particles in pixels.
      * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param sync          Whether the load must happen synchronously or asynchronously.
@@ -2188,9 +2196,9 @@ public interface IScriptingInterface {
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param profileDecay  The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise    In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize  The size of the particles in pixels.
      * @param ct            The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
@@ -2211,9 +2219,9 @@ public interface IScriptingInterface {
      * @param dsName             The name of the dataset.
      * @param path               Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param profileDecay       The profile decay of the particles as in 1 - distCentre^decay.
-     * @param particleColor      The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor      The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param colorNoise         In [0,1], the noise to apply to the color so that each particle gets a slightly different tone. Set to 0 so that all particles get the same color.
-     * @param labelColor         The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor         The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param particleSize       The size of the particles in pixels.
      * @param particleSizeLimits The minimum and maximum size of the particles in pixels.
      * @param ct                 The name of the component type to use like "Stars", "Galaxies", etc. (see {@link gaiasky.render.ComponentTypes.ComponentType}).
@@ -2236,7 +2244,7 @@ public interface IScriptingInterface {
      *
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param particleColor The base color of the particles and labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync          Whether the load must happen synchronously or asynchronously.
@@ -2255,8 +2263,8 @@ public interface IScriptingInterface {
      *
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param particleColor The base color of the particles, as an array of {red, green, blue, alpha} where each element is in [0,1].
-     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor The base color of the particles, as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync          Whether the load must happen synchronously or asynchronously.
@@ -2276,7 +2284,7 @@ public interface IScriptingInterface {
      *
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param particleColor The base color of the particles and labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
@@ -2296,8 +2304,8 @@ public interface IScriptingInterface {
      *
      * @param dsName        The name of the dataset.
      * @param path          Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param particleColor The base color of the particles and labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
-     * @param labelColor    The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param particleColor The base color of the particles and labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param labelColor    The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param ct            The name of the component type to use (see {@link gaiasky.render.ComponentTypes.ComponentType}).
      * @param fadeIn        Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut       Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
@@ -2323,7 +2331,7 @@ public interface IScriptingInterface {
      * @param dsName         The name of the dataset.
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the magnitudes in the light curve, as in <code>appmag = appmag - magnitudeScale</code>.
-     * @param labelColor     The color of the labels, as an array of {red, green, blue, alpha} where each element is in [0,1].
+     * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
      * @param fadeIn         Two values which represent the fade in mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param fadeOut        Two values which represent the fade out mapping distances (in parsecs, as distance from camera to the Sun) of this dataset.
      * @param sync           Whether the load must happen synchronously or asynchronously.

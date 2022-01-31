@@ -1014,6 +1014,13 @@ public enum Events {
     FORCE_OBJECT_LABEL_CMD,
 
     /**
+     * Sets the label color for a given object.
+     * Contains the object (instance of {@link gaiasky.scenegraph.SceneGraphNode}), the name of the object, the new color
+     * as a float array (RGBA) in [0,1], and the source object.
+     */
+    LABEL_COLOR_CMD,
+
+    /**
      * Quit action, can contain optional Runnable to run on accept()
      **/
     SHOW_QUIT_ACTION,
