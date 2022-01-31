@@ -37,6 +37,9 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * The dialog to search objects. It optionally presents the user with a list of suggestions as the
@@ -51,7 +54,7 @@ public class SearchDialog extends GenericDialog {
     private OwnLabel infoMessage;
     private final ISceneGraph sg;
     // Matching nodes
-    private final Array<String> matching;
+    private final SortedSet<String> matching;
     private Array<OwnLabel> matchingLabels;
     private Table candidates;
     private int cIdx = -1;
@@ -64,7 +67,7 @@ public class SearchDialog extends GenericDialog {
         super(I18n.txt("gui.objects.search"), skin, ui);
         this.sg = sg;
         this.aux = new Vector2();
-        this.matching = new Array<>(10);
+        this.matching = new TreeSet<>();
         this.matchingLabels = new Array<>(10);
         this.tasks = new Array<>(20);
 
@@ -117,10 +120,10 @@ public class SearchDialog extends GenericDialog {
                         me.remove();
                         return true;
                     } else if (code == Keys.UP) {
-                        cIdx = cIdx - 1 < 0 ? matching.size - 1 : cIdx - 1;
+                        cIdx = cIdx - 1 < 0 ? matching.size() - 1 : cIdx - 1;
                         selectMatch();
                     } else if (code == Keys.DOWN) {
-                        cIdx = (cIdx + 1) % matching.size;
+                        cIdx = (cIdx + 1) % matching.size();
                         selectMatch();
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
@@ -136,9 +139,8 @@ public class SearchDialog extends GenericDialog {
                                         if (!matching.isEmpty()) {
                                             cIdx = -1;
                                             candidates.clear();
-                                            int n = matching.size;
-                                            for (int i = n - 1; i >= 0; i--) {
-                                                String match = matching.get(i);
+                                            int n = matching.size();
+                                            matching.stream().forEach(match -> {
                                                 OwnLabel m = new OwnLabel(match, skin);
                                                 m.addListener((evt) -> {
                                                     if (evt instanceof InputEvent) {
@@ -155,10 +157,8 @@ public class SearchDialog extends GenericDialog {
                                                 matchingLabels.add(m);
                                                 m.setWidth(searchInput.getWidth());
                                                 Cell<?> c = candidates.add(m).left().padBottom(pad5);
-                                                if (i > 0) {
                                                     c.row();
-                                                }
-                                            }
+                                            });
                                             candidates.pack();
                                             searchInput.localToStageCoordinates(aux.set(0, 0));
                                             candidates.setPosition(aux.x, aux.y, Align.topLeft);

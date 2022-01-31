@@ -8,11 +8,13 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.utils.Sort;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -55,11 +57,11 @@ public interface ISceneGraph extends Disposable {
 
     /**
      * Returns focusable nodes matching the given string, to a maximum
-     * of 10
-     * @param str The name
-     * @param results The results
+     * of 10.
+     * @param str The name.
+     * @param results The results.
      */
-    void matchingFocusableNodes(String str, Array<String> results);
+    void matchingFocusableNodes(String str, SortedSet<String> results);
 
     /**
      * Returns focusable nodes matching the given string, to a maximum
@@ -69,7 +71,7 @@ public interface ISceneGraph extends Disposable {
      * @param maxResults The maximum number of results.
      * @param abort To enable abortion mid-computation.
      */
-    void matchingFocusableNodes(String str, Array<String> results, int maxResults, AtomicBoolean abort);
+    void matchingFocusableNodes(String str, SortedSet<String> results, int maxResults, AtomicBoolean abort);
     /**
      * Whether this scene graphs contains a node with the given name
      *

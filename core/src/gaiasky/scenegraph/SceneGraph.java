@@ -19,10 +19,7 @@ import gaiasky.util.math.Vector3b;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.util.tree.IPosition;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SceneGraph implements ISceneGraph {
@@ -288,11 +285,11 @@ public class SceneGraph implements ISceneGraph {
         removeFromHipMap(node);
     }
 
-    public void matchingFocusableNodes(String name, Array<String> results) {
+    public void matchingFocusableNodes(String name, SortedSet<String> results) {
         matchingFocusableNodes(name, results, 10, null);
     }
 
-    public void matchingFocusableNodes(String name, Array<String> results, int maxResults, AtomicBoolean abort) {
+    public void matchingFocusableNodes(String name, SortedSet<String> results, int maxResults, AtomicBoolean abort) {
         synchronized (index) {
             Set<String> keys = index.keySet();
             name = name.toLowerCase().trim();
