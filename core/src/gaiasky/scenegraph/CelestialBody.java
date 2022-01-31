@@ -35,7 +35,6 @@ import net.jafama.FastMath;
  * Represents any celestial body.
  */
 public abstract class CelestialBody extends SceneGraphNode implements I3DTextRenderable, IQuadRenderable, IModelRenderable, IFocus {
-    private static final float[] labelColour = new float[] { 1, 1, 1, 1 };
 
     /**
      * radius/distance limit for rendering at all. If angle is smaller than this
@@ -250,7 +249,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     @Override
     public float[] textColour() {
-        return labelColour;
+        return labelcolor;
     }
 
     @Override

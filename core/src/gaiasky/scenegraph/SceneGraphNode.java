@@ -194,6 +194,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      * Base RGB color
      */
     public float[] cc;
+    public float[] labelcolor = new float[] { 1, 1, 1, 1 };
 
     /**
      * Is this just a copy?
@@ -1066,12 +1067,44 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return posSph.y;
     }
 
+    /**
+     * Sets the object color, as an RGBA double array.
+     * @param color The color.
+     */
     public void setColor(double[] color) {
         this.cc = GlobalResources.toFloatArray(color);
     }
 
+    /**
+     * Sets the object color, as an RGBA float array.
+     * @param color The color.
+     */
     public void setColor(float[] color) {
         this.cc = color;
+    }
+
+    public float[] getColor() {
+        return cc;
+    }
+
+    /**
+     * Sets the label color, as an RGBA double array.
+     * @param color The label color.
+     */
+    public void setLabelcolor(double[] color) {
+        this.labelcolor = GlobalResources.toFloatArray(color);
+    }
+
+    /**
+     * Sets the label color, as an RGBA float array.
+     * @param color The label color.
+     */
+    public void setLabelcolor(float[] color) {
+        this.labelcolor = color;
+    }
+
+    public float[] getLabelcolor(){
+        return labelcolor;
     }
 
     public OctreeNode getOctant() {
@@ -1180,12 +1213,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return null;
     }
 
-    public void setLabelcolor(float[] labelColor) {
-    }
-
-    public void setLabelcolor(double[] labelColor) {
-    }
-
     public void setVisible(boolean visible) {
         this.visible = visible;
         this.lastStateChangeTimeMs = (long) (GaiaSky.instance.getT() * 1000f);
@@ -1243,10 +1270,6 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
     protected boolean shouldRender() {
         return GaiaSky.instance.isOn(ct) && opacity > 0 && (this.visible || msSinceStateChange() < Settings.settings.scene.fadeMs);
-    }
-
-    public float[] getColor() {
-        return cc;
     }
 
     public void setForceLabel(Boolean forceLabel) {

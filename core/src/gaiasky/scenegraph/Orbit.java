@@ -399,7 +399,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     @Override
     public float[] textColour() {
-        return cc;
+        return labelcolor;
     }
 
     @Override

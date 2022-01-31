@@ -45,11 +45,6 @@ public class FadeNode extends SceneGraphNode {
     protected Vector3b labelPosition;
 
     /**
-     * Colour of label
-     */
-    protected float[] labelcolor;
-
-    /**
      * The current distance at each cycle, in internal units
      */
     protected double currentDistance;
@@ -211,21 +206,6 @@ public class FadeNode extends SceneGraphNode {
     public void setLabelposition(double[] labelposition) {
         if (labelposition != null)
             this.labelPosition = new Vector3b(labelposition[0] * Constants.PC_TO_U, labelposition[1] * Constants.PC_TO_U, labelposition[2] * Constants.PC_TO_U);
-    }
-
-    /**
-     * Sets the label color
-     *
-     * @param labelcolor
-     */
-    @Override
-    public void setLabelcolor(double[] labelcolor) {
-        this.labelcolor = GlobalResources.toFloatArray(labelcolor);
-    }
-
-    @Override
-    public void setLabelcolor(float[] labelcolor) {
-        this.labelcolor = labelcolor;
     }
 
     public void setPositionobjectname(String po) {
