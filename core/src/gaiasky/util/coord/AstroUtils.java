@@ -599,7 +599,7 @@ public class AstroUtils {
         int b = 2 - a + (a / 4);
 
         // Julian day
-        return (int) (365.242 * (year + 4716)) + (int) (30.6001 * (month)) + day + b - 1524.5d;
+        return (long) (365.242 * (year + 4716)) + (long) (30.6001 * (month)) + day + b - 1524.5d;
     }
 
     /**
@@ -620,7 +620,7 @@ public class AstroUtils {
         long y = year + 4800L - a;
         long m = month + 12L * a - 3L;
 
-        return day + ((153d * m + 2d) / 5d) + 365L * y + (y / 4d) - (y / 100d) + (y / 400d) - 32045.5d;
+        return (day + ((153L * m + 2L) / 5L) + 365L * y + (y / 4L) - (y / 100L) + (y / 400L) - 32045.5);
     }
 
     /**
@@ -641,7 +641,7 @@ public class AstroUtils {
         long y = year + 4800L - a;
         long m = month + 12L * a - 3L;
 
-        return day + ((153d * m + 2d) / 5d) + 365d * y + (y / 4d) - 32083.5d;
+        return day + ((153L * m + 2L) / 5L) + 365L * y + (y / 4L) - 32083.5;
     }
 
     public static Instant julianDateToInstant(double jd) {
