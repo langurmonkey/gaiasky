@@ -182,17 +182,16 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             }
 
             // Up
-            Vector3b y = aux3b2.get().set(barycenter).nor();
+            Vector3b y = aux3b2.get().set(barycenter).scl(-1).nor();
             Vector3d yd = y.put(aux3d1.get());
             // Towards north - intersect y with plane
             Vector3d zd = aux3d2.get();
-            //Intersectord.intersectLinePlane(new Vector3d(0,0,0), new Vector3d(0,1,0), barycenter.put(new Vector3d()), yd, zd);
-            //Intersectord.lineIntersection(barycenter.put(new Vector3d()), new Vector3d(yd), new Vector3d(0,0,0), new Vector3d(0,1,0), zd);
-            //zd.sub(barycenter).nor();
-            zd.set(yd).crs(0, 1, 0).nor();
+            Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0,0,0), new Vector3d(-1,0,0), zd);
+            zd.sub(barycenter).nor();
+            //zd.set(yd).crs(0, 1, 0).nor();
 
-            // Orthogonal to ZY
-            Vector3d xd = aux3d3.get().set(zd).crs(yd);
+            // Orthogonal to ZY, right-hand system
+            Vector3d xd = aux3d3.get().set(yd).crs(zd);
 
             transformFunction = Matrix4d.changeOfBasis(xd, yd, zd);
         }

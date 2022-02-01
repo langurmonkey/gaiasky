@@ -110,6 +110,7 @@ public class SearchDialog extends GenericDialog {
         searchInput.addListener(event -> {
             if (event instanceof InputEvent) {
                 InputEvent ie = (InputEvent) event;
+                int matchingSize = matching.size();
                 int code = ie.getKeyCode();
                 if (ie.getType() == Type.keyUp) {
                     if (code == Keys.ESCAPE || code == Keys.ENTER) {
@@ -119,11 +120,11 @@ public class SearchDialog extends GenericDialog {
                         removeCandidates();
                         me.remove();
                         return true;
-                    } else if (code == Keys.UP) {
-                        cIdx = cIdx - 1 < 0 ? matching.size() - 1 : cIdx - 1;
+                    } else if (code == Keys.UP && matchingSize > 0) {
+                        cIdx = cIdx - 1 < 0 ? matchingSize - 1 : cIdx - 1;
                         selectMatch();
-                    } else if (code == Keys.DOWN) {
-                        cIdx = (cIdx + 1) % matching.size();
+                    } else if (code == Keys.DOWN && matchingSize > 0) {
+                        cIdx = (cIdx + 1) % matchingSize;
                         selectMatch();
                     } else if (!searchInput.getText().equals(currentInputText) && !searchInput.getText().isBlank()) {
                         // Process only if text changed
