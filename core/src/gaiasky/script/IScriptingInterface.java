@@ -2158,6 +2158,21 @@ public interface IScriptingInterface {
      *
      * @param dsName         The name of the dataset.
      * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadStarDataset(String dsName, String path, boolean sync);
+    /**
+     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * The dataset does not have a label.
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName         The name of the dataset.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
      * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
      * @param sync           Whether the load must happen synchronously or asynchronously.
      *

@@ -2610,6 +2610,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public boolean loadStarDataset(String dsName, String path, boolean sync) {
+        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, 1, new double[] { 0, 0, 0, 0 }, null, null, sync);
+    }
+
+    @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
     }
