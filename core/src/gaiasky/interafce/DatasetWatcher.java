@@ -90,10 +90,13 @@ public class DatasetWatcher implements IObserver {
                             case 2 -> "gui.download.status.cancelled";
                             case 3 -> "gui.download.status.notfound";
                             default -> "gui.download.status.working";
-
                         };
                         if (this.status != null) {
-                            this.status.setText(I18n.txt(messageKey));
+                            if(data.length > 2 && data[2] != null) {
+                                this.status.setText(I18n.txt(messageKey) + " " + data[2]);
+                            } else {
+                                this.status.setText(I18n.txt(messageKey));
+                            }
                         }
                     }
                     case DATASET_DOWNLOAD_PROGRESS_INFO -> {

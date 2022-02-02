@@ -858,6 +858,7 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         ChecksumRunnable finish = (digest) -> {
+            String errorMsg = null;
             // Unpack
             int errors = 0;
             logger.info("Extracting: " + tempDownload.path());
@@ -871,10 +872,12 @@ public class DatasetManagerWindow extends GenericDialog {
                         logger.info("SHA256 ok: " + name);
                     } else {
                         logger.error("SHA256 check failed: " + name);
+                        errorMsg = "(SHA256 check failed)";
                         errors++;
                     }
                 } catch (Exception e) {
                     logger.info("Error checking SHA256: " + name);
+                    errorMsg = "(SHA256 check failed)";
                     errors++;
                 }
             } else {
@@ -889,10 +892,12 @@ public class DatasetManagerWindow extends GenericDialog {
                     cleanupTempFile(tempDownload.path());
                 } catch (Exception e) {
                     logger.error(e, "Error decompressing: " + name);
+                    errorMsg = "(decompressing error)";
                     errors++;
                 }
             }
 
+            final String errorMessage = errorMsg;
             final int numErrors = errors;
             // Done
             GaiaSky.postRunnable(() -> {
@@ -915,7 +920,19 @@ public class DatasetManagerWindow extends GenericDialog {
                     }, 0.5f);
                 } else {
                     logger.error(I18n.txt("gui.download.failed", name + " - " + url));
-                    setStatusError(dataset);
+                    tempDownload.delete();
+                    if (errorMessage != null)
+                        setStatusError(dataset, errorMessage);
+                    else
+                        setStatusError(dataset);
+                    currentDownloads.remove(dataset.key);
+                    resetSelectedDataset();
+                    com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
+                        @Override
+                        public void run() {
+                            reloadAll();
+                        }
+                    }, 1.5f);
                 }
             });
 
@@ -923,6 +940,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         Runnable fail = () -> {
             logger.error(I18n.txt("gui.download.failed", name + " - " + url));
+            tempDownload.delete();
             setStatusError(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
@@ -931,7 +949,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 public void run() {
                     reloadAll();
                 }
-            }, 0.5f);
+            }, 1.5f);
         };
 
         Runnable cancel = () -> {
@@ -1067,6 +1085,10 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private void setStatusError(DatasetDesc ds) {
         EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 1);
+    }
+
+    private void setStatusError(DatasetDesc ds, String message) {
+        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 1, message);
     }
 
     private void setStatusCancelled(DatasetDesc ds) {
