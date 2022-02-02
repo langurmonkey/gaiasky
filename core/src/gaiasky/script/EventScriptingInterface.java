@@ -2647,18 +2647,27 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, null, null, sync);
     }
 
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, List<?> particleColor, double colorNoise, List<?> labelColor, double particleSize, String ct, boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, null, null, sync);
+    }
+
     @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, new double[] { 1.5d, 100d }, ct, fadeIn, fadeOut, sync);
     }
 
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut), sync);
+    }
+
+    @Override
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         return loadParticleDataset(dsName, path, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, compType, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, ct, dArray(fadeIn), dArray(fadeOut), sync);
+    public boolean loadParticleDataset(String dsName, String path, double profileDecay, final List<?> particleColor, double colorNoise, final List<?> labelColor, double particleSize, List<?> sizeLimits, String ct, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
+        return loadParticleDataset(dsName, path, profileDecay, dArray(particleColor), colorNoise, dArray(labelColor), particleSize, dArray(sizeLimits), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
