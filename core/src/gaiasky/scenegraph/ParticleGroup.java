@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
@@ -479,7 +478,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @return An map{string,int} mapping names to indices
      */
     public Map<String, Integer> generateIndex(List<IParticleRecord> pointData) {
-        Map<String, Integer> index = new HashMap<>((int)(pointData.size() * 1.25));
+        Map<String, Integer> index = new HashMap<>((int) (pointData.size() * 1.25));
         int n = pointData.size();
         for (int i = 0; i < n; i++) {
             IParticleRecord pb = pointData.get(i);
@@ -1329,7 +1328,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         double colorNoise = datasetOptions == null ? 0 : datasetOptions.particleColorNoise;
         double[] labelColor = datasetOptions == null || datasetOptions.labelColor == null ? new double[] { 1.0, 1.0, 1.0, 1.0 } : datasetOptions.labelColor;
         double particleSize = datasetOptions == null ? 0 : datasetOptions.particleSize;
-        double[] particleSizeLimits = datasetOptions == null ? new double[] { Math.toRadians(0.1), Math.toRadians(6.0) } : datasetOptions.particleSizeLimits;
+        double[] particleSizeLimits = datasetOptions == null ? new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) } : datasetOptions.particleSizeLimits;
         double profileDecay = datasetOptions == null ? 1 : datasetOptions.profileDecay;
         String ct = datasetOptions == null || datasetOptions.ct == null ? ComponentType.Galaxies.toString() : datasetOptions.ct.toString();
 

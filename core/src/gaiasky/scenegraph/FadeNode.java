@@ -199,9 +199,9 @@ public class FadeNode extends SceneGraphNode {
 
     /**
      * Sets the position of the label, in parsecs and in the internal reference
-     * frame
+     * frame.
      *
-     * @param labelposition
+     * @param labelposition The position of the label in internal cartesian coordinates.
      */
     public void setLabelposition(double[] labelposition) {
         if (labelposition != null)
