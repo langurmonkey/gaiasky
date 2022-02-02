@@ -660,7 +660,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setForceDisplayLabel(String name, boolean forceLabel) {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
-        if(checkObjectName(nameLc)) {
+        if (checkObjectName(nameLc)) {
             SceneGraphNode obj = getObject(nameLc);
             em.post(Events.FORCE_OBJECT_LABEL_CMD, obj, nameLc, forceLabel, this);
         }
@@ -669,13 +669,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setLabelColor(String name, double[] color) {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
-        if(checkObjectName(nameLc)) {
+        if (checkObjectName(nameLc)) {
             SceneGraphNode obj = getObject(nameLc);
             em.post(Events.LABEL_COLOR_CMD, obj, nameLc, GlobalResources.toFloatArray(color), this);
         }
     }
 
-    public void setLabelColor(String name,final List<?> color){
+    public void setLabelColor(String name, final List<?> color) {
         setLabelColor(name, dArray(color));
     }
 
@@ -2147,11 +2147,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return new double[] { pos.x, pos.y, pos.z };
     }
 
+    public double[] galacticToInternalCartesian(int l, int b, int r) {
+        return galacticToInternalCartesian((double) l, (double) b, (double) r);
+    }
+
     @Override
     public double[] eclipticToInternalCartesian(double l, double b, double r) {
         Vector3d pos = Coordinates.sphericalToCartesian(l * Nature.TO_RAD, b * Nature.TO_RAD, r * Constants.KM_TO_U, new Vector3d());
         pos.mul(Coordinates.eclipticToEquatorial());
         return new double[] { pos.x, pos.y, pos.z };
+    }
+
+    public double[] eclipticToInternalCartesian(int l, int b, int r) {
+        return eclipticToInternalCartesian((double) l, (double) b, (double) r);
     }
 
     @Override
@@ -2160,11 +2168,19 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return new double[] { pos.x, pos.y, pos.z };
     }
 
+    public double[] equatorialToInternalCartesian(int ra, int dec, int r) {
+        return equatorialToInternalCartesian((double) ra, (double) dec, (double) r);
+    }
+
     public double[] internalCartesianToEquatorial(double x, double y, double z) {
         Vector3b in = aux3b1.set(x, y, z);
         Vector3d out = aux3d6;
         Coordinates.cartesianToSpherical(in, out);
         return new double[] { out.x * Nature.TO_DEG, out.y * Nature.TO_DEG, in.lend() };
+    }
+
+    public double[] internalCartesianToEquatorial(int x, int y, int z) {
+        return internalCartesianToEquatorial((double) x, (double) y, (double) z);
     }
 
     @Override
@@ -2594,6 +2610,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync) {
+        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
+    }
+
+    @Override
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync) {
+        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, null, null, sync);
+    }
+
+    public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
+        return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), sync);
+    }
+
+    @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
@@ -2603,7 +2633,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public boolean loadStarDataset(String dsName, String path, CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
-        DatasetOptions dops = DatasetOptions.getStarDatasetOptions(magnitudeScale, labelColor, fadeIn, fadeOut);
+        DatasetOptions dops = DatasetOptions.getStarDatasetOptions(dsName, magnitudeScale, labelColor, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 
@@ -2631,7 +2661,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public boolean loadParticleDataset(String dsName, String path, CatalogInfoType type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut);
+        DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
 

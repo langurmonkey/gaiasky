@@ -383,9 +383,11 @@ public interface IScriptingInterface {
     double[] getCameraPosition();
 
     /**
-     * Sets the camera direction vector to the given vector, equatorial system.
+     * Sets the camera direction vector to the given vector, in equatorial cartesian coordinates.
+     * You can convert from spherical coordinates using {@link IScriptingInterface#equatorialCartesianToInternalCartesian(double[], double)},
+     * {@link IScriptingInterface#galacticToInternalCartesian(double, double, double)} and {@link IScriptingInterface#eclipticToInternalCartesian(double, double, double)}.
      *
-     * @param dir The direction vector in equatorial coordinates.
+     * @param dir The direction vector in equatorial cartesian coordinates.
      */
     void setCameraDirection(double[] dir);
 
@@ -2145,6 +2147,40 @@ public interface IScriptingInterface {
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
     boolean loadDataset(final String dsName, final String path, final CatalogInfo.CatalogInfoType type, final DatasetOptions options, final boolean sync);
+
+    /**
+     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * The dataset does not have a label.
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName         The name of the dataset.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync);
+
+    /**
+     * Loads a star dataset from a VOTable file (<code>.vot</code>).
+     * The call can be made synchronous or asynchronous.<br/>
+     * If <code>sync</code> is true, the call waits until the dataset is loaded and then returns.
+     * If <code>sync</code> is false, the loading happens in a new thread and
+     * the call returns immediately. It includes some parameters to apply to the new star group.
+     *
+     * @param dsName         The name of the dataset.
+     * @param path           Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
+     * @param magnitudeScale Scaling additive factor to apply to the star magnitudes, as in <code>appmag = appmag - magnitudeScale</code>.
+     * @param labelColor     The color of the labels, as an array of RGBA (red, green, blue, alpha) values in [0,1].
+     * @param sync           Whether the load must happen synchronously or asynchronously.
+     *
+     * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
+     */
+    boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync);
 
     /**
      * Loads a star dataset from a VOTable file (<code>.vot</code>).

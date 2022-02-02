@@ -9,19 +9,21 @@ import gaiasky.render.ComponentTypes.ComponentType;
 
 public class DatasetOptions {
 
-    public static DatasetOptions getStarDatasetOptions(double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut){
-       DatasetOptions datasetOptions = new DatasetOptions();
-       datasetOptions.type = DatasetLoadType.STARS;
-       datasetOptions.labelColor = labelColor;
-       datasetOptions.magnitudeScale = magnitudeScale;
-       datasetOptions.fadeIn = fadeIn;
-       datasetOptions.fadeOut = fadeOut;
-       return datasetOptions;
+    public static DatasetOptions getStarDatasetOptions(String datasetName, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut) {
+        DatasetOptions datasetOptions = new DatasetOptions();
+        datasetOptions.type = DatasetLoadType.STARS;
+        datasetOptions.catalogName = datasetName;
+        datasetOptions.labelColor = labelColor;
+        datasetOptions.magnitudeScale = magnitudeScale;
+        datasetOptions.fadeIn = fadeIn;
+        datasetOptions.fadeOut = fadeOut;
+        return datasetOptions;
     }
 
-    public static DatasetOptions getParticleDatasetOptions(double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] particleSizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut){
+    public static DatasetOptions getParticleDatasetOptions(String datasetName, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] particleSizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.PARTICLES;
+        datasetOptions.catalogName = datasetName;
         datasetOptions.profileDecay = profileDecay;
         datasetOptions.particleColor = particleColor;
         datasetOptions.particleColorNoise = colorNoise;
@@ -34,10 +36,10 @@ public class DatasetOptions {
         return datasetOptions;
     }
 
-    public static DatasetOptions getStarClusterDatasetOptions(String catalogName, double[] particleColor, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut){
+    public static DatasetOptions getStarClusterDatasetOptions(String datasetName, double[] particleColor, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.CLUSTERS;
-        datasetOptions.catalogName = catalogName;
+        datasetOptions.catalogName = datasetName;
         datasetOptions.particleColor = particleColor;
         datasetOptions.labelColor = labelColor;
         datasetOptions.ct = ct;
@@ -46,10 +48,10 @@ public class DatasetOptions {
         return datasetOptions;
     }
 
-    public static DatasetOptions getVariableStarDatasetOptions(String catalogName, double magnitudeScale, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut){
+    public static DatasetOptions getVariableStarDatasetOptions(String datasetName, double magnitudeScale, double[] labelColor, ComponentType ct, double[] fadeIn, double[] fadeOut) {
         DatasetOptions datasetOptions = new DatasetOptions();
         datasetOptions.type = DatasetLoadType.VARIABLES;
-        datasetOptions.catalogName = catalogName;
+        datasetOptions.catalogName = datasetName;
         datasetOptions.labelColor = labelColor;
         datasetOptions.magnitudeScale = magnitudeScale;
         datasetOptions.ct = ct;

@@ -17,10 +17,16 @@ gs = gateway.entry_point
 gs.cameraStop()
 gs.maximizeInterfaceWindow()
 
+# Let's look in the general direction of the dataset
+gs.setCameraFree()
+lookat = gs.equatorialToInternalCartesian(0.0, 0.0, 1.0)
+gs.setCameraDirection(lookat)
+
+# Let's load the data
 name = "hip-script"
 # Modify this path to your own file!
 assets = gs.getAssetsLocation()
-gs.loadDataset(name, assets + "/scripts/tests/hip-subset.vot")
+gs.loadStarDataset(name, assets + "/scripts/tests/hip-subset.vot", 5.0, [0.3, 0.4, 0.9, 0.6], None, None, True)
 
 lprint("Dataset ready: %s" % name)
 gs.sleep(4)

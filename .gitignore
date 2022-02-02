@@ -89,3 +89,5 @@ venv
 #########
 .java-version
 releasenotes.*
+**/Pipfile
+**/Pipfile.lock
