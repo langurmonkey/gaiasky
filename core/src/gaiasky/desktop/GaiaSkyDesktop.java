@@ -273,6 +273,9 @@ public class GaiaSkyDesktop implements IObserver {
             consoleLogger.dispose();
 
             gaiaSkyDesktop.init();
+
+            // Write session log
+            CrashReporter.writeLastSessionLog(logger);
         } catch (Exception e) {
             CrashReporter.reportCrash(e, logger);
         }

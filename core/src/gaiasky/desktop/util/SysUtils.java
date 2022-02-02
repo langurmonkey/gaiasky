@@ -170,6 +170,7 @@ public class SysUtils {
     private static final String DATA_DIR_NAME = "data";
     private static final String TMP_DIR_NAME = "tmp";
     private static final String CRASHREPORTS_DIR_NAME = "crashreports";
+    private static final String LOG_DIR_NAME = "log";
 
     /**
      * Gets a file pointer to the camera directory.
@@ -259,6 +260,15 @@ public class SysUtils {
      */
     public static Path getCrashReportsDir() {
         return getDataDir().resolve(CRASHREPORTS_DIR_NAME);
+    }
+
+    /**
+     * Gets a file pointer to the log directory, where the log for the last session is stored.
+     *
+     * @return A pointer to the log directory.
+     */
+    public static Path getLogDir() {
+        return getDataDir().resolve(LOG_DIR_NAME);
     }
 
     /**

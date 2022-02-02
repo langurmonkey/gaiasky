@@ -37,6 +37,7 @@ import java.util.List;
 
 /**
  * Creates a report whenever Gaia Sky crashes and saves it to disk.
+ * It also handles the last session's log and writes it to disk if necessary.
  */
 public class CrashReporter {
 
@@ -98,10 +99,29 @@ public class CrashReporter {
         print(logger, "");
     }
 
-    private static Path writeLog(Log logger, Path crashDir, String dateString) {
+    public static void writeLastSessionLog(Log logger) {
+        Path logDir = SysUtils.getLogDir();
+        try {
+            Files.createDirectories(logDir);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        // Write session log
+        writeLog(logger, logDir, "lastsession");
+    }
+
+    /**
+     * Writes the given logger to a file in the given directory using the given
+     * suffix string.
+     * @param logger The logger.
+     * @param dir The path to the output directory.
+     * @param suffixString The suffix for the log file name (can be a date string).
+     * @return The path to the created log file.
+     */
+    private static Path writeLog(Log logger, Path dir, String suffixString) {
         // LOG FILE
         List<MessageBean> logMessages = NotificationsInterface.getHistorical();
-        Path logFile = crashDir.resolve("gaiasky_log_" + dateString + ".txt");
+        Path logFile = dir.resolve("gaiasky_log_" + suffixString + ".txt");
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(logFile.toFile()));
