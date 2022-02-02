@@ -2903,7 +2903,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
                 CatalogInfo ci = this.catalogManager.get(dsName);
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
+                postRunnable(() -> EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -2929,7 +2929,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 ci.hlColor[1] = g;
                 ci.hlColor[2] = b;
                 ci.hlColor[3] = a;
-                EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
+                postRunnable(() -> EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -2952,7 +2952,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     ci.hlCmapMin = minMap;
                     ci.hlCmapMax = maxMap;
                     ci.hlCmapAttribute = attribute;
-                    EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false);
+                    postRunnable(() -> EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false));
                 } else {
                     if (attribute == null)
                         logger.error("Could not find attribute with name '" + attributeName + "'");
