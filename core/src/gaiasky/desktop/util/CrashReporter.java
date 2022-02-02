@@ -29,6 +29,7 @@ import java.io.*;
 import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Arrays;
@@ -82,7 +83,7 @@ public class CrashReporter {
 
         // Closure
         String crf1 = "Crash report file saved to: " + crashReportFile.toAbsolutePath();
-        String crf4 = "Full log file saved to: " + logFile.toAbsolutePath();
+        String crf4 = "Full log file saved to: " + (logFile != null ? logFile.toAbsolutePath() : "permission error");
         String crf2 = "Please attach these files to the bug report";
         String crf3 = "Create a bug report here: " + Settings.REPO_ISSUES;
         int len = Math.max(crf1.length(), Math.max(crf3.length(), crf4.length()));
@@ -119,34 +120,39 @@ public class CrashReporter {
      * @return The path to the created log file.
      */
     private static Path writeLog(Log logger, Path dir, String suffixString) {
-        // LOG FILE
-        List<MessageBean> logMessages = NotificationsInterface.getHistorical();
-        Path logFile = dir.resolve("gaiasky_log_" + suffixString + ".txt");
-        BufferedWriter writer = null;
-        try {
-            writer = new BufferedWriter(new FileWriter(logFile.toFile()));
-            for (MessageBean b : logMessages) {
-                writer.write(b.formatMessage(true));
-                writer.newLine();
-            }
-        } catch (Exception e) {
-            if (logger != null) {
-                logger.error("Writing log crashed... Inception level 1 achieved! :_D", e);
-            } else {
-                System.err.println("Writing log crashed... Inception level 1 achieved! :_D");
-                e.printStackTrace(System.err);
-            }
-        } finally {
+        if(Files.exists(dir) && Files.isWritable(dir)) {
+            // LOG FILE
+            List<MessageBean> logMessages = NotificationsInterface.getHistorical();
+            Path logFile = dir.resolve("gaiasky_log_" + suffixString + ".txt");
+            BufferedWriter writer = null;
             try {
-                // Close the writer regardless of what happens...
-                if (writer != null)
-                    writer.close();
+                writer = new BufferedWriter(new FileWriter(logFile.toFile()));
+                for (MessageBean b : logMessages) {
+                    writer.write(b.formatMessage(true));
+                    writer.newLine();
+                }
             } catch (Exception e) {
-                if (logger != null)
-                    logger.error("Closing writer crashed (inception level 2 achieved!)", e);
+                if (logger != null) {
+                    logger.error("Writing log crashed... Inception level 1 achieved! :_D", e);
+                } else {
+                    System.err.println("Writing log crashed... Inception level 1 achieved! :_D");
+                    e.printStackTrace(System.err);
+                }
+            } finally {
+                try {
+                    // Close the writer regardless of what happens...
+                    if (writer != null)
+                        writer.close();
+                } catch (Exception e) {
+                    if (logger != null)
+                        logger.error("Closing writer crashed (inception level 2 achieved!)", e);
+                }
             }
+            return logFile;
+        } else {
+            System.err.println("Log directory (" + dir.toAbsolutePath() + ") does not exist or is not writable");
+            return null;
         }
-        return logFile;
     }
 
     private static Path writeCrash(Log logger, Path crashDir, String dateString, Array<String> crashInfo) {
