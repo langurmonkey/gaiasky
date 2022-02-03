@@ -2782,9 +2782,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
                             EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? "stars" : "variable stars";
-
+                            String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.txt("gui.dsload.stars.name") : I18n.txt("gui.dsload.variablestars.name");
                             logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
@@ -2803,7 +2803,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
                             EventManager.instance.post(Events.CATALOG_ADD, ci, true);
 
-                            logger.info(data.size() + " particles loaded");
+                            String typeStr = I18n.txt("gui.dsload.objects.name");
+                            logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
@@ -2829,7 +2831,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         scc.initialize();
                         SceneGraphNode.insert(scc, true);
                         scc.doneLoading(manager);
-                        logger.info(scc.children.size + " star clusters loaded");
+                        String typeStr = I18n.txt("gui.dsload.clusters.name");
+                        logger.info(I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
+                        EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, dsName + ": " + I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
                     });
                     // Sync waiting until the node is in the scene graph
                     while (sync && (!scc.inSceneGraph)) {

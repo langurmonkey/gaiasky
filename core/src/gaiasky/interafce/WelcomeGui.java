@@ -67,6 +67,8 @@ public class WelcomeGui extends AbstractGui {
     private DataDescriptor serverDatasets;
     private DataDescriptor localDatasets;
 
+    private PopupNotificationsInterface popupInterface;
+
     /**
      * Creates an initial GUI
      *
@@ -87,6 +89,10 @@ public class WelcomeGui extends AbstractGui {
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
+
+        popupInterface = new PopupNotificationsInterface(skin);
+        popupInterface.top().right();
+        popupInterface.setFillParent(true);
 
         if (vrStatus.vrInitFailed()) {
             if (vrStatus.equals(VRStatus.ERROR_NO_CONTEXT))
@@ -311,6 +317,7 @@ public class WelcomeGui extends AbstractGui {
 
         ui.addActor(center);
         ui.addActor(topLeft);
+        ui.addActor(popupInterface);
 
         if (!baseDataPresent) {
             // Open dataset manager if base data is not there
@@ -376,8 +383,14 @@ public class WelcomeGui extends AbstractGui {
     private void gaiaSky() {
         ensureBaseDataEnabled(serverDatasets);
 
+        if (popupInterface != null) {
+            popupInterface.remove();
+            popupInterface.dispose();
+        }
+
         if (bgTex != null)
             bgTex.dispose();
+
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
         EventManager.instance.post(Events.LOAD_DATA_CMD);
     }

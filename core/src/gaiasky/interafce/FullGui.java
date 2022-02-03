@@ -57,6 +57,7 @@ public class FullGui extends AbstractGui {
     protected CustomInterface customInterface;
     protected RunStateInterface runStateInterface;
     protected TopInfoInterface topInfoInterface;
+    protected PopupNotificationsInterface popupNotificationsInterface;
     protected MinimapInterface minimapInterface;
     protected LoadProgressInterface loadProgressInterface;
 
@@ -165,6 +166,12 @@ public class FullGui extends AbstractGui {
         runStateInterface.pad(0, 0, pad, 0);
         interfaces.add(runStateInterface);
 
+        // POPUP NOTIFICATIONS
+        popupNotificationsInterface = new PopupNotificationsInterface(skin);
+        popupNotificationsInterface.setFillParent(true);
+        popupNotificationsInterface.right().top();
+        interfaces.add(popupNotificationsInterface);
+
         // LOAD PROGRESS INTERFACE
         addLoadProgressInterface(ui);
 
@@ -250,12 +257,15 @@ public class FullGui extends AbstractGui {
                 controlsWindow.setPosition(0, graphics.getHeight() * unitsPerPixel - controlsWindow.getHeight());
                 ui.addActor(controlsWindow);
             }
-            if (ni != null)
+            if (ni != null) {
                 ui.addActor(ni);
-            if (messagesInterface != null)
+            }
+            if (messagesInterface != null) {
                 ui.addActor(messagesInterface);
-            if (fi != null)
+            }
+            if (fi != null) {
                 ui.addActor(fi);
+            }
             if (runStateInterface != null) {
                 ui.addActor(runStateInterface);
             }
@@ -268,14 +278,15 @@ public class FullGui extends AbstractGui {
             if (loadProgressInterface != null) {
                 ui.addActor(loadProgressInterface);
             }
-
             if (pointerXCoord != null && pointerYCoord != null) {
                 ui.addActor(pointerXCoord);
                 ui.addActor(pointerYCoord);
             }
-
             if (customInterface != null) {
                 customInterface.reAddObjects();
+            }
+            if (popupNotificationsInterface != null) {
+                ui.addActor(popupNotificationsInterface);
             }
 
             /* CAPTURE SCROLL FOCUS */

@@ -749,6 +749,7 @@ public class GuiRegistry implements IObserver {
             GaiaSky.instance.sceneGraph.getRoot().updateNamesRec();
             // UI theme reload broadcast
             EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, globalResources.getSkin());
+            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.ui.reload"));
         });
     }
 

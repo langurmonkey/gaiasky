@@ -874,14 +874,17 @@ public class DatasetManagerWindow extends GenericDialog {
                         logger.error("SHA256 check failed: " + name);
                         errorMsg = "(SHA256 check failed)";
                         errors++;
+                        EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, "Error checking SHA256: " + name, 10f);
                     }
                 } catch (Exception e) {
                     logger.info("Error checking SHA256: " + name);
                     errorMsg = "(SHA256 check failed)";
                     errors++;
+                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, "Error checking SHA256: " + name, 10f);
                 }
             } else {
                 logger.info("No digest found for dataset: " + name);
+                EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, "No digest found for dataset: " + name, 10f);
             }
 
             if (errors == 0) {
@@ -912,6 +915,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         successRunnable.run();
                     }
                     resetSelectedDataset();
+                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.finished", name), 10f);
                     com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
@@ -927,6 +931,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         setStatusError(dataset);
                     currentDownloads.remove(dataset.key);
                     resetSelectedDataset();
+                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.failed", name), 10f);
                     com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
@@ -944,6 +949,7 @@ public class DatasetManagerWindow extends GenericDialog {
             setStatusError(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
+            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.failed", name), 10f);
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
                 public void run() {
@@ -957,6 +963,7 @@ public class DatasetManagerWindow extends GenericDialog {
             setStatusCancelled(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
+            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.cancelled", name), 10f);
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
                 public void run() {

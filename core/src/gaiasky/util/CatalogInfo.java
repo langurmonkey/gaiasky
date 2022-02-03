@@ -129,11 +129,12 @@ public class CatalogInfo {
      */
     public void removeCatalog() {
         if (this.object != null) {
-            logger.info("Removing dataset " + name);
             if(!isRegular()) {
                 EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, this.object, true);
             }
             this.object.dispose();
+            logger.info(I18n.txt("gui.dataset.remove.info",  name));
+            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.dataset.remove.info",  name));
         }
     }
 

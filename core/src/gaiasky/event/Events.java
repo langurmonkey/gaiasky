@@ -735,13 +735,21 @@ public enum Events {
      **/
     POST_HEADLINE_MESSAGE,
     /**
-     * Will be displayed in the notifications area (bottom left). Contains the
-     * notification level (same as log level: ERROR, WARN, INFO, DEBUG) and an
-     * array of strings with the messages plus an optional boolean indicating
-     * whether the message is permanent so should stay until the next message is
-     * received.
+     * Post a new notification that is to be displayed in the notifications area
+     * at the bottom left. Contains the notification level (same as log level:
+     * ERROR, WARN, INFO, DEBUG) and an array of strings with the messages plus
+     * an optional boolean indicating whether the message is permanent so should
+     * stay until the next message is received.
+     * The notifications sent via this event are logged in the system log and
+     * made permanent when the program closes.
      **/
     POST_NOTIFICATION,
+    /**
+     * Post a notification that is to be displayed with a screen pop-up. Contains
+     * the string message and an optional float duration, in seconds.
+     * The notifications sent via this event are not logged.
+     */
+    POST_POPUP_NOTIFICATION,
     /**
      * Contains a string with the subhead message, will be displayed in a small
      * font below the headline message
@@ -867,16 +875,6 @@ public enum Events {
      */
     RAYMARCHING_ADDITIONAL_CMD,
 
-    /**
-     * Contains the string with the script code and an optional boolean
-     * indicating whether it must be run asynchronous
-     **/
-    RUN_SCRIPT_PATH,
-    /**
-     * Contains the script PyCode object, the path and an optional boolean
-     * indicating whether it must be run asynchronous
-     **/
-    RUN_SCRIPT_PYCODE,
     /**
      * SAMP information
      **/

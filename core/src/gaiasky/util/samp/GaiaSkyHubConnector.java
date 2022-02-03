@@ -5,10 +5,14 @@
 
 package gaiasky.util.samp;
 
+import gaiasky.event.EventManager;
+import gaiasky.event.Events;
+import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import org.astrogrid.samp.client.ClientProfile;
 import org.astrogrid.samp.client.HubConnector;
+import org.astrogrid.samp.client.SampException;
 
 /**
  * Extends hub connector to provide some very basic logging using
@@ -24,13 +28,18 @@ public class GaiaSkyHubConnector extends HubConnector {
     @Override
     protected void connectionChanged(boolean isConnected) {
         super.connectionChanged(isConnected);
-        logger.info(isConnected ? "Connected to SAMP hub" : "Disconnected from SAMP hub");
+        String hubName = "-";
+        try {
+            hubName = super.getConnection().getRegInfo().getHubId();
+        }catch (SampException ignored) {}
+        logger.info(isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
+        EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
     }
 
     @Override
     protected void disconnect() {
         super.disconnect();
-        logger.info("Disconnected from SAMP hub");
+        logger.info(I18n.txt("samp.disconnected"));
     }
 
 }
