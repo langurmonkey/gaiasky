@@ -147,6 +147,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
+    public void displayPopupNotification(String message) {
+        if (checkString(message, "message")) {
+            em.post(Events.POST_POPUP_NOTIFICATION, message);
+        }
+    }
+
+    @Override
+    public void displayPopupNotification(String message, float duration) {
+        if (checkString(message, "message")) {
+            em.post(Events.POST_POPUP_NOTIFICATION, message, duration);
+        }
+    }
+    public void displayPopupNotification(String message, Double duration) {
+        displayPopupNotification(message, duration.floatValue());
+    }
+
+    @Override
     public void setHeadlineMessage(final String headline) {
         GaiaSky.postRunnable(() -> em.post(Events.POST_HEADLINE_MESSAGE, headline));
     }

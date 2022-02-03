@@ -59,6 +59,19 @@ public interface IScriptingInterface {
     void activateSimulationTimeFrame();
 
     /**
+     * Displays a popup notification on the screen for the default duration.
+     * @param message The message text.
+     */
+    void displayPopupNotification(String message);
+
+    /**
+     * Displays a popup notification on the screen for the given duration.
+     * @param message The message text.
+     * @param duration The duration in seconds until the notification is removed.
+     */
+    void displayPopupNotification(String message, float duration);
+
+    /**
      * Sets a headline message that will appear in a big font in the screen.
      *
      * @param headline The headline text.

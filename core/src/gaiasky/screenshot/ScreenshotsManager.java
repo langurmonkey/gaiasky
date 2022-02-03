@@ -19,6 +19,7 @@ import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.IPostProcessor.RenderType;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.I18n;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.ImageFormat;
 
@@ -97,6 +98,7 @@ public class ScreenshotsManager implements IObserver {
             if (file != null) {
                 screenshot.active = false;
                 EventManager.instance.post(Events.SCREENSHOT_INFO, file);
+                EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.screenshot", file));
             }
 
         }
@@ -106,6 +108,7 @@ public class ScreenshotsManager implements IObserver {
         String f = ImageRenderer.renderToImageGl20(folder, file, w, h, Settings.settings.screenshot.format, Settings.settings.screenshot.quality);
         if (f != null) {
             EventManager.instance.post(Events.SCREENSHOT_INFO, f);
+            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.screenshot", file));
         }
     }
 

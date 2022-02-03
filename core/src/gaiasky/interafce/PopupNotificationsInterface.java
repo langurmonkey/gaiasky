@@ -49,7 +49,7 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
 
         Table t = new Table(skin);
         t.pad(pad5, pad15, pad5, pad15);
-        OwnLabel label = new OwnLabel(message, skin, "ui-23");
+        OwnLabel label = new OwnLabel(message, skin, "ui-23", 60);
 
 
         // Add to table
