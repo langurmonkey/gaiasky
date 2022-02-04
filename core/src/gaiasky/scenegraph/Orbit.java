@@ -33,7 +33,6 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -172,10 +171,10 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             params.orbit = this;
         }
 
-        if(model == OrientationModel.EXTRASOLAR_SYSTEM && transformFunction == null && parent != null) {
+        if (model == OrientationModel.EXTRASOLAR_SYSTEM && transformFunction == null && parent != null) {
             // Compute new transform function from the orbit's parent position
             Vector3b barycenter = aux3b1.get();
-            if(parent.coordinates != null) {
+            if (parent.coordinates != null) {
                 parent.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), barycenter);
             } else {
                 parent.getAbsolutePosition(barycenter);
@@ -186,7 +185,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             Vector3d yd = y.put(aux3d1.get());
             // Towards north - intersect y with plane
             Vector3d zd = aux3d2.get();
-            Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0,0,0), new Vector3d(-1,0,0), zd);
+            Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(-1, 0, 0), zd);
             zd.sub(barycenter).nor();
             //zd.set(yd).crs(0, 1, 0).nor();
 
@@ -212,7 +211,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             }
         }
         mustRefresh = providerClass != null && providerClass.equals(OrbitFileDataProvider.class) && body != null && body instanceof Planet && oc.period > 0;
-        orbitTrail = mustRefresh | (providerClass != null && providerClass.equals(OrbitalParametersProvider.class));
+        orbitTrail = orbitTrail |  mustRefresh | (providerClass != null && providerClass.equals(OrbitalParametersProvider.class));
     }
 
     @Override
@@ -338,7 +337,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     public Vector3d keplerToCartesian(Vector3d out) {
         oc.loadDataPoint(out, GaiaSky.instance.time.getTime());
 
-        if(transformFunction != null) {
+        if (transformFunction != null) {
             auxMat.set(transformFunction).rotate(0, 1, 0, 90);
             out.mul(auxMat);
         }
@@ -348,6 +347,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
     public void textPosition(ICamera cam, Vector3d out) {
     }
+
     public double textPosition2(ICamera cam, Vector3d out) {
         keplerToCartesian(out);
         out.add(cam.getInversePos());
@@ -436,40 +436,75 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                     alpha = bottom;
                     dAlpha = -dAlpha;
                 }
-
             }
 
             // This is so that the shape renderer does not mess up the z-buffer
             int n = 0;
-            int i = wrap(stIdx + 2, nPoints);
-            while (n < nPoints - last) {
-                // i minus one
-                int im = wrap(i - 1, nPoints);
+            if (oc.period > 0) {
+                // Periodic orbits
+                int i = wrap(stIdx + 2, nPoints);
+                float cAlpha;
+                while (n < nPoints - last) {
+                    // i minus one
+                    int im = wrap(i - 1, nPoints);
 
-                pointCloudData.loadPoint(prev, im);
-                pointCloudData.loadPoint(curr, i);
+                    pointCloudData.loadPoint(prev, im);
+                    pointCloudData.loadPoint(curr, i);
 
-                if (parentPos != null) {
-                    prev.sub(parentPos);
-                    curr.sub(parentPos);
+                    if (parentPos != null) {
+                        prev.sub(parentPos);
+                        curr.sub(parentPos);
+                    }
+
+                    prev.mul(localTransformD);
+                    curr.mul(localTransformD);
+
+                    cAlpha = MathUtils.clamp(alpha, 0f, 1f);
+                    if (orbitTrail && !reverse && n == nPoints - 2) {
+                        renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                    } else if (orbitTrail && reverse && n == 0) {
+                        renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                    }
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+
+                    alpha -= dAlpha;
+
+                    // advance
+                    i = wrap(i + 1, nPoints);
+                    n++;
                 }
-
-                prev.mul(localTransformD);
-                curr.mul(localTransformD);
-
-                float cAlpha = MathUtils.clamp(alpha, 0f, 1f);
-                if (orbitTrail && !reverse && n == nPoints - 2) {
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
-                } else if (orbitTrail && reverse && n == 0) {
-                    renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+            } else if (orbitTrail) {
+                // Non-periodic orbits with trail
+                float cAlpha = 1f;
+                dAlpha = 0.5f / (float) stIdx;
+                alpha = 0.5f;
+                for (int i = 1; i < stIdx; i++) {
+                    pointCloudData.loadPoint(prev, i - 1);
+                    pointCloudData.loadPoint(curr, i);
+                    if (parentPos != null) {
+                        prev.sub(parentPos);
+                        curr.sub(parentPos);
+                    }
+                    prev.mul(localTransformD);
+                    curr.mul(localTransformD);
+                    cAlpha = MathUtils.clamp(alpha, 0f, 1f);
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                    alpha += dAlpha;
                 }
-                renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
-
-                alpha -= dAlpha;
-
-                // advance
-                i = wrap(i + 1, nPoints);
-                n++;
+                renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+            } else {
+                // Rest, the whole orbit
+                for (int i = 1; i < nPoints; i++) {
+                    pointCloudData.loadPoint(prev, i - 1);
+                    pointCloudData.loadPoint(curr, i);
+                    if (parentPos != null) {
+                        prev.sub(parentPos);
+                        curr.sub(parentPos);
+                    }
+                    prev.mul(localTransformD);
+                    curr.mul(localTransformD);
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cc[3]);
+                }
             }
         }
     }
@@ -589,15 +624,20 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         this.newMethod = newMethod;
     }
 
+    public void setTrail(Boolean trail) {
+        this.orbitTrail = trail;
+    }
+
     /**
      * Sets the orientation model as a string.
+     *
      * @param model The orientation model.
      */
     public void setModel(String model) {
         model = model.toUpperCase().trim();
-        try{
+        try {
             this.model = OrientationModel.valueOf(model);
-        } catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             logger.error(I18n.txt("notif.error", e.getLocalizedMessage()));
         }
     }
