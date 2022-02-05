@@ -65,7 +65,6 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
      * Adds a new mesh data to the meshes list and increases the mesh data index
      *
      * @param nVertices The max number of vertices this mesh data can hold
-     *
      * @return The index of the new mesh data
      */
     private int addMeshData(int nVertices) {
@@ -168,6 +167,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
             shaderProgram.setUniformf("u_alpha", (float) (renderable.getAlpha()) * getAlpha(renderable));
             shaderProgram.setUniformf("u_coordPos", renderable instanceof Orbit ? (float) ((Orbit) renderable).coord : 1f);
+            shaderProgram.setUniformf("u_period", renderable instanceof Orbit && ((Orbit) renderable).oc != null ? (float) ((Orbit) renderable).oc.period : 0f);
             if (renderable.getParent() != null) {
                 Vector3d urp = renderable.getParent().getUnrotatedPos();
                 if (urp != null)
