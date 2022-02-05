@@ -627,6 +627,9 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     public void setTrail(Boolean trail) {
         this.orbitTrail = trail;
     }
+    public void setOrbittrail(Boolean trail) {
+        this.orbitTrail = trail;
+    }
 
     /**
      * Sets the orientation model as a string.

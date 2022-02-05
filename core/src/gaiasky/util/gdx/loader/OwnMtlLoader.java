@@ -87,16 +87,16 @@ public class OwnMtlLoader {
                         if (tokens.length > 4)
                             a = Float.parseFloat(tokens[4]);
 
-                        if (tokens[0].toLowerCase().equals("kd")) {
+                        if (tokens[0].equalsIgnoreCase("kd")) {
                             difcolor = new Color();
                             difcolor.set(r, g, b, a);
-                        } else if (tokens[0].toLowerCase().equals("ks")) {
+                        } else if (tokens[0].equalsIgnoreCase("ks")) {
                             speccolor = new Color();
                             speccolor.set(r, g, b, a);
-                        } else if (tokens[0].toLowerCase().equals("ke")) {
+                        } else if (tokens[0].equalsIgnoreCase("ke")) {
                             emicolor = new Color();
                             emicolor.set(r, g, b, a);
-                        } else if (tokens[0].toLowerCase().equals("kr")) {
+                        } else if (tokens[0].equalsIgnoreCase("kr")) {
                             reflcolor = new Color();
                             reflcolor.set(r, g, b, a);
                         }
