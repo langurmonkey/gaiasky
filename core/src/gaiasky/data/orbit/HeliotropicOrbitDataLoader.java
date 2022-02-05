@@ -53,7 +53,7 @@ public class HeliotropicOrbitDataLoader {
             MathManager.initialize();
 
             String inputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.heliotropic.csv";
-            String outputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.csv";
+            String outputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.dat";
 
             PointCloudData od = l.load(new FileInputStream(inputFile));
             logger.info("Loaded and converted " + od.getNumPoints() + " orbit data points: " + inputFile);
