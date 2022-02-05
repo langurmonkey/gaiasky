@@ -5,20 +5,16 @@
 
 package gaiasky.scenegraph;
 
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
-import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.GaiaSky;
+import gaiasky.scenegraph.component.ITransform;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gaia.Attitude;
-import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-
-import java.util.Date;
 
 public class HeliotropicSatellite extends Satellite {
 
@@ -31,6 +27,7 @@ public class HeliotropicSatellite extends Satellite {
         super();
         unrotatedPos = new Vector3d();
         quaternion = new Quaternion();
+        quaterniond = new Quaterniond();
     }
 
     @Override
@@ -40,7 +37,6 @@ public class HeliotropicSatellite extends Satellite {
             unrotatedPos.set(pos);
             // Undo rotation
             unrotatedPos.mul(Coordinates.eqToEcl()).rotate(-AstroUtils.getSunLongitude(time.getTime()) - 180, 0, 1, 0);
-            attitude = GaiaAttitudeServer.instance.getAttitude(new Date(time.getTime().toEpochMilli()));
         }
     }
 
@@ -55,22 +51,24 @@ public class HeliotropicSatellite extends Satellite {
             if (attitude != null) {
                 quaterniond = attitude.getQuaternion();
                 quaternion.set((float) quaterniond.x, (float) quaterniond.y, (float) quaterniond.z, (float) quaterniond.w);
-
-                // Update orientation
-                orientation.idt().rotate(quaterniond).rotate(0, 0, 1, 180);
-
-                matauxd.set(localTransform).mul(orientation);
-                matauxd.putIn(localTransform);
-
+            } else {
+                quaterniond.setFromAxis(0, 1, 0, AstroUtils.getSunLongitude(GaiaSky.instance.time.getTime()));
             }
+
+            // Update orientation
+            orientation.idt().rotate(quaterniond);
+
+            matauxd.set(localTransform).mul(orientation);
+            matauxd.putIn(localTransform);
+
         } else {
             localTransform.set(this.localTransform);
         }
 
-    }
-
-    public Quaterniond getOrientationQuaternion() {
-        return attitude.getQuaternion();
+        // Apply transformations
+        if (transformations != null)
+            for (ITransform tc : transformations)
+                tc.apply(localTransform);
     }
 
 }

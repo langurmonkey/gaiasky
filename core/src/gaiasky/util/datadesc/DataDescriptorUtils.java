@@ -134,6 +134,7 @@ public class DataDescriptorUtils {
         }
 
         DataDescriptor desc = new DataDescriptor(typesList, datasetsList);
+        DataDescriptor.serverDataDescriptor = desc;
         return desc;
     }
 
@@ -224,7 +225,8 @@ public class DataDescriptorUtils {
         Comparator<DatasetType> byType = Comparator.comparing(datasetType -> DatasetManagerWindow.getTypeWeight(datasetType.typeStr));
         types.sort(byType);
 
-        return new DataDescriptor(types, datasets);
+        DataDescriptor desc = new DataDescriptor(types, datasets);
+        DataDescriptor.localDataDescriptor = desc;
+        return desc;
     }
-
 }

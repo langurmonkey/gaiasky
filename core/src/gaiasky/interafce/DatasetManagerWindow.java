@@ -127,14 +127,14 @@ public class DatasetManagerWindow extends GenericDialog {
 
     private AtomicBoolean initialized;
 
-    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor dd) {
-        this(stage, skin, dd, true, null);
+    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd) {
+        this(stage, skin, serverDd, true, null);
     }
 
-    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor dd, boolean dataLocation, String acceptText) {
-        super(I18n.txt("gui.download.title") + (dd != null && dd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", dd.numUpdates) : ""), skin, stage);
+    public DatasetManagerWindow(Stage stage, Skin skin, DataDescriptor serverDd, boolean dataLocation, String acceptText) {
+        super(I18n.txt("gui.download.title") + (serverDd != null && serverDd.updatesAvailable ? " - " + I18n.txt("gui.download.updates", serverDd.numUpdates) : ""), skin, stage);
         this.nf = NumberFormatFactory.getFormatter("##0.0");
-        this.serverDd = dd;
+        this.serverDd = serverDd;
         this.highlight = ColorUtils.gYellowC;
         this.watchers = new HashSet<>();
         this.scroll = new float[][] { { 0f, 0f }, { 0f, 0f } };
@@ -643,174 +643,175 @@ public class DatasetManagerWindow extends GenericDialog {
         cell.clearActor();
         Table t = new Table(skin);
 
-        // Type icon
-        Image typeImage = new OwnImage(skin.getDrawable(getIcon(dataset.type)));
-        float scl = 0.7f;
-        float iw = typeImage.getWidth();
-        float ih = typeImage.getHeight();
-        typeImage.setSize(iw * scl, ih * scl);
-        typeImage.addListener(new OwnTextTooltip(dataset.type, skin, 10));
-
-        // Title
-        String titleString = dataset.name;
-        OwnLabel title = new OwnLabel(TextUtils.breakCharacters(titleString, 45), skin, "hud-header");
-        title.addListener(new OwnTextTooltip(dataset.description, skin, 10));
-
-        // Title group
-        HorizontalGroup titleGroup = new HorizontalGroup();
-        titleGroup.space(pad10);
-        titleGroup.addActor(typeImage);
-        titleGroup.addActor(title);
-
-        // Status
-        OwnLabel status = null;
-        if (mode == DatasetMode.AVAILABLE) {
-            status = new OwnLabel(I18n.txt("gui.download.available"), skin, "mono");
-        } else if (mode == DatasetMode.INSTALLED) {
-            if (dataset.baseData || dataset.type.equals("texture-pack")) {
-                // Always enabled
-                status = new OwnLabel(I18n.txt("gui.download.enabled"), skin, "mono");
-            } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
-                // Notify version mismatch
-                status = new OwnLabel(I18n.txt("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
-                status.setColor(ColorUtils.gRedC);
-            } else {
-                // Notify status
-                java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
-                boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
-                status = new OwnLabel(I18n.txt(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
-            }
-        }
-
-        // Type
-        String typeString;
-        if (I18n.hasKey("gui.download.type." + dataset.type)) {
-            typeString = I18n.txt("gui.download.type." + dataset.type);
+        if (dataset == null) {
+            OwnLabel l = new OwnLabel(I18n.txt("gui.download.noselected"), skin);
+            t.add(l).center().padTop(pad20 * 3);
         } else {
-            typeString = dataset.type;
-        }
-        OwnLabel type = new OwnLabel(I18n.txt("gui.download.type", typeString), skin, "grey-large");
-        type.addListener(new OwnTextTooltip(dataset.type, skin, 10));
 
-        // Version
-        OwnLabel version = null;
-        if (mode == DatasetMode.AVAILABLE) {
-            version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
-        } else if (mode == DatasetMode.INSTALLED) {
-            if (dataset.outdated) {
-                version = new OwnLabel(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
-                version.setColor(highlight);
-            } else {
-                version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
-            }
-        }
+            // Type icon
+            String dType = dataset != null && dataset.type != null ? dataset.type : "other";
+            Image typeImage = new OwnImage(skin.getDrawable(getIcon(dType)));
+            float scl = 0.7f;
+            float iw = typeImage.getWidth();
+            float ih = typeImage.getHeight();
+            typeImage.setSize(iw * scl, ih * scl);
+            typeImage.addListener(new OwnTextTooltip(dType, skin, 10));
 
-        // Key
-        OwnLabel key = new OwnLabel(I18n.txt("gui.download.name", dataset.key), skin, "grey-large");
+            // Title
+            String titleString = dataset.name;
+            OwnLabel title = new OwnLabel(TextUtils.breakCharacters(titleString, 45), skin, "hud-header");
+            title.addListener(new OwnTextTooltip(dataset.description, skin, 10));
 
-        // Size
-        OwnLabel size = new OwnLabel(I18n.txt("gui.download.size", dataset.size), skin, "grey-large");
-        size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+            // Title group
+            HorizontalGroup titleGroup = new HorizontalGroup();
+            titleGroup.space(pad10);
+            titleGroup.addActor(typeImage);
+            titleGroup.addActor(title);
 
-        // Num objects
-        String nObjStr = dataset.nObjects > 0 ? I18n.txt("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.txt("gui.dataset.nobjects.none");
-        OwnLabel nObjects = new OwnLabel(nObjStr, skin, "grey-large");
-        nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
-
-        // Link
-        Link link = null;
-        if (dataset.link != null && !dataset.link.isBlank()) {
-            String linkStr = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
-            link = new Link(linkStr, skin, dataset.link);
-        }
-
-        Table infoTable = new Table(skin);
-        infoTable.align(Align.topLeft);
-
-        // Description
-        String descriptionString = dataset.description;
-        OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
-        desc.setWidth(1000f);
-
-        // Release notes
-        String releaseNotesString = dataset.releaseNotes;
-        if (releaseNotesString == null || releaseNotesString.isBlank()) {
-            releaseNotesString = "-";
-        }
-        releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
-        OwnLabel releaseNotes = new OwnLabel(I18n.txt("gui.download.releasenotes", releaseNotesString), skin);
-        releaseNotes.setWidth(1000f);
-
-        // Files
-        String filesString;
-        if (dataset.files == null || dataset.files.length == 0) {
-            filesString = "-";
-        } else {
-            filesString = TextUtils.arrayToStr(dataset.files, "", "", "\n");
-        }
-        OwnLabel files = new OwnLabel(I18n.txt("gui.download.files", filesString), skin, "grey-large");
-
-        infoTable.add(desc).top().left().padBottom(pad20).row();
-        infoTable.add(releaseNotes).top().left().padBottom(pad20).row();
-        infoTable.add(files).top().left();
-
-        // Scroll
-        OwnScrollPane infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
-        infoScroll.setScrollingDisabled(true, false);
-        infoScroll.setSmoothScrolling(false);
-        infoScroll.setFadeScrollBars(false);
-        infoScroll.setWidth(1050f);
-        infoScroll.setHeight(300f);
-
-        OwnTextIconButton cancelDownloadButton = null;
-        if (currentDownloads.containsKey(dataset.key)) {
-            Pair<DatasetDesc, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
-            HttpRequest request = pair.getSecond();
-            cancelDownloadButton = new OwnTextIconButton(I18n.txt("gui.download.cancel"), skin, "quit");
-            cancelDownloadButton.pad(14.4f);
-            cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
-            cancelDownloadButton.addListener(new ChangeListener() {
-                @Override
-                public void changed(ChangeEvent event, Actor actor) {
-                    if (request != null) {
-                        GaiaSky.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
-                    }
+            // Status
+            OwnLabel status = null;
+            if (mode == DatasetMode.AVAILABLE) {
+                status = new OwnLabel(I18n.txt("gui.download.available"), skin, "mono");
+            } else if (mode == DatasetMode.INSTALLED) {
+                if (dataset.baseData || dType.equals("texture-pack")) {
+                    // Always enabled
+                    status = new OwnLabel(I18n.txt("gui.download.enabled"), skin, "mono");
+                } else if (dataset.minGsVersion > GaiaSkyDesktop.SOURCE_VERSION) {
+                    // Notify version mismatch
+                    status = new OwnLabel(I18n.txt("gui.download.version.gs.mismatch.short", Integer.toString(GaiaSkyDesktop.SOURCE_VERSION), Integer.toString(dataset.minGsVersion)), skin, "mono");
+                    status.setColor(ColorUtils.gRedC);
+                } else {
+                    // Notify status
+                    java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
+                    boolean enabled = TextUtils.contains(dataset.catalogFile.path(), currentSetting);
+                    status = new OwnLabel(I18n.txt(enabled ? "gui.download.enabled" : "gui.download.disabled"), skin, "mono");
                 }
-            });
+            }
+
+            // Type
+            String typeString;
+            if (I18n.hasKey("gui.download.type." + dType)) {
+                typeString = I18n.txt("gui.download.type." + dType);
+            } else {
+                typeString = dType;
+            }
+            OwnLabel type = new OwnLabel(I18n.txt("gui.download.type", typeString), skin, "grey-large");
+            type.addListener(new OwnTextTooltip(dType, skin, 10));
+
+            // Version
+            OwnLabel version = null;
+            if (mode == DatasetMode.AVAILABLE) {
+                version = new OwnLabel(I18n.txt("gui.download.version.server", dataset.serverVersion), skin, "grey-large");
+            } else if (mode == DatasetMode.INSTALLED) {
+                if (dataset.outdated) {
+                    version = new OwnLabel(I18n.txt("gui.download.version.new", Integer.toString(dataset.serverVersion), Integer.toString(dataset.myVersion)), skin, "grey-large");
+                    version.setColor(highlight);
+                } else {
+                    version = new OwnLabel(I18n.txt("gui.download.version.local", dataset.myVersion), skin, "grey-large");
+                }
+            }
+
+            // Key
+            OwnLabel key = new OwnLabel(I18n.txt("gui.download.name", dataset.key), skin, "grey-large");
+
+            // Size
+            OwnLabel size = new OwnLabel(I18n.txt("gui.download.size", dataset.size), skin, "grey-large");
+            size.addListener(new OwnTextTooltip(I18n.txt("gui.download.size.tooltip"), skin, 10));
+
+            // Num objects
+            String nObjStr = dataset.nObjects > 0 ? I18n.txt("gui.dataset.nobjects", (int) dataset.nObjects) : I18n.txt("gui.dataset.nobjects.none");
+            OwnLabel nObjects = new OwnLabel(nObjStr, skin, "grey-large");
+            nObjects.addListener(new OwnTextTooltip(I18n.txt("gui.download.nobjects.tooltip") + ": " + dataset.nObjectsStr, skin, 10));
+
+            // Link
+            Link link = null;
+            if (dataset.link != null && !dataset.link.isBlank()) {
+                String linkStr = dataset.link.replace("@mirror-url@", Settings.settings.program.url.dataMirror);
+                link = new Link(linkStr, skin, dataset.link);
+            }
+
+            Table infoTable = new Table(skin);
+            infoTable.align(Align.topLeft);
+
+            // Description
+            String descriptionString = dataset.description;
+            OwnLabel desc = new OwnLabel(TextUtils.breakCharacters(descriptionString, 80), skin);
+            desc.setWidth(1000f);
+
+            // Release notes
+            String releaseNotesString = dataset.releaseNotes;
+            if (releaseNotesString == null || releaseNotesString.isBlank()) {
+                releaseNotesString = "-";
+            }
+            releaseNotesString = TextUtils.breakCharacters(releaseNotesString, 80);
+            OwnLabel releaseNotes = new OwnLabel(I18n.txt("gui.download.releasenotes", releaseNotesString), skin);
+            releaseNotes.setWidth(1000f);
+
+            // Files
+            String filesString;
+            if (dataset.files == null || dataset.files.length == 0) {
+                filesString = "-";
+            } else {
+                filesString = TextUtils.arrayToStr(dataset.files, "", "", "\n");
+            }
+            OwnLabel files = new OwnLabel(I18n.txt("gui.download.files", filesString), skin, "grey-large");
+
+            infoTable.add(desc).top().left().padBottom(pad20).row();
+            infoTable.add(releaseNotes).top().left().padBottom(pad20).row();
+            infoTable.add(files).top().left();
+
+            // Scroll
+            OwnScrollPane infoScroll = new OwnScrollPane(infoTable, skin, "minimalist-nobg");
+            infoScroll.setScrollingDisabled(true, false);
+            infoScroll.setSmoothScrolling(false);
+            infoScroll.setFadeScrollBars(false);
+            infoScroll.setWidth(1050f);
+            infoScroll.setHeight(300f);
+
+            OwnTextIconButton cancelDownloadButton = null;
+            if (currentDownloads.containsKey(dataset.key)) {
+                Pair<DatasetDesc, Net.HttpRequest> pair = currentDownloads.get(dataset.key);
+                HttpRequest request = pair.getSecond();
+                cancelDownloadButton = new OwnTextIconButton(I18n.txt("gui.download.cancel"), skin, "quit");
+                cancelDownloadButton.pad(14.4f);
+                cancelDownloadButton.getLabel().setColor(1, 0, 0, 1);
+                cancelDownloadButton.addListener(new ChangeListener() {
+                    @Override
+                    public void changed(ChangeEvent event, Actor actor) {
+                        if (request != null) {
+                            GaiaSky.postRunnable(() -> Gdx.net.cancelHttpRequest(request));
+                        }
+                    }
+                });
+            }
+
+            t.add(titleGroup).top().left().padBottom(pad5).padTop(pad20).row();
+            t.add(status).top().left().padLeft(pad10 * 3f).padBottom(pad20).row();
+            t.add(type).top().left().padBottom(pad5).row();
+            t.add(version).top().left().padBottom(pad5).row();
+            t.add(key).top().left().padBottom(pad5).row();
+            t.add(size).top().left().padBottom(pad5).row();
+            t.add(nObjects).top().left().padBottom(pad10).row();
+            t.add(link).top().left().padBottom(pad20 * 2f).row();
+            t.add(infoScroll).top().left().padBottom(pad20).row();
+            t.add(cancelDownloadButton).padTop(pad20).center();
+
+            // Scroll
+            OwnScrollPane scrollPane = new OwnScrollPane(t, skin, "minimalist-nobg");
+            scrollPane.setScrollingDisabled(true, false);
+            scrollPane.setSmoothScrolling(false);
+            scrollPane.setFadeScrollBars(false);
+            scrollPane.setWidth(1050f);
+            scrollPane.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
+
+            cell.setActor(t);
+            cell.top().left();
+            cell.getTable().pack();
+
+            // Create watcher
+            rightPaneWatcher = new DatasetWatcher(dataset, null, null, status, t);
+            watchers.add(rightPaneWatcher);
         }
-
-        t.add(titleGroup).top().left().padBottom(pad5).padTop(pad20).row();
-        t.add(status).top().left().padLeft(pad10 * 3f).padBottom(pad20).row();
-        t.add(type).top().left().padBottom(pad5).row();
-        t.add(version).top().left().padBottom(pad5).row();
-        t.add(key).top().left().padBottom(pad5).row();
-        t.add(size).top().left().padBottom(pad5).row();
-        t.add(nObjects).top().left().padBottom(pad10).row();
-        t.add(link).top().left().padBottom(pad20 * 2f).row();
-        t.add(infoScroll).top().left().padBottom(pad20).row();
-        t.add(cancelDownloadButton).padTop(pad20).center();
-
-        // Scroll
-        OwnScrollPane scrollPane = new OwnScrollPane(t, skin, "minimalist-nobg");
-        scrollPane.setScrollingDisabled(true, false);
-        scrollPane.setSmoothScrolling(false);
-        scrollPane.setFadeScrollBars(false);
-        scrollPane.setWidth(1050f);
-        scrollPane.setHeight(Math.min(stage.getHeight() * 0.5f, 1500f));
-
-        cell.setActor(t);
-        cell.top().
-
-                left();
-        cell.getTable().
-
-                pack();
-
-        // Create watcher
-        rightPaneWatcher = new
-
-                DatasetWatcher(dataset, null, null, status, t);
-        watchers.add(rightPaneWatcher);
     }
 
     public void refresh() {
@@ -1017,7 +1018,6 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the file size
      *
      * @param inputFilePath A file
-     *
      * @return The size in bytes
      */
     private long fileSize(String inputFilePath) {
@@ -1028,9 +1028,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the GZ uncompressed size
      *
      * @param inputFilePath A gzipped file
-     *
      * @return The uncompressed size in bytes
-     *
      * @throws IOException If the file failed to read
      */
     private long fileSizeGZUncompressed(String inputFilePath) throws IOException {

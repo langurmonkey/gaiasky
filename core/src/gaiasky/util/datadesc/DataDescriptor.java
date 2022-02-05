@@ -12,7 +12,7 @@ import java.util.List;
 
 public class DataDescriptor {
 
-    public static DataDescriptor currentDataDescriptor;
+    public static DataDescriptor localDataDescriptor, serverDataDescriptor;
 
     /** View organised by types, where each time has a list of datasets **/
     public List<DatasetType> types;
@@ -31,7 +31,6 @@ public class DataDescriptor {
             if (ds.outdated)
                 numUpdates++;
         }
-        currentDataDescriptor = this;
     }
 
     /**

@@ -293,7 +293,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 ComboBoxBean s = gquality.getSelected();
                 GraphicsQuality gq = GraphicsQuality.values()[s.value];
-                if ((DataDescriptor.currentDataDescriptor == null || !DataDescriptor.currentDataDescriptor.datasetPresent("hi-res-textures")) && (gq.isHigh() || gq.isUltra())) {
+                if ((DataDescriptor.localDataDescriptor == null || !DataDescriptor.localDataDescriptor.datasetPresent("hi-res-textures")) && (gq.isHigh() || gq.isUltra())) {
                     // Show notice
                     // Hi resolution textures notice
                     if (noticeHiResCell != null && noticeHiResCell.getActor() == null) {
@@ -1579,8 +1579,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         dataDownload.setHeight(buttonHeight);
         dataDownload.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                if (DataDescriptor.currentDataDescriptor != null) {
-                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, DataDescriptor.currentDataDescriptor, false, I18n.txt("gui.close"));
+                if(DataDescriptor.serverDataDescriptor != null || DataDescriptor.localDataDescriptor != null) {
+                    DataDescriptor dd = DataDescriptor.serverDataDescriptor != null ? DataDescriptor.serverDataDescriptor : DataDescriptor.localDataDescriptor;
+                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.txt("gui.close"));
                     ddw.setModal(true);
                     ddw.show(stage);
                 } else {
