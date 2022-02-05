@@ -22,12 +22,12 @@ import gaiasky.util.math.MathManager;
 import gaiasky.util.math.Vector3d;
 
 import java.io.*;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Calendar;
 
 public class HeliotropicOrbitDataLoader {
     static Log logger = Logger.getLogger(HeliotropicOrbitDataLoader.class);
+
     public static void main(String[] args) {
         HeliotropicOrbitDataLoader l = new HeliotropicOrbitDataLoader();
         try {
@@ -52,8 +52,8 @@ public class HeliotropicOrbitDataLoader {
             // Initialize math manager
             MathManager.initialize();
 
-            String inputFile = "/media/tsagrista/NeuDaten/Gaia/gaiasky/data-rc/orbit/ORB1_20190625_000001.txt";
-            String outputFile ="/media/tsagrista/NeuDaten/Gaia/gaiasky/data-rc/orbit/orb.GAIA.new.dat";
+            String inputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.heliotropic.csv";
+            String outputFile = System.getProperty("user.home") + "/Downloads/orbit.JWST.csv";
 
             PointCloudData od = l.load(new FileInputStream(inputFile));
             logger.info("Loaded and converted " + od.getNumPoints() + " orbit data points: " + inputFile);
@@ -88,16 +88,15 @@ public class HeliotropicOrbitDataLoader {
      * <li>The Y direction is defined to have (X,Y,Z) as a "three axis"
      * positively oriented.</li>
      * </ul>
-     * 
+     * <p>
      * The simulation reference system:
      * <ul>
      * <li>- XZ lies in the ECLIPTIC PLANE, with Z pointing to the vernal
      * equinox.</li>
      * <li>- Y perpendicular to the ECLIPTIC PLANE pointing north.</li>
      * </ul>
-     * 
-     * @param data
-     *            The input stream with the data to load
+     *
+     * @param data The input stream with the data to load
      * @throws Exception
      */
     public PointCloudData load(InputStream data) throws Exception {
@@ -106,46 +105,48 @@ public class HeliotropicOrbitDataLoader {
         BufferedReader br = new BufferedReader(new InputStreamReader(data));
         String line;
 
-        Timestamp previousAddedTime = null;
+        Instant previousAddedTime = null;
 
+        int lineNum = 1;
         while ((line = br.readLine()) != null) {
-            if (!line.isEmpty() && !line.startsWith("#")) {
-                // Read line
-                String[] tokens = line.split("\\s+");
-                if (tokens.length == 10) {
-                    try {
-                        // Valid data line
-                        Timestamp t = Timestamp.valueOf(tokens[0].replace('T', ' '));
+            // Skip header (first line)
+            if (lineNum > 1 && !line.isEmpty() && !line.startsWith("#")) {
+                String[] tokens = line.split(",");
+                try {
+                    // Valid data line
+                    // Julian date
+                    double jd = parsed(tokens[0]);
+                    Instant time = AstroUtils.julianDateToInstant(jd);
 
-                        /*
-                         * From Data coordinates to OpenGL world coordinates Z -> -X
-                         * X -> Y Y -> Z
-                         */
-                        Vector3d pos = new Vector3d(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
+                    /*
+                     * From Data coordinates to OpenGL world coordinates Z -> -X
+                     * X -> Y Y -> Z
+                     */
+                    Vector3d pos = new Vector3d(parsed(tokens[2]), parsed(tokens[3]), -parsed(tokens[1]));
 
-                        // Transform to heliotropic using the Sun's ecliptic longitude
-                        Vector3d posHel = correctSunLongitude(pos, t.toInstant(), 0);
+                    // Transform to heliotropic using the Sun's ecliptic longitude
+                    Vector3d posHel = correctSunLongitude(pos, time, 0);
 
-                        // To ecliptic again
-                        pos.mul(Coordinates.eqToEcl());
-                        posHel.mul(Coordinates.eqToEcl());
+                    // To ecliptic again
+                    pos.mul(Coordinates.eqToEcl());
+                    posHel.mul(Coordinates.eqToEcl());
 
-                        boolean add = count == 0 || previousAddedTime == null || (t.getTime() - previousAddedTime.getTime() >= maxMsSep);
+                    boolean add = count == 0 || previousAddedTime == null || (time.toEpochMilli() - previousAddedTime.toEpochMilli() >= maxMsSep);
 
-                        if (add) {
-                            orbitData.time.add(t.toInstant());
-                            orbitData.x.add(posHel.x * Constants.KM_TO_U);
-                            orbitData.y.add(posHel.y * Constants.KM_TO_U);
-                            orbitData.z.add(posHel.z * Constants.KM_TO_U);
-                            previousAddedTime = t;
-                        }
-                        count++;
-                    }catch(Exception e){
-                        logger.error("Error loading line: " + count);
+                    if (add) {
+                        orbitData.time.add(time);
+                        orbitData.x.add(posHel.x * Constants.KM_TO_U);
+                        orbitData.y.add(posHel.y * Constants.KM_TO_U);
+                        orbitData.z.add(posHel.z * Constants.KM_TO_U);
+                        previousAddedTime = time;
                     }
-
+                    count++;
+                } catch (Exception e) {
+                    logger.error("Error loading line: " + count);
                 }
+
             }
+            lineNum++;
         }
 
         br.close();
@@ -167,11 +168,9 @@ public class HeliotropicOrbitDataLoader {
 
     /**
      * Transforms the given vector to a heliotropic system using the given time.
-     * 
-     * @param pos
-     *            Position vector
-     * @param t
-     *            Time
+     *
+     * @param pos Position vector
+     * @param t   Time
      * @return Vector3 with the position in the heliotropic reference frame
      */
     protected Vector3d correctSunLongitude(final Vector3d pos, Instant t) {
@@ -180,13 +179,10 @@ public class HeliotropicOrbitDataLoader {
 
     /**
      * Transforms the given vector to a heliotropic system using the given time.
-     * 
-     * @param pos
-     *            Position vector
-     * @param t
-     *            Time
-     * @param origin
-     *            The origin angle
+     *
+     * @param pos    Position vector
+     * @param t      Time
+     * @param origin The origin angle
      * @return Vector3 with the position in the heliotropic reference frame
      */
     protected Vector3d correctSunLongitude(final Vector3d pos, Instant t, float origin) {
