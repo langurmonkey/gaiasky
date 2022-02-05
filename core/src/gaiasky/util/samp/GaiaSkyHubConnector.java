@@ -32,7 +32,7 @@ public class GaiaSkyHubConnector extends HubConnector {
         try {
             hubName = super.getConnection().getRegInfo().getHubId();
         }catch (NullPointerException | SampException ignored) {}
-        
+
         logger.info(isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
         EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
     }
