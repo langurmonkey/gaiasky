@@ -1,3 +1,5 @@
+#define PI 3.14159
+// https://gist.github.com/galek/53557375251e1a942dfa
 // compute fresnel specular factor for given base specular and product
 // product could be NdV or VdH depending on used technique
 vec3 fresnel_factor(in vec3 f0, in float product)
@@ -56,6 +58,7 @@ vec3 blinn_specular(in float NdH, in vec3 specular, in float roughness)
 }
 
 // cook-torrance specular calculation
+#define COOK_BLINN
 vec3 cooktorrance_specular(in float NdL, in float NdV, in float NdH, in vec3 specular, in float roughness)
 {
     #ifdef COOK_BLINN
@@ -72,7 +75,7 @@ vec3 cooktorrance_specular(in float NdL, in float NdV, in float NdH, in vec3 spe
 
     float G = G_schlick(roughness, NdV, NdL);
 
-    float rim = mix(1.0 - roughness * material.w * 0.9, 1.0, NdV);
+    float rim = mix(1.0 - roughness * 0.9, 1.0, NdV);
 
     return (1.0 / rim) * specular * G * D;
 }

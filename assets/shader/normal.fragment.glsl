@@ -291,6 +291,8 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 #include shader/lib_velbuffer.frag.glsl
 #endif // velocityBufferFlag
 
+//#include shader/lib_specular.glsl
+
 // MAIN
 void main() {
     vec2 texCoords = v_data.texCoords;
@@ -385,6 +387,7 @@ void main() {
     // Loop for directional light contributitons
     #ifdef directionalLightsFlag
     vec3 V = viewDir;
+    //float NV = max(0.001, dot(N, V));
     // Loop for directional light contributitons
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];
@@ -395,11 +398,14 @@ void main() {
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = lightDir[i];
         vec3 H = normalize(L + V);
-        float NL = max(0.0, dot(N, L));
-        float NH = max(0.0, dot(N, H));
+        float NL = max(0.001, dot(N, L));
+        float NH = max(0.001, dot(N, H));
+        float HV = max(0.001, dot(H, V));
 
         selfShadow *= saturate(4.0 * NL);
 
+        //vec3 specfresnel = fresnel_factor(specular, HV);
+        //specularColor += cooktorrance_specular(NL, NV, NH, specfresnel, 1.0) * NL;
         specularColor += specular * min(1.0, pow(NH, 40.0));
         shadowColor += col * night * max(0.0, 0.5 - NL) * shdw;
         diffuseColor += (col * diffuse.rgb) * NL * shdw + (ambient * diffuse.rgb) * (1.0 - NL);
