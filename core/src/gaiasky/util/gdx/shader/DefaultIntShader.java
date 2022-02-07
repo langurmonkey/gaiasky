@@ -108,7 +108,6 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform vrOffset = new Uniform("u_vroffset");
 
         public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
-        public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
         public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureExtAttribute.AO);
         public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
         public final static Uniform diffuseTexture = new Uniform("u_diffuseTexture", TextureAttribute.Diffuse);
@@ -118,6 +117,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform emissiveTexture = new Uniform("u_emissiveTexture", TextureAttribute.Emissive);
         public final static Uniform reflectionColor = new Uniform("u_reflectionColor", ColorAttribute.Reflection);
         public final static Uniform reflectionTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
+        public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
+        public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
@@ -254,13 +255,6 @@ public class DefaultIntShader extends BaseIntShader {
             }
         }
 
-        public final static Setter roughnessTexture = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Roughness))).textureDescription);
-                shader.set(inputID, unit);
-            }
-        };
         public final static Setter aoTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
@@ -323,6 +317,19 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Reflection))).textureDescription);
+                shader.set(inputID, unit);
+            }
+        };
+        public final static Setter shininess = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Shininess))).value);
+            }
+        };
+        public final static Setter roughnessTexture = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Roughness))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -471,7 +478,6 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_bones;
     // Material uniforms
     public final int u_aoTexture;
-    public final int u_roughnessTexture;
     public final int u_opacity;
     public final int u_diffuseColor;
     public final int u_diffuseTexture;
@@ -481,6 +487,8 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_emissiveTexture;
     public final int u_reflectionColor;
     public final int u_reflectionTexture;
+    public final int u_shininess;
+    public final int u_roughnessTexture;
     public final int u_normalTexture;
     public final int u_ambientTexture;
     public final int u_heightTexture;
@@ -624,7 +632,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_normalMatrix = register(Inputs.normalMatrix, Setters.normalMatrix);
         u_bones = (renderable.bones != null && config.numBones > 0) ? register(Inputs.bones, new Setters.Bones(config.numBones)) : -1;
 
-        u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
         u_aoTexture = register(Inputs.aoTexture, Setters.aoTexture);
         u_opacity = register(Inputs.opacity);
         u_diffuseColor = register(Inputs.diffuseColor, Setters.diffuseColor);
@@ -635,6 +642,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_emissiveTexture = register(Inputs.emissiveTexture, Setters.emissiveTexture);
         u_reflectionColor = register(Inputs.reflectionColor, Setters.reflectionColor);
         u_reflectionTexture = register(Inputs.reflectionTexture, Setters.reflectionTexture);
+        u_shininess = register(Inputs.shininess, Setters.shininess);
+        u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
         u_ambientTexture = register(Inputs.ambientTexture, Setters.ambientTexture);
         u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
@@ -798,6 +807,9 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define " + ColorAttribute.ReflectionAlias + "Flag\n";
         if ((attributesMask & FloatAttribute.AlphaTest) == FloatAttribute.AlphaTest)
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
+        if ((attributesMask & FloatAttribute.Shininess) == FloatAttribute.Shininess)
+            prefix += "#define " + FloatAttribute.ShininessAlias + "Flag\n";
+
         if (renderable.bones != null && config.numBones > 0)
             prefix += "#define numBones " + config.numBones + "\n";
         return prefix;

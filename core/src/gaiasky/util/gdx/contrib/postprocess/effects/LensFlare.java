@@ -32,7 +32,7 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * no need for light positions or anything. It includes ghost generation, halos,
  * chromatic distortion and blur.
  */
-public final class LensFlare2 extends PostProcessorEffect {
+public final class LensFlare extends PostProcessorEffect {
     public static class Settings {
         public final String name;
 
@@ -101,7 +101,7 @@ public final class LensFlare2 extends PostProcessorEffect {
     private boolean blending = false;
     private int sfactor, dfactor;
 
-    public LensFlare2(int fboWidth, int fboHeight) {
+    public LensFlare(int fboWidth, int fboHeight) {
         pingPongBuffer = PostProcessor.newPingPongBuffer(fboWidth, fboHeight, PostProcessor.getFramebufferFormat(), false);
 
         lensBefore = new Flare(fboWidth, fboHeight);

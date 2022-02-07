@@ -20,8 +20,8 @@ public class Vector4Attribute extends Attribute {
 
     public float[] value;
 
-    public static final String HtermsAlias = "hterms";
-    public static final long Hterms = register(HtermsAlias);
+    //public static final String HtermsAlias = "hterms";
+    //public static final long Hterms = register(HtermsAlias);
 
     @Override
     public Attribute copy() {

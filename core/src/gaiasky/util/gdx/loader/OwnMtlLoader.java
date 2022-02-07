@@ -9,6 +9,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelMaterial;
 import com.badlogic.gdx.graphics.g3d.model.data.ModelTexture;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -38,6 +39,7 @@ public class OwnMtlLoader {
         String texDiffuseFilename = null;
         String texEmissiveFilename = null;
         String texNormalFilename = null;
+        String texRoughnessFilename = null;
 
         if (file == null || file.exists() == false) {
             logger.error("ERROR: Material file not found: " + file.name());
@@ -60,7 +62,7 @@ public class OwnMtlLoader {
                 else {
                     final String key = tokens[0].toLowerCase();
                     if (key.equals("newmtl")) {
-                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, materials);
+                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texRoughnessFilename, materials);
 
                         if (tokens.length > 1) {
                             curMatName = tokens[1];
@@ -103,13 +105,16 @@ public class OwnMtlLoader {
                     } else if (key.equals("tr") || key.equals("d")) {
                         opacity = Float.parseFloat(tokens[1]);
                     } else if (key.equals("ns")) {
-                        shininess = Float.parseFloat(tokens[1]);
+                        // Shininess, normalize in [0,1]
+                        shininess = MathUtils.clamp(Float.parseFloat(tokens[1]), 0, 300) / 300;
                     } else if (key.equals("map_kd")) {
                         texDiffuseFilename = file.parent().child(tokens[1]).path();
                     } else if (key.equals("map_ke")) {
                         texEmissiveFilename = file.parent().child(tokens[1]).path();
                     } else if (key.equals("map_kn") || key.equals("map_bump")) {
                         texNormalFilename = file.parent().child(tokens[1]).path();
+                    } else if (key.equals("map_kr")) {
+                        texRoughnessFilename = file.parent().child(tokens[1]).path();
                     }
                 }
             }
@@ -119,12 +124,12 @@ public class OwnMtlLoader {
         }
 
         // last material
-        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, materials);
+        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texRoughnessFilename, materials);
 
         return;
     }
 
-    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, Array<ModelMaterial> materials) {
+    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texRoughnessFilename, Array<ModelMaterial> materials) {
         ModelMaterial mat = new ModelMaterial();
         mat.id = curMatName;
         mat.diffuse = new Color(difcolor);
@@ -153,6 +158,14 @@ public class OwnMtlLoader {
             ModelTexture tex = new ModelTexture();
             tex.usage = ModelTexture.USAGE_NORMAL;
             tex.fileName = texNormalFilename;
+            if (mat.textures == null)
+                mat.textures = new Array<>(1);
+            mat.textures.add(tex);
+        }
+        if (texRoughnessFilename != null) {
+            ModelTexture tex = new ModelTexture();
+            tex.usage = ModelTexture.USAGE_SHININESS;
+            tex.fileName = texRoughnessFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);

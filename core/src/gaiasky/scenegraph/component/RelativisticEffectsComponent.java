@@ -68,11 +68,11 @@ public class RelativisticEffectsComponent {
     }
 
     public void setUpGravitationalWavesMaterial(Material mat) {
-        mat.set(new Vector4Attribute(Vector4Attribute.Hterms, new float[4]));
-        mat.set(new Vector3Attribute(Vector3Attribute.Gw, new Vector3()));
-        mat.set(new Matrix3Attribute(Matrix3Attribute.Gwmat3, new Matrix3()));
-        mat.set(new FloatExtAttribute(FloatExtAttribute.Ts, 0f));
-        mat.set(new FloatExtAttribute(FloatExtAttribute.Omgw, 0f));
+        //mat.set(new Vector4Attribute(Vector4Attribute.Hterms, new float[4]));
+        //mat.set(new Vector3Attribute(Vector3Attribute.Gw, new Vector3()));
+        //mat.set(new Matrix3Attribute(Matrix3Attribute.Gwmat3, new Matrix3()));
+        //mat.set(new FloatExtAttribute(FloatExtAttribute.Ts, 0f));
+        //mat.set(new FloatExtAttribute(FloatExtAttribute.Omgw, 0f));
     }
 
     public void removeGravitationalWavesMaterial(Array<Material> materials) {
@@ -82,11 +82,11 @@ public class RelativisticEffectsComponent {
     }
 
     public void removeGravitationalWavesMaterial(Material mat) {
-        mat.remove(Vector4Attribute.Hterms);
-        mat.remove(Vector3Attribute.Gw);
-        mat.remove(Matrix3Attribute.Gwmat3);
-        mat.remove(FloatExtAttribute.Ts);
-        mat.remove(FloatExtAttribute.Omgw);
+        //mat.remove(Vector4Attribute.Hterms);
+        //mat.remove(Vector3Attribute.Gw);
+        //mat.remove(Matrix3Attribute.Gwmat3);
+        //mat.remove(FloatExtAttribute.Ts);
+        //mat.remove(FloatExtAttribute.Omgw);
     }
 
     public void updateRelativisticEffectsMaterial(Material material, ICamera camera) {
@@ -111,28 +111,29 @@ public class RelativisticEffectsComponent {
     }
 
     public void updateGravitationalWavesMaterial(Material material) {
-        if (material.get(Vector4Attribute.Hterms) == null) {
-            setUpGravitationalWavesMaterial(material);
-        }
+        //if (material.get(Vector4Attribute.Hterms) == null) {
+        //    setUpGravitationalWavesMaterial(material);
+        //}
         RelativisticEffectsManager rem = RelativisticEffectsManager.getInstance();
         // hterms
-        ((Vector4Attribute) material.get(Vector4Attribute.Hterms)).value = rem.hterms;
+        //((Vector4Attribute) material.get(Vector4Attribute.Hterms)).value = rem.hterms;
 
         // gw
-        ((Vector3Attribute) material.get(Vector3Attribute.Gw)).value.set(rem.gw);
+        //((Vector3Attribute) material.get(Vector3Attribute.Gw)).value.set(rem.gw);
 
         // gwmat3
-        ((Matrix3Attribute) material.get(Matrix3Attribute.Gwmat3)).value.set(rem.gwmat3);
+        //((Matrix3Attribute) material.get(Matrix3Attribute.Gwmat3)).value.set(rem.gwmat3);
 
         // ts
         ((FloatExtAttribute) material.get(FloatExtAttribute.Ts)).value = rem.gwtime;
 
         // omgw
-        ((FloatExtAttribute) material.get(FloatExtAttribute.Omgw)).value = rem.omgw;
+        //((FloatExtAttribute) material.get(FloatExtAttribute.Omgw)).value = rem.omgw;
     }
 
     public boolean hasGravitationalWaves(Material mat) {
-        return mat.get(Vector4Attribute.Hterms) != null;
+        //return mat.get(Vector4Attribute.Hterms) != null;
+        return false;
     }
 
     public boolean hasRelativisticEffects(Material mat) {

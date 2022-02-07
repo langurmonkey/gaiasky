@@ -22,8 +22,8 @@ public class Matrix3Attribute extends Attribute {
 
     public Matrix3 value;
 
-    public static final String Gwmat3Alias = "gwmat3";
-    public static final long Gwmat3 = register(Gwmat3Alias);
+    //public static final String Gwmat3Alias = "gwmat3";
+    //public static final long Gwmat3 = register(Gwmat3Alias);
 
     public void set(Matrix3 value) {
         this.value.set(value);

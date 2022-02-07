@@ -50,6 +50,7 @@ import gaiasky.util.gdx.model.data.IntModelData;
 import gaiasky.util.gdx.model.data.IntModelMesh;
 import gaiasky.util.gdx.model.data.IntModelMeshPart;
 import gaiasky.util.gdx.model.data.IntModelNode;
+import gaiasky.util.gdx.shader.TextureExtAttribute;
 
 /**
  * This implementation uses {@link IntMesh} and {@link IntMeshPart} instead of {@link Mesh} and {@link MeshPart}.
@@ -320,6 +321,9 @@ public class IntModel implements Disposable {
 					break;
 				case ModelTexture.USAGE_REFLECTION:
 					result.set(new TextureAttribute(TextureAttribute.Reflection, descriptor, offsetU, offsetV, scaleU, scaleV));
+					break;
+				case ModelTexture.USAGE_SHININESS:
+					result.set(new TextureAttribute(TextureExtAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));
 					break;
 				}
 			}

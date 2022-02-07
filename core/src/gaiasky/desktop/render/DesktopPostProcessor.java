@@ -223,7 +223,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lensDirt.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Texture lensStarBurst = manager.get(lensStarburstName);
         lensStarBurst.setFilter(TextureFilter.Linear, TextureFilter.Linear);
-        LensFlare2 lensFlare = new LensFlare2((int) (width * lensFboScale), (int) (height * lensFboScale));
+        LensFlare lensFlare = new LensFlare((int) (width * lensFboScale), (int) (height * lensFboScale));
         lensFlare.setGhosts(nGhosts);
         lensFlare.setHaloWidth(0.5f);
         lensFlare.setLensColorTexture(lensColor);
@@ -671,7 +671,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    LensFlare2 lensFlare = (LensFlare2) ppb.get(LensFlare2.class);
+                    LensFlare lensFlare = (LensFlare) ppb.get(LensFlare.class);
                     lensFlare.setGhosts(numGhosts);
                     lensFlare.setFlareIntesity(intensity);
                 }
@@ -686,7 +686,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ((LensFlare2) ppb.get(LensFlare2.class)).setStarburstOffset(cameraOffset);
+                    ((LensFlare) ppb.get(LensFlare.class)).setStarburstOffset(cameraOffset);
                     ((LightGlow) ppb.get(LightGlow.class)).setOrientation(cameraOffset * 50f);
 
                     // Update ray marching shaders

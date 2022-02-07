@@ -52,6 +52,14 @@ uniform sampler2D u_emissiveTexture;
 uniform sampler2D u_reflectionTexture;
 #endif
 
+#ifdef roughnessTextureFlag
+uniform sampler2D u_roughnessTexture;
+#endif
+
+#ifdef shininessFlag
+uniform float u_shininess;
+#endif
+
 #if defined(diffuseTextureFlag) || defined(specularTextureFlag)
 #define textureFlag
 #endif
@@ -370,7 +378,15 @@ void main() {
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
-        reflectionColor = texture(u_environmentCubemap, reflectDir).rgb;
+        float roughness = 0.0;
+        #if defined(roughnessTextureFlag) && defined(shininessFlag)
+            roughness = texture(u_roughnessTexture, texCoords).x * (1.0 - u_shininess);
+        #elif defined(roughnessTextureFlag)
+            roughness = texture(u_roughnessTexture, texCoords).x;
+        #elif defined(shininessFlag)
+            roughness = 1.0 - u_shininess;
+        #endif // roughnessTextureFlag, shininessFlag
+        reflectionColor = texture(u_environmentCubemap, reflectDir, roughness * 7.0).rgb;
         #ifdef reflectionTextureFlag
             reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
         #elif defined(reflectionColorFlag)

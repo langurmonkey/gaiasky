@@ -8,29 +8,32 @@ package gaiasky.scenegraph.component;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Cubemap;
+import com.badlogic.gdx.graphics.CubemapData;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureData;
+import com.badlogic.gdx.graphics.glutils.FacedCubemapData;
 import gaiasky.data.AssetBean;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.gdx.OwnCubemap;
 
 public class SkyboxComponent {
     private static final Log logger = Logger.getLogger(SkyboxComponent.class);
 
-    public static Cubemap skybox;
+    public static OwnCubemap skybox;
     protected static boolean skyboxLoad = false;
     protected static String skyboxBack, skyboxFront, skyboxUp, skyboxDown, skyboxRight, skyboxLeft;
 
     public synchronized static void initSkybox() {
         if (!skyboxLoad) {
             TextureParameter textureParams = new TextureParameter();
-            textureParams.genMipMaps = false;
+            textureParams.genMipMaps = true;
             textureParams.magFilter = TextureFilter.Linear;
-            textureParams.minFilter = TextureFilter.Linear;
+            textureParams.minFilter = TextureFilter.MipMapLinearLinear;
             skyboxLoad = true;
             try {
                 String skbLoc = Settings.settings.data.skyboxLocation;
@@ -63,7 +66,7 @@ public class SkyboxComponent {
             TextureData dn = m.get(skyboxDown, Texture.class).getTextureData();
             TextureData rt = m.get(skyboxRight, Texture.class).getTextureData();
             TextureData lf = m.get(skyboxLeft, Texture.class).getTextureData();
-            skybox = new Cubemap(rt, lf, up, dn, ft, bk);
+            skybox = new OwnCubemap(rt, lf, up, dn, ft, bk, TextureFilter.MipMapLinearLinear, TextureFilter.Linear);
         }
     }
     /**

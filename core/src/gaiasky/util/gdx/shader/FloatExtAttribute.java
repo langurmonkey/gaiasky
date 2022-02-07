@@ -24,8 +24,8 @@ public class FloatExtAttribute extends FloatAttribute {
     public static final String TsAlias = "ts";
     public static final long Ts = register(TsAlias);
 
-    public static final String OmgwAlias = "omgw";
-    public static final long Omgw = register(OmgwAlias);
+    //public static final String OmgwAlias = "omgw";
+    //public static final long Omgw = register(OmgwAlias);
 
     public static final String HeightScaleAlias = "heightScale";
     public static final long HeightScale = register(HeightScaleAlias);
@@ -38,7 +38,6 @@ public class FloatExtAttribute extends FloatAttribute {
 
     public static final String TimeAlias = "time";
     public static final long Time = register(TimeAlias);
-
 
     @Override
     public Attribute copy() {

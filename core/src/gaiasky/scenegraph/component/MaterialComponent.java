@@ -32,6 +32,7 @@ import gaiasky.util.Settings.ElevationType;
 import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.loader.PFMTextureLoader.PFMTextureParameter;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.CubemapAttribute;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.gdx.shader.TextureExtAttribute;
 import gaiasky.util.gdx.shader.Vector2Attribute;
@@ -97,6 +98,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public float[] diffuseColor;
     public float[] metallicColor;
     public float[] emissiveColor;
+    public float roughnessColor = Float.NaN;
 
     // SPECULAR
     public float specularIndex = -1;
@@ -189,6 +191,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -207,6 +210,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -321,6 +325,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, tex));
             }
         }
+        if (Float.isFinite(roughnessColor)) {
+            // Shininess is the opposite of roughness
+            material.set(new FloatAttribute(FloatAttribute.Shininess, 1f - roughnessColor));
+        }
         if (ao != null && material.get(TextureExtAttribute.AO) == null) {
             if (!ao.endsWith(Constants.GEN_KEYWORD)) {
                 Texture tex = manager.get(aoUnapcked, Texture.class);
@@ -357,6 +365,12 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     private void addNormalTex(Texture normalTex) {
         if (normalTex != null && material != null) {
             material.set(new TextureAttribute(TextureAttribute.Normal, normalTex));
+        }
+    }
+
+    private void addRoughnessTex(Texture roughnessTex) {
+        if (roughnessTex != null && material != null) {
+            material.set(new TextureExtAttribute(TextureExtAttribute.Roughness, roughnessTex));
         }
     }
 
@@ -538,7 +552,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     private void initializeElevationData(Texture tex) {
-        if(!heightInitialized.get()) {
+        if (!heightInitialized.get()) {
             heightInitialized.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Construct RAM height map from texture
@@ -687,6 +701,9 @@ public class MaterialComponent extends NamedComponent implements IObserver {
 
     public void setRoughness(String roughness) {
         this.roughness = Settings.settings.data.dataFile(roughness);
+    }
+    public void setRoughness(Double roughness) {
+        this.roughnessColor = roughness.floatValue();
     }
 
     public void setAo(String ao) {
