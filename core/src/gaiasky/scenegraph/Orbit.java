@@ -291,6 +291,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                     refreshOrbit(false);
                 }
             }
+            if(getName().equalsIgnoreCase("Gaia orbit"))
             // Orbital elements renderer
             if (body == null && oc != null && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
                 addToRender(this, RenderGroup.PARTICLE_ORBIT_ELEMENTS);
@@ -475,9 +476,9 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                 }
             } else if (orbitTrail) {
                 // Non-periodic orbits with trail
-                float cAlpha = 1f;
-                dAlpha = 0.5f / (float) stIdx;
-                alpha = 0.5f;
+                alpha = (float) (this.alpha * this.opacity);
+                dAlpha = 0.8f / (float) stIdx;
+                float currentAlpha = 0.4f;
                 for (int i = 1; i < stIdx; i++) {
                     pointCloudData.loadPoint(prev, i - 1);
                     pointCloudData.loadPoint(curr, i);
@@ -487,11 +488,10 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                     }
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
-                    cAlpha = MathUtils.clamp(alpha, 0f, 1f);
-                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
-                    alpha += dAlpha;
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * currentAlpha * cc[3]);
+                    currentAlpha = MathUtils.clamp(currentAlpha + dAlpha, 0f, 1f);
                 }
-                renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], cAlpha * cc[3]);
+                renderer.addLine(this, (float) curr.x, (float) curr.y, (float) curr.z, (float) bodyPos.x, (float) bodyPos.y, (float) bodyPos.z, cc[0], cc[1], cc[2], alpha * currentAlpha * cc[3]);
             } else {
                 // Rest, the whole orbit
                 for (int i = 1; i < nPoints; i++) {
@@ -503,7 +503,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                     }
                     prev.mul(localTransformD);
                     curr.mul(localTransformD);
-                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], cc[3]);
+                    renderer.addLine(this, (float) prev.x, (float) prev.y, (float) prev.z, (float) curr.x, (float) curr.y, (float) curr.z, cc[0], cc[1], cc[2], alpha * cc[3]);
                 }
             }
         }

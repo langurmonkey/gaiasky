@@ -50,7 +50,9 @@ public class DataDescriptorUtils {
             case "catalog-cluster" -> 4;
             case "catalog-other" -> 5;
             case "mesh" -> 6;
-            case "other" -> 8;
+            case "satellites" -> 7;
+            case "systems" -> 8;
+            case "other" -> 9;
             default -> 10;
         };
     }

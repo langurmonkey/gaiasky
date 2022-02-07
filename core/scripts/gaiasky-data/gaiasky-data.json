@@ -797,7 +797,7 @@
     },
     {
       "name": "exonia-system",
-      "type": "catalog-other",
+      "type": "system",
       "version": 1,
       "mingsversion": 30200,
       "size": 2556785,
