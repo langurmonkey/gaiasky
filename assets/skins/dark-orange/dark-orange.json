@@ -230,6 +230,11 @@
       "up": "default-round",
       "over": "default-round-over",
       "focused": "default-round-sel"
+    },
+    "dataset-nofocus": {
+      "down": "default-round",
+      "up": "default-round",
+      "over": "default-round-over"
     }
   },
   "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
