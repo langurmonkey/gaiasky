@@ -48,7 +48,6 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     public void initialize() {
 
         group = new VerticalGroup();
-        group.space(pad * 3f);
         group.align(Align.left);
 
         Collection<CatalogInfo> cis = this.catalogManager.getCatalogInfos();
@@ -121,6 +120,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         // Dataset table
         Table t = new Table(skin);
+        t.align(Align.topLeft);
         // Color picker
         ColormapPicker cp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
         cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
@@ -178,26 +178,31 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.row();
             t.add(sizeScaling).left().colspan(2).padTop(pad9);
         }
-
-        VerticalGroup ciGroup = new VerticalGroup();
-        ciGroup.space(pad * 2f);
-        ciGroup.align(Align.left);
+        Container c = new Container(t);
+        c.setFillParent(true);
+        c.align(Align.topLeft);
+        c.minHeight(130f);
+        c.width(ControlsWindow.getContentWidth() * 0.96f);
 
         // Info
-        ScrollPane scroll = new OwnScrollPane(t, skin, "minimalist-nobg");
+        ScrollPane scroll = new OwnScrollPane(c, skin, "minimalist-nobg");
         scroll.setScrollingDisabled(false, true);
         scroll.setForceScroll(false, false);
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
         scroll.setWidth(ControlsWindow.getContentWidth() * 0.96f);
-        scroll.setHeight(170f);
+        //scroll.setHeight(170f);
 
-        ciGroup.addActor(scroll);
+        OwnButton catalogWidget = new OwnButton(scroll, skin, "dataset", false);
+        catalogWidget.align(Align.topLeft);
+        catalogWidget.pad(pad9);
+        catalogWidget.setWidth(ControlsWindow.getContentWidth() * 0.95f);
 
-        group.addActor(ciGroup);
 
-        groupMap.put(ci.name, ciGroup);
+        group.addActor(catalogWidget);
+
+        groupMap.put(ci.name, catalogWidget);
     }
 
     @Override
