@@ -35,6 +35,12 @@ public class OwnButton extends Button {
         this.me = this;
         initialize();
     }
+    public OwnButton(Skin skin, String styleName, boolean changeCursor) {
+        super(skin, styleName);
+        this.me = this;
+        this.changeCursor = changeCursor;
+        initialize();
+    }
 
     public OwnButton(Actor child, Skin skin, String styleName, boolean changeCursor) {
         super(child, skin, styleName);

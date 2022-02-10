@@ -54,7 +54,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     public void initialize() {
 
         group = new VerticalGroup();
-        group.align(Align.left);
+        group.columnAlign(Align.left);
 
         Collection<CatalogInfo> cis = this.catalogManager.getCatalogInfos();
         if (cis != null) {
@@ -101,7 +101,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     private void addCatalogInfo(CatalogInfo ci) {
         // Controls
         HorizontalGroup controls = new HorizontalGroup();
-        controls.space(pad);
+        controls.space(pad6);
         OwnImageButton eye = new OwnImageButton(skin, "eye-toggle");
         eye.setCheckedNoFire(!ci.isVisible(true));
         eye.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.dataset.toggle"), skin));
@@ -147,8 +147,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         imageMap.put(ci.name, new OwnImageButton[] { eye, mark });
         controls.addActor(eye);
-        if (ci.isRegular())
+        if (ci.isRegular()) {
+            controls.addActor(mark);
             controls.addActor(prefs);
+        }
         controls.addActor(rubbish);
 
         // Dataset table
@@ -163,16 +165,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 26), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
-        if (ci.isRegular()) {
-            t.add(nameLabel).left().padBottom(pad);
-            t.add(cp).size(28.8f).right().padBottom(pad).row();
-        } else {
-            t.add(nameLabel).left().padBottom(pad);
-            t.add().size(28.8f).right().padBottom(pad).row();
-        }
+
         if (ci.isRegular()) {
             t.add(controls).left().padBottom(pad);
-            t.add(mark).right().padBottom(pad).row();
+            t.add(cp).right().size(28.8f).padRight(pad6).padBottom(pad).row();
         } else {
             t.add(controls).colspan(2).left().padBottom(pad).row();
         }
@@ -214,8 +210,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         Container c = new Container(t);
         c.setFillParent(true);
         c.align(Align.topLeft);
-        c.minHeight(130f);
-        c.width(ControlsWindow.getContentWidth() * 0.96f);
+        c.minHeight(80f);
+        c.width(ControlsWindow.getContentWidth() * 0.94f);
 
         // Info
         ScrollPane scroll = new OwnScrollPane(c, skin, "minimalist-nobg");
@@ -224,13 +220,12 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         scroll.setFadeScrollBars(false);
         scroll.setOverscroll(false, false);
         scroll.setSmoothScrolling(true);
-        scroll.setWidth(ControlsWindow.getContentWidth() * 0.96f);
-        //scroll.setHeight(170f);
+        scroll.setWidth(ControlsWindow.getContentWidth() * 0.94f);
 
-        OwnButton catalogWidget = new OwnButton(scroll, skin, "dataset-nofocus", false);
+        CollapsibleEntry catalogWidget = new CollapsibleEntry(nameLabel, scroll, skin);
         catalogWidget.align(Align.topLeft);
         catalogWidget.pad(pad9);
-        catalogWidget.setWidth(ControlsWindow.getContentWidth() * 0.95f);
+        catalogWidget.setWidth(ControlsWindow.getContentWidth() * 0.94f);
         catalogWidget.addListener(new InputListener() {
             @Override
             public boolean handle(Event event) {
