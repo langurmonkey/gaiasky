@@ -180,6 +180,9 @@ public class Constants {
     public static final float MIN_POINT_SIZE_SCALE = 0.2f;
     public static final float MAX_POINT_SIZE_SCALE = 3f;
 
+    public static final long MIN_FADE_TIME_MS = 0;
+    public static final long MAX_FADE_TIME_MS = 30000;
+
     /** Maximum fov value, in degrees **/
     public static final float MAX_FOV = 95f;
     /** Minimum fov value, in degrees **/

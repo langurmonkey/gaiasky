@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.FocusListener.FocusEvent;
+import com.badlogic.gdx.utils.Null;
 import gaiasky.util.I18n;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.validator.CallbackValidator;
@@ -30,8 +31,8 @@ public class OwnTextField extends TextField {
     private Color regularColor;
     private Color errorColor;
 
-    public OwnTextField(String text, Skin skin) {
-        super(text, skin);
+    public OwnTextField (@Null String text, Skin skin) {
+        super(text, new TextFieldStyle(skin.get(TextFieldStyle.class)));
         this.skin = skin;
     }
 
@@ -42,7 +43,7 @@ public class OwnTextField extends TextField {
     }
 
     public OwnTextField(String text, Skin skin, String styleName) {
-        super(text, skin, styleName);
+        super(text, new TextFieldStyle(skin.get(styleName, TextFieldStyle.class)));
         this.skin = skin;
     }
 
@@ -98,16 +99,18 @@ public class OwnTextField extends TextField {
 
     private void initValidator() {
         if (validator != null) {
-            errorColor = new Color(0xff6666ff);
+            errorColor = new Color(0xff3333ff);
             regularColor = getColor().cpy();
             addListener(event -> {
                 if (event instanceof ChangeEvent) {
                     String str = getText();
                     if (validator.validate(str)) {
-                        setColor(regularColor);
+                        this.setColor(regularColor);
+                        this.getStyle().fontColor = regularColor;
                         lastCorrectText = str;
                     } else {
-                        setColor(errorColor);
+                        this.setColor(errorColor);
+                        this.getStyle().fontColor = errorColor;
                     }
                     return true;
                 } else if (event instanceof FocusEvent) {
@@ -115,10 +118,10 @@ public class OwnTextField extends TextField {
                         // We lost focus, return to last correct text if current not valid
                         String str = getText();
                         if (!validator.validate(str)) {
-                            setText(lastCorrectText);
-                            setColor(regularColor);
+                            this.setText(lastCorrectText);
+                            this.setColor(regularColor);
+                            this.getStyle().fontColor = regularColor;
                         }
-
                     }
                     return true;
                 }

@@ -71,7 +71,7 @@ scene:
   # Name of the home object
   homeObject: Earth
   # Object fade time in ms
-  fadeMs: 2500
+  fadeMs: 1500
   # Camera configuration
   camera:
     # Camera speed limit

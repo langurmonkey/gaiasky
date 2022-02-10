@@ -77,7 +77,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<String> recgridOrigin;
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
-    private OwnTextField widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
+    private OwnTextField fadeTimeField, widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
@@ -683,6 +683,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         display.add(exposurel).left().padRight(pad5 * 4).padBottom(pad5);
         display.add(exposure).left().padRight(pad5 * 2).padBottom(pad5).row();
+
+        /* Fade-in and out time */
+        OwnLabel fadeTimel = new OwnLabel(I18n.txt("gui.fadetime"), skin, "default");
+        IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
+        fadeTimeField = new OwnTextField(Long.toString(settings.scene.fadeMs), skin, fadeTimeValidator);
+        fadeTimeField.setWidth(sliderWidth);
+        OwnImageButton fadeTimeTooltip = new OwnImageButton(skin, "tooltip");
+        fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.fadetime.info"), skin));
+        display.add(fadeTimel).left().padRight(pad5 * 4).padBottom(pad5);
+        display.add(fadeTimeField).left().padRight(pad5 * 2).padBottom(pad5);
+        display.add(fadeTimeTooltip).left().padRight(pad20).padBottom(pad5).row();
 
         // LABELS
         labels.addAll(brightnessl, contrastl, huel, saturationl, gammal);
@@ -2025,6 +2036,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         int newShadowResolution = Integer.parseInt(smResolution.getText());
         int newShadowNumber = nshadows.getSelected().value;
         final boolean reloadShadows = shadowsCb.isChecked() && (settings.scene.renderer.shadow.resolution != newShadowResolution || settings.scene.renderer.shadow.number != newShadowNumber);
+
+        // Fade time
+        settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs), Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
 
         // Interface
         LangComboBoxBean languageBean = lang.getSelected();
