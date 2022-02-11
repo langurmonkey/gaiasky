@@ -5,8 +5,8 @@
 
 package gaiasky.util;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
@@ -130,11 +130,11 @@ public class CatalogInfo {
     public void removeCatalog() {
         if (this.object != null) {
             if(!isRegular()) {
-                EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, this.object, true);
+                EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, this.object, true);
             }
             this.object.dispose();
             logger.info(I18n.txt("gui.dataset.remove.info",  name));
-            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.dataset.remove.info",  name));
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.dataset.remove.info",  name));
         }
     }
 

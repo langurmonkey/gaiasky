@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.format.DesktopNumberFormat;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.ILineRenderable;
@@ -57,7 +57,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         this.cc = new float[] { 1f, 1f, 0f };
         this.nf = new DesktopNumberFormat("0.#########E0");
         setCt("Ruler");
-        EventManager.instance.subscribe(this, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR);
+        EventManager.instance.subscribe(this, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR);
     }
 
     public CosmicRuler(String name0, String name1) {
@@ -138,7 +138,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
             dist = nf.format(d.getFirst()) + " " + d.getSecond();
 
             GaiaSky.postRunnable(() -> {
-                EventManager.instance.post(Events.RULER_DIST, dst, dist);
+                EventManager.publish(Event.RULER_DIST, this, dst, dist);
             });
         } else {
             dist = null;
@@ -244,7 +244,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case RULER_ATTACH_0:
             String name = (String) data[0];

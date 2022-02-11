@@ -8,8 +8,8 @@ package gaiasky.script;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
@@ -42,11 +42,11 @@ public class HiddenHelperUser implements IObserver {
         super();
         currentTasks = new Array<>(false, 5);
         lastCommandTime = -1;
-        EventManager.instance.subscribe(this, Events.NAVIGATE_TO_OBJECT, Events.LAND_ON_OBJECT, Events.LAND_AT_LOCATION_OF_OBJECT, Events.INPUT_EVENT);
+        EventManager.instance.subscribe(this, Event.NAVIGATE_TO_OBJECT, Event.LAND_ON_OBJECT, Event.LAND_AT_LOCATION_OF_OBJECT, Event.INPUT_EVENT);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case NAVIGATE_TO_OBJECT:
             IFocus body;

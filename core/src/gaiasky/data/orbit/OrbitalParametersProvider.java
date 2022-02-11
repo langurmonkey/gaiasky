@@ -7,14 +7,12 @@ package gaiasky.data.orbit;
 
 import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
-import gaiasky.util.Nature;
 import gaiasky.util.coord.AstroUtils;
-import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 
@@ -73,7 +71,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                     t += t_step;
                 }
 
-                EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
+                EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, parameter.name);
             } catch (Exception e) {
                 Logger.getLogger(this.getClass()).error(e);
             }
@@ -113,7 +111,7 @@ public class OrbitalParametersProvider implements IOrbitDataProvider {
                 data.z.add(point.z);
                 data.time.add(Instant.now());
             }
-            EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, parameter.name);
+            EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, parameter.name);
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);
         }

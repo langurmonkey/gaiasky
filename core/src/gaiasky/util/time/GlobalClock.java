@@ -5,8 +5,8 @@
 
 package gaiasky.util.time;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
@@ -59,7 +59,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
         time = instant;
         targetTime = null;
         lastTime = time.toEpochMilli();
-        EventManager.instance.subscribe(this, Events.TIME_WARP_CMD, Events.TIME_WARP_DECREASE_CMD, Events.TIME_WARP_INCREASE_CMD, Events.TIME_CHANGE_CMD, Events.TARGET_TIME_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_WARP_CMD, Event.TIME_WARP_DECREASE_CMD, Event.TIME_WARP_INCREASE_CMD, Event.TIME_CHANGE_CMD, Event.TARGET_TIME_CMD);
     }
 
     /**
@@ -104,21 +104,21 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
                 if (currentTime < settings.runtime.maxTimeMs) {
                     logger.info("Maximum time reached (" + (settings.runtime.maxTimeMs * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
-                    EventManager.instance.post(Events.TIME_STATE_CMD, false, false);
+                    EventManager.publish(Event.TIME_STATE_CMD, this, false);
                 }
                 newTime = settings.runtime.maxTimeMs;
                 time = Instant.ofEpochMilli(newTime);
-                EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
+                EventManager.publish(Event.TIME_CHANGE_INFO, this, time);
                 lastUpdate = 0;
             } else if (newTime < settings.runtime.minTimeMs) {
                 if (currentTime > settings.runtime.minTimeMs) {
                     logger.info("Minimum time reached (" + (settings.runtime.minTimeMs * Nature.MS_TO_Y) + " years)!");
                     // Turn off time
-                    EventManager.instance.post(Events.TIME_STATE_CMD, false, false);
+                    EventManager.publish(Event.TIME_STATE_CMD, this, false);
                 }
                 newTime = settings.runtime.minTimeMs;
                 time = Instant.ofEpochMilli(newTime);
-                EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
+                EventManager.publish(Event.TIME_CHANGE_INFO, this, time);
                 lastUpdate = 0;
             } else {
                 time = Instant.ofEpochMilli(newTime);
@@ -127,7 +127,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
             // Post event each 1/2 second
             lastUpdate += dt;
             if (lastUpdate > .5) {
-                EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
+                EventManager.publish(Event.TIME_CHANGE_INFO, this, time);
                 lastUpdate = 0;
             }
         } else if (time.toEpochMilli() - lastTime != 0) {
@@ -144,7 +144,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case TARGET_TIME_CMD:
             if (data.length > 0) {
@@ -213,7 +213,7 @@ public class GlobalClock implements IObserver, ITimeFrameProvider {
     public void setTimeWarp(double tw) {
         this.timeWarp = tw;
         checkTimeWarpValue();
-        EventManager.instance.post(Events.TIME_WARP_CHANGED_INFO, this.timeWarp);
+        EventManager.publish(Event.TIME_WARP_CHANGED_INFO, this, this.timeWarp);
     }
 
     private void checkTimeWarpValue() {

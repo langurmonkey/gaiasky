@@ -8,8 +8,8 @@ package gaiasky.scenegraph.octreewrapper;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.system.AbstractRenderSystem;
@@ -246,8 +246,8 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
         OctreeNode.maxDepth = 0;
         OctreeNode.nObjectsObserved = 0;
         OctreeNode.nOctantsObserved = 0;
-        EventManager.instance.post(Events.DEBUG_OBJECTS, 0, 0);
-        EventManager.instance.post(Events.OCTREE_DISPOSED);
+        EventManager.publish(Event.DEBUG_OBJECTS, this, 0, 0);
+        EventManager.publish(Event.OCTREE_DISPOSED, this);
     }
 
 }

@@ -5,8 +5,8 @@
 
 package gaiasky.util;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +35,8 @@ public class Logger {
 
     private static void error(Throwable t, String tag) {
         if (inLevel(LoggerLevel.ERROR))
-            if (EventManager.instance.hasSubscriptors(Events.JAVA_EXCEPTION)) {
-                EventManager.instance.post(Events.JAVA_EXCEPTION, t, tag);
+            if (EventManager.instance.hasSubscriptors(Event.JAVA_EXCEPTION)) {
+                EventManager.publish(Event.JAVA_EXCEPTION, null, t, tag);
             } else {
                 System.err.println(tag);
                 t.printStackTrace(System.err);
@@ -45,8 +45,8 @@ public class Logger {
 
     private static void error(Throwable t) {
         if (inLevel(LoggerLevel.ERROR))
-            if (EventManager.instance.hasSubscriptors(Events.JAVA_EXCEPTION)) {
-                EventManager.instance.post(Events.JAVA_EXCEPTION, t);
+            if (EventManager.instance.hasSubscriptors(Event.JAVA_EXCEPTION)) {
+                EventManager.publish(Event.JAVA_EXCEPTION, null, t);
             } else {
                 t.printStackTrace(System.err);
             }
@@ -90,7 +90,7 @@ public class Logger {
             msgs = messages;
         }
 
-        EventManager.instance.post(Events.POST_NOTIFICATION, level, msgs);
+        EventManager.publish(Event.POST_NOTIFICATION, null, level, msgs);
     }
 
     /**

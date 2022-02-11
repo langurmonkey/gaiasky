@@ -9,7 +9,7 @@ import com.badlogic.gdx.files.FileHandle;
 import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 
@@ -34,7 +34,7 @@ public class OrbitFileDataProvider implements IOrbitDataProvider {
                         data.z.set(i, data.z.get(i) * parameter.multiplier);
                     }
                 }
-                EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, file);
+                EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, file);
             } catch (Exception e) {
                 Logger.getLogger(this.getClass()).error(e);
             }

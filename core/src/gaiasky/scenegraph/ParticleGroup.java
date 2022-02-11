@@ -15,8 +15,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IParticleGroupDataProvider;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
@@ -246,7 +246,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         cPosD = new Vector3d();
         lastSortCameraPos = new Vector3d(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
         this.comp = new ParticleGroupComparator();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CAMERA_MOTION_UPDATE);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.CAMERA_MOTION_UPDATE);
     }
 
     public void initialize() {
@@ -281,7 +281,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                 ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;
 
                 // Insert
-                EventManager.instance.post(Events.CATALOG_ADD, ci, false);
+                EventManager.publish(Event.CATALOG_ADD, this, ci, false);
             }
 
         } catch (Exception e) {
@@ -1053,7 +1053,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case FOCUS_CHANGED:
             if (data[0] instanceof String) {
@@ -1220,14 +1220,14 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Dispose of GPU data
-        EventManager.instance.post(Events.DISPOSE_PARTICLE_GROUP_GPU_MESH, this.offset);
+        EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, this, this.offset);
         // Data to be gc'd
         this.pointData = null;
         // Remove focus if needed
         CameraManager cam = GaiaSky.instance.getCameraManager();
         if (cam != null && cam.getFocus() != null && cam.getFocus() == this) {
             this.setFocusIndex(-1);
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
         }
     }
 
@@ -1242,7 +1242,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public void setInGpu(boolean inGpu) {
         if (this.inGpu && !inGpu) {
             // Dispose of GPU data
-            EventManager.instance.post(Events.DISPOSE_PARTICLE_GROUP_GPU_MESH, this.offset);
+            EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, this, this.offset);
         }
         this.inGpu = inGpu;
     }

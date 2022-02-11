@@ -8,8 +8,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.utils.IntSet;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.NaturalCamera;
@@ -35,7 +35,7 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         this.pressedKeys = new IntSet();
         updateControllerMappings(mappingsFile);
 
-        em.subscribe(this, Events.RELOAD_CONTROLLER_MAPPINGS);
+        em.subscribe(this, Event.RELOAD_CONTROLLER_MAPPINGS);
     }
 
     public void addPressedKey(int keycode) {
@@ -97,13 +97,13 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
     @Override
     public void connected(Controller controller) {
         logger.info("Controller connected: " + controller.getName());
-        em.post(Events.CONTROLLER_CONNECTED_INFO, controller.getName());
+        em.post(Event.CONTROLLER_CONNECTED_INFO, this, controller.getName());
     }
 
     @Override
     public void disconnected(Controller controller) {
         logger.info("Controller disconnected: " + controller.getName());
-        em.post(Events.CONTROLLER_DISCONNECTED_INFO, controller.getName());
+        em.post(Event.CONTROLLER_DISCONNECTED_INFO, this, controller.getName());
     }
 
     @Override
@@ -122,30 +122,30 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
         logger.debug("button up [inputListener/code]: " + controller.getName() + " / " + buttonCode);
 
         if (buttonCode == mappings.getButtonX()) {
-            em.post(Events.TOGGLE_MINIMAP);
+            em.post(Event.TOGGLE_MINIMAP, this);
         } else if (buttonCode == mappings.getButtonY()) {
-            em.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false);
+            em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits");
         } else if (buttonCode == mappings.getButtonA()) {
-            em.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false);
+            em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
         } else if (buttonCode == mappings.getButtonB()) {
-            em.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false);
+            em.post(Event.TOGGLE_VISIBILITY_CMD, this, "element.asteroids");
         } else if (buttonCode == mappings.getButtonDpadUp()) {
-            em.post(Events.STAR_POINT_SIZE_INCREASE_CMD);
+            em.post(Event.STAR_POINT_SIZE_INCREASE_CMD, this);
         } else if (buttonCode == mappings.getButtonDpadDown()) {
-            em.post(Events.STAR_POINT_SIZE_DECREASE_CMD);
+            em.post(Event.STAR_POINT_SIZE_DECREASE_CMD, this);
         } else if (buttonCode == mappings.getButtonDpadLeft()) {
-            em.post(Events.TIME_STATE_CMD, false, false);
+            em.post(Event.TIME_STATE_CMD, this, false);
         } else if (buttonCode == mappings.getButtonDpadRight()) {
-            em.post(Events.TIME_STATE_CMD, true, false);
+            em.post(Event.TIME_STATE_CMD, this, true);
         } else if (buttonCode == mappings.getButtonStart()) {
-            em.post(Events.SHOW_CONTROLLER_GUI_ACTION, cam);
+            em.post(Event.SHOW_CONTROLLER_GUI_ACTION, this, cam);
         } else if (buttonCode == mappings.getButtonRstick()) {
             if (cam.getMode().isFocus()) {
                 // Set free
-                em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+                em.post(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
             } else {
                 // Set focus
-                em.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
+                em.post(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
             }
         }
         cam.setInputByController(true);
@@ -212,8 +212,8 @@ public class NaturalControllerListener implements ControllerListener, IObserver,
 
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.RELOAD_CONTROLLER_MAPPINGS) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.RELOAD_CONTROLLER_MAPPINGS) {
             updateControllerMappings((String) data[0]);
         }
     }

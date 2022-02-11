@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
@@ -24,7 +24,7 @@ public class VRInfoGui extends AbstractGui {
     public VRInfoGui(final Skin skin, final Graphics graphics, final Float unitsPerPixel, final Boolean vr) {
         super(graphics, unitsPerPixel);
         this.skin = skin;
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD);
     }
 
     @Override
@@ -99,9 +99,9 @@ public class VRInfoGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
 
-        if (event == Events.CAMERA_MODE_CMD) {
+        if (event == Event.CAMERA_MODE_CMD) {
             CameraMode cm = (CameraMode) data[0];
             if (cm.isFocus()) {
                 infoCell.setActor(infoFocus);

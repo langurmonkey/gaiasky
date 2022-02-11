@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -48,7 +48,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
         cmap = new Colormap();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_VARIABLE_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, Event.STAR_TEXTURE_IDX_CMD);
     }
 
     @Override
@@ -213,7 +213,7 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> {
             triComponent.updateStarOpacityLimits((float) data[0], Settings.settings.scene.star.opacity[1]);

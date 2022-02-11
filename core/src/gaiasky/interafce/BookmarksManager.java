@@ -2,7 +2,7 @@ package gaiasky.interafce;
 
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -84,7 +84,7 @@ public class BookmarksManager implements IObserver {
 
     public BookmarksManager() {
         initDefault();
-        EventManager.instance.subscribe(this, Events.BOOKMARKS_ADD, Events.BOOKMARKS_REMOVE, Events.BOOKMARKS_REMOVE_ALL, Events.BOOKMARKS_MOVE, Events.BOOKMARKS_MOVE_UP, Events.BOOKMARKS_MOVE_DOWN);
+        EventManager.instance.subscribe(this, Event.BOOKMARKS_ADD, Event.BOOKMARKS_REMOVE, Event.BOOKMARKS_REMOVE_ALL, Event.BOOKMARKS_MOVE, Event.BOOKMARKS_MOVE_UP, Event.BOOKMARKS_MOVE_DOWN);
     }
 
     private void initDefault() {
@@ -322,7 +322,7 @@ public class BookmarksManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case BOOKMARKS_ADD:
             String name = (String) data[0];

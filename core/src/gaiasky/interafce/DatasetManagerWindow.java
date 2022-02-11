@@ -11,8 +11,11 @@ import com.badlogic.gdx.Net;
 import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -22,8 +25,8 @@ import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -527,7 +530,7 @@ public class DatasetManagerWindow extends GenericDialog {
                     // Clicks
                     button.addListener(new InputListener() {
                         @Override
-                        public boolean handle(Event event) {
+                        public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
                             if (event != null && event instanceof InputEvent) {
                                 InputEvent ie = (InputEvent) event;
                                 InputEvent.Type type = ie.getType();
@@ -844,7 +847,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
                 // Since we are downloading on a background thread, post a runnable to touch UI
                 GaiaSky.postRunnable(() -> {
-                    EventManager.instance.post(Events.DATASET_DOWNLOAD_PROGRESS_INFO, dataset.key, (float) progress, progressString, speedString);
+                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
                 });
             } catch (Exception e) {
                 logger.warn(I18n.txt("gui.download.error.progress"));
@@ -858,7 +861,7 @@ public class DatasetManagerWindow extends GenericDialog {
             final String speedString = nf.format(readMb) + "/" + nf.format(totalMb) + " MB (" + nf.format(mbPerSecond) + " MB/s)";
             // Since we are downloading on a background thread, post a runnable to touch UI
             GaiaSky.postRunnable(() -> {
-                EventManager.instance.post(Events.DATASET_DOWNLOAD_PROGRESS_INFO, dataset.key, (float) progress, progressString, speedString);
+                EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, (float) progress, progressString, speedString);
             });
         };
 
@@ -879,17 +882,17 @@ public class DatasetManagerWindow extends GenericDialog {
                         logger.error("SHA256 check failed: " + name);
                         errorMsg = "(SHA256 check failed)";
                         errors++;
-                        EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, "Error checking SHA256: " + name, 10f);
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, 10f);
                     }
                 } catch (Exception e) {
                     logger.info("Error checking SHA256: " + name);
                     errorMsg = "(SHA256 check failed)";
                     errors++;
-                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, "Error checking SHA256: " + name, 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "Error checking SHA256: " + name, 10f);
                 }
             } else {
                 logger.info("No digest found for dataset: " + name);
-                EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, "No digest found for dataset: " + name, 10f);
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, "No digest found for dataset: " + name, 10f);
             }
 
             if (errors == 0) {
@@ -913,14 +916,14 @@ public class DatasetManagerWindow extends GenericDialog {
 
                 if (numErrors == 0) {
                     // Ok message
-                    EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, dataset.key, 0);
+                    EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, dataset.key, 0);
                     dataset.exists = true;
                     actionEnableDataset(dataset);
                     if (successRunnable != null) {
                         successRunnable.run();
                     }
                     resetSelectedDataset();
-                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.finished", name), 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.finished", name), 10f);
                     com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
@@ -936,7 +939,7 @@ public class DatasetManagerWindow extends GenericDialog {
                         setStatusError(dataset);
                     currentDownloads.remove(dataset.key);
                     resetSelectedDataset();
-                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.failed", name), 10f);
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.failed", name), 10f);
                     com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                         @Override
                         public void run() {
@@ -954,7 +957,7 @@ public class DatasetManagerWindow extends GenericDialog {
             setStatusError(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
-            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.failed", name), 10f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.failed", name), 10f);
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
                 public void run() {
@@ -968,7 +971,7 @@ public class DatasetManagerWindow extends GenericDialog {
             setStatusCancelled(dataset);
             currentDownloads.remove(dataset.key);
             resetSelectedDataset();
-            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("gui.download.cancelled", name), 10f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("gui.download.cancelled", name), 10f);
             com.badlogic.gdx.utils.Timer.schedule(new com.badlogic.gdx.utils.Timer.Task() {
                 @Override
                 public void run() {
@@ -979,7 +982,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
         // Download
         final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
-        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.DATASET_DOWNLOAD_START_INFO, dataset.key, request));
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_START_INFO, this, dataset.key, request));
         currentDownloads.put(dataset.key, new Pair<>(dataset, request));
 
     }
@@ -1010,7 +1013,7 @@ public class DatasetManagerWindow extends GenericDialog {
                 GaiaSky.postRunnable(() -> {
                     float val = (float) ((fIs.getBytesRead() / 1000d) / sizeKb) * 100f;
                     String progressString = I18n.txt("gui.download.extracting", nf.format(fIs.getBytesRead() / 1000d) + "/" + sizeKbStr + " Kb");
-                    EventManager.instance.post(Events.DATASET_DOWNLOAD_PROGRESS_INFO, dataset.key, val, progressString, null);
+                    EventManager.publish(Event.DATASET_DOWNLOAD_PROGRESS_INFO, this, dataset.key, val, progressString, null);
                 });
                 last = current;
             }
@@ -1093,15 +1096,15 @@ public class DatasetManagerWindow extends GenericDialog {
     }
 
     private void setStatusError(DatasetDesc ds) {
-        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 1);
+        EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1);
     }
 
     private void setStatusError(DatasetDesc ds, String message) {
-        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 1, message);
+        EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 1, message);
     }
 
     private void setStatusCancelled(DatasetDesc ds) {
-        EventManager.instance.post(Events.DATASET_DOWNLOAD_FINISH_INFO, ds.key, 2);
+        EventManager.publish(Event.DATASET_DOWNLOAD_FINISH_INFO, this, ds.key, 2);
     }
 
     @Override

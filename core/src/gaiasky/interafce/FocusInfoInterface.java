@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.ExternalInformationUpdater;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
@@ -169,9 +169,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         bookmark.addListener(event -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 if (bookmark.isChecked())
-                    EventManager.instance.post(Events.BOOKMARKS_ADD, currentFocus.getName(), false);
+                    EventManager.publish(Event.BOOKMARKS_ADD, bookmark, bookmark, currentFocus.getName(), false);
                 else
-                    EventManager.instance.post(Events.BOOKMARKS_REMOVE_ALL, currentFocus.getName());
+                    EventManager.publish(Event.BOOKMARKS_REMOVE_ALL, bookmark, bookmark, currentFocus.getName());
             }
             return false;
         });
@@ -181,7 +181,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         goTo.setSize(buttonSize, buttonSize);
         goTo.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.NAVIGATE_TO_OBJECT, currentFocus);
+                EventManager.publish(Event.NAVIGATE_TO_OBJECT, goTo, currentFocus);
                 return true;
             }
             return false;
@@ -193,7 +193,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         landOn.setSize(buttonSize, buttonSize);
         landOn.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.LAND_ON_OBJECT, currentFocus);
+                EventManager.publish(Event.LAND_ON_OBJECT, landOn, currentFocus);
                 return true;
             }
             return false;
@@ -205,7 +205,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         landAt.setSize(buttonSize, buttonSize);
         landAt.addListener((event) -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_LAND_AT_LOCATION_ACTION, currentFocus);
+                EventManager.publish(Event.SHOW_LAND_AT_LOCATION_ACTION, landAt, currentFocus);
                 return true;
             }
             return false;
@@ -216,7 +216,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         objectVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, currentFocus, currentFocus.getName(), !objectVisibility.isChecked(), this);
+                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, objectVisibility, currentFocus, currentFocus.getName(), !objectVisibility.isChecked());
                 return true;
             }
             return false;
@@ -226,7 +226,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         labelVisibility.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Toggle visibility
-                EventManager.instance.post(Events.FORCE_OBJECT_LABEL_CMD, currentFocus, currentFocus.getName(), !labelVisibility.isChecked(), this);
+                EventManager.publish(Event.FORCE_OBJECT_LABEL_CMD, labelVisibility, currentFocus, currentFocus.getName(), !labelVisibility.isChecked());
                 return true;
             }
             return false;
@@ -370,7 +370,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         pos = new Vector3d();
         posb = new Vector3b();
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.FOCUS_INFO_UPDATED, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_TRACKING_OBJECT_UPDATE, Events.CAMERA_MODE_CMD, Events.LON_LAT_UPDATED, Events.RA_DEC_UPDATED, Events.RULER_ATTACH_0, Events.RULER_ATTACH_1, Events.RULER_CLEAR, Events.RULER_DIST, Events.PER_OBJECT_VISIBILITY_CMD, Events.FORCE_OBJECT_LABEL_CMD);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.FOCUS_INFO_UPDATED, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_TRACKING_OBJECT_UPDATE, Event.CAMERA_MODE_CMD, Event.LON_LAT_UPDATED, Event.RA_DEC_UPDATED, Event.RULER_ATTACH_0, Event.RULER_ATTACH_1, Event.RULER_CLEAR, Event.RULER_DIST, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD);
     }
 
     private HorizontalGroup hg(Actor... actors) {
@@ -385,7 +385,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         final String deg = I18n.txt("gui.unit.deg");
         final Settings s = Settings.settings;
         switch (event) {
@@ -671,8 +671,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             rulerDist.setText(I18n.txt("gui.sc.distance") + ": " + rd);
         }
         case PER_OBJECT_VISIBILITY_CMD -> {
-            Object source = data[3];
-            if (source != this) {
+            if (source != objectVisibility) {
                 IVisibilitySwitch vs = (IVisibilitySwitch) data[0];
                 String name = (String) data[1];
                 if (vs == currentFocus && currentFocus.hasName(name)) {
@@ -682,8 +681,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             }
         }
         case FORCE_OBJECT_LABEL_CMD -> {
-            Object source = data[3];
-            if (source != this) {
+            if (source != labelVisibility) {
                 SceneGraphNode sgn = (SceneGraphNode) data[0];
                 String name = (String) data[1];
                 if (sgn == currentFocus && currentFocus.hasName(name)) {

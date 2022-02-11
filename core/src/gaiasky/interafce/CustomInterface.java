@@ -16,8 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.ObjectMap.Keys;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.scene2d.OwnLabel;
@@ -43,7 +43,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
         initSizes(skin);
 
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.ADD_CUSTOM_IMAGE, Events.ADD_CUSTOM_MESSAGE, Events.REMOVE_OBJECTS, Events.REMOVE_ALL_OBJECTS, Events.ADD_CUSTOM_TEXT);
+        EventManager.instance.subscribe(this, Event.ADD_CUSTOM_IMAGE, Event.ADD_CUSTOM_MESSAGE, Event.REMOVE_OBJECTS, Event.REMOVE_ALL_OBJECTS, Event.ADD_CUSTOM_TEXT);
     }
 
     private void unsubscribe() {
@@ -74,7 +74,7 @@ public class CustomInterface implements IObserver, IGuiInterface {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         float width = Gdx.graphics.getWidth();
         float height = Gdx.graphics.getHeight();
         synchronized (lock) {

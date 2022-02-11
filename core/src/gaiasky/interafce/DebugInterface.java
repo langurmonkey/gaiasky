@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.Settings;
@@ -275,7 +275,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         this.setVisible(settings.program.debugInfo);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.DEBUG_TIME, Events.DEBUG_RAM, Events.DEBUG_VRAM, Events.DEBUG_THREADS, Events.DEBUG_OBJECTS, Events.DEBUG_QUEUE, Events.FPS_INFO, Events.SHOW_DEBUG_CMD, Events.SAMP_INFO);
+        EventManager.instance.subscribe(this, Event.DEBUG_TIME, Event.DEBUG_RAM, Event.DEBUG_VRAM, Event.DEBUG_THREADS, Event.DEBUG_OBJECTS, Event.DEBUG_QUEUE, Event.FPS_INFO, Event.SHOW_DEBUG_CMD, Event.SAMP_INFO);
     }
 
     private void unsubscribe() {
@@ -295,7 +295,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             final boolean debug = Settings.settings.program.debugInfo;
             switch (event) {

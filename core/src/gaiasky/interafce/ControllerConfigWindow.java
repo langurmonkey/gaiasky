@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -523,7 +523,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
 
     private void restoreControllerListener() {
         Settings.settings.controls.gamepad.removeAllControllerListeners();
-        EventManager.instance.post(Events.CONTROLLER_CONNECTED_INFO, controllerName);
+        EventManager.publish(Event.CONTROLLER_CONNECTED_INFO, this, controllerName);
     }
 
     @Override
@@ -602,7 +602,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
         if (cm.persist(file)) {
             savedFile = file;
         }
-        EventManager.instance.post(Events.RELOAD_CONTROLLER_MAPPINGS, file.toAbsolutePath().toString());
+        EventManager.publish(Event.RELOAD_CONTROLLER_MAPPINGS, this, file.toAbsolutePath().toString());
         restoreControllerListener();
     }
 
@@ -617,7 +617,7 @@ public class ControllerConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
     }
 
     private class ConfigControllerListener implements ControllerListener {

@@ -20,8 +20,8 @@ import com.sudoplay.joise.module.ModuleFractal.FractalType;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.format.DesktopNumberFormat;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.component.*;
@@ -69,7 +69,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
         this.rand = new Random(1884L);
         this.setModal(false);
 
-        EventManager.instance.subscribe(this, Events.PROCEDURAL_GENERATION_CLOUD_INFO, Events.PROCEDURAL_GENERATION_SURFACE_INFO);
+        EventManager.instance.subscribe(this, Event.PROCEDURAL_GENERATION_CLOUD_INFO, Event.PROCEDURAL_GENERATION_SURFACE_INFO);
 
         setAcceptText(I18n.txt("gui.close"));
 
@@ -886,7 +886,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         boolean status = (Boolean) data[0];
         switch (event) {
         case PROCEDURAL_GENERATION_CLOUD_INFO -> {

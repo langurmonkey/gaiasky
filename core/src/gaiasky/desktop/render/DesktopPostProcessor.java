@@ -17,8 +17,8 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor;
 import gaiasky.scenegraph.BackgroundModel;
@@ -95,7 +95,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         frustumCorners = new Matrix4();
         raymarchingDef = new HashMap<>();
 
-        EventManager.instance.subscribe(this, Events.RAYMARCHING_CMD);
+        EventManager.instance.subscribe(this, Event.RAYMARCHING_CMD);
     }
 
     public void initialize(AssetManager manager) {
@@ -117,7 +117,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Events.SCREENSHOT_SIZE_UPDATE, Events.FRAME_SIZE_UPDATE, Events.BLOOM_CMD, Events.UNSHARP_MASK_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_POS_2D_UPDATE, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.CUBEMAP_CMD, Events.ANTIALIASING_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD, Events.STEREO_PROFILE_CMD, Events.STEREOSCOPIC_CMD, Events.FPS_INFO, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_BRIGHTNESS_CMD, Events.STAR_POINT_SIZE_CMD, Events.CAMERA_MOTION_UPDATE, Events.CAMERA_ORIENTATION_UPDATE, Events.GRAPHICS_QUALITY_UPDATED, Events.STAR_TEXTURE_IDX_CMD, Events.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.STAR_TEXTURE_IDX_CMD, Event.SCENE_GRAPH_LOADED);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -392,7 +392,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // Add to scene graph
         if (blurObject != null && !blurObjectAdded) {
             blurObject.doneLoading(manager);
-            GaiaSky.postRunnable(() -> EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, blurObject, false));
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, blurObject, false));
             blurObjectAdded = true;
         }
     }
@@ -483,7 +483,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     }
 
     @Override
-    public void notify(Events event, final Object... data) {
+    public void notify(Event event, Object source, final Object... data) {
         switch (event) {
         case SCENE_GRAPH_LOADED:
             initializeOffscreenPostProcessors();
@@ -749,7 +749,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     ppb.get(CameraMotion.class).setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
                 }
             }
-            if(enabled && blurObjectAdded) {
+            if (enabled && blurObjectAdded) {
                 blurObject.setVisible(true);
             } else if (blurObject != null) {
                 blurObject.setVisible(false);

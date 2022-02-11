@@ -23,8 +23,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -139,7 +139,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
             initMaterial();
 
         // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
 
         // Initialised
         texInitialised = !Settings.settings.scene.initialization.lazyTexture;
@@ -199,7 +199,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
             generated.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Begin
-                EventManager.instance.post(Events.PROCEDURAL_GENERATION_CLOUD_INFO, true);
+                EventManager.publish(Event.PROCEDURAL_GENERATION_CLOUD_INFO, this, true);
 
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
@@ -227,7 +227,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
                 });
 
                 // End
-                EventManager.instance.post(Events.PROCEDURAL_GENERATION_CLOUD_INFO, false);
+                EventManager.publish(Event.PROCEDURAL_GENERATION_CLOUD_INFO, this, false);
             });
         }
     }
@@ -303,8 +303,8 @@ public class CloudComponent extends NamedComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.GRAPHICS_QUALITY_UPDATED) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
             GaiaSky.postRunnable(() -> {
                 if (texInitialised) {
                     // Remove current textures

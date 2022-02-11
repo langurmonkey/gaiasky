@@ -13,8 +13,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.KeyframesPathObject;
@@ -151,7 +151,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
     public NaturalMouseKbdListener(final NaturalCamera camera) {
         this(new GaiaGestureListener(), camera);
-        EventManager.instance.subscribe(this, Events.TOUCH_DOWN, Events.TOUCH_UP, Events.TOUCH_DRAGGED, Events.SCROLLED, Events.KEY_DOWN, Events.KEY_UP);
+        EventManager.instance.subscribe(this, Event.TOUCH_DOWN, Event.TOUCH_UP, Event.TOUCH_DRAGGED, Event.SCROLLED, Event.KEY_DOWN, Event.KEY_UP);
     }
 
     private int touched;
@@ -239,8 +239,8 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                     keyframeBeingDragged = ((hit = getKeyframeCollision(screenX, screenY)) != null);
                     if(keyframeBeingDragged){
                         // FOCUS_MODE, do not center
-                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit, false);
-                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, false);
+                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit, false);
+                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, false);
                     }
                 }
             }
@@ -252,7 +252,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
     @Override
     public boolean touchUp(final int screenX, final int screenY, final int pointer, final int button) {
-        EventManager.instance.post(Events.INPUT_EVENT, button);
+        EventManager.publish(Event.INPUT_EVENT, this, button);
         if (Settings.settings.runtime.inputEnabled) {
             touched &= ~(1 << pointer);
             multiTouch = !MathUtils.isPowerOfTwo(touched);
@@ -272,8 +272,8 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                             // Select star, if any
                             IFocus hit = getBestHit(screenX, screenY);
                             if (hit != null) {
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
+                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
+                                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
                             }
                         }
                     }
@@ -285,7 +285,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                 if (keyframeBeingDragged) {
                     keyframeBeingDragged = false;
                 } else if (gesture.dst(screenX, screenY) < MOVE_PX_DIST &&  getKeyframesPathObject() != null && getKeyframesPathObject().isSelected() && !anyPressed(Keys.CONTROL_LEFT, Keys.SHIFT_LEFT, Keys.ALT_LEFT)) {
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                     Objects.requireNonNull(getKeyframesPathObject()).unselect();
                 } else {
                     // Ensure Octants observed property is computed
@@ -298,7 +298,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
 
                             // Right click, context menu
                             IFocus hit = getBestHit(screenX, screenY);
-                            EventManager.instance.post(Events.POPUP_MENU_FOCUS, hit, screenX, screenY);
+                            EventManager.publish(Event.POPUP_MENU_FOCUS, this, hit, screenX, screenY);
                         }
                     });
                     camera.setHorizontal(0);
@@ -307,7 +307,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
             }
 
             // Remove keyboard focus from GUI elements
-            EventManager.instance.notify(Events.REMOVE_KEYBOARD_FOCUS);
+            EventManager.instance.notify(Event.REMOVE_KEYBOARD_FOCUS, this);
 
             this.button = -1;
         }
@@ -432,7 +432,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case TOUCH_DOWN:
             this.touchDown((int) data[0], (int) data[1], (int) data[2], (int) data[3]);

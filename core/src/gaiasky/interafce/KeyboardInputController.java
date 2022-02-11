@@ -8,8 +8,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputAdapter;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.interafce.KeyBindings.ProgramAction;
 import gaiasky.util.Settings;
 
@@ -48,7 +48,7 @@ public class KeyboardInputController extends InputAdapter {
 
     @Override
     public boolean keyUp(int keycode) {
-        EventManager.instance.post(Events.INPUT_EVENT, keycode);
+        EventManager.publish(Event.INPUT_EVENT, this, keycode);
 
         cleanSpecial();
 
@@ -60,7 +60,7 @@ public class KeyboardInputController extends InputAdapter {
             }
         } else if (keycode == Keys.ESCAPE) {
             // If input is not enabled, only escape works
-            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+            EventManager.publish(Event.SHOW_QUIT_ACTION, this);
         }
         pressedKeys.remove(keycode);
         return false;

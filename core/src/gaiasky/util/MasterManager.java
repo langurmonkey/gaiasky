@@ -6,8 +6,8 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.net.HttpStatus;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.Logger.Log;
@@ -120,7 +120,7 @@ public class MasterManager implements IObserver {
         http = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
 
         // Subscribe to events that need to be broadcast
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_POINT_SIZE_CMD, Events.DISPOSE);
+        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_MIN_OPACITY_CMD, Event.STAR_POINT_SIZE_CMD, Event.DISPOSE);
     }
 
     /**
@@ -238,7 +238,7 @@ public class MasterManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         int i;
         switch (event) {
         case FOV_CHANGED_CMD:
@@ -256,9 +256,9 @@ public class MasterManager implements IObserver {
             break;
         case TOGGLE_VISIBILITY_CMD:
             String key = (String) data[0];
-            Boolean state = null;
-            if (data.length > 2) {
-                state = (Boolean) data[2];
+            Boolean state;
+            if (data.length == 2) {
+                state = (Boolean) data[1];
             } else {
                 ComponentType ct = ComponentType.getFromKey(key);
                 state = Settings.settings.scene.visibility.get(ct.toString());
@@ -386,7 +386,7 @@ public class MasterManager implements IObserver {
 
     private void slaveEvent(int idx, int newState){
         if(slaveStates[idx] != newState){
-            EventManager.instance.post(Events.SLAVE_CONNECTION_EVENT, idx, slaves.get(idx), newState >= 0);
+            EventManager.publish(Event.SLAVE_CONNECTION_EVENT, this, idx, slaves.get(idx), newState >= 0);
         }
     }
 }

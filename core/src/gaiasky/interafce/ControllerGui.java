@@ -18,8 +18,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pools;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.SceneGraphRenderer;
 import gaiasky.scenegraph.IFocus;
@@ -230,7 +230,7 @@ public class ControllerGui extends AbstractGui {
         cameraFocus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (cameraFocus.isChecked()) {
-                    em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
+                    em.post(Event.CAMERA_MODE_CMD, cameraFocus, CameraMode.FOCUS_MODE);
                     cameraFree.setProgrammaticChangeEvents(false);
                     cameraFree.setChecked(false);
                     cameraFree.setProgrammaticChangeEvents(true);
@@ -248,7 +248,7 @@ public class ControllerGui extends AbstractGui {
         cameraFree.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (cameraFree.isChecked()) {
-                    em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                    em.post(Event.CAMERA_MODE_CMD, cameraFree, CameraMode.FREE_MODE);
                     cameraFocus.setProgrammaticChangeEvents(false);
                     cameraFocus.setChecked(false);
                     cameraFocus.setProgrammaticChangeEvents(true);
@@ -265,7 +265,7 @@ public class ControllerGui extends AbstractGui {
         cameraCinematic.setChecked(Settings.settings.scene.camera.cinematic);
         cameraCinematic.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                em.post(Events.CAMERA_CINEMATIC_CMD, cameraCinematic.isChecked(), false);
+                em.post(Event.CAMERA_CINEMATIC_CMD, cameraCinematic, cameraCinematic.isChecked());
                 return true;
             }
             return false;
@@ -283,7 +283,7 @@ public class ControllerGui extends AbstractGui {
         fovSlider.addListener(event -> {
             if (event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
                 float value = fovSlider.getMappedValue();
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
+                EventManager.publish(Event.FOV_CHANGED_CMD, fovSlider, value);
                 return true;
             }
             return false;
@@ -298,7 +298,7 @@ public class ControllerGui extends AbstractGui {
         camSpeedSlider.setMappedValue(Settings.settings.scene.camera.speed);
         camSpeedSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CAMERA_SPEED_CMD, camSpeedSlider.getMappedValue(), false);
+                EventManager.publish(Event.CAMERA_SPEED_CMD, camSpeedSlider, camSpeedSlider.getMappedValue(), false);
                 return true;
             }
             return false;
@@ -313,7 +313,7 @@ public class ControllerGui extends AbstractGui {
         camRotSlider.setMappedValue(Settings.settings.scene.camera.rotate);
         camRotSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.ROTATION_SPEED_CMD, camRotSlider.getMappedValue(), false);
+                EventManager.publish(Event.ROTATION_SPEED_CMD, camRotSlider, camRotSlider.getMappedValue());
                 return true;
             }
             return false;
@@ -328,7 +328,7 @@ public class ControllerGui extends AbstractGui {
         camTurnSlider.setMappedValue(Settings.settings.scene.camera.turn);
         camTurnSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TURNING_SPEED_CMD, camTurnSlider.getMappedValue(), false);
+                EventManager.publish(Event.TURNING_SPEED_CMD, camTurnSlider, camTurnSlider.getMappedValue(), false);
                 return true;
             }
             return false;
@@ -362,7 +362,7 @@ public class ControllerGui extends AbstractGui {
         timeStartStop.setChecked(timeOn);
         timeStartStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                em.post(Events.TIME_STATE_CMD, timeStartStop.isChecked(), false);
+                em.post(Event.TIME_STATE_CMD, timeStartStop, timeStartStop.isChecked());
                 timeStartStop.setText(I18n.txt(timeStartStop.isChecked() ? "gui.time.pause" : "gui.time.start"));
                 return true;
             }
@@ -373,7 +373,7 @@ public class ControllerGui extends AbstractGui {
         timeUp.setWidth(ww);
         timeUp.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                em.post(Events.TIME_WARP_INCREASE_CMD);
+                em.post(Event.TIME_WARP_INCREASE_CMD, timeUp);
                 return true;
             }
             return false;
@@ -383,7 +383,7 @@ public class ControllerGui extends AbstractGui {
         timeDown.setWidth(ww);
         timeDown.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                em.post(Events.TIME_WARP_DECREASE_CMD);
+                em.post(Event.TIME_WARP_DECREASE_CMD, timeDown);
                 return true;
             }
             return false;
@@ -393,7 +393,7 @@ public class ControllerGui extends AbstractGui {
         timeReset.setWidth(ww);
         timeReset.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                em.post(Events.TIME_CHANGE_CMD, Instant.now());
+                em.post(Event.TIME_CHANGE_CMD, timeReset, Instant.now());
                 return true;
             }
             return false;
@@ -441,7 +441,7 @@ public class ControllerGui extends AbstractGui {
                     button.setChecked(visible[i]);
                     button.addListener(event -> {
                         if (event instanceof ChangeEvent) {
-                            EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
+                            EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, button, ct.key, button.isChecked());
                             return true;
                         }
                         return false;
@@ -479,7 +479,7 @@ public class ControllerGui extends AbstractGui {
         bloomSlider.setValue(Settings.settings.postprocess.bloom.intensity * 10f);
         bloomSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.BLOOM_CMD, bloomSlider.getValue() / 10f, false);
+                EventManager.publish(Event.BLOOM_CMD, bloomSlider, bloomSlider.getValue() / 10f);
                 return true;
             }
             return false;
@@ -494,7 +494,7 @@ public class ControllerGui extends AbstractGui {
         flareButton.setChecked(Settings.settings.postprocess.lensFlare);
         flareButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.LENS_FLARE_CMD, flareButton.isChecked(), false);
+                EventManager.publish(Event.LENS_FLARE_CMD, flareButton, flareButton.isChecked());
                 return true;
             }
             return false;
@@ -508,7 +508,7 @@ public class ControllerGui extends AbstractGui {
         starGlowButton.setChecked(Settings.settings.postprocess.lightGlow);
         starGlowButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.LIGHT_SCATTERING_CMD, starGlowButton.isChecked(), false);
+                EventManager.publish(Event.LIGHT_SCATTERING_CMD, starGlowButton, starGlowButton.isChecked());
                 return true;
             }
             return false;
@@ -522,7 +522,7 @@ public class ControllerGui extends AbstractGui {
         motionBlurButton.setChecked(Settings.settings.postprocess.motionBlur);
         motionBlurButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.MOTION_BLUR_CMD, motionBlurButton.isChecked(), false);
+                EventManager.publish(Event.MOTION_BLUR_CMD, motionBlurButton, motionBlurButton.isChecked());
                 return true;
             }
             return false;
@@ -713,8 +713,8 @@ public class ControllerGui extends AbstractGui {
                     boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                     if (!timeOverflow && canSelect && ctOn) {
                         GaiaSky.postRunnable(() -> {
-                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
                         });
                         info(null);
                     } else if (timeOverflow) {
@@ -761,7 +761,7 @@ public class ControllerGui extends AbstractGui {
         ui = new Stage(vp, sb);
 
         // Comment to hide this whole dialog and functionality
-        EventManager.instance.subscribe(this, Events.SHOW_CONTROLLER_GUI_ACTION, Events.TIME_STATE_CMD, Events.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Event.SHOW_CONTROLLER_GUI_ACTION, Event.TIME_STATE_CMD, Event.SCENE_GRAPH_LOADED);
     }
 
     @Override
@@ -978,13 +978,13 @@ public class ControllerGui extends AbstractGui {
     }
 
     public void back() {
-        EventManager.instance.post(Events.SHOW_CONTROLLER_GUI_ACTION, GaiaSky.instance.cameraManager.naturalCamera);
+        EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this, GaiaSky.instance.cameraManager.naturalCamera);
         updateFocused();
         ui.setKeyboardFocus(null);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         // Empty by default
         switch (event) {
         case SHOW_CONTROLLER_GUI_ACTION:
@@ -1104,7 +1104,7 @@ public class ControllerGui extends AbstractGui {
         @Override
         public boolean buttonUp(Controller controller, int buttonCode) {
             if (buttonCode == mappings.getButtonStart()) {
-                em.post(Events.SHOW_CONTROLLER_GUI_ACTION, cam);
+                em.post(Event.SHOW_CONTROLLER_GUI_ACTION, this, cam);
             } else if (buttonCode == mappings.getButtonB()) {
                 back();
             } else if (buttonCode == mappings.getButtonA()) {

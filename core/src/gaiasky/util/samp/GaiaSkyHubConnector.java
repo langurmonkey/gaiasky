@@ -5,8 +5,8 @@
 
 package gaiasky.util.samp;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -34,7 +34,7 @@ public class GaiaSkyHubConnector extends HubConnector {
         }catch (NullPointerException | SampException ignored) {}
 
         logger.info(isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
-        EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
+        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, isConnected ? I18n.txt("samp.connected", hubName) : I18n.txt("samp.disconnected"));
     }
 
     @Override

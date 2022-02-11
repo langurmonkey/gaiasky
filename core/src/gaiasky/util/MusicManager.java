@@ -8,8 +8,8 @@ package gaiasky.util;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger.Log;
 
@@ -46,7 +46,7 @@ public class MusicManager implements IObserver {
         super();
         initFiles(dirs);
 
-        EventManager.instance.subscribe(this, Events.MUSIC_NEXT_CMD, Events.MUSIC_PLAYPAUSE_CMD, Events.MUSIC_PREVIOUS_CMD, Events.MUSIC_VOLUME_CMD, Events.MUSIC_RELOAD_CMD);
+        EventManager.instance.subscribe(this, Event.MUSIC_NEXT_CMD, Event.MUSIC_PLAYPAUSE_CMD, Event.MUSIC_PREVIOUS_CMD, Event.MUSIC_VOLUME_CMD, Event.MUSIC_RELOAD_CMD);
     }
 
     private void initFiles(Path[] folders) {
@@ -98,7 +98,7 @@ public class MusicManager implements IObserver {
             currentMusic.setOnCompletionListener(music -> playNextMusic());
 
             currentMusic.play();
-            EventManager.instance.post(Events.MUSIC_TRACK_INFO, musicFiles.get(i).getFileName().toString());
+            EventManager.publish(Event.MUSIC_TRACK_INFO, this, musicFiles.get(i).getFileName().toString());
             logger.info(I18n.txt("gui.music.playing", musicFiles.get(i).getFileName().toString()));
         } catch (Exception e) {
             logger.error(e);
@@ -182,7 +182,7 @@ public class MusicManager implements IObserver {
             currentMusic.dispose();
         }
         if (EventManager.instance != null)
-            EventManager.instance.unsubscribe(this, Events.MUSIC_NEXT_CMD, Events.MUSIC_PLAYPAUSE_CMD, Events.MUSIC_PREVIOUS_CMD, Events.MUSIC_VOLUME_CMD, Events.MUSIC_RELOAD_CMD);
+            EventManager.instance.unsubscribe(this, Event.MUSIC_NEXT_CMD, Event.MUSIC_PLAYPAUSE_CMD, Event.MUSIC_PREVIOUS_CMD, Event.MUSIC_VOLUME_CMD, Event.MUSIC_RELOAD_CMD);
     }
 
     public static void dispose() {
@@ -193,7 +193,7 @@ public class MusicManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case MUSIC_PREVIOUS_CMD:
             previous();

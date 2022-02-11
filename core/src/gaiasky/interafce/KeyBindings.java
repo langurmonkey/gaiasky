@@ -9,8 +9,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -198,7 +198,7 @@ public class KeyBindings {
         BooleanRunnable masterWithSlaves = MasterManager::hasSlaves;
 
         // about action
-        final Runnable runnableAbout = () -> EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
+        final Runnable runnableAbout = () -> EventManager.publish(Event.SHOW_ABOUT_ACTION, this);
 
         // help dialog
         addAction(new ProgramAction("action.help", runnableAbout, noCleanMode));
@@ -209,7 +209,7 @@ public class KeyBindings {
         // show quit
         final Runnable runnableQuit = () -> {
             // Quit action
-            EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+            EventManager.publish(Event.SHOW_QUIT_ACTION, this);
         };
 
         // run quit action
@@ -219,135 +219,135 @@ public class KeyBindings {
         //addAction(new ProgramAction("action.exit", runnableQuit), CTRL_L, Keys.Q);
 
         // show preferences dialog
-        addAction(new ProgramAction("action.preferences", () -> EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION), noCleanMode));
+        addAction(new ProgramAction("action.preferences", () -> EventManager.publish(Event.SHOW_PREFERENCES_ACTION, this), noCleanMode));
 
         // minimap toggle
-        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.instance.post(Events.TOGGLE_MINIMAP), noCleanMode));
+        addAction(new ProgramAction("action.toggle/gui.minimap.title", () -> EventManager.publish(Event.TOGGLE_MINIMAP, this), noCleanMode));
 
         // load catalog
-        addAction(new ProgramAction("action.loadcatalog", () -> EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION), noCleanMode));
+        addAction(new ProgramAction("action.loadcatalog", () -> EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, this), noCleanMode));
 
         // show log dialog
-        addAction(new ProgramAction("action.log", () -> EventManager.instance.post(Events.SHOW_LOG_ACTION), noCleanMode));
+        addAction(new ProgramAction("action.log", () -> EventManager.publish(Event.SHOW_LOG_ACTION, this), noCleanMode));
 
         // show play camera dialog
         //addAction(new ProgramAction("action.playcamera", () ->
-        //        EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
+        //        EventManager.publish(Events.SHOW_PLAYCAMERA_ACTION), fullGuiCondition), Keys.C);
 
         // Toggle orbits
-        addAction(new ProgramAction("action.toggle/element.orbits", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.orbits", false)));
+        addAction(new ProgramAction("action.toggle/element.orbits", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.orbits")));
 
         // Toggle planets
-        addAction(new ProgramAction("action.toggle/element.planets", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.planets", false)));
+        addAction(new ProgramAction("action.toggle/element.planets", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.planets")));
 
         // Toggle moons
-        addAction(new ProgramAction("action.toggle/element.moons", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.moons", false)));
+        addAction(new ProgramAction("action.toggle/element.moons", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.moons")));
 
         // Toggle stars
-        addAction(new ProgramAction("action.toggle/element.stars", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.stars", false), noGameCondition));
+        addAction(new ProgramAction("action.toggle/element.stars", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.stars"), noGameCondition));
 
         // Toggle satellites
-        addAction(new ProgramAction("action.toggle/element.satellites", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.satellites", false)));
+        addAction(new ProgramAction("action.toggle/element.satellites", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.satellites")));
 
         // Toggle asteroids
-        addAction(new ProgramAction("action.toggle/element.asteroids", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.asteroids", false), noGameCondition));
+        addAction(new ProgramAction("action.toggle/element.asteroids", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.asteroids"), noGameCondition));
 
         // Toggle labels
-        addAction(new ProgramAction("action.toggle/element.labels", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false)));
+        addAction(new ProgramAction("action.toggle/element.labels", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels")));
 
         // Toggle constellations
-        addAction(new ProgramAction("action.toggle/element.constellations", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.constellations", false), noGameCondition));
+        addAction(new ProgramAction("action.toggle/element.constellations", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.constellations"), noGameCondition));
 
         // Toggle boundaries
-        addAction(new ProgramAction("action.toggle/element.boundaries", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.boundaries", false)));
+        addAction(new ProgramAction("action.toggle/element.boundaries", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.boundaries")));
 
         // Toggle equatorial
-        addAction(new ProgramAction("action.toggle/element.equatorial", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.equatorial", false)));
+        addAction(new ProgramAction("action.toggle/element.equatorial", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.equatorial")));
 
         // Toggle ecliptic
-        addAction(new ProgramAction("action.toggle/element.ecliptic", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.ecliptic", false)));
+        addAction(new ProgramAction("action.toggle/element.ecliptic", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.ecliptic")));
 
         // Toggle galactic
-        addAction(new ProgramAction("action.toggle/element.galactic", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.galactic", false)));
+        addAction(new ProgramAction("action.toggle/element.galactic", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.galactic")));
 
         // Toggle recgrid
-        addAction(new ProgramAction("action.toggle/element.recursivegrid", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.recursivegrid", false)));
+        addAction(new ProgramAction("action.toggle/element.recursivegrid", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.recursivegrid")));
 
         // toggle meshes
-        addAction(new ProgramAction("action.toggle/element.meshes", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.meshes", false)));
+        addAction(new ProgramAction("action.toggle/element.meshes", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.meshes")));
 
         // toggle clusters
-        addAction(new ProgramAction("action.toggle/element.clusters", () -> EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.clusters", false)));
+        addAction(new ProgramAction("action.toggle/element.clusters", () -> EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.clusters")));
 
         // divide speed
-        addAction(new ProgramAction("action.dividetime", () -> EventManager.instance.post(Events.TIME_WARP_DECREASE_CMD)));
+        addAction(new ProgramAction("action.dividetime", () -> EventManager.publish(Event.TIME_WARP_DECREASE_CMD, this)));
 
         // double speed
-        addAction(new ProgramAction("action.doubletime", () -> EventManager.instance.post(Events.TIME_WARP_INCREASE_CMD)));
+        addAction(new ProgramAction("action.doubletime", () -> EventManager.publish(Event.TIME_WARP_INCREASE_CMD, this)));
 
         // toggle time
         addAction(new ProgramAction("action.pauseresume", () -> {
             // Game mode has space bound to 'up'
             if (!GaiaSky.instance.cameraManager.mode.isGame())
-                EventManager.instance.post(Events.TIME_STATE_CMD, !Settings.settings.runtime.timeOn, false);
+                EventManager.publish(Event.TIME_STATE_CMD, this, !Settings.settings.runtime.timeOn);
         }));
 
         // increase field of view
-        addAction(new ProgramAction("action.incfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, Settings.settings.scene.camera.fov + 1f, false), noSlaveProj));
+        addAction(new ProgramAction("action.incfov", () -> EventManager.publish(Event.FOV_CHANGED_CMD, this, Settings.settings.scene.camera.fov + 1f), noSlaveProj));
 
         // decrease field of view
-        addAction(new ProgramAction("action.decfov", () -> EventManager.instance.post(Events.FOV_CHANGED_CMD, Settings.settings.scene.camera.fov - 1f, false), noSlaveProj));
+        addAction(new ProgramAction("action.decfov", () -> EventManager.publish(Event.FOV_CHANGED_CMD, this, Settings.settings.scene.camera.fov - 1f), noSlaveProj));
 
         // fullscreen
         addAction(new ProgramAction("action.togglefs", () -> {
             Settings.settings.graphics.fullScreen.active = !Settings.settings.graphics.fullScreen.active;
-            EventManager.instance.post(Events.SCREEN_MODE_CMD);
+            EventManager.publish(Event.SCREEN_MODE_CMD, this);
         }));
 
         // take screenshot
-        addAction(new ProgramAction("action.screenshot", () -> EventManager.instance.post(Events.SCREENSHOT_CMD, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
+        addAction(new ProgramAction("action.screenshot", () -> EventManager.publish(Event.SCREENSHOT_CMD, this, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1], Settings.settings.screenshot.location)));
 
         // toggle frame output
-        addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.instance.post(Events.FRAME_OUTPUT_CMD, !Settings.settings.frame.active)));
+        addAction(new ProgramAction("action.toggle/element.frameoutput", () -> EventManager.publish(Event.FRAME_OUTPUT_CMD, this, !Settings.settings.frame.active)));
 
         // toggle UI collapse/expand
-        addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.instance.post(Events.GUI_FOLD_CMD), fullGuiCondition, noCleanMode));
+        addAction(new ProgramAction("action.toggle/element.controls", () -> EventManager.publish(Event.GUI_FOLD_CMD, this), fullGuiCondition, noCleanMode));
 
         // toggle planetarium mode
         addAction(new ProgramAction("action.toggle/element.planetarium", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active;
-            EventManager.instance.post(Events.CUBEMAP_CMD, enable, CubemapProjection.FISHEYE, false);
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.FISHEYE);
         }, noPanorama));
 
         // toggle cubemap mode
         addAction(new ProgramAction("action.toggle/element.360", () -> {
             boolean enable = !Settings.settings.program.modeCubemap.active;
-            EventManager.instance.post(Events.CUBEMAP_CMD, enable, CubemapProjection.EQUIRECTANGULAR, false);
+            EventManager.publish(Event.CUBEMAP_CMD, this, enable, CubemapProjection.EQUIRECTANGULAR);
         }, noPlanetarium));
 
         // toggle cubemap projection
         addAction(new ProgramAction("action.toggle/element.projection", () -> {
             int newprojidx = (Settings.settings.program.modeCubemap.projection.ordinal() + 1) % (CubemapProjection.HAMMER.ordinal() + 1);
-            EventManager.instance.post(Events.CUBEMAP_PROJECTION_CMD, CubemapProjection.values()[newprojidx]);
+            EventManager.publish(Event.CUBEMAP_PROJECTION_CMD, this, CubemapProjection.values()[newprojidx]);
         }));
 
         // increase star point size by 0.5
-        addAction(new ProgramAction("action.starpointsize.inc", () -> EventManager.instance.post(Events.STAR_POINT_SIZE_INCREASE_CMD)));
+        addAction(new ProgramAction("action.starpointsize.inc", () -> EventManager.publish(Event.STAR_POINT_SIZE_INCREASE_CMD, this)));
 
         // decrease star point size by 0.5
-        addAction(new ProgramAction("action.starpointsize.dec", () -> EventManager.instance.post(Events.STAR_POINT_SIZE_DECREASE_CMD)));
+        addAction(new ProgramAction("action.starpointsize.dec", () -> EventManager.publish(Event.STAR_POINT_SIZE_DECREASE_CMD, this)));
 
         // reset star point size
-        addAction(new ProgramAction("action.starpointsize.reset", () -> EventManager.instance.post(Events.STAR_POINT_SIZE_RESET_CMD)));
+        addAction(new ProgramAction("action.starpointsize.reset", () -> EventManager.publish(Event.STAR_POINT_SIZE_RESET_CMD, this)));
 
         // new keyframe
-        addAction(new ProgramAction("action.keyframe", () -> EventManager.instance.post(Events.KEYFRAME_ADD)));
+        addAction(new ProgramAction("action.keyframe", () -> EventManager.publish(Event.KEYFRAME_ADD, this)));
 
         // toggle debug information
-        addAction(new ProgramAction("action.toggle/element.debugmode", () -> EventManager.instance.post(Events.SHOW_DEBUG_CMD), noCleanMode));
+        addAction(new ProgramAction("action.toggle/element.debugmode", () -> EventManager.publish(Event.SHOW_DEBUG_CMD, this), noCleanMode));
 
         // search dialog
-        final Runnable runnableSearch = () -> EventManager.instance.post(Events.SHOW_SEARCH_ACTION);
+        final Runnable runnableSearch = () -> EventManager.publish(Event.SHOW_SEARCH_ACTION, this);
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // search dialog
@@ -357,70 +357,70 @@ public class KeyBindings {
         addAction(new ProgramAction("action.search", runnableSearch, fullGuiCondition, noCleanMode));
 
         // toggle particle fade
-        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.instance.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
+        addAction(new ProgramAction("action.toggle/element.octreeparticlefade", () -> EventManager.publish(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.txt("element.octreeparticlefade"), !Settings.settings.scene.octree.fade)));
 
         // toggle stereoscopic mode
-        addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.instance.post(Events.STEREOSCOPIC_CMD, !Settings.settings.program.modeStereo.active, false)));
+        addAction(new ProgramAction("action.toggle/element.stereomode", () -> EventManager.publish(Event.STEREOSCOPIC_CMD, this, !Settings.settings.program.modeStereo.active)));
 
         // switch stereoscopic profile
         addAction(new ProgramAction("action.switchstereoprofile", () -> {
             int newidx = Settings.settings.program.modeStereo.profile.ordinal();
             newidx = (newidx + 1) % values().length;
-            EventManager.instance.post(Events.STEREO_PROFILE_CMD, newidx);
+            EventManager.publish(Event.STEREO_PROFILE_CMD, this, newidx);
         }));
 
         // Toggle clean (no GUI) mode
-        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.instance.post(Events.DISPLAY_GUI_CMD, !Settings.settings.runtime.displayGui, I18n.txt("notif.cleanmode"))));
+        addAction(new ProgramAction("action.toggle/element.cleanmode", () -> EventManager.publish(Event.DISPLAY_GUI_CMD, this, !Settings.settings.runtime.displayGui, I18n.txt("notif.cleanmode"))));
 
         // Travel to focus object
-        addAction(new ProgramAction("action.gotoobject", () -> EventManager.instance.post(Events.GO_TO_OBJECT_CMD)));
+        addAction(new ProgramAction("action.gotoobject", () -> EventManager.publish(Event.GO_TO_OBJECT_CMD, this)));
 
         // Reset time to current system time
-        addAction(new ProgramAction("action.resettime", () -> EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.now())));
+        addAction(new ProgramAction("action.resettime", () -> EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.now())));
 
         // Back home
-        addAction(new ProgramAction("action.home", () -> EventManager.instance.post(Events.HOME_CMD)));
+        addAction(new ProgramAction("action.home", () -> EventManager.publish(Event.HOME_CMD, this)));
 
         // Expand/collapse time pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.time", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "TimeComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.time", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "TimeComponent"), noCleanMode));
 
         // Expand/collapse camera pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.camera", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "CameraComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.camera", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "CameraComponent"), noCleanMode));
 
         // Expand/collapse visibility pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisibilityComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.visibility", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisibilityComponent"), noCleanMode));
 
         // Expand/collapse visual effects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "VisualEffectsComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.lighting", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "VisualEffectsComponent"), noCleanMode));
 
         // Expand/collapse datasets pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "DatasetsComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.dataset.title", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "DatasetsComponent"), noCleanMode));
 
         // Expand/collapse objects pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.objects", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "ObjectsComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.objects", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "ObjectsComponent"), noCleanMode));
 
         // Expand/collapse bookmarks pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.bookmarks", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "BookmarksComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.bookmarks", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "BookmarksComponent"), noCleanMode));
 
         // Expand/collapse music pane
-        addAction(new ProgramAction("action.expandcollapse.pane/gui.music", () -> EventManager.instance.post(Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, "MusicComponent"), noCleanMode));
+        addAction(new ProgramAction("action.expandcollapse.pane/gui.music", () -> EventManager.publish(Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, this, "MusicComponent"), noCleanMode));
 
         // Toggle mouse capture
-        addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.instance.post(Events.MOUSE_CAPTURE_TOGGLE)));
+        addAction(new ProgramAction("action.toggle/gui.mousecapture", () -> EventManager.publish(Event.MOUSE_CAPTURE_TOGGLE, this)));
 
         // Reload UI (debugging)
-        addAction(new ProgramAction("action.ui.reload", () -> EventManager.instance.post(Events.UI_RELOAD_CMD, GaiaSky.instance.getGlobalResources())));
+        addAction(new ProgramAction("action.ui.reload", () -> EventManager.publish(Event.UI_RELOAD_CMD, this, GaiaSky.instance.getGlobalResources())));
 
         // Configure slave
-        addAction(new ProgramAction("action.slave.configure", () -> EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION), masterWithSlaves));
+        addAction(new ProgramAction("action.slave.configure", () -> EventManager.publish(Event.SHOW_SLAVE_CONFIG_ACTION, this), masterWithSlaves));
 
         // Camera modes
         for (CameraMode mode : CameraMode.values()) {
-            addAction(new ProgramAction("camera.full/camera." + mode.toString(), () -> EventManager.instance.post(Events.CAMERA_MODE_CMD, mode)));
+            addAction(new ProgramAction("camera.full/camera." + mode.toString(), () -> EventManager.publish(Event.CAMERA_MODE_CMD, this, mode)));
         }
 
         // Controller GUI
-        addAction(new ProgramAction("action.controller.gui.in", () -> EventManager.instance.post(Events.SHOW_CONTROLLER_GUI_ACTION)));
+        addAction(new ProgramAction("action.controller.gui.in", () -> EventManager.publish(Event.SHOW_CONTROLLER_GUI_ACTION, this)));
     }
 
     private void initMappings() {

@@ -23,8 +23,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -125,7 +125,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
 
     public MaterialComponent() {
         super();
-        EventManager.instance.subscribe(this, Events.ELEVATION_TYPE_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.TESSELLATION_QUALITY_CMD);
+        EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
     }
 
     public void initialize(String name, Long id, AssetManager manager) {
@@ -385,7 +385,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             heightGenerated.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
                 // Begin
-                EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, true);
+                EventManager.publish(Event.PROCEDURAL_GENERATION_SURFACE_INFO, this, true);
 
                 final int N = Settings.settings.graphics.quality.texWidthTarget;
                 final int M = Settings.settings.graphics.quality.texHeightTarget;
@@ -546,7 +546,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 GaiaSky.postRunnable(() -> logger.info(I18n.txt("gui.procedural.info.done", I18n.txt("gui.procedural.surface"), Double.toString(elapsed / 1000d))));
 
                 // End
-                EventManager.instance.post(Events.PROCEDURAL_GENERATION_SURFACE_INFO, false);
+                EventManager.publish(Event.PROCEDURAL_GENERATION_SURFACE_INFO, this, false);
             });
         }
     }
@@ -757,7 +757,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case ELEVATION_TYPE_CMD:
             if (this.hasHeight() && this.material != null) {

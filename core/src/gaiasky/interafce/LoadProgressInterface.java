@@ -8,8 +8,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.utils.ObjectMap;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnProgressBar;
 
@@ -28,7 +28,7 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
         this.stack = new VerticalGroup();
         this.width = width;
         add(this.stack).center();
-        EventManager.instance.subscribe(this, Events.UPDATE_LOAD_PROGRESS);
+        EventManager.instance.subscribe(this, Event.UPDATE_LOAD_PROGRESS);
     }
 
     @Override
@@ -40,8 +40,8 @@ public class LoadProgressInterface extends TableGuiInterface implements IObserve
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.UPDATE_LOAD_PROGRESS) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.UPDATE_LOAD_PROGRESS) {
             String name = (String) data[0];
             float val = (Float) data[1];
 

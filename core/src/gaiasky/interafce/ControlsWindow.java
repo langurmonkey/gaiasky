@@ -16,8 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TiledDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.components.*;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -86,7 +86,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
-        EventManager.instance.subscribe(this, Events.TIME_STATE_CMD, Events.GUI_SCROLL_POSITION_CMD, Events.GUI_FOLD_CMD, Events.GUI_MOVE_CMD, Events.RECALCULATE_OPTIONS_SIZE, Events.EXPAND_PANE_CMD, Events.COLLAPSE_PANE_CMD, Events.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.RECORD_CAMERA_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_STATE_CMD, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_OPTIONS_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
     }
 
     public void initialize() {
@@ -105,7 +105,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         playStop.setChecked(Settings.settings.runtime.timeOn);
         playStop.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TIME_STATE_CMD, playStop.isChecked(), true);
+                EventManager.publish(Event.TIME_STATE_CMD, playStop, playStop.isChecked());
                 return true;
             }
             return false;
@@ -130,7 +130,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         recCamera.setChecked(Settings.settings.runtime.recordCamera);
         recCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.RECORD_CAMERA_CMD, recCamera.isChecked(), null, true);
+                EventManager.publish(Event.RECORD_CAMERA_CMD, recCamera, recCamera.isChecked(), null);
                 return true;
             }
             return false;
@@ -143,7 +143,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         recKeyframeCamera.setChecked(Settings.settings.runtime.recordKeyframeCamera);
         recKeyframeCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_KEYFRAMES_WINDOW_ACTION);
+                EventManager.publish(Event.SHOW_KEYFRAMES_WINDOW_ACTION, recKeyframeCamera);
                 return true;
             }
             return false;
@@ -156,7 +156,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         playCamera.setChecked(false);
         playCamera.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_PLAYCAMERA_ACTION);
+                EventManager.publish(Event.SHOW_PLAYCAMERA_ACTION, playCamera);
                 return true;
             }
             return false;
@@ -266,7 +266,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         map.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.map"), minimapHotkey, skin));
         map.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_MINIMAP_ACTION, map.isChecked(), true);
+                EventManager.publish(Event.SHOW_MINIMAP_ACTION, map, map.isChecked());
             }
             return false;
         });
@@ -276,7 +276,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         load.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.loadcatalog"), kb.getStringKeys("action.loadcatalog"), skin));
         load.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_LOAD_CATALOG_ACTION);
+                EventManager.publish(Event.SHOW_LOAD_CATALOG_ACTION, load);
             }
             return false;
         });
@@ -287,7 +287,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         preferences.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.preferences"), prefsHotkey, skin));
         preferences.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_PREFERENCES_ACTION);
+                EventManager.publish(Event.SHOW_PREFERENCES_ACTION, preferences);
             }
             return false;
         });
@@ -297,7 +297,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         showLog.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.tooltip.log"), kb.getStringKeys("action.log"), skin));
         showLog.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_LOG_ACTION);
+                EventManager.publish(Event.SHOW_LOG_ACTION, showLog);
             }
             return false;
         });
@@ -308,7 +308,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         about.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.help"), helpHotkey, skin));
         about.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_ABOUT_ACTION);
+                EventManager.publish(Event.SHOW_ABOUT_ACTION, about);
             }
             return false;
         });
@@ -318,7 +318,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         quit.addListener(new OwnTextHotkeyTooltip(I18n.txt("gui.quit.title"), kb.getStringKeys("action.exit"), skin));
         quit.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_QUIT_ACTION);
+                EventManager.publish(Event.SHOW_QUIT_ACTION, quit);
             }
             return false;
         });
@@ -413,12 +413,10 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case TIME_STATE_CMD:
-            // Pause has been toggled, update playstop button only if this does
-            // not come from this interface
-            if (!(Boolean) data[1]) {
+            if (source != playStop) {
                 playStop.setCheckedNoFire((Boolean) data[0]);
             }
             break;
@@ -473,8 +471,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             break;
         case SHOW_MINIMAP_ACTION:
             boolean show = (Boolean) data[0];
-            boolean ui = (Boolean) data[1];
-            if (!ui) {
+            if (source != map) {
                 map.setProgrammaticChangeEvents(false);
                 map.setChecked(show);
                 map.setProgrammaticChangeEvents(true);
@@ -487,8 +484,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             break;
         case RECORD_CAMERA_CMD:
             boolean state = (Boolean) data[0];
-            ui = (Boolean) data[2];
-            if (!ui) {
+            if (source != recCamera) {
                 recCamera.setCheckedNoFire(state);
             }
             break;

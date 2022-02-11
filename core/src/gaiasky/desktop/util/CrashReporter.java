@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.interafce.MessageBean;
 import gaiasky.interafce.NotificationsInterface;
 import gaiasky.util.Constants;
@@ -29,7 +29,6 @@ import java.io.*;
 import java.nio.IntBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Arrays;
@@ -192,7 +191,7 @@ public class CrashReporter {
     }
 
     private static void print(Log logger, String str) {
-        if (logger == null || !EventManager.instance.hasSubscriptors(Events.POST_NOTIFICATION)) {
+        if (logger == null || !EventManager.instance.hasSubscriptors(Event.POST_NOTIFICATION)) {
             System.err.println(str);
         } else {
             logger.error(str);

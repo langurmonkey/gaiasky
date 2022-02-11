@@ -23,8 +23,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.IStarGroupDataProvider;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.*;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -670,9 +670,9 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         // Super handles FOCUS_CHANGED and CAMERA_MOTION_UPDATED event
-        super.notify(event, data);
+        super.notify(event, source, data);
     }
 
     @Override
@@ -829,14 +829,14 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
         // Dispose of GPU datOLO
-        EventManager.instance.post(Events.DISPOSE_STAR_GROUP_GPU_MESH, this.offset);
+        EventManager.publish(Event.DISPOSE_STAR_GROUP_GPU_MESH, this, this.offset);
         // Data to be gc'd
         this.pointData = null;
         // Remove focus if needed
         CameraManager cam = GaiaSky.instance.getCameraManager();
         if (cam != null && cam.getFocus() != null && cam.getFocus() == this) {
             this.setFocusIndex(-1);
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
         }
     }
 
@@ -981,7 +981,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
     public void setInGpu(boolean inGpu) {
         if (this.inGpu() && !inGpu) {
             // Dispose of GPU data
-            EventManager.instance.post(variableStars ? Events.DISPOSE_VARIABLE_GROUP_GPU_MESH : Events.DISPOSE_STAR_GROUP_GPU_MESH, this.offset);
+            EventManager.publish(variableStars ? Event.DISPOSE_VARIABLE_GROUP_GPU_MESH : Event.DISPOSE_STAR_GROUP_GPU_MESH, this, this.offset);
         }
         this.inGpu(inGpu);
     }

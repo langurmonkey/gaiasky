@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.data.StreamingOctreeLoader;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.IFocus;
@@ -189,7 +189,7 @@ public class CameraManager implements ICamera, IObserver {
 
         updateCurrentCamera();
 
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.FOV_CHANGE_NOTIFICATION);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.FOV_CHANGE_NOTIFICATION);
     }
 
     private AbstractCamera backupCam(ICamera current) {
@@ -209,7 +209,7 @@ public class CameraManager implements ICamera, IObserver {
         // Update
         switch (mode) {
             case GAME_MODE:
-                EventManager.instance.post(Events.CAMERA_CINEMATIC_CMD, false, false);
+                EventManager.publish(Event.CAMERA_CINEMATIC_CMD, this, false );
             case FREE_MODE:
             case FOCUS_MODE:
             case GAIA_SCENE_MODE:
@@ -332,7 +332,7 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         // Post event with camera motion parameters
-        EventManager.instance.post(Events.CAMERA_MOTION_UPDATE, current.getPos(), speed, velocityNormalized, current.getCamera());
+        EventManager.publish(Event.CAMERA_MOTION_UPDATE, this, current.getPos(), speed, velocityNormalized, current.getCamera());
 
         // Update last pos and dir
         lastPos.set(current.getPos());
@@ -370,10 +370,10 @@ public class CameraManager implements ICamera, IObserver {
             }
         }
         IFocus newClosest = getClosest();
-        EventManager.instance.post(Events.CAMERA_CLOSEST_INFO, newClosest, getClosestBody(), getClosestParticle());
+        EventManager.publish(Event.CAMERA_CLOSEST_INFO, this, newClosest, getClosestBody(), getClosestParticle());
 
         if(newClosest != previousClosest){
-            EventManager.instance.post(Events.CAMERA_NEW_CLOSEST, newClosest);
+            EventManager.publish(Event.CAMERA_NEW_CLOSEST, this, newClosest);
             previousClosest = newClosest;
         }
     }
@@ -400,7 +400,7 @@ public class CameraManager implements ICamera, IObserver {
             double viewRA = out.x * Nature.TO_DEG;
             double viewDEC = out.y * Nature.TO_DEG;
 
-            EventManager.instance.post(Events.RA_DEC_UPDATED, pointerRA, pointerDEC, viewRA, viewDEC, pointerX, pointerY);
+            EventManager.publish(Event.RA_DEC_UPDATED, this, pointerRA, pointerDEC, viewRA, viewDEC, pointerX, pointerY);
         }catch(NumberFormatException e) {
             // Something fishy with the pointer coordinates
         }
@@ -416,7 +416,7 @@ public class CameraManager implements ICamera, IObserver {
                 boolean ok = CameraUtils.getLonLat(p, getCurrent(), screenX, screenY, v0, v1, vec, isec, in, out, localTransformInv, lonlat);
 
                 if (ok)
-                    EventManager.instance.post(Events.LON_LAT_UPDATED, lonlat[0], lonlat[1], screenX, screenY);
+                    EventManager.publish(Event.LON_LAT_UPDATED, this, lonlat[0], lonlat[1], screenX, screenY);
 
             }
 
@@ -436,12 +436,12 @@ public class CameraManager implements ICamera, IObserver {
         }
 
         if (postEvent) {
-            EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, this.getCamera().fieldOfView, getFovFactor());
+            EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, this.getCamera().fieldOfView, getFovFactor());
         }
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case CAMERA_MODE_CMD -> {
             CameraMode cm = (CameraMode) data[0];

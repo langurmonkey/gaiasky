@@ -8,8 +8,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnLabel;
 
@@ -37,7 +37,7 @@ public class MessagesInterface extends TableGuiInterface implements IObserver {
         this.row();
         this.add(subhead).left();
         this.lock = lock;
-        EventManager.instance.subscribe(this, Events.POST_HEADLINE_MESSAGE, Events.CLEAR_HEADLINE_MESSAGE, Events.POST_SUBHEAD_MESSAGE, Events.CLEAR_SUBHEAD_MESSAGE, Events.CLEAR_MESSAGES);
+        EventManager.instance.subscribe(this, Event.POST_HEADLINE_MESSAGE, Event.CLEAR_HEADLINE_MESSAGE, Event.POST_SUBHEAD_MESSAGE, Event.CLEAR_SUBHEAD_MESSAGE, Event.CLEAR_MESSAGES);
     }
 
     private void unsubscribe() {
@@ -45,7 +45,7 @@ public class MessagesInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             switch (event) {
             case POST_HEADLINE_MESSAGE:

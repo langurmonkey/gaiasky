@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.Settings;
 
 public class VRControllerInfoGui extends AbstractGui {
@@ -57,7 +57,7 @@ public class VRControllerInfoGui extends AbstractGui {
 
         rebuildGui();
 
-        EventManager.instance.subscribe(this, Events.DISPLAY_VR_CONTROLLER_HINT_CMD);
+        EventManager.instance.subscribe(this, Event.DISPLAY_VR_CONTROLLER_HINT_CMD);
     }
 
     @Override
@@ -85,7 +85,7 @@ public class VRControllerInfoGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
 
         switch (event) {
             case DISPLAY_VR_CONTROLLER_HINT_CMD:

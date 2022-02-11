@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -44,7 +44,7 @@ public class ParticleGroupPointRenderSystem extends PointCloudRenderSystem imple
         rand = new Random(123);
         aux1 = new Vector3();
         cmap = new Colormap();
-        EventManager.instance.subscribe(this, Events.DISPOSE_PARTICLE_GROUP_GPU_MESH);
+        EventManager.instance.subscribe(this, Event.DISPOSE_PARTICLE_GROUP_GPU_MESH);
     }
 
     @Override
@@ -170,8 +170,8 @@ public class ParticleGroupPointRenderSystem extends PointCloudRenderSystem imple
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.DISPOSE_PARTICLE_GROUP_GPU_MESH) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.DISPOSE_PARTICLE_GROUP_GPU_MESH) {
             Integer meshIdx = (Integer) data[0];
             clearMeshData(meshIdx);
         }

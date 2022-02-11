@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.IShapeRenderable;
@@ -37,7 +37,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
 
     @Override
     public void initialize() {
-        EventManager.instance.subscribe(this, Events.UI_THEME_RELOAD_INFO);
+        EventManager.instance.subscribe(this, Event.UI_THEME_RELOAD_INFO);
 
         LabelStyle headerStyle = GaiaSky.instance.getGlobalResources().getSkin().get("header", LabelStyle.class);
         labelcolor[0] = headerStyle.fontColor.r;
@@ -182,7 +182,7 @@ public class Text2D extends FadeNode implements I3DTextRenderable, IShapeRendera
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case UI_THEME_RELOAD_INFO:
             Skin skin = (Skin) data[0];

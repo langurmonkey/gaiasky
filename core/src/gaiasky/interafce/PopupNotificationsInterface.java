@@ -8,8 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.scene2d.OwnButton;
 import gaiasky.util.scene2d.OwnLabel;
@@ -34,7 +34,7 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
         this.stack.bottom().columnRight();
         me.add(stack).top().right().pad(pad15);
 
-        EventManager.instance.subscribe(this, Events.POST_POPUP_NOTIFICATION);
+        EventManager.instance.subscribe(this, Event.POST_POPUP_NOTIFICATION);
     }
 
     /**
@@ -103,8 +103,8 @@ public class PopupNotificationsInterface extends TableGuiInterface implements IO
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.POST_POPUP_NOTIFICATION) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.POST_POPUP_NOTIFICATION) {
             String message = (String) data[0];
             float seconds = defaultSeconds;
             if (data.length > 1) {

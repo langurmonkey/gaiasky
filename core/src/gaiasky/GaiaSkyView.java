@@ -23,8 +23,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.RenderUtils;
 import gaiasky.util.scene2d.OwnLabel;
@@ -57,7 +57,7 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
         this.skin = skin;
         this.spriteShader = spriteShader;
         this.lastTexSize = new Vector2(-1, -1);
-        EventManager.instance.subscribe(this, Events.INITIALIZED_INFO);
+        EventManager.instance.subscribe(this, Event.INITIALIZED_INFO);
     }
 
     public void setWindow(Lwjgl3Window window) {
@@ -144,8 +144,8 @@ public class GaiaSkyView implements ApplicationListener, IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.INITIALIZED_INFO) {// Initialize full gui
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.INITIALIZED_INFO) {// Initialize full gui
             postRunnable(this::removeGui);
         }
 

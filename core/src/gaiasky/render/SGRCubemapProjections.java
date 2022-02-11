@@ -7,8 +7,8 @@ package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
@@ -39,7 +39,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
 
         copy = new Copy();
 
-        EventManager.instance.subscribe(this, Events.CUBEMAP_RESOLUTION_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_CMD, Events.PLANETARIUM_APERTURE_CMD, Events.PLANETARIUM_ANGLE_CMD);
+        EventManager.instance.subscribe(this, Event.CUBEMAP_RESOLUTION_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_CMD, Event.PLANETARIUM_APERTURE_CMD, Event.PLANETARIUM_ANGLE_CMD);
     }
 
     private void setProjection(CubemapProjection projection) {
@@ -112,7 +112,7 @@ public class SGRCubemapProjections extends SGRCubemap implements ISGR, IObserver
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         if (!Settings.settings.runtime.openVr) {
             switch (event) {
                 case CUBEMAP_CMD:

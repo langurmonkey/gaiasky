@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -56,7 +56,7 @@ public class StereoGui extends AbstractGui {
         buildGui();
 
         // We must subscribe to the desired events
-        EventManager.instance.subscribe(this, Events.STEREO_PROFILE_CMD);
+        EventManager.instance.subscribe(this, Event.STEREO_PROFILE_CMD);
     }
 
     private void buildGui() {
@@ -125,8 +125,8 @@ public class StereoGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.STEREO_PROFILE_CMD) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.STEREO_PROFILE_CMD) {
             StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
             notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPH);
         }

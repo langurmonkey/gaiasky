@@ -19,8 +19,8 @@ import gaiasky.GaiaSky;
 import gaiasky.data.SceneGraphJsonLoader;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
@@ -84,7 +84,7 @@ public class GuiRegistry implements IObserver {
         this.guis = new Array<>(true, 2);
         this.catalogManager = catalogManager;
         // Windows which are visible from any GUI
-        EventManager.instance.subscribe(this, Events.SHOW_SEARCH_ACTION, Events.SHOW_QUIT_ACTION, Events.SHOW_ABOUT_ACTION, Events.SHOW_LOAD_CATALOG_ACTION, Events.SHOW_PREFERENCES_ACTION, Events.SHOW_KEYFRAMES_WINDOW_ACTION, Events.SHOW_SLAVE_CONFIG_ACTION, Events.UI_THEME_RELOAD_INFO, Events.MODE_POPUP_CMD, Events.DISPLAY_GUI_CMD, Events.CAMERA_MODE_CMD, Events.UI_RELOAD_CMD, Events.SHOW_PER_OBJECT_VISIBILITY_ACTION, Events.SHOW_RESTART_ACTION);
+        EventManager.instance.subscribe(this, Event.SHOW_SEARCH_ACTION, Event.SHOW_QUIT_ACTION, Event.SHOW_ABOUT_ACTION, Event.SHOW_LOAD_CATALOG_ACTION, Event.SHOW_PREFERENCES_ACTION, Event.SHOW_KEYFRAMES_WINDOW_ACTION, Event.SHOW_SLAVE_CONFIG_ACTION, Event.UI_THEME_RELOAD_INFO, Event.MODE_POPUP_CMD, Event.DISPLAY_GUI_CMD, Event.CAMERA_MODE_CMD, Event.UI_RELOAD_CMD, Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, Event.SHOW_RESTART_ACTION);
     }
 
     public void setInputMultiplexer(InputMultiplexer inputMultiplexer) {
@@ -312,7 +312,7 @@ public class GuiRegistry implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         if (current != null) {
             Stage ui = current.getGuiStage();
             // Treats windows that can appear in any GUI
@@ -429,7 +429,7 @@ public class GuiRegistry implements IObserver {
                                                     node.initialize();
                                                 }
                                                 for (SceneGraphNode node : objects) {
-                                                    EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, node, true);
+                                                    EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, node, true);
                                                 }
                                                 while (!GaiaSky.instance.assetManager.isFinished()) {
                                                     // Busy wait
@@ -462,12 +462,12 @@ public class GuiRegistry implements IObserver {
                                                 if (ci.object instanceof ParticleGroup) {
                                                     ParticleGroup pg = (ParticleGroup) ci.object;
                                                     if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
-                                                        EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                                        EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
+                                                        EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                                        EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg.getRandomParticleName());
                                                     }
                                                 } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
-                                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
+                                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, ci.object.children.get(0));
                                                 }
                                                 // Open UI datasets
                                                 GaiaSky.instance.scripting().maximizeInterfaceWindow();
@@ -738,18 +738,18 @@ public class GuiRegistry implements IObserver {
             globalResources.updateSkin();
             GenericDialog.updatePads();
             GaiaSky.instance.reinitialiseGUI1();
-            EventManager.instance.post(Events.SPACECRAFT_LOADED, GaiaSky.instance.sceneGraph.getNode("Spacecraft"));
+            EventManager.publish(Event.SPACECRAFT_LOADED, this, GaiaSky.instance.sceneGraph.getNode("Spacecraft"));
             GaiaSky.instance.reinitialiseGUI2();
             // Time init
-            EventManager.instance.post(Events.TIME_CHANGE_INFO, GaiaSky.instance.time.getTime());
+            EventManager.publish(Event.TIME_CHANGE_INFO, this, GaiaSky.instance.time.getTime());
             if (GaiaSky.instance.cameraManager.mode == CameraManager.CameraMode.FOCUS_MODE)
                 // Refocus
-                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, GaiaSky.instance.cameraManager.getFocus());
+                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, GaiaSky.instance.cameraManager.getFocus());
             // Update names with new language
             GaiaSky.instance.sceneGraph.getRoot().updateNamesRec();
             // UI theme reload broadcast
-            EventManager.instance.post(Events.UI_THEME_RELOAD_INFO, globalResources.getSkin());
-            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.ui.reload"));
+            EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.ui.reload"));
         });
     }
 

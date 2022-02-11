@@ -9,8 +9,8 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
@@ -109,7 +109,7 @@ public class RelativisticEffectsManager implements IObserver {
 
         screenCoords = new Vector3();
 
-        EventManager.instance.subscribe(this, Events.GRAV_WAVE_START);
+        EventManager.instance.subscribe(this, Event.GRAV_WAVE_START);
     }
 
     public boolean relAberrationOn() {
@@ -235,8 +235,8 @@ public class RelativisticEffectsManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.GRAV_WAVE_START) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.GRAV_WAVE_START) {
             int x = (Integer) data[0];
             int y = (Integer) data[1];
 

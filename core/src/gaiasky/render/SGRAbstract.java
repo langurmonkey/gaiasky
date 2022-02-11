@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Settings;
@@ -70,7 +70,7 @@ public class SGRAbstract {
     }
 
     protected void sendOrientationUpdate(PerspectiveCamera cam, int w, int h){
-        EventManager.instance.post(Events.CAMERA_ORIENTATION_UPDATE, cam, w, h);
+        EventManager.publish(Event.CAMERA_ORIENTATION_UPDATE, this, cam, w, h);
     }
 
 }

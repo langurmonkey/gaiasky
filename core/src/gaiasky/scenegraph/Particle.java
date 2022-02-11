@@ -9,8 +9,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -58,11 +58,11 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
     protected static class ParamUpdater implements IObserver {
         public ParamUpdater() {
             super();
-            EventManager.instance.subscribe(this, Events.FOV_CHANGE_NOTIFICATION, Events.STAR_POINT_SIZE_CMD);
+            EventManager.instance.subscribe(this, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_POINT_SIZE_CMD);
         }
 
         @Override
-        public void notify(final Events event, final Object... data) {
+        public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
             case FOV_CHANGE_NOTIFICATION:
                 fovFactor = (Float) data[1];

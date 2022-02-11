@@ -18,7 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -82,7 +82,7 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         aux3f1 = new Vector3();
         this.maxSizes = new float[PType.values().length];
         initializeMaxSizes(Settings.settings.graphics.quality);
-        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
     }
 
     /**
@@ -421,8 +421,8 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.GRAPHICS_QUALITY_UPDATED) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
             GraphicsQuality gq = (GraphicsQuality) data[0];
             GaiaSky.postRunnable(() -> {
                 // Dispose textures and meshes

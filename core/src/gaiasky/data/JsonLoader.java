@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.reflect.Constructor;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
@@ -79,9 +79,9 @@ public class JsonLoader<T extends SceneGraphNode> implements ISceneGraphLoader {
                         bodies.add(object);
 
                         child = child.next;
-                        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, file.name(), (float) current / (float) count);
+                        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), (float) current / (float) count);
                     }
-                    EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, file.name(), 2f);
+                    EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, file.name(), 2f);
                     logger.info(I18n.txt("notif.nodeloader", current, filePath));
                 }
             } catch (Exception e) {

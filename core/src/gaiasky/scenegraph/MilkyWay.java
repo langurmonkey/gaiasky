@@ -16,8 +16,8 @@ import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.PointDataProvider;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
@@ -137,7 +137,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
 
         transformData();
 
-        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
     }
 
     private void transformData() {
@@ -366,7 +366,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IObse
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         switch (event) {
         case GRAPHICS_QUALITY_UPDATED:
             // Reload data files with new graphics setting

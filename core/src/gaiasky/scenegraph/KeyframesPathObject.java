@@ -13,8 +13,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.desktop.util.camera.Keyframe;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.IPointRenderable;
@@ -483,13 +483,13 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             dir.setPrimitiveSize(0.8f * ss);
             up.setPrimitiveSize(0.8f * ss);
         }
-        EventManager.instance.post(Events.KEYFRAME_SELECT, kf);
+        EventManager.publish(Event.KEYFRAME_SELECT, this, kf);
     }
 
     private void initFocus() {
         if (focus == null || focus.parent == null) {
             focus = new Invisible("", 0.01 * Constants.KM_TO_U);
-            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, focus, false);
+            EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, focus, false);
         }
     }
 
@@ -508,7 +508,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
             Keyframe aux = selected;
             selected = null;
             selectedKnot.clear();
-            EventManager.instance.post(Events.KEYFRAME_UNSELECT, aux);
+            EventManager.publish(Event.KEYFRAME_UNSELECT, this, aux);
         }
     }
 

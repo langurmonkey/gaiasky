@@ -5,7 +5,6 @@
 
 package gaiasky.interafce;
 
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
@@ -14,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnCheckBox;
@@ -49,7 +48,7 @@ public class LandAtWindow extends GenericDialog {
         latlonCb.setChecked(false);
         latlonCb.addListener(new EventListener() {
             @Override
-            public boolean handle(Event event) {
+            public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
                 if (event instanceof ChangeEvent) {
                     if (latlonCb.isChecked()) {
                         enableComponents(false, location);
@@ -69,7 +68,7 @@ public class LandAtWindow extends GenericDialog {
         locationCb.setChecked(true);
         locationCb.addListener(new EventListener() {
             @Override
-            public boolean handle(Event event) {
+            public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
                 if (event instanceof ChangeEvent) {
                     if (locationCb.isChecked()) {
                         enableComponents(true, location);
@@ -101,9 +100,9 @@ public class LandAtWindow extends GenericDialog {
     @Override
     protected void accept() {
         if (latlonCb.isChecked()) {
-            EventManager.instance.post(Events.LAND_AT_LOCATION_OF_OBJECT, target, Double.parseDouble(longitude.getText()), Double.parseDouble(latitude.getText()));
+            EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, this, target, Double.parseDouble(longitude.getText()), Double.parseDouble(latitude.getText()));
         } else if (locationCb.isChecked()) {
-            EventManager.instance.post(Events.LAND_AT_LOCATION_OF_OBJECT, target, location.getText());
+            EventManager.publish(Event.LAND_AT_LOCATION_OF_OBJECT, this, target, location.getText());
         }
     }
 

@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.format.DateFormatFactory;
 import gaiasky.util.format.IDateFormat;
 import gaiasky.util.scene2d.OwnLabel;
@@ -63,7 +63,7 @@ public class RenderGui extends AbstractGui {
         // Add to GUI
         rebuildGui();
 
-        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO);
     }
 
     protected void rebuildGui() {
@@ -75,7 +75,7 @@ public class RenderGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             switch (event) {
             case TIME_CHANGE_INFO:

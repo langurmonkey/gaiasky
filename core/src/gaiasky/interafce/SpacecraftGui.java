@@ -36,7 +36,6 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.MachineDefinition;
 import gaiasky.scenegraph.Spacecraft;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -147,7 +146,7 @@ public class SpacecraftGui extends AbstractGui {
         assetManager.load("img/ai-vel.png", Texture.class);
         assetManager.load("img/ai-antivel.png", Texture.class);
 
-        EventManager.instance.subscribe(this, Events.SPACECRAFT_LOADED);
+        EventManager.instance.subscribe(this, gaiasky.event.Event.SPACECRAFT_LOADED);
     }
 
     /**
@@ -175,8 +174,8 @@ public class SpacecraftGui extends AbstractGui {
 
         buildGui();
 
-        EventManager.instance.subscribe(this, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_INFO, Events.SPACECRAFT_NEAREST_INFO, Events.SPACECRAFT_THRUST_INFO);
-        EventManager.instance.unsubscribe(this, Events.SPACECRAFT_LOADED);
+        EventManager.instance.subscribe(this, gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, gaiasky.event.Event.SPACECRAFT_STOP_CMD, gaiasky.event.Event.SPACECRAFT_INFO, gaiasky.event.Event.SPACECRAFT_NEAREST_INFO, gaiasky.event.Event.SPACECRAFT_THRUST_INFO);
+        EventManager.instance.unsubscribe(this, gaiasky.event.Event.SPACECRAFT_LOADED);
 
     }
 
@@ -196,7 +195,7 @@ public class SpacecraftGui extends AbstractGui {
             stabilise.setChecked(sc.isStabilising());
         stabilise.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, stabilise.isChecked());
+                EventManager.publish(gaiasky.event.Event.SPACECRAFT_STABILISE_CMD, stabilise, stabilise.isChecked());
                 return true;
             }
             return false;
@@ -210,7 +209,7 @@ public class SpacecraftGui extends AbstractGui {
             stop.setChecked(sc.isStopping());
         stop.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, stop.isChecked());
+                EventManager.publish(gaiasky.event.Event.SPACECRAFT_STOP_CMD, stop, stop.isChecked());
                 return true;
             }
             return false;
@@ -222,7 +221,7 @@ public class SpacecraftGui extends AbstractGui {
         exit.setName("exit spacecraft");
         exit.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
+                EventManager.publish(gaiasky.event.Event.CAMERA_MODE_CMD, exit, CameraMode.FOCUS_MODE);
                 return true;
             }
             return false;
@@ -251,7 +250,7 @@ public class SpacecraftGui extends AbstractGui {
         enginePlus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.powerup"), skin));
         enginePlus.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SPACECRAFT_THRUST_INCREASE_CMD);
+                EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_INCREASE_CMD, enginePlus);
                 return true;
             }
             return false;
@@ -260,7 +259,7 @@ public class SpacecraftGui extends AbstractGui {
         enginePlus.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.sc.powerdown"), skin));
         engineMinus.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SPACECRAFT_THRUST_DECREASE_CMD);
+                EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_DECREASE_CMD, engineMinus);
                 return true;
             }
             return false;
@@ -288,7 +287,7 @@ public class SpacecraftGui extends AbstractGui {
         enginePower.addListener(event -> {
             if (thrustEvents)
                 if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.SPACECRAFT_THRUST_SET_CMD, Math.round(enginePower.getValue()));
+                    EventManager.publish(gaiasky.event.Event.SPACECRAFT_THRUST_SET_CMD, enginePower, Math.round(enginePower.getValue()));
                     return true;
                 }
             return false;
@@ -310,7 +309,7 @@ public class SpacecraftGui extends AbstractGui {
         machineSelector.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 int machineIndex = machineSelector.getSelectedIndex();
-                EventManager.instance.post(Events.SPACECRAFT_MACHINE_SELECTION_CMD, machineIndex);
+                EventManager.publish(gaiasky.event.Event.SPACECRAFT_MACHINE_SELECTION_CMD, machineSelector, machineIndex);
                 return true;
             }
             return false;
@@ -504,7 +503,7 @@ public class SpacecraftGui extends AbstractGui {
             ui.addListener(new EventListener() {
 
                 @Override
-                public boolean handle(Event event) {
+                public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
                     if (event instanceof InputEvent) {
                         InputEvent ie = (InputEvent) event;
 
@@ -601,7 +600,7 @@ public class SpacecraftGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
         case SPACECRAFT_LOADED:
             this.sc = (Spacecraft) data[0];

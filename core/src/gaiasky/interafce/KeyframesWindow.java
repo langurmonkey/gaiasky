@@ -19,8 +19,8 @@ import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.desktop.util.camera.Keyframe;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Invisible;
@@ -242,7 +242,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         keyframesPathObject.doneLoading(null);
         keyframesPathObject.setKeyframes(keyframes);
 
-        EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, keyframesPathObject, false);
+        EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, keyframesPathObject, false);
 
         // Resizable
         setResizable(false, true);
@@ -418,7 +418,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 OwnTextField textField = fnw.getFileNameField();
                 fnw.setAcceptRunnable(() -> {
                     if (textField.isValid()) {
-                        EventManager.instance.post(Events.KEYFRAMES_FILE_SAVE, keyframes, textField.getText());
+                        EventManager.publish(Event.KEYFRAMES_FILE_SAVE, fnw, keyframes, textField.getText());
                         lastKeyframeFileName = textField.getText();
                         notice.clearActor();
                     } else {
@@ -444,7 +444,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
                 OwnTextField textField = fnw.getFileNameField();
                 fnw.setAcceptRunnable(() -> {
                     if (textField.isValid()) {
-                        EventManager.instance.post(Events.KEYFRAMES_EXPORT, keyframes, textField.getText());
+                        EventManager.publish(Event.KEYFRAMES_EXPORT, fnw, keyframes, textField.getText());
                         notice.clearActor();
                     } else {
                         Label warn = new OwnLabel(I18n.txt("error.file.name.notvalid", textField.getText()), skin);
@@ -803,12 +803,12 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         goTo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 // Go to keyframe
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+                EventManager.publish(Event.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
                 GaiaSky.postRunnable(() -> {
-                    EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) kf.pos.values());
-                    EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) kf.dir.values());
-                    EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) kf.up.values());
-                    EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(kf.time));
+                    EventManager.publish(Event.CAMERA_POS_CMD, goTo, (Object) kf.pos.values());
+                    EventManager.publish(Event.CAMERA_DIR_CMD, goTo, (Object) kf.dir.values());
+                    EventManager.publish(Event.CAMERA_UP_CMD, goTo, (Object) kf.up.values());
+                    EventManager.publish(Event.TIME_CHANGE_CMD, goTo, Instant.ofEpochMilli(kf.time));
                 });
                 return true;
             }
@@ -936,10 +936,10 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     @Override
     public GenericDialog show(Stage stage, Action action) {
         // Subscriptions
-        EventManager.instance.subscribe(this, Events.UPDATE_CAM_RECORDER, Events.KEYFRAMES_REFRESH, Events.KEYFRAME_SELECT, Events.KEYFRAME_UNSELECT, Events.KEYFRAME_ADD);
+        EventManager.instance.subscribe(this, Event.UPDATE_CAM_RECORDER, Event.KEYFRAMES_REFRESH, Event.KEYFRAME_SELECT, Event.KEYFRAME_UNSELECT, Event.KEYFRAME_ADD);
         // Re-add if necessary
         if (keyframesPathObject.getParent() == null) {
-            EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, keyframesPathObject, false);
+            EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, keyframesPathObject, false);
         }
         return super.show(stage, action);
     }
@@ -970,8 +970,8 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
         // Clean camera
         IFocus focus = GaiaSky.instance.getICamera().getFocus();
         if(focus instanceof Invisible && focus.getName().startsWith("Keyframe")){
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, Settings.settings.scene.homeObject);
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
+            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, Settings.settings.scene.homeObject);
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FREE_MODE);
         }
 
         if (cleanKeyframesList)
@@ -1017,7 +1017,7 @@ public class KeyframesWindow extends GenericDialog implements IObserver {
     private Color colorBak;
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case KEYFRAME_ADD:
             addKeyframe(-1);

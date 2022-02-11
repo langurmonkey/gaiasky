@@ -24,7 +24,7 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -305,7 +305,7 @@ public class AboutWindow extends GenericDialog {
         memInfoButton.setHeight(buttonHeight);
         memInfoButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.DISPLAY_MEM_INFO_WINDOW);
+                EventManager.publish(Event.DISPLAY_MEM_INFO_WINDOW, memInfoButton);
                 return true;
             }
             return false;

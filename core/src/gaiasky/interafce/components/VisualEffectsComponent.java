@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.util.*;
@@ -50,7 +50,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starBrightness.setMappedValue(Settings.settings.scene.star.brightness);
         starBrightness.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.instance.post(Events.STAR_BRIGHTNESS_CMD, starBrightness.getMappedValue(), true);
+                EventManager.publish(Event.STAR_BRIGHTNESS_CMD, starBrightness, starBrightness.getMappedValue());
                 return true;
             }
             return false;
@@ -63,7 +63,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starBrightnessPower.setMappedValue(Settings.settings.scene.star.power);
         starBrightnessPower.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.instance.post(Events.STAR_BRIGHTNESS_POW_CMD, starBrightnessPower.getValue(), true);
+                EventManager.publish(Event.STAR_BRIGHTNESS_POW_CMD, starBrightnessPower, starBrightnessPower.getValue());
                 return true;
             }
             return false;
@@ -76,7 +76,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starSize.setMappedValue(Settings.settings.scene.star.pointSize);
         starSize.addListener(event -> {
             if (flag && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, starSize.getMappedValue(), true);
+                EventManager.publish(Event.STAR_POINT_SIZE_CMD, starSize, starSize.getMappedValue());
                 return true;
             }
             return false;
@@ -89,7 +89,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         starMinOpacity.setMappedValue(Settings.settings.scene.star.opacity[0]);
         starMinOpacity.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
-                EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, starMinOpacity.getMappedValue(), true);
+                EventManager.publish(Event.STAR_MIN_OPACITY_CMD, starMinOpacity, starMinOpacity.getMappedValue());
                 return true;
             }
             return false;
@@ -102,7 +102,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         ambientLight.setMappedValue(Settings.settings.scene.renderer.ambient);
         ambientLight.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.AMBIENT_LIGHT_CMD, ambientLight.getMappedValue());
+                EventManager.publish(Event.AMBIENT_LIGHT_CMD, ambientLight, ambientLight.getMappedValue());
                 return true;
             }
             return false;
@@ -116,7 +116,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         labelSize.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 float val = labelSize.getMappedValue();
-                EventManager.instance.post(Events.LABEL_SIZE_CMD, val, true);
+                EventManager.publish(Event.LABEL_SIZE_CMD, labelSize, val);
                 return true;
             }
             return false;
@@ -130,7 +130,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         lineWidth.addListener(event -> {
             if (event instanceof ChangeEvent && hackProgrammaticChangeEvents) {
                 float val = lineWidth.getMappedValue();
-                EventManager.instance.post(Events.LINE_WIDTH_CMD, val, true);
+                EventManager.publish(Event.LINE_WIDTH_CMD, lineWidth, val);
                 return true;
             }
             return false;
@@ -144,7 +144,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
         elevMult.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 float val = elevMult.getValue();
-                EventManager.instance.post(Events.ELEVATION_MULTIPLIER_CMD, val, true);
+                EventManager.publish(Event.ELEVATION_MULTIPLIER_CMD, elevMult, val);
                 return true;
             }
             return false;
@@ -175,14 +175,14 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
                     // Events
                     EventManager m = EventManager.instance;
-                    m.post(Events.STAR_BRIGHTNESS_CMD, br, false);
-                    m.post(Events.STAR_BRIGHTNESS_POW_CMD, pow, false);
-                    m.post(Events.STAR_POINT_SIZE_CMD, ss, false);
-                    m.post(Events.STAR_MIN_OPACITY_CMD, pam, false);
-                    m.post(Events.AMBIENT_LIGHT_CMD, amb, false);
-                    m.post(Events.LABEL_SIZE_CMD, ls, false);
-                    m.post(Events.LINE_WIDTH_CMD, lw, false);
-                    m.post(Events.ELEVATION_MULTIPLIER_CMD, em, false);
+                    m.post(Event.STAR_BRIGHTNESS_CMD, resetDefaults, br);
+                    m.post(Event.STAR_BRIGHTNESS_POW_CMD, resetDefaults, pow);
+                    m.post(Event.STAR_POINT_SIZE_CMD, resetDefaults, ss);
+                    m.post(Event.STAR_MIN_OPACITY_CMD, resetDefaults, pam);
+                    m.post(Event.AMBIENT_LIGHT_CMD, resetDefaults, amb);
+                    m.post(Event.LABEL_SIZE_CMD, resetDefaults, ls);
+                    m.post(Event.LINE_WIDTH_CMD, resetDefaults, lw);
+                    m.post(Event.ELEVATION_MULTIPLIER_CMD, resetDefaults, em);
 
                 } catch (IOException e) {
                     logger.error(e, "Error loading default configuration file");
@@ -208,14 +208,14 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
 
         component = lightingGroup;
 
-        EventManager.instance.subscribe(this, Events.STAR_POINT_SIZE_CMD, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.STAR_MIN_OPACITY_CMD, Events.LABEL_SIZE_CMD, Events.LINE_WIDTH_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_POINT_SIZE_CMD, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_MIN_OPACITY_CMD, Event.LABEL_SIZE_CMD, Event.LINE_WIDTH_CMD);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_POINT_SIZE_CMD:
-            if (!(boolean) data[1]) {
+            if (source != starSize) {
                 flag = false;
                 float newsize = (float) data[0];
                 starSize.setMappedValue(newsize);
@@ -223,7 +223,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case STAR_BRIGHTNESS_CMD:
-            if (!(boolean) data[1]) {
+            if (source != starBrightness) {
                 Float brightness = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 starBrightness.setMappedValue(brightness);
@@ -231,7 +231,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case STAR_BRIGHTNESS_POW_CMD:
-            if (!(boolean) data[1]) {
+            if (source != starBrightnessPower) {
                 Float pow = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 starBrightnessPower.setMappedValue(pow);
@@ -239,7 +239,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case STAR_MIN_OPACITY_CMD:
-            if (!(boolean) data[1]) {
+            if (source != starMinOpacity) {
                 Float minopacity = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 starMinOpacity.setMappedValue(minopacity);
@@ -247,7 +247,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case LABEL_SIZE_CMD:
-            if (!(boolean) data[1]) {
+            if (source != labelSize) {
                 Float newsize = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 labelSize.setMappedValue(newsize);
@@ -255,7 +255,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
             }
             break;
         case LINE_WIDTH_CMD:
-            if (!(boolean) data[1]) {
+            if (source != lineWidth) {
                 Float newwidth = (Float) data[0];
                 hackProgrammaticChangeEvents = false;
                 lineWidth.setMappedValue(newwidth);

@@ -20,9 +20,9 @@ import gaiasky.data.group.DatasetOptions;
 import gaiasky.data.group.DatasetOptions.DatasetLoadType;
 import gaiasky.data.group.STILDataProvider;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.EventManager.TimeFrame;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.AddShapeDialog.Primitive;
 import gaiasky.interafce.AddShapeDialog.Shape;
@@ -105,7 +105,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         aux3b3 = new Vector3b();
         aux2d1 = new Vector2d();
 
-        em.subscribe(this, Events.INPUT_EVENT, Events.DISPOSE);
+        em.subscribe(this, Event.INPUT_EVENT, Event.DISPOSE);
     }
 
     private void initializeTextures() {
@@ -138,25 +138,25 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void activateRealTimeFrame() {
-        GaiaSky.postRunnable(() -> em.post(Events.EVENT_TIME_FRAME_CMD, TimeFrame.REAL_TIME));
+        GaiaSky.postRunnable(() -> em.post(Event.EVENT_TIME_FRAME_CMD, this, TimeFrame.REAL_TIME));
     }
 
     @Override
     public void activateSimulationTimeFrame() {
-        GaiaSky.postRunnable(() -> em.post(Events.EVENT_TIME_FRAME_CMD, TimeFrame.SIMULATION_TIME));
+        GaiaSky.postRunnable(() -> em.post(Event.EVENT_TIME_FRAME_CMD, this, TimeFrame.SIMULATION_TIME));
     }
 
     @Override
     public void displayPopupNotification(String message) {
         if (checkString(message, "message")) {
-            em.post(Events.POST_POPUP_NOTIFICATION, message);
+            em.post(Event.POST_POPUP_NOTIFICATION, this, message);
         }
     }
 
     @Override
     public void displayPopupNotification(String message, float duration) {
         if (checkString(message, "message")) {
-            em.post(Events.POST_POPUP_NOTIFICATION, message, duration);
+            em.post(Event.POST_POPUP_NOTIFICATION, this, message, duration);
         }
     }
     public void displayPopupNotification(String message, Double duration) {
@@ -165,42 +165,42 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setHeadlineMessage(final String headline) {
-        GaiaSky.postRunnable(() -> em.post(Events.POST_HEADLINE_MESSAGE, headline));
+        GaiaSky.postRunnable(() -> em.post(Event.POST_HEADLINE_MESSAGE, this, headline));
     }
 
     @Override
     public void setSubheadMessage(final String subhead) {
-        GaiaSky.postRunnable(() -> em.post(Events.POST_SUBHEAD_MESSAGE, subhead));
+        GaiaSky.postRunnable(() -> em.post(Event.POST_SUBHEAD_MESSAGE, this, subhead));
     }
 
     @Override
     public void clearHeadlineMessage() {
-        GaiaSky.postRunnable(() -> em.post(Events.CLEAR_HEADLINE_MESSAGE));
+        GaiaSky.postRunnable(() -> em.post(Event.CLEAR_HEADLINE_MESSAGE, this));
     }
 
     @Override
     public void clearSubheadMessage() {
-        GaiaSky.postRunnable(() -> em.post(Events.CLEAR_SUBHEAD_MESSAGE));
+        GaiaSky.postRunnable(() -> em.post(Event.CLEAR_SUBHEAD_MESSAGE, this));
     }
 
     @Override
     public void clearAllMessages() {
-        GaiaSky.postRunnable(() -> em.post(Events.CLEAR_MESSAGES));
+        GaiaSky.postRunnable(() -> em.post(Event.CLEAR_MESSAGES, this));
     }
 
     @Override
     public void disableInput() {
-        GaiaSky.postRunnable(() -> em.post(Events.INPUT_ENABLED_CMD, false));
+        GaiaSky.postRunnable(() -> em.post(Event.INPUT_ENABLED_CMD, this, false));
     }
 
     @Override
     public void enableInput() {
-        GaiaSky.postRunnable(() -> em.post(Events.INPUT_ENABLED_CMD, true));
+        GaiaSky.postRunnable(() -> em.post(Event.INPUT_ENABLED_CMD, this, true));
     }
 
     @Override
     public void setCinematicCamera(boolean cinematic) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_CINEMATIC_CMD, cinematic, false));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_CINEMATIC_CMD, this, cinematic));
     }
 
     @Override
@@ -234,15 +234,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
                 focus.getFocus(focusName);
-                em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-                em.post(Events.FOCUS_CHANGE_CMD, focus);
+                em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                em.post(Event.FOCUS_CHANGE_CMD, this, focus);
 
                 GaiaSky.postRunnable(() -> {
                     // Instantly set the camera direction to look towards the focus
                     Vector3b camPos = GaiaSky.instance.cameraManager.getPos();
                     Vector3b dir = new Vector3b();
                     focus.getAbsolutePosition(dir).sub(camPos);
-                    em.post(Events.CAMERA_DIR_CMD, (Object) dir.nor().valuesd());
+                    em.post(Event.CAMERA_DIR_CMD, this, (Object) dir.nor().valuesd());
                 });
                 // Make sure the last action is flushed
                 sleepFrames(2);
@@ -262,9 +262,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             SceneGraphNode sgn = getObject(focusName);
             if (sgn instanceof IFocus) {
                 IFocus focus = (IFocus) sgn;
-                em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-                em.post(Events.FOCUS_CHANGE_CMD, focus, true);
-                em.post(Events.GO_TO_OBJECT_CMD);
+                em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                em.post(Event.FOCUS_CHANGE_CMD, this, focus, true);
+                em.post(Event.GO_TO_OBJECT_CMD, this);
                 // Make sure the last action is flushed
                 if (sleep)
                     sleepFrames(2);
@@ -274,32 +274,32 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraLock(final boolean lock) {
-        GaiaSky.postRunnable(() -> em.post(Events.FOCUS_LOCK_CMD, I18n.txt("gui.camera.lock"), lock));
+        GaiaSky.postRunnable(() -> em.post(Event.FOCUS_LOCK_CMD, this, I18n.txt("gui.camera.lock"), lock));
     }
 
     @Override
     public void setCameraCenterFocus(boolean centerFocus) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_CENTER_FOCUS_CMD, centerFocus));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_CENTER_FOCUS_CMD, this, centerFocus));
     }
 
     @Override
     public void setCameraFree() {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE));
     }
 
     @Override
     public void setCameraFov1() {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.GAIA_FOV1_MODE));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.GAIA_FOV1_MODE));
     }
 
     @Override
     public void setCameraFov2() {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.GAIA_FOV2_MODE));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.GAIA_FOV2_MODE));
     }
 
     @Override
     public void setCameraFov1and2() {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_MODE_CMD, CameraMode.GAIA_FOVS_MODE));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_MODE_CMD, this, CameraMode.GAIA_FOVS_MODE));
     }
 
     @Override
@@ -317,7 +317,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             vec[1] = vec[1] * Constants.KM_TO_U;
             vec[2] = vec[2] * Constants.KM_TO_U;
             // Send event
-            em.post(Events.CAMERA_POS_CMD, (Object) vec);
+            em.post(Event.CAMERA_POS_CMD, this, (Object) vec);
         });
     }
 
@@ -338,7 +338,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraDirection(final double[] dir) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_DIR_CMD, (Object) dir));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_DIR_CMD, this, (Object) dir));
     }
 
     public void setCameraDirection(final List<?> dir) {
@@ -353,7 +353,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setCameraUp(final double[] up) {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_UP_CMD, (Object) up));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_UP_CMD, this, (Object) up));
 
     }
 
@@ -387,8 +387,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public void pointAtSkyCoordinate(double ra, double dec) {
-        em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-        em.post(Events.FREE_MODE_COORD_CMD, ra, dec);
+        em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+        em.post(Event.FREE_MODE_COORD_CMD, this, ra, dec);
     }
 
     public void pointAtSkyCoordinate(long ra, long dec) {
@@ -398,8 +398,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     private void setCameraPositionAndFocus(IFocus focus, IFocus other, double rotation, double viewAngle) {
         if (checkNum(viewAngle, 1e-50d, Double.MAX_VALUE, "viewAngle") && checkNotNull(focus, "focus") && checkNotNull(other, "other")) {
 
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            em.post(Events.FOCUS_CHANGE_CMD, focus);
+            em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+            em.post(Event.FOCUS_CHANGE_CMD, this, focus);
 
             double radius = focus.getRadius();
             double dist = radius / Math.tan(Math.toRadians(viewAngle / 2)) + radius;
@@ -434,7 +434,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraSpeed(final float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
-            GaiaSky.postRunnable(() -> em.post(Events.CAMERA_SPEED_CMD, speed / 10f, false));
+            GaiaSky.postRunnable(() -> em.post(Event.CAMERA_SPEED_CMD, this, speed / 10f, false));
     }
 
     public void setCameraSpeed(final int speed) {
@@ -449,7 +449,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraRotationSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
-            GaiaSky.postRunnable(() -> em.post(Events.ROTATION_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false));
+            GaiaSky.postRunnable(() -> em.post(Event.ROTATION_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED)));
     }
 
     public void setCameraRotationSpeed(final int speed) {
@@ -468,7 +468,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraTurningSpeed(float speed) {
         if (checkNum(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "speed"))
-            GaiaSky.postRunnable(() -> em.post(Events.TURNING_SPEED_CMD, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
+            GaiaSky.postRunnable(() -> em.post(Event.TURNING_SPEED_CMD, this, MathUtilsd.lint(speed, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false));
     }
 
     public void setCameraTurningSpeed(final int speed) {
@@ -488,7 +488,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraSpeedLimit(int index) {
         if (checkNum(index, 0, 18, "index"))
-            GaiaSky.postRunnable(() -> em.post(Events.SPEED_LIMIT_CMD, index, false));
+            GaiaSky.postRunnable(() -> em.post(Event.SPEED_LIMIT_CMD, this, index));
     }
 
     @Override
@@ -497,7 +497,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             removeCameraTrackingObject();
         } else if (checkFocusName(objectName)) {
             IFocus trackingObject = getFocus(objectName);
-            em.post(Events.CAMERA_TRACKING_OBJECT_CMD, trackingObject, objectName);
+            em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, trackingObject, objectName);
         } else {
             removeCameraTrackingObject();
         }
@@ -505,18 +505,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void removeCameraTrackingObject() {
-        em.post(Events.CAMERA_TRACKING_OBJECT_CMD, null, null);
+        em.post(Event.CAMERA_TRACKING_OBJECT_CMD, this, null, null);
     }
 
     @Override
     public void setCameraOrientationLock(boolean lock) {
-        GaiaSky.postRunnable(() -> em.post(Events.ORIENTATION_LOCK_CMD, I18n.txt("gui.camera.lock.orientation"), lock, false));
+        GaiaSky.postRunnable(() -> em.post(Event.ORIENTATION_LOCK_CMD, this, I18n.txt("gui.camera.lock.orientation"), lock));
     }
 
     @Override
     public void cameraForward(final double cameraForward) {
         if (checkNum(cameraForward, -100d, 100d, "cameraForward"))
-            GaiaSky.postRunnable(() -> em.post(Events.CAMERA_FWD, cameraForward));
+            GaiaSky.postRunnable(() -> em.post(Event.CAMERA_FWD, this, cameraForward));
     }
 
     public void cameraForward(final long value) {
@@ -526,7 +526,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void cameraRotate(final double deltaX, final double deltaY) {
         if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY"))
-            GaiaSky.postRunnable(() -> em.post(Events.CAMERA_ROTATE, deltaX, deltaY));
+            GaiaSky.postRunnable(() -> em.post(Event.CAMERA_ROTATE, this, deltaX, deltaY));
     }
 
     public void cameraRotate(final double deltaX, final long deltaY) {
@@ -540,7 +540,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void cameraRoll(final double roll) {
         if (checkNum(roll, -100d, 100d, "roll"))
-            GaiaSky.postRunnable(() -> em.post(Events.CAMERA_ROLL, roll));
+            GaiaSky.postRunnable(() -> em.post(Event.CAMERA_ROLL, this, roll));
     }
 
     public void cameraRoll(final long roll) {
@@ -550,7 +550,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void cameraTurn(final double deltaX, final double deltaY) {
         if (checkNum(deltaX, -100d, 100d, "deltaX") && checkNum(deltaY, -100d, 100d, "deltaY")) {
-            GaiaSky.postRunnable(() -> em.post(Events.CAMERA_TURN, deltaX, deltaY));
+            GaiaSky.postRunnable(() -> em.post(Event.CAMERA_TURN, this, deltaX, deltaY));
         }
     }
 
@@ -586,13 +586,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void cameraStop() {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_STOP));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_STOP, this));
 
     }
 
     @Override
     public void cameraCenter() {
-        GaiaSky.postRunnable(() -> em.post(Events.CAMERA_CENTER));
+        GaiaSky.postRunnable(() -> em.post(Event.CAMERA_CENTER, this));
     }
 
     @Override
@@ -604,7 +604,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setFov(final float newFov) {
         if (!SlaveManager.projectionActive()) {
             if (checkNum(newFov, Constants.MIN_FOV, Constants.MAX_FOV, "newFov"))
-                GaiaSky.postRunnable(() -> em.post(Events.FOV_CHANGED_CMD, newFov));
+                GaiaSky.postRunnable(() -> em.post(Event.FOV_CHANGED_CMD, this, newFov));
         }
     }
 
@@ -625,7 +625,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             for (ComponentType ct : cts)
                 logger.error(ct.key);
         } else {
-            GaiaSky.postRunnable(() -> em.post(Events.TOGGLE_VISIBILITY_CMD, key, false, visible));
+            GaiaSky.postRunnable(() -> em.post(Event.TOGGLE_VISIBILITY_CMD, this, key, visible));
         }
     }
 
@@ -652,7 +652,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
 
-        EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, nameLc, visible, this);
+        EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, nameLc, visible);
         return true;
     }
 
@@ -670,7 +670,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setLabelSizeFactor(float factor) {
         if (checkNum(factor, Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE, "labelSizeFactor")) {
-            GaiaSky.postRunnable(() -> em.post(Events.LABEL_SIZE_CMD, factor, false));
+            GaiaSky.postRunnable(() -> em.post(Event.LABEL_SIZE_CMD, this, factor));
         }
     }
 
@@ -679,7 +679,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
         if (checkObjectName(nameLc)) {
             SceneGraphNode obj = getObject(nameLc);
-            em.post(Events.FORCE_OBJECT_LABEL_CMD, obj, nameLc, forceLabel, this);
+            em.post(Event.FORCE_OBJECT_LABEL_CMD, this, obj, nameLc, forceLabel);
         }
     }
 
@@ -688,7 +688,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         String nameLc = name.toLowerCase(Locale.ROOT).trim();
         if (checkObjectName(nameLc)) {
             SceneGraphNode obj = getObject(nameLc);
-            em.post(Events.LABEL_COLOR_CMD, obj, nameLc, GlobalResources.toFloatArray(color), this);
+            em.post(Event.LABEL_COLOR_CMD, this, obj, nameLc, GlobalResources.toFloatArray(color));
         }
     }
 
@@ -715,7 +715,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setLineWidthFactor(final float factor) {
         if (checkNum(factor, Constants.MIN_LINE_WIDTH, Constants.MAX_LINE_WIDTH, "lineWidthFactor")) {
-            GaiaSky.postRunnable(() -> em.post(Events.LINE_WIDTH_CMD, factor, false));
+            GaiaSky.postRunnable(() -> em.post(Event.LINE_WIDTH_CMD, this, factor));
         }
     }
 
@@ -730,17 +730,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsNumberFactor(float factor) {
-        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR), false));
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.PM_NUM_FACTOR_CMD, this, MathUtilsd.lint(factor, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR)));
     }
 
     @Override
     public void setProperMotionsColorMode(int mode) {
-        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PM_COLOR_MODE_CMD, mode % 6, false));
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.PM_COLOR_MODE_CMD, this, mode % 6));
     }
 
     @Override
     public void setProperMotionsArrowheads(boolean arrowheadsEnabled) {
-        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PM_ARROWHEADS_CMD, arrowheadsEnabled, false));
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.PM_ARROWHEADS_CMD, this, arrowheadsEnabled));
     }
 
     public void setProperMotionsNumberFactor(int factor) {
@@ -753,7 +753,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setProperMotionsLengthFactor(float factor) {
-        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, factor, false));
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.PM_LEN_FACTOR_CMD, this, factor));
     }
 
     public void setProperMotionsLengthFactor(int factor) {
@@ -779,28 +779,28 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFocusCrosshairVisibility(boolean visible) {
-        GaiaSky.postRunnable(() -> em.post(Events.CROSSHAIR_FOCUS_CMD, visible));
+        GaiaSky.postRunnable(() -> em.post(Event.CROSSHAIR_FOCUS_CMD, this, visible));
     }
 
     @Override
     public void setClosestCrosshairVisibility(boolean visible) {
-        GaiaSky.postRunnable(() -> em.post(Events.CROSSHAIR_CLOSEST_CMD, visible));
+        GaiaSky.postRunnable(() -> em.post(Event.CROSSHAIR_CLOSEST_CMD, this, visible));
     }
 
     @Override
     public void setHomeCrosshairVisibility(boolean visible) {
-        GaiaSky.postRunnable(() -> em.post(Events.CROSSHAIR_HOME_CMD, visible));
+        GaiaSky.postRunnable(() -> em.post(Event.CROSSHAIR_HOME_CMD, this, visible));
     }
 
     @Override
     public void setMinimapVisibility(boolean visible) {
-        GaiaSky.postRunnable(() -> em.post(Events.SHOW_MINIMAP_ACTION, visible, false));
+        GaiaSky.postRunnable(() -> em.post(Event.SHOW_MINIMAP_ACTION, this, visible));
     }
 
     @Override
     public void setAmbientLight(final float ambientLight) {
         if (checkNum(ambientLight, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "ambientLight"))
-            GaiaSky.postRunnable(() -> em.post(Events.AMBIENT_LIGHT_CMD, ambientLight));
+            GaiaSky.postRunnable(() -> em.post(Event.AMBIENT_LIGHT_CMD, this, ambientLight));
     }
 
     public void setAmbientLight(final int value) {
@@ -810,13 +810,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setSimulationTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
         LocalDateTime date = LocalDateTime.of(year, month, day, hour, min, sec, millisec);
-        em.post(Events.TIME_CHANGE_CMD, date.toInstant(ZoneOffset.UTC));
+        em.post(Event.TIME_CHANGE_CMD, this, date.toInstant(ZoneOffset.UTC));
     }
 
     @Override
     public void setSimulationTime(final long time) {
         if (checkNum(time, 1, Long.MAX_VALUE, "time"))
-            em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
+            em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
     }
 
     @Override
@@ -843,12 +843,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void startSimulationTime() {
-        em.post(Events.TIME_STATE_CMD, true, false);
+        em.post(Event.TIME_STATE_CMD, this, true);
     }
 
     @Override
     public void stopSimulationTime() {
-        em.post(Events.TIME_STATE_CMD, false, false);
+        em.post(Event.TIME_STATE_CMD, this, false);
     }
 
     @Override
@@ -867,7 +867,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setTimeWarp(final double warp) {
-        em.post(Events.TIME_WARP_CMD, warp, false);
+        em.post(Event.TIME_WARP_CMD, this, warp);
     }
 
     public void setTimeWarp(final long warp) {
@@ -876,29 +876,29 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setTargetTime(long ms) {
-        em.post(Events.TARGET_TIME_CMD, Instant.ofEpochMilli(ms));
+        em.post(Event.TARGET_TIME_CMD, this, Instant.ofEpochMilli(ms));
     }
 
     @Override
     public void setTargetTime(int year, int month, int day, int hour, int min, int sec, int millisec) {
-        em.post(Events.TARGET_TIME_CMD, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
+        em.post(Event.TARGET_TIME_CMD, this, LocalDateTime.of(year, month, day, hour, min, sec, millisec).toInstant(ZoneOffset.UTC));
     }
 
     @Override
     public void unsetTargetTime() {
-        em.post(Events.TARGET_TIME_CMD);
+        em.post(Event.TARGET_TIME_CMD, this);
     }
 
     @Override
     public void setStarBrightness(final float brightness) {
         if (checkNum(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, "brightness"))
-            em.post(Events.STAR_BRIGHTNESS_CMD, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS), false);
+            em.post(Event.STAR_BRIGHTNESS_CMD, this, MathUtilsd.lint(brightness, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_STAR_BRIGHTNESS, Constants.MAX_STAR_BRIGHTNESS));
     }
 
     @Override
     public void setStarBrightnessPower(float power) {
         if (checkFinite(power, "brightness-pow")) {
-            em.post(Events.STAR_BRIGHTNESS_POW_CMD, power, false);
+            em.post(Event.STAR_BRIGHTNESS_POW_CMD, this, power);
         }
     }
 
@@ -914,7 +914,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarSize(final float size) {
         if (checkNum(size, Constants.MIN_STAR_POINT_SIZE, Constants.MAX_STAR_POINT_SIZE, "size"))
-            em.post(Events.STAR_POINT_SIZE_CMD, size, false);
+            em.post(Event.STAR_POINT_SIZE_CMD, this, size);
     }
 
     public void setStarSize(final int size) {
@@ -938,7 +938,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarMinOpacity(float minOpacity) {
         if (checkNum(minOpacity, Constants.MIN_STAR_MIN_OPACITY, Constants.MAX_STAR_MIN_OPACITY, "min-opacity"))
-            EventManager.instance.post(Events.STAR_MIN_OPACITY_CMD, minOpacity, false);
+            EventManager.publish(Event.STAR_MIN_OPACITY_CMD, this, minOpacity);
     }
 
     public void setMinStarOpacity(float minOpacity) {
@@ -948,20 +948,20 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setStarTextureIndex(int index) {
         if (checkNum(index, 1, 4, "index")) {
-            EventManager.instance.post(Events.STAR_TEXTURE_IDX_CMD, index, false);
+            EventManager.publish(Event.STAR_TEXTURE_IDX_CMD, this, index);
         }
     }
 
     @Override
     public void setStarGroupNearestNumber(int n) {
         if (checkNum(n, 1, 1000000, "nNearest")) {
-            EventManager.instance.post(Events.STAR_GROUP_NEAREST_CMD, n, false);
+            EventManager.publish(Event.STAR_GROUP_NEAREST_CMD, this, n);
         }
     }
 
     @Override
     public void setStarGroupBillboard(boolean flag) {
-        EventManager.instance.post(Events.STAR_GROUP_BILLBOARD_CMD, flag, false);
+        EventManager.publish(Event.STAR_GROUP_BILLBOARD_CMD, this, flag);
     }
 
     @Override
@@ -1006,14 +1006,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkNum(newFov, Constants.MIN_FOV, 170f, "newFov"))
             GaiaSky.postRunnable(() -> {
                 SlaveManager.instance.cameraFov = newFov;
-                em.post(Events.FOV_CHANGED_CMD, newFov, false);
+                em.post(Event.FOV_CHANGED_CMD, this, newFov);
             });
     }
 
     @Override
     public void setLimitFps(double limitFps) {
         if (checkNum(limitFps, Constants.MIN_FPS, Constants.MAX_FPS, "limitFps")) {
-            em.post(Events.LIMIT_FPS_CMD, limitFps);
+            em.post(Event.LIMIT_FPS_CMD, this, limitFps);
         }
 
     }
@@ -1026,7 +1026,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void configureScreenshots(int width, int height, String directory, String namePrefix) {
         if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkString(directory, "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
-            em.post(Events.SCREENSHOT_CMD, width, height, directory);
+            em.post(Event.SCREENSHOT_CMD, this, width, height, directory);
         }
     }
 
@@ -1037,15 +1037,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             screenshotMode = "ADVANCED";
         }
         if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode")) {
-            em.post(Events.SCREENSHOT_MODE_CMD, screenshotMode);
-            GaiaSky.postRunnable(() -> em.post(Events.SCREENSHOT_SIZE_UPDATE, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]));
+            em.post(Event.SCREENSHOT_MODE_CMD, this, screenshotMode);
+            GaiaSky.postRunnable(() -> em.post(Event.SCREENSHOT_SIZE_UPDATE, this, Settings.settings.screenshot.resolution[0], Settings.settings.screenshot.resolution[1]));
         }
     }
 
     @Override
     public void saveScreenshot() {
         ScreenshotSettings ss = Settings.settings.screenshot;
-        em.post(Events.SCREENSHOT_CMD, ss.resolution[0], ss.resolution[1], ss.location);
+        em.post(Event.SCREENSHOT_CMD, this, ss.resolution[0], ss.resolution[1], ss.location);
     }
 
     @Override
@@ -1065,8 +1065,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void configureFrameOutput(int width, int height, double fps, String directory, String namePrefix) {
         if (checkNum(width, 1, Integer.MAX_VALUE, "width") && checkNum(height, 1, Integer.MAX_VALUE, "height") && checkNum(fps, Constants.MIN_FPS, Constants.MAX_FPS, "FPS") && checkString(directory, "directory") && checkDirectoryExists(directory, "directory") && checkString(namePrefix, "namePrefix")) {
-            em.post(Events.FRAME_OUTPUT_MODE_CMD, Settings.ScreenshotMode.ADVANCED);
-            em.post(Events.CONFIG_FRAME_OUTPUT_CMD, width, height, fps, directory, namePrefix);
+            em.post(Event.FRAME_OUTPUT_MODE_CMD, this, Settings.ScreenshotMode.ADVANCED);
+            em.post(Event.CONFIG_FRAME_OUTPUT_CMD, this, width, height, fps, directory, namePrefix);
         }
     }
 
@@ -1082,7 +1082,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             screenshotMode = "ADVANCED";
         }
         if (checkStringEnum(screenshotMode, Settings.ScreenshotMode.class, "screenshotMode"))
-            em.post(Events.FRAME_OUTPUT_MODE_CMD, screenshotMode);
+            em.post(Event.FRAME_OUTPUT_MODE_CMD, this, screenshotMode);
     }
 
     @Override
@@ -1107,7 +1107,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setFrameOutput(boolean active) {
-        em.post(Events.FRAME_OUTPUT_CMD, active);
+        em.post(Event.FRAME_OUTPUT_CMD, this, active);
     }
 
     @Override
@@ -1266,7 +1266,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
 
-                    em.post(Events.CAMERA_FWD, (double) dt);
+                    em.post(Event.CAMERA_FWD, this, (double) dt);
                     try {
                         sleep(0.1f);
                     } catch (Exception e) {
@@ -1280,7 +1280,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     long dt = TimeUtils.timeSinceMillis(prevTime);
                     prevTime = TimeUtils.millis();
 
-                    em.post(Events.CAMERA_FWD, (double) -dt);
+                    em.post(Event.CAMERA_FWD, this, (double) -dt);
                     try {
                         sleep(0.1f);
                     } catch (Exception e) {
@@ -1290,7 +1290,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             }
 
             // We can stop now
-            em.post(Events.CAMERA_STOP);
+            em.post(Event.CAMERA_STOP, this);
         }
     }
 
@@ -1327,11 +1327,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Save speed, set it to 50
                 double speed = Settings.settings.scene.camera.speed;
-                em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
+                em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f, false);
 
                 // Save turn speed, set it to 50
                 double turnSpeedBak = Settings.settings.scene.camera.turn;
-                em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+                em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
 
                 // Save cinematic
                 boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -1360,14 +1360,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     prevTime = TimeUtils.millis();
 
                     if (distanceNotMet)
-                        em.post(Events.CAMERA_FWD, 0.1d * dt);
+                        em.post(Event.CAMERA_FWD, this, 0.1d * dt);
                     else
                         cam.stopForwardMovement();
 
                     if (viewNotMet) {
                         if (object.getDistToCamera() - object.getRadius() < object.getRadius() * 5)
                             // Start turning where we are at n times the radius
-                            em.post(Events.CAMERA_TURN, 0d, dt / 500d);
+                            em.post(Event.CAMERA_TURN, this, 0d, dt / 500d);
                     } else {
                         cam.stopRotateMovement();
                     }
@@ -1384,7 +1384,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 }
 
                 // STOP
-                em.post(Events.CAMERA_STOP);
+                em.post(Event.CAMERA_STOP, this);
 
                 // Roll till done
                 Vector3d up = cam.up;
@@ -1411,16 +1411,16 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                  */
 
                 // We can stop now
-                em.post(Events.CAMERA_STOP);
+                em.post(Event.CAMERA_STOP, this);
 
                 // Restore cinematic
                 Settings.settings.scene.camera.cinematic = cinematic;
 
                 // Restore speed
-                em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
+                em.post(Event.CAMERA_SPEED_CMD, this, (float) speed, false);
 
                 // Restore turning speed
-                em.post(Events.TURNING_SPEED_CMD, (float) turnSpeedBak, false);
+                em.post(Event.TURNING_SPEED_CMD, this, (float) turnSpeedBak, false);
 
             }
         }
@@ -1474,7 +1474,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
             if (!sg.containsNode(nameStub)) {
                 Invisible invisible = new Invisible(nameStub);
-                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
+                EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, invisible, true);
             }
             Invisible invisible = (Invisible) getObject(nameStub, 5);
 
@@ -1498,15 +1498,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 // Save speed, set it to 50
                 double speed = Settings.settings.scene.camera.speed;
-                em.post(Events.CAMERA_SPEED_CMD, 25f / 10f, false);
+                em.post(Event.CAMERA_SPEED_CMD, this, 25f / 10f);
 
                 // Save turn speed, set it to 50
                 double turnSpeedBak = Settings.settings.scene.camera.turn;
-                em.post(Events.TURNING_SPEED_CMD, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED), false);
+                em.post(Event.TURNING_SPEED_CMD, this, (float) MathUtilsd.lint(50d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_TURN_SPEED, Constants.MAX_TURN_SPEED));
 
                 // Save rotation speed, set it to 20
                 double rotationSpeedBak = Settings.settings.scene.camera.rotate;
-                em.post(Events.ROTATION_SPEED_CMD, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED), false);
+                em.post(Event.ROTATION_SPEED_CMD, this, (float) MathUtilsd.lint(20d, Constants.MIN_SLIDER, Constants.MAX_SLIDER, Constants.MIN_ROT_SPEED, Constants.MAX_ROT_SPEED));
 
                 // Save cinematic
                 boolean cinematic = Settings.settings.scene.camera.cinematic;
@@ -1549,13 +1549,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 Settings.settings.scene.camera.cinematic = cinematic;
 
                 // Restore speed
-                em.post(Events.CAMERA_SPEED_CMD, (float) speed, false);
+                em.post(Event.CAMERA_SPEED_CMD, this, (float) speed);
 
                 // Restore turning speed
-                em.post(Events.TURNING_SPEED_CMD, (float) turnSpeedBak, false);
+                em.post(Event.TURNING_SPEED_CMD, this, (float) turnSpeedBak);
 
                 // Restore rotation speed
-                em.post(Events.ROTATION_SPEED_CMD, (float) rotationSpeedBak, false);
+                em.post(Event.ROTATION_SPEED_CMD, this, (float) rotationSpeedBak);
 
                 // Restore crosshair
                 Settings.settings.scene.crosshair.focus = crosshair;
@@ -1564,7 +1564,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 landOnObject(object, stop);
             }
 
-            EventManager.instance.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, invisible, true);
+            EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, invisible, true);
         }
     }
 
@@ -1630,7 +1630,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setGuiScrollPosition(final float pixelY) {
-        GaiaSky.postRunnable(() -> em.post(Events.GUI_SCROLL_POSITION_CMD, pixelY));
+        GaiaSky.postRunnable(() -> em.post(Event.GUI_SCROLL_POSITION_CMD, this, pixelY));
 
     }
 
@@ -1640,17 +1640,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void enableGui() {
-        GaiaSky.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, true, I18n.txt("notif.cleanmode")));
+        GaiaSky.postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, true, I18n.txt("notif.cleanmode")));
     }
 
     @Override
     public void disableGui() {
-        GaiaSky.postRunnable(() -> em.post(Events.DISPLAY_GUI_CMD, false, I18n.txt("notif.cleanmode")));
+        GaiaSky.postRunnable(() -> em.post(Event.DISPLAY_GUI_CMD, this, false, I18n.txt("notif.cleanmode")));
     }
 
     @Override
     public void displayMessageObject(final int id, final String message, final float x, final float y, final float r, final float g, final float b, final float a, final float fontSize) {
-        GaiaSky.postRunnable(() -> em.post(Events.ADD_CUSTOM_MESSAGE, id, message, x, y, r, g, b, a, fontSize));
+        GaiaSky.postRunnable(() -> em.post(Event.ADD_CUSTOM_MESSAGE, this, id, message, x, y, r, g, b, a, fontSize));
     }
 
     @Override
@@ -1671,7 +1671,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth, final float maxHeight, final float r, final float g, final float b, final float a, final float fontSize) {
-        GaiaSky.postRunnable(() -> em.post(Events.ADD_CUSTOM_TEXT, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
+        GaiaSky.postRunnable(() -> em.post(Event.ADD_CUSTOM_TEXT, this, id, text, x, y, maxWidth, maxHeight, r, g, b, a, fontSize));
     }
 
     public void displayTextObject(final int id, final String text, final float x, final float y, final float maxWidth, final float maxHeight, final float r, final float g, final float b, final float a, final int fontSize) {
@@ -1682,7 +1682,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void displayImageObject(final int id, final String path, final float x, final float y, final float r, final float g, final float b, final float a) {
         GaiaSky.postRunnable(() -> {
             Texture tex = getTexture(path);
-            em.post(Events.ADD_CUSTOM_IMAGE, id, tex, x, y, r, g, b, a);
+            em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y, r, g, b, a);
         });
     }
 
@@ -1702,23 +1702,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void displayImageObject(final int id, final String path, final float x, final float y) {
         GaiaSky.postRunnable(() -> {
             Texture tex = getTexture(path);
-            em.post(Events.ADD_CUSTOM_IMAGE, id, tex, x, y);
+            em.post(Event.ADD_CUSTOM_IMAGE, this, id, tex, x, y);
         });
     }
 
     @Override
     public void removeAllObjects() {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_ALL_OBJECTS));
+        GaiaSky.postRunnable(() -> em.post(Event.REMOVE_ALL_OBJECTS, this));
     }
 
     @Override
     public void removeObject(final int id) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) new int[] { id }));
+        GaiaSky.postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) new int[] { id }));
     }
 
     @Override
     public void removeObjects(final int[] ids) {
-        GaiaSky.postRunnable(() -> em.post(Events.REMOVE_OBJECTS, (Object) ids));
+        GaiaSky.postRunnable(() -> em.post(Event.REMOVE_OBJECTS, this, (Object) ids));
     }
 
     public void removeObjects(final List<?> ids) {
@@ -1727,17 +1727,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void maximizeInterfaceWindow() {
-        GaiaSky.postRunnable(() -> em.post(Events.GUI_FOLD_CMD, false));
+        GaiaSky.postRunnable(() -> em.post(Event.GUI_FOLD_CMD, this, false));
     }
 
     @Override
     public void minimizeInterfaceWindow() {
-        GaiaSky.postRunnable(() -> em.post(Events.GUI_FOLD_CMD, true));
+        GaiaSky.postRunnable(() -> em.post(Event.GUI_FOLD_CMD, this, true));
     }
 
     @Override
     public void setGuiPosition(final float x, final float y) {
-        GaiaSky.postRunnable(() -> em.post(Events.GUI_MOVE_CMD, x, y));
+        GaiaSky.postRunnable(() -> em.post(Event.GUI_MOVE_CMD, this, x, y));
     }
 
     public void setGuiPosition(final int x, final int y) {
@@ -1816,12 +1816,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void expandGuiComponent(String name) {
-        em.post(Events.EXPAND_PANE_CMD, name);
+        em.post(Event.EXPAND_PANE_CMD, this, name);
     }
 
     @Override
     public void collapseGuiComponent(String name) {
-        em.post(Events.COLLAPSE_PANE_CMD, name);
+        em.post(Event.COLLAPSE_PANE_CMD, this, name);
     }
 
     @Override
@@ -1847,7 +1847,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraRecorderFps(double targetFps) {
         if (checkNum(targetFps, Constants.MIN_FPS, Constants.MAX_FPS, "targetFps")) {
-            em.post(Events.CAMRECORDER_FPS_CMD, targetFps);
+            em.post(Event.CAMRECORDER_FPS_CMD, this, targetFps);
         }
     }
 
@@ -1884,17 +1884,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void startRecordingCameraPath() {
-        em.post(Events.RECORD_CAMERA_CMD, true, null, false);
+        em.post(Event.RECORD_CAMERA_CMD, this, true, null);
     }
 
     @Override
     public void startRecordingCameraPath(String fileName) {
-        em.post(Events.RECORD_CAMERA_CMD, true, Path.of(fileName).getFileName().toString(), false);
+        em.post(Event.RECORD_CAMERA_CMD, this, true, Path.of(fileName).getFileName().toString());
     }
 
     @Override
     public void stopRecordingCameraPath() {
-        em.post(Events.RECORD_CAMERA_CMD, false, null, false);
+        em.post(Event.RECORD_CAMERA_CMD, this, false, null);
     }
 
     @Override
@@ -1904,12 +1904,12 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void runCameraPath(String file, boolean sync) {
-        em.post(Events.PLAY_CAMERA_CMD, file);
+        em.post(Event.PLAY_CAMERA_CMD, this, file);
 
         // Wait if needed
         if (sync) {
             Object monitor = new Object();
-            IObserver watcher = (event, data) -> {
+            IObserver watcher = (event, source, data) -> {
                 switch (event) {
                 case CAMERA_PLAY_INFO:
                     Boolean status = (Boolean) data[0];
@@ -1923,7 +1923,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     break;
                 }
             };
-            em.subscribe(watcher, Events.CAMERA_PLAY_INFO);
+            em.subscribe(watcher, Event.CAMERA_PLAY_INFO);
             // Wait for camera to finish
             synchronized (monitor) {
                 try {
@@ -2051,7 +2051,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         NaturalCamera cam = GaiaSky.instance.cameraManager.naturalCamera;
 
         // Put in focus mode
-        em.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+        em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
 
         // Set up final actions
         String name = "cameraTransition" + (cTransSeq++);
@@ -2136,8 +2136,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         // Post focus change and wait, if needed
         IFocus currentFocus = cam.getFocus();
         if (currentFocus instanceof ParticleGroup || currentFocus != object) {
-            em.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            em.post(Events.FOCUS_CHANGE_CMD, object);
+            em.post(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+            em.post(Event.FOCUS_CHANGE_CMD, this, object);
 
             // Wait til camera is facing focus or
             if (waitTimeSeconds < 0) {
@@ -2253,7 +2253,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setBrightnessLevel(double level) {
         if (checkNum(level, -1d, 1d, "brightness"))
-            GaiaSky.postRunnable(() -> em.post(Events.BRIGHTNESS_CMD, (float) level, false));
+            GaiaSky.postRunnable(() -> em.post(Event.BRIGHTNESS_CMD, this, (float) level));
     }
 
     public void setBrightnessLevel(long level) {
@@ -2263,7 +2263,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setContrastLevel(double level) {
         if (checkNum(level, 0d, 2d, "contrast"))
-            GaiaSky.postRunnable(() -> em.post(Events.CONTRAST_CMD, (float) level, false));
+            GaiaSky.postRunnable(() -> em.post(Event.CONTRAST_CMD, this, (float) level));
     }
 
     public void setContrastLevel(long level) {
@@ -2273,7 +2273,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setHueLevel(double level) {
         if (checkNum(level, 0d, 2d, "hue"))
-            GaiaSky.postRunnable(() -> em.post(Events.HUE_CMD, (float) level, false));
+            GaiaSky.postRunnable(() -> em.post(Event.HUE_CMD, this, (float) level));
     }
 
     public void setHueLevel(long level) {
@@ -2283,7 +2283,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setSaturationLevel(double level) {
         if (checkNum(level, 0d, 2d, "saturation"))
-            GaiaSky.postRunnable(() -> em.post(Events.SATURATION_CMD, (float) level, false));
+            GaiaSky.postRunnable(() -> em.post(Event.SATURATION_CMD, this, (float) level));
     }
 
     public void setSaturationLevel(long level) {
@@ -2293,7 +2293,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setGammaCorrectionLevel(double level) {
         if (checkNum(level, 0d, 3d, "gamma correction"))
-            GaiaSky.postRunnable(() -> em.post(Events.GAMMA_CMD, (float) level, false));
+            GaiaSky.postRunnable(() -> em.post(Event.GAMMA_CMD, this, (float) level));
     }
 
     public void setGammaCorrectionLevel(long level) {
@@ -2303,13 +2303,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setHDRToneMappingType(String type) {
         if (checkString(type, new String[] { "auto", "AUTO", "exposure", "EXPOSURE", "none", "NONE" }, "tone mapping type"))
-            GaiaSky.postRunnable(() -> em.post(Events.TONEMAPPING_TYPE_CMD, Settings.ToneMapping.valueOf(type.toUpperCase()), false));
+            GaiaSky.postRunnable(() -> em.post(Event.TONEMAPPING_TYPE_CMD, this, Settings.ToneMapping.valueOf(type.toUpperCase())));
     }
 
     @Override
     public void setExposureToneMappingLevel(double level) {
         if (checkNum(level, 0d, 20d, "exposure"))
-            GaiaSky.postRunnable(() -> em.post(Events.EXPOSURE_CMD, (float) level, false));
+            GaiaSky.postRunnable(() -> em.post(Event.EXPOSURE_CMD, this, (float) level));
     }
 
     public void setExposureToneMappingLevel(long level) {
@@ -2319,23 +2319,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCubemapMode(boolean state, String projection) {
         CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
-        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_CMD, state, newProj, false));
+        GaiaSky.postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, newProj));
     }
 
     @Override
     public void setPanoramaMode(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_CMD, state, CubemapProjections.CubemapProjection.EQUIRECTANGULAR, false));
+        GaiaSky.postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjections.CubemapProjection.EQUIRECTANGULAR));
     }
 
     @Override
     public void setPlanetariumMode(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_CMD, state, CubemapProjections.CubemapProjection.FISHEYE, false));
+        GaiaSky.postRunnable(() -> em.post(Event.CUBEMAP_CMD, this, state, CubemapProjections.CubemapProjection.FISHEYE));
     }
 
     @Override
     public void setCubemapResolution(int resolution) {
         if (checkNum(resolution, 20, 15000, "resolution")) {
-            GaiaSky.postRunnable(() -> em.post(Events.CUBEMAP_RESOLUTION_CMD, resolution));
+            GaiaSky.postRunnable(() -> em.post(Event.CUBEMAP_RESOLUTION_CMD, this, resolution));
         }
     }
 
@@ -2343,18 +2343,18 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public void setCubemapProjection(String projection) {
         if (checkStringEnum(projection, CubemapProjections.CubemapProjection.class, "projection")) {
             CubemapProjections.CubemapProjection newProj = CubemapProjections.CubemapProjection.valueOf(projection.toUpperCase());
-            em.post(Events.CUBEMAP_PROJECTION_CMD, newProj);
+            em.post(Event.CUBEMAP_PROJECTION_CMD, this, newProj);
         }
     }
 
     @Override
     public void setStereoscopicMode(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.STEREOSCOPIC_CMD, state, false));
+        GaiaSky.postRunnable(() -> em.post(Event.STEREOSCOPIC_CMD, this, state));
     }
 
     @Override
     public void setStereoscopicProfile(int index) {
-        GaiaSky.postRunnable(() -> em.post(Events.STEREO_PROFILE_CMD, index));
+        GaiaSky.postRunnable(() -> em.post(Event.STEREO_PROFILE_CMD, this, index));
     }
 
     @Override
@@ -2364,23 +2364,23 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setLensFlare(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.LENS_FLARE_CMD, state, false));
+        GaiaSky.postRunnable(() -> em.post(Event.LENS_FLARE_CMD, this, state));
     }
 
     @Override
     public void setMotionBlur(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.MOTION_BLUR_CMD, state, false));
+        GaiaSky.postRunnable(() -> em.post(Event.MOTION_BLUR_CMD, this, state));
     }
 
     @Override
     public void setStarGlow(boolean state) {
-        GaiaSky.postRunnable(() -> em.post(Events.LIGHT_SCATTERING_CMD, state, false));
+        GaiaSky.postRunnable(() -> em.post(Event.LIGHT_SCATTERING_CMD, this, state));
     }
 
     @Override
     public void setBloom(float value) {
         if (checkNum(value, 0f, 1f, "bloom"))
-            GaiaSky.postRunnable(() -> em.post(Events.BLOOM_CMD, value, false));
+            GaiaSky.postRunnable(() -> em.post(Event.BLOOM_CMD, this, value));
     }
 
     public void setBloom(int level) {
@@ -2389,7 +2389,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public void setSmoothLodTransitions(boolean value) {
-        GaiaSky.postRunnable(() -> em.post(Events.OCTREE_PARTICLE_FADE_CMD, I18n.txt("element.octreeparticlefade"), value));
+        GaiaSky.postRunnable(() -> em.post(Event.OCTREE_PARTICLE_FADE_CMD, this, I18n.txt("element.octreeparticlefade"), value));
     }
 
     @Override
@@ -2483,7 +2483,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             pl.setParent("Universe");
             pl.initialize();
 
-            em.post(Events.SCENE_GRAPH_ADD_OBJECT_CMD, pl, true);
+            em.post(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, pl, true);
         }
 
     }
@@ -2531,7 +2531,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void removeModelObject(String name) {
         if (checkString(name, "name"))
-            em.post(Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, name, true);
+            em.post(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, name, true);
     }
 
     @Override
@@ -2542,13 +2542,13 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void parkRunnable(String id, Runnable runnable) {
         if (checkString(id, "id"))
-            em.post(Events.PARK_RUNNABLE, id, runnable);
+            em.post(Event.PARK_RUNNABLE, this, id, runnable);
     }
 
     @Override
     public void removeRunnable(String id) {
         if (checkString(id, "id"))
-            em.post(Events.UNPARK_RUNNABLE, id);
+            em.post(Event.UNPARK_RUNNABLE, this, id);
     }
 
     @Override
@@ -2559,9 +2559,9 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraState(double[] pos, double[] dir, double[] up) {
         GaiaSky.postRunnable(() -> {
-            em.post(Events.CAMERA_POS_CMD, (Object) pos);
-            em.post(Events.CAMERA_DIR_CMD, (Object) dir);
-            em.post(Events.CAMERA_UP_CMD, (Object) up);
+            em.post(Event.CAMERA_POS_CMD, this, (Object) pos);
+            em.post(Event.CAMERA_DIR_CMD, this, (Object) dir);
+            em.post(Event.CAMERA_UP_CMD, this, (Object) up);
         });
     }
 
@@ -2572,8 +2572,8 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     @Override
     public void setCameraStateAndTime(double[] pos, double[] dir, double[] up, long time) {
         GaiaSky.postRunnable(() -> {
-            em.post(Events.CAMERA_PROJECTION_CMD, pos, dir, up);
-            em.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(time));
+            em.post(Event.CAMERA_PROJECTION_CMD, this, pos, dir, up);
+            em.post(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(time));
         });
     }
 
@@ -2769,15 +2769,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         provider.setDatasetOptions(datasetOptions);
         return provider.loadData(ds, 1.0f, () -> {
             // Create
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, datasetOptions.catalogName, 0.01f);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, datasetOptions.catalogName, 0.01f);
         }, (current, count) -> {
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, datasetOptions.catalogName, (float) current / (float) count);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, datasetOptions.catalogName, (float) current / (float) count);
             if (current % 250000 == 0) {
                 logger.info(current + " objects loaded...");
             }
         }, () -> {
             // Force remove
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, datasetOptions.catalogName, 2f);
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, datasetOptions.catalogName, 2f);
         });
     }
 
@@ -2797,11 +2797,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, starGroup.get());
-                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                            EventManager.publish(Event.CATALOG_ADD, this, ci, true);
 
                             String typeStr = datasetOptions == null || datasetOptions.type == DatasetLoadType.STARS ? I18n.txt("gui.dsload.stars.name") : I18n.txt("gui.dsload.variablestars.name");
                             logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (starGroup.get() == null || !starGroup.get().inSceneGraph)) {
@@ -2818,11 +2818,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                             // Catalog info
                             CatalogInfo ci = new CatalogInfo(dsName, ds.getName(), null, type, 1.5f, particleGroup.get());
-                            EventManager.instance.post(Events.CATALOG_ADD, ci, true);
+                            EventManager.publish(Event.CATALOG_ADD, this, ci, true);
 
                             String typeStr = I18n.txt("gui.dsload.objects.name");
                             logger.info(I18n.txt("notif.catalog.loaded", data.size(), typeStr));
-                            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
+                            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.txt("notif.catalog.loaded", data.size(), typeStr));
                         });
                         // Sync waiting until the node is in the scene graph
                         while (sync && (particleGroup.get() == null || !particleGroup.get().inSceneGraph)) {
@@ -2850,7 +2850,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                         scc.doneLoading(manager);
                         String typeStr = I18n.txt("gui.dsload.clusters.name");
                         logger.info(I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
-                        EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, dsName + ": " + I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
+                        EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, dsName + ": " + I18n.txt("notif.catalog.loaded", scc.children.size, typeStr));
                     });
                     // Sync waiting until the node is in the scene graph
                     while (sync && (!scc.inSceneGraph)) {
@@ -2884,7 +2884,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists)
-                GaiaSky.postRunnable(() -> EventManager.instance.post(Events.CATALOG_REMOVE, dsName));
+                GaiaSky.postRunnable(() -> EventManager.publish(Event.CATALOG_REMOVE, this, dsName));
             else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
@@ -2897,7 +2897,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists)
-                EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, false);
+                EventManager.publish(Event.CATALOG_VISIBLE, this, dsName);
             else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
@@ -2910,7 +2910,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         if (checkString(dsName, "datasetName")) {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists)
-                EventManager.instance.post(Events.CATALOG_VISIBLE, dsName, true);
+                EventManager.publish(Event.CATALOG_VISIBLE, this, dsName);
             else
                 logger.warn("Dataset with name " + dsName + " does not exist");
             return exists;
@@ -2924,7 +2924,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             boolean exists = this.catalogManager.contains(dsName);
             if (exists) {
                 CatalogInfo ci = this.catalogManager.get(dsName);
-                postRunnable(() -> EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -2950,7 +2950,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                 ci.hlColor[1] = g;
                 ci.hlColor[2] = b;
                 ci.hlColor[3] = a;
-                postRunnable(() -> EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false));
+                postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
             } else {
                 logger.warn("Dataset with name " + dsName + " does not exist");
             }
@@ -2973,7 +2973,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
                     ci.hlCmapMin = minMap;
                     ci.hlCmapMax = maxMap;
                     ci.hlCmapAttribute = attribute;
-                    postRunnable(() -> EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, false));
+                    postRunnable(() -> EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight));
                 } else {
                     if (attribute == null)
                         logger.error("Could not find attribute with name '" + attributeName + "'");
@@ -3078,7 +3078,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
                 shapeObj.doneLoading(GaiaSky.instance.assetManager);
 
-                EventManager.instance.post(Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, shapeObj, false);
+                EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, shapeObj, false);
             });
         }
     }
@@ -3236,7 +3236,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case INPUT_EVENT:
             inputCode = (Integer) data[0];

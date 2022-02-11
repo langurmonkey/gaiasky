@@ -5,13 +5,14 @@
 
 package gaiasky.interafce.components;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.KeyBindings;
@@ -47,7 +48,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cinematic.setChecked(Settings.settings.scene.camera.cinematic);
         cinematic.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CAMERA_CINEMATIC_CMD, cinematic.isChecked(), true);
+                EventManager.publish(Event.CAMERA_CINEMATIC_CMD, cinematic, cinematic.isChecked());
                 return true;
             }
             return false;
@@ -68,7 +69,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 CameraComboBoxBean selection = cameraMode.getSelected();
                 CameraMode mode = selection.mode;
 
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, mode);
+                EventManager.publish(Event.CAMERA_MODE_CMD, cameraMode, mode);
                 return true;
             }
             return false;
@@ -89,7 +90,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         buttonDome.setChecked(false);
                     }
                     // Enable/disable
-                    EventManager.instance.post(Events.STEREOSCOPIC_CMD, button3d.isChecked(), true);
+                    EventManager.publish(Event.STEREOSCOPIC_CMD, button3d, button3d.isChecked());
                     return true;
                 }
                 return false;
@@ -109,7 +110,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         button3d.setChecked(false);
                     }
                     // Enable/disable
-                    EventManager.instance.post(Events.CUBEMAP_CMD, buttonDome.isChecked(), CubemapProjection.FISHEYE, true);
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonDome, buttonDome.isChecked(), CubemapProjection.FISHEYE);
                     fieldOfView.setDisabled(buttonDome.isChecked());
                     return true;
                 }
@@ -131,7 +132,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                         button3d.setChecked(false);
                     }
                     // Enable/disable
-                    EventManager.instance.post(Events.CUBEMAP_CMD, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR, true);
+                    EventManager.publish(Event.CUBEMAP_CMD, buttonCubemap, buttonCubemap.isChecked(), CubemapProjection.EQUIRECTANGULAR);
                     fieldOfView.setDisabled(buttonCubemap.isChecked());
                     return true;
                 }
@@ -149,7 +150,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
                 buttonMaster.addListener(event -> {
                     if (event instanceof ChangeEvent) {
                         // Enable/disable
-                        EventManager.instance.post(Events.SHOW_SLAVE_CONFIG_ACTION);
+                        EventManager.publish(Event.SHOW_SLAVE_CONFIG_ACTION, buttonMaster);
                         return true;
                     }
                     return false;
@@ -166,7 +167,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         fieldOfView.addListener(event -> {
             if (fovFlag && event instanceof ChangeEvent && !SlaveManager.projectionActive() && !Settings.settings.program.modeCubemap.isFixedFov()) {
                 final float value = fieldOfView.getMappedValue();
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, value);
+                EventManager.publish(Event.FOV_CHANGED_CMD, fieldOfView, value);
                 return true;
             }
             return false;
@@ -201,7 +202,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeedLimit.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 final int idx = cameraSpeedLimit.getSelectedIndex();
-                EventManager.instance.post(Events.SPEED_LIMIT_CMD, idx, true);
+                EventManager.publish(Event.SPEED_LIMIT_CMD, cameraSpeedLimit, idx);
                 return true;
             }
             return false;
@@ -215,7 +216,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         cameraSpeed.setMappedValue(Settings.settings.scene.camera.speed);
         cameraSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.CAMERA_SPEED_CMD, cameraSpeed.getMappedValue(), true);
+                EventManager.publish(Event.CAMERA_SPEED_CMD, cameraSpeed, cameraSpeed.getMappedValue());
                 return true;
             }
             return false;
@@ -228,7 +229,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         rotateSpeed.setMappedValue(Settings.settings.scene.camera.rotate);
         rotateSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.ROTATION_SPEED_CMD, rotateSpeed.getMappedValue(), true);
+                EventManager.publish(Event.ROTATION_SPEED_CMD, rotateSpeed, rotateSpeed.getMappedValue());
                 return true;
             }
             return false;
@@ -241,7 +242,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         turnSpeed.setMappedValue(Settings.settings.scene.camera.turn);
         turnSpeed.addListener(event -> {
             if (!fieldLock && event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.TURNING_SPEED_CMD, turnSpeed.getMappedValue(), true);
+                EventManager.publish(Event.TURNING_SPEED_CMD, turnSpeed, turnSpeed.getMappedValue(), true);
                 return true;
             }
             return false;
@@ -253,7 +254,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         focusLock.setChecked(Settings.settings.scene.camera.focusLock.position);
         focusLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.FOCUS_LOCK_CMD, I18n.txt("gui.camera.lock"), focusLock.isChecked());
+                EventManager.publish(Event.FOCUS_LOCK_CMD, focusLock, I18n.txt("gui.camera.lock"), focusLock.isChecked());
                 orientationLock.setVisible(focusLock.isChecked());
                 return true;
             }
@@ -267,7 +268,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
         orientationLock.setVisible(Settings.settings.scene.camera.focusLock.position);
         orientationLock.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.ORIENTATION_LOCK_CMD, I18n.txt("gui.camera.lock.orientation"), orientationLock.isChecked(), true);
+                EventManager.publish(Event.ORIENTATION_LOCK_CMD, orientationLock, I18n.txt("gui.camera.lock.orientation"), orientationLock.isChecked());
                 return true;
             }
             return false;
@@ -302,21 +303,19 @@ public class CameraComponent extends GuiComponent implements IObserver {
         component = cameraGroup;
 
         cameraGroup.pack();
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.CAMERA_SPEED_CMD, Events.SPEED_LIMIT_CMD, Events.STEREOSCOPIC_CMD, Events.FOV_CHANGE_NOTIFICATION, Events.CUBEMAP_CMD, Events.CAMERA_CINEMATIC_CMD, Events.ORIENTATION_LOCK_CMD, Events.PLANETARIUM_CMD);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.ROTATION_SPEED_CMD, Event.TURNING_SPEED_CMD, Event.CAMERA_SPEED_CMD, Event.SPEED_LIMIT_CMD, Event.STEREOSCOPIC_CMD, Event.FOV_CHANGE_NOTIFICATION, Event.CUBEMAP_CMD, Event.CAMERA_CINEMATIC_CMD, Event.ORIENTATION_LOCK_CMD);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case CAMERA_CINEMATIC_CMD:
-
-            final boolean gui = (Boolean) data[1];
+            final boolean gui = source == cinematic;
             if (!gui) {
                 cinematic.setProgrammaticChangeEvents(false);
                 cinematic.setChecked((Boolean) data[0]);
                 cinematic.setProgrammaticChangeEvents(true);
             }
-
             break;
         case CAMERA_MODE_CMD:
             // Update camera mode selection
@@ -336,8 +335,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case ROTATION_SPEED_CMD:
-            Boolean interf = (Boolean) data[1];
-            if (!interf) {
+            if (source != rotateSpeed) {
                 float value = (Float) data[0];
                 fieldLock = true;
                 rotateSpeed.setMappedValue(value);
@@ -345,8 +343,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case CAMERA_SPEED_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
+            if (source != cameraSpeed) {
                 final float value = (Float) data[0];
                 fieldLock = true;
                 cameraSpeed.setMappedValue(value);
@@ -355,8 +352,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             break;
 
         case TURNING_SPEED_CMD:
-            interf = (Boolean) data[1];
-            if (!interf) {
+            if (source != turnSpeed) {
                 final float value = (Float) data[0];
                 fieldLock = true;
                 turnSpeed.setMappedValue(value);
@@ -364,10 +360,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case SPEED_LIMIT_CMD:
-            interf = false;
-            if (data.length > 1)
-                interf = (Boolean) data[1];
-            if (!interf) {
+            if (source != cameraSpeedLimit) {
                 final int value = (Integer) data[0];
                 cameraSpeedLimit.getSelection().setProgrammaticChangeEvents(false);
                 cameraSpeedLimit.setSelectedIndex(value);
@@ -375,10 +368,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case ORIENTATION_LOCK_CMD:
-            interf = false;
-            if (data.length > 2)
-                interf = (Boolean) data[2];
-            if (!interf) {
+            if (source != orientationLock) {
                 final boolean lock = (Boolean) data[1];
                 orientationLock.setProgrammaticChangeEvents(false);
                 orientationLock.setChecked(lock);
@@ -386,7 +376,7 @@ public class CameraComponent extends GuiComponent implements IObserver {
             }
             break;
         case STEREOSCOPIC_CMD:
-            if (!(boolean) data[1] && !Settings.settings.runtime.openVr) {
+            if (source != button3d && !Settings.settings.runtime.openVr) {
                 button3d.setProgrammaticChangeEvents(false);
                 button3d.setChecked((boolean) data[0]);
                 button3d.setProgrammaticChangeEvents(true);
@@ -398,30 +388,22 @@ public class CameraComponent extends GuiComponent implements IObserver {
             fovFlag = true;
             break;
         case CUBEMAP_CMD:
-            if (!(boolean) data[2] && !Settings.settings.runtime.openVr) {
+
+            if (!Settings.settings.runtime.openVr) {
                 final CubemapProjection proj = (CubemapProjection) data[1];
                 final boolean enable = (boolean) data[0];
-                if (proj.isPanorama()) {
+                if (proj.isPanorama() && source != buttonCubemap) {
                     buttonCubemap.setProgrammaticChangeEvents(false);
                     buttonCubemap.setChecked(enable);
                     buttonCubemap.setProgrammaticChangeEvents(true);
                     fieldOfView.setDisabled(enable);
-                } else if (proj.isPlanetarium()) {
+                } else if (proj.isPlanetarium() && source != buttonDome) {
                     buttonDome.setProgrammaticChangeEvents(false);
                     buttonDome.setChecked(enable);
                     buttonDome.setProgrammaticChangeEvents(true);
                     fieldOfView.setDisabled(enable);
                 }
 
-            }
-            break;
-        case PLANETARIUM_CMD:
-            if (!(boolean) data[1] && !Settings.settings.runtime.openVr) {
-                final boolean enable = (boolean) data[0];
-                buttonDome.setProgrammaticChangeEvents(false);
-                buttonDome.setChecked(enable);
-                buttonDome.setProgrammaticChangeEvents(true);
-                fieldOfView.setDisabled(enable);
             }
             break;
         default:

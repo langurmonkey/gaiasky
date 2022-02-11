@@ -7,13 +7,12 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
 import gaiasky.util.Constants;
-import gaiasky.util.GlobalResources;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector2d;
@@ -233,7 +232,7 @@ public class FadeNode extends SceneGraphNode {
         CatalogInfoType type = map.get("type") != null ? CatalogInfoType.valueOf(map.get("type")) : CatalogInfoType.INTERNAL;
         float size = map.get("size") != null ? Parser.parseFloat(map.get("size")) : 1;
         this.catalogInfo = new CatalogInfo(name, desc, source, type, size, this);
-        EventManager.instance.post(Events.CATALOG_ADD, this.catalogInfo, false);
+        EventManager.publish(Event.CATALOG_ADD, this, this.catalogInfo, false);
     }
 
     /**

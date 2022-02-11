@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
+import gaiasky.event.Event;
 import gaiasky.util.gdx.shader.CubemapAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
@@ -21,7 +22,6 @@ import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
@@ -34,7 +34,6 @@ import gaiasky.util.gdx.shader.FloatExtAttribute;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -205,7 +204,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             addColorToMat();
         }
         // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
 
         this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
         this.modelLoading = false;
@@ -561,8 +560,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.GRAPHICS_QUALITY_UPDATED) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
             GaiaSky.postRunnable(() -> {
                 if (mtc != null && mtc.texInitialised) {
                     // Remove current textures

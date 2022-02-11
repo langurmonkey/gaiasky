@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.scenegraph.camera.CameraManager;
@@ -28,7 +28,7 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
 
     public LocationLogComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.NEW_LOCATION_RECORD);
+        EventManager.instance.subscribe(this, Event.NEW_LOCATION_RECORD);
     }
 
     @Override
@@ -80,11 +80,11 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
             goToLoc.setSize(30f, 30f);
             goToLoc.addListener((event) -> {
                 if (event instanceof ChangeEvent) {
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FREE_MODE);
-                    EventManager.instance.post(Events.CAMERA_POS_CMD, lr.position.valuesd());
-                    EventManager.instance.post(Events.CAMERA_DIR_CMD, lr.direction.values());
-                    EventManager.instance.post(Events.CAMERA_UP_CMD, lr.up.values());
-                    EventManager.instance.post(Events.TIME_CHANGE_CMD, lr.simulationTime);
+                    EventManager.publish(Event.CAMERA_MODE_CMD, goToLoc, CameraManager.CameraMode.FREE_MODE);
+                    EventManager.publish(Event.CAMERA_POS_CMD, goToLoc, lr.position.valuesd());
+                    EventManager.publish(Event.CAMERA_DIR_CMD, goToLoc, lr.direction.values());
+                    EventManager.publish(Event.CAMERA_UP_CMD, goToLoc, lr.up.values());
+                    EventManager.publish(Event.TIME_CHANGE_CMD, goToLoc, lr.simulationTime);
 
                     return true;
                 }
@@ -121,8 +121,8 @@ public class LocationLogComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.NEW_LOCATION_RECORD) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.NEW_LOCATION_RECORD) {
             refresh();
         }
     }

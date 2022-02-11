@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.render.IPostProcessor.PostProcessBean;
 import gaiasky.render.RenderingContext.CubemapSide;
 import gaiasky.scenegraph.camera.ICamera;
@@ -79,7 +79,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         // dirUpCrs <- dir X up
         dirUpCrs.set(dirBak).crs(upBak).nor().scl(-1f);
 
-        EventManager.instance.post(Events.FOV_CHANGED_CMD, 90f);
+        EventManager.publish(Event.FOV_CHANGED_CMD, this, 90f);
 
         // The sides of the cubemap must be square. We use the max of our resolution
         int wh = Settings.settings.program.modeCubemap.faceResolution;
@@ -177,7 +177,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         Gdx.gl.glActiveTexture(GL20.GL_TEXTURE0);
 
         // Restore fov
-        EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBak);
+        EventManager.publish(Event.FOV_CHANGED_CMD, this, fovBak);
     }
 
     protected void renderFace(FrameBuffer fb, ICamera camera, SceneGraphRenderer sgr, PostProcessBean ppb, int rw, int rh, int wh, double t) {
@@ -206,7 +206,7 @@ public abstract class SGRCubemap extends SGRAbstract {
         float fov = 45f;
         float fov2 = fov / 2f;
 
-        EventManager.instance.post(Events.FOV_CHANGED_CMD, fov);
+        EventManager.publish(Event.FOV_CHANGED_CMD, this, fov);
 
         PerspectiveCamera cam = camera.getCamera();
 

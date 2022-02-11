@@ -12,8 +12,8 @@ import com.sudoplay.joise.module.*;
 import com.sudoplay.joise.module.ModuleBasisFunction.BasisType;
 import com.sudoplay.joise.module.ModuleBasisFunction.InterpolationType;
 import com.sudoplay.joise.module.ModuleFractal.FractalType;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
@@ -129,10 +129,10 @@ public class NoiseComponent extends NamedComponent {
             y += 1;
 
             // Progress bar
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, (float) y / (float) (M - 1));
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) y / (float) (M - 1));
         }
         // Force end
-        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, 2f);
+        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, 2f);
 
         return pixmap;
     }
@@ -173,10 +173,10 @@ public class NoiseComponent extends NamedComponent {
             y += 1;
 
             // Progress bar
-            EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, (float) y / (float) (M - 1));
+            EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, (float) y / (float) (M - 1));
         }
         // Force end
-        EventManager.instance.post(Events.UPDATE_LOAD_PROGRESS, name, 2f);
+        EventManager.publish(Event.UPDATE_LOAD_PROGRESS, this, name, 2f);
         return new Trio<>(elevation, moisture, pixmap);
     }
 

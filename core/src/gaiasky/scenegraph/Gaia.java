@@ -8,8 +8,8 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gaia.Attitude;
@@ -44,7 +44,7 @@ public class Gaia extends Satellite {
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
-        EventManager.instance.post(Events.GAIA_LOADED, this);
+        EventManager.publish(Event.GAIA_LOADED, this, this);
     }
 
     @Override

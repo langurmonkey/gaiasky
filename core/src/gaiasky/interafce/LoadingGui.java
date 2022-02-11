@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.LoadingTextGenerator;
 import gaiasky.util.Settings;
 import gaiasky.util.TipGenerator;
@@ -130,7 +130,7 @@ public class LoadingGui extends AbstractGui {
         screenModeButton.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 settings.graphics.fullScreen.active = !settings.graphics.fullScreen.active;
-                EventManager.instance.post(Events.SCREEN_MODE_CMD);
+                EventManager.publish(Event.SCREEN_MODE_CMD, screenModeButton);
                 return true;
             }
             return false;

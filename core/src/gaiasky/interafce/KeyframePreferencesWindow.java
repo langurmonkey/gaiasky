@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.interafce.beans.ComboBoxBean;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
@@ -93,7 +93,7 @@ public class KeyframePreferencesWindow extends GenericDialog {
 
     @Override
     protected void accept() {
-        EventManager.instance.post(Events.CAMRECORDER_FPS_CMD, Parser.parseDouble(camrecFps.getText()));
+        EventManager.publish(Event.CAMRECORDER_FPS_CMD, this, Parser.parseDouble(camrecFps.getText()));
         Settings.settings.camrecorder.keyframe.position = CameraKeyframeManager.PathType.values()[posMethod.getSelectedIndex()];
         Settings.settings.camrecorder.keyframe.orientation = CameraKeyframeManager.PathType.values()[orientationMethod.getSelectedIndex()];
     }

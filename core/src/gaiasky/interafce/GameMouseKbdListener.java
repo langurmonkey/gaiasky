@@ -11,8 +11,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.math.MathUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.Logger;
@@ -33,7 +33,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
 
     public GameMouseKbdListener(GameGestureListener l, NaturalCamera naturalCamera) {
         super(l, naturalCamera);
-        EventManager.instance.subscribe(this, Events.MOUSE_CAPTURE_CMD, Events.MOUSE_CAPTURE_TOGGLE);
+        EventManager.instance.subscribe(this, Event.MOUSE_CAPTURE_CMD, Event.MOUSE_CAPTURE_TOGGLE);
     }
 
     public GameMouseKbdListener(NaturalCamera naturalCamera) {
@@ -108,7 +108,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
             mpi.addMapping("Toggle mouse capture", "SHIFT", "CTRL", "L");
             mpi.addMapping("Go back to focus mode", "1");
 
-            EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "gamemode", 120f);
+            EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "gamemode", 120f);
         });
     }
 
@@ -116,7 +116,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
     public void deactivate() {
         // Release mouse
         setMouseCapture(false);
-        EventManager.instance.post(Events.MODE_POPUP_CMD, null, "gamemode");
+        EventManager.publish(Event.MODE_POPUP_CMD, this, null, "gamemode");
         prevValid = false;
     }
 
@@ -192,7 +192,7 @@ public class GameMouseKbdListener extends MouseKbdListener implements IObserver 
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case MOUSE_CAPTURE_CMD:
             setMouseCapture((Boolean) data[0]);

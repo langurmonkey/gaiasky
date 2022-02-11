@@ -13,8 +13,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.StringBuilder;
 import gaiasky.GaiaSky;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -126,7 +126,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
         c1 = this.add(message1).left();
 
         this.df = DateFormatFactory.getFormatter("uuuu-MM-dd HH:mm:ss");
-        EventManager.instance.subscribe(this, Events.POST_NOTIFICATION, Events.FOCUS_CHANGED, Events.TIME_STATE_CMD, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_MODE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.FOCUS_LOCK_CMD, Events.TOGGLE_AMBIENT_LIGHT, Events.FOV_CHANGE_NOTIFICATION, Events.JAVA_EXCEPTION, Events.ORBIT_DATA_LOADED, Events.SCREENSHOT_INFO, Events.STEREOSCOPIC_CMD, Events.DISPLAY_GUI_CMD, Events.FRAME_OUTPUT_CMD, Events.STEREO_PROFILE_CMD, Events.OCTREE_PARTICLE_FADE_CMD, Events.SCREEN_NOTIFICATION_CMD, Events.MODE_POPUP_CMD);
+        EventManager.instance.subscribe(this, Event.POST_NOTIFICATION, Event.FOCUS_CHANGED, Event.TIME_STATE_CMD, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_MODE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.FOCUS_LOCK_CMD, Event.TOGGLE_AMBIENT_LIGHT, Event.FOV_CHANGE_NOTIFICATION, Event.JAVA_EXCEPTION, Event.ORBIT_DATA_LOADED, Event.SCREENSHOT_INFO, Event.STEREOSCOPIC_CMD, Event.DISPLAY_GUI_CMD, Event.FRAME_OUTPUT_CMD, Event.STEREO_PROFILE_CMD, Event.OCTREE_PARTICLE_FADE_CMD, Event.SCREEN_NOTIFICATION_CMD, Event.MODE_POPUP_CMD);
     }
 
     public void unsubscribe() {
@@ -201,7 +201,7 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         synchronized (lock) {
             switch (event) {
             case POST_NOTIFICATION:
@@ -241,8 +241,8 @@ public class NotificationsInterface extends TableGuiInterface implements IObserv
                 }
                 break;
             case TOGGLE_VISIBILITY_CMD:
-                if (data.length == 3)
-                    addMessage(I18n.txt("notif.visibility." + (((Boolean) data[2]) ? "on" : "off"), I18n.txt((String) data[0])));
+                if (data.length == 2)
+                    addMessage(I18n.txt("notif.visibility." + (((Boolean) data[1]) ? "on" : "off"), I18n.txt((String) data[0])));
                 else
                     addMessage(I18n.txt("notif.visibility.toggle", I18n.txt((String) data[0])));
                 break;

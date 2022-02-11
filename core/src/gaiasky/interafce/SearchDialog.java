@@ -20,8 +20,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.ISceneGraph;
 import gaiasky.scenegraph.ParticleGroup;
@@ -37,7 +37,6 @@ import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextField;
 
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -280,8 +279,8 @@ public class SearchDialog extends GenericDialog {
                     boolean datasetVisible = ci.isEmpty() || ci.get().isVisible(true);
                     if (!timeOverflow && canSelect && ctOn && datasetVisible) {
                         GaiaSky.postRunnable(() -> {
-                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
                         });
                         info(null);
                     } else if (timeOverflow) {

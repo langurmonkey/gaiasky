@@ -16,8 +16,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -137,7 +137,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         ct = new ComponentTypes(ComponentType.Satellites);
         localTransform = new Matrix4();
         rotationMatrix = new Matrix4();
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD);
 
         // position attributes
         force = new Vector3d();
@@ -217,9 +217,9 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         //        }
 
         // Broadcast me
-        EventManager.instance.post(Events.SPACECRAFT_LOADED, this);
+        EventManager.publish(Event.SPACECRAFT_LOADED, this, this);
 
-        EventManager.instance.subscribe(this, Events.CAMERA_MODE_CMD, Events.SPACECRAFT_STABILISE_CMD, Events.SPACECRAFT_STOP_CMD, Events.SPACECRAFT_THRUST_DECREASE_CMD, Events.SPACECRAFT_THRUST_INCREASE_CMD, Events.SPACECRAFT_THRUST_SET_CMD, Events.SPACECRAFT_MACHINE_SELECTION_CMD);
+        EventManager.instance.subscribe(this, Event.CAMERA_MODE_CMD, Event.SPACECRAFT_STABILISE_CMD, Event.SPACECRAFT_STOP_CMD, Event.SPACECRAFT_THRUST_DECREASE_CMD, Event.SPACECRAFT_THRUST_INCREASE_CMD, Event.SPACECRAFT_THRUST_SET_CMD, Event.SPACECRAFT_MACHINE_SELECTION_CMD);
     }
 
     /**
@@ -247,7 +247,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case CAMERA_MODE_CMD:
             CameraMode mode = (CameraMode) data[0];
@@ -274,7 +274,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             GaiaSky.postRunnable(() -> {
                 this.setToMachine(machines[newMachineIndex], true);
                 this.currentMachine = newMachineIndex;
-                EventManager.instance.post(Events.SPACECRAFT_MACHINE_SELECTION_INFO, machines[newMachineIndex]);
+                EventManager.publish(Event.SPACECRAFT_MACHINE_SELECTION_INFO, this, machines[newMachineIndex]);
             });
             break;
         default:
@@ -294,7 +294,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
 
         if (render) {
-            EventManager.instance.post(Events.SPACECRAFT_INFO, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], currentEnginePower, yawp, pitchp, rollp);
+            EventManager.publish(Event.SPACECRAFT_INFO, this, yaw % 360, pitch % 360, roll % 360, vel.len(), thrustFactor[thrustFactorIndex], currentEnginePower, yawp, pitchp, rollp);
         }
     }
 
@@ -349,7 +349,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
                 setCurrentEnginePower(0);
                 force.scl(0);
                 vel.scl(0);
-                EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
             }
         }
 
@@ -471,7 +471,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
                     yawv = 0;
                     pitchv = 0;
                     rollv = 0;
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                 }
             }
 
@@ -568,7 +568,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         thrustFactorIndex = (thrustFactorIndex + 1) % thrustFactor.length;
         logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
-            EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
+            EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
     }
 
     public void decreaseThrustFactorIndex(boolean broadcast) {
@@ -577,7 +577,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             thrustFactorIndex = thrustFactor.length - 1;
         logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
-            EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
+            EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
     }
 
     public void setThrustFactorIndex(int i, boolean broadcast) {
@@ -585,7 +585,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         thrustFactorIndex = i;
         logger.info("Thrust factor: " + thrustFactor[thrustFactorIndex]);
         if (broadcast)
-            EventManager.instance.post(Events.SPACECRAFT_THRUST_INFO, thrustFactorIndex);
+            EventManager.publish(Event.SPACECRAFT_THRUST_INFO, this, thrustFactorIndex);
     }
 
     /**

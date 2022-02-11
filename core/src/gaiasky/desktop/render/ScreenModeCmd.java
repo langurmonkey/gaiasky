@@ -9,8 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Graphics.Monitor;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -30,12 +30,12 @@ public class ScreenModeCmd implements IObserver {
     }
 
     private ScreenModeCmd() {
-        EventManager.instance.subscribe(this, Events.SCREEN_MODE_CMD);
+        EventManager.instance.subscribe(this, Event.SCREEN_MODE_CMD);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.SCREEN_MODE_CMD) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.SCREEN_MODE_CMD) {
             boolean toFullScreen = Settings.settings.graphics.fullScreen.active;
             if (toFullScreen) {
                 // TODO hack

@@ -16,8 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
 import gaiasky.render.IPostProcessor.PostProcessBean;
@@ -141,17 +141,17 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
                 float fov = (float) (fovB - fovT);
                 if (fov > 50) {
                     logger.info("Setting fov to HMD value: " + fov);
-                    EventManager.instance.post(Events.FOV_CHANGED_CMD, fov);
+                    EventManager.publish(Event.FOV_CHANGED_CMD, this, fov);
                 } else {
                     // Default
                     logger.info("Setting fov to default value: " + 89f);
-                    EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
+                    EventManager.publish(Event.FOV_CHANGED_CMD, this, 89f);
                 }
             } catch (Exception e) {
                 // Default
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, 89f);
+                EventManager.publish(Event.FOV_CHANGED_CMD, this, 89f);
             }
-            EventManager.instance.subscribe(this, Events.FRAME_SIZE_UPDATE, Events.SCREENSHOT_SIZE_UPDATE, Events.VR_DEVICE_CONNECTED, Events.VR_DEVICE_DISCONNECTED, Events.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.VR_DEVICE_CONNECTED, Event.VR_DEVICE_DISCONNECTED, Event.UI_SCALE_CMD);
         }
     }
 
@@ -348,7 +348,7 @@ public class SGROpenVR extends SGRAbstract implements ISGR, IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case VR_DEVICE_CONNECTED:
             VRDevice device = (VRDevice) data[0];

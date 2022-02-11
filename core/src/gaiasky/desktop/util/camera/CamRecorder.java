@@ -7,7 +7,7 @@ package gaiasky.desktop.util.camera;
 
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
@@ -84,7 +84,7 @@ public class CamRecorder implements IObserver {
         aux1 = new Vector3d();
         aux2 = new Vector3d();
 
-        EventManager.instance.subscribe(this, Events.RECORD_CAMERA_CMD, Events.PLAY_CAMERA_CMD, Events.UPDATE_CAM_RECORDER, Events.STOP_CAMERA_PLAY);
+        EventManager.instance.subscribe(this, Event.RECORD_CAMERA_CMD, Event.PLAY_CAMERA_CMD, Event.UPDATE_CAM_RECORDER, Event.STOP_CAMERA_PLAY);
     }
 
     public void update(ITimeFrameProvider time, Vector3b position, Vector3d direction, Vector3d up) {
@@ -111,7 +111,7 @@ public class CamRecorder implements IObserver {
                                 line = line.strip();
                                 if(!line.startsWith("#")) {
                                     String[] tokens = line.split("\\s+");
-                                    EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.ofEpochMilli(Parser.parseLong(tokens[0])));
+                                    EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.ofEpochMilli(Parser.parseLong(tokens[0])));
 
                                     dir.set(Parser.parseDouble(tokens[4]), Parser.parseDouble(tokens[5]), Parser.parseDouble(tokens[6]));
                                     upp.set(Parser.parseDouble(tokens[7]), Parser.parseDouble(tokens[8]), Parser.parseDouble(tokens[9]));
@@ -129,15 +129,15 @@ public class CamRecorder implements IObserver {
                                 is = null;
                                 mode = RecorderState.IDLE;
                                 // Stop camera
-                                EventManager.instance.post(Events.CAMERA_STOP);
+                                EventManager.publish(Event.CAMERA_STOP, this);
                                 // Post notification
                                 logger.info(I18n.txt("notif.cameraplay.done"));
 
                                 // Issue message informing playing has stopped
-                                EventManager.instance.post(Events.CAMERA_PLAY_INFO, false);
+                                EventManager.publish(Event.CAMERA_PLAY_INFO, this, false);
 
                                 // Stop frame output if it is on!
-                                EventManager.instance.post(Events.FRAME_OUTPUT_CMD, false);
+                                EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
                                 break;
                             }
                         }
@@ -153,11 +153,11 @@ public class CamRecorder implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
             case RECORD_CAMERA_CMD:
                 // Start recording
-                RecorderState m = null;
+                RecorderState m;
                 if (data[0] != null) {
                     if ((Boolean) data[0]) {
                         m = RecorderState.RECORDING;
@@ -224,6 +224,7 @@ public class CamRecorder implements IObserver {
                     startMs = 0;
                     float secs = elapsed / 1000f;
                     logger.info(I18n.txt("notif.camerarecord.done", f.toAbsolutePath(), secs));
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.camerarecord.done", f.toAbsolutePath(), secs));
                     f = null;
                     mode = RecorderState.IDLE;
                 }
@@ -248,16 +249,16 @@ public class CamRecorder implements IObserver {
                     is = new BufferedReader(new InputStreamReader(Files.newInputStream(file)));
 
                     logger.info(I18n.txt("notif.cameraplay.start", file));
-                    EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.cameraplay.start", file));
+                    EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.cameraplay.start", file));
                     mode = RecorderState.PLAYING;
 
                     // Issue message informing playing has started
-                    EventManager.instance.post(Events.CAMERA_PLAY_INFO, true);
+                    EventManager.publish(Event.CAMERA_PLAY_INFO, this, true);
 
                     // Enable frame output if option is on
                     if (Settings.settings.camrecorder.auto) {
                         // Stop frame output if it is on!
-                        EventManager.instance.post(Events.FRAME_OUTPUT_CMD, true);
+                        EventManager.publish(Event.FRAME_OUTPUT_CMD, this, true);
                     }
                 }catch(Exception e){
                     logger.error(e);
@@ -276,16 +277,16 @@ public class CamRecorder implements IObserver {
                 // Stop playing
                 mode = RecorderState.IDLE;
                 // Stop camera
-                EventManager.instance.post(Events.CAMERA_STOP);
+                EventManager.publish(Event.CAMERA_STOP, this);
                 // Post notification
                 logger.info(I18n.txt("notif.cameraplay.done"));
-                EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.cameraplay.done"));
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.cameraplay.done"));
 
                 // Issue message informing playing has stopped
-                EventManager.instance.post(Events.CAMERA_PLAY_INFO, false);
+                EventManager.publish(Event.CAMERA_PLAY_INFO, this, false);
 
                 // Stop frame output if it is on!
-                EventManager.instance.post(Events.FRAME_OUTPUT_CMD, false);
+                EventManager.publish(Event.FRAME_OUTPUT_CMD, this, false);
                 break;
             default:
                 break;

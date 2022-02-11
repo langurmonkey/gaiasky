@@ -8,7 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -89,7 +89,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
 
         pack();
 
-        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.TIME_STATE_CMD, Events.CAMERA_CLOSEST_INFO, Events.CAMERA_MODE_CMD, Events.FOCUS_CHANGE_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_STATE_CMD, Event.CAMERA_CLOSEST_INFO, Event.CAMERA_MODE_CMD, Event.FOCUS_CHANGE_CMD);
     }
 
     private void unsubscribe() {
@@ -97,7 +97,7 @@ public class TopInfoInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case TIME_CHANGE_INFO:
         case TIME_CHANGE_CMD:

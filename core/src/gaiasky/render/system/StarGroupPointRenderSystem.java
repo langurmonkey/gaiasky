@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -51,7 +51,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
         cmap = new Colormap();
         setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Events.STAR_MIN_OPACITY_CMD, Events.DISPOSE_STAR_GROUP_GPU_MESH, Events.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_MIN_OPACITY_CMD, Event.DISPOSE_STAR_GROUP_GPU_MESH, Event.STAR_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String starTexture) {
@@ -233,7 +233,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case DISPOSE_STAR_GROUP_GPU_MESH -> {

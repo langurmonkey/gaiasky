@@ -7,8 +7,8 @@ package gaiasky.desktop.util.camera;
 
 import com.badlogic.gdx.utils.Array;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
@@ -46,7 +46,7 @@ public class CameraKeyframeManager implements IObserver {
     public CameraKeyframeManager() {
         super();
 
-        EventManager.instance.subscribe(this, Events.KEYFRAMES_FILE_SAVE, Events.KEYFRAMES_EXPORT);
+        EventManager.instance.subscribe(this, Event.KEYFRAMES_FILE_SAVE, Event.KEYFRAMES_EXPORT);
     }
 
     public enum PathType {
@@ -336,7 +336,7 @@ public class CameraKeyframeManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
 
         switch (event) {
             case KEYFRAMES_FILE_SAVE:

@@ -3,8 +3,8 @@ package gaiasky.interafce;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.StubModel;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
@@ -62,12 +62,12 @@ public class OpenVRListener implements VRDeviceListener {
 
     public void connected(VRDevice device) {
         logger.info(device + " connected");
-        EventManager.instance.post(Events.VR_DEVICE_CONNECTED, device);
+        EventManager.publish(Event.VR_DEVICE_CONNECTED, this, device);
     }
 
     public void disconnected(VRDevice device) {
         logger.info(device + " disconnected");
-        EventManager.instance.post(Events.VR_DEVICE_DISCONNECTED, device);
+        EventManager.publish(Event.VR_DEVICE_DISCONNECTED, this, device);
     }
 
     /**
@@ -117,7 +117,7 @@ public class OpenVRListener implements VRDeviceListener {
 
         // VR controller hint
         if (arePressed(VRControllerButtons.A, VRControllerButtons.B)) {
-            EventManager.instance.post(Events.DISPLAY_VR_CONTROLLER_HINT_CMD, true);
+            EventManager.publish(Event.DISPLAY_VR_CONTROLLER_HINT_CMD, this, true);
             vrControllerHint = true;
         }
     }
@@ -132,21 +132,21 @@ public class OpenVRListener implements VRDeviceListener {
             // Give some time to recover from double press
             lazyInit();
             if (vrControllerHint && !arePressed(VRControllerButtons.A, VRControllerButtons.B)) {
-                EventManager.instance.post(Events.DISPLAY_VR_CONTROLLER_HINT_CMD, false);
+                EventManager.publish(Event.DISPLAY_VR_CONTROLLER_HINT_CMD, this, false);
                 vrControllerHint = false;
                 lastDoublePress = TimeUtils.millis();
             } else if (button == VRControllerButtons.B) {
                 vrInfoGui = !vrInfoGui;
-                EventManager.instance.post(Events.DISPLAY_VR_GUI_CMD, vrInfoGui);
+                EventManager.publish(Event.DISPLAY_VR_GUI_CMD, vrInfoGui);
             } else if (button == VRControllerButtons.A) {
-                EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.labels", false);
+                EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.labels");
             } else if (button == VRControllerButtons.SteamVR_Touchpad) {
                 // Change mode from free to focus and viceversa
                 CameraMode cm = cam.getMode().isFocus() ? CameraMode.FREE_MODE : CameraMode.FOCUS_MODE;
                 // Stop
                 cam.clearVelocityVR();
 
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, cm);
+                EventManager.publish(Event.CAMERA_MODE_CMD, this, cm);
             }
         }
     }
@@ -155,7 +155,7 @@ public class OpenVRListener implements VRDeviceListener {
         selecting = true;
         selectingTime = System.currentTimeMillis();
         selectingDevice = device;
-        EventManager.instance.post(Events.VR_SELECTING_STATE, true, 0d);
+        EventManager.publish(Event.VR_SELECTING_STATE, this, true, 0d);
     }
 
     private void updateSelectionCountdown() {
@@ -169,12 +169,12 @@ public class OpenVRListener implements VRDeviceListener {
                     selecting = false;
                     selectingDevice = null;
                 }
-                EventManager.instance.post(Events.VR_SELECTING_STATE, selecting, completion);
+                EventManager.publish(Event.VR_SELECTING_STATE, this, selecting, completion);
             } else {
                 // Stop selecting
                 selecting = false;
                 selectingDevice = null;
-                EventManager.instance.post(Events.VR_SELECTING_STATE, false, 0d);
+                EventManager.publish(Event.VR_SELECTING_STATE, this, false, 0d);
             }
         }
     }
@@ -192,8 +192,8 @@ public class OpenVRListener implements VRDeviceListener {
             p1.set(sm.getBeamP1());
             IFocus hit = getBestHit(p0, p1);
             if (hit != null) {
-                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, hit);
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
+                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, hit);
+                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
             }
         } else {
             logger.info("Model corresponding to device not found");

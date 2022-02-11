@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.*;
 
@@ -174,7 +174,7 @@ public class DateDialog extends CollapsibleWindow {
                     LocalDateTime date = LocalDateTime.of(Integer.parseInt(year.getText()), month.getSelectedIndex() + 1, Integer.parseInt(day.getText()), Integer.parseInt(hour.getText()), Integer.parseInt(min.getText()), Integer.parseInt(sec.getText()));
 
                     // Send time change command
-                    EventManager.instance.post(Events.TIME_CHANGE_CMD, date.toInstant(ZoneOffset.UTC));
+                    EventManager.publish(Event.TIME_CHANGE_CMD, ok, date.toInstant(ZoneOffset.UTC));
 
                     me.remove();
                 }

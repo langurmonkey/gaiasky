@@ -7,7 +7,7 @@ package gaiasky.util.time;
 
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 
 import java.time.Instant;
 
@@ -54,7 +54,7 @@ public class RealTimeClock implements ITimeFrameProvider {
         // Post event each 1/2 second
         lastUpdate += dt;
         if (lastUpdate > .5) {
-            EventManager.instance.post(Events.TIME_CHANGE_INFO, time);
+            EventManager.publish(Event.TIME_CHANGE_INFO, this, time);
             lastUpdate = 0;
         }
     }

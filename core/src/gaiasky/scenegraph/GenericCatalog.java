@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.ISceneGraphLoader;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.Logger;
 import uk.ac.starlink.util.DataSource;
@@ -73,7 +73,7 @@ public class GenericCatalog extends FadeNode {
             // Create catalog info
             if (createCatalogInfo) {
                 CatalogInfo ci = new CatalogInfo(dsName, description, null, CatalogInfo.CatalogInfoType.INTERNAL, 1f, this);
-                EventManager.instance.post(Events.CATALOG_ADD, ci, false);
+                EventManager.publish(Event.CATALOG_ADD, this, ci, false);
             }
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);

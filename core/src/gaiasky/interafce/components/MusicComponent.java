@@ -15,8 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.Timer.Task;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.MusicManager;
@@ -40,7 +40,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
 
     public MusicComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.MUSIC_PLAYPAUSE_CMD, Events.MUSIC_VOLUME_CMD, Events.MUSIC_NEXT_CMD, Events.MUSIC_PREVIOUS_CMD, Events.MUSIC_TRACK_INFO);
+        EventManager.instance.subscribe(this, Event.MUSIC_PLAYPAUSE_CMD, Event.MUSIC_VOLUME_CMD, Event.MUSIC_NEXT_CMD, Event.MUSIC_PREVIOUS_CMD, Event.MUSIC_TRACK_INFO);
     }
 
     @Override
@@ -53,7 +53,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         prev = new OwnImageButton(skin, "audio-bwd");
         prev.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.MUSIC_PREVIOUS_CMD);
+                EventManager.publish(Event.MUSIC_PREVIOUS_CMD, prev);
                 return true;
             }
             return false;
@@ -65,7 +65,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         play.setChecked(false);
         play.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.MUSIC_PLAYPAUSE_CMD);
+                EventManager.publish(Event.MUSIC_PLAYPAUSE_CMD, play);
                 return true;
             }
             return false;
@@ -76,7 +76,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
         next = new OwnImageButton(skin, "audio-fwd");
         next.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.MUSIC_NEXT_CMD);
+                EventManager.publish(Event.MUSIC_NEXT_CMD, next);
                 return true;
             }
             return false;
@@ -94,7 +94,7 @@ public class MusicComponent extends GuiComponent implements IObserver {
                     float scroll = -ie.getScrollAmountY() * 0.1f;
                     float currentVol = getVolume();
                     float newVol = Math.max(0f, Math.min(1f, currentVol + scroll));
-                    EventManager.instance.post(Events.MUSIC_VOLUME_CMD, newVol);
+                    EventManager.publish(Event.MUSIC_VOLUME_CMD, vol, newVol);
                     vol.setText(I18n.txt("gui.music.volume.short") + ": " + nf.format(getVolumePercentage()) + "%");
                     return true;
                 }
@@ -191,8 +191,8 @@ public class MusicComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.MUSIC_TRACK_INFO) {// We changed the music track
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.MUSIC_TRACK_INFO) {// We changed the music track
             currentTrack = (String) data[0];
             si = 0;
             sp = 1;

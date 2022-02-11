@@ -30,8 +30,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -392,7 +392,7 @@ public class WelcomeGui extends AbstractGui {
             bgTex.dispose();
 
         Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
-        EventManager.instance.post(Events.LOAD_DATA_CMD);
+        EventManager.publish(Event.LOAD_DATA_CMD, this);
     }
 
     /**

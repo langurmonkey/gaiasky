@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IRenderable;
@@ -43,7 +43,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this,  Events.STAR_MIN_OPACITY_CMD, Events.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this,  Event.STAR_MIN_OPACITY_CMD, Event.STAR_TEXTURE_IDX_CMD);
         this.ct = ct;
         this.alphaSizeBrRc = new float[4];
         initializing = true;
@@ -189,7 +189,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));

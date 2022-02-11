@@ -68,7 +68,7 @@ public class EventManager implements IObserver {
             queues.put(tf, pq);
         }
         defaultTimeFrame = TimeFrame.REAL_TIME;
-        subscribe(this, Events.EVENT_TIME_FRAME_CMD);
+        subscribe(this, Event.EVENT_TIME_FRAME_CMD);
     }
 
     /**
@@ -77,8 +77,8 @@ public class EventManager implements IObserver {
      * @param observer The observer to subscribe.
      * @param events   The event types to subscribe to.
      */
-    public void subscribe(IObserver observer, Events... events) {
-        for (Events event : events) {
+    public void subscribe(IObserver observer, Event... events) {
+        for (Event event : events) {
             subscribe(observer, event);
         }
     }
@@ -90,7 +90,7 @@ public class EventManager implements IObserver {
      * @param msg      the message code
      * @param listener the listener to add
      */
-    public void subscribe(IObserver listener, Events msg) {
+    public void subscribe(IObserver listener, Event msg) {
         synchronized (subscriptions) {
             Set<IObserver> listeners = subscriptions.computeIfAbsent(msg.ordinal(), k -> new LinkedHashSet<>());
             // Associate an empty ordered array with the message code. Sometimes the order matters
@@ -98,8 +98,8 @@ public class EventManager implements IObserver {
         }
     }
 
-    public void unsubscribe(IObserver listener, Events... events) {
-        for (Events event : events) {
+    public void unsubscribe(IObserver listener, Event... events) {
+        for (Event event : events) {
             unsubscribe(listener, event);
         }
     }
@@ -107,12 +107,12 @@ public class EventManager implements IObserver {
     /**
      * Unregister the specified listener for the specified message code.
      *
-     * @param events   The message code.
+     * @param event    The message code.
      * @param listener The listener to remove.
      **/
-    public void unsubscribe(IObserver listener, Events events) {
+    public void unsubscribe(IObserver listener, Event event) {
         synchronized (subscriptions) {
-            Set<IObserver> listeners = subscriptions.get(events.ordinal());
+            Set<IObserver> listeners = subscriptions.get(event.ordinal());
             if (listeners != null) {
                 listeners.remove(listener);
             }
@@ -140,7 +140,7 @@ public class EventManager implements IObserver {
      *
      * @param msg the message code
      */
-    public void clearSubscriptions(Events msg) {
+    public void clearSubscriptions(Event msg) {
         synchronized (subscriptions) {
             subscriptions.remove(msg.ordinal());
         }
@@ -153,17 +153,38 @@ public class EventManager implements IObserver {
     }
 
     /**
-     * Posts or registers a new event type with the given data.
-     *
-     * @param event The event type.
-     * @param data  The event data.
+     * Posts an event to the default event manager instance.
+     * @param event The event.
+     * @param source The source object, if any.
+     * @param data The event data.
      */
-    public void post(final Events event, final Object... data) {
+    public static void publish(final Event event, Object source, final Object... data) {
+        instance.post(event, source, data);
+    }
+
+    /**
+     * Posts a new dataless event coming from the given source object.
+     *
+     * @param event  The event.
+     * @param source The source object, if any.
+     */
+    public void post(final Event event, Object source) {
+        post(event, source, new Object[0]);
+    }
+
+    /**
+     * Posts a new event coming from the given source object and with the given data.
+     *
+     * @param event  The event.
+     * @param source The source object, if any.
+     * @param data   The event data.
+     */
+    public void post(final Event event, Object source, final Object... data) {
         synchronized (subscriptions) {
             Set<IObserver> observers = subscriptions.get(event.ordinal());
             if (observers != null && observers.size() > 0) {
                 for (IObserver observer : observers) {
-                    observer.notify(event, data);
+                    observer.notify(event, source, data);
                 }
             }
         }
@@ -172,19 +193,21 @@ public class EventManager implements IObserver {
     /**
      * Posts or registers a new event type with the given data and the default
      * time frame. The default time frame can be changed using the event
-     * {@link Events#EVENT_TIME_FRAME_CMD}. The event will be passed along after
+     * {@link Event#EVENT_TIME_FRAME_CMD}. The event will be passed along after
      * the specified delay time [ms] in the given time frame has passed.
      *
-     * @param event   The event type.
+     * @param event   The event.
+     * @param source  The source object, if any.
      * @param delayMs Milliseconds of delay in the given time frame.
      * @param data    The event data.
      */
-    public void postDelayed(Events event, long delayMs, Object... data) {
+    public void postDelayed(Event event, Object source, long delayMs, Object... data) {
         if (delayMs <= 0) {
-            post(event, data);
+            post(event, source, data);
         } else {
             Telegram t = pool.obtain();
             t.event = event;
+            t.source = source;
             t.data = data;
             t.timestamp = defaultTimeFrame.getCurrentTimeMs() + delayMs;
 
@@ -198,18 +221,20 @@ public class EventManager implements IObserver {
      * be passed along after the specified delay time [ms] in the given time
      * frame has passed.
      *
-     * @param event   The event type.
+     * @param event   The event.
+     * @param source  The source object, if any.
      * @param delayMs Milliseconds of delay in the given time frame.
      * @param frame   The time frame, either real time (user) or simulation time
      *                (simulation clock time).
      * @param data    The event data.
      */
-    public void postDelayed(Events event, long delayMs, TimeFrame frame, Object... data) {
+    public void postDelayed(Event event, Object source, long delayMs, TimeFrame frame, Object... data) {
         if (delayMs <= 0) {
-            post(event, data);
+            post(event, source, data);
         } else {
             Telegram t = pool.obtain();
             t.event = event;
+            t.source = source;
             t.data = data;
             t.timestamp = frame.getCurrentTimeMs() + delayMs;
 
@@ -259,12 +284,12 @@ public class EventManager implements IObserver {
     }
 
     private void discharge(Telegram telegram) {
-        post(telegram.event, telegram.data);
+        post(telegram.event, telegram.source, telegram.data);
         // Release the telegram to the pool
         pool.free(telegram);
     }
 
-    public boolean hasSubscriptors(Events event) {
+    public boolean hasSubscriptors(Event event) {
         Set<IObserver> scr = subscriptions.get(event.ordinal());
         return scr != null && !scr.isEmpty();
     }
@@ -281,14 +306,14 @@ public class EventManager implements IObserver {
         return false;
     }
 
-    public boolean isSubscribedTo(IObserver o, Events event) {
+    public boolean isSubscribedTo(IObserver o, Event event) {
         Set<IObserver> scr = subscriptions.get(event.ordinal());
         return scr != null && scr.contains(o);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.EVENT_TIME_FRAME_CMD) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.EVENT_TIME_FRAME_CMD) {
             defaultTimeFrame = (TimeFrame) data[0];
         }
 

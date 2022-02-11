@@ -1,8 +1,8 @@
 package gaiasky.util;
 
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.camera.ICamera;
@@ -87,15 +87,15 @@ public class LocationLogManager implements IObserver {
      * Must be called at some point during initialization, otherwise no locations will be captured.
      */
     public void startCapturing() {
-        if (!EventManager.instance.isSubscribedTo(this, Events.CAMERA_NEW_CLOSEST))
-            EventManager.instance.subscribe(this, Events.CAMERA_NEW_CLOSEST);
+        if (!EventManager.instance.isSubscribedTo(this, Event.CAMERA_NEW_CLOSEST))
+            EventManager.instance.subscribe(this, Event.CAMERA_NEW_CLOSEST);
     }
 
     /**
      * Stops capturing locations.
      */
     public void stopCapturing() {
-        EventManager.instance.unsubscribe(this, Events.CAMERA_NEW_CLOSEST);
+        EventManager.instance.unsubscribe(this, Event.CAMERA_NEW_CLOSEST);
     }
 
     /**
@@ -131,15 +131,15 @@ public class LocationLogManager implements IObserver {
                     locations.pollFirst();
                 }
                 locations.add(record);
-                EventManager.instance.post(Events.NEW_LOCATION_RECORD, locations);
+                EventManager.publish(Event.NEW_LOCATION_RECORD, this, locations);
                 logger.debug(I18n.txt("gui.locationlog.newrecord", record.toStringFull()));
             }
         }
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.CAMERA_NEW_CLOSEST) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.CAMERA_NEW_CLOSEST) {
             final IFocus closest = (IFocus) data[0];
             this.addRecord(closest, GaiaSky.instance.getICamera(), GaiaSky.instance.time);
 

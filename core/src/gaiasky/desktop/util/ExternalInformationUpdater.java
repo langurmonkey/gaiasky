@@ -11,7 +11,6 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.Net.HttpResponse;
 import com.badlogic.gdx.Net.HttpResponseListener;
 import com.badlogic.gdx.net.HttpStatus;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -19,8 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.scenegraph.*;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
@@ -67,9 +66,9 @@ public class ExternalInformationUpdater {
         }
 
         @Override
-        public boolean handle(Event event) {
+        public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_ARCHIVE_VIEW_ACTION, focus);
+                EventManager.publish(Event.SHOW_ARCHIVE_VIEW_ACTION, this, focus);
                 return true;
             }
             return false;
@@ -87,7 +86,7 @@ public class ExternalInformationUpdater {
 
                 // Add table
                 if (focus instanceof IStarFocus) {
-                    EventManager.instance.post(Events.UPDATE_ARCHIVE_VIEW_ACTION, focus);
+                    EventManager.publish(Event.UPDATE_ARCHIVE_VIEW_ACTION, this, focus);
                     if (gaiaButton != null)
                         gaiaButton.remove();
                     gaiaButton = new OwnTextButton(I18n.txt("gui.focusinfo.archive"), skin);
@@ -107,7 +106,7 @@ public class ExternalInformationUpdater {
                         if (infoCell != null) {
                             try {
                                 String actualWikiname = link.substring(Constants.URL_WIKIPEDIA.length());
-                                EventManager.instance.post(Events.UPDATE_WIKI_INFO_ACTION, actualWikiname);
+                                EventManager.publish(Event.UPDATE_WIKI_INFO_ACTION, this, actualWikiname);
                                 if (infoButton != null)
                                     infoButton.remove();
                                 infoButton = new OwnTextButton(I18n.txt("gui.focusinfo.moreinfo"), skin);
@@ -115,7 +114,7 @@ public class ExternalInformationUpdater {
                                 infoButton.pad(pad / 3f, pad, pad / 3f, pad);
                                 infoButton.addListener((event) -> {
                                     if (event instanceof ChangeEvent) {
-                                        EventManager.instance.post(Events.SHOW_WIKI_INFO_ACTION, actualWikiname);
+                                        EventManager.publish(Event.SHOW_WIKI_INFO_ACTION, this, actualWikiname);
                                         return true;
                                     }
                                     return false;

@@ -27,7 +27,7 @@ import gaiasky.assets.GroundShaderProviderLoader.GroundShaderProviderParameter;
 import gaiasky.assets.RelativisticShaderProviderLoader.RelativisticShaderProviderParameter;
 import gaiasky.assets.TessellationShaderProviderLoader;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
@@ -874,7 +874,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         GL30.glClampColor(GL30.GL_CLAMP_VERTEX_COLOR, GL30.GL_FALSE);
         GL30.glClampColor(GL30.GL_CLAMP_FRAGMENT_COLOR, GL30.GL_FALSE);
 
-        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PIXEL_RENDERER_UPDATE, Events.LINE_RENDERER_UPDATE, Events.STEREOSCOPIC_CMD, Events.CAMERA_MODE_CMD, Events.CUBEMAP_CMD, Events.REBUILD_SHADOW_MAP_DATA_CMD, Events.LIGHT_SCATTERING_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.PIXEL_RENDERER_UPDATE, Event.LINE_RENDERER_UPDATE, Event.STEREOSCOPIC_CMD, Event.CAMERA_MODE_CMD, Event.CUBEMAP_CMD, Event.REBUILD_SHADOW_MAP_DATA_CMD, Event.LIGHT_SCATTERING_CMD);
 
     }
 
@@ -1297,16 +1297,16 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     @Override
-    public void notify(Events event, final Object... data) {
+    public void notify(Event event, Object source, final Object... data) {
         switch (event) {
         case TOGGLE_VISIBILITY_CMD:
             ComponentType ct = ComponentType.getFromKey((String) data[0]);
             if (ct != null) {
                 int idx = ct.ordinal();
-                if (data.length == 3) {
+                if (data.length == 2) {
                     // We have the boolean
                     boolean currvis = visible.get(ct.ordinal());
-                    boolean newvis = (boolean) data[2];
+                    boolean newvis = (boolean) data[1];
                     if (currvis != newvis) {
                         // Only update if visibility different
                         if (newvis)

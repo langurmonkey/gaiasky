@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.scene2d.OwnTextIconButton;
@@ -53,11 +53,11 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
         bgLoading.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (loadingPaused) {
-                    EventManager.instance.post(Events.RESUME_BACKGROUND_LOADING);
+                    EventManager.publish(Event.RESUME_BACKGROUND_LOADING, bgLoading);
                     loadingPaused = false;
                     pauseBgTT.getActor().setText(I18n.txt("gui.tooltip.pausebg"));
                 } else {
-                    EventManager.instance.post(Events.PAUSE_BACKGROUND_LOADING);
+                    EventManager.publish(Event.PAUSE_BACKGROUND_LOADING, bgLoading);
                     loadingPaused = true;
                     pauseBgTT.getActor().setText(I18n.txt("gui.tooltip.resumebg"));
                 }
@@ -69,7 +69,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
         cancelCamera.addListener(new OwnTextTooltip(I18n.txt("gui.stop"), skin));
         cancelCamera.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.STOP_CAMERA_PLAY);
+                EventManager.publish(Event.STOP_CAMERA_PLAY, cancelCamera);
             }
             return false;
         });
@@ -92,7 +92,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
             frameoutputImgCell.row();
         }
 
-        EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.CAMERA_PLAY_INFO, Events.BACKGROUND_LOADING_INFO, Events.FRAME_OUTPUT_CMD, Events.OCTREE_DISPOSED);
+        EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.CAMERA_PLAY_INFO, Event.BACKGROUND_LOADING_INFO, Event.FRAME_OUTPUT_CMD, Event.OCTREE_DISPOSED);
     }
 
     private void unsubscribe() {
@@ -100,7 +100,7 @@ public class RunStateInterface extends TableGuiInterface implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case INPUT_ENABLED_CMD:
             GaiaSky.postRunnable(() -> {

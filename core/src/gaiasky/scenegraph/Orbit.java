@@ -21,7 +21,7 @@ import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.RenderingContext;
@@ -656,7 +656,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         super.setVisible(visible, name);
 
         if (change) {
-            EventManager.instance.post(Events.RESET_ORBITAL_ELEMENTS_SYSTEM);
+            EventManager.publish(Event.RESET_ORBITAL_ELEMENTS_SYSTEM, this);
         }
 
     }

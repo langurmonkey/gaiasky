@@ -6,7 +6,7 @@
 package gaiasky.util;
 
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import org.apfloat.Apfloat;
 
 /**
@@ -148,7 +148,7 @@ public class Constants {
         U_TO_Ro = 1d / Ro_TO_U;
         CAMERA_K = 1e7d / DISTANCE_SCALE_FACTOR;
 
-        EventManager.instance.post(Events.NEW_DISTANCE_SCALE_FACTOR);
+        EventManager.publish(Event.NEW_DISTANCE_SCALE_FACTOR, null);
     }
 
     public static final double STAR_SIZE_FACTOR = 1.31526e-6;

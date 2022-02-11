@@ -27,8 +27,8 @@ import gaiasky.desktop.util.CrashReporter;
 import gaiasky.desktop.util.DesktopMusicActors;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.desktop.util.camera.CamRecorder;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ConsoleLogger;
 import gaiasky.interafce.KeyBindings;
@@ -283,7 +283,7 @@ public class GaiaSkyDesktop implements IObserver {
 
     public GaiaSkyDesktop() {
         super();
-        EventManager.instance.subscribe(this, Events.SCENE_GRAPH_LOADED, Events.DISPOSE);
+        EventManager.instance.subscribe(this, Event.SCENE_GRAPH_LOADED, Event.DISPOSE);
     }
 
     private void init() {
@@ -468,7 +468,7 @@ public class GaiaSkyDesktop implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case SCENE_GRAPH_LOADED:
             if (REST_ENABLED) {

@@ -7,8 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.*;
@@ -51,7 +51,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         // Pack
         pack();
 
-        EventManager.instance.subscribe(this, Events.PER_OBJECT_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Event.PER_OBJECT_VISIBILITY_CMD);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
                 cb.addListener((event) -> {
                     if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
-                        GaiaSky.postRunnable(() -> EventManager.instance.post(Events.PER_OBJECT_VISIBILITY_CMD, obj, obj.getName(), cb.isChecked(), this));
+                        GaiaSky.postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, cb, obj, obj.getName(), cb.isChecked()));
                         return true;
                     }
                     return false;
@@ -294,24 +294,20 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.PER_OBJECT_VISIBILITY_CMD) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.PER_OBJECT_VISIBILITY_CMD) {
             IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
             String name = (String) data[1];
             boolean checked = (Boolean) data[2];
-            Object source = data[3];
-            if (source != this) {
-                // Update checkbox if necessary
-                if (currentCt != null && obj.hasCt(currentCt)) {
-                    CheckBox cb = cbMap.get(name);
-                    if (cb != null) {
-                        cb.setProgrammaticChangeEvents(false);
-                        cb.setChecked(checked);
-                        cb.setProgrammaticChangeEvents(true);
-                    }
+            // Update checkbox if necessary
+            if (currentCt != null && obj.hasCt(currentCt)) {
+                CheckBox cb = cbMap.get(name);
+                if (cb != null && source != cb) {
+                    cb.setProgrammaticChangeEvents(false);
+                    cb.setChecked(checked);
+                    cb.setProgrammaticChangeEvents(true);
                 }
             }
         }
-
     }
 }

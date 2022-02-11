@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.Settings;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnProgressBar;
@@ -59,7 +59,7 @@ public class VRSelectionGui extends AbstractGui {
 
         rebuildGui();
 
-        EventManager.instance.subscribe(this, Events.VR_SELECTING_STATE);
+        EventManager.instance.subscribe(this, Event.VR_SELECTING_STATE);
     }
 
     @Override
@@ -82,7 +82,7 @@ public class VRSelectionGui extends AbstractGui {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case VR_SELECTING_STATE:
             selectionState = (Boolean) data[0];

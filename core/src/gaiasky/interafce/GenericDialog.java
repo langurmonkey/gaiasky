@@ -18,8 +18,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.Disableable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.scene2d.CollapsibleWindow;
 import gaiasky.util.scene2d.OwnScrollPane;
 import gaiasky.util.scene2d.OwnTextButton;
@@ -269,7 +269,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         if (this.modal)
             // Disable input
-            EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
+            EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
         return this;
     }
@@ -337,7 +337,7 @@ public abstract class GenericDialog extends CollapsibleWindow {
 
         if (this.modal)
             // Enable input
-            EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
+            EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
     }
 
     /**

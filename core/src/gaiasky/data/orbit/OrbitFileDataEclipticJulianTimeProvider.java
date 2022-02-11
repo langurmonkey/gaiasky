@@ -9,8 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.Settings;
 
 /**
@@ -25,7 +25,7 @@ public class OrbitFileDataEclipticJulianTimeProvider implements IOrbitDataProvid
         try {
             FileHandle f = Settings.settings.data.dataFileHandle(file);
             data = odl.load(f.read());
-            EventManager.instance.post(Events.ORBIT_DATA_LOADED, data, file);
+            EventManager.publish(Event.ORBIT_DATA_LOADED, this, data, file);
         } catch (Exception e) {
             Gdx.app.error(OrbitFileDataEclipticJulianTimeProvider.class.getName(), e.getMessage());
         }

@@ -14,7 +14,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.IQuadRenderable;
 import gaiasky.render.IRenderable;
@@ -74,7 +74,7 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
 
         aux = new Vector3();
 
-        EventManager.instance.subscribe(this, Events.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_TEXTURE_IDX_CMD);
     }
 
     public void setStarTexture(String tex0) {
@@ -155,8 +155,8 @@ public class BillboardStarRenderSystem extends AbstractRenderSystem implements I
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.STAR_TEXTURE_IDX_CMD) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.STAR_TEXTURE_IDX_CMD) {
             GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
         }
     }

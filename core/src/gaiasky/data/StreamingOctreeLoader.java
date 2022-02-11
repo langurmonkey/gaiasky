@@ -8,8 +8,8 @@ package gaiasky.data;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Constellation;
 import gaiasky.scenegraph.SceneGraphNode;
@@ -121,7 +121,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
         idxLoadedIds = 0;
         loadedIds = new long[maxLoadedIds];
 
-        EventManager.instance.subscribe(this, Events.DISPOSE, Events.PAUSE_BACKGROUND_LOADING, Events.RESUME_BACKGROUND_LOADING);
+        EventManager.instance.subscribe(this, Event.DISPOSE, Event.PAUSE_BACKGROUND_LOADING, Event.RESUME_BACKGROUND_LOADING);
     }
 
     @Override
@@ -291,7 +291,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     public void flushLoadQueue() {
         if (!daemon.isAwake() && !toLoadQueue.isEmpty() && !loadingPaused) {
             synchronized (daemon.getThreadLock()) {
-                EventManager.instance.post(Events.BACKGROUND_LOADING_INFO);
+                EventManager.publish(Event.BACKGROUND_LOADING_INFO, this);
                 daemon.getThreadLock().notifyAll();
             }
         }
@@ -491,7 +491,7 @@ public abstract class StreamingOctreeLoader implements IObserver, ISceneGraphLoa
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case PAUSE_BACKGROUND_LOADING:
             loadingPaused = true;

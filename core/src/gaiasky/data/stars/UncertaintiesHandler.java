@@ -8,7 +8,7 @@ package gaiasky.data.stars;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IStarFocus;
 import gaiasky.scenegraph.ParticleGroup;
@@ -67,7 +67,7 @@ public class UncertaintiesHandler implements IObserver {
             Logger.getLogger(this.getClass()).error(e);
         }
 
-        EventManager.instance.subscribe(this, Events.SHOW_UNCERTAINTIES, Events.HIDE_UNCERTAINTIES);
+        EventManager.instance.subscribe(this, Event.SHOW_UNCERTAINTIES, Event.HIDE_UNCERTAINTIES);
     }
 
     public boolean containsStar(Long id) {
@@ -79,7 +79,7 @@ public class UncertaintiesHandler implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case SHOW_UNCERTAINTIES:
             if (data[0] instanceof IStarFocus) {

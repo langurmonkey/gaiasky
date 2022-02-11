@@ -8,7 +8,7 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
@@ -114,7 +114,7 @@ public class SceneGraph implements ISceneGraph {
         if (!hasOctree) {
             if (nObjects < 0)
                 nObjects = getNObjects();
-            EventManager.instance.post(Events.DEBUG_OBJECTS, nObjects, nObjects);
+            EventManager.publish(Event.DEBUG_OBJECTS, this, nObjects, nObjects);
         }
     }
 

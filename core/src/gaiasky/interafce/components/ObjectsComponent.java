@@ -15,8 +15,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.scenegraph.IFocus;
@@ -47,7 +47,7 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
 
     public ObjectsComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED);
     }
 
     @Override
@@ -70,8 +70,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                             boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                             if (!timeOverflow && ctOn) {
                                 GaiaSky.postRunnable(() -> {
-                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
+                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
                                 });
                             } else if (timeOverflow) {
                                 info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
@@ -149,8 +149,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
                         boolean ctOn = GaiaSky.instance.isOn(focus.getCt());
                         if (!timeOverflow && ctOn) {
                             GaiaSky.postRunnable(() -> {
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE, true);
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, focus, true);
+                                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE, true);
+                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, focus, true);
                             });
                         } else if (timeOverflow) {
                             info(I18n.txt("gui.objects.search.timerange.1", text), I18n.txt("gui.objects.search.timerange.2"));
@@ -220,8 +220,8 @@ public class ObjectsComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.FOCUS_CHANGED) {// Update focus selection in focus list
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.FOCUS_CHANGED) {// Update focus selection in focus list
             SceneGraphNode sgn = null;
             if (data[0] instanceof String) {
                 sgn = sg.getNode((String) data[0]);

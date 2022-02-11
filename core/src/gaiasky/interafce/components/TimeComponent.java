@@ -12,8 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.DateDialog;
@@ -53,7 +53,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
 
         dfDate = DateFormatFactory.getFormatter(I18n.locale, DateType.DATE);
         dfTime = DateFormatFactory.getFormatter(I18n.locale, DateType.TIME);
-        EventManager.instance.subscribe(this, Events.TIME_CHANGE_INFO, Events.TIME_CHANGE_CMD, Events.TIME_WARP_CHANGED_INFO, Events.TIME_WARP_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_CHANGE_INFO, Event.TIME_CHANGE_CMD, Event.TIME_WARP_CHANGED_INFO, Event.TIME_WARP_CMD);
     }
 
     @Override
@@ -94,7 +94,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
             if (event instanceof ChangeEvent && !warpGuard) {
                 int index = (int) warp.getValue();
                 double newWarp = timeWarpVector[index + warpSteps];
-                EventManager.instance.post(Events.TIME_WARP_CMD, newWarp, true);
+                EventManager.publish(Event.TIME_WARP_CMD, warp, newWarp);
             }
             return false;
         });
@@ -104,7 +104,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         plus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Plus pressed
-                EventManager.instance.post(Events.TIME_WARP_INCREASE_CMD);
+                EventManager.publish(Event.TIME_WARP_INCREASE_CMD, plus);
 
                 return true;
             }
@@ -117,7 +117,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
         minus.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Minus pressed
-                EventManager.instance.post(Events.TIME_WARP_DECREASE_CMD);
+                EventManager.publish(Event.TIME_WARP_DECREASE_CMD, minus);
                 return true;
             }
             return false;
@@ -133,8 +133,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
             if (event instanceof ChangeEvent) {
                 // Events
                 EventManager m = EventManager.instance;
-                m.post(Events.TIME_CHANGE_CMD, Instant.now());
-                m.post(Events.TIME_WARP_CMD, 1d, false);
+                m.post(Event.TIME_CHANGE_CMD, resetTime, Instant.now());
+                m.post(Event.TIME_WARP_CMD, resetTime, 1d);
                 return true;
             }
             return false;
@@ -215,7 +215,7 @@ public class TimeComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case TIME_CHANGE_INFO:
         case TIME_CHANGE_CMD:
@@ -228,9 +228,8 @@ public class TimeComponent extends GuiComponent implements IObserver {
             break;
         case TIME_WARP_CHANGED_INFO:
         case TIME_WARP_CMD:
-            double newWarp = (double) data[0];
-            boolean ui = data.length > 1 ? (Boolean) data[1] : false;
-            if (!ui) {
+            if (source != warp) {
+                double newWarp = (double) data[0];
                 int index = getWarpIndex(newWarp);
 
                 if (index >= 0) {

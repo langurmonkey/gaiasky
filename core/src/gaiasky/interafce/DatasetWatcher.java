@@ -3,13 +3,12 @@ package gaiasky.interafce;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.I18n;
 import gaiasky.util.datadesc.DatasetDesc;
@@ -34,7 +33,7 @@ public class DatasetWatcher implements IObserver {
         this.status = status;
         this.table = table;
 
-        EventManager.instance.subscribe(this, Events.DATASET_DOWNLOAD_START_INFO, Events.DATASET_DOWNLOAD_FINISH_INFO, Events.DATASET_DOWNLOAD_PROGRESS_INFO);
+        EventManager.instance.subscribe(this, Event.DATASET_DOWNLOAD_START_INFO, Event.DATASET_DOWNLOAD_FINISH_INFO, Event.DATASET_DOWNLOAD_PROGRESS_INFO);
 
     }
 
@@ -43,7 +42,7 @@ public class DatasetWatcher implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
+    public void notify(Event event, Object source, Object... data) {
         if (data.length > 0) {
             if (data[0] instanceof String) {
                 String key = (String) data[0];

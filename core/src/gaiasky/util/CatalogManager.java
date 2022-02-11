@@ -5,8 +5,8 @@
 
 package gaiasky.util;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.FadeNode;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
@@ -24,7 +24,7 @@ public class CatalogManager implements IObserver {
         super();
         ciMap = new HashMap<>();
         cis = new ArrayList<>(5);
-        EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
+        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT);
     }
 
     public Collection<CatalogInfo> getCatalogInfos() {
@@ -71,7 +71,7 @@ public class CatalogManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case CATALOG_ADD:
             CatalogInfo ci = (CatalogInfo) data[0];
@@ -81,7 +81,7 @@ public class CatalogManager implements IObserver {
                 post = (Boolean) data[2];
             if (addToSg) {
                 // Insert object into scene graph
-                EventManager.instance.post(post ? Events.SCENE_GRAPH_ADD_OBJECT_CMD : Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, ci.object, true);
+                EventManager.publish(post ? Event.SCENE_GRAPH_ADD_OBJECT_CMD : Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, this, ci.object, true);
             }
             String key = ci.name;
             if(ciMap.containsKey(key)){
@@ -102,7 +102,7 @@ public class CatalogManager implements IObserver {
             String dsName = (String) data[0];
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
-                EventManager.instance.post(Events.FOCUS_NOT_AVAILABLE, ci.object);
+                EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.object);
                 ci.removeCatalog();
                 ciMap.remove(dsName);
                 cis.remove(ci);
@@ -114,7 +114,7 @@ public class CatalogManager implements IObserver {
             if (ciMap.containsKey(dsName)) {
                 ci = ciMap.get(dsName);
                 if (!visible)
-                    EventManager.instance.post(Events.FOCUS_NOT_AVAILABLE, ci.object);
+                    EventManager.publish(Event.FOCUS_NOT_AVAILABLE, this, ci.object);
                 ci.setVisibility(visible);
                 logger.info(I18n.txt("notif.visibility." + (visible ? "on" : "off"), ci.name));
             }

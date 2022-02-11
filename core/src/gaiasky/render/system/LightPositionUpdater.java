@@ -10,8 +10,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.PostProcessorFactory;
@@ -46,7 +46,7 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
         this.auxV = new Vector3();
         this.auxD = new Vector3d();
 
-        EventManager.instance.subscribe(this, Events.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
     }
 
     public void reinitialize(int nLights) {
@@ -123,17 +123,17 @@ public class LightPositionUpdater implements RenderSystemRunnable, IObserver {
                         }
                     }
                 }
-                EventManager.instance.post(Events.LIGHT_POS_2D_UPDATE, lightIndex, positions, viewAngles, colors, glowTex);
+                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, lightIndex, positions, viewAngles, colors, glowTex);
             } else {
-                EventManager.instance.post(Events.LIGHT_POS_2D_UPDATE, 0, positions, viewAngles, colors, glowTex);
+                EventManager.publish(Event.LIGHT_POS_2D_UPDATE, this, 0, positions, viewAngles, colors, glowTex);
             }
         }
 
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.GRAPHICS_QUALITY_UPDATED) {// Update graphics quality
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.GRAPHICS_QUALITY_UPDATED) {// Update graphics quality
             GraphicsQuality gq = (GraphicsQuality) data[0];
             reinitialize(gq.getGlowNLights());
         }

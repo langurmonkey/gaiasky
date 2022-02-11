@@ -19,8 +19,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScalingViewport;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.Gaia;
@@ -136,7 +136,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fpStages[1] = fov2;
         fpStages[2] = fov12;
 
-        EventManager.instance.subscribe(this, Events.GAIA_LOADED);
+        EventManager.instance.subscribe(this, Event.GAIA_LOADED);
     }
 
     public void update(double dt, ITimeFrameProvider time) {
@@ -265,8 +265,8 @@ public class FovCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.GAIA_LOADED) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.GAIA_LOADED) {
             this.gaia = (Gaia) data[0];
         }
     }

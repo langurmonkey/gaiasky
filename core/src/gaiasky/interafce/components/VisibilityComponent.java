@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.KeyBindings;
@@ -44,7 +44,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
     public VisibilityComponent(Skin skin, Stage stage) {
         super(skin, stage);
-        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.PM_LEN_FACTOR_CMD, Event.PM_NUM_FACTOR_CMD, Event.PM_COLOR_MODE_CMD, Event.PM_ARROWHEADS_CMD);
     }
 
     public void setVisibilityEntitites(ComponentType[] ve, boolean[] v) {
@@ -93,7 +93,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
                     button.setChecked(visible[i]);
                     button.addListener(event -> {
                         if (event instanceof ChangeEvent) {
-                            EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, ct.key, true, ((Button) event.getListenerActor()).isChecked());
+                            EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, button, ct.key, button.isChecked());
                             return true;
                         }
                         return false;
@@ -121,12 +121,11 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmArrowheads.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents)
-                    EventManager.instance.post(Events.PM_ARROWHEADS_CMD, pmArrowheads.isChecked(), true);
+                    EventManager.publish(Event.PM_ARROWHEADS_CMD, pmArrowheads, pmArrowheads.isChecked());
                 return true;
             }
             return false;
         });
-
 
         // NUM FACTOR
         pmNumFactorSlider = new OwnSliderPlus(I18n.txt("gui.pmnumfactor"), Constants.MIN_SLIDER_1, Constants.MAX_SLIDER, Constants.SLIDER_STEP_SMALL, Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR, skin);
@@ -136,7 +135,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmNumFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents) {
-                    EventManager.instance.post(Events.PM_NUM_FACTOR_CMD, pmNumFactorSlider.getMappedValue(), true);
+                    EventManager.publish(Event.PM_NUM_FACTOR_CMD, pmNumFactorSlider, pmNumFactorSlider.getMappedValue());
                 }
                 return true;
             }
@@ -151,7 +150,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmLenFactorSlider.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents) {
-                    EventManager.instance.post(Events.PM_LEN_FACTOR_CMD, pmLenFactorSlider.getValue(), true);
+                    EventManager.publish(Event.PM_LEN_FACTOR_CMD, pmLenFactorSlider, pmLenFactorSlider.getValue());
                 }
                 return true;
             }
@@ -161,7 +160,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         // PM COLOR MODE
         Label pmColorModeLabel = new Label(I18n.txt("gui.pm.colormode"), skin, "default");
 
-        ComboBoxBean[] cms = new ComboBoxBean[]{
+        ComboBoxBean[] cms = new ComboBoxBean[] {
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.dir"), 0),
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.speed"), 1),
                 new ComboBoxBean(I18n.txt("gui.pm.colormode.hasrv"), 2),
@@ -177,7 +176,7 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         pmColorMode.addListener((event) -> {
             if (event instanceof ChangeEvent) {
                 if (sendEvents)
-                    EventManager.instance.post(Events.PM_COLOR_MODE_CMD, pmColorMode.getSelectedIndex(), true);
+                    EventManager.publish(Event.PM_COLOR_MODE_CMD, pmColorMode, pmColorMode.getSelectedIndex());
                 return true;
             }
             return false;
@@ -210,8 +209,8 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
         individualVisibility.align(Align.center);
         individualVisibility.setWidth(contentWidth);
         individualVisibility.addListener(event -> {
-            if(event instanceof ChangeEvent) {
-                EventManager.instance.post(Events.SHOW_PER_OBJECT_VISIBILITY_ACTION);
+            if (event instanceof ChangeEvent) {
+                EventManager.publish(Event.SHOW_PER_OBJECT_VISIBILITY_ACTION, individualVisibility);
                 return true;
             }
             return false;
@@ -225,7 +224,6 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
 
         component = content;
     }
-
 
     private void velocityVectorsEnabled(boolean state) {
         if (state) {
@@ -244,62 +242,54 @@ public class VisibilityComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
-            case TOGGLE_VISIBILITY_CMD:
-                boolean interf = (Boolean) data[1];
-                if (!interf) {
-                    String key = (String) data[0];
-                    Button b = buttonMap.get(key);
+        case TOGGLE_VISIBILITY_CMD:
+            String key = (String) data[0];
+            Button b = buttonMap.get(key);
+            if (b != null && source != b) {
+                b.setProgrammaticChangeEvents(false);
+                if (data.length == 2) {
+                    b.setChecked((Boolean) data[1]);
+                } else {
+                    b.setChecked(!b.isChecked());
+                }
+                b.setProgrammaticChangeEvents(true);
+            }
+            break;
+        case PM_LEN_FACTOR_CMD:
+            if (source != pmLenFactorSlider) {
+                sendEvents = false;
+                float value = (Float) data[0];
+                pmLenFactorSlider.setValue(value);
+                sendEvents = true;
+            }
+            break;
+        case PM_NUM_FACTOR_CMD:
+            if (source != pmNumFactorSlider) {
+                sendEvents = false;
+                float value = (Float) data[0];
+                pmNumFactorSlider.setMappedValue(value);
+                sendEvents = true;
+            }
+            break;
+        case PM_COLOR_MODE_CMD:
+            if (source != pmColorMode) {
+                sendEvents = false;
+                pmColorMode.setSelectedIndex((Integer) data[0]);
+                sendEvents = true;
+            }
+            break;
+        case PM_ARROWHEADS_CMD:
+            if (source != pmArrowheads) {
+                sendEvents = false;
+                pmArrowheads.setChecked((boolean) data[0]);
+                sendEvents = true;
+            }
 
-                    if (b != null) {
-                        b.setProgrammaticChangeEvents(false);
-                        if (data.length == 3) {
-                            b.setChecked((Boolean) data[2]);
-                        } else {
-                            b.setChecked(!b.isChecked());
-                        }
-                        b.setProgrammaticChangeEvents(true);
-                    }
-                }
-                break;
-            case PM_LEN_FACTOR_CMD:
-                interf = (Boolean) data[1];
-                if (!interf) {
-                    sendEvents = false;
-                    float value = (Float) data[0];
-                    pmLenFactorSlider.setValue(value);
-                    sendEvents = true;
-                }
-                break;
-            case PM_NUM_FACTOR_CMD:
-                interf = (Boolean) data[1];
-                if (!interf) {
-                    sendEvents = false;
-                    float value = (Float) data[0];
-                    pmNumFactorSlider.setMappedValue(value);
-                    sendEvents = true;
-                }
-                break;
-            case PM_COLOR_MODE_CMD:
-                interf = (Boolean) data[1];
-                if (!interf) {
-                    sendEvents = false;
-                    pmColorMode.setSelectedIndex((Integer) data[0]);
-                    sendEvents = true;
-                }
-                break;
-            case PM_ARROWHEADS_CMD:
-                interf = (Boolean) data[1];
-                if (!interf) {
-                    sendEvents = false;
-                    pmArrowheads.setChecked((boolean) data[0]);
-                    sendEvents = true;
-                }
-
-                break;
-            default:
-                break;
+            break;
+        default:
+            break;
         }
 
     }

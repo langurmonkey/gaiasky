@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Constants;
 import gaiasky.util.I18n;
@@ -52,7 +52,7 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
         // Build UI
         buildSuper();
 
-        EventManager.instance.subscribe(this, Events.SLAVE_CONNECTION_EVENT);
+        EventManager.instance.subscribe(this, Event.SLAVE_CONNECTION_EVENT);
     }
 
     @Override
@@ -257,8 +257,8 @@ public class SlaveConfigWindow extends GenericDialog implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.SLAVE_CONNECTION_EVENT) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.SLAVE_CONNECTION_EVENT) {
             int idx = (Integer) data[0];
             boolean status = (Boolean) data[2];
             if (slaveStatuses != null && slaveStatuses.length > idx && idx >= 0) {

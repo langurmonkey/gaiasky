@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import gaiasky.GaiaSky;
 import gaiasky.data.group.DatasetOptions;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.DatasetLoadDialog;
 import gaiasky.scenegraph.FadeNode;
@@ -51,7 +51,7 @@ public class SAMPClient implements IObserver {
     public SAMPClient(final CatalogManager catalogManager) {
         super();
         this.catalogManager = catalogManager;
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGED, Events.CATALOG_REMOVE, Events.DISPOSE);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGED, Event.CATALOG_REMOVE, Event.DISPOSE);
     }
 
     public void initialize(final Skin skin) {
@@ -117,8 +117,8 @@ public class SAMPClient implements IObserver {
                             ParticleGroup pg = (ParticleGroup) idToNode.getForward(id);
                             pg.setFocusIndex((int) row);
                             preventProgrammaticEvents = true;
-                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg);
+                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg);
                             preventProgrammaticEvents = false;
                         } else if (idToNode.getForward(id) != null) {
                             // Star cluster
@@ -126,8 +126,8 @@ public class SAMPClient implements IObserver {
                             if (fn.children != null && fn.children.size > (int) row) {
                                 SceneGraphNode sgn = fn.children.get((int) row);
                                 preventProgrammaticEvents = true;
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, sgn);
+                                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, sgn);
                                 preventProgrammaticEvents = false;
                             } else {
                                 logger.info("Star cluster to select not found: " + row);
@@ -160,8 +160,8 @@ public class SAMPClient implements IObserver {
                             ParticleGroup pg = (ParticleGroup) fn;
                             pg.setFocusIndex(row);
                             preventProgrammaticEvents = true;
-                            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg);
+                            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg);
                             preventProgrammaticEvents = false;
                         }
                     }
@@ -179,8 +179,8 @@ public class SAMPClient implements IObserver {
                 double dec = Parser.parseDouble((String) msg.getParam("dec"));
                 logger.info("Point to coordinate (ra,dec): (" + ra + ", " + dec + ")");
 
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-                EventManager.instance.post(Events.FREE_MODE_COORD_CMD, ra, dec);
+                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+                EventManager.publish(Event.FREE_MODE_COORD_CMD, this, ra, dec);
 
                 return null;
             }
@@ -239,12 +239,12 @@ public class SAMPClient implements IObserver {
                             if (ci.object instanceof ParticleGroup) {
                                 ParticleGroup pg = (ParticleGroup) ci.object;
                                 if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {
-                                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                    EventManager.instance.post(Events.FOCUS_CHANGE_CMD, pg.getRandomParticleName());
+                                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                    EventManager.publish(Event.FOCUS_CHANGE_CMD, this, pg.getRandomParticleName());
                                 }
                             } else if (ci.object.children != null && !ci.object.children.isEmpty() && ci.object.children.get(0).isVisibilityOn()) {
-                                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraManager.CameraMode.FOCUS_MODE);
-                                EventManager.instance.post(Events.FOCUS_CHANGE_CMD, ci.object.children.get(0));
+                                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraManager.CameraMode.FOCUS_MODE);
+                                EventManager.publish(Event.FOCUS_CHANGE_CMD, this, ci.object.children.get(0));
                             }
                             // Open UI datasets
                             GaiaSky.instance.scripting().maximizeInterfaceWindow();
@@ -271,7 +271,7 @@ public class SAMPClient implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case FOCUS_CHANGED:
             if (!preventProgrammaticEvents) {

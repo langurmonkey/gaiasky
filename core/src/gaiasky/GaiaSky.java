@@ -29,8 +29,8 @@ import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.util.PointCloudData;
 import gaiasky.desktop.util.CrashReporter;
 import gaiasky.desktop.util.SysUtils;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
 import gaiasky.render.*;
@@ -344,7 +344,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         frameBufferMap = new HashMap<>();
 
         // Disable all kinds of input
-        EventManager.instance.post(Events.INPUT_ENABLED_CMD, false);
+        EventManager.publish(Event.INPUT_ENABLED_CMD, this, false);
 
         if (!settings.initialized) {
             logger.error(new RuntimeException(I18n.txt("notif.error", "global configuration not initialized")));
@@ -457,7 +457,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         renderBatch = globalResources.getSpriteBatch();
 
-        EventManager.instance.subscribe(this, Events.LOAD_DATA_CMD);
+        EventManager.instance.subscribe(this, Event.LOAD_DATA_CMD);
 
         welcomeGui = new WelcomeGui(globalResources.getSkin(), graphics, 1f / settings.program.ui.scale, skipWelcome, vrStatus);
         welcomeGui.initialize(assetManager, globalResources.getSpriteBatch());
@@ -525,7 +525,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 // Enable visibility of 'Others' if off (for VR controllers)
                 if (!settings.scene.visibility.get(ComponentType.Others.name())) {
-                    EventManager.instance.post(Events.TOGGLE_VISIBILITY_CMD, "element.others", false, true);
+                    EventManager.publish(Event.TOGGLE_VISIBILITY_CMD, this, "element.others", false);
                 }
                 return VRStatus.OK;
             } catch (Exception e) {
@@ -627,26 +627,26 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         reinitialiseGUI2();
 
         // Publish visibility
-        EventManager.instance.post(Events.VISIBILITY_OF_COMPONENTS, SceneGraphRenderer.visible);
+        EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, SceneGraphRenderer.visible);
 
         // Key bindings
         inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input));
 
-        EventManager.instance.post(Events.SCENE_GRAPH_LOADED, sceneGraph);
+        EventManager.publish(Event.SCENE_GRAPH_LOADED, this, sceneGraph);
 
         touchSceneGraph();
 
         // Initialise time in GUI
-        EventManager.instance.post(Events.TIME_CHANGE_INFO, time.getTime());
+        EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Events.TOGGLE_AMBIENT_LIGHT, Events.AMBIENT_LIGHT_CMD, Events.RECORD_CAMERA_CMD, Events.CAMERA_MODE_CMD, Events.STEREOSCOPIC_CMD, Events.FRAME_SIZE_UPDATE, Events.SCREENSHOT_SIZE_UPDATE, Events.PARK_RUNNABLE, Events.UNPARK_RUNNABLE, Events.SCENE_GRAPH_ADD_OBJECT_CMD, Events.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Events.SCENE_GRAPH_REMOVE_OBJECT_CMD, Events.HOME_CMD, Events.UI_SCALE_CMD, Events.PER_OBJECT_VISIBILITY_CMD, Events.FORCE_OBJECT_LABEL_CMD, Events.LABEL_COLOR_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD);
 
         // Re-enable input
-        EventManager.instance.post(Events.INPUT_ENABLED_CMD, true);
+        EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
 
         // Set current date
-        EventManager.instance.post(Events.TIME_CHANGE_CMD, Instant.now());
+        EventManager.publish(Event.TIME_CHANGE_CMD, this, Instant.now());
 
         // Resize GUIs to current size
         for (IGui gui : guis)
@@ -665,26 +665,26 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             @Override
             public void run() {
                 // FPS
-                EventManager.instance.post(Events.FPS_INFO, 1f / graphics.getDeltaTime());
+                EventManager.publish(Event.FPS_INFO, this, 1f / graphics.getDeltaTime());
                 // Current session time
-                EventManager.instance.post(Events.DEBUG_TIME, TimeUtils.timeSinceMillis(startTime) / 1000d);
+                EventManager.publish(Event.DEBUG_TIME, this, TimeUtils.timeSinceMillis(startTime) / 1000d);
                 // Memory
-                EventManager.instance.post(Events.DEBUG_RAM, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
+                EventManager.publish(Event.DEBUG_RAM, this, MemInfo.getUsedMemory(), MemInfo.getFreeMemory(), MemInfo.getTotalMemory(), MemInfo.getMaxMemory());
                 // Observed objects
-                EventManager.instance.post(Events.DEBUG_OBJECTS, OctreeNode.nObjectsObserved, StreamingOctreeLoader.getNLoadedStars());
+                EventManager.publish(Event.DEBUG_OBJECTS, this, OctreeNode.nObjectsObserved, StreamingOctreeLoader.getNLoadedStars());
                 // Observed octants
-                EventManager.instance.post(Events.DEBUG_QUEUE, OctreeNode.nOctantsObserved, StreamingOctreeLoader.getLoadQueueSize());
+                EventManager.publish(Event.DEBUG_QUEUE, this, OctreeNode.nOctantsObserved, StreamingOctreeLoader.getLoadQueueSize());
                 // VRAM
-                EventManager.instance.post(Events.DEBUG_VRAM, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
+                EventManager.publish(Event.DEBUG_VRAM, this, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
                 // Threads
-                EventManager.instance.post(Events.DEBUG_THREADS, executorService.pool().getActiveCount(), executorService.pool().getPoolSize());
+                EventManager.publish(Event.DEBUG_THREADS, this, executorService.pool().getActiveCount(), executorService.pool().getPoolSize());
             }
         };
 
         final Task debugTask10 = new Task() {
             @Override
             public void run() {
-                EventManager.instance.post(Events.SAMP_INFO, sampClient.getStatus());
+                EventManager.publish(Event.SAMP_INFO, this, sampClient.getStatus());
             }
         };
 
@@ -708,7 +708,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Go home
         goHome();
 
-        EventManager.instance.post(Events.INITIALIZED_INFO);
+        EventManager.publish(Event.INITIALIZED_INFO, this);
         initialized = true;
     }
 
@@ -734,19 +734,19 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         boolean isOn = true;
         if (homeObject != null && (isOn = GaiaSky.instance.isOn(homeObject.getCt())) && !settings.program.net.slave.active) {
             // Set focus to Earth
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FOCUS_MODE);
-            EventManager.instance.post(Events.FOCUS_CHANGE_CMD, homeObject, true);
-            EventManager.instance.post(Events.GO_TO_OBJECT_CMD);
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FOCUS_MODE);
+            EventManager.publish(Event.FOCUS_CHANGE_CMD, this, homeObject, true);
+            EventManager.publish(Event.GO_TO_OBJECT_CMD, this);
             if (settings.runtime.openVr) {
                 // Free mode by default in VR
-                EventManager.instance.postDelayed(Events.CAMERA_MODE_CMD, 1000L, CameraMode.FREE_MODE);
+                EventManager.instance.postDelayed(Event.CAMERA_MODE_CMD, this, 1000L, CameraMode.FREE_MODE);
             }
         } else {
             // At 5 AU in Y looking towards origin (top-down look)
-            EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
-            EventManager.instance.post(Events.CAMERA_POS_CMD, (Object) new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
-            EventManager.instance.post(Events.CAMERA_DIR_CMD, (Object) new double[] { 0d, -1d, 0d });
-            EventManager.instance.post(Events.CAMERA_UP_CMD, (Object) new double[] { 0d, 0d, 1d });
+            EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
+            EventManager.publish(Event.CAMERA_POS_CMD, this, (Object) new double[] { 0d, 5d * Constants.AU_TO_U, 0d });
+            EventManager.publish(Event.CAMERA_DIR_CMD, this, (Object) new double[] { 0d, -1d, 0d });
+            EventManager.publish(Event.CAMERA_UP_CMD, this, (Object) new double[] { 0d, 0d, 1d });
         }
 
         if (!isOn) {
@@ -854,14 +854,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         ScriptingServer.dispose();
 
         // Flush frames
-        EventManager.instance.post(Events.FLUSH_FRAMES);
+        EventManager.publish(Event.FLUSH_FRAMES, this);
 
         // Dispose all
         if (guis != null)
             for (IGui gui : guis)
                 gui.dispose();
 
-        EventManager.instance.post(Events.DISPOSE);
+        EventManager.publish(Event.DISPOSE, this);
         if (sceneGraph != null) {
             sceneGraph.dispose();
         }
@@ -916,12 +916,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             /*
              * FRAME OUTPUT
              */
-            EventManager.instance.post(Events.RENDER_FRAME, this);
+            EventManager.publish(Event.RENDER_FRAME, this, this);
 
             /*
              * SCREENSHOT OUTPUT - simple|advanced mode
              */
-            EventManager.instance.post(Events.RENDER_SCREENSHOT, this);
+            EventManager.publish(Event.RENDER_SCREENSHOT, this, this);
 
             /*
              * SCREEN OUTPUT
@@ -1166,7 +1166,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Update GUI 
         guiRegistry.update(dtGs);
-        EventManager.instance.post(Events.UPDATE_GUI, dtGs);
+        EventManager.publish(Event.UPDATE_GUI, this, dtGs);
 
         // Update clock
         time.update(dtGs);
@@ -1343,7 +1343,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case LOAD_DATA_CMD:
             // Init components that need assets in data folder
@@ -1423,9 +1423,9 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 mpi.addMapping(I18n.txt("gui.stereo.notice.back"), keysStrToggle);
                 mpi.addMapping(I18n.txt("gui.stereo.notice.profile"), keysStrProfile);
 
-                EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "stereo", 120f);
+                EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 120f);
             } else {
-                EventManager.instance.post(Events.MODE_POPUP_CMD, null, "stereo");
+                EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
             }
 
             break;

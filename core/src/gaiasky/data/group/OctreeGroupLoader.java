@@ -10,7 +10,7 @@ import gaiasky.GaiaSky;
 import gaiasky.data.StreamingOctreeLoader;
 import gaiasky.data.octreegen.MetadataBinaryIO;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.scenegraph.StarGroup;
 import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
@@ -83,7 +83,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
             ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
-            EventManager.instance.post(Events.CATALOG_ADD, ci, false);
+            EventManager.publish(Event.CATALOG_ADD, this, ci, false);
 
             dataVersionHint = name.contains("DR2") || name.contains("dr2") || description.contains("DR2") || description.contains("dr2") ? 0 : 1;
 

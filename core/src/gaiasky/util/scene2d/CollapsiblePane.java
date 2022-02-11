@@ -11,8 +11,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.util.I18n;
 import gaiasky.util.TextUtils;
 
@@ -188,7 +188,7 @@ public class CollapsiblePane extends Table {
             expanding = false;
             collapsing = true;
         }
-        EventManager.instance.post(Events.RECALCULATE_OPTIONS_SIZE);
+        EventManager.publish(Event.RECALCULATE_OPTIONS_SIZE, this);
     }
 
     public void detach() {

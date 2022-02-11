@@ -15,8 +15,8 @@ import com.badlogic.gdx.utils.reflect.ClassReflection;
 import com.badlogic.gdx.utils.reflect.Method;
 import com.badlogic.gdx.utils.reflect.ReflectionException;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
@@ -224,7 +224,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         mc.setColorAttribute(ColorAttribute.Emissive, ColorUtils.getRgbaComplimentary(cc));
 
         // Listen
-        EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD);
 
         // Fade out in VR
         if (Settings.settings.runtime.openVr) {
@@ -595,8 +595,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.TOGGLE_VISIBILITY_CMD) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.TOGGLE_VISIBILITY_CMD) {
             ComponentType ct = ComponentType.getFromKey((String) data[0]);
             if (ct != null && Settings.settings.scene.visibility.get(ct.toString())) {
                 if (ct.equals(ComponentType.Equatorial)) {

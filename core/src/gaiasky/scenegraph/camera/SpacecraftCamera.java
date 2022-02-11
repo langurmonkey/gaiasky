@@ -14,8 +14,8 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.input.GestureDetector.GestureAdapter;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.Spacecraft;
@@ -119,7 +119,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
         inputController = new SpacecraftInputController(new GestureAdapter());
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOV_CHANGED_CMD, Events.SPACECRAFT_LOADED, Events.SPACECRAFT_MACHINE_SELECTION_INFO);
+        EventManager.instance.subscribe(this, Event.FOV_CHANGED_CMD, Event.SPACECRAFT_LOADED, Event.SPACECRAFT_MACHINE_SELECTION_INFO);
     }
 
     @Override
@@ -206,7 +206,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                 cldist = closestStarDist;
             }
         }
-        EventManager.instance.post(Events.SPACECRAFT_NEAREST_INFO, clname, cldist);
+        EventManager.publish(Event.SPACECRAFT_NEAREST_INFO, this, clname, cldist);
 
     }
 
@@ -312,7 +312,7 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case SPACECRAFT_LOADED:
             this.sc = (Spacecraft) data[0];
@@ -351,42 +351,42 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                 case Keys.W:
                     // power 1
                     sc.setCurrentEnginePower(sc.currentEnginePower + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
                     break;
                 case Keys.S:
                     // power -1
                     sc.setCurrentEnginePower(sc.currentEnginePower - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
                     break;
                 case Keys.A:
                     // roll 1
                     sc.setRollPower(sc.rollp + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, false);
                     break;
                 case Keys.D:
                     // roll -1
                     sc.setRollPower(sc.rollp - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                     break;
                 case Keys.DOWN:
                     // pitch 1
                     sc.setPitchPower(sc.pitchp + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                     break;
                 case Keys.UP:
                     // pitch -1
                     sc.setPitchPower(sc.pitchp - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                     break;
                 case Keys.LEFT:
                     // yaw 1
                     sc.setYawPower(sc.yawp + step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                     break;
                 case Keys.RIGHT:
                     // yaw -1
                     sc.setYawPower(sc.yawp - step);
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, false);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, false);
                     break;
                 default:
                     break;
@@ -422,11 +422,11 @@ public class SpacecraftCamera extends AbstractCamera implements IObserver {
                     break;
                 case Keys.L:
                     // level spaceship
-                    EventManager.instance.post(Events.SPACECRAFT_STABILISE_CMD, true);
+                    EventManager.publish(Event.SPACECRAFT_STABILISE_CMD, this, true);
                     break;
                 case Keys.K:
                     // stop spaceship
-                    EventManager.instance.post(Events.SPACECRAFT_STOP_CMD, true);
+                    EventManager.publish(Event.SPACECRAFT_STOP_CMD, this, true);
                     break;
                 case Keys.PAGE_UP:
                     // Increase thrust factor

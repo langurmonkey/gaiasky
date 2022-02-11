@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.ColormapPicker;
 import gaiasky.interafce.ControlsWindow;
@@ -47,7 +46,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         imageMap = new HashMap<>();
         colorMap = new HashMap<>();
         prefsMap = new HashMap<>();
-        EventManager.instance.subscribe(this, Events.CATALOG_ADD, Events.CATALOG_REMOVE, Events.CATALOG_VISIBLE, Events.CATALOG_HIGHLIGHT);
+        EventManager.instance.subscribe(this, gaiasky.event.Event.CATALOG_ADD, gaiasky.event.Event.CATALOG_REMOVE, gaiasky.event.Event.CATALOG_VISIBLE, gaiasky.event.Event.CATALOG_HIGHLIGHT);
     }
 
     @Override
@@ -71,7 +70,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             if (source != eye) {
                 eye.setCheckedNoFire(!visible);
             }
-            EventManager.instance.post(Events.CATALOG_VISIBLE, ci.name, visible, true);
+            EventManager.publish(gaiasky.event.Event.CATALOG_VISIBLE, this, ci.name, visible);
         }
     }
 
@@ -80,7 +79,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             if (source != mark) {
                 mark.setCheckedNoFire(highlight);
             }
-            EventManager.instance.post(Events.CATALOG_HIGHLIGHT, ci, highlight, true);
+            EventManager.publish(gaiasky.event.Event.CATALOG_HIGHLIGHT, this, ci, highlight);
         }
     }
 
@@ -139,7 +138,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         rubbish.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset
-                EventManager.instance.post(Events.CATALOG_REMOVE, ci.name);
+                EventManager.publish(gaiasky.event.Event.CATALOG_REMOVE, this, ci.name);
                 return true;
             }
             return false;
@@ -228,7 +227,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         catalogWidget.setWidth(ControlsWindow.getContentWidth() * 0.94f);
         catalogWidget.addListener(new InputListener() {
             @Override
-            public boolean handle(Event event) {
+            public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
                 if (event != null && event instanceof InputEvent) {
                     InputEvent ie = (InputEvent) event;
                     InputEvent.Type type = ie.getType();
@@ -273,7 +272,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 delete.addListener(new ChangeListener() {
                                     @Override
                                     public void changed(ChangeEvent event, Actor actor) {
-                                        EventManager.instance.post(Events.CATALOG_REMOVE, ci.name);
+                                        EventManager.publish(gaiasky.event.Event.CATALOG_REMOVE, this, ci.name);
                                     }
                                 });
                                 datasetContext.addItem(delete);
@@ -295,7 +294,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final gaiasky.event.Event event, Object source, final Object... data) {
         switch (event) {
         case CATALOG_ADD:
             addCatalogInfo((CatalogInfo) data[0]);
@@ -307,13 +306,11 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 groupMap.remove(ciName);
                 imageMap.remove(ciName);
                 colorMap.remove(ciName);
-                EventManager.instance.post(Events.RECALCULATE_OPTIONS_SIZE);
+                EventManager.publish(gaiasky.event.Event.RECALCULATE_OPTIONS_SIZE, this);
             }
             break;
         case CATALOG_VISIBLE:
-            boolean ui = false;
-            if (data.length > 2)
-                ui = (Boolean) data[2];
+            boolean ui = source == this;
             if (!ui) {
                 ciName = (String) data[0];
                 boolean visible = (Boolean) data[1];
@@ -322,9 +319,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             }
             break;
         case CATALOG_HIGHLIGHT:
-            ui = false;
-            if (data.length > 2)
-                ui = (Boolean) data[2];
+            ui = source == this;
             if (!ui) {
                 CatalogInfo ci = (CatalogInfo) data[0];
                 float[] col = ci.hlColor;

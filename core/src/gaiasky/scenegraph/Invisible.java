@@ -7,8 +7,8 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.RenderingContext;
@@ -55,7 +55,7 @@ public class Invisible extends CelestialBody {
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
         if (this.raymarchingShader != null && !this.raymarchingShader.isBlank() && !Settings.settings.program.safeMode)
-            EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, coordinates.getEquatorialCartesianCoordinates(Instant.now(), pos), this.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
+            EventManager.publish(Event.RAYMARCHING_CMD, this, this.getName(), false, coordinates.getEquatorialCartesianCoordinates(Instant.now(), pos), this.raymarchingShader, new float[] { 1f, 0f, 0f, 0f });
         else
             raymarchingShader = null;
     }
@@ -109,13 +109,13 @@ public class Invisible extends CelestialBody {
             if (viewAngleApparent > Math.toRadians(0.001)) {
                 if (!isOn) {
                     // Turn on
-                    EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), true, pos);
+                    EventManager.publish(Event.RAYMARCHING_CMD, this, this.getName(), true, pos);
                     isOn = true;
                 }
             } else {
                 if (isOn) {
                     // Turn off
-                    EventManager.instance.post(Events.RAYMARCHING_CMD, this.getName(), false, pos);
+                    EventManager.publish(Event.RAYMARCHING_CMD, this, this.getName(), false, pos);
                     isOn = false;
                 }
             }

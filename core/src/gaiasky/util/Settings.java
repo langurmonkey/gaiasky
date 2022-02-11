@@ -5,14 +5,15 @@ import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.KeyBindings;
 import gaiasky.interafce.ModePopupInfo;
@@ -236,7 +237,7 @@ public class Settings {
         public boolean screenOutput;
 
         public GraphicsSettings() {
-            EventManager.instance.subscribe(this, Events.LIMIT_FPS_CMD);
+            EventManager.instance.subscribe(this, Event.LIMIT_FPS_CMD);
         }
 
         public void setQuality(final String qualityString) {
@@ -270,8 +271,8 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Events event, final Object... data) {
-            if (event == Events.LIMIT_FPS_CMD) {
+        public void notify(final Event event, Object source, final Object... data) {
+            if (event == Event.LIMIT_FPS_CMD) {
                 fpsLimit = (Double) data[0];
             }
         }
@@ -295,7 +296,7 @@ public class Settings {
         @JsonIgnore public double distanceScaleVr = 1e4d;
 
         public SceneSettings() {
-            EventManager.instance.subscribe(this, Events.TOGGLE_VISIBILITY_CMD, Events.LINE_WIDTH_CMD);
+            EventManager.instance.subscribe(this, Event.TOGGLE_VISIBILITY_CMD, Event.LINE_WIDTH_CMD);
         }
 
         public void setVisibility(final Map<String, Object> map) {
@@ -324,7 +325,7 @@ public class Settings {
             public FocusSettings focusLock;
 
             public CameraSettings() {
-                EventManager.instance.subscribe(this, Events.CAMERA_CINEMATIC_CMD, Events.FOCUS_LOCK_CMD, Events.ORIENTATION_LOCK_CMD, Events.FOV_CHANGED_CMD, Events.CAMERA_SPEED_CMD, Events.ROTATION_SPEED_CMD, Events.TURNING_SPEED_CMD, Events.SPEED_LIMIT_CMD);
+                EventManager.instance.subscribe(this, Event.CAMERA_CINEMATIC_CMD, Event.FOCUS_LOCK_CMD, Event.ORIENTATION_LOCK_CMD, Event.FOV_CHANGED_CMD, Event.CAMERA_SPEED_CMD, Event.ROTATION_SPEED_CMD, Event.TURNING_SPEED_CMD, Event.SPEED_LIMIT_CMD);
             }
 
             @JsonProperty("speedLimitIndex")
@@ -334,13 +335,13 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Events event, final Object... data) {
+            public void notify(final Event event, Object source, final Object... data) {
                 switch (event) {
                 case FOCUS_LOCK_CMD -> focusLock.position = (boolean) data[1];
                 case ORIENTATION_LOCK_CMD -> focusLock.orientation = (boolean) data[1];
                 case FOV_CHANGED_CMD -> {
                     if (!SlaveManager.projectionActive()) {
-                        boolean checkMax = data.length == 1 || (boolean) data[1];
+                        boolean checkMax = source instanceof Actor;
                         fov = MathUtilsd.clamp((Float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
                     }
                 }
@@ -410,7 +411,7 @@ public class Settings {
             public ThresholdSettings threshold;
 
             public StarSettings() {
-                EventManager.instance.subscribe(this, Events.STAR_BRIGHTNESS_CMD, Events.STAR_BRIGHTNESS_POW_CMD, Events.STAR_POINT_SIZE_CMD, Events.STAR_POINT_SIZE_INCREASE_CMD, Events.STAR_POINT_SIZE_DECREASE_CMD, Events.STAR_POINT_SIZE_RESET_CMD, Events.STAR_MIN_OPACITY_CMD, Events.STAR_GROUP_BILLBOARD_CMD, Events.STAR_GROUP_NEAREST_CMD, Events.STAR_TEXTURE_IDX_CMD);
+                EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_POINT_SIZE_INCREASE_CMD, Event.STAR_POINT_SIZE_DECREASE_CMD, Event.STAR_POINT_SIZE_RESET_CMD, Event.STAR_MIN_OPACITY_CMD, Event.STAR_GROUP_BILLBOARD_CMD, Event.STAR_GROUP_NEAREST_CMD, Event.STAR_TEXTURE_IDX_CMD);
             }
 
             @JsonIgnore
@@ -472,18 +473,18 @@ public class Settings {
                 public double none;
             }
 
-            public void notify(final Events event, final Object... data) {
+            public void notify(final Event event, Object source, final Object... data) {
                 switch (event) {
                 case STAR_POINT_SIZE_CMD:
                     pointSize = (float) data[0];
                     break;
                 case STAR_POINT_SIZE_INCREASE_CMD:
                     float size = Math.min(this.pointSize + Constants.SLIDER_STEP_TINY, Constants.MAX_STAR_POINT_SIZE);
-                    EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
+                    EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
                     break;
                 case STAR_POINT_SIZE_DECREASE_CMD:
                     size = Math.max(this.pointSize - Constants.SLIDER_STEP_TINY, Constants.MIN_STAR_POINT_SIZE);
-                    EventManager.instance.post(Events.STAR_POINT_SIZE_CMD, size, false);
+                    EventManager.publish(Event.STAR_POINT_SIZE_CMD, this, size);
                     break;
                 case STAR_POINT_SIZE_RESET_CMD:
                     this.pointSize = pointSizeBak;
@@ -518,12 +519,12 @@ public class Settings {
             public float number;
 
             public LabelSettings() {
-                EventManager.instance.subscribe(this, Events.LABEL_SIZE_CMD);
+                EventManager.instance.subscribe(this, Event.LABEL_SIZE_CMD);
             }
 
             @Override
-            public void notify(final Events event, final Object... data) {
-                if (event == Events.LABEL_SIZE_CMD) {
+            public void notify(final Event event, Object source, final Object... data) {
+                if (event == Event.LABEL_SIZE_CMD) {
                     size = MathUtilsd.clamp((float) data[0], Constants.MIN_LABEL_SIZE, Constants.MAX_LABEL_SIZE);
                 }
             }
@@ -548,11 +549,11 @@ public class Settings {
             public boolean arrowHeads;
 
             public ProperMotionSettings() {
-                EventManager.instance.subscribe(this, Events.PM_LEN_FACTOR_CMD, Events.PM_NUM_FACTOR_CMD, Events.PM_COLOR_MODE_CMD, Events.PM_ARROWHEADS_CMD);
+                EventManager.instance.subscribe(this, Event.PM_LEN_FACTOR_CMD, Event.PM_NUM_FACTOR_CMD, Event.PM_COLOR_MODE_CMD, Event.PM_ARROWHEADS_CMD);
             }
 
             @Override
-            public void notify(final Events event, final Object... data) {
+            public void notify(final Event event, Object source, final Object... data) {
                 switch (event) {
                 case PM_NUM_FACTOR_CMD -> number = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_NUM_FACTOR, Constants.MAX_PM_NUM_FACTOR);
                 case PM_LEN_FACTOR_CMD -> length = MathUtilsd.clamp((float) data[0], Constants.MIN_PM_LEN_FACTOR, Constants.MAX_PM_LEN_FACTOR);
@@ -569,12 +570,12 @@ public class Settings {
             public boolean fade;
 
             public OctreeSettings() {
-                EventManager.instance.subscribe(this, Events.OCTREE_PARTICLE_FADE_CMD);
+                EventManager.instance.subscribe(this, Event.OCTREE_PARTICLE_FADE_CMD);
             }
 
             @Override
-            public void notify(Events event, Object... data) {
-                if (event == Events.OCTREE_PARTICLE_FADE_CMD) {
+            public void notify(Event event, Object source, Object... data) {
+                if (event == Event.OCTREE_PARTICLE_FADE_CMD) {
                     fade = (boolean) data[1];
                 }
             }
@@ -589,7 +590,7 @@ public class Settings {
             public ElevationSettings elevation;
 
             public RendererSettings() {
-                EventManager.instance.subscribe(this, Events.AMBIENT_LIGHT_CMD, Events.ELEVATION_MULTIPLIER_CMD, Events.ELEVATION_TYPE_CMD, Events.TESSELLATION_QUALITY_CMD);
+                EventManager.instance.subscribe(this, Event.AMBIENT_LIGHT_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.ELEVATION_TYPE_CMD, Event.TESSELLATION_QUALITY_CMD);
             }
 
             @JsonIgnoreProperties(ignoreUnknown = true)
@@ -633,7 +634,7 @@ public class Settings {
             }
 
             @Override
-            public void notify(final Events event, final Object... data) {
+            public void notify(final Event event, Object source, final Object... data) {
                 switch (event) {
                 case AMBIENT_LIGHT_CMD -> ambient = (float) data[0];
                 case ELEVATION_MULTIPLIER_CMD -> elevation.multiplier = MathUtilsd.clamp((float) data[0], Constants.MIN_ELEVATION_MULT, Constants.MAX_ELEVATION_MULT);
@@ -651,11 +652,11 @@ public class Settings {
             public boolean home;
 
             public CrosshairSettings() {
-                EventManager.instance.subscribe(this, Events.CROSSHAIR_FOCUS_CMD, Events.CROSSHAIR_CLOSEST_CMD, Events.CROSSHAIR_HOME_CMD);
+                EventManager.instance.subscribe(this, Event.CROSSHAIR_FOCUS_CMD, Event.CROSSHAIR_CLOSEST_CMD, Event.CROSSHAIR_HOME_CMD);
             }
 
             @Override
-            public void notify(final Events event, final Object... data) {
+            public void notify(final Event event, Object source, final Object... data) {
                 switch (event) {
                 case CROSSHAIR_FOCUS_CMD -> focus = (boolean) data[0];
                 case CROSSHAIR_CLOSEST_CMD -> closest = (boolean) data[0];
@@ -673,13 +674,13 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Events event, final Object... data) {
+        public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
             case TOGGLE_VISIBILITY_CMD -> {
                 String key = (String) data[0];
                 Boolean state = null;
-                if (data.length > 2) {
-                    state = (Boolean) data[2];
+                if (data.length == 2) {
+                    state = (Boolean) data[1];
                 }
                 ComponentType ct = ComponentType.getFromKey(key);
                 if (ct != null) {
@@ -716,7 +717,7 @@ public class Settings {
         public UrlSettings url;
 
         public ProgramSettings() {
-            EventManager.instance.subscribe(this, Events.STEREOSCOPIC_CMD, Events.STEREO_PROFILE_CMD, Events.CUBEMAP_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.SHOW_MINIMAP_ACTION, Events.TOGGLE_MINIMAP, Events.PLANETARIUM_APERTURE_CMD, Events.CUBEMAP_PROJECTION_CMD, Events.CUBEMAP_RESOLUTION_CMD, Events.POINTER_GUIDES_CMD, Events.UI_SCALE_CMD);
+            EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
         }
 
         @JsonIgnoreProperties(ignoreUnknown = true)
@@ -951,14 +952,14 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Events event, final Object... data) {
+        public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
             case STEREOSCOPIC_CMD:
                 if (!GaiaSky.instance.cameraManager.mode.isGaiaFov()) {
                     modeStereo.active = (boolean) (Boolean) data[0];
                     if (modeStereo.active && modeCubemap.active) {
                         modeStereo.active = false;
-                        EventManager.instance.post(Events.DISPLAY_GUI_CMD, true, I18n.txt("notif.cleanmode"));
+                        EventManager.publish(Event.DISPLAY_GUI_CMD, this, true, I18n.txt("notif.cleanmode"));
                     }
                 }
                 break;
@@ -989,9 +990,9 @@ public class Settings {
                         mpi.addMapping(I18n.txt("gui.planetarium.notice.back"), keysStr);
                     }
 
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "cubemap", 120f);
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "cubemap", 120f);
                 } else {
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, null, "cubemap");
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, null, "cubemap");
                 }
                 break;
             case CUBEMAP_PROJECTION_CMD:
@@ -1143,7 +1144,7 @@ public class Settings {
         public int[] resolution;
 
         public ScreenshotSettings() {
-            EventManager.instance.subscribe(this, Events.CONFIG_SCREENSHOT_CMD, Events.SCREENSHOT_MODE_CMD);
+            EventManager.instance.subscribe(this, Event.CONFIG_SCREENSHOT_CMD, Event.SCREENSHOT_MODE_CMD);
         }
 
         public void setFormat(final String formatString) {
@@ -1165,7 +1166,7 @@ public class Settings {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(Event event, Object source, Object... data) {
             switch (event) {
             case CONFIG_SCREENSHOT_CMD -> {
                 resolution[0] = (int) data[0];
@@ -1201,11 +1202,11 @@ public class Settings {
         public double targetFps;
 
         public FrameSettings() {
-            EventManager.instance.subscribe(this, Events.CONFIG_FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_CMD, Events.FRAME_OUTPUT_MODE_CMD);
+            EventManager.instance.subscribe(this, Event.CONFIG_FRAME_OUTPUT_CMD, Event.FRAME_OUTPUT_CMD, Event.FRAME_OUTPUT_MODE_CMD);
         }
 
         @Override
-        public void notify(final Events event, final Object... data) {
+        public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
             case CONFIG_FRAME_OUTPUT_CMD -> {
                 boolean updateFrameSize = resolution[0] != (int) data[0] || resolution[1] != (int) data[1];
@@ -1215,7 +1216,7 @@ public class Settings {
                 location = (String) data[3];
                 prefix = (String) data[4];
                 if (updateFrameSize) {
-                    EventManager.instance.post(Events.FRAME_SIZE_UPDATE, resolution[0], resolution[1]);
+                    EventManager.publish(Event.FRAME_SIZE_UPDATE, this, resolution[0], resolution[1]);
                 }
             }
             case FRAME_OUTPUT_MODE_CMD -> {
@@ -1238,7 +1239,7 @@ public class Settings {
                 active = (Boolean) data[0];
                 // Flush buffer if needed
                 if (!active && GaiaSky.instance != null) {
-                    EventManager.instance.post(Events.FLUSH_FRAMES);
+                    EventManager.publish(Event.FLUSH_FRAMES, this);
                 }
             }
             default -> {
@@ -1254,12 +1255,12 @@ public class Settings {
         public boolean auto;
 
         public CamrecorderSettings() {
-            EventManager.instance.subscribe(this, Events.CAMRECORDER_FPS_CMD);
+            EventManager.instance.subscribe(this, Event.CAMRECORDER_FPS_CMD);
         }
 
         @Override
-        public void notify(Events event, Object... data) {
-            if (event == Events.CAMRECORDER_FPS_CMD) {
+        public void notify(Event event, Object source, Object... data) {
+            if (event == Event.CAMRECORDER_FPS_CMD) {
                 targetFps = (Double) data[0];
             }
         }
@@ -1297,7 +1298,7 @@ public class Settings {
         public ToneMappingSettings toneMapping;
 
         public PostprocessSettings() {
-            EventManager.instance.subscribe(this, Events.BLOOM_CMD, Events.UNSHARP_MASK_CMD, Events.LENS_FLARE_CMD, Events.MOTION_BLUR_CMD, Events.LIGHT_SCATTERING_CMD, Events.FISHEYE_CMD, Events.BRIGHTNESS_CMD, Events.CONTRAST_CMD, Events.HUE_CMD, Events.SATURATION_CMD, Events.GAMMA_CMD, Events.TONEMAPPING_TYPE_CMD, Events.EXPOSURE_CMD);
+            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -1344,7 +1345,7 @@ public class Settings {
         }
 
         @Override
-        public void notify(final Events event, final Object... data) {
+        public void notify(final Event event, Object source, final Object... data) {
             switch (event) {
             case BLOOM_CMD -> bloom.intensity = (float) data[0];
             case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
@@ -1362,9 +1363,9 @@ public class Settings {
                     mpi.header = I18n.txt("gui.planetarium.notice.header");
                     mpi.addMapping(I18n.txt("gui.planetarium.notice.back"), keysStr);
 
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, mpi, "planetarium", 120f);
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "planetarium", 120f);
                 } else {
-                    EventManager.instance.post(Events.MODE_POPUP_CMD, null, "planetarium");
+                    EventManager.publish(Event.MODE_POPUP_CMD, this, null, "planetarium");
                 }
             }
             case BRIGHTNESS_CMD -> levels.brightness = MathUtils.clamp((float) data[0], Constants.MIN_BRIGHTNESS, Constants.MAX_BRIGHTNESS);
@@ -1417,7 +1418,7 @@ public class Settings {
         public long minTimeMs = -maxTimeMs;
 
         public RuntimeSettings() {
-            EventManager.instance.subscribe(this, Events.INPUT_ENABLED_CMD, Events.DISPLAY_GUI_CMD, Events.TOGGLE_UPDATEPAUSE, Events.TIME_STATE_CMD, Events.RECORD_CAMERA_CMD, Events.GRAV_WAVE_START, Events.GRAV_WAVE_STOP, Events.DISPLAY_VR_GUI_CMD);
+            EventManager.instance.subscribe(this, Event.INPUT_ENABLED_CMD, Event.DISPLAY_GUI_CMD, Event.TOGGLE_UPDATEPAUSE, Event.TIME_STATE_CMD, Event.RECORD_CAMERA_CMD, Event.GRAV_WAVE_START, Event.GRAV_WAVE_STOP, Event.DISPLAY_VR_GUI_CMD);
         }
 
         public void setMaxTime(long years) {
@@ -1451,7 +1452,7 @@ public class Settings {
         }
 
         @Override
-        public void notify(Events event, Object... data) {
+        public void notify(Event event, Object source, Object... data) {
 
             switch (event) {
             case INPUT_ENABLED_CMD:
@@ -1469,7 +1470,7 @@ public class Settings {
                 break;
             case TOGGLE_UPDATEPAUSE:
                 updatePause = !updatePause;
-                EventManager.instance.post(Events.UPDATEPAUSE_CHANGED, updatePause);
+                EventManager.publish(Event.UPDATEPAUSE_CHANGED, this, updatePause);
                 break;
             case TIME_STATE_CMD:
                 toggleTimeOn((Boolean) data[0]);

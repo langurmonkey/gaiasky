@@ -15,7 +15,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -46,7 +46,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
-        EventManager.instance.subscribe(this, Events.RESET_ORBITAL_ELEMENTS_SYSTEM);
+        EventManager.instance.subscribe(this, Event.RESET_ORBITAL_ELEMENTS_SYSTEM);
     }
 
     @Override
@@ -178,8 +178,8 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event.equals(Events.RESET_ORBITAL_ELEMENTS_SYSTEM)) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event.equals(Event.RESET_ORBITAL_ELEMENTS_SYSTEM)) {
             GaiaSky.postRunnable(this::reset);
         }
     }

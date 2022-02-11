@@ -10,8 +10,8 @@ import gaiasky.GaiaSky;
 import gaiasky.assets.OrbitDataLoader.OrbitDataLoaderParameter;
 import gaiasky.data.orbit.OrbitSamplerDataProvider;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.Orbit;
 import gaiasky.util.Logger;
@@ -48,7 +48,7 @@ public class OrbitRefresher implements IObserver {
         daemon.setPriority(Thread.MIN_PRIORITY);
         daemon.start();
 
-        EventManager.instance.subscribe(this, Events.DISPOSE);
+        EventManager.instance.subscribe(this, Event.DISPOSE);
     }
 
     public void queue(OrbitDataLoaderParameter param) {
@@ -73,8 +73,8 @@ public class OrbitRefresher implements IObserver {
     }
 
     @Override
-    public void notify(Events event, Object... data) {
-        if (event == Events.DISPOSE && daemon != null) {
+    public void notify(Event event, Object source, Object... data) {
+        if (event == Event.DISPOSE && daemon != null) {
             daemon.stopDaemon();
         }
     }

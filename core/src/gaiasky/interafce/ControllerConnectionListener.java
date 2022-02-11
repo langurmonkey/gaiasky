@@ -8,7 +8,7 @@ package gaiasky.interafce;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerAdapter;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.Logger;
 
 public class ControllerConnectionListener extends ControllerAdapter {
@@ -17,12 +17,12 @@ public class ControllerConnectionListener extends ControllerAdapter {
     @Override
     public void connected (Controller controller) {
         logger.info("Controller connected: " + controller.getName());
-        EventManager.instance.post(Events.CONTROLLER_CONNECTED_INFO, controller.getName());
+        EventManager.publish(Event.CONTROLLER_CONNECTED_INFO, this, controller.getName());
     }
 
     @Override
     public void disconnected (Controller controller) {
         logger.info("Controller disconnected: " + controller.getName());
-        EventManager.instance.post(Events.CONTROLLER_DISCONNECTED_INFO, controller.getName());
+        EventManager.publish(Event.CONTROLLER_DISCONNECTED_INFO, this, controller.getName());
     }
 }

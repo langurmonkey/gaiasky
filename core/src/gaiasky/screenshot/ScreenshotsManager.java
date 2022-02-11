@@ -9,8 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.IGui;
 import gaiasky.interafce.RenderGui;
@@ -63,7 +63,7 @@ public class ScreenshotsManager implements IObserver {
         renderGui.initialize(null, globalResources.getSpriteBatch());
         renderGui.doneLoading(null);
 
-        EventManager.instance.subscribe(this, Events.RENDER_FRAME, Events.RENDER_SCREENSHOT, Events.RENDER_FRAME_BUFFER, Events.FLUSH_FRAMES, Events.SCREENSHOT_CMD, Events.UPDATE_GUI, Events.DISPOSE);
+        EventManager.instance.subscribe(this, Event.RENDER_FRAME, Event.RENDER_SCREENSHOT, Event.RENDER_FRAME_BUFFER, Event.FLUSH_FRAMES, Event.SCREENSHOT_CMD, Event.UPDATE_GUI, Event.DISPOSE);
     }
 
     public void renderFrame(IMainRenderer mr) {
@@ -97,8 +97,8 @@ public class ScreenshotsManager implements IObserver {
             }
             if (file != null) {
                 screenshot.active = false;
-                EventManager.instance.post(Events.SCREENSHOT_INFO, file);
-                EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.screenshot", file));
+                EventManager.publish(Event.SCREENSHOT_INFO, this, file);
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.screenshot", file));
             }
 
         }
@@ -107,8 +107,8 @@ public class ScreenshotsManager implements IObserver {
     public void renderCurrentFrameBuffer(String folder, String file, int w, int h) {
         String f = ImageRenderer.renderToImageGl20(folder, file, w, h, Settings.settings.screenshot.format, Settings.settings.screenshot.quality);
         if (f != null) {
-            EventManager.instance.post(Events.SCREENSHOT_INFO, f);
-            EventManager.instance.post(Events.POST_POPUP_NOTIFICATION, I18n.txt("notif.screenshot", file));
+            EventManager.publish(Event.SCREENSHOT_INFO, this, f);
+            EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.screenshot", file));
         }
     }
 
@@ -159,7 +159,7 @@ public class ScreenshotsManager implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case RENDER_FRAME:
             IMainRenderer mr = (IMainRenderer) data[0];

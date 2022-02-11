@@ -22,9 +22,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
 import gaiasky.render.ComponentTypes.ComponentType;
@@ -381,7 +382,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // FOCUS_MODE is changed from GUI
-        EventManager.instance.subscribe(this, Events.FOCUS_CHANGE_CMD, Events.FOV_CHANGED_CMD, Events.ORIENTATION_LOCK_CMD, Events.CAMERA_POS_CMD, Events.CAMERA_DIR_CMD, Events.CAMERA_UP_CMD, Events.CAMERA_PROJECTION_CMD, Events.CAMERA_FWD, Events.CAMERA_ROTATE, Events.CAMERA_PAN, Events.CAMERA_ROLL, Events.CAMERA_TURN, Events.CAMERA_STOP, Events.CAMERA_CENTER, Events.GO_TO_OBJECT_CMD, Events.PLANETARIUM_CMD, Events.CUBEMAP_CMD, Events.FREE_MODE_COORD_CMD, Events.CATALOG_VISIBLE, Events.CATALOG_REMOVE, Events.FOCUS_NOT_AVAILABLE, Events.TOGGLE_VISIBILITY_CMD, Events.CAMERA_CENTER_FOCUS_CMD, Events.CONTROLLER_CONNECTED_INFO, Events.CONTROLLER_DISCONNECTED_INFO, Events.NEW_DISTANCE_SCALE_FACTOR, Events.CAMERA_TRACKING_OBJECT_CMD);
+        EventManager.instance.subscribe(this, Event.FOCUS_CHANGE_CMD, Event.FOV_CHANGED_CMD, Event.ORIENTATION_LOCK_CMD, Event.CAMERA_POS_CMD, Event.CAMERA_DIR_CMD, Event.CAMERA_UP_CMD, Event.CAMERA_PROJECTION_CMD, Event.CAMERA_FWD, Event.CAMERA_ROTATE, Event.CAMERA_PAN, Event.CAMERA_ROLL, Event.CAMERA_TURN, Event.CAMERA_STOP, Event.CAMERA_CENTER, Event.GO_TO_OBJECT_CMD, Event.CUBEMAP_CMD, Event.FREE_MODE_COORD_CMD, Event.CATALOG_VISIBLE, Event.CATALOG_REMOVE, Event.FOCUS_NOT_AVAILABLE, Event.TOGGLE_VISIBILITY_CMD, Event.CAMERA_CENTER_FOCUS_CMD, Event.CONTROLLER_CONNECTED_INFO, Event.CONTROLLER_DISCONNECTED_INFO, Event.NEW_DISTANCE_SCALE_FACTOR, Event.CAMERA_TRACKING_OBJECT_CMD);
     }
 
     private void computeNextPositions(ITimeFrameProvider time) {
@@ -532,9 +533,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                     appMagEarth = computeFocusApparentMagnitudeEarth();
                 }
 
-                EventManager.instance.post(Events.FOCUS_INFO_UPDATED, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
+                EventManager.publish(Event.FOCUS_INFO_UPDATED, this, focus.getDistToCamera() - focus.getRadius(), focus.getViewAngle(), focus.getAlpha(), focus.getDelta(), focus.getAbsolutePosition(aux2b).lend() - focus.getRadius(), appMagCamera, appMagEarth);
             } else {
-                EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
             }
             break;
         case GAME_MODE:
@@ -603,7 +604,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         }
 
         // Update camera recorder
-        EventManager.instance.post(Events.UPDATE_CAM_RECORDER, time, pos, direction, up);
+        EventManager.publish(Event.UPDATE_CAM_RECORDER, this, time, pos, direction, up);
 
         // Update actual camera
         lastFwdTime += dt;
@@ -1192,7 +1193,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             // Reset facing focus
             this.facingFocus = false;
             // Create event to notify focus change
-            EventManager.instance.post(Events.FOCUS_CHANGED, focus);
+            EventManager.publish(Event.FOCUS_CHANGED, this, focus);
         }
     }
 
@@ -1247,7 +1248,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
+    public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case FOCUS_CHANGE_CMD:
             setTrackingObject(null, null);
@@ -1275,7 +1276,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
 
             break;
         case FOV_CHANGED_CMD:
-            boolean checkMax = data.length == 1 || (boolean) data[1];
+            boolean checkMax = source instanceof Actor;
             float fov = MathUtilsd.clamp((float) data[0], Constants.MIN_FOV, checkMax ? Constants.MAX_FOV : 179f);
 
             for (PerspectiveCamera cam : cameras) {
@@ -1283,7 +1284,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             }
             fovFactor = camera.fieldOfView / 40f;
             if (parent.current == this) {
-                EventManager.instance.post(Events.FOV_CHANGE_NOTIFICATION, fov, fovFactor);
+                EventManager.publish(Event.FOV_CHANGE_NOTIFICATION, this, fov, fovFactor);
             }
             break;
         case CUBEMAP_CMD:
@@ -1291,16 +1292,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             CubemapProjection p = (CubemapProjection) data[1];
             if (p.isPlanetarium() && state && !Settings.settings.runtime.openVr) {
                 fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
-            }
-            break;
-        case PLANETARIUM_CMD:
-            state = (boolean) data[0];
-            EventManager.instance.post(Events.FISHEYE_CMD, state);
-            if (state) {
-                fovBackup = GaiaSky.instance.cameraManager.getCamera().fieldOfView;
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, 140f, false);
-            } else {
-                EventManager.instance.post(Events.FOV_CHANGED_CMD, fovBackup);
             }
             break;
         case CAMERA_POS_CMD:
@@ -1429,7 +1420,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 }
                 if (found) {
                     // Set camera  free
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                 }
             }
             break;
@@ -1438,7 +1429,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 ComponentType ct = ComponentType.getFromKey((String) data[0]);
                 if (this.focus != null && ct != null && this.focus.getCt().isEnabled(ct)) {
                     // Set camera  free
-                    EventManager.instance.post(Events.CAMERA_MODE_CMD, CameraMode.FREE_MODE);
+                    EventManager.publish(Event.CAMERA_MODE_CMD, this, CameraMode.FREE_MODE);
                 }
             }
             break;
@@ -1910,6 +1901,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
     private void setTrackingObject(final IFocus trackingObject, final String trackingName) {
         this.trackingObject = trackingObject;
         this.trackingName = trackingName;
-        EventManager.instance.post(Events.CAMERA_TRACKING_OBJECT_UPDATE, trackingObject, trackingName);
+        EventManager.publish(Event.CAMERA_TRACKING_OBJECT_UPDATE, this, trackingObject, trackingName);
     }
 }

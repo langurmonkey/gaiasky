@@ -7,7 +7,7 @@ package gaiasky.script;
 
 import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
+import gaiasky.event.Event;
 import gaiasky.util.Logger;
 import gaiasky.util.Settings;
 import py4j.ClientServer;
@@ -54,7 +54,7 @@ public class ScriptingServer {
                         @Override
                         public void connectionStopped(Py4JServerConnection gatewayConnection) {
                             // Enable input, just in case
-                            GaiaSky.postRunnable(() -> EventManager.instance.post(Events.INPUT_ENABLED_CMD, true));
+                            GaiaSky.postRunnable(() -> EventManager.publish(Event.INPUT_ENABLED_CMD, this, true));
                             logger.info("Connection stopped (" + connections.decrementAndGet() + "): " + gatewayConnection.getSocket().toString());
                         }
 

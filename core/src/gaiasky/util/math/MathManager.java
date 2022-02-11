@@ -5,8 +5,8 @@
 
 package gaiasky.util.math;
 
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
-import gaiasky.event.Events;
 import gaiasky.event.IObserver;
 import gaiasky.util.Settings;
 
@@ -34,12 +34,12 @@ public class MathManager implements IObserver {
 
         trigonometryInterface = highAccuracy ? trigonometry : fastTrigonometry;
 
-        EventManager.instance.subscribe(this, Events.HIGH_ACCURACY_CMD);
+        EventManager.instance.subscribe(this, Event.HIGH_ACCURACY_CMD);
     }
 
     @Override
-    public void notify(final Events event, final Object... data) {
-        if (event == Events.HIGH_ACCURACY_CMD) {
+    public void notify(final Event event, Object source, final Object... data) {
+        if (event == Event.HIGH_ACCURACY_CMD) {
             boolean highAcc = (Boolean) data[0];
             trigonometryInterface = highAcc ? trigonometry : fastTrigonometry;
         }
