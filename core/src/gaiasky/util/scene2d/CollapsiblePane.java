@@ -5,11 +5,17 @@
 
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -76,6 +82,27 @@ public class CollapsiblePane extends Table {
                 }
             }
         }
+        mainLabel.addListener(new ClickListener(){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getButton() == Buttons.LEFT)
+                    toggleExpandCollapse(mainLabel);
+
+                // Bubble up
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
+        mainLabel.addListener(event -> {
+            if (event instanceof InputEvent) {
+                Type type = ((InputEvent) event).getType();
+                if (type == Type.enter) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Hand);
+                } else if (type == Type.exit) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
+                }
+                return true;
+            }
+            return false;
+        });
 
         // Expand icon
         expandIcon = new OwnImageButton(skin, expandButtonStyle);
@@ -83,7 +110,7 @@ public class CollapsiblePane extends Table {
         expandIcon.setChecked(expanded);
         expandIcon.addListener(event -> {
             if (event instanceof ChangeEvent) {
-                toggleExpandCollapse();
+                toggleExpandCollapse(expandIcon);
                 return true;
             }
             return false;
@@ -176,8 +203,18 @@ public class CollapsiblePane extends Table {
             collapsePane();
     }
 
-    private void toggleExpandCollapse() {
-        if (expandIcon.isChecked() && dialogWindow == null) {
+    private void toggleExpandCollapse(Actor source) {
+        boolean expand;
+        if (source != expandIcon) {
+            expand = !expandIcon.isChecked();
+            expandIcon.setProgrammaticChangeEvents(false);
+            expandIcon.setChecked(expand);
+            expandIcon.setProgrammaticChangeEvents(true);
+        } else {
+            expand = expandIcon.isChecked();
+        }
+
+        if (expand && dialogWindow == null) {
             // Expand
             contentCell.setActor(content);
             expanding = true;
