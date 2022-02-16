@@ -72,6 +72,8 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         super(skin);
         this.setBackground("table-bg");
         this.skin = skin;
+        // Widget width
+        float width = 360f;
 
         nf = NumberFormatFactory.getFormatter("##0.##");
         sf = NumberFormatFactory.getFormatter("0.###E0");
@@ -232,6 +234,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
             return false;
         });
 
+
         bw = Math.max(landOn.getWidth(), landAt.getWidth());
         bw += 3.2f;
 
@@ -264,7 +267,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         camVel.setWidth(w);
 
         // FOCUS INFO
-        focusInfo.add(focusNameGroup).left().colspan(2).padBottom(pad5);
+        focusInfo.add(focusNameGroup).width(width).left().colspan(2).padBottom(pad5);
         focusInfo.row();
         focusInfo.add(focusType).left().padBottom(pad5).colspan(2);
         focusInfo.row();
@@ -317,7 +320,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
         // POINTER INFO
         if (!vr) {
-            pointerInfo.add(pointerName).left().colspan(3);
+            pointerInfo.add(pointerName).width(width).left().colspan(3);
             pointerInfo.row();
             pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
             pointerInfo.add(RADECPointerLabel).left();
@@ -333,7 +336,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         }
 
         // CAMERA INFO
-        cameraInfo.add(camName).left().colspan(2);
+        cameraInfo.add(camName).width(width).left().colspan(2);
         cameraInfo.row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.track"), skin, "hud")).left();
         cameraInfo.add(camTracking).left().padLeft(pad15);
