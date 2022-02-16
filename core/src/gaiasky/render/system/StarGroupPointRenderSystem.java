@@ -188,7 +188,6 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                          */
                         curr = meshes.get(starGroup.offset);
                         if (curr != null) {
-
                             if (starTex != null) {
                                 starTex.bind(0);
                                 shaderProgram.setUniformi("u_starTex", 0);
@@ -197,7 +196,7 @@ public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implem
                             shaderProgram.setUniform2fv("u_opacityLimits", starGroup.isHighlighted() && starGroup.getCatalogInfo().hlAllVisible ? opacityLimitsHl : opacityLimits, 0, 2);
 
                             alphaSizeBrRc[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 10f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
+                            alphaSizeBrRc[1] = ((fovMode == 0 ? (Settings.settings.program.modeStereo.isStereoFullWidth() ? 1f : 2f) : 2f) * starPointSize * rc.scaleFactor * starGroup.highlightedSizeFactor()) / camera.getFovFactor();
                             shaderProgram.setUniform4fv("u_alphaSizeBrRc", alphaSizeBrRc, 0, 4);
 
                             // Days since epoch

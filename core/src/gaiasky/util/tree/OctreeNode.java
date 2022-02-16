@@ -581,7 +581,7 @@ public class OctreeNode implements ILineRenderable {
      * @return Whether the octant is observed
      */
     private boolean computeObserved(ICamera cam) {
-        return cam.getMode().isGaiaFov() || computeObservedFast(cam);
+        return computeObservedFast(cam);
     }
 
     /**

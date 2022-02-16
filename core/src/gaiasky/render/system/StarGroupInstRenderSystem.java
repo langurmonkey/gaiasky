@@ -170,7 +170,7 @@ public class StarGroupInstRenderSystem extends InstancedRenderSystem implements 
                     }
 
                     triComponent.alphaSizeBr[0] = starGroup.opacity * alphas[starGroup.ct.getFirstOrdinal()];
-                    triComponent.alphaSizeBr[1] = (triComponent.fovMode == 0 ? 1f : 10f) * triComponent.starPointSize * 1e6f * starGroup.highlightedSizeFactor();
+                    triComponent.alphaSizeBr[1] = triComponent.starPointSize * 1e6f * starGroup.highlightedSizeFactor();
                     shaderProgram.setUniform3fv("u_alphaSizeBr", triComponent.alphaSizeBr, 0, 3);
 
                     // Days since epoch

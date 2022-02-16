@@ -7,7 +7,7 @@ package gaiasky.render;
 
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import gaiasky.render.IPostProcessor.PostProcessBean;
-import gaiasky.render.system.StarGroupPointRenderSystem;
+import gaiasky.render.system.*;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
@@ -27,22 +27,50 @@ public class SGRFov extends SGRAbstract implements ISGR {
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean postProcess = postProcessCapture(ppb, fb, tw, th);
 
-        /* FIELD OF VIEW CAMERA - we only render the star group process */
+        // Viewport
+        extendViewport.setCamera(camera.getCamera());
+        extendViewport.setWorldSize(rw, rh);
+        extendViewport.setScreenSize(rw * rw / tw, rh * rh / th);
+        extendViewport.apply();
 
+        /* FIELD OF VIEW CAMERA - we only render the star group process */
         FovCamera cam = ((CameraManager) camera).fovCamera;
         int fovMode = camera.getMode().getGaiaFovMode();
         if (fovMode == 1 || fovMode == 3) {
             cam.dirIndex = 0;
-            sgr.renderSystem(camera, t, rc, StarGroupPointRenderSystem.class);
+            sgr.renderSystems(camera, t, rc,
+                    StarGroupRenderSystem.class,
+                    StarGroupInstRenderSystem.class,
+                    StarGroupPointRenderSystem.class,
+
+                    VariableGroupInstRenderSystem.class,
+                    VariableGroupPointRenderSystem.class,
+                    VariableGroupRenderSystem.class,
+
+                    VertGPURenderSystem.class
+            );
         }
 
         if (fovMode == 2 || fovMode == 3) {
             cam.dirIndex = 1;
-            sgr.renderSystem(camera, t, rc, StarGroupPointRenderSystem.class);
+            sgr.renderSystems(camera, t, rc,
+                    StarGroupRenderSystem.class,
+                    StarGroupInstRenderSystem.class,
+                    StarGroupPointRenderSystem.class,
+
+                    VariableGroupInstRenderSystem.class,
+                    VariableGroupPointRenderSystem.class,
+                    VariableGroupRenderSystem.class,
+
+                    VertGPURenderSystem.class
+            );
         }
 
-        sendOrientationUpdate(camera.getCamera(), rw, rh);
-        postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+        // GLFW reports a window size of 0x0 with AMD Graphics on Windows when minimizing
+        if (rw > 0 && rh > 0) {
+            sendOrientationUpdate(camera.getCamera(), rw, rh);
+            postProcessRender(ppb, fb, postProcess, camera, rw, rh);
+        }
 
     }
 

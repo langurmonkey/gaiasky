@@ -26,8 +26,8 @@ import gaiasky.assets.AtmosphereShaderProviderLoader.AtmosphereShaderProviderPar
 import gaiasky.assets.GroundShaderProviderLoader.GroundShaderProviderParameter;
 import gaiasky.assets.RelativisticShaderProviderLoader.RelativisticShaderProviderParameter;
 import gaiasky.assets.TessellationShaderProviderLoader;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.IPostProcessor.PostProcessBean;
@@ -77,152 +77,146 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /**
          * Using normal shader for per-pixel lighting
          **/
-        MODEL_PIX(0),
+        MODEL_PIX,
         /**
          * Using default shader, no normal map
          **/
-        MODEL_VERT(1),
+        MODEL_VERT,
         /**
          * IntShader - stars
          **/
-        BILLBOARD_STAR(2),
+        BILLBOARD_STAR,
         /**
          * IntShader - galaxies
          **/
-        BILLBOARD_GAL(3),
+        BILLBOARD_GAL,
         /**
          * IntShader - front (planets, satellites...)
          **/
-        BILLBOARD_SSO(4),
+        BILLBOARD_SSO,
         /**
          * Billboard with custom texture
          **/
-        BILLBOARD_TEX(5),
+        BILLBOARD_TEX,
         /**
          * Single pixel
          **/
-        POINT_STAR(6),
+        POINT_STAR,
         /**
          * Line
          **/
-        LINE(7),
+        LINE,
         /**
          * Annotations
          **/
-        FONT_ANNOTATION(8),
+        FONT_ANNOTATION,
         /**
          * Atmospheres of planets
          **/
-        MODEL_ATM(9),
+        MODEL_ATM,
         /**
          * Label
          **/
-        FONT_LABEL(10),
+        FONT_LABEL,
         /**
          * Model star
          **/
-        MODEL_VERT_STAR(11),
+        MODEL_VERT_STAR,
         /**
          * Galaxy as a whole
          **/
-        GALAXY(12),
+        GALAXY,
         /**
          * Model close up
          **/
-        MODEL_CLOSEUP(13),
+        MODEL_CLOSEUP,
         /**
          * Beams
          **/
-        MODEL_VERT_BEAM(14),
+        MODEL_VERT_BEAM,
         /**
          * Particle group
          **/
-        PARTICLE_GROUP(16),
+        PARTICLE_GROUP,
         /**
          * Star group
          **/
-        STAR_GROUP(17),
+        STAR_GROUP,
         /**
          * Shapes
          **/
-        SHAPE(19),
+        SHAPE,
         /**
          * Regular billboard sprite
          **/
-        BILLBOARD_SPRITE(20),
+        BILLBOARD_SPRITE,
         /**
          * Line GPU
          **/
-        LINE_GPU(21),
+        LINE_GPU,
         /**
          * Particle positions from orbital elements
          **/
-        PARTICLE_ORBIT_ELEMENTS(22),
+        PARTICLE_ORBIT_ELEMENTS,
         /**
          * Transparent additive-blended meshes
          **/
-        MODEL_VERT_ADDITIVE(23),
+        MODEL_VERT_ADDITIVE,
         /**
          * Grids shader
          **/
-        MODEL_VERT_GRID(24),
+        MODEL_VERT_GRID,
         /**
          * Clouds
          **/
-        MODEL_CLOUD(25),
+        MODEL_CLOUD,
         /**
          * Point
          **/
-        POINT(26),
+        POINT,
         /**
          * Point GPU
          **/
-        POINT_GPU(27),
+        POINT_GPU,
         /**
          * Opaque meshes (dust, etc.)
          **/
-        MODEL_PIX_DUST(28),
+        MODEL_PIX_DUST,
         /**
          * Tessellated model
          **/
-        MODEL_PIX_TESS(29),
+        MODEL_PIX_TESS,
         /**
          * Only diffuse
          **/
-        MODEL_DIFFUSE(30),
+        MODEL_DIFFUSE,
         /**
          * Recursive grid
          */
-        MODEL_VERT_RECGRID(31),
+        MODEL_VERT_RECGRID,
         /**
          * Thrusters
          */
-        MODEL_VERT_THRUSTER(32),
+        MODEL_VERT_THRUSTER,
         /**
          * Variable star group
          **/
-        VARIABLE_GROUP(33),
+        VARIABLE_GROUP,
         /**
          * Per-pixel lighting (early in the rendering pipeline)
          **/
-        MODEL_PIX_EARLY(34),
+        MODEL_PIX_EARLY,
         /**
          * Per-vertex lighting (early in the rendering pipeline)
          **/
-        MODEL_VERT_EARLY(35),
+        MODEL_VERT_EARLY,
         /**
          * None
          **/
-        NONE(-1);
-
-        private final int index;
-
-        RenderGroup(int index) {
-            this.index = index;
-        }
+        NONE;
 
         public boolean is(Bits renderGroupMask) {
-            return (index < 0 && renderGroupMask.isEmpty()) || renderGroupMask.get(index);
+            return (this.ordinal() < 0 && renderGroupMask.isEmpty()) || renderGroupMask.get(this.ordinal());
         }
 
         /**
@@ -235,7 +229,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          */
         public static Bits add(Bits renderGroupMask, RenderGroup... rgs) {
             for (RenderGroup rg : rgs) {
-                renderGroupMask.set(rg.index);
+                renderGroupMask.set(rg.ordinal());
             }
             return renderGroupMask;
         }
@@ -1190,11 +1184,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /**
      * Renders the scene.
      *
-     * @param camera The camera to use.
-     * @param t      The time in seconds since the start.
-     * @param rc     The render context.
+     * @param camera        The camera to use.
+     * @param t             The time in seconds since the start.
+     * @param renderContext The render context.
      */
-    public void renderScene(ICamera camera, double t, RenderingContext rc) {
+    public void renderScene(ICamera camera, double t, RenderingContext renderContext) {
         try {
             // Update time difference since last update
             for (ComponentType ct : ComponentType.values()) {
@@ -1208,9 +1202,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
                     Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
-                    process.render(l, camera, t, rc);
+                    process.render(l, camera, t, renderContext);
                 } else {
-                    process.render(null, camera, t, rc);
+                    process.render(null, camera, t, renderContext);
                 }
             }
         } catch (Exception ignored) {
@@ -1219,7 +1213,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     /**
-     * Renders all the systems which are the same type of the given class.
+     * Renders all the systems which are of the given class.
      *
      * @param camera        The camera to use.
      * @param t             The time in seconds since the start.
@@ -1236,6 +1230,44 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         for (int i = 0; i < size; i++) {
             IRenderSystem process = renderSystems.get(i);
             if (systemClass.isInstance(process)) {
+                // If we have no render group, this means all the info is already in
+                // the render system. No lists needed
+                if (process.getRenderGroup() != null) {
+                    Array<IRenderable> l = renderLists.get(process.getRenderGroup().ordinal());
+                    process.render(l, camera, t, renderContext);
+                } else {
+                    process.render(null, camera, t, renderContext);
+                }
+            }
+        }
+    }
+
+    private boolean isInstance(IRenderSystem process, Class<? extends IRenderSystem>... systemClasses) {
+        for (Class<? extends IRenderSystem> systemClass : systemClasses) {
+            if (systemClass.isInstance(process))
+                return true;
+        }
+        return false;
+    }
+
+    /**
+     * Renders all the systems which are of one of the given classes.
+     *
+     * @param camera        The camera to use.
+     * @param t             The time in seconds since the start.
+     * @param renderContext The render context.
+     * @param systemClasses The classes.
+     */
+    protected void renderSystems(ICamera camera, double t, RenderingContext renderContext, Class<? extends IRenderSystem>... systemClasses) {
+        // Update time difference since last update
+        for (ComponentType ct : ComponentType.values()) {
+            alphas[ct.ordinal()] = calculateAlpha(ct, t);
+        }
+
+        int size = renderSystems.size;
+        for (int i = 0; i < size; i++) {
+            IRenderSystem process = renderSystems.get(i);
+            if (isInstance(process, systemClasses)) {
                 // If we have no render group, this means all the info is already in
                 // the render system. No lists needed
                 if (process.getRenderGroup() != null) {
