@@ -38,32 +38,12 @@ public class SGRFov extends SGRAbstract implements ISGR {
         int fovMode = camera.getMode().getGaiaFovMode();
         if (fovMode == 1 || fovMode == 3) {
             cam.dirIndex = 0;
-            sgr.renderSystems(camera, t, rc,
-                    StarGroupRenderSystem.class,
-                    StarGroupInstRenderSystem.class,
-                    StarGroupPointRenderSystem.class,
-
-                    VariableGroupInstRenderSystem.class,
-                    VariableGroupPointRenderSystem.class,
-                    VariableGroupRenderSystem.class,
-
-                    VertGPURenderSystem.class
-            );
+            sgr.renderScene(camera, t, rc);
         }
 
         if (fovMode == 2 || fovMode == 3) {
             cam.dirIndex = 1;
-            sgr.renderSystems(camera, t, rc,
-                    StarGroupRenderSystem.class,
-                    StarGroupInstRenderSystem.class,
-                    StarGroupPointRenderSystem.class,
-
-                    VariableGroupInstRenderSystem.class,
-                    VariableGroupPointRenderSystem.class,
-                    VariableGroupRenderSystem.class,
-
-                    VertGPURenderSystem.class
-            );
+            sgr.renderScene(camera, t, rc);
         }
 
         // GLFW reports a window size of 0x0 with AMD Graphics on Windows when minimizing

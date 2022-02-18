@@ -27,6 +27,7 @@ import gaiasky.scenegraph.Gaia;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
+import gaiasky.util.Constants;
 import gaiasky.util.gaia.GaiaAttitudeServer;
 import gaiasky.util.gaia.Satellite;
 import gaiasky.util.math.Frustumd;
@@ -150,6 +151,9 @@ public class FovCamera extends AbstractCamera implements IObserver {
         fccopy.getRoot().update(time, null, this);
 
         fccopy.translation.put(this.pos);
+        // Raise the camera 1 metre
+        dirMiddle.set(0, 1.5f * Constants.M_TO_U, 0).mul(matrix);
+        this.pos.add(dirMiddle);
         this.posinv.set(this.pos).scl(-1);
 
         /* ORIENTATION - directions and up */
