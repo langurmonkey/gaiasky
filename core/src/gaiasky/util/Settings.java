@@ -234,6 +234,10 @@ public class Settings {
         public double backBufferScale;
         @JsonIgnore public int[] backBufferResolution;
         public boolean dynamicResolution;
+        // This controls the dynamic resolution levels available as back buffer scales.
+        // Add more items to add more levels.
+        @JsonIgnore
+        final public double[] dynamicResolutionScale = new double[] { 1f, 0.85f, 0.75f };
         public boolean screenOutput;
 
         public GraphicsSettings() {
@@ -980,7 +984,7 @@ public class Settings {
                         mpi.header = I18n.txt("gui.360.notice.header");
                         mpi.addMapping(I18n.txt("gui.360.notice.back"), keysStrToggle);
                         mpi.addMapping(I18n.txt("gui.360.notice.projection"), keysStrProj);
-                        if(settings.scene.renderer.pointCloud.isPoints()){
+                        if (settings.scene.renderer.pointCloud.isPoints()) {
                             mpi.warn = I18n.txt("gui.360.notice.renderer");
                         }
                     } else if (modeCubemap.projection.isPlanetarium()) {
@@ -997,7 +1001,7 @@ public class Settings {
                 break;
             case CUBEMAP_PROJECTION_CMD:
                 modeCubemap.projection = (CubemapProjections.CubemapProjection) data[0];
-                logger.info(I18n.txt("gui.360.projection",modeCubemap.projection.toString()));
+                logger.info(I18n.txt("gui.360.projection", modeCubemap.projection.toString()));
                 break;
             case CUBEMAP_RESOLUTION_CMD:
                 modeCubemap.faceResolution = (int) data[0];

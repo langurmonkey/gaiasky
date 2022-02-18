@@ -158,9 +158,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     // Registry
     private GuiRegistry guiRegistry;
 
-    // Dynamic resolution state
-    private boolean lowResolution = false;
-    private long lastResolutionChange = 0;
+    /**
+     * Dynamic resolution level, the index in {@link gaiasky.util.Settings.GraphicsSettings#dynamicResolutionScale}
+     * 0 - native
+     * 1 - level 1
+     * 2 - level 2
+     */
+    private int dynamicResolutionLevel = 0;
+    private long lastDynamicResolutionChange = 0;
 
     /**
      * Provisional console logger
@@ -678,6 +683,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 EventManager.publish(Event.DEBUG_VRAM, this, VMemInfo.getUsedMemory(), VMemInfo.getTotalMemory());
                 // Threads
                 EventManager.publish(Event.DEBUG_THREADS, this, executorService.pool().getActiveCount(), executorService.pool().getPoolSize());
+                // Dynamic resolution
+                EventManager.publish(Event.DEBUG_DYN_RES, this, dynamicResolutionLevel, settings.graphics.dynamicResolutionScale[dynamicResolutionLevel]);
             }
         };
 
@@ -841,6 +848,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Stop
         running.set(false);
 
+        // Revert back-buffer resolution
+        if (dynamicResolutionLevel > 0 && settings.graphics.backBufferScale == settings.graphics.dynamicResolutionScale[0]) {
+            settings.graphics.backBufferScale = 1f;
+            dynamicResolutionLevel = 0;
+        }
+
         // Dispose
         if (saveState && !crashed.get()) {
             SettingsManager.persistSettings(new File(System.getProperty("properties.file")));
@@ -961,22 +974,20 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         if (settings.graphics.fpsLimit > 0.0) {
             sleep(settings.graphics.fpsLimit);
-        } else if (settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastResolutionChange > 2000 && !settings.runtime.openVr) {
+        } else if (settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
             float fps = 1f / graphics.getDeltaTime();
-            if (!lowResolution && fps < 20) {
+
+            if (fps < 30 && dynamicResolutionLevel < settings.graphics.dynamicResolutionScale.length - 1) {
                 // Downscale
-                settings.graphics.backBufferScale = 0.6f;
-                resize(graphics.getWidth(), graphics.getHeight());
-                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true, true));
-                lowResolution = true;
-                lastResolutionChange = TimeUtils.millis();
-            } else if (lowResolution && fps > 60) {
-                // Set to regular resolution
-                settings.graphics.backBufferScale = 1f;
-                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, true, true));
-                lowResolution = false;
-                lastResolutionChange = TimeUtils.millis();
+                settings.graphics.backBufferScale = settings.graphics.dynamicResolutionScale[++dynamicResolutionLevel];
+                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
+                lastDynamicResolutionChange = TimeUtils.millis();
+            } else if (fps > 60 && dynamicResolutionLevel > 0) {
+                // Move up
+                settings.graphics.backBufferScale = settings.graphics.dynamicResolutionScale[--dynamicResolutionLevel];
+                postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
+                lastDynamicResolutionChange = TimeUtils.millis();
             }
         }
     };

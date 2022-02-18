@@ -37,6 +37,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
     private final OwnLabel debugOcObserved;
     private final OwnLabel debugOcQueue;
     private final OwnLabel debugSamp;
+    private final OwnLabel debugDynRes;
     private final OwnLabel fps;
     private final OwnLabel spf;
     private final OwnLabel device;
@@ -223,6 +224,14 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
         extra.add(threadsLabel).left().padBottom(pad20);
         extra.row();
 
+        /* DYN RES */
+        debugDynRes = new OwnLabel("", skin, "hud");
+        Label dynResLabel = new OwnLabel(I18n.txt("gui.debug.dynres.short"), skin, "hud-big");
+        dynResLabel.setColor(skin.getColor("theme"));
+        extra.add(debugDynRes).right().padRight(pad10).padBottom(pad20);
+        extra.add(dynResLabel).left().padBottom(pad20);
+        extra.row();
+
         /* OBJECTS */
         debugObjectsDisplay = new OwnLabel("", skin, "hud");
         debugObjectsLoaded = new OwnLabel("", skin, "hud");
@@ -275,7 +284,7 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
 
         this.setVisible(settings.program.debugInfo);
         this.lock = lock;
-        EventManager.instance.subscribe(this, Event.DEBUG_TIME, Event.DEBUG_RAM, Event.DEBUG_VRAM, Event.DEBUG_THREADS, Event.DEBUG_OBJECTS, Event.DEBUG_QUEUE, Event.FPS_INFO, Event.SHOW_DEBUG_CMD, Event.SAMP_INFO);
+        EventManager.instance.subscribe(this, Event.DEBUG_TIME, Event.DEBUG_RAM, Event.DEBUG_VRAM, Event.DEBUG_THREADS, Event.DEBUG_OBJECTS, Event.DEBUG_QUEUE, Event.DEBUG_DYN_RES, Event.FPS_INFO, Event.SHOW_DEBUG_CMD, Event.SAMP_INFO);
     }
 
     private void unsubscribe() {
@@ -370,6 +379,11 @@ public class DebugInterface extends TableGuiInterface implements IObserver {
                     }
                     queueStatus.setValue(queueSize * 100f / currentQueueMax);
                     previousQueueSize = queueSize;
+                }
+                break;
+            case DEBUG_DYN_RES:
+                if(debug && data.length > 0) {
+                    debugDynRes.setText("L" + data[0] + ": " + fpsFormatter.format((Double) data[1]));
                 }
                 break;
             case FPS_INFO:
