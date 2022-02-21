@@ -69,7 +69,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final INumberFormat nf3;
 
-    private CheckBox fullscreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
+    private CheckBox fullscreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb, dynamicResolution;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -431,6 +431,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
+        // FADE TIME
+        OwnLabel fadeTimel = new OwnLabel(I18n.txt("gui.fadetime"), skin, "default");
+        IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
+        fadeTimeField = new OwnTextField(Long.toString(settings.scene.fadeMs), skin, fadeTimeValidator);
+        fadeTimeField.setWidth(sliderWidth);
+        OwnImageButton fadeTimeTooltip = new OwnImageButton(skin, "tooltip");
+        fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.fadetime.info"), skin));
+
         graphics.add(graphicsQualityLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(gquality).left().padRight(pad10).padBottom(pad5);
         graphics.add(gqualityTooltip).left().padBottom(pad5).row();
@@ -463,6 +471,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(lightGlow).left().padBottom(pad5).row();
         graphics.add(motionBlurLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(motionBlur).left().padBottom(pad5).row();
+        graphics.add(fadeTimel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(fadeTimeField).left().padRight(pad10).padBottom(pad5);
+        graphics.add(fadeTimeTooltip).left().padRight(pad20).padBottom(pad5).row();
 
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
@@ -562,12 +573,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         shadows.add(nshadows).left().padRight(pad5 * 2).padBottom(pad5);
 
         // Add to content
-        contentGraphicsTable.add(titleShadows).left().padBottom(pad5 * 2).row();
-        contentGraphicsTable.add(shadows).left().padBottom(pad5 * 4).row();
+        contentGraphicsTable.add(titleShadows).left().padBottom(pad10).row();
+        contentGraphicsTable.add(shadows).left().padBottom(pad20).row();
 
-        // DISPLAY SETTINGS
+        // IMAGE LEVELS
         Label titleDisplay = new OwnLabel(I18n.txt("gui.graphics.imglevels"), skin, "header");
-        Table display = new Table();
+        Table imageLevels = new Table();
 
 
         /* Brightness */
@@ -584,8 +595,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        display.add(brightnessl).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(brightness).left().padRight(pad5 * 2).padBottom(pad5).row();
+        imageLevels.add(brightnessl).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(brightness).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         /* Contrast */
         OwnLabel contrastl = new OwnLabel(I18n.txt("gui.contrast"), skin, "default");
@@ -601,8 +612,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        display.add(contrastl).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(contrast).left().padRight(pad5 * 2).padBottom(pad5).row();
+        imageLevels.add(contrastl).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(contrast).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         /* Hue */
         OwnLabel huel = new OwnLabel(I18n.txt("gui.hue"), skin, "default");
@@ -618,8 +629,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        display.add(huel).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(hue).left().padRight(pad5 * 2).padBottom(pad5).row();
+        imageLevels.add(huel).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(hue).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         /* Saturation */
         OwnLabel saturationl = new OwnLabel(I18n.txt("gui.saturation"), skin, "default");
@@ -635,8 +646,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        display.add(saturationl).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(saturation).left().padRight(pad5 * 2).padBottom(pad5).row();
+        imageLevels.add(saturationl).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(saturation).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         /* Gamma */
         OwnLabel gammal = new OwnLabel(I18n.txt("gui.gamma"), skin, "default");
@@ -652,8 +663,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        display.add(gammal).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(gamma).left().padRight(pad5 * 2).padBottom(pad5).row();
+        imageLevels.add(gammal).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(gamma).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         /* Tone Mapping */
         OwnLabel toneMappingl = new OwnLabel(I18n.txt("gui.tonemapping.type"), skin, "default");
@@ -668,8 +679,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         toneMappingSelect.setItems(toneMappingTypes);
         toneMappingSelect.setWidth(textWidth * 3f);
         toneMappingSelect.setSelectedIndex(settings.postprocess.toneMapping.type.ordinal());
-        display.add(toneMappingl).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(toneMappingSelect).left().padBottom(pad5).row();
+        imageLevels.add(toneMappingl).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(toneMappingSelect).left().padBottom(pad5).row();
 
         /* Exposure */
         OwnLabel exposurel = new OwnLabel(I18n.txt("gui.exposure"), skin, "default");
@@ -698,26 +709,37 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        display.add(exposurel).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(exposure).left().padRight(pad5 * 2).padBottom(pad5).row();
-
-        /* Fade-in and out time */
-        OwnLabel fadeTimel = new OwnLabel(I18n.txt("gui.fadetime"), skin, "default");
-        IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
-        fadeTimeField = new OwnTextField(Long.toString(settings.scene.fadeMs), skin, fadeTimeValidator);
-        fadeTimeField.setWidth(sliderWidth);
-        OwnImageButton fadeTimeTooltip = new OwnImageButton(skin, "tooltip");
-        fadeTimeTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.fadetime.info"), skin));
-        display.add(fadeTimel).left().padRight(pad5 * 4).padBottom(pad5);
-        display.add(fadeTimeField).left().padRight(pad5 * 2).padBottom(pad5);
-        display.add(fadeTimeTooltip).left().padRight(pad20).padBottom(pad5).row();
+        imageLevels.add(exposurel).left().padRight(pad5 * 4).padBottom(pad5);
+        imageLevels.add(exposure).left().padRight(pad5 * 2).padBottom(pad5).row();
 
         // LABELS
         labels.addAll(brightnessl, contrastl, huel, saturationl, gammal);
 
         // Add to content
         contentGraphicsTable.add(titleDisplay).left().padBottom(pad5 * 2).row();
-        contentGraphicsTable.add(display).left();
+        contentGraphicsTable.add(imageLevels).left().padBottom(pad20).row();
+
+        if (!settings.runtime.openVr) {
+            // EXPERIMENTAL
+            Label titleExperimental = new OwnLabel(I18n.txt("gui.experimental"), skin, "header");
+            Table experimental = new Table();
+
+            // Dynamic resolution
+            OwnLabel dynamicResolutionLabel = new OwnLabel(I18n.txt("gui.dynamicresolution"), skin);
+            dynamicResolution = new OwnCheckBox("", skin);
+            dynamicResolution.setChecked(settings.graphics.dynamicResolution);
+
+            experimental.add(dynamicResolutionLabel).left().padRight(pad20).padBottom(pad5);
+            experimental.add(dynamicResolution).left().padRight(pad20).padBottom(pad5).row();
+
+            // LABELS
+            labels.addAll(dynamicResolutionLabel);
+
+            // Add to content
+            contentGraphicsTable.add(titleExperimental).left().padBottom(pad5 * 2).row();
+            contentGraphicsTable.add(experimental).left();
+        }
+
         /*
          * ==== UI ====
          */
@@ -2086,6 +2108,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Fade time
         settings.scene.fadeMs = MathUtils.clamp(fadeTimeField.getLongValue(settings.scene.fadeMs), Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
+
+        // Dynamic resolution
+        settings.graphics.dynamicResolution = !settings.runtime.openVr && dynamicResolution.isChecked();
+        if (!settings.graphics.dynamicResolution)
+            GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
 
         // Interface
         LangComboBoxBean languageBean = lang.getSelected();
