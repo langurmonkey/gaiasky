@@ -13,6 +13,12 @@ public class OwnCheckBox extends CheckBox {
     private final Color regularColor;
     private float ownwidth = 0f, ownheight = 0f;
 
+    public OwnCheckBox(String text, Skin skin) {
+        super(text, skin);
+        this.regularColor = getLabel().getColor().cpy();
+        this.getCells().get(0);
+    }
+
     public OwnCheckBox(String text, Skin skin, float space) {
         super(text, skin);
         this.regularColor = getLabel().getColor().cpy();

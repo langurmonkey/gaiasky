@@ -69,7 +69,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final INumberFormat nf3;
 
-    private CheckBox fullscreen, windowed, vsync, limitfpsCb, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
+    private CheckBox fullscreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertx, inverty, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocusCb, crosshairClosestCb, crosshairHomeCb, pointerGuidesCb, exitConfirmation, recgridProjectionLinesCb;
     private OwnSelectBox<DisplayMode> fullscreenResolutions;
     private OwnSelectBox<ComboBoxBean> gquality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -77,7 +77,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private OwnSelectBox<String> recgridOrigin;
     private OwnSelectBox<StrComboBoxBean> theme;
     private OwnSelectBox<FileComboBoxBean> controllerMappings;
-    private OwnTextField fadeTimeField, widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, limitFps;
+    private OwnTextField fadeTimeField, widthField, heightField, sswidthField, ssheightField, frameoutputPrefix, frameoutputFps, fowidthField, foheightField, camrecFps, cmResolution, plResolution, plAperture, plAngle, smResolution, maxFpsInput;
     private OwnSlider lodTransitions, tessQuality, minimapSize, pointerGuidesWidth, uiScale;
     private OwnTextButton screenshotsLocation, frameoutputLocation;
     private ColorPicker pointerGuidesColor;
@@ -241,32 +241,41 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         new ButtonGroup<>(fullscreen, windowed);
 
         // VSYNC
-        vsync = new OwnCheckBox(I18n.txt("gui.vsync"), skin, "default", pad5);
+        OwnLabel vsyncLabel = new OwnLabel(I18n.txt("gui.vsync"), skin);
+        vsync = new OwnCheckBox("", skin);
         vsync.setChecked(settings.graphics.vsync);
 
         // LIMIT FPS
         IValidator limitFpsValidator = new DoubleValidator(Constants.MIN_FPS, Constants.MAX_FPS);
         double limitFps = settings.graphics.fpsLimit == 0 ? 60 : settings.graphics.fpsLimit;
-        this.limitFps = new OwnTextField(nf3.format(MathUtilsd.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
-        this.limitFps.setDisabled(settings.graphics.fpsLimit == 0);
+        this.maxFpsInput = new OwnTextField(nf3.format(MathUtilsd.clamp(limitFps, Constants.MIN_FPS, Constants.MAX_FPS)), skin, limitFpsValidator);
+        this.maxFpsInput.setDisabled(settings.graphics.fpsLimit == 0);
 
-        limitfpsCb = new OwnCheckBox(I18n.txt("gui.limitfps"), skin, "default", pad5);
-        limitfpsCb.setChecked(settings.graphics.fpsLimit > 0);
-        limitfpsCb.addListener((event) -> {
+        OwnLabel maxFpsLabel = new OwnLabel(I18n.txt("gui.limitfps"), skin);
+        maxFps = new OwnCheckBox("", skin);
+        maxFps.setChecked(settings.graphics.fpsLimit > 0);
+        maxFps.addListener((event) -> {
             if (event instanceof ChangeEvent) {
-                enableComponents(limitfpsCb.isChecked(), this.limitFps);
+                enableComponents(maxFps.isChecked(), this.maxFpsInput);
                 return true;
             }
             return false;
         });
+        HorizontalGroup maxFpsGroup = new HorizontalGroup();
+        maxFpsGroup.space(pad10);
+        maxFpsGroup.addActor(maxFps);
+        maxFpsGroup.addActor(this.maxFpsInput);
+
+        labels.addAll(vsyncLabel, maxFpsLabel);
 
         mode.add(fullscreen).left().padRight(pad5 * 2f);
         mode.add(fullscreenResolutions).left().row();
-        mode.add(windowed).left().padRight(pad5 * 2f).padTop(pad5 * 2f);
-        mode.add(windowedResolutions).left().padTop(pad5 * 2f).row();
-        mode.add(vsync).left().padTop(pad5 * 2f).colspan(2).row();
-        mode.add(limitfpsCb).left().padRight(pad20 * 4.9f);
-        mode.add(this.limitFps).left();
+        mode.add(windowed).left().padRight(pad5 * 2f).padTop(pad5 * 2f).padBottom(pad5);
+        mode.add(windowedResolutions).left().padTop(pad5 * 2f).padBottom(pad5).row();
+        mode.add(vsyncLabel).left().padRight(pad20).padBottom(pad5);
+        mode.add(vsync).left().padBottom(pad5).row();
+        mode.add(maxFpsLabel).left().padRight(pad20).padBottom(pad5);
+        mode.add(maxFpsGroup).left().padBottom(pad5).row();
 
         // Add to content
         contentGraphicsTable.add(titleResolution).left().padBottom(pad5 * 2f).row();
@@ -383,7 +392,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(graphicsQualityLabel, aaLabel, lrLabel, bloomLabel);
 
         // LENS FLARE
-        CheckBox lensFlare = new OwnCheckBox(I18n.txt("gui.lensflare"), skin, pad5);
+        OwnLabel lensFlareLabel = new OwnLabel(I18n.txt("gui.lensflare"), skin);
+        CheckBox lensFlare = new OwnCheckBox("", skin);
         lensFlare.setName("lens flare");
         lensFlare.addListener(event -> {
             if (event instanceof ChangeEvent) {
@@ -395,7 +405,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lensFlare.setChecked(settings.postprocess.lensFlare);
 
         // LIGHT GLOW
-        CheckBox lightGlow = new OwnCheckBox(I18n.txt("gui.lightscattering"), skin, pad5);
+        OwnLabel lightGlowLabel = new OwnLabel(I18n.txt("gui.lightscattering"), skin);
+        CheckBox lightGlow = new OwnCheckBox("", skin);
         lightGlow.setName("light scattering");
         lightGlow.setChecked(settings.postprocess.lightGlow);
         lightGlow.addListener(event -> {
@@ -407,7 +418,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // MOTION BLUR
-        CheckBox motionBlur = new OwnCheckBox(I18n.txt("gui.motionblur"), skin, pad5);
+        OwnLabel motionBlurLabel = new OwnLabel(I18n.txt("gui.motionblur"), skin);
+        CheckBox motionBlur = new OwnCheckBox("", skin);
         motionBlur.setName("motion blur");
         motionBlur.setChecked(!settings.program.safeMode && settings.postprocess.motionBlur);
         motionBlur.setDisabled(settings.program.safeMode);
@@ -445,9 +457,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(bloomEffect).left().padBottom(pad5).row();
         graphics.add(unsharpMaskLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(unsharpMaskFactor).left().padBottom(pad5).row();
-        graphics.add(lensFlare).colspan(2).left().padBottom(pad5).row();
-        graphics.add(lightGlow).colspan(2).left().padBottom(pad5).row();
-        graphics.add(motionBlur).colspan(2).left().padBottom(pad5).row();
+        graphics.add(lensFlareLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(lensFlare).left().padBottom(pad5).row();
+        graphics.add(lightGlowLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(lightGlow).left().padBottom(pad5).row();
+        graphics.add(motionBlurLabel).left().padRight(pad20).padBottom(pad5);
+        graphics.add(motionBlur).left().padBottom(pad5).row();
 
         // Add to content
         contentGraphicsTable.add(titleGraphics).left().padBottom(pad5 * 2).row();
@@ -524,7 +539,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         nshadows.setDisabled(!settings.scene.renderer.shadow.active);
 
         // ENABLE SHADOWS
-        shadowsCb = new OwnCheckBox(I18n.txt("gui.graphics.shadows.enable"), skin, "default", pad5);
+        OwnLabel shadowsLabel = new OwnLabel(I18n.txt("gui.graphics.shadows.enable"), skin);
+        shadowsCb = new OwnCheckBox("", skin);
         shadowsCb.setChecked(settings.scene.renderer.shadow.active);
         shadowsCb.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -538,6 +554,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // LABELS
         labels.add(smResolutionLabel);
 
+        shadows.add(shadowsLabel).left().padRight(pad5 * 4).padBottom(pad5);
         shadows.add(shadowsCb).left().padRight(pad5 * 2).padBottom(pad5).row();
         shadows.add(smResolutionLabel).left().padRight(pad5 * 4).padBottom(pad5);
         shadows.add(smResolution).left().padRight(pad5 * 2).padBottom(pad5).row();
@@ -796,7 +813,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // POINTER COORDINATES
-        pointerCoords = new OwnCheckBox(I18n.txt("gui.ui.pointercoordinates"), skin, "default", pad5);
+        OwnLabel pointerCoordsLabel = new OwnLabel(I18n.txt("gui.ui.pointercoordinates"), skin);
+        pointerCoords = new OwnCheckBox("", skin);
         pointerCoords.setChecked(settings.program.pointer.coordinates);
 
         // MINIMAP SIZE
@@ -825,14 +843,15 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         labels.addAll(langLabel, themeLabel);
 
         // Add to table
-        ui.add(langLabel).left().padRight(pad5 * 4).padBottom(pad10);
+        ui.add(langLabel).left().padRight(pad20).padBottom(pad10);
         ui.add(lang).colspan(2).left().padBottom(pad10).row();
-        ui.add(themeLabel).left().padRight(pad5 * 4).padBottom(pad10);
+        ui.add(themeLabel).left().padRight(pad20).padBottom(pad10);
         ui.add(theme).colspan(2).left().padBottom(pad10).row();
-        ui.add(uiScalelabel).left().padRight(pad5 * 4).padBottom(pad10);
+        ui.add(uiScalelabel).left().padRight(pad20).padBottom(pad10);
         ui.add(uiScale).left().padRight(pad5).padBottom(pad10);
         ui.add(applyUiScale).left().padBottom(pad10).row();
-        ui.add(pointerCoords).colspan(3).left().padRight(pad5).padBottom(pad10).row();
+        ui.add(pointerCoordsLabel).left().padRight(pad20).padBottom(pad10);
+        ui.add(pointerCoords).colspan(2).left().padRight(pad5).padBottom(pad10).row();
         ui.add(minimapSizeLabel).left().padRight(pad5).padBottom(pad10);
         ui.add(minimapSize).colspan(2).left().padRight(pad5).padBottom(pad10).row();
         ui.add(distUnitsLabel).left().padRight(pad5).padBottom(pad10);
@@ -844,23 +863,31 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table ch = new Table();
 
         // CROSSHAIR FOCUS
-        crosshairFocusCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.focus"), skin, pad10);
+        OwnLabel crosshairFocusLabel = new OwnLabel(I18n.txt("gui.ui.crosshair.focus"), skin);
+        crosshairFocusCb = new OwnCheckBox("", skin);
         crosshairFocusCb.setName("ch focus");
         crosshairFocusCb.setChecked(settings.scene.crosshair.focus);
 
         // CROSSHAIR CLOSEST
-        crosshairClosestCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.closest"), skin, pad10);
+        OwnLabel crosshairClosestLabel = new OwnLabel(I18n.txt("gui.ui.crosshair.closest"), skin);
+        crosshairClosestCb = new OwnCheckBox("", skin);
         crosshairClosestCb.setName("ch closest");
         crosshairClosestCb.setChecked(settings.scene.crosshair.closest);
 
         // CROSSHAIR HOME
-        crosshairHomeCb = new OwnCheckBox("" + I18n.txt("gui.ui.crosshair.home"), skin, pad10);
+        OwnLabel crosshairHomeLabel = new OwnLabel(I18n.txt("gui.ui.crosshair.home"), skin);
+        crosshairHomeCb = new OwnCheckBox("", skin);
         crosshairHomeCb.setName("ch home");
         crosshairHomeCb.setChecked(settings.scene.crosshair.home);
 
+        labels.add(crosshairClosestLabel, crosshairHomeLabel, crosshairFocusLabel);
+
         // Add to table
+        ch.add(crosshairFocusLabel).left().padRight(pad20).padBottom(pad5);
         ch.add(crosshairFocusCb).left().padBottom(pad5).row();
+        ch.add(crosshairClosestLabel).left().padRight(pad20).padBottom(pad5);
         ch.add(crosshairClosestCb).left().padBottom(pad5).row();
+        ch.add(crosshairHomeLabel).left().padRight(pad20).padBottom(pad5);
         ch.add(crosshairHomeCb).left().padBottom(pad5).row();
 
         /* POINTER GUIDES */
@@ -868,7 +895,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table pg = new Table();
 
         // GUIDES CHECKBOX
-        pointerGuidesCb = new OwnCheckBox("" + I18n.txt("gui.ui.pointer.guides.display"), skin, pad10);
+        OwnLabel pointerGuidesLabel = new OwnLabel(I18n.txt("gui.ui.pointer.guides.display"), skin);
+        pointerGuidesCb = new OwnCheckBox("", skin);
         pointerGuidesCb.setName("pointer guides cb");
         pointerGuidesCb.setChecked(settings.program.pointer.guides.active);
         OwnImageButton guidesTooltip = new OwnImageButton(skin, "tooltip");
@@ -879,24 +907,29 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         pointerGuidesCbGroup.addActor(guidesTooltip);
 
         // GUIDES COLOR
+        OwnLabel pointerGuidesColorLabel = new OwnLabel(I18n.txt("gui.ui.pointer.guides.color"), skin);
         float colorPickerSize = 32f;
         pointerGuidesColor = new ColorPicker(stage, skin);
         pointerGuidesColor.setPickedColor(settings.program.pointer.guides.color);
 
         // GUIDES WIDTH
-        OwnLabel guidesWidthLabel = new OwnLabel(I18n.txt("gui.ui.pointer.guides.width"), skin, "default");
-        guidesWidthLabel.setWidth(labelWidth);
+        OwnLabel pointerGuidesWidthLabel = new OwnLabel(I18n.txt("gui.ui.pointer.guides.width"), skin, "default");
+        pointerGuidesWidthLabel.setWidth(labelWidth);
         pointerGuidesWidth = new OwnSlider(Constants.MIN_POINTER_GUIDES_WIDTH, Constants.MAX_POINTER_GUIDES_WIDTH, Constants.SLIDER_STEP_TINY, skin);
         pointerGuidesWidth.setName("pointerguideswidth");
         pointerGuidesWidth.setWidth(sliderWidth);
         pointerGuidesWidth.setValue(settings.program.pointer.guides.width);
 
+        labels.add(pointerGuidesLabel, pointerGuidesColorLabel, pointerGuidesWidthLabel);
+
         // Add to table
-        pg.add(pointerGuidesCbGroup).left().colspan(2).padBottom(pad5).row();
-        pg.add(new OwnLabel(I18n.txt("gui.ui.pointer.guides.color"), skin)).left().padBottom(pad5).padRight(pad10);
+        pg.add(pointerGuidesLabel).left().padBottom(pad5).padRight(pad20);
+        pg.add(pointerGuidesCb).left().colspan(2).padBottom(pad5);
+        pg.add(guidesTooltip).left().colspan(2).padBottom(pad5).row();
+        pg.add(pointerGuidesColorLabel).left().padBottom(pad5).padRight(pad20);
         pg.add(pointerGuidesColor).left().size(colorPickerSize).padBottom(pad5).row();
-        pg.add(guidesWidthLabel).left().padBottom(pad5).padRight(pad10);
-        pg.add(pointerGuidesWidth).left().padBottom(pad5).padRight(pad10);
+        pg.add(pointerGuidesWidthLabel).left().padBottom(pad5).padRight(pad20);
+        pg.add(pointerGuidesWidth).left().padBottom(pad5).padRight(pad20);
 
         /* RECURSIVE GRID */
         OwnLabel titleRecgrid = new OwnLabel(I18n.txt("gui.ui.recursivegrid"), skin, "header");
@@ -912,14 +945,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         recgridOrigin.setSelectedIndex(settings.program.recursiveGrid.origin.ordinal());
 
         // PROJECTION LINES
-        recgridProjectionLinesCb = new OwnCheckBox("" + I18n.txt("gui.ui.recursivegrid.projlines"), skin, pad10);
+        OwnLabel recgridProjectionLinesLabel = new OwnLabel(I18n.txt("gui.ui.recursivegrid.projlines"), skin);
+        recgridProjectionLinesCb = new OwnCheckBox("", skin);
         recgridProjectionLinesCb.setName("origin projection lines cb");
         recgridProjectionLinesCb.setChecked(settings.program.recursiveGrid.projectionLines);
 
         // Add to table
-        rg.add(originLabel).left().padBottom(pad5).padRight(pad10);
+        rg.add(originLabel).left().padBottom(pad5).padRight(pad20);
         rg.add(recgridOrigin).left().padBottom(pad5).row();
-        rg.add(recgridProjectionLinesCb).colspan(2).left().padBottom(pad5);
+        rg.add(recgridProjectionLinesLabel).left().padBottom(pad5).padRight(pad20);
+        rg.add(recgridProjectionLinesCb).left().padBottom(pad5);
 
         // Add to content
         contentUI.add(titleUI).left().padBottom(pad5 * 2f).row();
@@ -957,7 +992,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         numThreads.setItems(cbs);
         numThreads.setSelectedIndex(settings.performance.numberThreads);
 
-        multithreadCb = new OwnCheckBox(I18n.txt("gui.thread.enable"), skin, "default", pad5);
+        OwnLabel multithreadLabel = new OwnLabel(I18n.txt("gui.thread.enable"), skin);
+        multithreadCb = new OwnCheckBox("", skin);
         multithreadCb.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 numThreads.setDisabled(!multithreadCb.isChecked());
@@ -970,8 +1006,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         numThreads.setDisabled(!multithreadCb.isChecked());
 
         // Add to table
-        multiThread.add(multithreadCb).colspan(2).left().padBottom(pad5).row();
-        multiThread.add(numThreadsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        multiThread.add(multithreadLabel).left().padRight(pad20).padBottom(pad5);
+        multiThread.add(multithreadCb).left().padBottom(pad5).row();
+        multiThread.add(numThreadsLabel).left().padRight(pad20).padBottom(pad5);
         multiThread.add(numThreads).left().padBottom(pad5).row();
         final Cell<Actor> noticeMultiThreadCell = multiThread.add((Actor) null);
         noticeMultiThreadCell.colspan(2).left();
@@ -1003,7 +1040,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         Table lod = new Table(skin);
 
         // Smooth transitions
-        lodFadeCb = new OwnCheckBox(I18n.txt("gui.lod.fade"), skin, "default", pad5);
+        OwnLabel lodFadeLabel = new OwnLabel(I18n.txt("gui.lod.fade"), skin);
+        lodFadeCb = new OwnCheckBox("", skin);
         lodFadeCb.setChecked(settings.scene.octree.fade);
 
         // Draw distance
@@ -1017,11 +1055,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         lodTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.lod.thresholds.info"), skin));
 
         // LABELS
-        labels.addAll(numThreadsLabel, ddLabel);
+        labels.addAll(numThreadsLabel, ddLabel, lodFadeLabel);
 
         // Add to table
-        lod.add(lodFadeCb).colspan(3).left().padBottom(pad5).row();
-        lod.add(ddLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        lod.add(lodFadeLabel).left().padRight(pad20).padBottom(pad5);
+        lod.add(lodFadeCb).colspan(2).left().padBottom(pad5).row();
+        lod.add(ddLabel).left().padRight(pad20).padBottom(pad5);
         lod.add(lodTransitions).left().padRight(pad10).padBottom(pad5);
         lod.add(lodTooltip).left().padBottom(pad5);
 
@@ -1050,10 +1089,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         reloadControllerMappings(null);
 
         // INVERT X
-        invertx = new OwnCheckBox(I18n.txt("gui.controller.axis.invert", "X"), skin, "default", pad5);
+        OwnLabel invertxLabel = new OwnLabel(I18n.txt("gui.controller.axis.invert", "X"), skin);
+        invertx = new OwnCheckBox("", skin);
         invertx.setChecked(settings.controls.gamepad.invertX);
         // INVERT Y
-        inverty = new OwnCheckBox(I18n.txt("gui.controller.axis.invert", "Y"), skin, "default", pad5);
+        OwnLabel invertyLabel = new OwnLabel(I18n.txt("gui.controller.axis.invert", "Y"), skin);
+        inverty = new OwnCheckBox("", skin);
         inverty.setChecked(settings.controls.gamepad.invertY);
 
         // KEY BINDINGS
@@ -1123,8 +1164,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         contentControls.add(controllersTable).left().padBottom(pad10).row();
         contentControls.add(mappingsLabel).left().padBottom(pad10).padRight(pad10);
         contentControls.add(controllerMappings).left().padBottom(pad10).row();
-        contentControls.add(invertx).left().colspan(2).padBottom(pad10).row();
-        contentControls.add(inverty).left().colspan(2).padBottom(pad10).row();
+        contentControls.add(invertxLabel).left().padBottom(pad10).padRight(pad10);
+        contentControls.add(invertx).left().padBottom(pad10).row();
+        contentControls.add(invertyLabel).left().padBottom(pad10).padRight(pad10);
+        contentControls.add(inverty).left().padBottom(pad10).row();
         contentControls.add(titleKeybindings).colspan(2).left().padBottom(pad10).row();
         contentControls.add(controlsScroll).colspan(2).left();
 
@@ -1413,29 +1456,27 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // Activate automatically
-        cbAutoCamrec = new OwnCheckBox(I18n.txt("gui.camerarec.frameoutput"), skin, "default", pad5);
+        OwnLabel autoCamrecLabel = new OwnLabel(I18n.txt("gui.camerarec.frameoutput"), skin);
+        cbAutoCamrec = new OwnCheckBox("", skin);
         cbAutoCamrec.setChecked(settings.camrecorder.auto);
         cbAutoCamrec.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
         OwnImageButton camrecAutoTooltip = new OwnImageButton(skin, "tooltip");
         camrecAutoTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.playcamera.frameoutput"), skin));
 
-        HorizontalGroup cbGroup = new HorizontalGroup();
-        cbGroup.space(pad5);
-        cbGroup.addActor(cbAutoCamrec);
-        cbGroup.addActor(camrecAutoTooltip);
-
         // LABELS
-        labels.add(camfpsLabel);
+        labels.add(autoCamrecLabel);
 
         // Add to table
-        camrec.add(camfpsLabel).left().padRight(pad5 * 4).padBottom(pad5);
+        camrec.add(camfpsLabel).left().padRight(pad20).padBottom(pad5);
         camrec.add(camrecFps).left().expandX().padBottom(pad5);
         camrec.add(camrecFpsTooltip).left().padLeft(pad5).padBottom(pad5).row();
-        camrec.add(cbGroup).colspan(3).left().padBottom(pad5 * 2).row();
-        camrec.add(keyframePrefs).colspan(3).left().row();
+        camrec.add(autoCamrecLabel).left().padRight(pad20).padBottom(pad5);
+        camrec.add(cbAutoCamrec).left().padBottom(pad5);
+        camrec.add(camrecAutoTooltip).left().padLeft(pad5).padBottom(pad5).row();
+        camrec.add(keyframePrefs).colspan(3).left().padTop(pad20 * 2f).row();
 
         // Add to content
-        contentCamera.add(titleCamrec).left().padBottom(pad5 * 2).row();
+        contentCamera.add(titleCamrec).left().padBottom(pad10).row();
         contentCamera.add(camrec).left();
 
         /*
@@ -1562,16 +1603,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // GENERAL OPTIONS
         OwnLabel titleGeneralData = new OwnLabel(I18n.txt("gui.data.options"), skin, "header");
-        highAccuracyPositions = new OwnCheckBox(I18n.txt("gui.data.highaccuracy"), skin, pad5);
+        OwnLabel highAccuracyPositionsLabel = new OwnLabel(I18n.txt("gui.data.highaccuracy"), skin);
+        highAccuracyPositions = new OwnCheckBox("", skin);
         highAccuracyPositions.setChecked(settings.data.highAccuracy);
         highAccuracyPositions.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
         OwnImageButton highAccTooltip = new OwnImageButton(skin, "tooltip");
         highAccTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.tooltip.data.highaccuracy"), skin));
 
-        HorizontalGroup haGroup = new HorizontalGroup();
-        haGroup.space(pad5);
-        haGroup.addActor(highAccuracyPositions);
-        haGroup.addActor(highAccTooltip);
+        labels.add(highAccuracyPositionsLabel);
 
         // DATA SOURCE
         final OwnLabel titleData = new OwnLabel(I18n.txt("gui.data.source"), skin, "header");
@@ -1616,10 +1655,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Add to content
         contentDataTable.add(titleGeneralData).left().padBottom(pad5 * 2).row();
-        contentDataTable.add(haGroup).left().padBottom(pad5 * 4).row();
-        contentDataTable.add(titleData).left().padBottom(pad5 * 2).row();
-        contentDataTable.add(dataSourceInfo).left().padBottom(pad5).row();
-        contentDataTable.add(dataDownload).left();
+        contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad20);
+        contentDataTable.add(highAccuracyPositions).left().padBottom(pad20);
+        contentDataTable.add(highAccTooltip).left().padBottom(pad20).row();
+        contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
+        contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
+        contentDataTable.add(dataDownload).left().colspan(3);
 
         /*
          * ==== GAIA ====
@@ -1681,7 +1722,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel titleStats = new OwnLabel(I18n.txt("gui.system.reporting"), skin, "header");
         Table stats = new Table(skin);
 
-        debugInfo = new OwnCheckBox(I18n.txt("gui.system.debuginfo"), skin, pad5);
+        OwnLabel debugInfoLabel = new OwnLabel(I18n.txt("gui.system.debuginfo"), skin);
+        debugInfo = new OwnCheckBox("", skin);
         debugInfo.setChecked(settings.program.debugInfo);
         debugInfo.addListener((event) -> {
             if (event instanceof ChangeEvent) {
@@ -1692,8 +1734,11 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         });
 
         // EXIT CONFIRMATION
-        exitConfirmation = new OwnCheckBox(I18n.txt("gui.quit.confirmation"), skin, pad5);
+        OwnLabel exitConfirmationLabel = new OwnLabel(I18n.txt("gui.quit.confirmation"), skin);
+        exitConfirmation = new OwnCheckBox("", skin);
         exitConfirmation.setChecked(settings.program.exitConfirmation);
+
+        labels.addAll(debugInfoLabel, exitConfirmationLabel);
 
         // RELOAD DEFAULTS
         OwnTextButton reloadDefaults = new OwnTextButton(I18n.txt("gui.system.reloaddefaults"), skin);
@@ -1715,10 +1760,12 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel warningLabel = new OwnLabel(I18n.txt("gui.system.reloaddefaults.warn"), skin, "default-red");
 
         // Add to table
+        stats.add(debugInfoLabel).left().padBottom(pad5);
         stats.add(debugInfo).left().padBottom(pad5).row();
-        stats.add(exitConfirmation).left().padBottom(pad5).row();
-        stats.add(warningLabel).left().padBottom(pad5).row();
-        stats.add(reloadDefaults).left();
+        stats.add(exitConfirmationLabel).left().padBottom(pad10);
+        stats.add(exitConfirmation).left().padBottom(pad10).row();
+        stats.add(warningLabel).left().colspan(2).padBottom(pad20).row();
+        stats.add(reloadDefaults).left().colspan(2);
 
         // Add to content
         contentSystem.add(titleStats).left().padBottom(pad5 * 2).row();
@@ -2002,8 +2049,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             Logger.getLogger(this.getClass()).error(e);
         }
 
-        if (limitfpsCb.isChecked()) {
-            EventManager.publish(Event.LIMIT_FPS_CMD, this, Parser.parseDouble(limitFps.getText()));
+        if (maxFps.isChecked()) {
+            EventManager.publish(Event.LIMIT_FPS_CMD, this, Parser.parseDouble(maxFpsInput.getText()));
         } else {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, 0.0);
         }
