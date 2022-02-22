@@ -505,6 +505,7 @@ postprocess:
     type: NONE
     # When type=exposure, set the exposure here, in [0,n]
     exposure: 0.0
+    
 #
 # Spacecraft configuration
 #
@@ -513,3 +514,34 @@ spacecraft:
   velocityDirection: false
   # Whether to show the direction and up axes of the spacecraft
   showAxes: false
+
+#
+# Proxy configuraiton
+#
+
+#proxy:
+#   useSystemProxies: true
+#   http:
+#     port: 8080
+#     host: 127.0.0.1
+#     username: myself
+#     password: secret
+#     nonProxyHosts: localhost,192.168.0.*
+#   https:
+#     port: 8080
+#     host: 127.0.0.1
+#     username: myself
+#     password: secret
+#     nonProxyHosts: localhost,192.168.0.*
+#   ftp:
+#     port: 8080
+#     host: 127.0.0.1
+#     username: myself
+#     password: secret
+#     nonProxyHosts: localhost,192.168.0.*
+#   socks:
+#     port: 8080
+#     host: 127.0.0.1
+#     username: myself
+#     password: secret
+#     version: 5
