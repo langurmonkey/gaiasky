@@ -211,6 +211,7 @@ public class GaiaSkyDesktop implements IObserver {
             // Reinitialize with user-defined locale
             I18n.initialize(Gdx.files.absolute(Settings.ASSETS_LOC + File.separator + "i18n/gsbundle"));
 
+            // -v or --version
             if (gsArgs.version) {
                 out.println(Settings.getShortApplicationName());
                 if (gsArgs.asciiart) {

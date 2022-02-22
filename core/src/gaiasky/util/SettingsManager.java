@@ -8,10 +8,13 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature;
 import gaiasky.desktop.GaiaSkyDesktop;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.util.Settings.DistanceUnits;
+import gaiasky.util.Settings.ProxySettings.ProxyBean;
 import gaiasky.util.Settings.VersionSettings;
 import gaiasky.util.math.MathUtilsd;
 
 import java.io.*;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -34,6 +37,7 @@ public class SettingsManager {
         SettingsManager.instance = new SettingsManager(vr);
         instance.initSettings();
     }
+
     public static void initialize(FileInputStream fis, FileInputStream vis) throws Exception {
         SettingsManager.instance = new SettingsManager(fis, vis);
         instance.initSettings();
@@ -184,7 +188,81 @@ public class SettingsManager {
             logger.error("Error initializing frame output location", e);
         }
 
+        // Set up proxy if needed
+        if (settings.proxy != null) {
+            if (settings.proxy.useSystemProxies != null) {
+                System.setProperty("java.net.useSystemProxies", Boolean.toString(settings.proxy.useSystemProxies));
+            }
+            if (settings.proxy.http != null) {
+                setProxySettings(settings.proxy.http, "http");
+            }
+            if (settings.proxy.https != null) {
+                setProxySettings(settings.proxy.https, "https", "http");
+            }
+            if (settings.proxy.socks != null) {
+                setSocksProxySettings(settings.proxy.socks, "socks");
+            }
+            if (settings.proxy.ftp != null) {
+                setProxySettings(settings.proxy.ftp, "ftp");
+            }
+        }
+
         settings.initialized = true;
+    }
+
+    private static void setProxySettings(ProxyBean proxy, String protocol) {
+        setProxySettings(proxy, protocol, protocol);
+    }
+
+    private static void setProxySettings(ProxyBean proxy, String protocol, String nonProxyHostsProtocol) {
+        if (proxy.host != null)
+            System.setProperty(protocol + ".proxyHost", proxy.host);
+        if (proxy.port != null)
+            System.setProperty(protocol + ".proxyPort", Integer.toString(proxy.port));
+        if (proxy.nonProxyHosts != null)
+            System.setProperty(nonProxyHostsProtocol + ".nonProxyHosts", proxy.password);
+
+        if (proxy.username != null)
+            System.setProperty(protocol + ".proxyUser", proxy.username);
+        if (proxy.password != null)
+            System.setProperty(protocol + ".proxyPassword", proxy.password);
+
+        if (proxy.username != null || proxy.password != null) {
+            // Java ignores http(s).proxyUser. Here we register an authenticator to
+            // use as a workaround
+            Authenticator.setDefault(new Authenticator() {
+                @Override
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    if (getRequestorType() == RequestorType.PROXY) {
+                        String prot = getRequestingProtocol().toLowerCase();
+                        String host = System.getProperty(prot + ".proxyHost", "");
+                        String port = System.getProperty(prot + ".proxyPort", "80");
+                        String user = System.getProperty(prot + ".proxyUser", "");
+                        String password = System.getProperty(prot + ".proxyPassword", "");
+                        if (getRequestingHost().equalsIgnoreCase(host)) {
+                            if (Integer.parseInt(port) == getRequestingPort()) {
+                                return new PasswordAuthentication(user, password.toCharArray());
+                            }
+                        }
+                    }
+                    return null;
+                }
+            });
+        }
+
+    }
+
+    private static void setSocksProxySettings(ProxyBean proxy, String prefix) {
+        if (proxy.version != null)
+            System.setProperty(prefix + "ProxyVersion", Integer.toString(proxy.version));
+        if (proxy.host != null)
+            System.setProperty(prefix + "ProxyHost", proxy.host);
+        if (proxy.port != null)
+            System.setProperty(prefix + "ProxyPort", Integer.toString(proxy.port));
+        if (proxy.username != null)
+            System.setProperty("java.net.socks.username", proxy.username);
+        if (proxy.password != null)
+            System.setProperty("java.net.socks.password", proxy.password);
     }
 
     public static void persistSettings(final File settingsFile) {

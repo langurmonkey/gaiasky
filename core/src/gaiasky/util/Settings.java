@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import gaiasky.GaiaSky;
 import gaiasky.desktop.util.camera.CameraKeyframeManager;
@@ -101,17 +103,32 @@ public class Settings {
     public int configVersion;
     @JsonIgnore public boolean initialized = false;
     @JsonIgnore public VersionSettings version;
+
+    @JsonInclude(Include.NON_NULL)
     public DataSettings data;
+    @JsonInclude(Include.NON_NULL)
     public PerformanceSettings performance;
+    @JsonInclude(Include.NON_NULL)
     public GraphicsSettings graphics;
+    @JsonInclude(Include.NON_NULL)
     public SceneSettings scene;
+    @JsonInclude(Include.NON_NULL)
     public ProgramSettings program;
+    @JsonInclude(Include.NON_NULL)
     public ControlsSettings controls;
+    @JsonInclude(Include.NON_NULL)
     public FrameSettings frame;
+    @JsonInclude(Include.NON_NULL)
     public ScreenshotSettings screenshot;
+    @JsonInclude(Include.NON_NULL)
     public CamrecorderSettings camrecorder;
+    @JsonInclude(Include.NON_NULL)
     public PostprocessSettings postprocess;
+    @JsonInclude(Include.NON_NULL)
     public SpacecraftSettings spacecraft;
+    @JsonInclude(Include.NON_NULL)
+    public ProxySettings proxy;
+
     @JsonIgnore public RuntimeSettings runtime;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -236,8 +253,7 @@ public class Settings {
         public boolean dynamicResolution;
         // This controls the dynamic resolution levels available as back buffer scales.
         // Add more items to add more levels.
-        @JsonIgnore
-        final public double[] dynamicResolutionScale = new double[] { 1f, 0.85f, 0.75f };
+        @JsonIgnore final public double[] dynamicResolutionScale = new double[] { 1f, 0.85f, 0.75f };
         public boolean screenOutput;
 
         public GraphicsSettings() {
@@ -1492,6 +1508,36 @@ public class Settings {
                 break;
 
             }
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class ProxySettings {
+
+        @JsonInclude(Include.NON_NULL)
+        public ProxyBean http;
+        @JsonInclude(Include.NON_NULL)
+        public ProxyBean https;
+        @JsonInclude(Include.NON_NULL)
+        public ProxyBean socks;
+        @JsonInclude(Include.NON_NULL)
+        public ProxyBean ftp;
+        @JsonInclude(Include.NON_NULL)
+        public Boolean useSystemProxies;
+
+        public static class ProxyBean {
+            @JsonInclude(Include.NON_NULL)
+            public Integer version;
+            @JsonInclude(Include.NON_NULL)
+            public Integer port;
+            @JsonInclude(Include.NON_EMPTY)
+            public String host;
+            @JsonInclude(Include.NON_EMPTY)
+            public String username;
+            @JsonInclude(Include.NON_EMPTY)
+            public String password;
+            @JsonInclude(Include.NON_EMPTY)
+            public String nonProxyHosts;
         }
     }
 
