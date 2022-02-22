@@ -206,6 +206,8 @@ public class SettingsManager {
                 setProxySettings(settings.proxy.ftp, "ftp");
             }
         }
+        // Set up proxy authenticator
+        initializeProxyAuthenticator();
 
         settings.initialized = true;
     }
@@ -226,31 +228,6 @@ public class SettingsManager {
             System.setProperty(protocol + ".proxyUser", proxy.username);
         if (proxy.password != null)
             System.setProperty(protocol + ".proxyPassword", proxy.password);
-
-        if (proxy.username != null || proxy.password != null) {
-            // Java ignores http(s).proxyUser. Here we register an authenticator to
-            // use as a workaround
-            Authenticator.setDefault(new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    if (getRequestorType() == RequestorType.PROXY) {
-                        String prot = getRequestingProtocol().toLowerCase();
-                        String host = System.getProperty(prot + ".proxyHost", "");
-                        String port = System.getProperty(prot + ".proxyPort", "80");
-                        String user = System.getProperty(prot + ".proxyUser", "");
-                        String password = System.getProperty(prot + ".proxyPassword", "");
-                        if (getRequestingHost().equalsIgnoreCase(host)) {
-                            if (Integer.parseInt(port) == getRequestingPort()) {
-                                return new PasswordAuthentication(user, password.toCharArray());
-                            }
-                        }
-                    }
-                    return null;
-                }
-            });
-            System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
-        }
-
     }
 
     private static void setSocksProxySettings(ProxyBean proxy, String prefix) {
@@ -264,6 +241,28 @@ public class SettingsManager {
             System.setProperty("java.net.socks.username", proxy.username);
         if (proxy.password != null)
             System.setProperty("java.net.socks.password", proxy.password);
+    }
+
+    public static void initializeProxyAuthenticator() {
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                if (getRequestorType() == RequestorType.PROXY) {
+                    String protocol = getRequestingProtocol().toLowerCase();
+                    String host = System.getProperty(protocol + ".proxyHost", "");
+                    String port = System.getProperty(protocol + ".proxyPort", "80");
+                    String user = System.getProperty(protocol + ".proxyUser", "");
+                    String password = System.getProperty(protocol + ".proxyPassword", "");
+                    if (getRequestingHost().equalsIgnoreCase(host)) {
+                        if (Integer.parseInt(port) == getRequestingPort()) {
+                            return new PasswordAuthentication(user, password.toCharArray());
+                        }
+                    }
+                }
+                return null;
+            }
+        });
+        System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
     }
 
     public static void persistSettings(final File settingsFile) {
