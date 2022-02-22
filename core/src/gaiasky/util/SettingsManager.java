@@ -248,6 +248,7 @@ public class SettingsManager {
                     return null;
                 }
             });
+            System.setProperty("jdk.http.auth.tunneling.disabledSchemes", "");
         }
 
     }
