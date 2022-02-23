@@ -44,7 +44,7 @@ import java.util.List;
  * The field of view cameras
  */
 public class FovCamera extends AbstractCamera implements IObserver {
-    private static final float FOV_CORR = 0.2f;
+    private static final float FOV_CORR = 0.3f;
     private static final float FOV = (float) Satellite.FOV_AC + FOV_CORR;
     private static final float BAM_2 = (float) Satellite.BASICANGLE_DEGREE / 2f;
     private static final double GAIA_ASPECT_RATIO = (Satellite.FOV_AL + FOV_CORR) / FOV;
@@ -212,7 +212,7 @@ public class FovCamera extends AbstractCamera implements IObserver {
      * the position to zero.
      *
      * @param dir The direction vector.
-     * @param up The up vector.
+     * @param up  The up vector.
      * @param cam The perspective camera.
      */
     private void updateCamera(Vector3d dir, Vector3d up, PerspectiveCamera cam) {

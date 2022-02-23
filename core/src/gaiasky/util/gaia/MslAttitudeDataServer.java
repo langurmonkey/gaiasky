@@ -104,8 +104,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
         //this.nativeTimeContext = TimeContext.TCB;
 
         this.msl = msl;
-        // maxStepSec = 125.0;
-        maxStepSec = 5000.0;
+        maxStepSec = 125.0;
         initialized = false;
     }
 
@@ -119,7 +118,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
         long tEnd = super.getStopTime();
 
         // adjust tBegNs such that the interval since the reference epoch is a
-        // multiple of the timeGranularity (the largest such multiple not not
+        // multiple of the timeGranularity (the largest such multiple not
         // greater than the original tBeg is chosen):
         long refEpoch = getRefTime();
         long tBegNsFromRef = tBeg - refEpoch;
@@ -127,7 +126,7 @@ public class MslAttitudeDataServer extends HermiteInterpolatedAttitudeDataServer
         long tBegNs = refEpoch + tBegNsFromRef;
 
         // adjust tEndNs such that the interval since the reference epoch is a
-        // multiple of the timeGranularity (the smallest such multiple not not
+        // multiple of the timeGranularity (the smallest such multiple not
         // less than the original tEnd is chosen):
         long tEndNsFromRef = tEnd - refEpoch;
         tEndNsFromRef = timeGranularity * ((tEndNsFromRef - 1L) / timeGranularity + 1L);

@@ -132,14 +132,13 @@ public class AttitudeXmlParser {
         /** MODEL ELEMENT **/
         String name = model.get("name");
         String className = model.get("classname").replace("gaia.cu9.ari.gaiaorbit", "gaiasky");
-        double startTimeNsSince2010 = (AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * Nature.D_TO_NS;
+        long startTimeNsSince2010 = (long) ((AstroUtils.getJulianDate(activationTime) - AstroUtils.JD_J2010) * Nature.D_TO_NS);
 
         /** SCAN LAW ELEMENT **/
         XmlReader.Element scanlaw = model.getChildByName("scanlaw");
         String epochRef = scanlaw.getAttribute("epochref");
         Instant refEpochDate = getDate(epochRef);
-        double refEpoch = AstroUtils.getJulianDate(refEpochDate) * Nature.D_TO_NS;
-        double refEpochJ2010 = refEpoch - AstroUtils.JD_J2010 * Nature.D_TO_NS;
+        long refEpochJ2010 = (long) ((AstroUtils.getJulianDate(refEpochDate) - AstroUtils.JD_J2010) * Nature.D_TO_NS);
 
         // Spin phase
         XmlReader.Element spinphase = scanlaw.getChildByName("spinphase");
@@ -163,29 +162,19 @@ public class AttitudeXmlParser {
 
         if (className.contains("MslAttitudeDataServer")) {
             // We need to pass the startTime, duration and MSL to the constructor
-
-            ModifiedScanningLaw msl = new ModifiedScanningLaw((long) startTimeNsSince2010);
-            msl.setRefEpoch((long) refEpochJ2010);
-            msl.setRefOmega(spinPhase.get(Quantity.Angle.AngleUnit.RAD));
+            ModifiedScanningLaw msl = new ModifiedScanningLaw(startTimeNsSince2010);
+            msl.setRefEpoch(refEpochJ2010);
             msl.setRefNu(precessionPhase.get(Quantity.Angle.AngleUnit.RAD));
+            msl.setRefOmega(spinPhase.get(Quantity.Angle.AngleUnit.RAD));
             msl.setPrecRate(precessionRate);
             msl.setScanRate(scanRate.get(Quantity.Angle.AngleUnit.ARCSEC));
             msl.setRefXi(solarAspectAngle.get(Quantity.Angle.AngleUnit.RAD));
+            msl.setTypicalHighDensityArea();
             msl.initialize();
 
-            MslAttitudeDataServer mslDatServ = new MslAttitudeDataServer((long) startTimeNsSince2010, duration, msl);
+            MslAttitudeDataServer mslDatServ = new MslAttitudeDataServer(startTimeNsSince2010, duration, msl);
             mslDatServ.initialize();
             result = mslDatServ;
-
-            //            Nsl37 nsl = new Nsl37();
-            //            nsl.setRefTime((long) refEpochJ2010);
-            //            nsl.setNuRef(precessionPhase.get(Quantity.Angle.AngleUnit.RAD));
-            //            nsl.setOmegaRef(spinPhase.get(Quantity.Angle.AngleUnit.RAD));
-            //            nsl.setXiRef(solarAspectAngle.get(Quantity.Angle.AngleUnit.RAD));
-            //            nsl.setTargetScanRate(scanRate.get(Quantity.Angle.AngleUnit.ARCSEC));
-            //            nsl.setTargetPrecessionRate(precessionRate);
-            //
-            //            result = nsl;
 
         } else if (className.contains("Epsl")) {
 

@@ -33,6 +33,7 @@ public class Gaia extends Satellite {
     public Gaia() {
         super();
         unrotatedPos = new Vector3d();
+        quaterniond = new Quaterniond();
         quaternion = new Quaternion();
     }
 
@@ -68,7 +69,8 @@ public class Gaia extends Satellite {
         if (sizeFactor != 1 || forceUpdate) {
             translation.getMatrix(localTransform).scl(size * sizeFactor);
             if (attitude != null) {
-                quaterniond = attitude.getQuaternion();
+                Quaterniond attQuat = attitude.getQuaternion();
+                quaterniond.set(attQuat.x, attQuat.y, attQuat.z, attQuat.w);
                 quaternion.set((float) quaterniond.x, (float) quaterniond.y, (float) quaterniond.z, (float) quaterniond.w);
 
                 // Update orientation
