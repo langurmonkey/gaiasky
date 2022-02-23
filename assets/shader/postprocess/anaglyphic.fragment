@@ -8,13 +8,6 @@ uniform int u_anaglyphMode;// 0 - red/blue, 1 - red/cyan
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
 
-//vec3 dubois(vec4 l, vec4 r) { // By kazuya2k8 at https://forum.doom9.org/showthread.php?t=170475
-//    float red   = l.r* 0.456 + l.g* 0.500 + l.b* 0.176  +  r.r*-0.043 + r.g*-0.088 + r.b*-0.002;
-//    float green = l.r*-0.040 + l.g*-0.038 + l.b*-0.016  +  r.r* 0.378 + r.g* 0.734 + r.b*-0.018;
-//    float blue  = l.r*-0.015 + l.g*-0.021 + l.b*-0.005  +  r.r*-0.072 + r.g*-0.113 + r.b* 1.226;
-//    return vec3(red, green, blue);
-//}
-
 void main() {
     vec2 texcoord = v_texCoords;
 
@@ -23,9 +16,6 @@ void main() {
 
     if (u_anaglyphMode == 1){
         // red-cyan
-        //vec3 l = vec3(leftFrag.r, rightFrag.gb);
-        //vec3 r = dubois(leftFrag, rightFrag);
-        //fragColor = vec4((l + r) * 0.5, 1.0);
         rightFrag = vec4(1.0, rightFrag.g, rightFrag.b, 1.0);
         leftFrag = vec4(leftFrag.r, 1.0, 1.0, 1.0);
         fragColor = vec4(leftFrag.rgb * rightFrag.rgb, 1.0);
