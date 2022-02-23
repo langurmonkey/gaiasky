@@ -784,6 +784,9 @@ public class Settings {
             @JsonIgnore public float eyeSeparation = 1f;
 
             public void setProfile(String profileString) {
+                if (profileString.toUpperCase().equals("ANAGLYPH")) {
+                    profileString = StereoProfile.ANAGLYPH_RED_CYAN.toString();
+                }
                 this.profile = StereoProfile.valueOf(profileString.toUpperCase());
             }
 
@@ -799,7 +802,7 @@ public class Settings {
 
             @JsonIgnore
             public boolean isStereoHalfViewport() {
-                return active && profile != StereoProfile.ANAGLYPH;
+                return active && !profile.isAnaglyph();
             }
 
         }
@@ -1579,7 +1582,11 @@ public class Settings {
         /**
          * Red-cyan anaglyph 3D mode
          **/
-        ANAGLYPH;
+        ANAGLYPH_RED_CYAN,
+        /**
+         * Red-blue anaglyph 3D mode
+         **/
+        ANAGLYPH_RED_BLUE;
 
         public boolean isHorizontal() {
             return this.equals(VR_HEADSET) || this.equals(HORIZONTAL_3DTV) || this.equals(CROSSEYE) || this.equals(PARALLEL_VIEW);
@@ -1590,11 +1597,29 @@ public class Settings {
         }
 
         public boolean isAnaglyph() {
-            return this.equals(ANAGLYPH);
+            return this.equals(ANAGLYPH_RED_BLUE) || this.equals(ANAGLYPH_RED_CYAN);
+        }
+
+        public boolean isAnaglyphRedCyan() {
+            return this.equals(ANAGLYPH_RED_CYAN);
+        }
+
+        public boolean isAnaglyphRedBlue() {
+            return this.equals(ANAGLYPH_RED_BLUE);
+        }
+
+        public int getAnaglyphModeInteger() {
+            if (isAnaglyphRedBlue()) {
+                return 0;
+            } else if (isAnaglyphRedCyan()) {
+                return 1;
+            } else {
+                return 1;
+            }
         }
 
         public boolean correctAspect() {
-            return !this.equals(HORIZONTAL_3DTV) && !this.equals(ANAGLYPH);
+            return !this.equals(HORIZONTAL_3DTV) && !this.isAnaglyph();
         }
     }
 

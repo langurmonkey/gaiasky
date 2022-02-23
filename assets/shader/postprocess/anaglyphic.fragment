@@ -3,6 +3,7 @@
 
 uniform sampler2D u_texture0;
 uniform sampler2D u_texture1;
+uniform int u_anaglyphMode; // 0 - red/blue, 1 - red/cyan
 
 in vec2 v_texCoords;
 layout (location = 0) out vec4 fragColor;
@@ -11,11 +12,17 @@ void main() {
     vec2 texcoord = v_texCoords;
     
     vec4 rightFrag = texture(u_texture1, texcoord);
-	rightFrag = vec4(1.0, rightFrag.g, rightFrag.b, 1.0); // Right eye (cyan filter) is full red and actual green and blue
-	
 	vec4 leftFrag = texture(u_texture0, texcoord);
-	leftFrag = vec4(leftFrag.r, 1.0, 1.0, 1.0); // Left eye (red filter) is full green and blue and actual red
- 
-	// Multiply left and right components for final output colour
-	fragColor = vec4(leftFrag.rgb * rightFrag.rgb, 1.0);
+
+	if(u_anaglyphMode == 1){
+		rightFrag = vec4(1.0, rightFrag.g, rightFrag.b, 1.0);
+		leftFrag = vec4(leftFrag.r, 1.0, 1.0, 1.0);
+		fragColor = vec4(leftFrag.rgb * rightFrag.rgb, 1.0);
+	} else {
+		rightFrag = vec4(rightFrag.r, 0.0, 0.0, 1.0);
+		leftFrag = vec4(0.0, 0.0, leftFrag.b, 1.0);
+		fragColor = vec4(leftFrag.rgb + rightFrag.rgb, 1.0);
+	}
+
+
 }

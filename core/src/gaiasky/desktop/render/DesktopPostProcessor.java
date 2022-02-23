@@ -976,7 +976,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     private void updateStereo(boolean stereo, StereoProfile profile) {
         boolean curvatureEnabled = stereo && profile == StereoProfile.VR_HEADSET;
-        boolean viewportHalved = stereo && profile != StereoProfile.ANAGLYPH && profile != StereoProfile.HORIZONTAL_3DTV;
+        boolean viewportHalved = stereo && !profile.isAnaglyph() && profile != StereoProfile.HORIZONTAL_3DTV;
 
         for (int i = 0; i < RenderType.values().length; i++) {
             if (pps[i] != null) {

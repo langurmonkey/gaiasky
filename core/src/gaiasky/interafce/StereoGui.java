@@ -128,7 +128,7 @@ public class StereoGui extends AbstractGui {
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.STEREO_PROFILE_CMD) {
             StereoProfile profile = StereoProfile.values()[(Integer) data[0]];
-            notificationsTwo.setVisible(profile != StereoProfile.ANAGLYPH);
+            notificationsTwo.setVisible(!profile.isAnaglyph());
         }
     }
 

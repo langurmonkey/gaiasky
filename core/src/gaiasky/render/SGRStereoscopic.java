@@ -26,7 +26,7 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.StereoProfile;
-import gaiasky.util.gdx.contrib.postprocess.effects.Anaglyphic;
+import gaiasky.util.gdx.contrib.postprocess.effects.AnaglyphEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.math.Vector3d;
 
@@ -52,7 +52,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
 
     private final SpriteBatch sb;
 
-    private final Anaglyphic anaglyphic;
+    private final AnaglyphEffect anaglyphEffect;
     private final Copy copy;
 
     private final Vector3 aux1;
@@ -76,7 +76,8 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         fb3D.put(getKey(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight()), new FrameBuffer(Format.RGB888, Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight(), true));
 
         // Init anaglyph 3D effect
-        anaglyphic = new Anaglyphic();
+        anaglyphEffect = new AnaglyphEffect();
+        updateAnaglyphMode();
 
         // Copy
         copy = new Copy();
@@ -94,10 +95,15 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE);
     }
 
+    public void updateAnaglyphMode(){
+        if(anaglyphEffect != null) {
+            anaglyphEffect.setAnaglyphMode(Settings.settings.program.modeStereo.profile.getAnaglyphModeInteger());
+        }
+    }
+
     @Override
     public void render(SceneGraphRenderer sgr, ICamera camera, double t, int rw, int rh, int tw, int th, FrameBuffer fb, PostProcessBean ppb) {
         boolean moveCam = camera.getMode() == CameraMode.FREE_MODE || camera.getMode() == CameraMode.FOCUS_MODE || camera.getMode() == CameraMode.SPACECRAFT_MODE;
-
 
         PerspectiveCamera cam = camera.getCamera();
         // Vector of 1 meter length pointing to the side of the camera
@@ -183,12 +189,12 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             Texture texRight = fb2.getColorBufferTexture();
 
             // We have left and right images to texLeft and texRight
-
-            anaglyphic.setTextureLeft(texLeft);
-            anaglyphic.setTextureRight(texRight);
+            updateAnaglyphMode();
+            anaglyphEffect.setTextureLeft(texLeft);
+            anaglyphEffect.setTextureRight(texRight);
 
             // Render 
-            anaglyphic.render(null, resultBuffer, null);
+            anaglyphEffect.render(null, resultBuffer, null);
             resultBuffer.end();
 
             // ensure default texture unit #0 is active

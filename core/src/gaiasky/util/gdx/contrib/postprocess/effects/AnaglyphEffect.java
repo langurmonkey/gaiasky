@@ -28,37 +28,49 @@ import gaiasky.util.gdx.contrib.postprocess.filters.AnaglyphFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
- * Anaglyphic 3D red-cyan effect
+ * Anaglyph 3D red-cyan effect
  */
-public final class Anaglyphic extends PostProcessorEffect {
-    private final AnaglyphFilter anaglyphic;
+public final class AnaglyphEffect extends PostProcessorEffect {
+    private final AnaglyphFilter anaglyphFilter;
 
-    public Anaglyphic() {
-        anaglyphic = new AnaglyphFilter();
+    public AnaglyphEffect() {
+        anaglyphFilter = new AnaglyphFilter();
     }
 
     @Override
     public void dispose() {
-        anaglyphic.dispose();
+        anaglyphFilter.dispose();
     }
 
     @Override
     public void rebind() {
-        anaglyphic.rebind();
+        anaglyphFilter.rebind();
     }
 
     public void setTextureLeft(Texture tex) {
-        anaglyphic.setTextureLeft(tex);
+        anaglyphFilter.setTextureLeft(tex);
     }
 
     public void setTextureRight(Texture tex) {
-        anaglyphic.setTextureRight(tex);
+        anaglyphFilter.setTextureRight(tex);
+    }
+
+    /**
+     * Sets the mode:
+     * <ul>
+     *     <li>0 - red/blue</li>
+     *     <li>1 - red/cyan</li>
+     * </ul>
+     * @param mode The mode.
+     */
+    public void setAnaglyphMode(int mode) {
+        anaglyphFilter.setAnaglyphMode(mode);
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-        anaglyphic.setInput(src).setOutput(dest).render();
+        anaglyphFilter.setInput(src).setOutput(dest).render();
     }
 
 }
