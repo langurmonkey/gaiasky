@@ -973,6 +973,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         frames++;
 
         if (settings.graphics.fpsLimit > 0.0) {
+            // If FPS limit is on, dynamic resolution is off
             sleep(settings.graphics.fpsLimit);
         } else if (settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate

@@ -234,6 +234,11 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
             start2w /= Settings.settings.program.ui.scale;
             start2h /= Settings.settings.program.ui.scale;
 
+            boundsw /= Settings.settings.graphics.backBufferScale;
+            boundsh /= Settings.settings.graphics.backBufferScale;
+            start2w /= Settings.settings.graphics.backBufferScale;
+            start2h /= Settings.settings.graphics.backBufferScale;
+
             // Side by side rendering
             Viewport viewport = stretch ? stretchViewport : extendViewport;
 

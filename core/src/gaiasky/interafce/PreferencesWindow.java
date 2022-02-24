@@ -2071,6 +2071,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             Logger.getLogger(this.getClass()).error(e);
         }
 
+        // FPS limiter
         if (maxFps.isChecked()) {
             EventManager.publish(Event.LIMIT_FPS_CMD, this, Parser.parseDouble(maxFpsInput.getText()));
         } else {

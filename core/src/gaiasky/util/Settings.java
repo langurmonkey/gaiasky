@@ -294,6 +294,10 @@ public class Settings {
         public void notify(final Event event, Object source, final Object... data) {
             if (event == Event.LIMIT_FPS_CMD) {
                 fpsLimit = (Double) data[0];
+                if (fpsLimit > 0) {
+                    // When FPS limit is active, dynamic resolution must be inactive
+                    GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
+                }
             }
         }
     }
