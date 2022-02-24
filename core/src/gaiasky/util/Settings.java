@@ -40,7 +40,7 @@ import java.util.*;
 
 /**
  * This class contains the settings for Gaia Sky, organized into
- * several sub-classes by topic.
+ * several inner classes by topic.
  */
 public class Settings {
     private static final Log logger = Logger.getLogger(Settings.class);

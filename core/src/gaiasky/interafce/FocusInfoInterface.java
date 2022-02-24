@@ -46,7 +46,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
     protected OwnLabel rulerName, rulerName0, rulerName1, rulerDist;
     protected OwnLabel focusIdExpand;
 
-    protected HorizontalGroup focusNameGroup;
+    protected HorizontalGroup focusActionsGroup;
 
     protected IFocus currentFocus;
     private ExternalInformationUpdater externalInfoUpdater;
@@ -242,15 +242,14 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         landOn.setWidth(bw);
         landAt.setWidth(bw);
 
-        focusNameGroup = new HorizontalGroup();
-        focusNameGroup.space(pad5);
-        focusNameGroup.addActor(focusName);
-        focusNameGroup.addActor(objectVisibility);
-        focusNameGroup.addActor(labelVisibility);
-        focusNameGroup.addActor(bookmark);
-        focusNameGroup.addActor(goTo);
-        focusNameGroup.addActor(landOn);
-        focusNameGroup.addActor(landAt);
+        focusActionsGroup = new HorizontalGroup();
+        focusActionsGroup.space(pad5);
+        focusActionsGroup.addActor(objectVisibility);
+        focusActionsGroup.addActor(labelVisibility);
+        focusActionsGroup.addActor(bookmark);
+        focusActionsGroup.addActor(goTo);
+        focusActionsGroup.addActor(landOn);
+        focusActionsGroup.addActor(landAt);
 
         float w = 208f;
         focusId.setWidth(w);
@@ -267,93 +266,68 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         camVel.setWidth(w);
 
         // FOCUS INFO
-        focusInfo.add(focusNameGroup).width(width).left().colspan(2).padBottom(pad5);
-        focusInfo.row();
-        focusInfo.add(focusType).left().padBottom(pad5).colspan(2);
-        focusInfo.row();
+        focusInfo.add(focusName).width(width).left().colspan(2).padBottom(pad5).row();
+        focusInfo.add(focusActionsGroup).width(width).left().colspan(2).padBottom(pad5).row();
+        focusInfo.add(focusType).left().padBottom(pad5).colspan(2).row();
         focusInfo.add(new OwnLabel("ID", skin, "hud")).left();
-        focusInfo.add(hg(focusId, focusIdExpand)).left().padLeft(pad15);
-        focusInfo.row();
+        focusInfo.add(hg(focusId, focusIdExpand)).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.names"), skin, "hud")).left().padBottom(pad5);
-        focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad15);
-        focusInfo.row();
+        focusInfo.add(focusNames).left().padBottom(pad5).padLeft(pad15).row();
         if (!vr) {
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.alpha"), skin, "hud")).left();
-            focusInfo.add(focusRA).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusRA).left().padLeft(pad15).row();
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.delta"), skin, "hud")).left();
-            focusInfo.add(focusDEC).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusDEC).left().padLeft(pad15).row();
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mualpha"), skin, "hud")).left();
-            focusInfo.add(focusMuAlpha).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusMuAlpha).left().padLeft(pad15).row();
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.mudelta"), skin, "hud")).left();
-            focusInfo.add(focusMuDelta).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusMuDelta).left().padLeft(pad15).row();
             focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radvel"), skin, "hud")).left();
-            focusInfo.add(focusRadVel).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusRadVel).left().padLeft(pad15).row();
             focusInfo.add(appMagEarthLabel).left();
-            focusInfo.add(focusAppMagEarth).left().padLeft(pad15);
-            focusInfo.row();
-            focusInfo.row();
+            focusInfo.add(focusAppMagEarth).left().padLeft(pad15).row();
             focusInfo.add(appMagCameraLabel).left();
-            focusInfo.add(focusAppMagCamera).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusAppMagCamera).left().padLeft(pad15).row();
             focusInfo.add(absMagLabel).left();
-            focusInfo.add(focusAbsMag).left().padLeft(pad15);
-            focusInfo.row();
+            focusInfo.add(focusAbsMag).left().padLeft(pad15).row();
         }
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.angle"), skin, "hud")).left();
-        focusInfo.add(focusAngle).left().padLeft(pad15);
-        focusInfo.row();
+        focusInfo.add(focusAngle).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.sol"), skin, "hud")).left();
-        focusInfo.add(focusDistSol).left().padLeft(pad15);
-        focusInfo.row();
+        focusInfo.add(focusDistSol).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.cam"), skin, "hud")).left();
-        focusInfo.add(focusDistCam).left().padLeft(pad15);
-        focusInfo.row();
+        focusInfo.add(focusDistCam).left().padLeft(pad15).row();
         focusInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.radius"), skin, "hud")).left();
-        focusInfo.add(focusRadius).left().padLeft(pad15);
-        focusInfo.row();
+        focusInfo.add(focusRadius).left().padLeft(pad15).row();
         focusInfo.add(moreInfo).left().colspan(2).padBottom(pad5).padTop(pad10);
 
         // POINTER INFO
         if (!vr) {
-            pointerInfo.add(pointerName).width(width).left().colspan(3);
-            pointerInfo.row();
+            pointerInfo.add(pointerName).width(width).left().colspan(3).row();
             pointerInfo.add(pointerImgBtn1).left().padRight(pad3);
             pointerInfo.add(RADECPointerLabel).left();
-            pointerInfo.add(pointerRADEC).left().padLeft(pad15);
-            pointerInfo.row();
+            pointerInfo.add(pointerRADEC).left().padLeft(pad15).row();
             pointerInfo.add(pointerImgBtn2).left().padRight(pad3);
             pointerInfo.add(lonLatLabel).left();
-            pointerInfo.add(pointerLonLat).left().padLeft(pad15);
-            pointerInfo.row();
+            pointerInfo.add(pointerLonLat).left().padLeft(pad15).row();
             pointerInfo.add(viewImgBtn).left().padRight(pad3);
             pointerInfo.add(RADECViewLabel).left();
             pointerInfo.add(viewRADEC).left().padLeft(pad15);
         }
 
         // CAMERA INFO
-        cameraInfo.add(camName).width(width).left().colspan(2);
-        cameraInfo.row();
+        cameraInfo.add(camName).width(width).left().colspan(2).row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.track"), skin, "hud")).left();
-        cameraInfo.add(camTracking).left().padLeft(pad15);
-        cameraInfo.row();
+        cameraInfo.add(camTracking).left().padLeft(pad15).row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.camera.vel"), skin, "hud")).left();
-        cameraInfo.add(camVel).left().padLeft(pad15);
-        cameraInfo.row();
+        cameraInfo.add(camVel).left().padLeft(pad15).row();
         cameraInfo.add(new OwnLabel(I18n.txt("gui.focusinfo.distance.sol"), skin, "hud")).left();
-        cameraInfo.add(camDistSol).left().padLeft(pad15);
-        cameraInfo.row();
+        cameraInfo.add(camDistSol).left().padLeft(pad15).row();
         cameraInfo.add(camPos).left().colspan(2);
 
         // RULER INFO
-        rulerInfo.add(rulerName).left();
-        rulerInfo.row();
-        rulerInfo.add(rulerNameGroup).left();
-        rulerInfo.row();
+        rulerInfo.add(rulerName).left().row();
+        rulerInfo.add(rulerNameGroup).left().row();
         rulerInfo.add(rulerDist).left();
 
         focusInfoCell = add(focusInfo).align(Align.left);
@@ -400,7 +374,7 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
                 focus = (IFocus) data[0];
             }
             currentFocus = focus;
-            final int focusFieldMaxLength = 20;
+            final int focusFieldMaxLength = 16;
 
             // ID
             boolean cappedId = false;
@@ -424,11 +398,11 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
 
             // Link
             boolean vis = focus instanceof Planet;
-            focusNameGroup.removeActor(landOn);
-            focusNameGroup.removeActor(landAt);
+            focusActionsGroup.removeActor(landOn);
+            focusActionsGroup.removeActor(landAt);
             if (vis) {
-                focusNameGroup.addActor(landOn);
-                focusNameGroup.addActor(landAt);
+                focusActionsGroup.addActor(landOn);
+                focusActionsGroup.addActor(landAt);
             }
 
             // Type

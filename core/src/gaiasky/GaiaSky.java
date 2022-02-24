@@ -78,6 +78,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -283,7 +284,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     /**
      * Runnables
      */
-    private final Array<Runnable> parkedRunnables;
+    private final List<Runnable> parkedRunnables;
     private final Map<String, Runnable> parkedRunnablesMap;
 
     /**
@@ -315,8 +316,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.noScripting = noScriptingServer;
         this.debugMode = debugMode;
 
-        this.parkedRunnablesMap = new HashMap<>();
-        this.parkedRunnables = new Array<>();
+        this.parkedRunnablesMap = Collections.synchronizedMap(new HashMap<>());
+        this.parkedRunnables = Collections.synchronizedList(new ArrayList<>());
 
         this.renderProcess = runnableInitialGui;
     }
@@ -1087,7 +1088,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
                 // Run parked runnables
                 synchronized (parkedRunnables) {
-                    if (parkedRunnables.size > 0) {
+                    if (parkedRunnables.size() > 0) {
                         Iterator<Runnable> it = parkedRunnables.iterator();
                         while (it.hasNext()) {
                             Runnable r = it.next();
@@ -1562,7 +1563,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable.
      */
-    public void parkRunnable(final String key, final Runnable runnable) {
+    public synchronized void parkRunnable(final String key, final Runnable runnable) {
         parkedRunnablesMap.put(key, runnable);
         parkedRunnables.add(runnable);
     }
@@ -1572,10 +1573,10 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      *
      * @param key The key of the runnable to remove.
      */
-    public void removeRunnable(final String key) {
+    public synchronized void removeRunnable(final String key) {
         final Runnable r = parkedRunnablesMap.get(key);
         if (r != null) {
-            parkedRunnables.removeValue(r, true);
+            parkedRunnables.remove(r);
             parkedRunnablesMap.remove(key);
         }
     }
@@ -1585,7 +1586,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      *
      * @param r The runnable to post.
      */
-    public static void postRunnable(final Runnable r) {
+    public static synchronized void postRunnable(final Runnable r) {
         if (instance != null && instance.window != null)
             instance.window.postRunnable(r);
         else

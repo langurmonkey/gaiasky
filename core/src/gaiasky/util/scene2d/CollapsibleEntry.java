@@ -1,9 +1,15 @@
 package gaiasky.util.scene2d;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputEvent.Type;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 
 public class CollapsibleEntry extends OwnButton {
     private Cell<?> contentCell, actorCell;
@@ -55,6 +61,33 @@ public class CollapsibleEntry extends OwnButton {
                     collapse();
                 } else {
                     expand();
+                }
+                return true;
+            }
+            return false;
+        });
+        title.addListener(new ClickListener(){
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(event.getButton() == Buttons.LEFT){
+                    boolean checked = collapse.isChecked();
+                    if (checked) {
+                        collapse();
+                    } else {
+                        expand();
+                    }
+                    collapse.setCheckedNoFire(!checked);
+                }
+                // Bubble up
+                super.touchUp(event, x, y, pointer, button);
+            }
+        });
+        title.addListener(event -> {
+            if (event instanceof InputEvent) {
+                Type type = ((InputEvent) event).getType();
+                if (type == Type.enter) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Hand);
+                } else if (type == Type.exit) {
+                    Gdx.graphics.setSystemCursor(SystemCursor.Arrow);
                 }
                 return true;
             }
