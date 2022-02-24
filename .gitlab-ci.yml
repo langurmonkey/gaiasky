@@ -1,4 +1,4 @@
-image: archlinux:base-devel-20210221.0.15908
+image: archlinux:base-devel
 
 stages:
     - compile
