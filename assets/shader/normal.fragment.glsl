@@ -218,6 +218,8 @@ uniform vec4 u_reflectionColor;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
+layout (location = 2) out vec4 normalColor;
+layout (location = 3) out vec4 reflectionMaskColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -350,6 +352,7 @@ void main() {
     texAlpha = luma(emissive.rgb);
     #endif
 
+    vec3 normalVector = vec3(0.0, 0.0, 0.0);
     #ifdef normalTextureFlag
         // Normal in tangent space
         vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
@@ -359,11 +362,13 @@ void main() {
             #ifndef heightFlag
             mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
             #endif // heighFlag
-            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalize(TBN * N)));
+            normalVector = normalize(TBN * N);
+            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector));
 		#endif // environmentCubemapFlag
     #else
 	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
+        normalVector = v_data.normal;
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_data.reflect);
 		#endif // environmentCubemapFlag
@@ -393,6 +398,11 @@ void main() {
             reflectionColor = reflectionColor * u_reflectionColor.rgb;
         #endif // reflectionColorFlag
         reflectionColor += reflectionColor * diffuse.rgb;
+        // Reflection mask
+        reflectionMaskColor = vec4(1.0, 1.0, 1.0, 1.0);
+    #else
+        // Reflection mask
+        reflectionMaskColor = vec4(0.0, 0.0, 0.0, 1.0);
     #endif // environmentCubemapFlag
 
     vec3 shadowColor = vec3(0.0);
@@ -439,10 +449,11 @@ void main() {
 
     // Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
-
     if (fragColor.a <= 0.0) {
         discard;
     }
+    normalColor = vec4(normalVector, 1.0);
+
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 

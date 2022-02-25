@@ -33,20 +33,22 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
             return null;
     }
 
-    public Texture getColorBufferTexture() {
-        return super.getColorBufferTexture();
-    }
-
-    public Texture getColorBufferTexture1() {
-        return super.getColorBufferTexture();
-    }
-
-    public Texture getColorBufferTexture2() {
-        // Second texture attachment
-        if (textureAttachments.size > 1)
-            return textureAttachments.get(1);
+    public Texture getNormalBufferTexture() {
+        if (textureAttachments.size > 3)
+            return textureAttachments.get(3);
         else
             return null;
+    }
+
+    public Texture getReflectionBufferTexture() {
+        if (textureAttachments.size > 4)
+            return textureAttachments.get(4);
+        else
+            return null;
+    }
+
+    public Texture getColorBufferTexture() {
+        return super.getColorBufferTexture();
     }
 
     public Texture getTextureAttachment(int index) {
