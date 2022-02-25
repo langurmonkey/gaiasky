@@ -130,7 +130,7 @@ public class AboutWindow extends GenericDialog {
         gaiaskyIcon.setOrigin(Align.center);
 
         // Add all to content
-        contentHelp.add(gaiasky).pad(pad10 * 2f).padBottom(pad10 * 5f).colspan(2);
+        contentHelp.add(gaiasky).pad(pad10).padBottom(pad10 * 5f).colspan(2);
         contentHelp.row();
         contentHelp.add(homepageTitle).align(Align.left).padRight(pad10);
         contentHelp.add(homepageTxt).align(Align.left);
@@ -190,7 +190,7 @@ public class AboutWindow extends GenericDialog {
 
         // License
         HorizontalGroup licenseh = new HorizontalGroup();
-        licenseh.space(pad10 * 2f);
+        licenseh.space(pad10);
 
         VerticalGroup licensev = new VerticalGroup();
         TextArea licensetext = new OwnTextArea(I18n.txt("gui.help.license"), skin.get("regular", TextFieldStyle.class));
@@ -206,7 +206,7 @@ public class AboutWindow extends GenericDialog {
 
         // Thanks
         HorizontalGroup thanks = new HorizontalGroup();
-        thanks.space(pad10 * 2f).pad(pad10);
+        thanks.space(pad10).pad(pad10);
         Container<Actor> thanksc = new Container<>(thanks);
         thanksc.setBackground(skin.getDrawable("bg-clear"));
 
@@ -220,21 +220,21 @@ public class AboutWindow extends GenericDialog {
         thanks.addActor(bwt);
         thanks.addActor(dpac);
 
-        contentAbout.add(intro).colspan(2).left().padTop(pad10 * 2f);
+        contentAbout.add(intro).colspan(2).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(homepagetitle).left().padRight(pad10 * 2f).padTop(pad10 * 2f);
-        contentAbout.add(homepage).left().padTop(pad10 * 2f);
+        contentAbout.add(homepagetitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(homepage).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(twtitle).left().padRight(pad10 * 2f).padTop(pad10 * 2f);
-        contentAbout.add(tw).left().padTop(pad10 * 2f);
+        contentAbout.add(twtitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(tw).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(authortitle).left().padRight(pad10).padTop(pad10 * 2f);
-        contentAbout.add(author).left().padTop(pad5).padTop(pad10 * 2f);
+        contentAbout.add(authortitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(author).left().padTop(pad5).padTop(pad10);
         contentAbout.row();
-        contentAbout.add(contribtitle).left().padRight(pad10).padTop(pad10 * 2f);
-        contentAbout.add(contrib).left().padTop(pad10 * 2f);
+        contentAbout.add(contribtitle).left().padRight(pad10).padTop(pad10);
+        contentAbout.add(contrib).left().padTop(pad10);
         contentAbout.row();
-        contentAbout.add(licenseh).colspan(2).center().padTop(pad10 * 2f);
+        contentAbout.add(licenseh).colspan(2).center().padTop(pad10);
         contentAbout.row();
         contentAbout.add(thanksc).colspan(2).center().padTop(pad10 * 4f);
 
@@ -360,7 +360,7 @@ public class AboutWindow extends GenericDialog {
         scrolls.add(glextensionsscroll);
 
         // BUILD
-        contentSystem.add(buildinfo).colspan(2).align(Align.left).padTop(pad10 * 2f).padBottom(pad5);
+        contentSystem.add(buildinfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(versiontitle).align(Align.topLeft).padRight(pad10);
         contentSystem.add(version).align(Align.left);
@@ -379,7 +379,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // PATHS
-        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad10 * 2f).padBottom(pad5);
+        contentSystem.add(paths).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(configtitle).align(Align.topLeft).padRight(pad10);
         contentSystem.add(config).align(Align.left);
@@ -404,7 +404,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // JAVA
-        contentSystem.add(javainfo).colspan(2).align(Align.left).padTop(pad10 * 2f).padBottom(pad5);
+        contentSystem.add(javainfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(javaversiontitle).align(Align.topLeft).padRight(pad10);
         contentSystem.add(javaversion).align(Align.left);
@@ -425,7 +425,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // SYSTEM
-        contentSystem.add(sysinfo).colspan(2).align(Align.left).padTop(pad10 * 2f).padBottom(pad5);
+        contentSystem.add(sysinfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
         contentSystem.row();
         try {
             SystemInfo si = new SystemInfo();
@@ -449,7 +449,7 @@ public class AboutWindow extends GenericDialog {
         contentSystem.row();
 
         // GL
-        contentSystem.add(glinfo).colspan(2).align(Align.left).padTop(pad10 * 2f).padBottom(pad5);
+        contentSystem.add(glinfo).colspan(2).align(Align.left).padTop(pad10).padBottom(pad5);
         contentSystem.row();
         contentSystem.add(glversiontitle).align(Align.topLeft).padRight(pad10);
         contentSystem.add(glversion).align(Align.left);
@@ -491,7 +491,7 @@ public class AboutWindow extends GenericDialog {
                 // Inform latest
                 newVersionCheck(Settings.settings.version.version, Settings.settings.version.versionNumber, Settings.settings.version.buildTime, false);
             }
-            contentUpdates.add(checkTable).left().top().padTop(pad10 * 2f);
+            contentUpdates.add(checkTable).left().top().padTop(pad10);
         }
 
         /* ADD ALL CONTENT */

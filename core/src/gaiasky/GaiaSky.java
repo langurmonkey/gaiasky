@@ -78,7 +78,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -316,8 +315,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         this.noScripting = noScriptingServer;
         this.debugMode = debugMode;
 
-        this.parkedRunnablesMap = Collections.synchronizedMap(new HashMap<>());
-        this.parkedRunnables = Collections.synchronizedList(new ArrayList<>());
+        this.parkedRunnablesMap = new HashMap<>();
+        this.parkedRunnables = new ArrayList<>();
 
         this.renderProcess = runnableInitialGui;
     }
@@ -646,7 +645,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD);
+        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD);
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -976,7 +975,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         if (settings.graphics.fpsLimit > 0.0) {
             // If FPS limit is on, dynamic resolution is off
             sleep(settings.graphics.fpsLimit);
-        } else if (settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
+        } else if (!settings.program.isStereoOrCubemap() && settings.graphics.dynamicResolution && TimeUtils.millis() - startTime > 10000 && TimeUtils.millis() - lastDynamicResolutionChange > 500 && !settings.runtime.openVr) {
             // Dynamic resolution, adjust the back-buffer scale depending on the frame rate
             float fps = 1f / graphics.getDeltaTime();
 
@@ -993,8 +992,8 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             }
         }
     };
-    
-    public void resetDynamicResolution(){
+
+    public void resetDynamicResolution() {
         dynamicResolutionLevel = 0;
         settings.graphics.backBufferScale = 1f;
         postRunnable(() -> resizeImmediate(graphics.getWidth(), graphics.getHeight(), true, true, false, false));
@@ -1432,8 +1431,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 guiRegistry.change(guiRegistry.previous, prev);
             }
 
+            // Disable dynamic resolution
             // Post a message to the screen
             if (stereoMode) {
+                resetDynamicResolution();
+
                 String[] keysStrToggle = KeyBindings.instance.getStringArrayKeys("action.toggle/element.stereomode");
                 String[] keysStrProfile = KeyBindings.instance.getStringArrayKeys("action.switchstereoprofile");
                 final ModePopupInfo mpi = new ModePopupInfo();
@@ -1446,6 +1448,12 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 EventManager.publish(Event.MODE_POPUP_CMD, this, mpi, "stereo", 120f);
             } else {
                 EventManager.publish(Event.MODE_POPUP_CMD, this, null, "stereo");
+            }
+            break;
+        case CUBEMAP_CMD:
+            boolean cubemapMode = (Boolean) data[0];
+            if(cubemapMode) {
+                resetDynamicResolution();
             }
 
             break;
@@ -1563,9 +1571,11 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      * @param key      The key to identify the runnable.
      * @param runnable The runnable.
      */
-    public synchronized void parkRunnable(final String key, final Runnable runnable) {
-        parkedRunnablesMap.put(key, runnable);
-        parkedRunnables.add(runnable);
+    public void parkRunnable(final String key, final Runnable runnable) {
+        synchronized (parkedRunnables) {
+            parkedRunnablesMap.put(key, runnable);
+            parkedRunnables.add(runnable);
+        }
     }
 
     /**
@@ -1573,11 +1583,13 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
      *
      * @param key The key of the runnable to remove.
      */
-    public synchronized void removeRunnable(final String key) {
-        final Runnable r = parkedRunnablesMap.get(key);
-        if (r != null) {
-            parkedRunnables.remove(r);
-            parkedRunnablesMap.remove(key);
+    public void removeRunnable(final String key) {
+        synchronized (parkedRunnables) {
+            final Runnable r = parkedRunnablesMap.get(key);
+            if (r != null) {
+                parkedRunnables.remove(r);
+                parkedRunnablesMap.remove(key);
+            }
         }
     }
 

@@ -744,6 +744,11 @@ public class Settings {
             EventManager.instance.subscribe(this, Event.STEREOSCOPIC_CMD, Event.STEREO_PROFILE_CMD, Event.CUBEMAP_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.PLANETARIUM_APERTURE_CMD, Event.CUBEMAP_PROJECTION_CMD, Event.CUBEMAP_RESOLUTION_CMD, Event.POINTER_GUIDES_CMD, Event.UI_SCALE_CMD);
         }
 
+        @JsonIgnore
+        public boolean isStereoOrCubemap(){
+            return modeStereo.active || modeCubemap.active;
+        }
+
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class MinimapSettings {
             public boolean active;
@@ -807,6 +812,11 @@ public class Settings {
             @JsonIgnore
             public boolean isStereoHalfViewport() {
                 return active && !profile.isAnaglyph();
+            }
+
+            @JsonIgnore
+            public boolean isStereoVR(){
+                return active && profile.isVR();
             }
 
         }
@@ -1598,6 +1608,10 @@ public class Settings {
 
         public boolean isVertical() {
             return this.equals(VERTICAL_3DTV);
+        }
+
+        public boolean isVR() {
+            return this.equals(VR_HEADSET);
         }
 
         public boolean isAnaglyph() {

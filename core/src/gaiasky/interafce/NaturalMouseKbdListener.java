@@ -291,7 +291,7 @@ public class NaturalMouseKbdListener extends MouseKbdListener implements IObserv
                     // Ensure Octants observed property is computed
                     GaiaSky.postRunnable(() -> {
                         // 5% of width pixels distance
-                        if (gesture.dst(screenX, screenY) < MOVE_PX_DIST) {
+                        if (gesture.dst(screenX, screenY) < MOVE_PX_DIST && !Settings.settings.program.modeStereo.active) {
                             // Stop
                             camera.setYaw(0);
                             camera.setPitch(0);
