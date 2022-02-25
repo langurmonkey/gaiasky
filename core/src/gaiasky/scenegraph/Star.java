@@ -201,8 +201,8 @@ public class Star extends Particle {
 
     @Override
     protected void addToRenderLists(ICamera camera) {
+        camera.checkClosestParticle(this);
         if (this.shouldRender()) {
-            camera.checkClosestParticle(this);
             addToRender(this, RenderGroup.POINT_STAR);
 
             if (camera.getCurrent() instanceof FovCamera) {
