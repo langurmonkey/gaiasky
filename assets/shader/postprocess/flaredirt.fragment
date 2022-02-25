@@ -1,5 +1,6 @@
 #version 330 core
 // Lens flare implementation by Toni Sagrista
+// License: MPL2
 // From John Chapman's article http://john-chapman-graphics.blogspot.co.uk/2013/02/pseudo-lens-flare.html
 
 // Scene

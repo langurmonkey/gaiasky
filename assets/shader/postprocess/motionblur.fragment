@@ -1,4 +1,5 @@
 // Simple motion blur implementation by Toni Sagrista
+// License: MPL2
 #version 330 core
 
 // Unprocessed image

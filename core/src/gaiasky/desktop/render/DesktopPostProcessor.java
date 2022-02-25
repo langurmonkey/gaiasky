@@ -22,6 +22,7 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor;
 import gaiasky.scenegraph.BackgroundModel;
+import gaiasky.scenegraph.camera.AbstractCamera;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.component.MaterialComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -35,6 +36,7 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
+import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -152,16 +154,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, safeMode || vr);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, true, true, safeMode || vr);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS
         raymarchingDef.forEach((key, list) -> {
             Raymarching rm = new Raymarching((String) list[0], width, height);
             // Fixed uniforms
-            float zfar = (float) GaiaSky.instance.getCameraManager().current.getFar();
+            float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
             float k = Constants.getCameraK();
-            rm.setZfarK(zfar, k);
+            rm.setZfarK(zFar, k);
             if (list[3] != null) {
                 rm.setAdditional((float[]) list[3]);
             }
@@ -178,9 +180,18 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             ppb.set(key, rm);
         });
 
+        // COPY
+        //DrawTexture copy = new DrawTexture();
+        //ppb.set(copy);
+
         // DEPTH BUFFER
         //DepthBuffer depthBuffer = new DepthBuffer();
         //ppb.set(depthBuffer);
+
+        // SSR
+        SSR ssr = new SSR();
+        ssr.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
+        ppb.set(ssr);
 
         // CAMERA MOTION BLUR
         initCameraBlur(ppb, width, height, gq);
