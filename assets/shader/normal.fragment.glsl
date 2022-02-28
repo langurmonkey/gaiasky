@@ -196,6 +196,7 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
+    vec4 fragPosView;
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -220,6 +221,7 @@ uniform vec4 u_reflectionColor;
 layout (location = 0) out vec4 fragColor;
 layout (location = 2) out vec4 normalBuffer;
 layout (location = 3) out vec4 reflectionMask;
+layout (location = 4) out vec4 positionBuffer;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -453,6 +455,7 @@ void main() {
         discard;
     }
     normalBuffer = vec4(normalVector, 1.0);
+    positionBuffer = v_data.fragPosView;
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

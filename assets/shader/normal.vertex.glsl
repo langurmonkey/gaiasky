@@ -269,6 +269,7 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
+    vec4 fragPosView;
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -297,6 +298,7 @@ void main() {
 
     v_data.fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
+    v_data.fragPosView = gpos;
     gl_Position = gpos;
 
     #ifdef velocityBufferFlag

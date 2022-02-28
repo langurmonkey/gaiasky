@@ -47,6 +47,13 @@ public class GaiaSkyFrameBuffer extends FrameBuffer {
             return null;
     }
 
+    public Texture getPositionBufferTexture() {
+        if (textureAttachments.size > 5)
+            return textureAttachments.get(5);
+        else
+            return null;
+    }
+
     public Texture getColorBufferTexture() {
         return super.getColorBufferTexture();
     }

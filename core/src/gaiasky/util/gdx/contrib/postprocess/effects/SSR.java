@@ -24,6 +24,8 @@ public class SSR extends Raymarching {
         ((SSRFilter) filter).setNormalTexture(main.getNormalBufferTexture());
         // Reflection mask
         ((SSRFilter) filter).setReflectionTexture(main.getReflectionBufferTexture());
+        // Position buffer
+        ((SSRFilter) filter).setPositionTexture(main.getPositionBufferTexture());
         // Set input, output and render
         filter.setInput(src).setOutput(dest).render();
     }

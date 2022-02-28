@@ -37,7 +37,7 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
      * Additional textures. Texture1 is typically used for the depth buffer. The
      * others may be used for any purpose.
      */
-    private Texture texture1, texture2, texture3;
+    private Texture texture1, texture2, texture3, texture4;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -45,6 +45,7 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         Texture1("u_texture1", 0),
         Texture2("u_texture2", 0),
         Texture3("u_texture3", 0),
+        Texture4("u_texture4", 0),
         Time("u_time", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
@@ -184,6 +185,11 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.Texture3, u_texture3);
     }
 
+    public void setTexture4(Texture tex) {
+        this.texture4 = tex;
+        setParam(Param.Texture4, u_texture4);
+    }
+
     public void setAdditional(float[] additional) {
         int len = Math.min(additional.length, 4);
         System.arraycopy(additional, 0, this.additional, 0, len);
@@ -218,6 +224,7 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.Texture1, u_texture1);
         setParams(Param.Texture2, u_texture2);
         setParams(Param.Texture3, u_texture3);
+        setParams(Param.Texture4, u_texture4);
         setParams(Param.Viewport, viewport);
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
@@ -240,5 +247,7 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
             texture2.bind(u_texture2);
         if (texture3 != null)
             texture3.bind(u_texture3);
+        if (texture4 != null)
+            texture4.bind(u_texture4);
     }
 }

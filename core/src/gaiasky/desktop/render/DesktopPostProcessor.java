@@ -152,7 +152,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode || vr);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, !safeMode, safeMode || vr);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS

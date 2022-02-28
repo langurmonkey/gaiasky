@@ -1296,7 +1296,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
     public FrameBuffer getFrameBuffer(final int w, final int h) {
         final String key = getKey(w, h);
         if (!frameBufferMap.containsKey(key)) {
-            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, true, Format.RGB888, true);
+            final FrameBuffer fb = PingPongBuffer.createMainFrameBuffer(w, h, true, true, true, true, true, Format.RGB888, true);
             frameBufferMap.put(key, fb);
         }
         return frameBufferMap.get(key);

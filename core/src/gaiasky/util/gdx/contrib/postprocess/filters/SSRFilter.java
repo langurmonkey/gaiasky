@@ -34,4 +34,8 @@ public class SSRFilter extends RaymarchingFilter {
     public void setReflectionTexture(Texture tex) {
         setTexture3(tex);
     }
+
+    public void setPositionTexture(Texture tex) {
+        setTexture4(tex);
+    }
 }
