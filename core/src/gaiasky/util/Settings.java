@@ -1327,12 +1327,13 @@ public class Settings {
         public Antialias antialias;
         public BloomSettings bloom;
         public UnsharpMaskSettings unsharpMask;
+        public LevelsSettings levels;
+        public ToneMappingSettings toneMapping;
+        public boolean ssr;
         public boolean motionBlur;
         public boolean lensFlare;
         public boolean lightGlow;
         public boolean fisheye;
-        public LevelsSettings levels;
-        public ToneMappingSettings toneMapping;
 
         public PostprocessSettings() {
             EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);

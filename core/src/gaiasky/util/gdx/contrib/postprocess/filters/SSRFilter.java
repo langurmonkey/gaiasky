@@ -17,87 +17,25 @@
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.math.Vector2;
-import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Screen space reflections filter.
  */
-public class SSRFilter extends Filter<SSRFilter> {
+public class SSRFilter extends RaymarchingFilter {
 
-    private Texture depthTexture, normalTexture, reflectionTexture;
-    private final Vector2 zfark;
-
-    public enum Param implements Parameter {
-        // @formatter:off
-        Texture0("u_texture0", 0),
-        Texture1("u_texture1", 0),
-        Texture2("u_texture2", 0),
-        Texture3("u_texture3", 0),
-        ZfarK("u_zfark", 2),
-        ;
-        // @formatter:on
-
-        private final String mnemonic;
-        private final int elementSize;
-
-        Param(String m, int elementSize) {
-            this.mnemonic = m;
-            this.elementSize = elementSize;
-        }
-
-        @Override
-        public String mnemonic() {
-            return this.mnemonic;
-        }
-
-        @Override
-        public int arrayElementSize() {
-            return this.elementSize;
-        }
+    public SSRFilter(int viewportWidth, int viewportHeight) {
+        super("ssr", viewportWidth, viewportHeight);
     }
 
-    public SSRFilter() {
-        super(ShaderLoader.fromFile("screenspace", "ssr"));
-        this.zfark = new Vector2();
+    public void setNormalTexture(Texture tex) {
+        setTexture2(tex);
     }
 
-    public void setDepthTexture(Texture tex){
-        this.depthTexture = tex;
-        setParam(Param.Texture1, u_texture1);
+    public void setReflectionTexture(Texture tex) {
+        setTexture3(tex);
     }
 
-    public void setNormalTexture(Texture tex){
-        this.normalTexture = tex;
-        setParam(Param.Texture2, u_texture2);
-    }
-
-    public void setReflectionTexture(Texture tex){
-        this.reflectionTexture = tex;
-        setParam(Param.Texture3, u_texture3);
-    }
-
-
-    public void setZfarK(float zfar, float k) {
-        this.zfark.set(zfar, k);
-        setParam(Param.ZfarK, this.zfark);
-    }
-
-    @Override
-    public void rebind() {
-        setParams(Param.Texture0, u_texture0);
-        setParams(Param.Texture1, u_texture1);
-        setParams(Param.Texture2, u_texture2);
-        setParams(Param.Texture3, u_texture3);
-        setParams(Param.ZfarK, zfark);
-        endParams();
-    }
-
-    @Override
-    protected void onBeforeRender() {
-        inputTexture.bind(u_texture0);
-        depthTexture.bind(u_texture1);
-        normalTexture.bind(u_texture2);
-        reflectionTexture.bind(u_texture3);
+    public void setPositionTexture(Texture tex) {
+        setTexture4(tex);
     }
 }

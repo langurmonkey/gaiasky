@@ -8,8 +8,6 @@ uniform sampler2D u_texture0;
 uniform sampler2D u_texture1;
 // Noise buffer
 uniform sampler2D u_texture2;
-// Camera matrix
-uniform mat4 u_modelView;
 // Time in seconds
 uniform float u_time;
 // Floating position
