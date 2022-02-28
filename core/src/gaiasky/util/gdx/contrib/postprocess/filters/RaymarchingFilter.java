@@ -30,14 +30,14 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 zfark;
     private final Vector3 pos;
     private final float[] additional;
-    private Matrix4 frustumCorners, combined, projection;
+    private Matrix4 frustumCorners, combined, projection, invProjection;
     private float timeSecs;
 
     /**
      * Additional textures. Texture1 is typically used for the depth buffer. The
      * others may be used for any purpose.
      */
-    private Texture texture1, texture2, texture3, texture4;
+    private Texture texture1, texture2, texture3;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -45,12 +45,12 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         Texture1("u_texture1", 0),
         Texture2("u_texture2", 0),
         Texture3("u_texture3", 0),
-        Texture4("u_texture4", 0),
         Time("u_time", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
         Pos("u_pos", 3),
         Projection("u_projection", 16),
+        InvProjection("u_invProjection", 16),
         Combined("u_modelView", 16),
         FrustumCorners("u_frustumCorners", 16),
         Additional("u_additional", 4);
@@ -78,28 +78,52 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     /**
      * Creates a filter with the given viewport size
      *
+     * @param vertexShader   The name of the vertex shader file, without extension
      * @param fragmentShader The name of the fragment shader file, without extension
      * @param viewportWidth  The viewport width in pixels.
      * @param viewportHeight The viewport height in pixels.
      */
-    public RaymarchingFilter(String fragmentShader, int viewportWidth, int viewportHeight) {
-        this(fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
+    public RaymarchingFilter(String vertexShader, String fragmentShader, int viewportWidth, int viewportHeight) {
+        this(vertexShader, fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
     }
 
     /**
-     * Creates a filter with the given viewport size.
+     * Creates a filter with the given viewport size and using the default raymarching vertex shader.
+     *
+     * @param fragmentShader Name of fragment shader file without extension
+     * @param viewportWidth  The viewport width in pixels.
+     * @param viewportHeight The viewport height in pixels.
+     */
+    public RaymarchingFilter(String fragmentShader, int viewportWidth, int viewportHeight) {
+        this("raymarching/screenspace", fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
+    }
+
+    /**
+     * Creates a filter with the given viewport size and using the default raymarching vertex shader.
      *
      * @param fragmentShader Name of fragment shader file without extension
      * @param viewportSize   The viewport size in pixels.
      */
     public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
-        super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
+        this("raymarching/screenspace", fragmentShader, viewportSize);
+    }
+
+    /**
+     * Creates a filter with the given viewport size.
+     *
+     * @param vertexShader   The name of the vertex shader file, without extension
+     * @param fragmentShader Name of fragment shader file without extension
+     * @param viewportSize   The viewport size in pixels.
+     */
+    public RaymarchingFilter(String vertexShader, String fragmentShader, Vector2 viewportSize) {
+        super(ShaderLoader.fromFile(vertexShader, fragmentShader));
         this.viewport = viewportSize;
         this.zfark = new Vector2();
         this.pos = new Vector3();
         this.frustumCorners = new Matrix4();
         this.combined = new Matrix4();
         this.projection = new Matrix4();
+        this.invProjection = new Matrix4();
         this.additional = new float[4];
         rebind();
     }
@@ -111,7 +135,9 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
 
     public void setProjection(Matrix4 proj) {
         this.projection.set(proj);
+        this.invProjection.set(proj).inv();
         setParam(Param.Projection, this.projection);
+        setParam(Param.InvProjection, this.invProjection);
     }
 
     public void setCombined(Matrix4 mv) {
@@ -158,11 +184,6 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.Texture3, u_texture3);
     }
 
-    public void setTexture4(Texture tex) {
-        this.texture4 = tex;
-        setParam(Param.Texture4, u_texture4);
-    }
-
     public void setAdditional(float[] additional) {
         int len = Math.min(additional.length, 4);
         System.arraycopy(additional, 0, this.additional, 0, len);
@@ -197,12 +218,12 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.Texture1, u_texture1);
         setParams(Param.Texture2, u_texture2);
         setParams(Param.Texture3, u_texture3);
-        setParams(Param.Texture4, u_texture4);
         setParams(Param.Viewport, viewport);
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.Combined, this.combined);
         setParams(Param.Projection, this.projection);
+        setParams(Param.InvProjection, this.invProjection);
         setParams(Param.Pos, this.pos);
         setParams(Param.Time, timeSecs);
         setParamsv(Param.Additional, this.additional, 0, 4);
@@ -219,7 +240,5 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
             texture2.bind(u_texture2);
         if (texture3 != null)
             texture3.bind(u_texture3);
-        if (texture4 != null)
-            texture4.bind(u_texture4);
     }
 }

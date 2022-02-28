@@ -196,7 +196,6 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    vec4 fragPosView;
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -221,7 +220,6 @@ uniform vec4 u_reflectionColor;
 layout (location = 0) out vec4 fragColor;
 layout (location = 2) out vec4 normalBuffer;
 layout (location = 3) out vec4 reflectionMask;
-layout (location = 4) out vec4 positionBuffer;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -384,6 +382,8 @@ void main() {
     #endif
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
+    // Reflection mask
+    reflectionMask = vec4(0.0);
     #ifdef environmentCubemapFlag
         float roughness = 0.0;
         #if defined(roughnessTextureFlag) && defined(shininessFlag)
@@ -395,16 +395,14 @@ void main() {
         #endif // roughnessTextureFlag, shininessFlag
         reflectionColor = texture(u_environmentCubemap, reflectDir, roughness * 7.0).rgb;
         #ifdef reflectionTextureFlag
-            reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
+            vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb
+            reflectionColor = reflectionColor * reflectionStrength;
+            reflectionMask = vec4(reflectionStrength, 1.0);
         #elif defined(reflectionColorFlag)
             reflectionColor = reflectionColor * u_reflectionColor.rgb;
+            reflectionMask = vec4(u_reflectionColor.rgb, 1.0);
         #endif // reflectionColorFlag
-        reflectionColor += reflectionColor * diffuse.rgb;
-        // Reflection mask
-        reflectionMask = vec4(1.0, 1.0, 1.0, 1.0);
-    #else
-        // Reflection mask
-        reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
+        reflectionColor *= 0.0;
     #endif // environmentCubemapFlag
 
     vec3 shadowColor = vec3(0.0);
@@ -455,7 +453,6 @@ void main() {
         discard;
     }
     normalBuffer = vec4(normalVector, 1.0);
-    positionBuffer = v_data.fragPosView;
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

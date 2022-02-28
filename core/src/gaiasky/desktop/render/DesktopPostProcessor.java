@@ -152,7 +152,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, !safeMode, safeMode || vr);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode || vr);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS
@@ -711,11 +711,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     // Update ray marching shaders
                     Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                     if (rms != null)
-                        rms.forEach((key, rm) -> {
-                            if (rm.isEnabled()) {
+                        rms.forEach((key, rmEffect) -> {
+                            if (rmEffect.isEnabled()) {
                                 Vector3b pos = (Vector3b) raymarchingDef.get(key)[2];
                                 Vector3 camPos = auxb.set(campos).sub(pos).put(auxf);
-                                Raymarching raymarching = (Raymarching) rm;
+                                Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setTime(secs);
                                 raymarching.setPos(camPos);
                             }
@@ -738,13 +738,24 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     // Update all raymarching and SSR shaders
                     Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                     if (rms != null)
-                        rms.forEach((key, rm) -> {
-                            if (rm.isEnabled()) {
-                                Raymarching raymarching = (Raymarching) rm;
+                        rms.forEach((key, rmEffect) -> {
+                            if (rmEffect.isEnabled()) {
+                                Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setFrustumCorners(frustumCorners);
                                 raymarching.setProjection(projection);
                                 raymarching.setCombined(combined);
                                 raymarching.setViewportSize(w, h);
+                            }
+                        });
+                    Map<String, PostProcessorEffect> ssrs = ppb.getAll(SSR.class);
+                    if (ssrs != null)
+                        ssrs.forEach((key, ssrEffect) -> {
+                            if (ssrEffect.isEnabled()) {
+                                SSR ssr = (SSR) ssrEffect;
+                                ssr.setFrustumCorners(frustumCorners);
+                                ssr.setProjection(combined);
+                                ssr.setCombined(combined);
+                                ssr.setViewportSize(w, h);
                             }
                         });
                 }

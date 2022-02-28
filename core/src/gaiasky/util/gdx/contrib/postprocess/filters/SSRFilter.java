@@ -24,7 +24,7 @@ import com.badlogic.gdx.graphics.Texture;
 public class SSRFilter extends RaymarchingFilter {
 
     public SSRFilter(int viewportWidth, int viewportHeight) {
-        super("ssr", viewportWidth, viewportHeight);
+        super("raymarching/screenspace", "ssr", viewportWidth, viewportHeight);
     }
 
     public void setNormalTexture(Texture tex) {
@@ -33,9 +33,5 @@ public class SSRFilter extends RaymarchingFilter {
 
     public void setReflectionTexture(Texture tex) {
         setTexture3(tex);
-    }
-
-    public void setPositionTexture(Texture tex) {
-        setTexture4(tex);
     }
 }

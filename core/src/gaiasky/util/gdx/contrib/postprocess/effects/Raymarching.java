@@ -81,10 +81,6 @@ public class Raymarching extends PostProcessorEffect {
         filter.setTexture3(tex);
     }
 
-    public void setTexture4(Texture tex) {
-        filter.setTexture4(tex);
-    }
-
     public void setAdditional(float[] additional) {
         filter.setAdditional(additional);
     }
