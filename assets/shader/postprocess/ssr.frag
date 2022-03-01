@@ -31,12 +31,11 @@ in vec3 v_ray;
 // OUTPUTS
 layout (location = 0) out vec4 fragColor;
 
-#define MIN_RAY_STEP 0.1
-#define STEP 0.1
+#define STEP 1.0e-10
 #define STEPS 30
 
 #define getPosition(uv) texture(u_texture4, uv).xyz
-#define getDepth(uv) texture(u_texture1, uv).xyz
+#define getDepth(uv) 1.0 / recoverWValue(texture(u_texture1, uv).r, u_zfark.x, u_zfark.y);
 
 vec3 prj(vec3 wc, mat4 combined){
     vec4 w = vec4(wc, 1.0);
@@ -61,10 +60,9 @@ vec2 raymarch(vec3 dir, vec3 hit) {
         // Project
         vec2 projCoord = project(h, u_projection).xy;
         // Sample position and get depth
-        float depth = length(texture(u_texture4, projCoord).xyz);
+        float depth = getDepth(projCoord);
 
-        float dp = length(h) - depth;
-        if(dp < 0.0) {
+        if(length(h) > depth) {
             return projCoord;
         }
     }
