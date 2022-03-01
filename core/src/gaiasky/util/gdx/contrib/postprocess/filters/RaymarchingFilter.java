@@ -25,34 +25,37 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 /**
  * Raymarching filter.
  */
-public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
+public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 viewport;
     private final Vector2 zfark;
     private final Vector3 pos;
     private final float[] additional;
-    private Matrix4 frustumCorners, combined, projection, invProjection;
+    private Matrix4 frustumCorners;
+    private final Matrix4 invView;
+    private final Matrix4 modelView;
     private float timeSecs;
+    /**
+     * Default depth buffer texture. In our case, it contains the logarithmic
+     * depth buffer data.
+     */
+    private Texture depthTexture;
 
     /**
-     * Additional textures. Texture1 is typically used for the depth buffer. The
-     * others may be used for any purpose.
+     * Additional texture, to be used for any purpose
      */
-    private Texture texture1, texture2, texture3, texture4;
+    private Texture additionalTexture;
 
     public enum Param implements Parameter {
         // @formatter:off
-        Texture0("u_texture0", 0),
-        Texture1("u_texture1", 0),
-        Texture2("u_texture2", 0),
-        Texture3("u_texture3", 0),
-        Texture4("u_texture4", 0),
+        Texture("u_texture0", 0),
+        TextureDepth("u_texture1", 0),
+        TextureAdditional("u_texture2", 0),
         Time("u_time", 1),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
         Pos("u_pos", 3),
-        Projection("u_projection", 16),
-        InvProjection("u_invProjection", 16),
-        Combined("u_modelView", 16),
+        InvView("u_camInvViewTransform", 16),
+        ModelView("u_modelView", 16),
         FrustumCorners("u_frustumCorners", 16),
         Additional("u_additional", 4);
         // @formatter:on
@@ -76,55 +79,32 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         }
     }
 
+
     /**
      * Creates a filter with the given viewport size
      *
-     * @param vertexShader   The name of the vertex shader file, without extension
      * @param fragmentShader The name of the fragment shader file, without extension
      * @param viewportWidth  The viewport width in pixels.
      * @param viewportHeight The viewport height in pixels.
      */
-    public RaymarchingFilter(String vertexShader, String fragmentShader, int viewportWidth, int viewportHeight) {
-        this(vertexShader, fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
-    }
-
-    /**
-     * Creates a filter with the given viewport size and using the default raymarching vertex shader.
-     *
-     * @param fragmentShader Name of fragment shader file without extension
-     * @param viewportWidth  The viewport width in pixels.
-     * @param viewportHeight The viewport height in pixels.
-     */
     public RaymarchingFilter(String fragmentShader, int viewportWidth, int viewportHeight) {
-        this("raymarching/screenspace", fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
-    }
-
-    /**
-     * Creates a filter with the given viewport size and using the default raymarching vertex shader.
-     *
-     * @param fragmentShader Name of fragment shader file without extension
-     * @param viewportSize   The viewport size in pixels.
-     */
-    public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
-        this("raymarching/screenspace", fragmentShader, viewportSize);
+        this(fragmentShader, new Vector2((float) viewportWidth, (float) viewportHeight));
     }
 
     /**
      * Creates a filter with the given viewport size.
      *
-     * @param vertexShader   The name of the vertex shader file, without extension
      * @param fragmentShader Name of fragment shader file without extension
      * @param viewportSize   The viewport size in pixels.
      */
-    public RaymarchingFilter(String vertexShader, String fragmentShader, Vector2 viewportSize) {
-        super(ShaderLoader.fromFile(vertexShader, fragmentShader));
+    public RaymarchingFilter(String fragmentShader, Vector2 viewportSize) {
+        super(ShaderLoader.fromFile("raymarching/screenspace", fragmentShader));
         this.viewport = viewportSize;
         this.zfark = new Vector2();
         this.pos = new Vector3();
         this.frustumCorners = new Matrix4();
-        this.projection = new Matrix4();
-        this.invProjection = new Matrix4();
-        this.combined = new Matrix4();
+        this.invView = new Matrix4();
+        this.modelView = new Matrix4();
         this.additional = new float[4];
         rebind();
     }
@@ -134,16 +114,14 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.FrustumCorners, this.frustumCorners);
     }
 
-    public void setProjection(Matrix4 proj) {
-        this.projection.set(proj);
-        this.invProjection.set(proj).inv();
-        setParam(Param.Projection, this.projection);
-        setParam(Param.InvProjection, this.invProjection);
+    public void setInvView(Matrix4 civ) {
+        this.invView.set(civ);
+        setParam(Param.InvView, this.invView);
     }
 
-    public void setCombined(Matrix4 mv) {
-        this.combined.set(mv);
-        setParam(Param.Combined, this.combined);
+    public void setModelView(Matrix4 mv) {
+        this.modelView.set(mv);
+        setParam(Param.ModelView, this.modelView);
     }
 
     public void setPos(Vector3 pos) {
@@ -166,28 +144,14 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.ZfarK, this.zfark);
     }
 
-    public void setTexture1(Texture tex) {
-        this.texture1 = tex;
-        setParam(Param.Texture1, u_texture1);
-    }
-
     public void setDepthTexture(Texture tex) {
-        setTexture1(tex);
+        this.depthTexture = tex;
+        setParam(Param.TextureDepth, u_texture1);
     }
 
-    public void setTexture2(Texture tex) {
-        this.texture2 = tex;
-        setParam(Param.Texture2, u_texture2);
-    }
-
-    public void setTexture3(Texture tex) {
-        this.texture3 = tex;
-        setParam(Param.Texture3, u_texture3);
-    }
-
-    public void setTexture4(Texture tex) {
-        this.texture4 = tex;
-        setParam(Param.Texture4, u_texture4);
+    public void setAdditionalTexture(Texture tex) {
+        this.additionalTexture = tex;
+        setParam(Param.TextureAdditional, u_texture2);
     }
 
     public void setAdditional(float[] additional) {
@@ -220,20 +184,17 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
-        setParams(Param.Texture0, u_texture0);
-        setParams(Param.Texture1, u_texture1);
-        setParams(Param.Texture2, u_texture2);
-        setParams(Param.Texture3, u_texture3);
-        setParams(Param.Texture4, u_texture4);
+        setParams(Param.Texture, u_texture0);
+        setParams(Param.TextureDepth, u_texture1);
+        setParams(Param.TextureAdditional, u_texture2);
         setParams(Param.Viewport, viewport);
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
-        setParams(Param.Combined, this.combined);
-        setParams(Param.Projection, this.projection);
-        setParams(Param.InvProjection, this.invProjection);
-        setParams(Param.Pos, this.pos);
+        setParams(Param.InvView, invView);
+        setParams(Param.ModelView, modelView);
+        setParams(Param.Pos, pos);
         setParams(Param.Time, timeSecs);
-        setParamsv(Param.Additional, this.additional, 0, 4);
+        setParamsv(Param.Additional, additional, 0, 4);
         endParams();
     }
 
@@ -241,13 +202,9 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     protected void onBeforeRender() {
         if (inputTexture != null)
             inputTexture.bind(u_texture0);
-        if (texture1 != null)
-            texture1.bind(u_texture1);
-        if (texture2 != null)
-            texture2.bind(u_texture2);
-        if (texture3 != null)
-            texture3.bind(u_texture3);
-        if (texture4 != null)
-            texture4.bind(u_texture4);
+        if (depthTexture != null)
+            depthTexture.bind(u_texture1);
+        if (additionalTexture != null)
+            additionalTexture.bind(u_texture2);
     }
 }

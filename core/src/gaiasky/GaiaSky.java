@@ -1272,6 +1272,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             cameraManager.updateAngleEdge(renderWidth, renderHeight);
             cameraManager.resize(width, height);
         } catch (Exception e) {
+            logger.error(e);
             // TODO This try-catch block is a provisional fix for Windows, as GLFW crashes when minimizing with lwjgl 3.2.3 and libgdx 1.9.10
         }
     }

@@ -27,10 +27,8 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 /**
  * Implements a raymarching effect, usually for SDFs.
  */
-public class Raymarching extends PostProcessorEffect {
-    protected RaymarchingFilter filter;
-
-    public Raymarching(){}
+public final class Raymarching extends PostProcessorEffect {
+    private RaymarchingFilter filter;
 
     public Raymarching(String fragmentShader, float viewportWidth, float viewportHeight) {
         this(fragmentShader, (int) viewportWidth, (int) viewportHeight);
@@ -49,12 +47,12 @@ public class Raymarching extends PostProcessorEffect {
         filter.setFrustumCorners(frustumCorners);
     }
 
-    public void setCombined(Matrix4 combined) {
-        filter.setCombined(combined);
+    public void setInvView(Matrix4 invView) {
+        filter.setInvView(invView);
     }
 
-    public void setProjection(Matrix4 proj) {
-        filter.setProjection(proj);
+    public void setModelView(Matrix4 civ) {
+        filter.setModelView(civ);
     }
 
     public void setPos(Vector3 pos) {
@@ -69,16 +67,8 @@ public class Raymarching extends PostProcessorEffect {
         filter.setZfarK(zfar, k);
     }
 
-    public void setTexture1(Texture tex) {
-        filter.setTexture1(tex);
-    }
-
-    public void setTexture2(Texture tex) {
-        filter.setTexture2(tex);
-    }
-
-    public void setTexture3(Texture tex) {
-        filter.setTexture3(tex);
+    public void setAdditionalTexture(Texture tex){
+        filter.setAdditionalTexture(tex);
     }
 
     public void setAdditional(float[] additional) {

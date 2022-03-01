@@ -17,14 +17,64 @@
 package gaiasky.util.gdx.contrib.postprocess.filters;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
+import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 
 /**
  * Screen space reflections filter.
  */
-public class SSRFilter extends RaymarchingFilter {
+public class SSRFilter extends Filter3<SSRFilter> {
+    private final Vector2 viewport;
+    private final Vector2 zfark;
+    private Matrix4 frustumCorners, combined, projection, invProjection, invView;
 
+    private Texture texture1, texture2, texture3, texture4;
+
+    public enum Param implements Parameter {
+        // @formatter:off
+        Texture0("u_texture0", 0),
+        Texture1("u_texture1", 0),
+        Texture2("u_texture2", 0),
+        Texture3("u_texture3", 0),
+        Texture4("u_texture4", 0),
+        Viewport("u_viewport", 2),
+        ZfarK("u_zfark", 2),
+        Projection("u_projection", 16),
+        InvProjection("u_invProjection", 16),
+        InvView("u_camInvViewTransform", 16),
+        Combined("u_modelView", 16),
+        FrustumCorners("u_frustumCorners", 16);
+        // @formatter:on
+
+        private final String mnemonic;
+        private final int elementSize;
+
+        Param(String mnemonic, int arrayElementSize) {
+            this.mnemonic = mnemonic;
+            this.elementSize = arrayElementSize;
+        }
+
+        @Override
+        public String mnemonic() {
+            return this.mnemonic;
+        }
+
+        @Override
+        public int arrayElementSize() {
+            return this.elementSize;
+        }
+    }
     public SSRFilter(int viewportWidth, int viewportHeight) {
-        super("raymarching/screenspace", "ssr", viewportWidth, viewportHeight);
+        super(ShaderLoader.fromFile("raymarching/screenspace", "ssr"));
+        this.viewport = new Vector2(viewportWidth, viewportHeight);
+        this.zfark = new Vector2();
+        this.frustumCorners = new Matrix4();
+        this.projection = new Matrix4();
+        this.invProjection = new Matrix4();
+        this.combined = new Matrix4();
+        this.invView = new Matrix4();
+        rebind();
     }
 
     public void setNormalTexture(Texture tex) {
@@ -37,5 +87,94 @@ public class SSRFilter extends RaymarchingFilter {
 
     public void setPositionTexture(Texture tex) {
         setTexture4(tex);
+    }
+    public void setFrustumCorners(Matrix4 fc) {
+        this.frustumCorners = fc;
+        setParam(Param.FrustumCorners, this.frustumCorners);
+    }
+
+    public void setProjection(Matrix4 proj) {
+        this.projection.set(proj);
+        this.invProjection.set(proj).inv();
+        setParam(Param.Projection, this.projection);
+        setParam(Param.InvProjection, this.invProjection);
+    }
+
+    public void setCombined(Matrix4 mv) {
+        this.combined.set(mv);
+        setParam(Param.Combined, this.combined);
+    }
+
+    public void setInvView(Matrix4 civ) {
+        this.invView.set(civ);
+        setParam(Param.InvView, this.invView);
+    }
+
+    public void setViewportSize(float width, float height) {
+        this.viewport.set(width, height);
+        setParam(Param.Viewport, this.viewport);
+    }
+
+    public void setZfarK(float zfar, float k) {
+        this.zfark.set(zfar, k);
+        setParam(Param.ZfarK, this.zfark);
+    }
+
+    public void setTexture1(Texture tex) {
+        this.texture1 = tex;
+        setParam(Param.Texture1, u_texture1);
+    }
+
+    public void setDepthTexture(Texture tex) {
+        setTexture1(tex);
+    }
+
+    public void setTexture2(Texture tex) {
+        this.texture2 = tex;
+        setParam(Param.Texture2, u_texture2);
+    }
+
+    public void setTexture3(Texture tex) {
+        this.texture3 = tex;
+        setParam(Param.Texture3, u_texture3);
+    }
+
+    public void setTexture4(Texture tex) {
+        this.texture4 = tex;
+        setParam(Param.Texture4, u_texture4);
+    }
+
+    public Vector2 getViewportSize() {
+        return viewport;
+    }
+
+    @Override
+    public void rebind() {
+        // reimplement super to batch every parameter
+        setParams(Param.Texture0, u_texture0);
+        setParams(Param.Texture1, u_texture1);
+        setParams(Param.Texture2, u_texture2);
+        setParams(Param.Viewport, viewport);
+        setParams(Param.ZfarK, zfark);
+        setParams(Param.FrustumCorners, frustumCorners);
+        setParams(Param.Combined, combined);
+        setParams(Param.Projection, projection);
+        setParams(Param.InvProjection, invProjection);
+        setParams(Param.InvView, invView);
+        endParams();
+    }
+
+    @Override
+    protected void onBeforeRender() {
+        if (inputTexture != null)
+            inputTexture.bind(u_texture0);
+        if (texture1 != null)
+            texture1.bind(u_texture1);
+        if (texture2 != null)
+            texture2.bind(u_texture2);
+        if (texture3 != null)
+            texture3.bind(u_texture3);
+        if (texture4 != null)
+            texture4.bind(u_texture4);
     }
 }
