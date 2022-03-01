@@ -122,9 +122,9 @@ public class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.zfark = new Vector2();
         this.pos = new Vector3();
         this.frustumCorners = new Matrix4();
-        this.combined = new Matrix4();
         this.projection = new Matrix4();
         this.invProjection = new Matrix4();
+        this.combined = new Matrix4();
         this.additional = new float[4];
         rebind();
     }

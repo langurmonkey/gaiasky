@@ -184,7 +184,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             rm.setEnabled((boolean) list[1]);
-            //ppb.set(key, rm);
+            ppb.set(key, rm);
         });
 
         // COPY
@@ -202,7 +202,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.set(ssr);
 
         // CAMERA MOTION BLUR
-        //initCameraBlur(ppb, width, height, gq);
+        initCameraBlur(ppb, width, height, gq);
 
         // LIGHT GLOW
         Texture glow = manager.get(starTextureName);
@@ -213,7 +213,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackbufferScale(Settings.settings.runtime.openVr ? (float) Settings.settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && Settings.settings.postprocess.lightGlow);
-        //ppb.set(lightGlow);
+        ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
         /*
@@ -253,16 +253,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lensFlare.setBaseIntesity(1f);
         lensFlare.setBias(-0.98f);
         lensFlare.setBlurPasses(35);
-        //ppb.set(lensFlare);
+        ppb.set(lensFlare);
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();
         unsharp.setSharpenFactor(Settings.settings.postprocess.unsharpMask.factor);
         unsharp.setEnabled(Settings.settings.postprocess.unsharpMask.factor > 0);
-        //ppb.set(unsharp);
+        ppb.set(unsharp);
 
         // ANTI-ALIAS
-        //initAntiAliasing(Settings.settings.postprocess.antialias, width, height, ppb);
+        initAntiAliasing(Settings.settings.postprocess.antialias, width, height, ppb);
 
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
@@ -271,24 +271,24 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         bloom.setBlurAmount(10);
         bloom.setThreshold(0f);
         bloom.setEnabled(Settings.settings.postprocess.bloom.intensity > 0);
-        //ppb.set(bloom);
+        ppb.set(bloom);
 
         // DISTORTION (STEREOSCOPIC MODE)
         Curvature curvature = new Curvature();
         curvature.setDistortion(1.2f);
         curvature.setZoom(0.75f);
         curvature.setEnabled(Settings.settings.program.modeStereo.active && Settings.settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
-        //ppb.set(curvature);
+        ppb.set(curvature);
 
         // FISHEYE DISTORTION (DOME)
         Fisheye fisheye = new Fisheye(width, height);
         fisheye.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
         fisheye.setMode(0);
         fisheye.setEnabled(Settings.settings.postprocess.fisheye);
-        //ppb.set(fisheye);
+        ppb.set(fisheye);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
-        //initLevels(ppb);
+        initLevels(ppb);
 
         // SLAVE DISTORTION
         if (Settings.settings.program.net.isSlaveInstance() && SlaveManager.projectionActive() && SlaveManager.instance.isWarpOrBlend()) {
@@ -313,7 +313,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 geometryWarp = new GeometryWarp(data);
             }
             geometryWarp.setEnabled(true);
-            //ppb.set(geometryWarp);
+            ppb.set(geometryWarp);
 
         }
 
@@ -757,7 +757,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                             if (ssrEffect.isEnabled()) {
                                 SSR ssr = (SSR) ssrEffect;
                                 ssr.setFrustumCorners(frustumCorners);
-                                ssr.setProjection(combined);
+                                ssr.setProjection(projection);
                                 ssr.setCombined(combined);
                                 ssr.setViewportSize(w, h);
                             }

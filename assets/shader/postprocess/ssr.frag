@@ -59,21 +59,19 @@ vec2 raymarch(vec3 dir, inout vec3 hitCoord, out float dDepth) {
     for(int i = 0; i < STEPS; ++i) {
         hitCoord               += dir;
 
-        vec4 projectedCoord     = u_modelView * vec4(hitCoord, 1.0);
+        vec4 projectedCoord     = vec4(hitCoord, 1.0);
         projectedCoord.xy      /= projectedCoord.w;
         projectedCoord.xy       = projectedCoord.xy * 0.5 + 0.5;
 
-        //float depth             = calcViewPosition(projectedCoord.xy).z;
-        float depth             = getPosition(projectedCoord.xy).z;
+        float depth             = calcViewPosition(projectedCoord.xy).z;
+        //float depth             = getPosition(projectedCoord.xy).z;
         dDepth                  = hitCoord.z - depth;
 
         if(dDepth < 0.0)
         return projectedCoord.xy;
     }
-
     return vec2(0.0f);
 }
-
 
 void main(void) {
     float mask                      = texture(u_texture3, v_texCoords).r;

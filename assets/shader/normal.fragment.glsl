@@ -373,7 +373,7 @@ void main() {
     #else
 	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
-        normalVector.xyz = N;
+        normalVector.xyz = v_data.normal;
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_data.reflect);
 		#endif // environmentCubemapFlag

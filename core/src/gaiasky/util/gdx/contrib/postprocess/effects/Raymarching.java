@@ -49,8 +49,8 @@ public class Raymarching extends PostProcessorEffect {
         filter.setFrustumCorners(frustumCorners);
     }
 
-    public void setCombined(Matrix4 civ) {
-        filter.setCombined(civ);
+    public void setCombined(Matrix4 combined) {
+        filter.setCombined(combined);
     }
 
     public void setProjection(Matrix4 proj) {
