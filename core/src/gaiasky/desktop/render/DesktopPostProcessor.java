@@ -178,6 +178,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             ppb.set(key, rm);
         });
 
+        // COPY
+        //DrawTexture copy = new DrawTexture();
+        //ppb.set(copy);
+
         // DEPTH BUFFER
         //DepthBuffer depthBuffer = new DepthBuffer();
         //ppb.set(depthBuffer);
@@ -686,17 +690,21 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ((LensFlare) ppb.get(LensFlare.class)).setStarburstOffset(cameraOffset);
-                    ((LightGlow) ppb.get(LightGlow.class)).setOrientation(cameraOffset * 50f);
+                    LensFlare flare = (LensFlare) ppb.get(LensFlare.class);
+                    if (flare != null)
+                        flare.setStarburstOffset(cameraOffset);
+                    LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
+                    if (glow != null)
+                        glow.setOrientation(cameraOffset * 50f);
 
                     // Update ray marching shaders
                     Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                     if (rms != null)
-                        rms.forEach((key, rm) -> {
-                            if (rm.isEnabled()) {
+                        rms.forEach((key, rmEffect) -> {
+                            if (rmEffect.isEnabled()) {
                                 Vector3b pos = (Vector3b) raymarchingDef.get(key)[2];
                                 Vector3 camPos = auxb.set(campos).sub(pos).put(auxf);
-                                Raymarching raymarching = (Raymarching) rm;
+                                Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setTime(secs);
                                 raymarching.setPos(camPos);
                             }
@@ -719,9 +727,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                     // Update raymarching shaders
                     Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                     if (rms != null)
-                        rms.forEach((key, rm) -> {
-                            if (rm.isEnabled()) {
-                                Raymarching raymarching = (Raymarching) rm;
+                        rms.forEach((key, rmEffect) -> {
+                            if (rmEffect.isEnabled()) {
+                                Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setFrustumCorners(frustumCorners);
                                 raymarching.setCamInvView(civ);
                                 raymarching.setModelView(mv);
@@ -971,7 +979,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public boolean isLightScatterEnabled() {
-        return pps != null && pps[RenderType.screen.index] != null && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
+        return pps != null && pps[RenderType.screen.index] != null
+                && pps[RenderType.screen.index].get(LightGlow.class) != null
+                && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {

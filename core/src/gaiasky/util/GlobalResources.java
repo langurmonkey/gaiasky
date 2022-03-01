@@ -718,24 +718,27 @@ public class GlobalResources {
      * @return The combinations
      */
     public static String[] combinations(String[] values) {
-        List<String> valueList = Arrays.asList(values);
+        return combinations(values, 0).toArray(String.class);
+    }
+
+    private static Array<String> combinations(String[] values, int startIndex) {
         Array<String> combinations = new Array<>();
-        // First, add empty
-        combinations.add("");
-        // Add all combinations
-        int n = values.length;
-        for (int objectNumber = 1; objectNumber <= n; objectNumber++) {
-            // Iterate over all elements
-            List<List<String>> res = combination(valueList, objectNumber);
-            for (List<String> r : res) {
-                // Concat all strings in r and add to combinations
-                StringBuilder value = new StringBuilder();
-                for (String s : r)
-                    value.append(s);
-                combinations.add(value.toString());
+        // Simple case
+        if (startIndex == values.length - 1) {
+            combinations.add("");
+            combinations.add(values[startIndex]);
+            return combinations;
+        }
+        // Recursive case
+        for (int i = startIndex; i < values.length; i++) {
+            // With and without
+            Array<String> cbs = combinations(values, i + 1);
+            for (String cb : cbs) {
+                combinations.add(cb);
+                combinations.add(values[i] + cb);
             }
         }
-        return combinations.toArray(String.class);
+        return combinations;
     }
 
     /**

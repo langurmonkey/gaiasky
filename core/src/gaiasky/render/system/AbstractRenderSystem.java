@@ -191,28 +191,15 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     protected ExtShaderProgram getShaderProgram() {
-        try {
-            if (!settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                //return programs[0];
-                // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
-                return programs[SysUtils.isMac() ? 1 : 0];
-            if (settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                return programs[1];
-            else if (!settings.postprocess.motionBlur && settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                return programs[2];
-            else if (!settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[3];
-            else if (settings.postprocess.motionBlur && settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                return programs[4];
-            else if (settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[5];
-            else if (!settings.postprocess.motionBlur && settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[6];
-            else if (settings.postprocess.motionBlur && settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[7];
-        } catch (Exception ignored) {
+        boolean gw = settings.runtime.gravitationalWaves;
+        boolean ra = settings.runtime.relativisticAberration;
+        boolean vb = settings.postprocess.motionBlur;
+        int num = (gw ? 4 : 0) + (ra ? 2 : 0) + (vb ? 1 : 0);
+        if(SysUtils.isMac() && num == 0) {
+            // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
+            num = 2;
         }
-        return programs[1];
+        return programs[num];
     }
 
 }
