@@ -13,6 +13,10 @@ layout (location = 0) out vec4 fragColor;
 
 #define PI 3.1415927
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
 #endif
@@ -32,6 +36,10 @@ void main() {
 
     fragColor = vec4(v_col.rgb * profile, 1.0) * v_col.a;
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer(profile);

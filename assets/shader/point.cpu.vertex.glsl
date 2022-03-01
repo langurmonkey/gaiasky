@@ -17,6 +17,10 @@ out vec4 v_col;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
+
 void main() {
     vec4 pos = a_position;
     
@@ -27,8 +31,13 @@ void main() {
     #ifdef gravitationalWaves
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
-    
-    gl_Position = u_projView * pos;
+
+    vec4 gpos = u_projView * pos;
+    gl_Position = gpos;
     gl_PointSize = a_size;
     v_col = a_color;
+
+    #ifdef ssrFlag
+    ssrData(gpos);
+    #endif // ssrFlag
 }

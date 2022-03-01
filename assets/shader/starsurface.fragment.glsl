@@ -139,6 +139,10 @@ float noise(vec3 position, int octaves, float frequency, float persistence) {
     return total / maxAmplitude;
 }
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
 #endif
@@ -168,6 +172,10 @@ void main() {
     fragColor = vec4(min(vec3(0.9), color * 6.0 * v_lightDiffuse * percolor), v_opacity);
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer();

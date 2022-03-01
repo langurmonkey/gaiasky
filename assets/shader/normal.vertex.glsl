@@ -269,7 +269,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
+    #ifdef ssrFlag
     vec4 fragPosView;
+    #endif // ssrFlag
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -294,12 +296,15 @@ void main() {
 
     #ifdef gravitationalWaves
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
-    #endif // gravitationalWaves
+    #endif // gravitationalWave
 
     v_data.fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
-    v_data.fragPosView = gpos;
     gl_Position = gpos;
+
+    #ifdef ssrFlag
+    v_data.fragPosView = gpos;
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);
@@ -346,7 +351,6 @@ void main() {
     #endif // directionalLightsFlag
 
     // Camera is at origin, view direction is inverse of vertex position
-    pushNormal();
     #ifdef heightFlag
     v_data.viewDir = normalize(-pos.xyz);
     #else
@@ -360,6 +364,7 @@ void main() {
     #endif // normalTextureFlag
     #endif // environmentCubemapFlag
 
+    pushNormalValue(g_normal);
     pushColor(g_color);
     pushTexCoord0(g_texCoord0);
 }

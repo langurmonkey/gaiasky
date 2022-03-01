@@ -140,10 +140,13 @@ out vec3 v_ambientLight;
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 void main() {
 	computeAtmosphericScatteringGround();
@@ -175,9 +178,13 @@ void main() {
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
 
+	#ifdef ssrFlag
+	ssrData(gpos);
+	#endif // ssrFlag
+
 	#ifdef velocityBufferFlag
 	velocityBufferCam(gpos, pos, 0.0);
-    #endif
+    #endif // velocityBufferFlag
 
 	#ifdef shadowMapFlag
 		vec4 spos = u_shadowMapProjViewTrans * pos;

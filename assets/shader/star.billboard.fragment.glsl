@@ -21,7 +21,6 @@ in vec4 v_color;
 
 layout (location = 0) out vec4 fragColor;
 
-
 // Time multiplier
 #define time u_time * 0.02
 
@@ -31,6 +30,10 @@ layout (location = 0) out vec4 fragColor;
 
 // Decays
 #define light_decay 0.05
+
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
@@ -105,6 +108,10 @@ void main() {
     fragColor = draw();
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);
+
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer(fragColor.a);

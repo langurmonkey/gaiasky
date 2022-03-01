@@ -15,6 +15,10 @@ in vec2 v_uv;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
 #endif
@@ -42,6 +46,10 @@ void main() {
     //if (uv.x > 0.99 || uv.x < 0.01 || uv.y > 0.99 || uv.y < 0.01) {
     //    fragColor = vec4(1.0, 1.0, 0.0, 1.0);
     //}
+
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer();

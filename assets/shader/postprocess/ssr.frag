@@ -19,11 +19,14 @@ uniform sampler2D u_texture4;
 uniform mat4 u_projection;
 // Camera inverse projection matrix
 uniform mat4 u_invProjection;
+// Camera projection-view (combined) matrix
+uniform mat4 u_modelView;
 // Z-far and K values for depth buffer
 uniform vec2 u_zfark;
 
 // INPUTS
 in vec2 v_texCoords;
+in vec3 v_ray;
 
 // OUTPUTS
 layout (location = 0) out vec4 fragColor;
@@ -56,7 +59,7 @@ vec2 raymarch(vec3 dir, inout vec3 hitCoord, out float dDepth) {
     for(int i = 0; i < STEPS; ++i) {
         hitCoord               += dir;
 
-        vec4 projectedCoord     = u_projection * vec4(hitCoord, 1.0);
+        vec4 projectedCoord     = u_modelView * vec4(hitCoord, 1.0);
         projectedCoord.xy      /= projectedCoord.w;
         projectedCoord.xy       = projectedCoord.xy * 0.5 + 0.5;
 
@@ -93,4 +96,10 @@ void main(void) {
         // Non-reflective parts
         fragColor                   = vec4(col, 1.0);
     }
+    // View normal buffer
+    //fragColor = vec4(texture(u_texture2, v_texCoords).xyz, 1.0);
+    // View reflection mask
+    //fragColor = vec4(texture(u_texture3, v_texCoords).xyz, 1.0);
+    // View position buffer
+    //fragColor = vec4(texture(u_texture4, v_texCoords).xyz, 1.0);
 }

@@ -43,6 +43,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.assets.ShaderTemplatingLoader;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
@@ -793,6 +794,9 @@ public class DefaultIntShader extends BaseIntShader {
 
         if ((attributesMask & Matrix4Attribute.PrevProjView) == Matrix4Attribute.PrevProjView) {
             prefix += "#define velocityBufferFlag\n";
+        }
+        if (Settings.settings.postprocess.ssr) {
+            prefix += "#define ssrFlag\n";
         }
         if ((attributesMask & TextureAttribute.Ambient) == TextureAttribute.Ambient) {
             prefix += "#define " + TextureAttribute.AmbientAlias + "Flag\n";

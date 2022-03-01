@@ -184,7 +184,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             rm.setEnabled((boolean) list[1]);
-            ppb.set(key, rm);
+            //ppb.set(key, rm);
         });
 
         // COPY
@@ -202,7 +202,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ppb.set(ssr);
 
         // CAMERA MOTION BLUR
-        initCameraBlur(ppb, width, height, gq);
+        //initCameraBlur(ppb, width, height, gq);
 
         // LIGHT GLOW
         Texture glow = manager.get(starTextureName);
@@ -213,7 +213,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lightGlow.setSpiralScale(getGlowSpiralScale(Settings.settings.scene.star.brightness, Settings.settings.scene.star.pointSize, GaiaSky.instance.cameraManager.getFovFactor()));
         lightGlow.setBackbufferScale(Settings.settings.runtime.openVr ? (float) Settings.settings.graphics.backBufferScale : 1);
         lightGlow.setEnabled(!SysUtils.isMac() && Settings.settings.postprocess.lightGlow);
-        ppb.set(lightGlow);
+        //ppb.set(lightGlow);
         updateGlow(ppb, gq);
 
         /*
@@ -253,16 +253,16 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         lensFlare.setBaseIntesity(1f);
         lensFlare.setBias(-0.98f);
         lensFlare.setBlurPasses(35);
-        ppb.set(lensFlare);
+        //ppb.set(lensFlare);
 
         // UNSHARP MASK
         UnsharpMask unsharp = new UnsharpMask();
         unsharp.setSharpenFactor(Settings.settings.postprocess.unsharpMask.factor);
         unsharp.setEnabled(Settings.settings.postprocess.unsharpMask.factor > 0);
-        ppb.set(unsharp);
+        //ppb.set(unsharp);
 
         // ANTI-ALIAS
-        initAntiAliasing(Settings.settings.postprocess.antialias, width, height, ppb);
+        //initAntiAliasing(Settings.settings.postprocess.antialias, width, height, ppb);
 
         // BLOOM
         Bloom bloom = new Bloom((int) (width * bloomFboScale), (int) (height * bloomFboScale));
@@ -271,24 +271,24 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         bloom.setBlurAmount(10);
         bloom.setThreshold(0f);
         bloom.setEnabled(Settings.settings.postprocess.bloom.intensity > 0);
-        ppb.set(bloom);
+        //ppb.set(bloom);
 
         // DISTORTION (STEREOSCOPIC MODE)
         Curvature curvature = new Curvature();
         curvature.setDistortion(1.2f);
         curvature.setZoom(0.75f);
         curvature.setEnabled(Settings.settings.program.modeStereo.active && Settings.settings.program.modeStereo.profile == StereoProfile.VR_HEADSET);
-        ppb.set(curvature);
+        //ppb.set(curvature);
 
         // FISHEYE DISTORTION (DOME)
         Fisheye fisheye = new Fisheye(width, height);
         fisheye.setFov(GaiaSky.instance.cameraManager.getCamera().fieldOfView);
         fisheye.setMode(0);
         fisheye.setEnabled(Settings.settings.postprocess.fisheye);
-        ppb.set(fisheye);
+        //ppb.set(fisheye);
 
         // LEVELS - BRIGHTNESS, CONTRAST, HUE, SATURATION, GAMMA CORRECTION and HDR TONE MAPPING
-        initLevels(ppb);
+        //initLevels(ppb);
 
         // SLAVE DISTORTION
         if (Settings.settings.program.net.isSlaveInstance() && SlaveManager.projectionActive() && SlaveManager.instance.isWarpOrBlend()) {
@@ -313,7 +313,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 geometryWarp = new GeometryWarp(data);
             }
             geometryWarp.setEnabled(true);
-            ppb.set(geometryWarp);
+            //ppb.set(geometryWarp);
 
         }
 
@@ -375,11 +375,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         }
         lgh = Math.round(lgw / ar);
         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-        lightglow.setNSamples(samples);
-        lightglow.setViewportSize(lgw, lgh);
-
+        if(lightglow != null) {
+            lightglow.setNSamples(samples);
+            lightglow.setViewportSize(lgw, lgh);
+        }
         lightGlowNSamples = samples;
-
     }
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
@@ -705,8 +705,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ((LensFlare) ppb.get(LensFlare.class)).setStarburstOffset(cameraOffset);
-                    ((LightGlow) ppb.get(LightGlow.class)).setOrientation(cameraOffset * 50f);
+                    LensFlare flare = (LensFlare) ppb.get(LensFlare.class);
+                    if (flare != null)
+                        flare.setStarburstOffset(cameraOffset);
+                    LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
+                    if (glow != null)
+                        glow.setOrientation(cameraOffset * 50f);
 
                     // Update ray marching shaders
                     Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
@@ -766,8 +770,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.get(Fisheye.class).setEnabled(active);
-                    ((LightGlow) ppb.get(LightGlow.class)).setNSamples(active ? 1 : lightGlowNSamples);
+                    Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
+                    if (fisheye != null)
+                        fisheye.setEnabled(active);
+                    LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
+                    if (glow != null)
+                        glow.setNSamples(active ? 1 : lightGlowNSamples);
                 }
             }
             break;
@@ -776,7 +784,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.get(CameraMotion.class).setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
+                    CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
+                    if(cameraMotion != null)
+                        cameraMotion.setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
                 }
             }
             if (enabled && blurObjectAdded) {
@@ -1001,7 +1011,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     @Override
     public boolean isLightScatterEnabled() {
-        return pps != null && pps[RenderType.screen.index] != null && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
+        return pps != null && pps[RenderType.screen.index] != null
+                && pps[RenderType.screen.index].get(LightGlow.class) != null
+                && pps[RenderType.screen.index].get(LightGlow.class).isEnabled();
     }
 
     private void updateStereo(boolean stereo, StereoProfile profile) {

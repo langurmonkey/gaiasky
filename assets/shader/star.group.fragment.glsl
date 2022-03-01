@@ -16,9 +16,13 @@ in vec4 v_col;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
-#endif
+#endif // velocityBufferFlag
 
 float starTexture(vec2 uv) {
     return texture(u_starTex, uv).r;
@@ -40,7 +44,11 @@ void main() {
     fragColor = clamp(alpha * (v_col + core * 2.0), 0.0, 1.0);
     gl_FragDepth = getDepthValue(u_zfar, u_k);
 
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
+
     #ifdef velocityBufferFlag
     velocityBuffer();
-    #endif
+    #endif // velocityBufferFlag
 }

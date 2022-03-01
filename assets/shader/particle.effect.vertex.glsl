@@ -24,7 +24,11 @@ uniform float u_ttl; // time to live in seconds
 #ifdef gravitationalWaves
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
-    
+
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
+
 out vec4 v_col;
 
 #include shader/lib_math.glsl
@@ -46,6 +50,11 @@ void main() {
     
     v_col = vec4(a_color.rgb, a_color.a * alpha);
 
-    gl_Position = u_projView * vec4(pos, 1.0);
+    vec4 gpos =  u_projView * vec4(pos, 1.0);
+    gl_Position = gpos;
     gl_PointSize = a_size * u_sizeFactor;
+
+    #ifdef ssrFlag
+    ssrData(gpos);
+    #endif // ssrFlag
 }

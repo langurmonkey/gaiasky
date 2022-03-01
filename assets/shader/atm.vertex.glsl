@@ -24,6 +24,9 @@ in vec3 a_position;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
 
 void main(void) {
     computeAtmosphericScattering();
@@ -39,4 +42,8 @@ void main(void) {
     
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
+
+    #ifdef ssrFlag
+    ssrData(gpos);
+    #endif // ssrFlag
 }

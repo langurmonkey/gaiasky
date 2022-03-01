@@ -29,9 +29,13 @@ uniform float u_vrScale;
 out vec4 v_color;
 out vec2 v_uv;
 
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 #define LEN0 20000.0
 
@@ -64,6 +68,10 @@ void main() {
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos;
+
+    #ifdef ssrFlag
+    ssrData(gpos);
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);

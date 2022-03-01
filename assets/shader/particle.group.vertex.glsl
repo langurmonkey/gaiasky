@@ -29,6 +29,10 @@ uniform float u_vrScale;
     
 out vec4 v_col;
 
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -61,9 +65,12 @@ void main() {
     float viewAngle = a_additional.x / dist;
 
     vec4 gpos = u_projView * vec4(pos, 1.0);
-
-    gl_Position = u_projView * vec4(pos, 0.0);
+    gl_Position = gpos;
     gl_PointSize = min(max(viewAngle * u_sizeFactor * cubemapSizeFactor, u_sizeLimits.x), u_sizeLimits.y);
+
+    #ifdef ssrFlag
+    ssrData(gpos);
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position.xyz, dist, vec2(1e10, 1e12), 1.0);

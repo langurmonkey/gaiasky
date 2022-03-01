@@ -23,7 +23,7 @@ import gaiasky.util.gdx.contrib.postprocess.filters.Glow;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 
 /**
- * Light scattering implementation.
+ * Light glow implementation.
  */
 public final class LightGlow extends PostProcessorEffect {
     public static class Settings {
@@ -31,7 +31,6 @@ public final class LightGlow extends PostProcessorEffect {
 
         public Settings(String name) {
             this.name = name;
-
         }
 
         public Settings(Settings other) {
@@ -47,7 +46,6 @@ public final class LightGlow extends PostProcessorEffect {
 
     public LightGlow(int width, int height) {
         glow = new Glow(width, height);
-
     }
 
     @Override
@@ -99,7 +97,6 @@ public final class LightGlow extends PostProcessorEffect {
 
     public void setSettings(Settings settings) {
         this.settings = settings;
-
     }
 
     public void setLightGlowTexture(Texture tex) {

@@ -92,6 +92,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      * component types
      *
      * @param renderable The renderable
+     *
      * @return The alpha value as the product of all the alphas of its component
      * types.
      */
@@ -183,7 +184,7 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
      */
     protected void addPreviousFrameUniforms(ExtShaderProgram shaderProgram, ICamera camera) {
         // Velocity buffer
-        if(settings.postprocess.motionBlur) {
+        if (settings.postprocess.motionBlur) {
             shaderProgram.setUniformf("u_prevCamPos", camera.getPreviousPos().put(aux));
             shaderProgram.setUniformf("u_dCamPos", auxd.set(camera.getPreviousPos()).sub(camera.getPos()).put(aux));
             shaderProgram.setUniformMatrix("u_prevProjView", camera.getPreviousProjView());
@@ -191,28 +192,16 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
     }
 
     protected ExtShaderProgram getShaderProgram() {
-        try {
-            if (!settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                //return programs[0];
-                // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
-                return programs[SysUtils.isMac() ? 1 : 0];
-            if (settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                return programs[1];
-            else if (!settings.postprocess.motionBlur && settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                return programs[2];
-            else if (!settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[3];
-            else if (settings.postprocess.motionBlur && settings.runtime.relativisticAberration && !settings.runtime.gravitationalWaves)
-                return programs[4];
-            else if (settings.postprocess.motionBlur && !settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[5];
-            else if (!settings.postprocess.motionBlur && settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[6];
-            else if (settings.postprocess.motionBlur && settings.runtime.relativisticAberration && settings.runtime.gravitationalWaves)
-                return programs[7];
-        } catch (Exception ignored) {
+        boolean gw = settings.runtime.gravitationalWaves;
+        boolean ra = settings.runtime.relativisticAberration;
+        boolean vb = settings.postprocess.motionBlur;
+        boolean ssr = settings.postprocess.ssr;
+        int num = (gw ? 8 : 0) + (ra ? 4 : 0) + (vb ? 2 : 0) + (ssr ? 1 : 0);
+        if(SysUtils.isMac() && num == 0) {
+            // TODO this is a hack till I narrow down the bug, for the moment, velocity map always computed
+            num = 2;
         }
-        return programs[1];
+        return programs[num];
     }
 
 }

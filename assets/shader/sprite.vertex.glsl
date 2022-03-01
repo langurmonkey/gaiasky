@@ -19,8 +19,13 @@ uniform vec3 u_camShift;
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
+// OUTPUTS
 out vec4 v_color;
 out vec2 v_texCoords;
+
+#ifdef ssrFlag
+#include shader/lib_ssr.vert.glsl
+#endif // ssrFlag
 
 void main()
 {
@@ -45,4 +50,8 @@ void main()
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos;
+
+    #ifdef ssrFlag
+    ssrData(gpos);
+    #endif // ssrFlag
 }

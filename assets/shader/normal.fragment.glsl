@@ -196,7 +196,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
+    #ifdef ssrFlag
     vec4 fragPosView;
+    #endif // ssrFlag
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -219,9 +221,10 @@ uniform vec4 u_reflectionColor;
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
-layout (location = 2) out vec4 normalBuffer;
-layout (location = 3) out vec4 reflectionMask;
-layout (location = 4) out vec4 positionBuffer;
+
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
@@ -354,7 +357,7 @@ void main() {
     texAlpha = luma(emissive.rgb);
     #endif
 
-    vec3 normalVector = vec3(0.0, 0.0, 0.0);
+    vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
     #ifdef normalTextureFlag
         // Normal in tangent space
         vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
@@ -364,13 +367,13 @@ void main() {
             #ifndef heightFlag
             mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
             #endif // heighFlag
-            normalVector = normalize(TBN * N);
-            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector));
+            normalVector.xyz = normalize(TBN * N);
+            vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
 		#endif // environmentCubemapFlag
     #else
 	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
-        normalVector = v_data.normal;
+        normalVector.xyz = N;
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_data.reflect);
 		#endif // environmentCubemapFlag
@@ -384,8 +387,12 @@ void main() {
     #endif
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
+
     // Reflection mask
-    reflectionMask = vec4(0.0);
+    #ifdef ssrFlag
+    reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
+    #endif // ssrFlag
+
     #ifdef environmentCubemapFlag
         float roughness = 0.0;
         #if defined(roughnessTextureFlag) && defined(shininessFlag)
@@ -397,14 +404,22 @@ void main() {
         #endif // roughnessTextureFlag, shininessFlag
         reflectionColor = texture(u_environmentCubemap, reflectDir, roughness * 7.0).rgb;
         #ifdef reflectionTextureFlag
-            vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb
+            vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb;
             reflectionColor = reflectionColor * reflectionStrength;
+            #ifdef ssrFlag
             reflectionMask = vec4(reflectionStrength, 1.0);
+            #endif // ssrFlag
         #elif defined(reflectionColorFlag)
             reflectionColor = reflectionColor * u_reflectionColor.rgb;
+            #ifdef ssrFlag
             reflectionMask = vec4(u_reflectionColor.rgb, 1.0);
+            #endif //ssrFlag
         #endif // reflectionColorFlag
+        #ifdef ssrFlag
         reflectionColor *= 0.0;
+        #else
+        reflectionColor += reflectionColor * diffuse.rgb;
+        #endif // ssrFlag
     #endif // environmentCubemapFlag
 
     vec3 shadowColor = vec3(0.0);
@@ -454,8 +469,10 @@ void main() {
     if (fragColor.a <= 0.0) {
         discard;
     }
-    normalBuffer = vec4(normalVector, 1.0);
+    #ifdef ssrFlag
+    normalBuffer = vec4(normalVector.xyz, 1.0);
     positionBuffer = v_data.fragPosView;
+    #endif // ssrFlag
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);

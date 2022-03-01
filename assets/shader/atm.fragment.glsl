@@ -22,6 +22,10 @@ in float v_fadeFactor;
 layout (location = 0) out vec4 fragColor;
 layout (location = 1) out vec4 velMap;
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 float luma(vec3 color){
     return dot(color, vec3(0.2126, 0.7152, 0.0722));
 }
@@ -42,5 +46,10 @@ void main(void) {
 
     fragColor.rgb = fragColor.rgb * 0.95;
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
+
     velMap = vec4(0.0);
 }
