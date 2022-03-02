@@ -481,6 +481,8 @@ postprocess:
     factor: 0.0
   # Activate/deactivate motion blur effect
   motionBlur: false
+  # Activate/deactivate screen space reflections
+  ssr: false
   # Activate/deactivate lens flare effect
   lensFlare: true
   # Activate/deactivate light glow effect
