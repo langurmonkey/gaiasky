@@ -70,7 +70,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     Vector3b auxb, prevCampos;
     Vector3 auxf;
     Matrix4 prevViewProj;
-    Matrix4 projection, combined, invView;
+    Matrix4 projection, combined, view;
     Matrix4 frustumCorners;
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
@@ -90,7 +90,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         auxf = new Vector3();
         prevCampos = new Vector3b();
         prevViewProj = new Matrix4();
-        invView = new Matrix4();
+        view = new Matrix4();
         projection = new Matrix4();
         combined = new Matrix4();
         frustumCorners = new Matrix4();
@@ -192,7 +192,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //ppb.set(depthBuffer);
 
         // SSR
-        SSR ssrEffect = new SSR(width, height);
+        SSR ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
         ssrEffect.setEnabled(Settings.settings.postprocess.ssr);
         ppb.set(ssrEffect);
@@ -730,7 +730,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             int w = (Integer) data[1];
             int h = (Integer) data[2];
             CameraManager.getFrustumCornersEye(cam, frustumCorners);
-            invView.set(cam.view).inv();
+            view.set(cam.view);
             projection.set(cam.projection);
             combined.set(cam.combined);
             for (int i = 0; i < RenderType.values().length; i++) {
@@ -743,8 +743,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                             if (rmEffect.isEnabled()) {
                                 Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setFrustumCorners(frustumCorners);
-                                raymarching.setInvView(invView);
-                                raymarching.setModelView(combined);
+                                raymarching.setView(view);
+                                raymarching.setCombined(combined);
                                 raymarching.setViewportSize(w, h);
                             }
                         });
@@ -754,10 +754,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                             if (ssrEffect.isEnabled()) {
                                 SSR ssr = (SSR) ssrEffect;
                                 ssr.setFrustumCorners(frustumCorners);
-                                ssr.setInvView(invView);
+                                ssr.setView(view);
                                 ssr.setProjection(projection);
                                 ssr.setCombined(combined);
-                                ssr.setViewportSize(w, h);
                             }
                         });
                 }

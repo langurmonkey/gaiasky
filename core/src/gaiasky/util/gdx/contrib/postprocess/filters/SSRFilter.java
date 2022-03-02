@@ -25,9 +25,8 @@ import gaiasky.util.gdx.contrib.utils.ShaderLoader;
  * Screen space reflections filter.
  */
 public class SSRFilter extends Filter3<SSRFilter> {
-    private final Vector2 viewport;
     private final Vector2 zfark;
-    private Matrix4 frustumCorners, combined, projection, invProjection, invView;
+    private Matrix4 frustumCorners, combined, projection, invProjection, view, invView;
 
     private Texture texture1, texture2, texture3, texture4;
 
@@ -42,7 +41,8 @@ public class SSRFilter extends Filter3<SSRFilter> {
         ZfarK("u_zfark", 2),
         Projection("u_projection", 16),
         InvProjection("u_invProjection", 16),
-        InvView("u_camInvViewTransform", 16),
+        View("u_view", 16),
+        InvView("u_invView", 16),
         Combined("u_modelView", 16),
         FrustumCorners("u_frustumCorners", 16);
         // @formatter:on
@@ -65,15 +65,15 @@ public class SSRFilter extends Filter3<SSRFilter> {
             return this.elementSize;
         }
     }
-    public SSRFilter(int viewportWidth, int viewportHeight) {
+    public SSRFilter() {
         super(ShaderLoader.fromFile("raymarching/screenspace", "ssr"));
-        this.viewport = new Vector2(viewportWidth, viewportHeight);
         this.zfark = new Vector2();
         this.frustumCorners = new Matrix4();
         this.projection = new Matrix4();
         this.invProjection = new Matrix4();
-        this.combined = new Matrix4();
+        this.view = new Matrix4();
         this.invView = new Matrix4();
+        this.combined = new Matrix4();
         rebind();
     }
 
@@ -105,14 +105,11 @@ public class SSRFilter extends Filter3<SSRFilter> {
         setParam(Param.Combined, this.combined);
     }
 
-    public void setInvView(Matrix4 civ) {
-        this.invView.set(civ);
+    public void setView(Matrix4 view) {
+        this.view.set(view);
+        setParam(Param.View, this.view);
+        this.invView.set(view).inv();
         setParam(Param.InvView, this.invView);
-    }
-
-    public void setViewportSize(float width, float height) {
-        this.viewport.set(width, height);
-        setParam(Param.Viewport, this.viewport);
     }
 
     public void setZfarK(float zfar, float k) {
@@ -144,22 +141,18 @@ public class SSRFilter extends Filter3<SSRFilter> {
         setParam(Param.Texture4, u_texture4);
     }
 
-    public Vector2 getViewportSize() {
-        return viewport;
-    }
-
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Texture0, u_texture0);
         setParams(Param.Texture1, u_texture1);
         setParams(Param.Texture2, u_texture2);
-        setParams(Param.Viewport, viewport);
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.Combined, combined);
         setParams(Param.Projection, projection);
         setParams(Param.InvProjection, invProjection);
+        setParams(Param.View, view);
         setParams(Param.InvView, invView);
         endParams();
     }

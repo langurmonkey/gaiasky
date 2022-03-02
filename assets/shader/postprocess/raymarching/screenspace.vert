@@ -19,7 +19,7 @@ in vec4 a_position;
 in vec2 a_texCoord0;
 
 uniform mat4 u_frustumCorners;
-uniform mat4 u_camInvViewTransform;
+uniform mat4 u_invView;
 
 out vec2 v_texCoords;
 out vec3 v_ray;
@@ -33,6 +33,6 @@ void main() {
 
 	vec4 ray = u_frustumCorners[int(index)];
 	ray /= abs(ray.z);
-	ray = u_camInvViewTransform * ray;
+	ray = u_invView * ray;
 	v_ray = ray.xyz;
 }

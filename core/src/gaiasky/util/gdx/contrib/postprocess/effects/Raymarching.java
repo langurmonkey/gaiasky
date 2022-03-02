@@ -47,12 +47,12 @@ public final class Raymarching extends PostProcessorEffect {
         filter.setFrustumCorners(frustumCorners);
     }
 
-    public void setInvView(Matrix4 invView) {
-        filter.setInvView(invView);
+    public void setView(Matrix4 view) {
+        filter.setView(view);
     }
 
-    public void setModelView(Matrix4 civ) {
-        filter.setModelView(civ);
+    public void setCombined(Matrix4 viewProjection) {
+        filter.setCombined(viewProjection);
     }
 
     public void setPos(Vector3 pos) {

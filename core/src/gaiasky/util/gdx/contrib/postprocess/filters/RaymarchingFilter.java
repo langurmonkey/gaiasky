@@ -30,9 +30,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
     private final Vector2 zfark;
     private final Vector3 pos;
     private final float[] additional;
-    private Matrix4 frustumCorners;
-    private final Matrix4 invView;
-    private final Matrix4 modelView;
+    private Matrix4 frustumCorners, invView, combined;
     private float timeSecs;
     /**
      * Default depth buffer texture. In our case, it contains the logarithmic
@@ -54,8 +52,8 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
         Pos("u_pos", 3),
-        InvView("u_camInvViewTransform", 16),
-        ModelView("u_modelView", 16),
+        InvView("u_invView", 16),
+        Combined("u_modelView", 16),
         FrustumCorners("u_frustumCorners", 16),
         Additional("u_additional", 4);
         // @formatter:on
@@ -104,7 +102,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         this.pos = new Vector3();
         this.frustumCorners = new Matrix4();
         this.invView = new Matrix4();
-        this.modelView = new Matrix4();
+        this.combined = new Matrix4();
         this.additional = new float[4];
         rebind();
     }
@@ -114,14 +112,14 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParam(Param.FrustumCorners, this.frustumCorners);
     }
 
-    public void setInvView(Matrix4 civ) {
-        this.invView.set(civ);
+    public void setView(Matrix4 view) {
+        this.invView.set(view).inv();
         setParam(Param.InvView, this.invView);
     }
 
-    public void setModelView(Matrix4 mv) {
-        this.modelView.set(mv);
-        setParam(Param.ModelView, this.modelView);
+    public void setCombined(Matrix4 viewProjection) {
+        this.combined.set(viewProjection);
+        setParam(Param.Combined, this.combined);
     }
 
     public void setPos(Vector3 pos) {
@@ -191,7 +189,7 @@ public final class RaymarchingFilter extends Filter3<RaymarchingFilter> {
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.InvView, invView);
-        setParams(Param.ModelView, modelView);
+        setParams(Param.Combined, combined);
         setParams(Param.Pos, pos);
         setParams(Param.Time, timeSecs);
         setParamsv(Param.Additional, additional, 0, 4);

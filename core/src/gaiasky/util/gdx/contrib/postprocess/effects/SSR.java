@@ -14,12 +14,9 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
 public class SSR extends PostProcessorEffect {
     private SSRFilter filter;
 
-    public SSR(float viewportWidth, float viewportHeight) {
+    public SSR() {
         super();
-        filter = new SSRFilter((int) viewportWidth, (int) viewportHeight);
-    }
-    public void setViewportSize(int width, int height) {
-        filter.setViewportSize(width, height);
+        filter = new SSRFilter();
     }
 
     public void setFrustumCorners(Matrix4 frustumCorners) {
@@ -34,8 +31,8 @@ public class SSR extends PostProcessorEffect {
         filter.setProjection(proj);
     }
 
-    public void setInvView(Matrix4 invView) {
-        filter.setInvView(invView);
+    public void setView(Matrix4 view) {
+        filter.setView(view);
     }
 
     public void setZfarK(float zfar, float k) {
