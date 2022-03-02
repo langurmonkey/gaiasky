@@ -124,10 +124,6 @@ out vec3 v_ambientLight;
 
 out float v_depth;
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -161,10 +157,6 @@ void main() {
 
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
-
-	#ifdef ssrFlag
-	ssrData(gpos);
-	#endif // ssrFlag
 
 	#ifdef velocityBufferFlag
 	velocityBufferCam(gpos, pos);

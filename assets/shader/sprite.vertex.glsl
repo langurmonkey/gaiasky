@@ -23,10 +23,6 @@ uniform vec3 u_camShift;
 out vec4 v_color;
 out vec2 v_texCoords;
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 void main()
 {
     v_color = u_color;
@@ -50,8 +46,4 @@ void main()
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos;
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 }

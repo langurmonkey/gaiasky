@@ -18,10 +18,6 @@ out vec4 v_col;
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -42,10 +38,6 @@ void main() {
     // Position
     vec4 gpos = u_projView * pos;
     gl_Position = gpos;
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);

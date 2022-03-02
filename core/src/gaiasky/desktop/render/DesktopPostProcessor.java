@@ -151,12 +151,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         GraphicsQuality gq = Settings.settings.graphics.quality;
         boolean safeMode = Settings.settings.program.safeMode;
         boolean vr = Settings.settings.runtime.openVr;
-        boolean ssr = Settings.settings.postprocess.ssr;
-        boolean cameraBlur = Settings.settings.postprocess.motionBlur;
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, cameraBlur && !safeMode, ssr && !safeMode, ssr && !safeMode, ssr && !safeMode, safeMode || vr);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode || vr);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS

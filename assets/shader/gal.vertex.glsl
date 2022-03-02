@@ -29,10 +29,6 @@ out vec2 v_texCoords;
 #define distfac 6.24e-8 / 60000.0
 #define distfacinv 60000.0 / 3.23e-8
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -69,10 +65,6 @@ void main() {
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos;
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);

@@ -56,10 +56,6 @@ out vec4 v_col;
 #define len0 20000.0
 #define day_to_year 1.0 / 365.25
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -176,10 +172,6 @@ void main() {
     vec4 gpos = u_projView * vec4(pos, 1.0);
     gl_Position = gpos;
     gl_PointSize = max(3.3 * u_alphaSizeBrRc.w, pow(solidAngle * .5e8, u_brightnessPower) * u_alphaSizeBrRc.y * cubemapFactor);
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer(gpos, a_position, dist, pm, vec2(500.0, 3000.0), 1.0);

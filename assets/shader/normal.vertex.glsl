@@ -94,6 +94,7 @@
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
+uniform mat4 u_viewTrans;
 uniform mat4 u_worldTrans;
 uniform mat3 u_normalMatrix;
 uniform float u_vrScale;
@@ -269,9 +270,6 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef ssrFlag
-    vec4 fragPosView;
-    #endif // ssrFlag
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -301,10 +299,6 @@ void main() {
     v_data.fragPosWorld = pos.xyz;
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
-
-    #ifdef ssrFlag
-    v_data.fragPosView = gpos;
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);

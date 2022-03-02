@@ -1511,7 +1511,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             FrameBufferBuilder fbb = new FrameBufferBuilder(1920, 1080);
             fbb.addBasicColorTextureAttachment(Format.RGBA8888);
             fbb.addBasicDepthRenderBuffer();
-            glowFb = new GaiaSkyFrameBuffer(fbb);
+            glowFb = new GaiaSkyFrameBuffer(fbb, 0, 1);
         }
     }
 

@@ -59,28 +59,28 @@ public final class PingPongBuffer {
     private int ownedW, ownedH;
 
     public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth) {
-        this(width, height, frameBufferFormat, hasDepth, true, false, false, false, false);
+        this(width, height, frameBufferFormat, hasDepth, true, false, false, false);
     }
 
     /** Creates a new ping-pong buffer and owns the resources. */
-    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasPosition, boolean hasReflectionMask, boolean preventFloatBuffer) {
+    public PingPongBuffer(int width, int height, Format frameBufferFormat, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, boolean preventFloatBuffer) {
         ownResources = true;
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
         //      0: FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
         //      1: FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
-        //      2: FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
-        //      3: FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
-        //      4: FLOAT TEXTURE ATTACHMENT (POSITION BUFFER)
+        //      2: FLOAT TEXTURE ATTACHMENT (VELOCITY BUFFER)
+        //      3: FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
+        //      4: FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         // 1 DEPTH TEXTURE ATTACHMENT
-        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasVelocity, hasNormal, hasPosition, hasReflectionMask, frameBufferFormat, preventFloatBuffer);
+        ownedMain = createMainFrameBuffer(width, height, hasDepth, hasVelocity, hasNormal, hasReflectionMask, frameBufferFormat, preventFloatBuffer);
 
         // EXTRA BUFFER:
         // SINGLE RENDER TARGET WITH A COLOR TEXTURE ATTACHMENT
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
         addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-        ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder);
+        ownedExtra = new GaiaSkyFrameBuffer(frameBufferBuilder, 0);
 
         // Buffer the scene is rendered to is actually the second
         set(ownedExtra, ownedMain);
@@ -94,44 +94,46 @@ public final class PingPongBuffer {
         set(buffer1, buffer2);
     }
 
-    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasPosition, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
+    public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
+
+        int colorIndex, depthIndex = -1, velIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int idx = 0;
 
         // 0
         // Main color render target
         addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+        colorIndex = idx++;
 
         // 1
         // Depth buffer
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
+            depthIndex = idx++;
         }
 
         // 2
         // Velocity buffer
         if (hasVelocity) {
             addFloatRenderTarget(frameBufferBuilder, frameBufferFormat);
+            velIndex = idx++;
         }
 
         // 3
         // Normal buffer
         if (hasNormal) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+            normalIndex = idx++;
         }
 
         // 4
         // Reflection mask buffer
         if (hasReflectionMask) {
             addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
+            reflectionMaskIndex = idx++;
         }
 
-        // 5
-        // Position buffer
-        if (hasPosition) {
-            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
-        }
-
-        return new GaiaSkyFrameBuffer(frameBufferBuilder);
+        return new GaiaSkyFrameBuffer(frameBufferBuilder, colorIndex, depthIndex, velIndex, normalIndex, reflectionMaskIndex);
 
     }
 
@@ -218,7 +220,7 @@ public final class PingPongBuffer {
         textureDepth = buffer1.getDepthBufferTexture();
         textureVel = buffer1.getVelocityBufferTexture();
         textureNormal = buffer1.getNormalBufferTexture();
-        textureReflectionMap = buffer1.getReflectionBufferTexture();
+        textureReflectionMap = buffer1.getReflectionMaskBufferTexture();
     }
 
     /**

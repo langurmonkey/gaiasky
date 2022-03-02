@@ -51,10 +51,6 @@ public class SSR extends PostProcessorEffect {
         filter.setTexture3(tex);
     }
 
-    public void setTexture4(Texture tex) {
-        filter.setTexture4(tex);
-    }
-
     @Override
     public void dispose() {
         if (filter != null) {
@@ -78,9 +74,7 @@ public class SSR extends PostProcessorEffect {
         // Normal buffer
         filter.setNormalTexture(main.getNormalBufferTexture());
         // Reflection mask
-        filter.setReflectionTexture(main.getReflectionBufferTexture());
-        // Position buffer
-        filter.setPositionTexture(main.getPositionBufferTexture());
+        filter.setReflectionTexture(main.getReflectionMaskBufferTexture());
         // Set input, output and render
         filter.setInput(src).setOutput(dest).render();
     }

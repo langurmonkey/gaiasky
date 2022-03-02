@@ -196,9 +196,6 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef ssrFlag
-    vec4 fragPosView;
-    #endif // ssrFlag
     #ifdef environmentCubemapFlag
     vec3 reflect;
     #endif // environmentCubemapFlag
@@ -367,7 +364,7 @@ void main() {
             #ifndef heightFlag
             mat3 TBN = cotangentFrame(g_normal, -v_data.viewDir, texCoords);
             #endif // heighFlag
-            normalVector.xyz = normalize(TBN * N);
+            normalVector.xyz = TBN * N;
             vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
 		#endif // environmentCubemapFlag
     #else
@@ -376,7 +373,7 @@ void main() {
         normalVector.xyz = v_data.normal;
 		#ifdef environmentCubemapFlag
 			vec3 reflectDir = normalize(v_data.reflect);
-		#endif // environmentCubemapFlag
+        #endif // environmentCubemapFlag
     #endif // normalTextureFlag
 
     // Shadow
@@ -471,7 +468,6 @@ void main() {
     }
     #ifdef ssrFlag
     normalBuffer = vec4(normalVector.xyz, 1.0);
-    positionBuffer = v_data.fragPosView;
     #endif // ssrFlag
 
     // Logarithmic depth buffer

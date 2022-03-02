@@ -17,10 +17,6 @@ out vec4 v_col;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 void main() {
     vec4 pos = a_position;
     
@@ -36,8 +32,4 @@ void main() {
     gl_Position = gpos;
     gl_PointSize = a_size;
     v_col = a_color;
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 }

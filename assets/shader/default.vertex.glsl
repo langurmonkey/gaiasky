@@ -132,17 +132,12 @@ out vec3 v_ambientLight;
 #include shader/lib_relativity.glsl
 #endif // relativisticEffects
 
-
 ////////////////////////////////////////////////////////////////////////////////////
 //////////GRAVITATIONAL WAVES - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef gravitationalWaves
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
-
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
@@ -177,10 +172,6 @@ void main() {
 
 	vec4 gpos = u_projViewTrans * pos;
 	gl_Position = gpos;
-
-	#ifdef ssrFlag
-	ssrData(gpos);
-	#endif // ssrFlag
 
 	#ifdef velocityBufferFlag
 	velocityBufferCam(gpos, pos, 0.0);

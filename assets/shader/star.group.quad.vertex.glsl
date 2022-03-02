@@ -45,10 +45,6 @@ out vec2 v_uv;
 #define LEN0 20000.0
 #define DAY_TO_YEAR 1.0 / 365.25
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -100,10 +96,6 @@ void main() {
 
     gl_Position = gpos;
     v_uv = a_texCoord;
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, a_starPos, s_size, a_position, s_quat, s_quat_conj);

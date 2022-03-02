@@ -35,10 +35,6 @@ out vec2 v_uv;
 #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-#ifdef ssrFlag
-#include shader/lib_ssr.vert.glsl
-#endif // ssrFlag
-
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
@@ -139,10 +135,6 @@ void main() {
     gl_Position = gpos;
 
     v_uv = a_texCoord;
-
-    #ifdef ssrFlag
-    ssrData(gpos);
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBufferBillboard(gpos, pos, s_size, a_position, s_quat, s_quat_conj);

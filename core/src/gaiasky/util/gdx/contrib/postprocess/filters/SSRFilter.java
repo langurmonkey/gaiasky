@@ -28,7 +28,7 @@ public class SSRFilter extends Filter3<SSRFilter> {
     private final Vector2 zfark;
     private Matrix4 frustumCorners, combined, projection, invProjection, view, invView;
 
-    private Texture texture1, texture2, texture3, texture4;
+    private Texture texture1, texture2, texture3;
 
     public enum Param implements Parameter {
         // @formatter:off
@@ -36,7 +36,6 @@ public class SSRFilter extends Filter3<SSRFilter> {
         Texture1("u_texture1", 0),
         Texture2("u_texture2", 0),
         Texture3("u_texture3", 0),
-        Texture4("u_texture4", 0),
         Viewport("u_viewport", 2),
         ZfarK("u_zfark", 2),
         Projection("u_projection", 16),
@@ -85,9 +84,6 @@ public class SSRFilter extends Filter3<SSRFilter> {
         setTexture3(tex);
     }
 
-    public void setPositionTexture(Texture tex) {
-        setTexture4(tex);
-    }
     public void setFrustumCorners(Matrix4 fc) {
         this.frustumCorners = fc;
         setParam(Param.FrustumCorners, this.frustumCorners);
@@ -136,17 +132,13 @@ public class SSRFilter extends Filter3<SSRFilter> {
         setParam(Param.Texture3, u_texture3);
     }
 
-    public void setTexture4(Texture tex) {
-        this.texture4 = tex;
-        setParam(Param.Texture4, u_texture4);
-    }
-
     @Override
     public void rebind() {
         // reimplement super to batch every parameter
         setParams(Param.Texture0, u_texture0);
         setParams(Param.Texture1, u_texture1);
         setParams(Param.Texture2, u_texture2);
+        setParams(Param.Texture3, u_texture3);
         setParams(Param.ZfarK, zfark);
         setParams(Param.FrustumCorners, frustumCorners);
         setParams(Param.Combined, combined);
@@ -167,7 +159,5 @@ public class SSRFilter extends Filter3<SSRFilter> {
             texture2.bind(u_texture2);
         if (texture3 != null)
             texture3.bind(u_texture3);
-        if (texture4 != null)
-            texture4.bind(u_texture4);
     }
 }
