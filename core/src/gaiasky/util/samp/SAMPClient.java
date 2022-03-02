@@ -30,6 +30,8 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
 import java.net.URL;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +72,7 @@ public class SAMPClient implements IObserver {
         meta.setName(Settings.APPLICATION_NAME);
         meta.setDescriptionText("3D Universe application focused on ESA's Gaia satellite");
         meta.setDocumentationUrl(Settings.DOCUMENTATION);
-        meta.setIconUrl(Settings.ICON_URL);
+        meta.setIconUrl(Settings.ICON_URL.replaceAll("[^\\x00-\\x7F]", "?"));
         meta.put("author.name", Settings.AUTHOR_NAME_PLAIN);
         meta.put("author.email", Settings.AUTHOR_EMAIL);
         meta.put("author.affiliation", Settings.AUTHOR_AFFILIATION_PLAIN);
