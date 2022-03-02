@@ -303,7 +303,9 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 #include shader/lib_velbuffer.frag.glsl
 #endif // velocityBufferFlag
 
-//#include shader/lib_specular.glsl
+#ifdef ssrFlag
+#include shader/lib_pack.glsl
+#endif // ssrFlag
 
 // MAIN
 void main() {
@@ -404,12 +406,15 @@ void main() {
             vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb;
             reflectionColor = reflectionColor * reflectionStrength;
             #ifdef ssrFlag
-            reflectionMask = vec4(reflectionStrength, 1.0);
+            // pack this in rgb
+            vec3 rmc = diffuse.rgb * reflectionStrength;
+            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
             #endif // ssrFlag
         #elif defined(reflectionColorFlag)
             reflectionColor = reflectionColor * u_reflectionColor.rgb;
             #ifdef ssrFlag
-            reflectionMask = vec4(u_reflectionColor.rgb, 1.0);
+            vec3 rmc = diffuse.rgb * u_reflectionColor.rgb;
+            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
             #endif //ssrFlag
         #endif // reflectionColorFlag
         #ifdef ssrFlag
