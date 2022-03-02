@@ -45,7 +45,7 @@ flat out int v_layer;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 void main() {
     vec3 pos = a_particlePos - u_camPos;

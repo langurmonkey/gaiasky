@@ -65,6 +65,10 @@ layout (location = 0) out vec4 fragColor;
 
 #include shader/lib_logdepthbuff.glsl
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
 #endif
@@ -88,6 +92,10 @@ void main() {
     fragColor = clamp(fragColor, 0.0, 0.9);
 
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
+
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer();

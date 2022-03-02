@@ -22,7 +22,6 @@ import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.IPostProcessor;
 import gaiasky.scenegraph.BackgroundModel;
-import gaiasky.scenegraph.camera.AbstractCamera;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.component.MaterialComponent;
 import gaiasky.scenegraph.component.ModelComponent;
@@ -36,7 +35,6 @@ import gaiasky.util.coord.StaticCoordinates;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessor;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.effects.*;
-import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.gdx.contrib.utils.ShaderLoader;
 import gaiasky.util.gdx.loader.PFMData;
 import gaiasky.util.gdx.loader.PFMReader;
@@ -72,12 +70,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
     Vector3b auxb, prevCampos;
     Vector3 auxf;
     Matrix4 prevViewProj;
-    Matrix4 invView, invProj;
+    Matrix4 projection, combined, view;
     Matrix4 frustumCorners;
 
     private String starTextureName, lensDirtName, lensColorName, lensStarburstName;
 
-    // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}]] for raymarching post-processors
+    // Contains a map by name with [0:shader{string}, 1:enabled {bool}, 2:position{vector3b}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]] for raymarching post-processors
     private final Map<String, Object[]> raymarchingDef;
 
     private void addRayMarchingDef(String name, Object[] list) {
@@ -92,8 +90,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         auxf = new Vector3();
         prevCampos = new Vector3b();
         prevViewProj = new Matrix4();
-        invView = new Matrix4();
-        invProj = new Matrix4();
+        view = new Matrix4();
+        projection = new Matrix4();
+        combined = new Matrix4();
         frustumCorners = new Matrix4();
         raymarchingDef = new HashMap<>();
 
@@ -113,8 +112,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         initializeBlurObject();
 
         // Raymarching objects
-        // [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}]]
-        //GraymarchingDef.put("Black Hole", new Object[] { "raymarching/blackhole", true, new Vector3d(300 * Constants.PC_TO_U, 300 * Constants.PC_TO_U, 0), new float[] { 1f, 0f, 0f, 0f }, Settings.settings.assetsFileStr("img/static.jpg") });
+        // [0:shader{string}, 1:enabled {bool}, 2:position{vector3d}, 3:additional{float4}, 4:texture2{string}, 5:texture3{string}]]
+        //raymarchingDef.put("Black Hole", new Object[] { "raymarching/blackhole", true, new Vector3b(300 * Constants.PC_TO_U, 300 * Constants.PC_TO_U, 0), new float[] { 1f, 0f, 0f, 0f }, Settings.settings.assetsFileStr("img/static.jpg") });
+        //raymarchingDef.put("Torus", new Object[] { "raymarching/torus", true, new Vector3b(1 * Constants.AU_TO_U, 0, 0), new float[] { 1f, 0f, 0f, 0f }, Settings.settings.assetsFileStr("img/static.jpg") });
     }
 
     public void doneLoading(AssetManager manager) {
@@ -154,7 +154,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, true, true, safeMode || vr);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode || vr);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS
@@ -164,7 +164,8 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             float zFar = (float) GaiaSky.instance.getCameraManager().current.getFar();
             float k = Constants.getCameraK();
             rm.setZfarK(zFar, k);
-            if (list[3] != null) {
+            if (list.length > 3 && list[3] != null) {
+                // Additional
                 rm.setAdditional((float[]) list[3]);
             }
             if (list.length > 4) {
@@ -189,9 +190,10 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         //ppb.set(depthBuffer);
 
         // SSR
-        SSR ssr = new SSR();
-        ssr.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
-        ppb.set(ssr);
+        SSR ssrEffect = new SSR();
+        ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
+        ssrEffect.setEnabled(Settings.settings.postprocess.ssr);
+        ppb.set(ssrEffect);
 
         // CAMERA MOTION BLUR
         initCameraBlur(ppb, width, height, gq);
@@ -367,11 +369,11 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         }
         lgh = Math.round(lgw / ar);
         LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
-        lightglow.setNSamples(samples);
-        lightglow.setViewportSize(lgw, lgh);
-
+        if (lightglow != null) {
+            lightglow.setNSamples(samples);
+            lightglow.setViewportSize(lgw, lgh);
+        }
         lightGlowNSamples = samples;
-
     }
 
     private void updateCameraBlur(PostProcessBean ppb, GraphicsQuality gq) {
@@ -726,21 +728,33 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             int w = (Integer) data[1];
             int h = (Integer) data[2];
             CameraManager.getFrustumCornersEye(cam, frustumCorners);
-            Matrix4 civ = invView.set(cam.view).inv();
-            Matrix4 mv = invProj.set(cam.combined);
+            view.set(cam.view);
+            projection.set(cam.projection);
+            combined.set(cam.combined);
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    // Update raymarching shaders
+                    // Update all raymarching and SSR shaders
                     Map<String, PostProcessorEffect> rms = ppb.getAll(Raymarching.class);
                     if (rms != null)
                         rms.forEach((key, rmEffect) -> {
                             if (rmEffect.isEnabled()) {
                                 Raymarching raymarching = (Raymarching) rmEffect;
                                 raymarching.setFrustumCorners(frustumCorners);
-                                raymarching.setCamInvView(civ);
-                                raymarching.setModelView(mv);
+                                raymarching.setView(view);
+                                raymarching.setCombined(combined);
                                 raymarching.setViewportSize(w, h);
+                            }
+                        });
+                    Map<String, PostProcessorEffect> ssrs = ppb.getAll(SSR.class);
+                    if (ssrs != null)
+                        ssrs.forEach((key, ssrEffect) -> {
+                            if (ssrEffect.isEnabled()) {
+                                SSR ssr = (SSR) ssrEffect;
+                                ssr.setFrustumCorners(frustumCorners);
+                                ssr.setView(view);
+                                ssr.setProjection(projection);
+                                ssr.setCombined(combined);
                             }
                         });
                 }
@@ -751,8 +765,12 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.get(Fisheye.class).setEnabled(active);
-                    ((LightGlow) ppb.get(LightGlow.class)).setNSamples(active ? 1 : lightGlowNSamples);
+                    Fisheye fisheye = (Fisheye) ppb.get(Fisheye.class);
+                    if (fisheye != null)
+                        fisheye.setEnabled(active);
+                    LightGlow glow = (LightGlow) ppb.get(LightGlow.class);
+                    if (glow != null)
+                        glow.setNSamples(active ? 1 : lightGlowNSamples);
                 }
             }
             break;
@@ -761,7 +779,9 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.get(CameraMotion.class).setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
+                    CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
+                    if (cameraMotion != null)
+                        cameraMotion.setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
                 }
             }
             if (enabled && blurObjectAdded) {

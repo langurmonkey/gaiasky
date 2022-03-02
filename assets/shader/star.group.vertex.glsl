@@ -44,7 +44,7 @@ out vec4 v_col;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 void main() {
 	// Lengths

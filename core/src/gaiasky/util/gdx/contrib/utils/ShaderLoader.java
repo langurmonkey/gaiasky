@@ -34,8 +34,8 @@ public final class ShaderLoader {
         log += "...";
         logger.debug("Compiling " + log);
 
-        String vpSrc = loadShaderCode(vertexFileName + ".vertex");
-        String fpSrc = loadShaderCode(fragmentFileName + ".fragment");
+        String vpSrc = loadShaderCode(vertexFileName, "vert", "vertex", "vert.glsl");
+        String fpSrc = loadShaderCode(fragmentFileName, "frag", "fragment", "frag.glsl");
 
         // Resolve includes
         vpSrc = ShaderTemplatingLoader.resolveIncludes(vpSrc);
@@ -44,21 +44,22 @@ public final class ShaderLoader {
         return ShaderLoader.fromString(vpSrc, fpSrc, vertexFileName, fragmentFileName, defines);
     }
 
-    private static String loadShaderCode(String file) {
-        try {
-            return Gdx.files.internal(BasePath + file).readString();
-        } catch (Exception e0) {
-            // Try to load from data
-            Path path = Settings.settings.data.dataPath(file);
-            if (Files.exists(path) && Files.isReadable(path)) {
-                try {
-                    return Files.readString(path);
-                } catch (Exception e1) {
-                    logger.error(e1);
-                    return null;
+    private static String loadShaderCode(String fileName, String... extensions) {
+        for(String extension : extensions) {
+            String file = fileName + "." + extension;
+            try {
+                return Gdx.files.internal(BasePath + file).readString();
+            } catch (Exception e0) {
+                // Try to load from data
+                Path path = Settings.settings.data.dataPath(file);
+                if (Files.exists(path) && Files.isReadable(path)) {
+                    try {
+                        return Files.readString(path);
+                    } catch (Exception e1) {
+                        continue;
+                    }
                 }
             }
-            logger.error(e0);
         }
         return null;
 

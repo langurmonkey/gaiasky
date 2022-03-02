@@ -28,7 +28,7 @@ float sdTorus(vec3 p, vec2 t) {
 // of any object we put in the scene.  If the given point (point p) is inside of an object, we return a
 // negative answer.
 float map(vec3 p) {
-    return sdTorus(p, vec2(100.0, 3.0));
+    return sdTorus(p, vec2(10.0, 5.0));
 }
 
 vec3 calcNormal(in vec3 pos) {

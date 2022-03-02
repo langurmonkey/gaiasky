@@ -103,7 +103,7 @@ public class GlobalResources {
         updateSkin();
     }
 
-    public void reloadDataFiles(){
+    public void reloadDataFiles() {
         // Star group textures
         manager.load(Settings.settings.data.dataFile("tex/base/star.jpg"), Texture.class);
         manager.load(Settings.settings.data.dataFile("tex/base/lut.jpg"), Texture.class);
@@ -177,7 +177,7 @@ public class GlobalResources {
      * Converts the double to the string representation of a velocity (always in
      * seconds)
      *
-     * @param d Distance in internal units
+     * @param d  Distance in internal units
      * @param du The distance units to use
      *
      * @return Array containing the number and the units
@@ -191,7 +191,7 @@ public class GlobalResources {
     /**
      * Converts this float to the string representation of a distance
      *
-     * @param f Distance in internal units
+     * @param f  Distance in internal units
      * @param du The distance units to use
      *
      * @return An array containing the float number and the string units

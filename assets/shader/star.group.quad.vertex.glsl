@@ -95,7 +95,6 @@ void main() {
     #include shader/snip_billboard.glsl
 
     gl_Position = gpos;
-
     v_uv = a_texCoord;
 
     #ifdef velocityBufferFlag

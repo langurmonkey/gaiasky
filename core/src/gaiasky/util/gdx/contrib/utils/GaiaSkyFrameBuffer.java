@@ -14,41 +14,63 @@ import com.badlogic.gdx.graphics.glutils.GLFrameBuffer;
  */
 public class GaiaSkyFrameBuffer extends FrameBuffer {
 
-    public GaiaSkyFrameBuffer(GLFrameBufferBuilder<? extends GLFrameBuffer<Texture>> bufferBuilder) {
+    // Indices for all buffers
+    private int colorIndex = -1, depthIndex = -1, velocityIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+
+    /**
+     * Creates a buffer. Contains the builder and the indices for color, depth, velocity, normal and reflection buffers.
+     * If any of the indices is negative, the render target does not exist in this buffer.
+     *
+     * @param bufferBuilder The builder.
+     * @param indices       The indices for color, depth, velocity, normal and reflection buffers.
+     */
+    public GaiaSkyFrameBuffer(GLFrameBufferBuilder<? extends GLFrameBuffer<Texture>> bufferBuilder, int... indices) {
         super(bufferBuilder);
+        if (indices.length > 0)
+            colorIndex = indices[0];
+        if (indices.length > 1)
+            depthIndex = indices[1];
+        if (indices.length > 2)
+            velocityIndex = indices[2];
+        if (indices.length > 3)
+            normalIndex = indices[3];
+        if (indices.length > 4)
+            reflectionMaskIndex = indices[4];
+    }
+
+    public Texture getColorBufferTexture() {
+        if (colorIndex >= 0)
+            return textureAttachments.get(colorIndex);
+        else
+            return null;
     }
 
     public Texture getDepthBufferTexture() {
-        // Last texture attachment
-        if (textureAttachments.size > 1)
-            return textureAttachments.get(1);
+        if (depthIndex >= 0)
+            return textureAttachments.get(depthIndex);
         else
             return null;
     }
 
     public Texture getVelocityBufferTexture() {
-        if (textureAttachments.size > 2)
-            return textureAttachments.get(2);
+        if (velocityIndex >= 0)
+            return textureAttachments.get(velocityIndex);
         else
             return null;
     }
 
     public Texture getNormalBufferTexture() {
-        if (textureAttachments.size > 3)
-            return textureAttachments.get(3);
+        if (normalIndex >= 0)
+            return textureAttachments.get(normalIndex);
         else
             return null;
     }
 
-    public Texture getReflectionBufferTexture() {
-        if (textureAttachments.size > 4)
-            return textureAttachments.get(4);
+    public Texture getReflectionMaskBufferTexture() {
+        if (reflectionMaskIndex >= 0)
+            return textureAttachments.get(reflectionMaskIndex);
         else
             return null;
-    }
-
-    public Texture getColorBufferTexture() {
-        return super.getColorBufferTexture();
     }
 
     public Texture getTextureAttachment(int index) {

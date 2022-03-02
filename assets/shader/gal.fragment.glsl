@@ -18,6 +18,10 @@ layout (location = 0) out vec4 fragColor;
 #define light_decay 0.3
 #define PI 3.1415927
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.frag.glsl
 #endif
@@ -42,6 +46,10 @@ vec4 drawSimple(vec2 tc) {
 
 void main() {
 	fragColor = drawSimple(v_texCoords) * u_alpha;
+
+	#ifdef ssrFlag
+	ssrBuffers();
+	#endif // ssrFlag
 
 	#ifdef velocityBufferFlag
 	velocityBuffer(fragColor.a);

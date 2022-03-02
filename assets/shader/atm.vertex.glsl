@@ -24,7 +24,6 @@ in vec3 a_position;
     #include shader/lib_gravwaves.glsl
 #endif // gravitationalWaves
 
-
 void main(void) {
     computeAtmosphericScattering();
     vec4 pos = u_worldTrans * vec4(a_position, 1.0);

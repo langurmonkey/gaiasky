@@ -19,6 +19,7 @@ uniform vec3 u_camShift;
 #include shader/lib_gravwaves.glsl
 #endif// gravitationalWaves
 
+// OUTPUTS
 out vec4 v_color;
 out vec2 v_texCoords;
 

@@ -27,8 +27,9 @@ void main() {
     #ifdef gravitationalWaves
         pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
-    
-    gl_Position = u_projView * pos;
+
+    vec4 gpos = u_projView * pos;
+    gl_Position = gpos;
     gl_PointSize = a_size;
     v_col = a_color;
 }

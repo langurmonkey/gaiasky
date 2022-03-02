@@ -31,7 +31,7 @@ out vec2 v_uv;
 
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
-#endif
+#endif // velocityBufferFlag
 
 #define LEN0 20000.0
 

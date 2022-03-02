@@ -1,6 +1,8 @@
 package gaiasky.util.gdx.contrib.postprocess.effects;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.math.Matrix4;
 import gaiasky.util.gdx.contrib.postprocess.PostProcessorEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.SSRFilter;
 import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
@@ -10,36 +12,70 @@ import gaiasky.util.gdx.contrib.utils.GaiaSkyFrameBuffer;
  * textures to implement screen space reflections.
  */
 public class SSR extends PostProcessorEffect {
-    private final SSRFilter ssr;
+    private SSRFilter filter;
 
     public SSR() {
-        ssr = new SSRFilter();
+        super();
+        filter = new SSRFilter();
+    }
+
+    public void setFrustumCorners(Matrix4 frustumCorners) {
+        filter.setFrustumCorners(frustumCorners);
+    }
+
+    public void setCombined(Matrix4 combined) {
+        filter.setCombined(combined);
+    }
+
+    public void setProjection(Matrix4 proj) {
+        filter.setProjection(proj);
+    }
+
+    public void setView(Matrix4 view) {
+        filter.setView(view);
     }
 
     public void setZfarK(float zfar, float k) {
-        ssr.setZfarK(zfar, k);
+        filter.setZfarK(zfar, k);
+    }
+
+    public void setTexture1(Texture tex) {
+        filter.setTexture1(tex);
+    }
+
+    public void setTexture2(Texture tex) {
+        filter.setTexture2(tex);
+    }
+
+    public void setTexture3(Texture tex) {
+        filter.setTexture3(tex);
     }
 
     @Override
     public void dispose() {
-        if (ssr != null) {
-            ssr.dispose();
+        if (filter != null) {
+            filter.dispose();
+            filter = null;
         }
     }
 
     @Override
     public void rebind() {
-        ssr.rebind();
+        if (filter != null) {
+            filter.rebind();
+        }
     }
 
     @Override
     public void render(FrameBuffer src, FrameBuffer dest, GaiaSkyFrameBuffer main) {
         restoreViewport(dest);
-
-        ssr.setDepthTexture(main.getDepthBufferTexture());
-        ssr.setNormalTexture(main.getNormalBufferTexture());
-        ssr.setReflectionTexture(main.getReflectionBufferTexture());
-
-        ssr.setInput(src).setOutput(dest).render();
+        // Get depth buffer texture from main frame buffer
+        filter.setDepthTexture(main.getDepthBufferTexture());
+        // Normal buffer
+        filter.setNormalTexture(main.getNormalBufferTexture());
+        // Reflection mask
+        filter.setReflectionTexture(main.getReflectionMaskBufferTexture());
+        // Set input, output and render
+        filter.setInput(src).setOutput(dest).render();
     }
 }

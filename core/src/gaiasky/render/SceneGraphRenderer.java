@@ -347,11 +347,11 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram.pedantic = false;
 
         /* DATA LOAD */
-        String[] defines = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
-        String[] names = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav" });
+        String[] defines = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n" });
+        String[] names = GlobalResources.combinations(new String[] { "SSR", "Velbuff", "Rel", "Grav" });
         // Color mapping in shaders
-        String[] definesCmap = GlobalResources.combinations(new String[] { "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
-        String[] namesCmap = GlobalResources.combinations(new String[] { "Velbuff", "Rel", "Grav", "Colmap" });
+        String[] definesCmap = GlobalResources.combinations(new String[] { "#define ssrFlag\n", "#define velocityBufferFlag\n", "#define relativisticEffects\n", "#define gravitationalWaves\n", "#define colorMap\n" });
+        String[] namesCmap = GlobalResources.combinations(new String[] { "SSR", "Velbuff", "Rel", "Grav", "Colmap" });
 
         // Add shaders to load (no providers)
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
@@ -470,7 +470,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         int maxTexSize = intBuffer.get();
         logger.info("Max texture size: " + maxTexSize + "^2 pixels");
 
-        String[] names = GlobalResources.combinations(new String[] { " (vel)", " (rel)", " (grav)" });
+        String[] names = GlobalResources.combinations(new String[] { " (ssr)", " (vel)", " (rel)", " (grav)" });
 
         /*
           STAR BILLBOARD SHADER
@@ -1511,7 +1511,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             FrameBufferBuilder fbb = new FrameBufferBuilder(1920, 1080);
             fbb.addBasicColorTextureAttachment(Format.RGBA8888);
             fbb.addBasicDepthRenderBuffer();
-            glowFb = new GaiaSkyFrameBuffer(fbb);
+            glowFb = new GaiaSkyFrameBuffer(fbb, 0, 1);
         }
     }
 

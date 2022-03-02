@@ -30,8 +30,6 @@ import uk.ac.starlink.util.DataSource;
 import uk.ac.starlink.util.URLDataSource;
 
 import java.net.URL;
-import java.text.Normalizer;
-import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
