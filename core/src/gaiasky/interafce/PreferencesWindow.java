@@ -69,7 +69,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final INumberFormat nf3;
 
-    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution;
+    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -735,9 +735,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(dynamicResolution).left().padRight(pad10).padBottom(pad5);
             experimental.add(dynamicResolutionTooltip).left().padBottom(pad5).row();
 
+            // SSR
+            OwnLabel ssrLabel = new OwnLabel(I18n.txt("gui.ssr"), skin);
+            ssr = new OwnCheckBox("", skin);
+            ssr.setChecked(settings.postprocess.ssr);
+            OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
+            ssrTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.ssr.info"), skin));
+
+            experimental.add(ssrLabel).left().padRight(pad20).padBottom(pad5);
+            experimental.add(ssr).left().padRight(pad10).padBottom(pad5);
+            experimental.add(ssrTooltip).left().padBottom(pad5).row();
+
 
             // LABELS
             labels.addAll(dynamicResolutionLabel);
+            labels.addAll(ssrLabel);
 
             // Add to content
             contentGraphicsTable.add(titleExperimental).left().padBottom(pad10).row();
@@ -2122,6 +2134,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         settings.graphics.dynamicResolution = !settings.runtime.openVr && dynamicResolution.isChecked();
         if (!settings.graphics.dynamicResolution)
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
+
+        // SSR
+        settings.postprocess.ssr = ssr.isChecked();
 
         // Interface
         LangComboBoxBean languageBean = lang.getSelected();
