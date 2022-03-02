@@ -652,7 +652,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
             return false;
         }
 
-        EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, nameLc, visible);
+        GaiaSky.postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, obj, nameLc, visible));
         return true;
     }
 
