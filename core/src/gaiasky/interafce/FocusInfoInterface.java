@@ -171,9 +171,9 @@ public class FocusInfoInterface extends TableGuiInterface implements IObserver {
         bookmark.addListener(event -> {
             if (currentFocus != null && event instanceof ChangeEvent) {
                 if (bookmark.isChecked())
-                    EventManager.publish(Event.BOOKMARKS_ADD, bookmark, bookmark, currentFocus.getName(), false);
+                    EventManager.publish(Event.BOOKMARKS_ADD, bookmark, currentFocus.getName(), false);
                 else
-                    EventManager.publish(Event.BOOKMARKS_REMOVE_ALL, bookmark, bookmark, currentFocus.getName());
+                    EventManager.publish(Event.BOOKMARKS_REMOVE_ALL, bookmark, currentFocus.getName());
             }
             return false;
         });
