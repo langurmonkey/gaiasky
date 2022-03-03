@@ -60,7 +60,7 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 24,
+      "version": 25,
       "mingsversion": 30200,
       "size": 69134391,
       "check": "data-main.json",
@@ -110,9 +110,9 @@
       ],
       "sha256": "536b279bef01c163c7f6148775b908588e570874361dd749760ca9c751b94279",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- Upgrade to new descriptor format introduced in 3.2.0.\n- Oort cloud taken to its own external dataset.\n- NBG hook moved to own dataset.",
+      "releasenotes": "- Update Gaia model to work better with the new SSR feature.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v024_20220126/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v025_20220303/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -883,6 +883,26 @@
       "link": "https://galaxymap.org",
       "sha256" : "67b7d601ca39d1cca8ab8ce258abc2ed540091c9b4c8a1694d5b85438a4146d8",
       "file": "@mirror-url@meshes/dr2/isodensity/v01_20201217/mesh-dr2-isodensity.tar.gz"
+    },
+    {
+      "key" : "spacecraft-jwst",
+      "name": "James Webb Space Telescope",
+      "type": "spacecraft",
+      "version": 1,
+      "mingsversion": 30200,
+      "size": 3443795,
+      "check": "catalog-jwst.json",
+      "data": [
+        "catalog-jwst.json",
+        "satellite-jwst.json",
+        "models/jwst",
+        "orbit/orb.JWST.dat"
+      ],
+      "sha256": "494de7980fd08a8b6877c050cbd1ba54390865276d040d0b37b8327bd1af8c96",
+      "description": "The James Webb Space Telescope, with its orbit around L2 and a wavefront (.obj) 3D model.",
+      "releasenotes": "- First version of JWST.",
+      "link": "https://sci.esa.int/web/jwst",
+      "file": "@mirror-url@extra/spacecraft/jwst/v01_20220207/satellite-jwst.tar.gz"
     }
   ]
 }
