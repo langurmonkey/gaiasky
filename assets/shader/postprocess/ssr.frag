@@ -1,8 +1,8 @@
 // Screen Space Reflections shader by Toni Sagrista
+// Implementation based on:
+// https://github.com/RoundedGlint585/ScreenSpaceReflection (License: MIT)
 // License: MPL2
 #version 330 core
-
-#include shader/lib_logdepthbuff.glsl
 
 // Color buffer
 uniform sampler2D u_texture0;
@@ -11,8 +11,8 @@ uniform sampler2D u_texture1;
 // Normal buffer (world space)
 uniform sampler2D u_texture2;
 // Reflection mask
-// r: packed diffuse and reflection (rgb)
-// g: 1
+// r: diffuse & reflection red channel
+// g: diffuse & reflection green and blue channels (packed)
 // b: roughness
 uniform sampler2D u_texture3;
 
@@ -36,23 +36,32 @@ in vec3 v_ray;
 // OUTPUTS
 layout (location = 0) out vec4 fragColor;
 
+// Do a binary search pass in case no hit is found
 bool isBinarySearchEnabled = true;
+// Use adaptive iterative convergence
 bool isAdaptiveStepEnabled = true;
+// Use exponential steps
 bool isExponentialStepEnabled = true;
+// Take multiple samples with slightly randomized directions
+// depending on material roughness
 bool isSamplingEnabled = true;
 
+// Ray-march iterations
+int iterationCount = 60;
+// Number of samples if sampling is enabled
+int sampleCount = 6;
+
 #define M_TO_U 1.0e-9
+#define PC_TO_U 3.08567758149137e7
 
-#define RAY_STEP M_TO_U * 0.15
-#define DISTANCE_BIAS M_TO_U * 0.05
+#define RAY_STEP M_TO_U * 0.05
+#define DIST_BIAS M_TO_U * 0.01
 
-#define ITERATION_COUNT 60
-#define SAMPLE_COUNT 6
+#include shader/lib_logdepthbuff.glsl
+#include shader/lib_pack.glsl
 
 #define getViewDepth(uv) 1.0 / recoverWValue(texture(u_texture1, uv).r, u_zfark.x, u_zfark.y)
 #define getNDCDepth(uv) texture(u_texture1, uv).r
-
-#include shader/lib_pack.glsl
 
 float random (vec2 uv) {
     return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453123); //simple random function
@@ -83,13 +92,13 @@ vec2 raymarch(vec3 P, vec3 R) {
     vec2 screenPosition;
 
     int i = 0;
-    for (; i < ITERATION_COUNT; ++i) {
+    for (; i < iterationCount; ++i) {
         // Project
         screenPosition = screenFromView(marchingPosition);
         depthFromScreen = abs(viewFromDepth(screenPosition).z);
         delta = abs(marchingPosition.z) - depthFromScreen;
 
-        if (abs(delta) < DISTANCE_BIAS) {
+        if (abs(delta) < DIST_BIAS) {
             return screenPosition;
         }
         if (isBinarySearchEnabled && delta > 0) {
@@ -109,7 +118,7 @@ vec2 raymarch(vec3 P, vec3 R) {
         }
     }
     if(isBinarySearchEnabled){
-        for(; i < ITERATION_COUNT; i++){
+        for(; i < iterationCount; i++){
             step *= 0.5;
             marchingPosition = marchingPosition - step * sign(delta);
 
@@ -117,12 +126,20 @@ vec2 raymarch(vec3 P, vec3 R) {
             depthFromScreen = abs(viewFromDepth(screenPosition).z);
             delta = abs(marchingPosition.z) - depthFromScreen;
 
-            if (abs(delta) < DISTANCE_BIAS) {
+            if (abs(delta) < DIST_BIAS) {
                 return screenPosition;
             }
         }
     }
-    return screenPosition;
+    // This is specific to Gaia Sky
+    // Stars do not populate the depth buffer, so we only
+    // reflect things that are far away (> 1e6 km)
+    float z = getViewDepth(screenPosition);
+    if(z < 1.0e9 * M_TO_U) {
+        return vec2(-1.0);
+    } else {
+        return screenPosition;
+    }
 }
 
 void main(void) {
@@ -142,13 +159,15 @@ void main(void) {
             vec3 firstBasis = normalize(cross(vec3(0.0, 0.0, 1.0), R));
             vec3 secondBasis = normalize(cross(R, firstBasis));
             vec4 resultingColor = vec4(0.0);
-            for (int i = 0; i < SAMPLE_COUNT; i++) {
+            for (int i = 0; i < sampleCount; i++) {
                 vec2 coeffs = vec2(random(v_texCoords + vec2(0, i)) + random(v_texCoords + vec2(i, 0))) * roughness;
                 vec3 reflectionDirectionRandomized = R + firstBasis * coeffs.x + secondBasis * coeffs.y;
                 vec2 coords = raymarch(P, normalize(reflectionDirectionRandomized));
-                vec3 reflection = texture(u_texture0, coords).rgb;
-                if (reflection != vec3(0.0)) {
-                    resultingColor += vec4(reflection, 1.0);
+                if(all(greaterThanEqual(coords, vec2(0.0)))) {
+                    vec3 reflection = texture(u_texture0, coords).rgb;
+                    if (reflection != vec3(0.0)) {
+                        resultingColor += vec4(reflection, 1.0);
+                    }
                 }
             }
             if (resultingColor.w == 0.0){
@@ -160,7 +179,7 @@ void main(void) {
         } else {
             // Ray cast
             vec2 coords = raymarch(P, R);
-            if (coords.x >= 0.0 && coords.y >= 0.0){
+            if (all(greaterThanEqual(coords, vec2(0.0)))){
                 vec3 reflection = texture(u_texture0, coords).rgb;
                 fragColor = vec4(col + mix(reflection, maskColor, 0.15), 1.0);
             } else {

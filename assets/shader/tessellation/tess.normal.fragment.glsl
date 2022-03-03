@@ -207,6 +207,10 @@ uniform vec4 u_reflectionColor;
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
 
+#ifdef ssrFlag
+#include shader/lib_ssr.frag.glsl
+#endif // ssrFlag
+
 #define saturate(x) clamp(x, 0.0, 1.0)
 
 #include shader/lib_atmfog.glsl
@@ -346,7 +350,11 @@ void main() {
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 
+    #ifdef ssrFlag
+    ssrBuffers();
+    #endif // ssrFlag
+
     #ifdef velocityBufferFlag
     velocityBuffer();
-    #endif
+    #endif // velocityBufferFlag
 }
