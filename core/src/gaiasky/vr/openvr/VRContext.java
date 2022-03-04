@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
@@ -87,9 +88,12 @@ public class VRContext implements Disposable {
      * The role of a {@link VRDevice} of type {@link VRDeviceType#Controller}
      */
     public enum VRControllerRole {
-        Unknown,
+        Invalid,
         LeftHand,
-        RightHand
+        Max,
+        OptOut,
+        RightHand,
+        Treadmill
     }
 
     /**
@@ -591,7 +595,7 @@ public class VRContext implements Disposable {
             return;
         }
 
-        VRControllerRole role = VRControllerRole.Unknown;
+        VRControllerRole role = VRControllerRole.OptOut;
         if (type == VRDeviceType.Controller) {
             int r = VRSystem.VRSystem_GetControllerRoleForTrackedDeviceIndex(index);
             switch (r) {
@@ -820,7 +824,7 @@ public class VRContext implements Disposable {
             String renderModelName = getStringProperty(VRDeviceProperty.RenderModelName_String);
             String modelNumber = getStringProperty(VRDeviceProperty.ModelNumber_String);
             String manufacturerName = getStringProperty(VRDeviceProperty.ManufacturerName_String);
-            int controllerRole = getInt32Property(VRDeviceProperty.ControllerRoleHint_Int32);
+            int controllerRole = MathUtils.clamp(getInt32Property(VRDeviceProperty.ControllerRoleHint_Int32), 0, VRControllerRole.values().length - 1);
             this.role = VRControllerRole.values()[controllerRole];
             IntModel model = loadRenderModel(renderModelName, modelNumber, manufacturerName, this.role);
             this.modelInstance = model != null ? new IntModelInstance(model) : null;
@@ -896,7 +900,7 @@ public class VRContext implements Disposable {
          * <p>
          * <strong>Note</strong>: the role is not reliable! If one controller is
          * connected on startup, it will have a role of
-         * {@link VRControllerRole#Unknown} and retain that role even if a
+         * {@link VRControllerRole#Invalid} and retain that role even if a
          * second controller is connected (which will also haven an unknown
          * role). The role is only reliable if two controllers are connected
          * already, and none of the controllers disconnects during the
