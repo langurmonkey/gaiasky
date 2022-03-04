@@ -128,9 +128,9 @@ public class OrbitComponent {
         double z = ox * (sinomega * sini) + oy * (cosomega * sini);
 
         // 7
-        x *= Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
-        y *= Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
-        z *= Constants.M_TO_U * Constants.DISTANCE_SCALE_FACTOR;
+        x *= Constants.M_TO_U;
+        y *= Constants.M_TO_U;
+        z *= Constants.M_TO_U;
 
         out.set(y, z, x);
     }
