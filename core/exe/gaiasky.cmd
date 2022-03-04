@@ -19,8 +19,6 @@ SET OPTS=%OPTS% -XX:+UseShenandoahGC
 SET OPTS=%OPTS% -Dassets.location=.
 :: SimpleLogger defaults
 SET OPTS=%OPTS% -Dorg.slf4j.simpleLogger.defaultLogLevel=warn -Dorg.slf4j.simpleLogger.showThreadName=false
-:: Non-ASCII characters workaround for Jython (see #281)
-SET OPTS=%OPTS% -Dpython.console.encoding=UTF-8
 
 IF EXIST ".\jre\bin\java.exe" (
     :: Use bundled java
