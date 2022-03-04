@@ -108,7 +108,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "536b279bef01c163c7f6148775b908588e570874361dd749760ca9c751b94279",
+      "sha256": "24fac3a761cf44c7e3c3721ebabd3b2c3bd688106178cdb51a0fe2c364dcf364",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
       "releasenotes": "- Update Gaia model to work better with the new SSR feature.",
       "link": "@mirror-url@basedata",
