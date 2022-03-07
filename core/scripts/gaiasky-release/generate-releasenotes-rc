@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# This script generates the releasenotes.txt file for Release Candidates
+
+# Utils dir, with a relative path core/utils/ to the root gaiasky directory
+UTILSDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+GSDIR=`realpath $UTILSDIR/../../../`
+
+if [[ $# -ne 2 ]]; then
+    echo "Usage: $0 RCTAG OUTPUT"
+    echo
+    echo "$0: Must provide Release Candidate tag name and an output file."
+    exit -1
+fi
+
+# The current tag
+RC_TAG=$1
+OUTPUT=$2
+
+echo "Creating release notes: $CURRENT_TAG"
+
+echo "git-chglog -> $OUTPUT"
+git-chglog --config $GSDIR/.chglog/config.rn.yml -o $OUTPUT $RC_TAG && echo "File saved to $OUTPUT"
+echo "Done"
+

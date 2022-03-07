@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.BufferUtils;
+import gaiasky.GaiaSky;
 import gaiasky.event.EventManager;
 import gaiasky.event.Event;
 import gaiasky.interafce.MessageBean;
@@ -19,6 +20,8 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.MemInfo;
 import gaiasky.util.Settings;
 import gaiasky.util.TextUtils;
+import gaiasky.vr.openvr.VRContext;
+import gaiasky.vr.openvr.VRContext.VRDevice;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.HardwareAbstractionLayer;
@@ -299,6 +302,23 @@ public class CrashReporter {
             strArray.add("## GL INFORMATION not available");
         }
 
+        if(Settings.settings.runtime.openVr) {
+           VRContext vrContext = GaiaSky.instance.vrContext;
+           if(vrContext != null){
+               /* VR info **/
+               strArray.add("");
+               strArray.add("## VR INFORMATION");
+               strArray.add("VR resolution: " + vrContext.getWidth() + "x" + vrContext.getHeight());
+               Array<VRDevice> devices = vrContext.getDevices();
+               for(VRDevice device : devices) {
+                   strArray.add("Device: " + device.renderModelName);
+                   strArray.add("    Model number: " + device.modelNumber);
+                   strArray.add("    Manufacturer: " + device.manufacturerName);
+                   strArray.add("    Role: " + device.getControllerRole());
+                   strArray.add("    Type: " + device.getType());
+                   strArray.add("    Index: " + (device.getPose() != null ? device.getPose().getIndex() : "null"));
+               }
+           }
+        }
     }
-
 }

@@ -649,7 +649,7 @@ public class VRContext implements Disposable {
             RenderModelTextureMap renderModelTexture = new RenderModelTextureMap(texturePointer.getByteBuffer(RenderModelTextureMap.SIZEOF));
 
             // convert to a Model
-            IntMesh mesh = new IntMesh(true, renderModel.unVertexCount(), renderModel.unTriangleCount() * 3, new VertexAttribute[]{VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0)});
+            IntMesh mesh = new IntMesh(true, renderModel.unVertexCount(), renderModel.unTriangleCount() * 3, new VertexAttribute[] { VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0) });
             IntMeshPart meshPart = new IntMeshPart(name, mesh, 0, renderModel.unTriangleCount() * 3, GL20.GL_TRIANGLES);
             RenderModelVertex.Buffer vertices = renderModel.rVertexData();
             float[] packedVertices = new float[8 * renderModel.unVertexCount()];
@@ -704,7 +704,7 @@ public class VRContext implements Disposable {
             VRRenderModels.VRRenderModels_FreeTexture(renderModelTexture);
         } else {
             OwnObjLoader ol = new OwnObjLoader();
-            if (manufacturer.equalsIgnoreCase("Oculus")) {
+            if (manufacturer == null || manufacturer.equalsIgnoreCase("Oculus")) {
                 if (isControllerLeft(name, modelNumber, role)) {
                     model = ol.loadModel(Settings.settings.data.dataFileHandle("models/controllers/oculus/oculus-left.obj"));
                 } else if (isControllerRight(name, modelNumber, role)) {
@@ -734,11 +734,15 @@ public class VRContext implements Disposable {
     }
 
     private boolean isControllerLeft(String name, String modelNumber, VRControllerRole role) {
-        return role == VRControllerRole.LeftHand || name.equals("renderLeftHand") || name.contains("_left") || modelNumber.contains("Left");
+        return (role != null && role == VRControllerRole.LeftHand)
+                || (name != null && name.equals("renderLeftHand") || name.contains("_left"))
+                || (modelNumber != null && modelNumber.contains("Left"));
     }
 
     private boolean isControllerRight(String name, String modelNumber, VRControllerRole role) {
-        return role == VRControllerRole.RightHand || name.equals("renderRightHand") || name.contains("_right") || modelNumber.contains("Right");
+        return (role != null && role == VRControllerRole.RightHand)
+                || (name != null && name.equals("renderRightHand") || name.contains("_right"))
+                || (modelNumber != null && modelNumber.contains("Right"));
     }
 
     /**
@@ -777,6 +781,10 @@ public class VRContext implements Disposable {
         public VRDevicePose(int index) {
             this.index = index;
         }
+
+        public int getIndex() {
+            return index;
+        }
     }
 
     /**
@@ -784,6 +792,8 @@ public class VRContext implements Disposable {
      * etc.
      */
     public class VRDevice {
+        public String renderModelName, modelNumber, manufacturerName;
+
         private final VRDevicePose pose;
         private final VRDeviceType type;
         private VRControllerRole role;
@@ -821,9 +831,9 @@ public class VRContext implements Disposable {
         }
 
         public void initialize() {
-            String renderModelName = getStringProperty(VRDeviceProperty.RenderModelName_String);
-            String modelNumber = getStringProperty(VRDeviceProperty.ModelNumber_String);
-            String manufacturerName = getStringProperty(VRDeviceProperty.ManufacturerName_String);
+            renderModelName = getStringProperty(VRDeviceProperty.RenderModelName_String);
+            modelNumber = getStringProperty(VRDeviceProperty.ModelNumber_String);
+            manufacturerName = getStringProperty(VRDeviceProperty.ManufacturerName_String);
             int controllerRole = MathUtils.clamp(getInt32Property(VRDeviceProperty.ControllerRoleHint_Int32), 0, VRControllerRole.values().length - 1);
             this.role = VRControllerRole.values()[controllerRole];
             IntModel model = loadRenderModel(renderModelName, modelNumber, manufacturerName, this.role);
@@ -1044,13 +1054,19 @@ public class VRContext implements Disposable {
 
         @Override
         public String toString() {
-            return "VRDevice[manufacturer=" + getStringProperty(VRDeviceProperty.ManufacturerName_String) + ", renderModel=" + getStringProperty(VRDeviceProperty.RenderModelName_String) + ", index=" + pose.index + ", type=" + type + ", role=" + role + "]";
+            return "VRDevice[manufacturer=" + manufacturerName
+                    + ", modelNumber=" + modelNumber
+                    + ", renderModel=" + renderModelName
+                    + ", index=" + (pose != null ? pose.index : "null")
+                    + ", type=" + type
+                    + ", role=" + role + "]";
         }
 
         /**
          * Updates the axis values and returns whether the values changed.
          *
          * @param axis The axis
+         *
          * @return Whether the values of this axis changed
          */
         public boolean pollAxis(int axis) {
