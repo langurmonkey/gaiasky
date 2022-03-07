@@ -367,17 +367,18 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         vel.add(acc.scl(dt));
 
         Vector3b velocity = aux3b2.get().set(vel);
-        Vector3b position = aux3b3.get().set(posb).add(velocity.scl(dt));
+        Vector3b newPosition = aux3b3.get().set(posb).add(velocity.scl(dt));
         Vector3b pos = posb.put(aux3b4.get());
         // Check collision!
         if (closest != null && closest != this && !this.copy) {
             double twoRadii = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadii) {
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), newPosition.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadii) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), position.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadii);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), newPosition.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadii);
 
+                // Teleport outside
                 if (intersections.size >= 1) {
                     posb.set(intersections.get(0));
                 }
@@ -386,10 +387,10 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             } else if (posb.dstd(closest.getPos()) < twoRadii) {
                 posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), aux3b2.get())));
             } else {
-                posb.set(position);
+                posb.set(newPosition);
             }
         } else {
-            posb.set(position);
+            posb.set(newPosition);
         }
 
         return posb;
