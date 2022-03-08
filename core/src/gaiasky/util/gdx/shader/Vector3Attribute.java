@@ -45,6 +45,9 @@ public class Vector3Attribute extends Attribute {
     public static final String DCamPosAlias = "dCamPos";
     public static final long DCamPos = register(DCamPosAlias);
 
+    public static final String VrOffsetAlias = "vrOffset";
+    public static final long VrOffset = register(VrOffsetAlias);
+
     @Override
     public Attribute copy() {
         return new Vector3Attribute(type, value);

@@ -152,13 +152,13 @@ public class AtmosphereComponent extends NamedComponent {
      * @param ground Whether it is the ground shader or the atmosphere.
      * @param planet The planet itself, holder of this atmosphere
      */
-    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vroffset) {
+    public void updateAtmosphericScatteringParams(Material mat, float alpha, boolean ground, Planet planet, Vector3d vrOffset) {
         Vector3b transform = planet.translation;
         RotationComponent rc = planet.rc;
         SceneGraphNode sol = planet.parent;
         transform.put(aux3);
-        if (vroffset != null) {
-            aux1.set(vroffset).scl(1 / Constants.M_TO_U);
+        if (vrOffset != null) {
+            aux1.set(vrOffset).scl(1 / Constants.M_TO_U);
             aux3.sub(aux1);
         }
 

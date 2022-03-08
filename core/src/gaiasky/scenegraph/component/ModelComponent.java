@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
 import gaiasky.event.Event;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.gdx.shader.CubemapAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
@@ -30,10 +31,12 @@ import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
+import gaiasky.util.gdx.shader.Vector3Attribute;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Vector;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -267,6 +270,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void update(Matrix4 localTransform, float alpha, int blendSrc, int blendDst) {
         touch(localTransform);
         if (instance != null) {
+            setVROffset(GaiaSky.instance.getCameraManager().naturalCamera);
             setTransparency(alpha, blendSrc, blendDst);
             updateRelativisticEffects(GaiaSky.instance.getICamera());
             updateVelocityBufferUniforms(GaiaSky.instance.getICamera());
@@ -362,6 +366,22 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void dispose() {
         if (instance != null && instance.model != null)
             instance.model.dispose();
+    }
+
+    public void setVROffset(NaturalCamera cam) {
+        if(Settings.settings.runtime.openVr && cam.vrOffset != null) {
+            int n = instance.materials.size;
+            for (int i = 0; i < n; i++) {
+                Material mat = instance.materials.get(i);
+                if (mat.has(Vector3Attribute.VrOffset)) {
+                    cam.vrOffset.put(((Vector3Attribute) mat.get(Vector3Attribute.VrOffset)).value);
+                    ((Vector3Attribute) mat.get(Vector3Attribute.VrOffset)).value.scl(5e4f);
+                } else {
+                    Vector3Attribute v3a = new Vector3Attribute(Vector3Attribute.VrOffset, cam.vrOffset.toVector3());
+                    mat.set(v3a);
+                }
+            }
+        }
     }
 
     public void setTransparency(float alpha, int src, int dst) {

@@ -42,6 +42,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.render.RenderingContext;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
@@ -82,6 +83,7 @@ public class DefaultIntShader extends BaseIntShader {
             this.vertexShaderCode = vertexShaderCode;
             this.fragmentShaderCode = fragmentShaderCode;
         }
+
         public Config(final String vertexShaderCode, final String fragmentShaderCode) {
             this(null, null, vertexShaderCode, fragmentShaderCode);
         }
@@ -100,13 +102,13 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform prevProjView = new Uniform("u_prevProjView");
         public final static Uniform dCamPos = new Uniform("u_dCamPos");
         public final static Uniform vrScale = new Uniform("u_vrScale");
+        public final static Uniform vrOffset = new Uniform("u_vrOffset");
 
         public final static Uniform worldTrans = new Uniform("u_worldTrans");
         public final static Uniform viewWorldTrans = new Uniform("u_viewWorldTrans");
         public final static Uniform projViewWorldTrans = new Uniform("u_projViewWorldTrans");
         public final static Uniform normalMatrix = new Uniform("u_normalMatrix");
         public final static Uniform bones = new Uniform("u_bones");
-        public final static Uniform vrOffset = new Uniform("u_vroffset");
 
         public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
         public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureExtAttribute.AO);
@@ -235,6 +237,13 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, (float) Constants.DISTANCE_SCALE_FACTOR);
+            }
+        };
+        public final static Setter vrOffset = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.VrOffset))
+                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.VrOffset))).value);
             }
         };
 
@@ -470,7 +479,9 @@ public class DefaultIntShader extends BaseIntShader {
     // Vel buffer
     public final int u_prevProjView;
     public final int u_dCamPos;
+    // VR
     public final int u_vrScale;
+    public final int u_vrOffset;
     // Object uniforms
     public final int u_worldTrans;
     public final int u_viewWorldTrans;
@@ -509,7 +520,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected final int u_pointLights0intensity;
     protected final int u_pointLights1color;
     protected final int u_spotLights0color;
-    protected final int u_spotLights0position ;
+    protected final int u_spotLights0position;
     protected final int u_spotLights0intensity;
     protected final int u_spotLights0direction;
     protected final int u_spotLights0cutoffAngle;
@@ -626,6 +637,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_prevProjView = register(Inputs.prevProjView, Setters.prevProjView);
         u_dCamPos = register(Inputs.dCamPos, Setters.dCamPos);
         u_vrScale = register(Inputs.vrScale, Setters.vrScale);
+        u_vrOffset = register(Inputs.vrOffset, Setters.vrOffset);
         // Object uniforms
         u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);
         u_viewWorldTrans = register(Inputs.viewWorldTrans, Setters.viewWorldTrans);
