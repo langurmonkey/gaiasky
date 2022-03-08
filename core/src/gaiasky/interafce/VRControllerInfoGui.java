@@ -29,8 +29,9 @@ public class VRControllerInfoGui extends AbstractGui {
     @Override
     public void initialize(AssetManager assetManager, SpriteBatch sb) {
         // User interface
-        float w = Settings.settings.graphics.backBufferResolution[0] * Settings.settings.program.ui.scale;
-        float h = Settings.settings.graphics.backBufferResolution[1] * Settings.settings.program.ui.scale;
+        float uis = Settings.settings.program.ui.scale;
+        float w = Settings.settings.graphics.backBufferResolution[0] / uis;
+        float h = Settings.settings.graphics.backBufferResolution[1] / uis;
         ScreenViewport vp = new ScreenViewport();
         vp.setUnitsPerPixel(unitsPerPixel);
         ui = new Stage(vp, sb);
@@ -43,7 +44,7 @@ public class VRControllerInfoGui extends AbstractGui {
         Texture vrctrl_tex = new Texture(Gdx.files.internal("img/controller/hud-info-ui.png"));
         vrctrl_tex.setFilter(TextureFilter.Linear, TextureFilter.Linear);
         Image vrctrl = new Image(vrctrl_tex);
-        float texScale = 0.7f * h / 1780f;
+        float texScale = 0.8f;
         vrctrl.setScale(texScale);
         contents.addActor(vrctrl);
 
@@ -80,7 +81,7 @@ public class VRControllerInfoGui extends AbstractGui {
     }
 
     @Override
-    public boolean mustDraw(){
+    public boolean mustDraw() {
         return contents != null && contents.isVisible();
     }
 
@@ -88,11 +89,11 @@ public class VRControllerInfoGui extends AbstractGui {
     public void notify(final Event event, Object source, final Object... data) {
 
         switch (event) {
-            case DISPLAY_VR_CONTROLLER_HINT_CMD:
-                contents.setVisible((Boolean) data[0]);
-                break;
-            default:
-                break;
+        case DISPLAY_VR_CONTROLLER_HINT_CMD:
+            contents.setVisible((Boolean) data[0]);
+            break;
+        default:
+            break;
         }
     }
 }

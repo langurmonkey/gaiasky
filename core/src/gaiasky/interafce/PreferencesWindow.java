@@ -2136,7 +2136,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
 
         // SSR
-        settings.postprocess.ssr = ssr.isChecked();
+        if(ssr != null) {
+            settings.postprocess.ssr = ssr.isChecked();
+        }
 
         // Interface
         LangComboBoxBean languageBean = lang.getSelected();
