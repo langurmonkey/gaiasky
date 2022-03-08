@@ -60,9 +60,9 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 25,
+      "version": 26,
       "mingsversion": 30200,
-      "size": 69134391,
+      "size": 68772232,
       "check": "data-main.json",
       "data": [
         "asteroids-dr2.json",
@@ -108,11 +108,11 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "24fac3a761cf44c7e3c3721ebabd3b2c3bd688106178cdb51a0fe2c364dcf364",
-      "description": "Required data pack.\\nFor Gaia Sky 3.2.0 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- Update Gaia model to work better with the new SSR feature.",
+      "sha256": "a970dd4d6c581bda1418bcbd016626bde0b1b1c45573362360130c039667c18e",
+      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC9 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC9+.\\n- Update milky way to new billboard group infrastructure.\\n- Update materials of Gaia model.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v025_20220303/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v026_20220308/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -888,9 +888,9 @@
       "key" : "spacecraft-jwst",
       "name": "James Webb Space Telescope",
       "type": "spacecraft",
-      "version": 1,
+      "version": 2,
       "mingsversion": 30200,
-      "size": 3443795,
+      "size": 3636371,
       "check": "catalog-jwst.json",
       "data": [
         "catalog-jwst.json",
@@ -898,11 +898,11 @@
         "models/jwst",
         "orbit/orb.JWST.dat"
       ],
-      "sha256": "494de7980fd08a8b6877c050cbd1ba54390865276d040d0b37b8327bd1af8c96",
+      "sha256": "fa94f99f23c15fd08f05f3dcce704a9591b3a22d7f9a7e336285b9daeb73daac",
       "description": "The James Webb Space Telescope, with its orbit around L2 and a wavefront (.obj) 3D model.",
-      "releasenotes": "- First version of JWST.",
+      "releasenotes": "- Update metallic materials of JWST.",
       "link": "https://sci.esa.int/web/jwst",
-      "file": "@mirror-url@extra/spacecraft/jwst/v01_20220207/satellite-jwst.tar.gz"
+      "file": "@mirror-url@extra/spacecraft/jwst/v02_20220308/satellite-jwst.tar.gz"
     }
   ]
 }

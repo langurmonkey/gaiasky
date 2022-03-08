@@ -55,7 +55,7 @@ int sampleCount = 4;
 #define PC_TO_U 3.08567758149137e7
 
 #define RAY_STEP M_TO_U * 0.05
-#define DIST_BIAS M_TO_U * 0.01
+#define DIST_BIAS M_TO_U * 0.005
 
 #include shader/lib_logdepthbuff.glsl
 #include shader/lib_pack.glsl
