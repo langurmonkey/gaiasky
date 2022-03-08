@@ -6,9 +6,11 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.math.Vector2;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.render.IFadeObject;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoType;
@@ -26,7 +28,7 @@ import java.util.Map;
 /**
  * Node that offers fade-in and fade-out capabilities.
  */
-public class FadeNode extends SceneGraphNode {
+public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     /**
      * Fade in low and high limits
@@ -174,9 +176,14 @@ public class FadeNode extends SceneGraphNode {
         return fadeIn;
     }
 
+    @Override
+    public void setFadeIn(double nearPc, double farPc) {
+       fadeIn = new Vector2d(nearPc * Constants.PC_TO_U, farPc * Constants.PC_TO_U);
+    }
+
     public void setFadein(double[] fadein) {
         if (fadein != null)
-            fadeIn = new Vector2d((float) (fadein[0] * Constants.PC_TO_U), (float) (fadein[1] * Constants.PC_TO_U));
+            fadeIn = new Vector2d(fadein[0] * Constants.PC_TO_U, fadein[1] * Constants.PC_TO_U);
         else
             fadeIn = null;
     }
@@ -185,9 +192,14 @@ public class FadeNode extends SceneGraphNode {
         return fadeOut;
     }
 
+    @Override
+    public void setFadeOut(double nearPc, double farPc) {
+        fadeOut = new Vector2d(nearPc * Constants.PC_TO_U, farPc * Constants.PC_TO_U);
+    }
+
     public void setFadeout(double[] fadeout) {
         if (fadeout != null)
-            fadeOut = new Vector2d((float) (fadeout[0] * Constants.PC_TO_U), (float) (fadeout[1] * Constants.PC_TO_U));
+            fadeOut = new Vector2d(fadeout[0] * Constants.PC_TO_U, fadeout[1] * Constants.PC_TO_U);
         else
             fadeOut = null;
     }

@@ -7,6 +7,7 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.render.BlendMode;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;

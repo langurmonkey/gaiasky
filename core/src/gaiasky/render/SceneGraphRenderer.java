@@ -123,9 +123,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         MODEL_VERT_STAR,
         /**
-         * Galaxy as a whole
+         * Group of billboard datasets
          **/
-        GALAXY,
+        BILLBOARD_GROUP,
         /**
          * Model close up
          **/
@@ -266,7 +266,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private ExtShaderProgram[] lineShaders;
     private ExtShaderProgram[] lineQuadShaders;
-    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, milkyWayDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
+    private AssetDescriptor<ExtShaderProgram>[] starGroupDesc, particleGroupDesc, variableGroupDesc, particleEffectDesc, orbitElemDesc, pointDesc, lineDesc, lineQuadDesc, lineGpuDesc, billboardGroupDesc, starPointDesc, galDesc, spriteDesc, starBillboardDesc;
 
     /**
      * Render lists for all render groups
@@ -356,7 +356,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // Add shaders to load (no providers)
         starBillboardDesc = loadShader(manager, "shader/star.billboard.vertex.glsl", "shader/star.billboard.fragment.glsl", TextUtils.concatAll("star.billboard", names), defines);
         spriteDesc = loadShader(manager, "shader/sprite.vertex.glsl", "shader/sprite.fragment.glsl", TextUtils.concatAll("sprite", names), defines);
-        milkyWayDesc = loadShader(manager, "shader/milkyway.vertex.glsl", "shader/milkyway.fragment.glsl", TextUtils.concatAll("milkyway", names), defines);
+        billboardGroupDesc = loadShader(manager, "shader/billboard.group.vertex.glsl", "shader/billboard.group.fragment.glsl", TextUtils.concatAll("billboard.group", names), defines);
         pointDesc = loadShader(manager, "shader/point.cpu.vertex.glsl", "shader/point.cpu.fragment.glsl", TextUtils.concatAll("point.cpu", names), defines);
         lineDesc = loadShader(manager, "shader/line.cpu.vertex.glsl", "shader/line.cpu.fragment.glsl", TextUtils.concatAll("line.cpu", names), defines);
         lineQuadDesc = loadShader(manager, "shader/line.quad.vertex.glsl", "shader/line.quad.fragment.glsl", TextUtils.concatAll("line.quad", names), defines);
@@ -516,9 +516,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         ExtShaderProgram[] lineGpuShaders = fetchShaderProgram(manager, lineGpuDesc, TextUtils.concatAll("line.gpu", names));
 
         /*
-         * MILKY WAY
+         * BILLBOARD GROUP
          */
-        ExtShaderProgram[] milkyWayShaders = fetchShaderProgram(manager, milkyWayDesc, TextUtils.concatAll("milkyway", names));
+        ExtShaderProgram[] billboardGroupShaders = fetchShaderProgram(manager, billboardGroupDesc, TextUtils.concatAll("billboard.group", names));
 
         /*
          * PARTICLE EFFECT - default and relativistic
@@ -733,7 +733,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         AbstractRenderSystem modelThrusterProc = new ModelBatchRenderSystem(MODEL_VERT_THRUSTER, alphas, mbVertexLightingThruster);
 
         // GALAXY
-        MWModelRenderSystem milkyWayRenderSystem = new MWModelRenderSystem(GALAXY, alphas, milkyWayShaders);
+        BillboardGroupRenderSystem billboardGroupRenderSystem = new BillboardGroupRenderSystem(BILLBOARD_GROUP, alphas, billboardGroupShaders);
 
         // PARTICLE EFFECTS
         AbstractRenderSystem particleEffectsProc = new ParticleEffectsRenderSystem(null, alphas, particleEffectShaders);
@@ -814,7 +814,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(modelPerVertexLightingEarly);
 
         // Milky way
-        addRenderSystem(milkyWayRenderSystem);
+        addRenderSystem(billboardGroupRenderSystem);
 
         // Billboards
         addRenderSystem(billboardStarsProc);
@@ -1207,7 +1207,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
                     process.render(null, camera, t, renderContext);
                 }
             }
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            logger.error(e);
         }
 
     }

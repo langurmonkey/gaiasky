@@ -17,13 +17,17 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.IBillboardDatasetProvider;
+import gaiasky.render.IFadeObject;
 import gaiasky.render.IRenderable;
+import gaiasky.render.IStatusObject;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.scenegraph.MilkyWay;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.particle.BillboardDataset;
+import gaiasky.scenegraph.particle.BillboardDataset.ParticleType;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
@@ -35,92 +39,43 @@ import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.StdRandom;
 import gaiasky.util.tree.LoadStatus;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Map;
+import java.util.Set;
 
-public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+/**
+ * Renders billboard datasets by sending them to the GPU at once. Eligible objects
+ * must implement {@link IRenderable}, {@link IStatusObject}, {@link IBillboardDatasetProvider} and
+ * {@link IFadeObject}.
+ */
+public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
     private static final String texFolder = "data/galaxy/sprites/";
 
     private final Vector3 aux3f1;
-    private MeshData dust, bulge, stars, hii, gas;
-    private GpuData dustA, bulgeA, starsA, hiiA, gasA;
 
-    private AtomicBoolean reloadDataFlag = new AtomicBoolean(false);
+    private Map<IBillboardDatasetProvider, MeshDataWrap[]> meshes;
+    private Map<IBillboardDatasetProvider, GpuData[]> gpus;
 
     private TextureArray ta;
-    // Max sizes for dust, star, bulge, gas and hii
-    private final float[] maxSizes;
 
-    private enum PType {
-        DUST(0, new int[] { 3, 5, 7 }),
-        STAR(1, new int[] { 0, 1 }),
-        BULGE(2, new int[] { 0, 1 }),
-        GAS(3, new int[] { 0, 1, 2, 3, 4, 5, 6, 7 }),
-        HII(4, new int[] { 2, 3, 4, 5, 6, 7 });
+    private ColorGenerator starColorGenerator, dustColorGenerator;
 
-        // The particle type id
-        public int id;
-        // The layers it can use
-        public int[] layers;
-        // The modulus to skip particles, usually 0
-        public int modulus;
-
-        PType(int id, int[] layers, int modulus) {
-            this.id = id;
-            this.layers = layers;
-            this.modulus = modulus;
-        }
-
-        PType(int id, int[] layers) {
-            this(id, layers, 0);
-        }
-
-    }
-
-    public MWModelRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
+    public BillboardGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] starShaders) {
         super(rg, alphas, starShaders);
         aux3f1 = new Vector3();
-        this.maxSizes = new float[PType.values().length];
-        initializeMaxSizes(Settings.settings.graphics.quality);
-        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
-    }
 
-    /**
-     * Initializes the maximum size per component regarding the given graphics quality
-     *
-     * @param gq The graphics quality
-     */
-    private void initializeMaxSizes(GraphicsQuality gq) {
-        if (gq.isUltra()) {
-            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(30f));
-            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.15f));
-            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(10f));
-            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(8f));
-        } else if (gq.isHigh()) {
-            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(20f));
-            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(8f));
-            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(2f));
-        } else if (gq.isNormal()) {
-            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(13f));
-            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(2.3f));
-            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(1.5f));
-        } else if (gq.isLow()) {
-            this.maxSizes[PType.DUST.ordinal()] = (float) Math.tan(Math.toRadians(13f));
-            this.maxSizes[PType.STAR.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.BULGE.ordinal()] = (float) Math.tan(Math.toRadians(0.1f));
-            this.maxSizes[PType.GAS.ordinal()] = (float) Math.tan(Math.toRadians(2f));
-            this.maxSizes[PType.HII.ordinal()] = (float) Math.tan(Math.toRadians(1.5f));
-        }
+        starColorGenerator = new StarColorGenerator();
+        dustColorGenerator = new DustColorGenerator();
+
+        meshes = new HashMap<>();
+        gpus = new HashMap<>();
+
+        EventManager.instance.subscribe(this, Event.DISPOSE_BILLBOARD_DATASET_MESHES);
     }
 
     @Override
     protected void initShaderProgram() {
-
         for (ExtShaderProgram shaderProgram : programs) {
             shaderProgram.begin();
             shaderProgram.setUniformf("u_pointAlphaMin", 0.1f);
@@ -134,6 +89,7 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         // Create TextureArray with 8 layers
         FileHandle s00 = unpack("star-00" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle s01 = unpack("star-01" + Constants.STAR_SUBSTITUTE + ".png", gq);
+
         FileHandle d00 = unpack("dust-00" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d01 = unpack("dust-01" + Constants.STAR_SUBSTITUTE + ".png", gq);
         FileHandle d02 = unpack("dust-02" + Constants.STAR_SUBSTITUTE + ".png", gq);
@@ -148,7 +104,6 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
             ta.bind(0);
             shaderProgram.setUniformi("u_textures", 0);
         }
-
     }
 
     private FileHandle unpack(String texName, GraphicsQuality gq) {
@@ -159,27 +114,20 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         ta.dispose();
     }
 
+    private void disposeMeshes(IBillboardDatasetProvider key) {
+        MeshDataWrap[] m = meshes.get(key);
+        for (MeshDataWrap meshData : m) {
+            meshData.meshData.dispose();
+        }
+        meshes.remove(key);
+        gpus.remove(key);
+    }
+
     private void disposeMeshes() {
-        if (dust != null)
-            dust.dispose();
-        dust = null;
-        dustA = null;
-        if (bulge != null)
-            bulge.dispose();
-        bulge = null;
-        bulgeA = null;
-        if (stars != null)
-            stars.dispose();
-        stars = null;
-        starsA = null;
-        if (hii != null)
-            hii.dispose();
-        hii = null;
-        hiiA = null;
-        if (gas != null)
-            gas.dispose();
-        gas = null;
-        gasA = null;
+        Set<IBillboardDatasetProvider> keys = meshes.keySet();
+        for (IBillboardDatasetProvider key : keys) {
+            disposeMeshes(key);
+        }
     }
 
     @Override
@@ -193,12 +141,13 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
     protected void initVertices() {
     }
 
-    private MeshData toMeshData(GpuData ad, MeshData md) {
+    private MeshDataWrap toMeshData(GpuData ad, MeshDataWrap mdw) {
         if (ad != null && ad.vertices != null) {
-            if (md != null) {
-                md.dispose();
+            if (mdw != null && mdw.meshData != null) {
+                mdw.meshData.dispose();
             }
-            md = new MeshData();
+            mdw = new MeshDataWrap();
+            MeshData md = new MeshData();
             VertexAttribute[] attributes = buildVertexAttributes();
             md.mesh = new IntMesh(true, ad.vertices.length / 6, ad.indices.length, attributes);
             md.vertexSize = md.mesh.getVertexAttributes().vertexSize / 4;
@@ -207,28 +156,27 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
             md.mesh.setVertices(ad.vertices, 0, ad.vertices.length);
             md.mesh.setIndices(ad.indices, 0, ad.indices.length);
 
+            mdw.meshData = md;
+            mdw.dataset = ad.dataset;
+
             ad.vertices = null;
-            return md;
+            return mdw;
         }
         return null;
     }
 
     /**
-     * Converts a given list of particle records to GPU data
-     * 0 - dust
-     * 1 - star
-     * 2 - bulge
-     * 3 - gas
-     * 4 - hii
+     * Converts a given list of particle records to GPU data.
      *
-     * @param data List with the particle records
-     * @param cg   The color generator
-     * @param type The type
+     * @param bd The billboard dataset.
+     * @param cg The color generator.
      *
-     * @return The GPU data object
+     * @return The GPU data object.
      */
-    private GpuData convertDataToGpu(List<IParticleRecord> data, ColorGenerator cg, PType type) {
+    private GpuData convertDataToGpu(BillboardDataset bd, ColorGenerator cg) {
         GpuData ad = new GpuData();
+        // Dataset
+        ad.dataset = bd;
 
         // vert_pos + col + uv + obj_pos + additional
         int vertexSize = 2 + 1 + 2 + 3 + 3;
@@ -238,14 +186,15 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         int uvOffset = 3;
         int particlePosOffset = 5;
         int additionalOffset = 8;
+        List<IParticleRecord> data = bd.data;
         ad.vertices = new float[data.size() * vertexSize * 4];
         ad.indices = new int[data.size() * 6];
 
-        int nLayers = type.layers.length;
+        int nLayers = bd.layers.length;
 
         int i = 0;
         for (IParticleRecord particle : data) {
-            if (type.modulus == 0 || i % type.modulus == 0) {
+            if (bd.modulus == 0 || i % bd.modulus == 0) {
                 int layer = StdRandom.uniform(nLayers);
                 for (int vert = 0; vert < 4; vert++) {
                     // Vertex POSITION
@@ -267,8 +216,8 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
                     // SIZE, TYPE, TEX LAYER
                     double starSize = particle.size();
                     ad.vertices[ad.vertexIdx + additionalOffset] = (float) starSize;
-                    ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) type.id;
-                    ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) type.layers[layer];
+                    ad.vertices[ad.vertexIdx + additionalOffset + 1] = (float) bd.type.ordinal();
+                    ad.vertices[ad.vertexIdx + additionalOffset + 2] = (float) bd.layers[layer];
 
                     // OBJECT POSITION
                     final int idx = ad.vertexIdx;
@@ -286,125 +235,122 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         return ad;
     }
 
-    private void convertDataToGpuFormat(MilkyWay mw) {
-        logger.info("Converting galaxy data to VRAM format");
-        StarColorGenerator scg = new StarColorGenerator();
-        bulgeA = convertDataToGpu(mw.bulgeData, scg, PType.BULGE);
-        starsA = convertDataToGpu(mw.starData, scg, PType.STAR);
-        hiiA = convertDataToGpu(mw.hiiData, scg, PType.HII);
-        gasA = convertDataToGpu(mw.gasData, scg, PType.GAS);
-        dustA = convertDataToGpu(mw.dustData, new DustColorGenerator(), PType.DUST);
+    private ColorGenerator getColorGenerator(final ParticleType type) {
+        return switch (type) {
+            case BULGE -> starColorGenerator;
+            case STAR -> starColorGenerator;
+            case HII -> starColorGenerator;
+            case GAS -> starColorGenerator;
+            case DUST -> dustColorGenerator;
+            default -> starColorGenerator;
+        };
     }
 
-    private void streamToGpu() {
-        logger.info("Streaming galaxy to GPU");
-        bulge = toMeshData(bulgeA, bulge);
-        bulgeA = null;
+    /**
+     * Creates the GPU data objects for a given dataset provider and stores them.
+     *
+     * @param datasetProvider The dataset provider object.
+     */
+    private void convertDataToGpuFormat(IBillboardDatasetProvider datasetProvider) {
+        logger.info("Converting billboard data to VRAM format: " + datasetProvider);
+        BillboardDataset[] datasets = datasetProvider.getDatasets();
+        GpuData[] g = new GpuData[datasets.length];
+        for (int i = 0; i < g.length; i++) {
+            g[i] = convertDataToGpu(datasets[i], getColorGenerator(datasets[i].type));
+        }
+        gpus.put(datasetProvider, g);
+    }
 
-        stars = toMeshData(starsA, stars);
-        starsA = null;
-
-        hii = toMeshData(hiiA, hii);
-        hiiA = null;
-
-        gas = toMeshData(gasA, gas);
-        gasA = null;
-
-        dust = toMeshData(dustA, dust);
-        dustA = null;
+    /**
+     * Converts the GPU data objects for the given dataset provider to mesh data
+     * objects and stores them.
+     *
+     * @param datasetProvider The dataset provider object.
+     */
+    private void streamToGpu(IBillboardDatasetProvider datasetProvider) {
+        logger.info("Streaming billboard datasets to GPU: " + datasetProvider);
+        GpuData[] g = gpus.get(datasetProvider);
+        if (g != null) {
+            MeshDataWrap[] m = new MeshDataWrap[g.length];
+            for (int i = 0; i < g.length; i++) {
+                m[i] = toMeshData(g[i], m[i]);
+            }
+            gpus.remove(datasetProvider);
+            meshes.put(datasetProvider, m);
+        }
     }
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        if (renderables.size > 0) {
-            MilkyWay mw = (MilkyWay) renderables.get(0);
+        for (IRenderable renderable : renderables) {
+            IStatusObject statusObject = (IStatusObject) renderable;
+            IBillboardDatasetProvider datasetProvider = (IBillboardDatasetProvider) renderable;
+            IFadeObject fadeObject = (IFadeObject) renderable;
 
-            if (reloadDataFlag.get()) {
-                mw.status = LoadStatus.NOT_LOADED;
-                reloadDataFlag.set(false);
-            }
-
-            switch (mw.status) {
+            switch (statusObject.getStatus()) {
             case NOT_LOADED:
                 // PRELOAD
-                mw.status = LoadStatus.LOADING;
+                statusObject.setStatus(LoadStatus.LOADING);
                 Thread loader = new Thread(() -> {
-                    convertDataToGpuFormat(mw);
-                    mw.status = LoadStatus.READY;
+                    convertDataToGpuFormat(datasetProvider);
+                    statusObject.setStatus(LoadStatus.READY);
                 });
                 loader.start();
                 break;
             case READY:
                 // TO GPU
-                streamToGpu();
-                mw.status = LoadStatus.LOADED;
+                streamToGpu(datasetProvider);
+                statusObject.setStatus(LoadStatus.LOADED);
                 break;
             case LOADED:
                 // RENDER
-                float alpha = getAlpha(mw);
+                float alpha = getAlpha(renderable);
                 if (alpha > 0) {
                     ExtShaderProgram shaderProgram = getShaderProgram();
 
                     shaderProgram.begin();
 
+                    // Global uniforms
                     shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                     shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux3f1));
-                    shaderProgram.setUniformf("u_alpha", mw.opacity * alpha);
-                    shaderProgram.setUniformf("u_edges", mw.getFadeIn().y, mw.getFadeOut().y);
+                    shaderProgram.setUniformf("u_alpha", renderable.getOpacity() * alpha);
+                    shaderProgram.setUniformf("u_edges", (float) fadeObject.getFadeIn().y, (float) fadeObject.getFadeOut().y);
                     double pointScaleFactor = 1.8e7;
 
                     // Rel, grav, z-buffer
                     addEffectsUniforms(shaderProgram, camera);
 
+                    int qualityIndex = Settings.settings.graphics.quality.ordinal();
+
                     // General settings for all
                     Gdx.gl20.glEnable(GL20.GL_DEPTH_TEST);
                     Gdx.gl20.glEnable(GL20.GL_BLEND);
 
-                    // PART 1: DUST - depth enabled - depth writes
-                    Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-                    Gdx.gl20.glDepthMask(true);
+                    MeshDataWrap[] m = meshes.get(datasetProvider);
+                    for (MeshDataWrap meshDataWrap : m) {
+                        MeshData meshData = meshDataWrap.meshData;
+                        BillboardDataset dataset = meshDataWrap.dataset;
+                        // Blend mode
+                        switch (dataset.blending) {
+                        case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+                        case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
+                        };
+                        // Depth mask
+                        Gdx.gl20.glDepthMask(dataset.depthMask);
 
-                    //  Dust
-                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.DUST.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (3e2 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 2.0f);
-                    dust.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                        // Specific uniforms
+                        shaderProgram.setUniformf("u_maxPointSize", (float) dataset.maxSizes[qualityIndex]);
+                        shaderProgram.setUniformf("u_sizeFactor", (float) (dataset.size * pointScaleFactor));
+                        shaderProgram.setUniformf("u_intensity", dataset.intensity);
 
-                    // PART2: BULGE + STARS + HII + GAS - depth enabled - no depth writes
-                    Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                    Gdx.gl20.glDepthMask(false);
-
-                    // HII
-                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.HII.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (1e2 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 0.5f);
-                    hii.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-
-                    // Gas
-                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.GAS.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (4e1 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 0.5f);
-                    gas.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-
-                    // Bulge
-                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.BULGE.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (3e1f * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 10f);
-                    bulge.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-
-                    // Stars
-                    shaderProgram.setUniformf("u_maxPointSize", maxSizes[PType.STAR.ordinal()]);
-                    shaderProgram.setUniformf("u_sizeFactor", (float) (.2e1 * pointScaleFactor));
-                    shaderProgram.setUniformf("u_intensity", 8f);
-                    stars.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
-
+                        // Render mesh
+                        meshData.mesh.render(shaderProgram, GL20.GL_TRIANGLES);
+                    }
                     shaderProgram.end();
-
                 }
                 break;
             }
         }
-
     }
 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
@@ -422,22 +368,9 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.GRAPHICS_QUALITY_UPDATED) {
-            GraphicsQuality gq = (GraphicsQuality) data[0];
-            GaiaSky.postRunnable(() -> {
-                // Dispose textures and meshes
-                dispose();
-
-                // Initialize textures
-                initializeTextureArray(gq);
-
-                // Initialize maximum sizes
-                initializeMaxSizes(gq);
-
-                // Mark data for reload
-                reloadDataFlag.set(true);
-
-            });
+        if (event == Event.DISPOSE_BILLBOARD_DATASET_MESHES) {
+            IBillboardDatasetProvider object = (IBillboardDatasetProvider) source;
+            disposeMeshes(object);
         }
     }
 
@@ -472,6 +405,7 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         int vertexIdx;
         int indexIdx;
         int numVertices;
+        BillboardDataset dataset;
 
         public void quadIndices() {
             index(numVertices - 4);
@@ -486,5 +420,10 @@ public class MWModelRenderSystem extends PointCloudTriRenderSystem implements IO
         private void index(int idx) {
             indices[indexIdx++] = idx;
         }
+    }
+
+    private static class MeshDataWrap {
+        public MeshData meshData;
+        public BillboardDataset dataset;
     }
 }

@@ -40,11 +40,9 @@ import gaiasky.util.tree.LoadStatus;
 import java.util.List;
 
 /**
- * The milky way model. This is obsolete, use {@link BillboardDataset} instead.
- * @deprecated Use {@link BillboardDataset} instead.
+ * Represents a group of particle datasets that are represented as billboards.
  */
-@Deprecated
-public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IStatusObject, IFadeObject, IBillboardDatasetProvider, IObserver {
+public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable, IStatusObject, IFadeObject, IBillboardDatasetProvider, IObserver {
     String transformName;
     Matrix4 coordinateSystem;
 
@@ -73,7 +71,7 @@ public class MilkyWay extends SceneGraphNode implements I3DTextRenderable, IStat
      */
     private double currentDistance;
 
-    public MilkyWay() {
+    public BillboardGroup() {
         super();
         localTransform = new Matrix4();
     }

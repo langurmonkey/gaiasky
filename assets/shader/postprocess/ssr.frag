@@ -49,7 +49,7 @@ bool isSamplingEnabled = true;
 // Ray-march iterations
 int iterationCount = 60;
 // Number of samples if sampling is enabled
-int sampleCount = 6;
+int sampleCount = 4;
 
 #define M_TO_U 1.0e-9
 #define PC_TO_U 3.08567758149137e7
@@ -63,9 +63,15 @@ int sampleCount = 6;
 #define getViewDepth(uv) 1.0 / recoverWValue(texture(u_texture1, uv).r, u_zfark.x, u_zfark.y)
 #define getNDCDepth(uv) texture(u_texture1, uv).r
 
-float random (vec2 uv) {
-    return fract(sin(dot(uv, vec2(12.9898, 78.233))) * 43758.5453123); //simple random function
+float random(vec2 co) {
+    float a = 12.9898;
+    float b = 78.233;
+    float c = 43758.5453;
+    float dt = dot(co.xy, vec2(a, b));
+    float sn = mod(dt, 3.14);
+    return fract(sin(sn) * c);
 }
+
 
 vec3 viewFromDepth(vec2 texCoords) {
     // Convert depth to default non-linear function
@@ -145,7 +151,7 @@ vec2 raymarch(vec3 P, vec3 R) {
 void main(void) {
     vec4 mask = texture(u_texture3, v_texCoords);
     vec3 maskColor = vec3(mask.r, unpack2(mask.g));
-    float roughness = clamp(mask.b * 0.4, 0.0, 0.4);
+    float roughness = clamp(mask.b * 0.3, 0.0, 0.3);
     vec3 col = texture(u_texture0, v_texCoords).rgb;
     if (mask.r > 0.0) {
         // SSR
@@ -170,7 +176,7 @@ void main(void) {
                     }
                 }
             }
-            if (resultingColor.w == 0.0){
+            if (resultingColor.w == 0.0) {
                 fragColor = vec4(col + maskColor * 0.15, 1.0);
             } else {
                 resultingColor /= resultingColor.w;

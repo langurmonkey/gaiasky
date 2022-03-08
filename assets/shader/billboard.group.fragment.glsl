@@ -12,19 +12,18 @@ uniform sampler2DArray u_textures;
 // INPUT
 in vec4 v_col;
 in vec2 v_uv;
-// 0 - dust
-// 1 - star
-// 2 - bulge
-// 3 - gas
-// 4 - hii
 flat in int v_type;
 flat in int v_layer;
 
+// Types
 #define T_DUST 0
 #define T_STAR 1
 #define T_BULGE 2
 #define T_GAS 3
 #define T_HII 4
+#define T_GALAXY 5
+#define T_POINT 6
+#define T_OTHER 7
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -68,7 +67,6 @@ void main() {
     }
 
     if (v_type == T_DUST){
-        //fragColor = colorDust(u_alpha, dist);
         fragColor = colorDustTex(u_alpha, uv);
         if (fragColor.a < 1.0) {
             if (dither(gl_FragCoord.xy, fragColor.a) < 0.5) {
@@ -78,9 +76,6 @@ void main() {
     } else {
         fragColor = colorTex(u_alpha, uv);
     }
-    //} else {
-    //    fragColor = colorStar(u_alpha, dist);
-    //}
 
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_zfar, u_k);

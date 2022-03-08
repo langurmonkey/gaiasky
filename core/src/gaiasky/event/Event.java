@@ -351,6 +351,11 @@ public enum Event {
     DISPOSE_VARIABLE_GROUP_GPU_MESH,
 
     /**
+     * Contains the billboard dataset object.
+     */
+    DISPOSE_BILLBOARD_DATASET_MESHES,
+
+    /**
      * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}].
      */
     ELEVATION_MULTIPLIER_CMD,
