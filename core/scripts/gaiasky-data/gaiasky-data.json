@@ -108,7 +108,7 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "a970dd4d6c581bda1418bcbd016626bde0b1b1c45573362360130c039667c18e",
+      "sha256": "acbb2f6879cc50ac59f247108224bf10dd4a6c95475930e7830c1107fb20108a",
       "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC9 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
       "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC9+.\\n- Update milky way to new billboard group infrastructure.\\n- Update materials of Gaia model.",
       "link": "@mirror-url@basedata",
@@ -898,7 +898,7 @@
         "models/jwst",
         "orbit/orb.JWST.dat"
       ],
-      "sha256": "fa94f99f23c15fd08f05f3dcce704a9591b3a22d7f9a7e336285b9daeb73daac",
+      "sha256": "086a0d0311f8093582025f9f44ba0f6b7d5f8b710ce1a3e59b87f6757721b50c",
       "description": "The James Webb Space Telescope, with its orbit around L2 and a wavefront (.obj) 3D model.",
       "releasenotes": "- Update metallic materials of JWST.",
       "link": "https://sci.esa.int/web/jwst",
