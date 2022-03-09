@@ -68,11 +68,11 @@ public final class PingPongBuffer {
 
         // BUFFER USED FOR THE ACTUAL RENDERING:
         // n RENDER TARGETS:
-        //      0: FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
-        //      1: FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
-        //      2: FLOAT TEXTURE ATTACHMENT (VELOCITY BUFFER)
-        //      3: FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
-        //      4: FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
+        //      0: COLOR 0 - FLOAT TEXTURE ATTACHMENT (allow values outside of [0,1])
+        //      1: DEPTH - FLOAT TEXTURE ATTACHMENT (DEPTH BUFFER)
+        //      2: COLOR 1 - FLOAT TEXTURE ATTACHMENT (VELOCITY BUFFER)
+        //      3: COLOR 2 - FLOAT TEXTURE ATTACHMENT (NORMAL BUFFER)
+        //      4: COLOR 3 - FLOAT TEXTURE ATTACHMENT (REFLECTION MASK)
         // 1 DEPTH TEXTURE ATTACHMENT
         ownedMain = createMainFrameBuffer(width, height, hasDepth, hasVelocity, hasNormal, hasReflectionMask, frameBufferFormat, preventFloatBuffer);
 
@@ -115,7 +115,7 @@ public final class PingPongBuffer {
         // 2
         // Velocity buffer
         if (hasVelocity) {
-            addFloatRenderTarget(frameBufferBuilder, frameBufferFormat);
+            addColorRenderTarget(frameBufferBuilder, frameBufferFormat, preventFloatBuffer);
             velIndex = idx++;
         }
 
@@ -139,14 +139,14 @@ public final class PingPongBuffer {
 
     private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
-            addFloatRenderTarget(fbb, fbf);
+            addFloatRenderTarget(fbb, GL30.GL_RGBA16F);
         } else {
             addColorRenderTarget(fbb, fbf);
         }
     }
 
-    private static void addFloatRenderTarget(FrameBufferBuilder fbb, Format fbf) {
-        fbb.addFloatAttachment(GL30.GL_RGBA16F, GL30.GL_RGBA, GL30.GL_FLOAT, true);
+    private static void addFloatRenderTarget(FrameBufferBuilder fbb, int internalFormat) {
+        fbb.addFloatAttachment(internalFormat, GL30.GL_RGBA, GL30.GL_FLOAT, true);
     }
 
     private static void addColorRenderTarget(FrameBufferBuilder fbb, Format fbf) {
@@ -156,7 +156,7 @@ public final class PingPongBuffer {
     private static void addDepthRenderTarget(FrameBufferBuilder fbb, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
             // 32 bit depth buffer texture
-            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT24, GL20.GL_FLOAT);
+            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
         } else {
             fbb.addBasicDepthRenderBuffer();
         }
