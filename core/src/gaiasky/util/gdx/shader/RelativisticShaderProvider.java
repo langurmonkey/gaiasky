@@ -7,6 +7,8 @@ package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 
@@ -15,6 +17,7 @@ public class RelativisticShaderProvider extends DefaultIntShaderProvider {
 
     public RelativisticShaderProvider(final RelativisticShader.Config config) {
         this.config = (config == null) ? new RelativisticShader.Config() : config;
+        EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
     public RelativisticShaderProvider(final String vertexFile, final String fragmentFile, final String vertexShader, final String fragmentShader) {

@@ -119,7 +119,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
     public void doneLoading(AssetManager manager) {
         pps = new PostProcessBean[RenderType.values().length];
-        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.STAR_TEXTURE_IDX_CMD, Event.SCENE_GRAPH_LOADED);
+        EventManager.instance.subscribe(this, Event.SCREENSHOT_SIZE_UPDATE, Event.FRAME_SIZE_UPDATE, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.SSR_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_POS_2D_UPDATE, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.CUBEMAP_CMD, Event.ANTIALIASING_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD, Event.STEREO_PROFILE_CMD, Event.STEREOSCOPIC_CMD, Event.FPS_INFO, Event.FOV_CHANGE_NOTIFICATION, Event.STAR_BRIGHTNESS_CMD, Event.STAR_POINT_SIZE_CMD, Event.CAMERA_MOTION_UPDATE, Event.CAMERA_ORIENTATION_UPDATE, Event.GRAPHICS_QUALITY_UPDATED, Event.STAR_TEXTURE_IDX_CMD, Event.SCENE_GRAPH_LOADED);
     }
 
     public void initializeOffscreenPostProcessors() {
@@ -192,7 +192,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // SSR
         SSR ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
-        ssrEffect.setEnabled(Settings.settings.postprocess.ssr);
+        ssrEffect.setEnabled(Settings.settings.postprocess.ssr && !Settings.settings.runtime.openVr);
         ppb.set(ssrEffect);
 
         // CAMERA MOTION BLUR
@@ -774,14 +774,25 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
                 }
             }
             break;
+        case SSR_CMD:
+            boolean enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr;
+            for (int i = 0; i < RenderType.values().length; i++) {
+                if (pps[i] != null) {
+                    PostProcessBean ppb = pps[i];
+                    SSR ssr = (SSR) ppb.get(SSR.class);
+                    if (ssr != null)
+                        ssr.setEnabled(enabled);
+                }
+            }
+            break;
         case MOTION_BLUR_CMD:
-            boolean enabled = (boolean) data[0];
+            enabled = (boolean) data[0] && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr;
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
                     CameraMotion cameraMotion = (CameraMotion) ppb.get(CameraMotion.class);
                     if (cameraMotion != null)
-                        cameraMotion.setEnabled(enabled && !Settings.settings.program.safeMode && !Settings.settings.runtime.openVr);
+                        cameraMotion.setEnabled(enabled);
                 }
             }
             if (enabled && blurObjectAdded) {
@@ -796,7 +807,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
             for (int i = 0; i < RenderType.values().length; i++) {
                 if (pps[i] != null) {
                     PostProcessBean ppb = pps[i];
-                    ppb.get(CameraMotion.class).setEnabled(enabled && !Settings.settings.runtime.openVr);
+                    ppb.get(CameraMotion.class).setEnabled(enabled);
                     LightGlow lightglow = (LightGlow) ppb.get(LightGlow.class);
                     if (lightglow != null) {
                         lightglow.setNSamples(enabled ? 1 : lightGlowNSamples);

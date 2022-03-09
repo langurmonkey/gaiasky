@@ -56,10 +56,10 @@ public class VelocityBufferComponent {
         ((Matrix4Attribute) material.get(Matrix4Attribute.PrevProjView)).value.set(cam.getPreviousProjView());
 
         // Camera position difference
-        Vector3 dcampos = ((Vector3Attribute) material.get(Vector3Attribute.DCamPos)).value;
+        Vector3 dCamPos = ((Vector3Attribute) material.get(Vector3Attribute.DCamPos)).value;
         Vector3b dp = cam.getPreviousPos();
         Vector3b p = cam.getPos();
-        dcampos.set(dp.x.subtract(p.x).floatValue(), dp.y.subtract(p.y).floatValue(), dp.z.subtract(p.z).floatValue());
+        dCamPos.set(dp.x.subtract(p.x).floatValue(), dp.y.subtract(p.y).floatValue(), dp.z.subtract(p.z).floatValue());
     }
 
     public boolean hasVelocityBuffer(Material mat) {

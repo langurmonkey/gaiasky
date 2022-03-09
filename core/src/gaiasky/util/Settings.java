@@ -1336,7 +1336,7 @@ public class Settings {
         public boolean fisheye;
 
         public PostprocessSettings() {
-            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
+            EventManager.instance.subscribe(this, Event.BLOOM_CMD, Event.UNSHARP_MASK_CMD, Event.LENS_FLARE_CMD, Event.MOTION_BLUR_CMD, Event.SSR_CMD, Event.LIGHT_SCATTERING_CMD, Event.FISHEYE_CMD, Event.BRIGHTNESS_CMD, Event.CONTRAST_CMD, Event.HUE_CMD, Event.SATURATION_CMD, Event.GAMMA_CMD, Event.TONEMAPPING_TYPE_CMD, Event.EXPOSURE_CMD);
         }
 
         public void setAntialias(final String antialiasString) {
@@ -1374,7 +1374,6 @@ public class Settings {
 
         public Antialias getAntialias(int code) {
             return switch (code) {
-                case 0 -> Antialias.NONE;
                 case -1 -> Antialias.FXAA;
                 case -2 -> Antialias.NFAA;
                 case 1 -> Antialias.SSAA;
@@ -1389,6 +1388,7 @@ public class Settings {
             case UNSHARP_MASK_CMD -> unsharpMask.factor = (float) data[0];
             case LENS_FLARE_CMD -> lensFlare = (Boolean) data[0];
             case LIGHT_SCATTERING_CMD -> lightGlow = (Boolean) data[0];
+            case SSR_CMD -> ssr = (Boolean) data[0];
             case MOTION_BLUR_CMD -> motionBlur = (Boolean) data[0];
             case FISHEYE_CMD -> {
                 fisheye = (Boolean) data[0];

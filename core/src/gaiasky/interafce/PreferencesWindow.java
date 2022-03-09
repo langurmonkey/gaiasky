@@ -746,7 +746,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(ssr).left().padRight(pad10).padBottom(pad5);
             experimental.add(ssrTooltip).left().padBottom(pad5).row();
 
-
             // LABELS
             labels.addAll(dynamicResolutionLabel);
             labels.addAll(ssrLabel);
@@ -1669,7 +1668,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             if (event instanceof ChangeEvent) {
                 if (DataDescriptor.serverDataDescriptor != null || DataDescriptor.localDataDescriptor != null) {
                     DataDescriptor dd = DataDescriptor.serverDataDescriptor != null ? DataDescriptor.serverDataDescriptor : DataDescriptor.localDataDescriptor;
-                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.txt("gui.close"));
+                    DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
                     ddw.setModal(true);
                     ddw.show(stage);
                 } else {
@@ -1677,7 +1676,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                     FileHandle dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(settings.data.location) + "/gaiasky-data.json");
                     DownloadHelper.downloadFile(settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> {
                         DataDescriptor dd = DataDescriptorUtils.instance().buildServerDatasets(dataDescriptor);
-                        DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, I18n.txt("gui.close"));
+                        DatasetManagerWindow ddw = new DatasetManagerWindow(stage, skin, dd, false, null);
                         ddw.setModal(true);
                         ddw.show(stage);
                     }, () -> {
@@ -2136,8 +2135,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
 
         // SSR
-        if(ssr != null) {
-            settings.postprocess.ssr = ssr.isChecked();
+        if (ssr != null) {
+            GaiaSky.postRunnable(() -> {
+                EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked());
+            });
         }
 
         // Interface

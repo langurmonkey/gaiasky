@@ -611,6 +611,10 @@ public enum Event {
      **/
     MOTION_BLUR_CMD,
     /**
+     * Enables/disables screen-space reflections. Contains the boolean state.
+     */
+    SSR_CMD,
+    /**
      * True to capture the mouse, false to un-capture.
      */
     MOUSE_CAPTURE_CMD,
@@ -1312,6 +1316,11 @@ public enum Event {
      * Update external GUIs signal. Contains the dt in seconds.
      **/
     UPDATE_GUI,
+
+    /**
+     * Clears all cached shaders.
+     */
+    CLEAR_SHADERS,
 
     /**
      * Contains an array of booleans with the visibility of each ComponentType,

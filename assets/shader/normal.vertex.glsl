@@ -214,11 +214,8 @@ uniform mat4 u_shadowMapProjViewTrans;
 #endif
 
 #ifdef ambientLightFlag
-    #ifndef ambientFlag
-	#define ambientFlag
-    #endif
     uniform vec3 u_ambientLight;
-#endif
+#endif // ambientLightFlag
 
 #ifdef ambientCubemapFlag
     uniform vec3 u_ambientCubemap[6];
@@ -272,9 +269,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionFlag
     vec3 reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionFlag
 };
 out VertexData v_data;
 
@@ -353,12 +350,12 @@ void main() {
     v_data.viewDir = normalize(normalize(-pos.xyz - u_vrOffset) * TBN);
     #endif // heightFlag
 
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionFlag
     #ifndef normalTextureFlag
         // Only if normal map not present, otherwise we perturb the normal in the fragment shader
     	v_data.reflect = reflect(normalize(-pos.xyz - u_vrOffset), g_normal);
     #endif // normalTextureFlag
-    #endif // environmentCubemapFlag
+    #endif // reflectionFlag
 
     pushNormalValue(g_normal);
     pushColor(g_color);

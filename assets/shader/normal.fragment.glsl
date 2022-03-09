@@ -72,10 +72,6 @@ uniform float u_shininess;
 #define emissiveFlag
 #endif
 
-#if	defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
-#define ambientFlag
-#endif //ambientFlag
-
 #if defined(heightTextureFlag)
 #define heightFlag
 #endif //heightFlag
@@ -196,9 +192,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionFlag
     vec3 reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionFlag
 };
 in VertexData v_data;
 
@@ -209,7 +205,7 @@ in float v_fadeFactor;
 
 #ifdef environmentCubemapFlag
 uniform samplerCube u_environmentCubemap;
-#endif
+#endif // environmentCubemapFlag
 
 #ifdef reflectionColorFlag
 uniform vec4 u_reflectionColor;
@@ -360,7 +356,7 @@ void main() {
     #ifdef normalTextureFlag
         // Normal in tangent space
         vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
-		#ifdef environmentCubemapFlag
+		#ifdef reflectionFlag
             // Perturb the normal to get reflect direction
             pullNormal();
             #ifndef heightFlag
@@ -368,14 +364,14 @@ void main() {
             #endif // heighFlag
             normalVector.xyz = TBN * N;
             vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
-		#endif // environmentCubemapFlag
+		#endif // reflectionFlag
     #else
 	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
         normalVector.xyz = v_data.normal;
-		#ifdef environmentCubemapFlag
+		#ifdef reflectionFlag
 			vec3 reflectDir = normalize(v_data.reflect);
-        #endif // environmentCubemapFlag
+        #endif // reflectionFlag
     #endif // normalTextureFlag
 
     // Shadow
@@ -392,21 +388,22 @@ void main() {
     reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
     #endif // ssrFlag
 
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionFlag
         float roughness = 0.0;
-        #if defined(roughnessTextureFlag) && defined(shininessFlag)
-            roughness = texture(u_roughnessTexture, texCoords).x * (1.0 - u_shininess);
-        #elif defined(roughnessTextureFlag)
+        #if defined(roughnessTextureFlag)
             roughness = texture(u_roughnessTexture, texCoords).x;
         #elif defined(shininessFlag)
             roughness = 1.0 - u_shininess;
         #endif // roughnessTextureFlag, shininessFlag
-        reflectionColor = texture(u_environmentCubemap, reflectDir, roughness * 7.0).rgb;
+
+        #ifdef environmentCubemapFlag
+            reflectionColor = texture(u_environmentCubemap, reflectDir, roughness * 7.0).rgb;
+        #endif // environmentCubemapFlag
+
         #ifdef reflectionTextureFlag
             vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb;
             reflectionColor = reflectionColor * reflectionStrength;
             #ifdef ssrFlag
-            // pack this in rgb
             vec3 rmc = diffuse.rgb * reflectionStrength;
             reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
             #endif // ssrFlag
@@ -422,7 +419,7 @@ void main() {
         #else
         reflectionColor += reflectionColor * diffuse.rgb;
         #endif // ssrFlag
-    #endif // environmentCubemapFlag
+    #endif // reflectionFlag
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);

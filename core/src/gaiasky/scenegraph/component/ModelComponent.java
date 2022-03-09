@@ -13,30 +13,28 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.attributes.*;
-import gaiasky.event.Event;
-import gaiasky.scenegraph.camera.NaturalCamera;
-import gaiasky.util.gdx.shader.CubemapAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import gaiasky.GaiaSky;
 import gaiasky.data.AssetBean;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
-import gaiasky.util.color.ColorUtils;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.CubemapAttribute;
 import gaiasky.util.gdx.shader.FloatExtAttribute;
 import gaiasky.util.gdx.shader.Vector3Attribute;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Vector;
 
 public class ModelComponent extends NamedComponent implements Disposable, IObserver {
     private static final Log logger = Logger.getLogger(ModelComponent.class);
@@ -123,6 +121,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
      * Returns the given directional light
      *
      * @param i The index of the light (must be less than {@link Constants#N_DIR_LIGHTS}.
+     *
      * @return The directional light with index i
      */
     public DirectionalLight directional(int i) {
@@ -207,7 +206,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             addColorToMat();
         }
         // Subscribe to new graphics quality setting event
-        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED);
+        EventManager.instance.subscribe(this, Event.GRAPHICS_QUALITY_UPDATED, Event.SSR_CMD);
 
         this.modelInitialised = this.modelInitialised || !Settings.settings.scene.initialization.lazyMesh;
         this.modelLoading = false;
@@ -233,13 +232,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     materials.put("base", model.materials.first());
             }
             // Add skybox to materials if reflection present
-            for (Material mat : model.materials) {
-                if (mat.has(ColorAttribute.Reflection) && !ColorUtils.isZero(((ColorAttribute) mat.get(ColorAttribute.Reflection)).color)) {
-                    SkyboxComponent.prepareSkybox();
-                    mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
-                }
+            if (!Settings.settings.postprocess.ssr) {
+                addCubemapAttribute(model.materials);
             }
-
         } else if (type != null) {
             // We create the model
             Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
@@ -369,7 +364,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     }
 
     public void setVROffset(NaturalCamera cam) {
-        if(Settings.settings.runtime.openVr && cam.vrOffset != null) {
+        if (Settings.settings.runtime.openVr && cam.vrOffset != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
@@ -575,6 +570,23 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
+    public void addCubemapAttribute(Array<Material> materials) {
+        for (Material mat : materials) {
+            if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
+                SkyboxComponent.prepareSkybox();
+                mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
+            }
+        }
+    }
+
+    public void removeCubemapAttribute(Array<Material> materials) {
+        for (Material mat : materials) {
+            if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
+                mat.remove(CubemapAttribute.EnvironmentMap);
+            }
+        }
+    }
+
     public boolean hasHeight() {
         return mtc != null && mtc.hasHeight();
     }
@@ -590,6 +602,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                     mtc.setGenerated(false);
                 }
             });
+        } else if (event == Event.SSR_CMD) {
+            // Update cubemap
+            boolean active = (Boolean) data[0];
+            if (active) {
+                // Remove cubemap
+                removeCubemapAttribute(instance.materials);
+            } else {
+                // Add cubemap
+                addCubemapAttribute(instance.materials);
+            }
         }
     }
 
@@ -624,8 +646,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         setMaterial(mtc);
     }
 
-    public void print(Log log){
-        if(mtc != null)
+    public void print(Log log) {
+        if (mtc != null)
             mtc.print(log);
     }
 }

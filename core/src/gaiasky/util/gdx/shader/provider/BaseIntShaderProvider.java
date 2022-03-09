@@ -22,10 +22,12 @@
 package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.utils.Array;
+import gaiasky.event.Event;
+import gaiasky.event.IObserver;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.IntShader;
 
-public abstract class BaseIntShaderProvider implements IntShaderProvider {
+public abstract class BaseIntShaderProvider implements IntShaderProvider, IObserver {
 	protected Array<IntShader> shaders = new Array<>();
 
 	@Override
@@ -49,5 +51,12 @@ public abstract class BaseIntShaderProvider implements IntShaderProvider {
 			shader.dispose();
 		}
 		shaders.clear();
+	}
+
+	@Override
+	public void notify(Event event, Object source, Object... data) {
+		if(event == Event.CLEAR_SHADERS) {
+			dispose();
+		}
 	}
 }

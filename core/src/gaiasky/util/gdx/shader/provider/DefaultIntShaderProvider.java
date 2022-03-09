@@ -22,6 +22,8 @@
 package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.DefaultIntShader;
 import gaiasky.util.gdx.shader.IntShader;
@@ -31,6 +33,7 @@ public class DefaultIntShaderProvider extends BaseIntShaderProvider {
 
 	public DefaultIntShaderProvider(final DefaultIntShader.Config config) {
 		this.config = (config == null) ? new DefaultIntShader.Config() : config;
+		EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
 	}
 
 	public DefaultIntShaderProvider(final String vertexShader, final String fragmentShader) {

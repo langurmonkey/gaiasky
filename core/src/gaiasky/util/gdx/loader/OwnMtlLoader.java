@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
+import gaiasky.util.color.ColorUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,7 +40,9 @@ public class OwnMtlLoader {
         String texDiffuseFilename = null;
         String texEmissiveFilename = null;
         String texNormalFilename = null;
+        String texSpecularFilename = null;
         String texRoughnessFilename = null;
+        String texReflectionFilename = null;
 
         if (file == null || file.exists() == false) {
             logger.error("ERROR: Material file not found: " + file.name());
@@ -62,7 +65,7 @@ public class OwnMtlLoader {
                 else {
                     final String key = tokens[0].toLowerCase();
                     if (key.equals("newmtl")) {
-                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texRoughnessFilename, materials);
+                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texReflectionFilename, materials);
 
                         if (tokens.length > 1) {
                             curMatName = tokens[1];
@@ -78,9 +81,11 @@ public class OwnMtlLoader {
                         texDiffuseFilename = null;
                         texEmissiveFilename = null;
                         texNormalFilename = null;
+                        texRoughnessFilename = null;
+                        texReflectionFilename = null;
                         opacity = 1.f;
                         shininess = 0.f;
-                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr")) // diffuse, specular or emissive
+                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr")) // diffuse, specular, emissive, reflection
                     {
                         float r = Float.parseFloat(tokens[1]);
                         float g = Float.parseFloat(tokens[2]);
@@ -113,7 +118,11 @@ public class OwnMtlLoader {
                         texEmissiveFilename = file.parent().child(tokens[1]).path();
                     } else if (key.equals("map_kn") || key.equals("map_bump")) {
                         texNormalFilename = file.parent().child(tokens[1]).path();
+                    } else if (key.equals("map_ks")) {
+                        texSpecularFilename = file.parent().child(tokens[1]).path();
                     } else if (key.equals("map_kr")) {
+                        texReflectionFilename = file.parent().child(tokens[1]).path();
+                    } else if (key.equals("map_ns")) {
                         texRoughnessFilename = file.parent().child(tokens[1]).path();
                     }
                 }
@@ -124,18 +133,21 @@ public class OwnMtlLoader {
         }
 
         // last material
-        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texRoughnessFilename, materials);
+        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texReflectionFilename, materials);
 
         return;
     }
 
-    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texRoughnessFilename, Array<ModelMaterial> materials) {
+    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texSpecularFilename, String texRoughnessFilename, String texReflectionFilename, Array<ModelMaterial> materials) {
         ModelMaterial mat = new ModelMaterial();
         mat.id = curMatName;
         mat.diffuse = new Color(difcolor);
-        mat.specular = new Color(speccolor);
-        mat.emissive = new Color(emicolor);
-        mat.reflection = new Color(reflcolor);
+        if (!ColorUtils.isZero(speccolor))
+            mat.specular = new Color(speccolor);
+        if (!ColorUtils.isZero(emicolor))
+            mat.emissive = new Color(emicolor);
+        if (!ColorUtils.isZero(reflcolor))
+            mat.reflection = new Color(reflcolor);
         mat.opacity = opacity;
         mat.shininess = shininess;
         if (texDiffuseFilename != null) {
@@ -162,10 +174,26 @@ public class OwnMtlLoader {
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
+        if (texSpecularFilename != null) {
+            ModelTexture tex = new ModelTexture();
+            tex.usage = ModelTexture.USAGE_SPECULAR;
+            tex.fileName = texSpecularFilename;
+            if (mat.textures == null)
+                mat.textures = new Array<>(1);
+            mat.textures.add(tex);
+        }
         if (texRoughnessFilename != null) {
             ModelTexture tex = new ModelTexture();
             tex.usage = ModelTexture.USAGE_SHININESS;
             tex.fileName = texRoughnessFilename;
+            if (mat.textures == null)
+                mat.textures = new Array<>(1);
+            mat.textures.add(tex);
+        }
+        if (texReflectionFilename != null) {
+            ModelTexture tex = new ModelTexture();
+            tex.usage = ModelTexture.USAGE_REFLECTION;
+            tex.fileName = texReflectionFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);

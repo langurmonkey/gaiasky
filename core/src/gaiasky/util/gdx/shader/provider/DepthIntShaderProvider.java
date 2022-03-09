@@ -22,6 +22,8 @@
 package gaiasky.util.gdx.shader.provider;
 
 import com.badlogic.gdx.files.FileHandle;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.DepthIntShader;
 import gaiasky.util.gdx.shader.IntShader;
@@ -31,6 +33,7 @@ public class DepthIntShaderProvider extends BaseIntShaderProvider {
 
 	public DepthIntShaderProvider(final DepthIntShader.Config config) {
 		this.config = (config == null) ? new DepthIntShader.Config() : config;
+		EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
 	}
 
 	public DepthIntShaderProvider(final String vertexShader, final String fragmentShader) {

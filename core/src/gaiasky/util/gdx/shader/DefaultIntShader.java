@@ -42,9 +42,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.assets.ShaderTemplatingLoader;
-import gaiasky.render.RenderingContext;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
@@ -124,7 +122,6 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
-        public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
         public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureExtAttribute.Height);
         public final static Uniform heightScale = new Uniform("u_heightScale", FloatExtAttribute.HeightScale);
         public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatExtAttribute.HeightNoiseSize);
@@ -350,13 +347,6 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, unit);
             }
         };
-        public final static Setter ambientTexture = new LocalSetter() {
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Ambient))).textureDescription);
-                shader.set(inputID, unit);
-            }
-        };
         public final static Setter heightTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
@@ -502,7 +492,6 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_shininess;
     public final int u_roughnessTexture;
     public final int u_normalTexture;
-    public final int u_ambientTexture;
     public final int u_heightTexture;
     public final int u_heightScale;
     public final int u_heightNoiseSize;
@@ -658,7 +647,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_shininess = register(Inputs.shininess, Setters.shininess);
         u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
-        u_ambientTexture = register(Inputs.ambientTexture, Setters.ambientTexture);
         u_heightTexture = register(Inputs.heightTexture, Setters.heightTexture);
         u_heightScale = register(Inputs.heightScale, Setters.heightScale);
         u_heightNoiseSize = register(Inputs.heightNoiseSize, Setters.heightNoiseSize);
@@ -759,8 +747,6 @@ public class DefaultIntShader extends BaseIntShader {
                 }
                 if (renderable.environment.shadowMap != null)
                     prefix += "#define shadowMapFlag\n";
-                if (attributes.has(CubemapAttribute.EnvironmentMap))
-                    prefix += "#define environmentCubemapFlag\n";
             }
         }
         final int n = renderable.meshPart.mesh.getVertexAttributes().size();
@@ -804,12 +790,6 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define heightFlag\n";
         }
 
-        if ((attributesMask & Matrix4Attribute.PrevProjView) == Matrix4Attribute.PrevProjView) {
-            prefix += "#define velocityBufferFlag\n";
-        }
-        if (Settings.settings.postprocess.ssr) {
-            prefix += "#define ssrFlag\n";
-        }
         if ((attributesMask & TextureAttribute.Ambient) == TextureAttribute.Ambient) {
             prefix += "#define " + TextureAttribute.AmbientAlias + "Flag\n";
         }
@@ -825,6 +805,18 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
         if ((attributesMask & FloatAttribute.Shininess) == FloatAttribute.Shininess)
             prefix += "#define " + FloatAttribute.ShininessAlias + "Flag\n";
+
+        if ((attributesMask & Matrix4Attribute.PrevProjView) == Matrix4Attribute.PrevProjView) {
+            prefix += "#define velocityBufferFlag\n";
+        }
+        if (attributes.has(ColorAttribute.Reflection) || attributes.has(TextureAttribute.Reflection)) {
+            prefix += "#define reflectionFlag\n";
+            if (attributes.has(CubemapAttribute.EnvironmentMap)) {
+                prefix += "#define environmentCubemapFlag\n";
+            } else {
+                prefix += "#define ssrFlag\n";
+            }
+        }
 
         if (renderable.bones != null && config.numBones > 0)
             prefix += "#define numBones " + config.numBones + "\n";

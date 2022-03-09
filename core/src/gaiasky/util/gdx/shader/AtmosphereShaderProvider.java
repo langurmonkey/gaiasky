@@ -7,6 +7,8 @@ package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.files.FileHandle;
 import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.shader.provider.DefaultIntShaderProvider;
 
@@ -15,6 +17,7 @@ public class AtmosphereShaderProvider extends DefaultIntShaderProvider {
 
     public AtmosphereShaderProvider(final AtmosphereShader.Config config) {
         this.config = (config == null) ? new AtmosphereShader.Config() : config;
+        EventManager.instance.subscribe(this, Event.CLEAR_SHADERS);
     }
 
     public AtmosphereShaderProvider(final String vertexShader, final String fragmentShader) {

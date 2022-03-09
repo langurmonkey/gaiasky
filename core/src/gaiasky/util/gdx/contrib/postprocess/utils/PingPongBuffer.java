@@ -156,7 +156,7 @@ public final class PingPongBuffer {
     private static void addDepthRenderTarget(FrameBufferBuilder fbb, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
             // 32 bit depth buffer texture
-            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
+            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT24, GL20.GL_FLOAT);
         } else {
             fbb.addBasicDepthRenderBuffer();
         }
