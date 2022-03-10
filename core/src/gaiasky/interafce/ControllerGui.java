@@ -419,7 +419,7 @@ public class ControllerGui extends AbstractGui {
         ComponentType[] visibilityEntities = ComponentType.values();
         boolean[] visible = new boolean[visibilityEntities.length];
         for (int i = 0; i < visibilityEntities.length; i++)
-            visible[i] = SceneGraphRenderer.visible.get(visibilityEntities[i].ordinal());
+            visible[i] = GaiaSky.instance.sgr.visible.get(visibilityEntities[i].ordinal());
 
         if (visibilityEntities != null) {
             int di = 0, dj = 0;

@@ -160,7 +160,7 @@ public class VisualEffectsComponent extends GuiComponent implements IObserver {
                 // Read defaults from internal settings file
                 try {
                     Path confFolder = Settings.settings.assetsPath("conf");
-                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr || Settings.settings.runtime.OVR));
+                    Path internalFolderConfFile = confFolder.resolve(SettingsManager.getConfigFileName(Settings.settings.runtime.openVr));
                     Yaml yaml = new Yaml();
                     Map<Object, Object> conf = yaml.load(Files.newInputStream(internalFolderConfFile));
 

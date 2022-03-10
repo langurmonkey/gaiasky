@@ -603,14 +603,16 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 }
             });
         } else if (event == Event.SSR_CMD) {
-            // Update cubemap
-            boolean active = (Boolean) data[0];
-            if (active) {
-                // Remove cubemap
-                removeCubemapAttribute(instance.materials);
-            } else {
-                // Add cubemap
-                addCubemapAttribute(instance.materials);
+            if(instance != null && instance.materials != null) {
+                // Update cubemap
+                boolean active = (Boolean) data[0];
+                if (active) {
+                    // Remove cubemap
+                    removeCubemapAttribute(instance.materials);
+                } else {
+                    // Add cubemap
+                    addCubemapAttribute(instance.materials);
+                }
             }
         }
     }

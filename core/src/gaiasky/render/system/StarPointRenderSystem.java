@@ -41,9 +41,11 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     boolean initializing;
 
+    private boolean pointUpdateFlag = true;
+
     public StarPointRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, ComponentType ct) {
         super(rg, alphas, shaders);
-        EventManager.instance.subscribe(this,  Event.STAR_MIN_OPACITY_CMD, Event.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this,  Event.STAR_MIN_OPACITY_CMD, Event.STAR_TEXTURE_IDX_CMD, Event.STAR_POINT_UPDATE_FLAG);
         this.ct = ct;
         this.alphaSizeBrRc = new float[4];
         initializing = true;
@@ -105,8 +107,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        POINT_UPDATE_FLAG = true;
-        if (POINT_UPDATE_FLAG) {
+        if (pointUpdateFlag) {
             // Reset variables
             curr.clear();
 
@@ -139,7 +140,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
             });
             curr.mesh.setVertices(tempVerts, 0, curr.vertexIdx);
             // Put flag down
-            POINT_UPDATE_FLAG = false;
+            pointUpdateFlag = false;
         }
         ExtShaderProgram shaderProgram = getShaderProgram();
 
@@ -193,6 +194,7 @@ public class StarPointRenderSystem extends ImmediateModeRenderSystem implements 
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
+        case STAR_POINT_UPDATE_FLAG -> pointUpdateFlag = (Boolean) data[0];
         default ->{}
         }
     }

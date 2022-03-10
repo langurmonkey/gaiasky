@@ -7,12 +7,17 @@ package gaiasky.render.system;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.render.BlendMode;
+import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     protected static final Log logger = Logger.getLogger(ImmediateModeRenderSystem.class);
@@ -24,6 +29,11 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     protected float[] tempVerts;
     // Auxiliary array that holds indices temporarily
     protected int[] tempIndices;
+
+    // Renderables that are already in the GPU
+    protected Set<IRenderable> inGpu;
+    // Offset and count per renderable, if needed
+    private Map<IRenderable, Integer> offsets, counts;
 
     protected static class MeshData {
 
@@ -99,7 +109,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     }
 
     public void clearMeshes() {
-        if(meshes != null) {
+        if (meshes != null) {
             for (int i = 0; i < meshes.size; i++) {
                 clearMeshData(i);
             }
@@ -119,7 +129,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
                 md.dispose();
                 meshes.set(i, null);
             }
-        }catch(IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             // Nothing
         }
     }
@@ -135,13 +145,72 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         meshIdx = 0;
         if (tempVertsSize > 0)
             tempVerts = new float[tempVertsSize];
+        inGpu = new HashSet<>();
+        offsets = new HashMap<>();
+        counts = new HashMap<>();
     }
 
     protected abstract void initShaderProgram();
 
     protected abstract void initVertices();
 
-    public void dispose(){
+    protected boolean inGpu(IRenderable renderable) {
+        return inGpu != null && inGpu.contains(renderable);
+    }
+
+    protected void setInGpu(IRenderable renderable, boolean state) {
+        if(inGpu != null) {
+            if (state) {
+                inGpu.add(renderable);
+            } else {
+                inGpu.remove(renderable);
+            }
+        }
+    }
+
+    protected void setOffset(IRenderable renderable, int offset) {
+        if (offsets != null) {
+            if(offset >= 0) {
+                offsets.put(renderable, offset);
+            } else {
+                offsets.remove(renderable);
+            }
+
+        }
+    }
+
+    protected int getOffset(IRenderable renderable) {
+        if (offsets != null && offsets.containsKey(renderable)) {
+            return offsets.get(renderable);
+        }
+        return -1;
+    }
+
+    protected void setCount(IRenderable renderable, int count) {
+        if (counts != null) {
+            counts.put(renderable, count);
+        }
+    }
+
+    protected int getCount(IRenderable renderable) {
+        if (counts != null && counts.containsKey(renderable)) {
+            return counts.get(renderable);
+        }
+        return -1;
+    }
+
+    public void dispose() {
+        super.dispose();
+
+        inGpu.clear();
+        inGpu = null;
+
+        offsets.clear();
+        offsets = null;
+
+        counts.clear();
+        counts = null;
+
         clearMeshes();
         tempVerts = null;
         curr = null;
@@ -151,10 +220,11 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
      * This function makes sure that the tempVerts array has at least
      * the given size. After calling this function, the elements of tempVerts
      * may have been cleared.
+     *
      * @param size The size to ensure
      */
-    protected void ensureTempVertsSize(int size){
-        if(tempVerts == null || tempVerts.length < size) {
+    protected void ensureTempVertsSize(int size) {
+        if (tempVerts == null || tempVerts.length < size) {
             tempVerts = new float[size];
         }
     }
@@ -163,10 +233,11 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
      * This function makes sure that the tempIndices array has at least
      * the given size. After calling this function, the elements of tempIndices
      * may have been cleared.
+     *
      * @param size The size to ensure
      */
     protected void ensureTempIndicesSize(int size) {
-        if(tempIndices == null || tempIndices.length < size) {
+        if (tempIndices == null || tempIndices.length < size) {
             tempIndices = new int[size];
         }
     }

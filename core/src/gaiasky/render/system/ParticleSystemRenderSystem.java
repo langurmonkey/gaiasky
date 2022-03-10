@@ -13,11 +13,8 @@ import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
-import gaiasky.util.Settings;
-import gaiasky.util.gdx.shader.ExtShaderProgram;
 
 public class ParticleSystemRenderSystem extends AbstractRenderSystem {
     private ParticleSystem particleSystem;

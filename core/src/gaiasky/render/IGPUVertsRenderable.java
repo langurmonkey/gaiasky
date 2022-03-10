@@ -10,13 +10,8 @@ import gaiasky.data.util.PointCloudData;
 import gaiasky.scenegraph.SceneGraphNode;
 
 public interface IGPUVertsRenderable extends IRenderable {
-    boolean inGpu();
 
     void markForUpdate();
-
-    int getOffset();
-
-    int getCount();
 
     PointCloudData getPointCloud();
 
@@ -27,12 +22,6 @@ public interface IGPUVertsRenderable extends IRenderable {
     Matrix4 getLocalTransform();
 
     SceneGraphNode getParent();
-
-    void setInGpu(boolean inGpu);
-
-    void setOffset(int offset);
-
-    void setCount(int count);
 
     boolean isClosedLoop();
 

@@ -97,7 +97,7 @@ public final class PingPongBuffer {
     public static GaiaSkyFrameBuffer createMainFrameBuffer(int width, int height, boolean hasDepth, boolean hasVelocity, boolean hasNormal, boolean hasReflectionMask, Format frameBufferFormat, boolean preventFloatBuffer) {
         FrameBufferBuilder frameBufferBuilder = new FrameBufferBuilder(width, height);
 
-        int colorIndex, depthIndex = -1, velIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
+        int colorIndex = -1, depthIndex = -1, velIndex = -1, normalIndex = -1, reflectionMaskIndex = -1;
         int idx = 0;
 
         // 0
@@ -109,7 +109,8 @@ public final class PingPongBuffer {
         // Depth buffer
         if (hasDepth) {
             addDepthRenderTarget(frameBufferBuilder, preventFloatBuffer);
-            depthIndex = idx++;
+            if (!preventFloatBuffer)
+                depthIndex = idx++;
         }
 
         // 2
@@ -155,8 +156,8 @@ public final class PingPongBuffer {
 
     private static void addDepthRenderTarget(FrameBufferBuilder fbb, boolean preventFloatBuffer) {
         if (Gdx.graphics.isGL30Available() && !preventFloatBuffer) {
-            // 32 bit depth buffer texture
-            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT32, GL20.GL_FLOAT);
+            // 24 bit depth buffer texture
+            fbb.addDepthTextureAttachment(GL20.GL_DEPTH_COMPONENT24, GL20.GL_FLOAT);
         } else {
             fbb.addBasicDepthRenderBuffer();
         }

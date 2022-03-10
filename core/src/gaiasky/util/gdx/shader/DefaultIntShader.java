@@ -43,6 +43,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.assets.ShaderTemplatingLoader;
 import gaiasky.util.Constants;
+import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
 
 public class DefaultIntShader extends BaseIntShader {
@@ -813,9 +814,10 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define reflectionFlag\n";
             if (attributes.has(CubemapAttribute.EnvironmentMap)) {
                 prefix += "#define environmentCubemapFlag\n";
-            } else {
-                prefix += "#define ssrFlag\n";
             }
+        }
+        if (Settings.settings.postprocess.ssr) {
+            prefix += "#define ssrFlag\n";
         }
 
         if (renderable.bones != null && config.numBones > 0)

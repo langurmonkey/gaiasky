@@ -22,11 +22,6 @@ import gaiasky.util.math.Vector3d;
 import java.util.Comparator;
 
 public abstract class AbstractRenderSystem implements IRenderSystem {
-    /**
-     * When this is true, new point information is available, so new data is
-     * streamed to the GPU
-     **/
-    public static boolean POINT_UPDATE_FLAG = true;
 
     protected ExtShaderProgram[] programs;
     private final RenderGroup group;
@@ -202,6 +197,13 @@ public abstract class AbstractRenderSystem implements IRenderSystem {
             num = 2;
         }
         return programs[num];
+    }
+
+    public void dispose(){
+        preRunnables.clear();
+        preRunnables = null;
+        postRunnables.clear();
+        postRunnables = null;
     }
 
 }

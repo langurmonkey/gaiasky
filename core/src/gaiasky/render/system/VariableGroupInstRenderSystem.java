@@ -120,9 +120,10 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
             if (!starGroup.disposed) {
                 boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
                 int n = starGroup.size();
-                if (!starGroup.inGpu()) {
-                    starGroup.offset = addMeshData(6, n);
-                    curr = meshes.get(starGroup.offset);
+                if (!inGpu(starGroup)) {
+                    int offset = addMeshData(6, n);
+                    setOffset(starGroup, offset);
+                    curr = meshes.get(offset);
                     ensureInstanceAttribsSize(n * curr.instanceSize);
                     int numStarsAdded = 0;
 
@@ -173,16 +174,17 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
                     // Global (divisor=0) vertices (position, uv)
                     curr.mesh.setVertices(tempVerts, 0, 24);
                     // Per instance (divisor=1) vertices
-                    starGroup.count = numStarsAdded * curr.instanceSize;
-                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, starGroup.count);
+                    int count = numStarsAdded * curr.instanceSize;
+                    setCount(starGroup, count);
+                    curr.mesh.setInstanceAttribs(tempInstanceAttribs, 0, count);
 
-                    starGroup.inGpu(true);
+                    setInGpu(starGroup, true);
                 }
 
                 /*
                  * RENDER
                  */
-                curr = meshes.get(starGroup.offset);
+                curr = meshes.get(getOffset(starGroup));
                 if (curr != null) {
                     if (triComponent.starTex != null) {
                         triComponent.starTex.bind(0);
@@ -212,6 +214,19 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
         }
     }
 
+    protected void setInGpu(IRenderable renderable, boolean state) {
+        if(inGpu != null) {
+            if(inGpu.contains(renderable) && !state) {
+                EventManager.publish(Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, renderable);
+            }
+            if (state) {
+                inGpu.add(renderable);
+            } else {
+                inGpu.remove(renderable);
+            }
+        }
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -231,9 +246,11 @@ public class VariableGroupInstRenderSystem extends InstancedRenderSystem impleme
             triComponent.updateStarPointSize((float) data[0]);
             triComponent.touchStarParameters(getShaderProgram());
         }
-        case DISPOSE_STAR_GROUP_GPU_MESH -> {
-            Integer meshIdx = (Integer) data[0];
-            clearMeshData(meshIdx);
+        case DISPOSE_VARIABLE_GROUP_GPU_MESH -> {
+            IRenderable renderable = (IRenderable) source;
+            int offset = getOffset(renderable);
+            clearMeshData(offset);
+            inGpu.remove(renderable);
         }
         case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
         default -> {

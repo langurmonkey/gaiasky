@@ -332,21 +332,29 @@ public enum Event {
     DISPLAY_VR_GUI_CMD,
 
     /**
+     * Mark a verts object (source) for update with the given render group in [0].
+     */
+    MARK_FOR_UPDATE,
+    /**
+     * Mark star points for update, contains the value of the flag in [0].
+     */
+    STAR_POINT_UPDATE_FLAG,
+
+    /**
      * Dispose all resources, app is shutting down.
      **/
     DISPOSE,
 
     /**
-     * Contains the index to the particle group mesh to be cleared.
+     * Disposes the source GPU mesh
      **/
     DISPOSE_PARTICLE_GROUP_GPU_MESH,
-
     /**
-     * Contains the index of the star group mesh to be cleared.
+     * Disposes the source GPU mesh
      **/
     DISPOSE_STAR_GROUP_GPU_MESH,
     /**
-     * Contains the index of the variable group mesh to be cleared.
+     * Disposes the source GPU mesh
      **/
     DISPOSE_VARIABLE_GROUP_GPU_MESH,
 
@@ -1325,7 +1333,11 @@ public enum Event {
     /**
      * Disposes the post-processor and re-initializes it.
      */
-    RESTART_POSTPROCESSOR,
+    REINITIALIZE_POSTPROCESSOR,
+    /**
+     * Disposes the current scene graph renderer and re-initializes it.
+     */
+    REINITIALIZE_RENDERER,
 
     /**
      * Contains an array of booleans with the visibility of each ComponentType,

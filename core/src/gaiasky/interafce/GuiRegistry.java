@@ -458,7 +458,7 @@ public class GuiRegistry implements IObserver {
                                             GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, datasetOptions, true);
                                             // Select first
                                             CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
-                                            if (ci != null && ci.object != null) {
+                                            if (datasetOptions.type.isSelectable() && ci != null && ci.object != null) {
                                                 if (ci.object instanceof ParticleGroup) {
                                                     ParticleGroup pg = (ParticleGroup) ci.object;
                                                     if (pg.data() != null && !pg.data().isEmpty() && pg.isVisibilityOn()) {

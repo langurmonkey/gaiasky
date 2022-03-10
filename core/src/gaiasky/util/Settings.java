@@ -1436,7 +1436,6 @@ public class Settings {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RuntimeSettings implements IObserver {
         public boolean openVr = false;
-        public boolean OVR = false;
         public boolean displayGui = true;
         public boolean updatePause = false;
         public boolean timeOn = false;

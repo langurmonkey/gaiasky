@@ -91,11 +91,12 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         synchronized (starGroup) {
             if (!starGroup.disposed) {
                 boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                if (!starGroup.inGpu()) {
+                if (!inGpu(starGroup)) {
                     int n = starGroup.size();
-                    starGroup.offset = addMeshData(n * 4, n * 6);
+                    int offset = addMeshData(n * 4, n * 6);
+                    setOffset(starGroup, offset);
                     // Get mesh, reset indices
-                    curr = meshes.get(starGroup.offset);
+                    curr = meshes.get(offset);
                     ensureTempVertsSize(n * 4 * curr.vertexSize);
                     ensureTempIndicesSize(n * 6);
                     int numVerticesAdded = 0;
@@ -154,17 +155,18 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
                             numStarsAdded++;
                         }
                     }
-                    starGroup.count = numVerticesAdded * curr.vertexSize;
-                    curr.mesh.setVertices(tempVerts, 0, starGroup.count);
+                    int count = numVerticesAdded * curr.vertexSize;
+                    setCount(starGroup, count);
+                    curr.mesh.setVertices(tempVerts, 0, count);
                     curr.mesh.setIndices(tempIndices, 0, numStarsAdded * 6);
 
-                    starGroup.inGpu(true);
+                    setInGpu(starGroup, true);
                 }
 
                 /*
                  * RENDER
                  */
-                curr = meshes.get(starGroup.offset);
+                curr = meshes.get(getOffset(starGroup));
                 if (curr != null) {
                     if (triComponent.starTex != null) {
                         triComponent.starTex.bind(0);
@@ -191,6 +193,19 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
         }
     }
 
+    protected void setInGpu(IRenderable renderable, boolean state) {
+        if(inGpu != null) {
+            if(inGpu.contains(renderable) && !state) {
+                EventManager.publish(Event.DISPOSE_STAR_GROUP_GPU_MESH, renderable);
+            }
+            if (state) {
+                inGpu.add(renderable);
+            } else {
+                inGpu.remove(renderable);
+            }
+        }
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
@@ -211,8 +226,10 @@ public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements 
             triComponent.touchStarParameters(getShaderProgram());
         }
         case DISPOSE_STAR_GROUP_GPU_MESH -> {
-            Integer meshIdx = (Integer) data[0];
-            clearMeshData(meshIdx);
+            IRenderable renderable = (IRenderable) source;
+            int offset = getOffset(renderable);
+            clearMeshData(offset);
+            inGpu.remove(renderable);
         }
         case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture()));
         default -> {

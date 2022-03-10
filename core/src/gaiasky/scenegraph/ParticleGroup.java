@@ -96,14 +96,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.1)), Math.tan(Math.toRadians(6.0)) };
 
     /**
-     * Are the data of this group in the GPU memory?
-     */
-    private boolean inGpu;
-
-    // Offset and count for this group
-    public int offset = -1, count = -1;
-
-    /**
      * This flag indicates whether the mean position is already given by the
      * JSON injector
      */
@@ -238,7 +230,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public ParticleGroup() {
         super();
         id = idSeq++;
-        inGpu = false;
         focusIndex = -1;
         proximity = new Proximity(Constants.N_DIR_LIGHTS);
         focusPosition = new Vector3d();
@@ -422,7 +413,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         boolean previousVisibility = this.visibilityArray[index] != 0;
         this.visibilityArray[index] = (byte) (visible ? 1 : 0);
         if (previousVisibility != visible) {
-            this.setInGpu(false);
+            this.disposeGpuMesh();
         }
     }
 
@@ -1213,14 +1204,16 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return false;
     }
 
+    public void disposeGpuMesh(){
+       EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, this);
+    }
+
     @Override
     public void dispose() {
         this.disposed = true;
         GaiaSky.instance.sceneGraph.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
-        // Dispose of GPU data
-        EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, this, this.offset);
         // Data to be gc'd
         this.pointData = null;
         // Remove focus if needed
@@ -1231,22 +1224,6 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         }
     }
 
-    public boolean inGpu() {
-        return inGpu;
-    }
-
-    public void inGpu(boolean inGpu) {
-        this.inGpu = inGpu;
-    }
-
-    public void setInGpu(boolean inGpu) {
-        if (this.inGpu && !inGpu) {
-            // Dispose of GPU data
-            EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, this, this.offset);
-        }
-        this.inGpu = inGpu;
-    }
-
     @Override
     public float getTextOpacity() {
         return getOpacity();
@@ -1254,13 +1231,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public void highlight(boolean hl, float[] color, boolean allVisible) {
-        setInGpu(false);
+        disposeGpuMesh();
         super.highlight(hl, color, allVisible);
     }
 
     @Override
     public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
-        setInGpu(false);
+        disposeGpuMesh();
         super.highlight(hl, cmi, cma, cmmin, cmmax, allVisible);
     }
 

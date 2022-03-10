@@ -258,7 +258,10 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
             return getAbsolutePosition(aux);
         } else {
             double deltaYears = AstroUtils.getMsSince(time.getTime(), epochJd) * Nature.MS_TO_Y;
-            return aux.set(this.fetchPosition(pointData.get(focusIndex), null, aux3d1.get(), deltaYears));
+            if (pointData != null) {
+                return aux.set(this.fetchPosition(pointData.get(focusIndex), null, aux3d1.get(), deltaYears));
+            }
+            return aux;
         }
     }
 
@@ -397,7 +400,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        alpha *= SceneGraphRenderer.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
+        alpha *= GaiaSky.instance.sgr.alphas[ComponentTypes.ComponentType.VelocityVectors.ordinal()];
         float thPointTimesFovFactor = (float) Settings.settings.scene.star.threshold.point * camera.getFovFactor();
         int n = (int) getMaxProperMotionLines();
         for (int i = n - 1; i >= 0; i--) {
@@ -828,8 +831,6 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         GaiaSky.instance.sceneGraph.remove(this, true);
         // Unsubscribe from all events
         EventManager.instance.removeAllSubscriptions(this);
-        // Dispose of GPU datOLO
-        EventManager.publish(Event.DISPOSE_STAR_GROUP_GPU_MESH, this, this.offset);
         // Data to be gc'd
         this.pointData = null;
         // Remove focus if needed
@@ -978,11 +979,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return labelcolor;
     }
 
-    public void setInGpu(boolean inGpu) {
-        if (this.inGpu() && !inGpu) {
-            // Dispose of GPU data
-            EventManager.publish(variableStars ? Event.DISPOSE_VARIABLE_GROUP_GPU_MESH : Event.DISPOSE_STAR_GROUP_GPU_MESH, this, this.offset);
+    public void disposeGpuMesh() {
+        if (variableStars) {
+            EventManager.publish(Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, this);
+        } else {
+            EventManager.publish(Event.DISPOSE_STAR_GROUP_GPU_MESH, this);
         }
-        this.inGpu(inGpu);
     }
 }

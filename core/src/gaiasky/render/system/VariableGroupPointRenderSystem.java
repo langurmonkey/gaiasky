@@ -137,10 +137,11 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                 synchronized (starGroup) {
                     if (!starGroup.disposed) {
                         boolean hlCmap = starGroup.isHighlighted() && !starGroup.isHlplain();
-                        if (!starGroup.inGpu()) {
+                        if (!inGpu(starGroup)) {
                             int n = starGroup.size();
-                            starGroup.offset = addMeshData(n);
-                            curr = meshes.get(starGroup.offset);
+                            int offset = addMeshData(n);
+                            setOffset(starGroup, offset);
+                            curr = meshes.get(offset);
                             ensureTempVertsSize(n * curr.vertexSize);
                             int numAdded = 0;
                             for (int i = 0; i < n; i++) {
@@ -185,17 +186,18 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
                                     numAdded++;
                                 }
                             }
-                            starGroup.count = numAdded * curr.vertexSize;
-                            curr.mesh.setVertices(tempVerts, 0, starGroup.count);
+                            int count = numAdded * curr.vertexSize;
+                            setCount(starGroup, count);
+                            curr.mesh.setVertices(tempVerts, 0, count);
 
-                            starGroup.inGpu(true);
+                            setInGpu(starGroup, true);
 
                         }
 
                         /*
                          * RENDER
                          */
-                        curr = meshes.get(starGroup.offset);
+                        curr = meshes.get(getOffset(starGroup));
                         if (curr != null) {
 
                             if (starTex != null) {
@@ -254,13 +256,28 @@ public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem im
         return array;
     }
 
+    protected void setInGpu(IRenderable renderable, boolean state) {
+        if(inGpu != null) {
+            if(inGpu.contains(renderable) && !state) {
+                EventManager.publish(Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, renderable);
+            }
+            if (state) {
+                inGpu.add(renderable);
+            } else {
+                inGpu.remove(renderable);
+            }
+        }
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         switch (event) {
         case STAR_MIN_OPACITY_CMD -> opacityLimits[0] = (float) data[0];
         case DISPOSE_VARIABLE_GROUP_GPU_MESH -> {
-            Integer meshIdx = (Integer) data[0];
-            clearMeshData(meshIdx);
+            IRenderable renderable = (IRenderable) source;
+            int offset = getOffset(renderable);
+            clearMeshData(offset);
+            inGpu.remove(renderable);
         }
         case STAR_TEXTURE_IDX_CMD -> GaiaSky.postRunnable(() -> setStarTexture(Settings.settings.scene.star.getStarTexture()));
         default -> {

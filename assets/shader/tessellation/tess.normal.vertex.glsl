@@ -291,6 +291,7 @@ void main() {
     gl_Position = pos;
 
     #ifdef velocityBufferFlag
+    vec4 gpos = u_projViewTrans * pos;
     velocityBufferCam(gpos, pos);
     #endif
 

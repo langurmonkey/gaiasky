@@ -81,7 +81,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         /**
          * Using default shader, no normal map
          **/
-        MODEL_VERT,
+        MODEL_BG,
         /**
          * IntShader - stars
          **/
@@ -254,15 +254,15 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     /**
      * Contains the flags representing each type's visibility
      **/
-    public static ComponentTypes visible;
+    public ComponentTypes visible;
     /**
      * Contains the last update time of each of the flags
      **/
-    public static long[] times;
+    public long[] times;
     /**
      * Alpha values for each type
      **/
-    public static float[] alphas;
+    public float[] alphas;
 
     private ExtShaderProgram[] lineShaders;
     private ExtShaderProgram[] lineQuadShaders;
@@ -301,6 +301,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     // Light glow pre-render
     private FrameBuffer glowFb;
     private IntModelBatch mbPixelLightingDepth, mbPixelLightingOpaque, mbPixelLightingOpaqueTessellation, mbPixelLightingDepthTessellation;
+    private ExtSpriteBatch spriteBatch, fontBatch;
     private LightPositionUpdater lpu;
 
     private Vector3 aux1;
@@ -612,12 +613,12 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         BitmapFont fontTitles = manager.get("font/font-titles.fnt");
 
         // Sprites
-        ExtSpriteBatch spriteBatch = globalResources.getExtSpriteBatch();
+        spriteBatch = globalResources.getExtSpriteBatch();
         spriteBatch.enableBlending();
 
         // Font batch - additive, no depth writes
         // Two model batches, for front (models), back and atmospheres
-        ExtSpriteBatch fontBatch = new ExtSpriteBatch(2000, distanceFieldFontShader);
+        fontBatch = new ExtSpriteBatch(2000, distanceFieldFontShader);
         fontBatch.enableBlending();
         fontBatch.setBlendFunction(GL20.GL_ONE, GL20.GL_ONE);
 
@@ -665,7 +666,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
-        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_VERT, alphas, mbVertexLighting);
+        AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_BG, alphas, mbVertexDiffuse);
         modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
@@ -1357,7 +1358,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
             break;
         case PIXEL_RENDERER_UPDATE:
             GaiaSky.postRunnable(() -> {
-                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                EventManager.publish(Event.STAR_POINT_UPDATE_FLAG, this, true);
                 // updatePixelRenderSystem();
             });
             break;
@@ -1459,11 +1460,23 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     public void dispose() {
-        if (sgrList != null)
+        // Batches, etc.
+        spriteBatch.dispose();
+        fontBatch.dispose();
+        // Dispose render systems
+        for (IRenderSystem rendSys : renderSystems) {
+            rendSys.dispose();
+        }
+        renderSystems.clear();
+
+        // Dispose SGRs
+        if (sgrList != null) {
             for (ISGR sgr : sgrList) {
                 if (sgr != null)
                     sgr.dispose();
             }
+            sgrList = null;
+        }
     }
 
     /**

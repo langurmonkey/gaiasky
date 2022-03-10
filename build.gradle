@@ -52,19 +52,15 @@ project(":core") {
     project.ext.rev = proc.text.trim()
 
     if (DefaultNativePlatform.currentOperatingSystem.windows) {
-        project.ext.system = "Windows10 x86_64"
+        project.ext.system = DefaultNativePlatform.currentOperatingSystem.getName() + " " + DefaultNativePlatform.currentArchitecture.getName()
     } else {
         cmd = "uname -snmr"
         proc = cmd.execute()
         project.ext.system = proc.text.trim()
     }
 
-    cmd = "whoami"
-    proc = cmd.execute()
-    project.ext.builder = proc.text.trim()
-
+    project.ext.builder = System.properties["user.name"]
     project.ext.buildtime = new Date()
-
     version = "$tag"
 
     println ""
@@ -81,7 +77,6 @@ project(":core") {
     println "buildtime: $buildtime"
     println "builder: $builder"
     println ""
-
 
     // Set some build variables
     project.ext.baseDir = System.getProperty("user.dir")

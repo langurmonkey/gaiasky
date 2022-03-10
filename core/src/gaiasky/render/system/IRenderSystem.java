@@ -6,6 +6,7 @@
 package gaiasky.render.system;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.RenderingContext;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -14,7 +15,7 @@ import gaiasky.scenegraph.camera.ICamera;
 /**
  * A component that renders a type of objects.
  */
-public interface IRenderSystem {
+public interface IRenderSystem extends Disposable {
 
     RenderGroup getRenderGroup();
 

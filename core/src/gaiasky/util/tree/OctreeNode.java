@@ -8,6 +8,8 @@ package gaiasky.util.tree;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.StreamingOctreeLoader;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.ILineRenderable;
@@ -536,7 +538,7 @@ public class OctreeNode implements ILineRenderable {
 
             double alpha = 1;
             if (Settings.settings.scene.octree.fade && viewAngle < th1) {
-                AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                EventManager.publish(Event.STAR_POINT_UPDATE_FLAG, this, true);
                 alpha = MathUtilsd.clamp(MathUtilsd.lint(viewAngle, th0, th1, 0d, 1d), 0f, 1f);
             }
             this.opacity *= alpha;

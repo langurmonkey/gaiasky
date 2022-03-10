@@ -11,6 +11,9 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
+import gaiasky.event.IObserver;
 import gaiasky.render.IGPUVertsRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -26,7 +29,7 @@ import org.lwjgl.opengl.GL30;
 /**
  * Renders vertices using a VBO.
  */
-public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateModeRenderSystem {
+public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends ImmediateModeRenderSystem implements IObserver {
     protected ICamera camera;
     protected boolean lines;
     protected int coordOffset;
@@ -34,6 +37,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(rg, alphas, shaders);
         this.lines = lines;
+        EventManager.instance.subscribe(this, Event.MARK_FOR_UPDATE);
     }
 
     public boolean isLine() {
@@ -97,11 +101,11 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
             /*
              * ADD LINES
              */
-            if (!renderable.inGpu()) {
+            if (!inGpu(renderable)) {
                 // Remove previous line data if present
-                if (renderable.getOffset() >= 0) {
-                    clearMeshData(renderable.getOffset());
-                    renderable.setOffset(-1);
+                if (getOffset(renderable) >= 0) {
+                    clearMeshData(getOffset(renderable));
+                    setOffset(renderable, -1);
                 }
 
                 // Actually add data
@@ -109,16 +113,16 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                 int nPoints = od.getNumPoints();
 
                 // Initialize or fetch mesh data
-                if (renderable.getOffset() < 0) {
-                    renderable.setOffset(addMeshData(nPoints));
+                if (getOffset(renderable) < 0) {
+                    setOffset(renderable,addMeshData(nPoints));
                 } else {
-                    curr = meshes.get(renderable.getOffset());
+                    curr = meshes.get(getOffset(renderable));
                     // Check we still have capacity, otherwise, reinitialize.
                     if (curr.numVertices != od.getNumPoints()) {
                         curr.clear();
                         curr.mesh.dispose();
-                        meshes.set(renderable.getOffset(), null);
-                        renderable.setOffset(addMeshData(nPoints));
+                        meshes.set(getOffset(renderable), null);
+                        setOffset(renderable,addMeshData(nPoints));
                     }
                 }
                 // Coord maps time
@@ -143,12 +147,14 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
                     vertex((float) od.getX(0), (float) od.getY(0), (float) od.getZ(0));
                 }
 
-                renderable.setCount(nPoints * curr.vertexSize);
-                curr.mesh.setVertices(curr.vertices, 0, renderable.getCount());
+                int count = nPoints * curr.vertexSize;
+                setCount(renderable, count);
+                curr.mesh.setVertices(curr.vertices, 0, count);
                 curr.vertices = null;
-                renderable.setInGpu(true);
+
+                setInGpu(renderable, true);
             }
-            curr = meshes.get(renderable.getOffset());
+            curr = meshes.get(getOffset(renderable));
 
             /*
              * RENDER
@@ -201,4 +207,14 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
         return array;
     }
 
+    @Override
+    public void notify(Event event, Object source, Object... data) {
+        if(event == Event.MARK_FOR_UPDATE) {
+            IRenderable renderable = (IRenderable) source;
+            RenderGroup rg = (RenderGroup) data[0];
+            if(rg == RenderGroup.LINE_GPU || rg == RenderGroup.POINT_GPU) {
+                setInGpu(renderable, false);
+            }
+        }
+    }
 }

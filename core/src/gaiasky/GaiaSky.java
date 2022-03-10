@@ -632,7 +632,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         reinitialiseGUI2();
 
         // Publish visibility
-        EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, SceneGraphRenderer.visible);
+        EventManager.publish(Event.VISIBILITY_OF_COMPONENTS, this, sgr.visible);
 
         // Key bindings
         inputMultiplexer.addProcessor(new KeyboardInputController(Gdx.input));
@@ -645,7 +645,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         EventManager.publish(Event.TIME_CHANGE_INFO, this, time.getTime());
 
         // Subscribe to events
-        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD, Event.RESTART_POSTPROCESSOR);
+        EventManager.instance.subscribe(this, Event.TOGGLE_AMBIENT_LIGHT, Event.AMBIENT_LIGHT_CMD, Event.RECORD_CAMERA_CMD, Event.CAMERA_MODE_CMD, Event.STEREOSCOPIC_CMD, Event.CUBEMAP_CMD, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE, Event.PARK_RUNNABLE, Event.UNPARK_RUNNABLE, Event.SCENE_GRAPH_ADD_OBJECT_CMD, Event.SCENE_GRAPH_ADD_OBJECT_NO_POST_CMD, Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, Event.HOME_CMD, Event.UI_SCALE_CMD, Event.PER_OBJECT_VISIBILITY_CMD, Event.FORCE_OBJECT_LABEL_CMD, Event.LABEL_COLOR_CMD, Event.REINITIALIZE_RENDERER, Event.REINITIALIZE_POSTPROCESSOR);
 
         // Re-enable input
         EventManager.publish(Event.INPUT_ENABLED_CMD, this, true);
@@ -816,7 +816,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
 
         // Only for the Full GUI
         ((FullGui) mainGui).setSceneGraph(sceneGraph);
-        mainGui.setVisibilityToggles(ComponentType.values(), SceneGraphRenderer.visible);
+        mainGui.setVisibilityToggles(ComponentType.values(), sgr.visible);
 
         for (IGui gui : guis)
             gui.doneLoading(assetManager);
@@ -1547,7 +1547,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
                 removeRunnable(key);
             }
             break;
-        case RESTART_POSTPROCESSOR:
+        case REINITIALIZE_POSTPROCESSOR:
             if(postProcessor != null) {
                 postProcessor.dispose();
             } else {
@@ -1557,6 +1557,14 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             postProcessor.initialize(assetManager);
             // Set up
             postProcessor.doneLoading(assetManager);
+            break;
+        case REINITIALIZE_RENDERER:
+            logger.info("Re-initializing main renderer");
+            if(sgr != null) {
+                sgr.dispose();
+            }
+            // Initialize and load
+            sgr.doneLoading(assetManager);
             break;
         default:
             break;

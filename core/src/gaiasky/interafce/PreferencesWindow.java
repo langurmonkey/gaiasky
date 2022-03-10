@@ -132,6 +132,9 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         final float sliderWidth = textWidth * 3f;
         final float buttonHeight = 40f;
 
+        boolean safeMode = settings.program.safeMode;
+        boolean vr = settings.runtime.openVr;
+
         // Create the tab buttons
         Table group = new Table(skin);
         group.align(Align.left | Align.top);
@@ -421,8 +424,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         OwnLabel motionBlurLabel = new OwnLabel(I18n.txt("gui.motionblur"), skin);
         motionBlur = new OwnCheckBox("", skin);
         motionBlur.setName("motion blur");
-        motionBlur.setChecked(!settings.program.safeMode && settings.postprocess.motionBlur);
-        motionBlur.setDisabled(settings.program.safeMode);
+        motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur);
+        motionBlur.setDisabled(safeMode || vr);
 
         // FADE TIME
         OwnLabel fadeTimeLabel = new OwnLabel(I18n.txt("gui.fadetime"), skin, "default");
@@ -731,8 +734,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.txt("gui.ssr"), skin);
             ssr = new OwnCheckBox("", skin);
-            ssr.setChecked(!settings.program.safeMode && settings.postprocess.ssr);
-            ssr.setDisabled(settings.program.safeMode);
+            ssr.setChecked(!safeMode && !vr && settings.postprocess.ssr);
+            ssr.setDisabled(safeMode || vr);
             OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
             ssrTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.ssr.info"), skin));
 
@@ -2049,7 +2052,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         final boolean reloadFullScreenMode = fullScreen.isChecked() != settings.graphics.fullScreen.active;
         final boolean reloadScreenMode = reloadFullScreenMode || (settings.graphics.fullScreen.active && (settings.graphics.fullScreen.resolution[0] != fullScreenResolutions.getSelected().width || settings.graphics.fullScreen.resolution[1] != fullScreenResolutions.getSelected().height)) || (!settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
-        boolean reloadPostprocessor = false;
+        boolean reloadRenderSystem = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
 
@@ -2130,18 +2133,14 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // Motion blur
         if (motionBlur != null) {
-            reloadPostprocessor = settings.postprocess.motionBlur != motionBlur.isChecked();
-            GaiaSky.postRunnable(() -> {
-                EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked());
-            });
+            reloadRenderSystem = reloadRenderSystem || settings.postprocess.motionBlur != motionBlur.isChecked();
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked()));
         }
 
         // SSR
         if (ssr != null) {
-            reloadPostprocessor = settings.postprocess.ssr != ssr.isChecked();
-            GaiaSky.postRunnable(() -> {
-                EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked());
-            });
+            reloadRenderSystem = reloadRenderSystem || settings.postprocess.ssr != ssr.isChecked();
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked()));
         }
 
         // Interface
@@ -2294,8 +2293,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             });
         }
 
-        if (reloadPostprocessor) {
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.RESTART_POSTPROCESSOR, this));
+        if (reloadRenderSystem) {
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.REINITIALIZE_RENDERER, this));
         }
 
         if (reloadUI) {

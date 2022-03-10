@@ -71,11 +71,13 @@ in vec3 v_lightSpecular;
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5 + u_emissiveColor * 2.0
+#define fetchColorEmissiveTD(texCoord) texture(u_emissiveTexture, texCoord) * 1.5 + u_emissiveColor * 2.0
 #elif defined(emissiveTextureFlag)
-#define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord) * 1.5
+#define fetchColorEmissiveTD(texCoord) texture(u_emissiveTexture, texCoord) * 1.5
 #elif defined(emissiveColorFlag)
-#define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor * 2.0
+#define fetchColorEmissiveTD(texCoord) u_emissiveColor * 2.0
+#else
+#define fetchColorEmissiveTD(texCoord) vec4(0.0)
 #endif // emissiveTextureFlag && emissiveColorFlag
 
 #ifdef shadowMapFlag
@@ -126,7 +128,7 @@ layout (location = 0) out vec4 fragColor;
 #endif
 
 void main() {
-	vec4 emissive = fetchColorEmissiveTD(u_emissiveTexture, texCoords);
+	vec4 emissive = fetchColorEmissiveTD(v_texCoords0);
 	#ifdef atmosphereGround
 	vec3 night = emissive.rgb;
 	emissive = vec4(0.0);
@@ -211,9 +213,6 @@ void main() {
 	#else
 		fragColor.a = 1.0;
 	#endif
-		
-	// Prevent saturation
-    fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
 
 	gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
 

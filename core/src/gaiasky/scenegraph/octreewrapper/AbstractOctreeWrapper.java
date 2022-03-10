@@ -130,7 +130,7 @@ public abstract class AbstractOctreeWrapper extends FadeNode implements Iterable
 
                 if (OctreeNode.nObjectsObserved != lastNumberObjects) {
                     // Need to update the points in renderer
-                    AbstractRenderSystem.POINT_UPDATE_FLAG = true;
+                    EventManager.publish(Event.STAR_POINT_UPDATE_FLAG, this, true);
                     lastNumberObjects = OctreeNode.nObjectsObserved;
                 }
 

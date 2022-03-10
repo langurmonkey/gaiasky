@@ -78,10 +78,11 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
         synchronized (particleGroup) {
             if (!particleGroup.disposed) {
                 boolean hlCmap = particleGroup.isHighlighted() && !particleGroup.isHlplain();
-                if (!particleGroup.inGpu()) {
+                if (!inGpu(particleGroup)) {
                     int n = particleGroup.size();
-                    particleGroup.offset = addMeshData(n * 4, n * 6);
-                    curr = meshes.get(particleGroup.offset);
+                    int offset = addMeshData(n * 4, n * 6);
+                    setOffset(particleGroup, offset);
+                    curr = meshes.get(offset);
                     ensureTempVertsSize(n * 4 * curr.vertexSize);
                     ensureTempIndicesSize(n * 6);
 
@@ -150,17 +151,18 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
                             numParticlesAdded++;
                         }
                     }
-                    particleGroup.count = numVerticesAdded * curr.vertexSize;
-                    curr.mesh.setVertices(tempVerts, 0, particleGroup.count);
+                    int count = numVerticesAdded * curr.vertexSize;
+                    setCount(particleGroup, count);
+                    curr.mesh.setVertices(tempVerts, 0, count);
                     curr.mesh.setIndices(tempIndices, 0, numParticlesAdded * 6);
 
-                    particleGroup.inGpu(true);
+                    setInGpu(particleGroup, true);
                 }
 
                 /*
                  * RENDER
                  */
-                curr = meshes.get(particleGroup.offset);
+                curr = meshes.get(getOffset(particleGroup));
                 if (curr != null) {
                     float meanDist = (float) (particleGroup.getMeanDistance());
 
@@ -188,11 +190,26 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
         result[3] = (1 - f) * c0[3] + f * c1[3];
     }
 
+    protected void setInGpu(IRenderable renderable, boolean state) {
+        if(inGpu != null) {
+            if(inGpu.contains(renderable) && !state) {
+                EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, renderable);
+            }
+            if (state) {
+                inGpu.add(renderable);
+            } else {
+                inGpu.remove(renderable);
+            }
+        }
+    }
+
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event == Event.DISPOSE_PARTICLE_GROUP_GPU_MESH) {
-            Integer meshIdx = (Integer) data[0];
-            clearMeshData(meshIdx);
+            IRenderable renderable = (IRenderable) source;
+            int offset = getOffset(renderable);
+            clearMeshData(offset);
+            inGpu.remove(renderable);
         }
     }
 

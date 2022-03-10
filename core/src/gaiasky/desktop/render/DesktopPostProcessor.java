@@ -154,7 +154,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
 
         ar = width / height;
 
-        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode || vr);
+        ppb.pp = new PostProcessor(rt, Math.round(width), Math.round(height), true, false, true, !safeMode, !safeMode, !safeMode, safeMode);
         ppb.pp.setViewport(new Rectangle(0, 0, targetWidth, targetHeight));
 
         // RAY MARCHING SHADERS
@@ -192,11 +192,22 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         // SSR
         SSR ssrEffect = new SSR();
         ssrEffect.setZfarK((float) GaiaSky.instance.getCameraManager().current.getFar(), Constants.getCameraK());
-        ssrEffect.setEnabled(Settings.settings.postprocess.ssr && !Settings.settings.runtime.openVr);
+        ssrEffect.setEnabled(Settings.settings.postprocess.ssr && !vr && !safeMode);
         ppb.set(ssrEffect);
 
         // CAMERA MOTION BLUR
-        initCameraBlur(ppb, width, height, gq);
+        CameraMotion cameraBlur = new CameraMotion(width, height);
+        cameraBlur.setBlurScale(.8f);
+        cameraBlur.setEnabled(Settings.settings.postprocess.motionBlur && !vr && !safeMode);
+        ppb.set(cameraBlur);
+        updateCameraBlur(ppb, gq);
+
+        // Add to scene graph
+        if (blurObject != null && !blurObjectAdded) {
+            blurObject.doneLoading(manager);
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, blurObject, false));
+            blurObjectAdded = true;
+        }
 
         // LIGHT GLOW
         Texture glow = manager.get(starTextureName);
@@ -393,21 +404,6 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         Fxaa fxaa = (Fxaa) ppb.get(Fxaa.class);
         if (fxaa != null)
             fxaa.updateQuality(getFxaaQuality(gq));
-    }
-
-    private void initCameraBlur(PostProcessBean ppb, float width, float height, GraphicsQuality gq) {
-        CameraMotion cameraBlur = new CameraMotion(width, height);
-        cameraBlur.setBlurScale(.8f);
-        cameraBlur.setEnabled(!Settings.settings.program.safeMode && Settings.settings.postprocess.motionBlur && !Settings.settings.runtime.openVr);
-        ppb.set(cameraBlur);
-        updateCameraBlur(ppb, gq);
-
-        // Add to scene graph
-        if (blurObject != null && !blurObjectAdded) {
-            blurObject.doneLoading(manager);
-            GaiaSky.postRunnable(() -> EventManager.publish(Event.SCENE_GRAPH_ADD_OBJECT_CMD, this, blurObject, false));
-            blurObjectAdded = true;
-        }
     }
 
     private void initLevels(PostProcessBean ppb) {

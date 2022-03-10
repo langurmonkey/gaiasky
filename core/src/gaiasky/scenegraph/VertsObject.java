@@ -9,6 +9,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Matrix4;
 import gaiasky.data.util.PointCloudData;
+import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.IGPUVertsRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
@@ -19,12 +21,6 @@ import gaiasky.util.time.ITimeFrameProvider;
  * Represents a group of vertices which are sent to the GPU in a VBO
  */
 public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
-
-    /** GPU rendering attributes **/
-    protected boolean inGpu = false;
-    /** Indicates the index of the mesh data in the renderer **/
-    protected int offset = -1;
-    protected int count;
 
     protected boolean blend = true, depth = true, additive = true;
 
@@ -118,21 +114,6 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
         setPoints(new double[] {});
     }
 
-    @Override
-    public boolean inGpu() {
-        return inGpu;
-    }
-
-    @Override
-    public int getOffset() {
-        return offset;
-    }
-
-    @Override
-    public int getCount() {
-        return count;
-    }
-
     public void setPointCloudData(PointCloudData pcd){
         this.pointCloudData = pcd;
     }
@@ -160,21 +141,6 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
     @Override
     public SceneGraphNode getParent() {
         return parent;
-    }
-
-    @Override
-    public void setInGpu(boolean inGpu) {
-        this.inGpu = inGpu;
-    }
-
-    @Override
-    public void setOffset(int offset) {
-        this.offset = offset;
-    }
-
-    @Override
-    public void setCount(int count) {
-        this.count = count;
     }
 
     @Override
@@ -260,7 +226,7 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
 
     @Override
     public void markForUpdate() {
-        this.inGpu = false;
+        EventManager.publish(Event.MARK_FOR_UPDATE, this, renderGroup);
     }
 
     public boolean isLine(){

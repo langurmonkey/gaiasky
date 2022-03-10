@@ -64,7 +64,11 @@ public class DatasetOptions {
         PARTICLES,
         STARS,
         CLUSTERS,
-        VARIABLES
+        VARIABLES;
+
+        public boolean isSelectable(){
+            return this != PARTICLES;
+        }
     }
 
     public DatasetLoadType type;
