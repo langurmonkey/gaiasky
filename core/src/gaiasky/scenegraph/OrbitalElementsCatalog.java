@@ -6,6 +6,7 @@ import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
+import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -55,7 +56,7 @@ public class OrbitalElementsCatalog extends FadeNode implements IObserver {
 
         if (children != null) {
             if (rendered > 1) {
-                if (orbitsWithOrbit.isEmpty()) {
+                if (orbitsWithOrbit.isEmpty() || !GaiaSky.instance.isOn(ComponentType.Orbits)) {
                     children.first().update(time, translation, camera, this.opacity);
                 } else {
                     for (int i = 0; i < orbitsWithOrbit.size; i++) {
