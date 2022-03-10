@@ -1323,6 +1323,11 @@ public enum Event {
     CLEAR_SHADERS,
 
     /**
+     * Disposes the post-processor and re-initializes it.
+     */
+    RESTART_POSTPROCESSOR,
+
+    /**
      * Contains an array of booleans with the visibility of each ComponentType,
      * in the same order returned by ComponentType.values()
      **/

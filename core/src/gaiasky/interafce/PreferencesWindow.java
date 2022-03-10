@@ -69,7 +69,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
     private final INumberFormat nf3;
 
-    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, ssr;
+    private CheckBox fullScreen, windowed, vsync, maxFps, multithreadCb, lodFadeCb, cbAutoCamrec, real, nsl, invertX, invertY, highAccuracyPositions, shadowsCb, pointerCoords, debugInfo, crosshairFocus, crosshairClosest, crosshairHome, pointerGuides, exitConfirmation, recGridProjectionLines, dynamicResolution, motionBlur, ssr;
     private OwnSelectBox<DisplayMode> fullScreenResolutions;
     private OwnSelectBox<ComboBoxBean> graphicsQuality, aa, pointCloudRenderer, lineRenderer, numThreads, screenshotMode, frameoutputMode, nshadows, distUnitsSelect;
     private OwnSelectBox<LangComboBoxBean> lang;
@@ -90,7 +90,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     // Backup values
     private ToneMapping toneMappingBak;
     private float brightnessBak, contrastBak, hueBak, saturationBak, gammaBak, exposureBak, bloomBak, unsharpMaskBak;
-    private boolean lensflareBak, lightGlowBak, debugInfoBak, motionBlurBak;
+    private boolean lensflareBak, lightGlowBak, debugInfoBak;
     private Settings settings;
 
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
@@ -419,17 +419,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         // MOTION BLUR
         OwnLabel motionBlurLabel = new OwnLabel(I18n.txt("gui.motionblur"), skin);
-        CheckBox motionBlur = new OwnCheckBox("", skin);
+        motionBlur = new OwnCheckBox("", skin);
         motionBlur.setName("motion blur");
         motionBlur.setChecked(!settings.program.safeMode && settings.postprocess.motionBlur);
         motionBlur.setDisabled(settings.program.safeMode);
-        motionBlur.addListener(event -> {
-            if (event instanceof ChangeEvent) {
-                GaiaSky.postRunnable(() -> EventManager.publish(Event.MOTION_BLUR_CMD, motionBlur, motionBlur.isChecked()));
-                return true;
-            }
-            return false;
-        });
 
         // FADE TIME
         OwnLabel fadeTimeLabel = new OwnLabel(I18n.txt("gui.fadetime"), skin, "default");
@@ -738,7 +731,8 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             // SSR
             OwnLabel ssrLabel = new OwnLabel(I18n.txt("gui.ssr"), skin);
             ssr = new OwnCheckBox("", skin);
-            ssr.setChecked(settings.postprocess.ssr);
+            ssr.setChecked(!settings.program.safeMode && settings.postprocess.ssr);
+            ssr.setDisabled(settings.program.safeMode);
             OwnImageButton ssrTooltip = new OwnImageButton(skin, "tooltip");
             ssrTooltip.addListener(new OwnTextTooltip(I18n.txt("gui.ssr.info"), skin));
 
@@ -1911,7 +1905,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         unsharpMaskBak = settings.postprocess.unsharpMask.factor;
         lensflareBak = settings.postprocess.lensFlare;
         lightGlowBak = settings.postprocess.lightGlow;
-        motionBlurBak = settings.postprocess.motionBlur;
         brightnessBak = settings.postprocess.levels.brightness;
         contrastBak = settings.postprocess.levels.contrast;
         hueBak = settings.postprocess.levels.hue;
@@ -2056,6 +2049,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
 
         final boolean reloadFullScreenMode = fullScreen.isChecked() != settings.graphics.fullScreen.active;
         final boolean reloadScreenMode = reloadFullScreenMode || (settings.graphics.fullScreen.active && (settings.graphics.fullScreen.resolution[0] != fullScreenResolutions.getSelected().width || settings.graphics.fullScreen.resolution[1] != fullScreenResolutions.getSelected().height)) || (!settings.graphics.fullScreen.active && (settings.graphics.resolution[0] != Integer.parseInt(widthField.getText())) || settings.graphics.resolution[1] != Integer.parseInt(heightField.getText()));
+        boolean reloadPostprocessor = false;
 
         settings.graphics.fullScreen.active = fullScreen.isChecked();
 
@@ -2134,8 +2128,17 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         if (!settings.graphics.dynamicResolution)
             GaiaSky.postRunnable(() -> GaiaSky.instance.resetDynamicResolution());
 
+        // Motion blur
+        if (motionBlur != null) {
+            reloadPostprocessor = settings.postprocess.motionBlur != motionBlur.isChecked();
+            GaiaSky.postRunnable(() -> {
+                EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlur.isChecked());
+            });
+        }
+
         // SSR
         if (ssr != null) {
+            reloadPostprocessor = settings.postprocess.ssr != ssr.isChecked();
             GaiaSky.postRunnable(() -> {
                 EventManager.publish(Event.SSR_CMD, ssr, ssr.isChecked());
             });
@@ -2291,6 +2294,10 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             });
         }
 
+        if (reloadPostprocessor) {
+            GaiaSky.postRunnable(() -> EventManager.publish(Event.RESTART_POSTPROCESSOR, this));
+        }
+
         if (reloadUI) {
             reloadUI(globalResources);
         }
@@ -2314,7 +2321,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         EventManager.publish(Event.HUE_CMD, this, hueBak);
         EventManager.publish(Event.SATURATION_CMD, this, saturationBak);
         EventManager.publish(Event.GAMMA_CMD, this, gammaBak);
-        EventManager.publish(Event.MOTION_BLUR_CMD, this, motionBlurBak);
         EventManager.publish(Event.LENS_FLARE_CMD, this, lensflareBak);
         EventManager.publish(Event.LIGHT_SCATTERING_CMD, this, lightGlowBak);
         EventManager.publish(Event.BLOOM_CMD, this, bloomBak);
