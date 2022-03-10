@@ -24,6 +24,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
@@ -33,6 +35,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  * Renders variable star groups using regular arrays via billboards with geometry (quads as two triangles).
  */
 public class VariableGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(VariableGroupRenderSystem.class);
+
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
 

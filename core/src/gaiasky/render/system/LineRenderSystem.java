@@ -11,13 +11,12 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
-import gaiasky.event.IObserver;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -26,6 +25,8 @@ import org.lwjgl.opengl.GL30;
 import java.util.Comparator;
 
 public class LineRenderSystem extends ImmediateModeRenderSystem {
+    protected static final Log logger = Logger.getLogger(LineRenderSystem.class);
+
     protected ICamera camera;
     protected Vector3 aux2;
 

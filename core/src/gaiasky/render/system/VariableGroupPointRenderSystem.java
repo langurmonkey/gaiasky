@@ -22,6 +22,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
@@ -34,6 +36,8 @@ import org.lwjgl.opengl.GL30;
  * Renders variable stars which have periodical light curve data
  */
 public class VariableGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(VariableGroupPointRenderSystem.class);
+
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;

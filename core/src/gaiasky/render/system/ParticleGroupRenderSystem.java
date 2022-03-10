@@ -21,6 +21,8 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -32,6 +34,8 @@ import java.util.Random;
  * Renders particle groups using regular arrays via billboards with geometry (quads as two triangles).
  */
 public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(ParticleGroupRenderSystem.class);
+
     private final Vector3 aux1;
     private int posOffset, sizeOffset, particlePosOffset, uvOffset;
     private final Random rand;

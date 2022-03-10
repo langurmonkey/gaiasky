@@ -14,8 +14,8 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -23,6 +23,8 @@ import gaiasky.scenegraph.Orbit;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
@@ -32,6 +34,8 @@ import gaiasky.util.math.MathUtilsd;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(OrbitalElementsParticlesRenderSystem.class);
+
     private final Vector3 aux1;
     private final Matrix4 maux;
     private int posOffset;
@@ -78,7 +82,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
         int n = renderables.size;
         if (n > 0 && renderables.get(0).getOpacity() > 0) {
             Orbit first = (Orbit) renderables.get(0);
-            if (forceAdd || !first.elemsInGpu) {
+            if (forceAdd || !inGpu(first)) {
                 forceAdd = false;
                 curr = meshes.get(addMeshData(n * 4, n * 6));
 
@@ -90,7 +94,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
                 renderables.forEach(renderable -> {
                     Orbit orbitElems = (Orbit) renderable;
 
-                    if (!orbitElems.elemsInGpu) {
+                    if (!inGpu(orbitElems)) {
 
                         OrbitComponent oc = orbitElems.oc;
 
@@ -130,7 +134,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
                         quadIndices(curr);
                         numParticlesAdded.incrementAndGet();
 
-                        orbitElems.elemsInGpu = true;
+                        setInGpu(orbitElems, true);
                     }
                 });
                 int count = numVerticesAdded.get() * curr.vertexSize;

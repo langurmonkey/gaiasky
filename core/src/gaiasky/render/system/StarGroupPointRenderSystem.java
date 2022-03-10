@@ -22,6 +22,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
@@ -31,6 +33,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class StarGroupPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(StarGroupPointRenderSystem.class);
+
     private final double BRIGHTNESS_FACTOR;
 
     private final Vector3 aux1;

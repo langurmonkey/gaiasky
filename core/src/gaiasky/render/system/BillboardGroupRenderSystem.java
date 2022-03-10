@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
@@ -31,6 +30,8 @@ import gaiasky.scenegraph.particle.BillboardDataset.ParticleType;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
 import gaiasky.util.GlobalResources;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.mesh.IntMesh;
@@ -50,6 +51,8 @@ import java.util.Set;
  * {@link IFadeObject}.
  */
 public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(BillboardGroupRenderSystem.class);
+
     private static final String texFolder = "data/galaxy/sprites/";
 
     private final Vector3 aux3f1;

@@ -24,6 +24,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
@@ -33,6 +35,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  * Renders star groups using regular arrays via billboards with geometry (quads as two triangles).
  */
 public class StarGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(StarGroupRenderSystem.class);
+
     private final Vector3 aux1;
     private int sizeOffset, pmOffset, uvOffset, starPosOffset;
     private final Colormap cmap;

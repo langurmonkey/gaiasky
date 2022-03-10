@@ -21,6 +21,8 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.comp.DistToCameraComparator;
@@ -33,6 +35,8 @@ import java.util.Random;
  * Renders particle groups using instancing via billboards with geometry (quads as two triangles).
  */
 public class ParticleGroupInstRenderSystem extends InstancedRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(ParticleGroupInstRenderSystem.class);
+
     private final Vector3 aux1;
     private int sizeOffset, particlePosOffset;
     private final Random rand;

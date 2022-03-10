@@ -15,6 +15,8 @@ import gaiasky.render.ILineRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -27,6 +29,8 @@ import net.jafama.FastMath;
  * Slower but higher quality.
  */
 public class LineQuadRenderSystem extends LineRenderSystem {
+    protected static final Log logger = Logger.getLogger(LineQuadRenderSystem.class);
+
     protected static final int INI_DPOOL_SIZE = 1000;
     protected static final int MAX_DPOOL_SIZE = 10000;
     private MeshDataExt currExt;

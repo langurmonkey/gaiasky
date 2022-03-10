@@ -15,11 +15,15 @@ import gaiasky.render.IPointRenderable;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class PointRenderSystem extends ImmediateModeRenderSystem {
+    protected static final Log logger = Logger.getLogger(PointRenderSystem.class);
+
     protected ICamera camera;
     protected int glType;
     private int sizeOffset;

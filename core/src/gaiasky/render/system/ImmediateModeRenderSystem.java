@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
-    protected static final Log logger = Logger.getLogger(ImmediateModeRenderSystem.class);
 
     protected int meshIdx;
     protected Array<MeshData> meshes;

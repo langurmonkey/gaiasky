@@ -112,11 +112,6 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     private OrbitDataLoaderParameter params;
 
     /**
-     * Orbital elements in gpu, in case there is no body
-     **/
-    public boolean elemsInGpu = false;
-
-    /**
      * Point color
      **/
     public float[] pointColor;
@@ -291,7 +286,6 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                     refreshOrbit(false);
                 }
             }
-            if(getName().equalsIgnoreCase("Gaia orbit"))
             // Orbital elements renderer
             if (body == null && oc != null && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
                 addToRender(this, RenderGroup.PARTICLE_ORBIT_ELEMENTS);

@@ -13,8 +13,8 @@ import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.GaiaSky;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
@@ -24,6 +24,8 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.particle.VariableRecord;
 import gaiasky.util.Constants;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
@@ -33,6 +35,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
  * Renders variable star groups using instancing via billboards with geometry (quads as two triangles).
  */
 public class VariableGroupInstRenderSystem extends InstancedRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(VariableGroupInstRenderSystem.class);
+
     // Maximum number of data points in the light curves
     public static final int MAX_VARI = 20;
 

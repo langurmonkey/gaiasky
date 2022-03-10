@@ -21,6 +21,8 @@ import gaiasky.scenegraph.CelestialBody;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.Logger;
+import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.Settings.SceneSettings.StarSettings;
 import gaiasky.util.coord.AstroUtils;
@@ -29,6 +31,8 @@ import gaiasky.util.gdx.shader.ExtShaderProgram;
 import org.lwjgl.opengl.GL30;
 
 public class StarPointRenderSystem extends ImmediateModeRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(StarPointRenderSystem.class);
+
     private final double BRIGHTNESS_FACTOR = 10;
 
     Vector3 aux;
