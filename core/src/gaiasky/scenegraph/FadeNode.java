@@ -6,7 +6,6 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.math.Vector2;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -54,7 +53,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
      * If set, the fade distance is the distance between the current fade node and this object.
      * Otherwise, it is the length of the current object's position.
      */
-    private SceneGraphNode position;
+    protected SceneGraphNode position;
 
     /**
      * The name of the position object
@@ -72,7 +71,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     protected CatalogInfo catalogInfo = null;
 
     // Initial update flag
-    private boolean initialUpdate = true;
+    protected boolean initialUpdate = true;
 
     /**
      * Is it highlighted?
@@ -127,12 +126,14 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         // Update with translation/rotation/etc
         updateLocal(time, camera);
 
-        if (children != null && (initialUpdate || GaiaSky.instance.isOn(ct))) {
-            for (int i = 0; i < children.size; i++) {
-                SceneGraphNode child = children.get(i);
-                child.update(time, translation, camera, this.opacity);
+        if (children != null) {
+            if (initialUpdate || GaiaSky.instance.isOn(ct)) {
+                for (int i = 0; i < children.size; i++) {
+                    SceneGraphNode child = children.get(i);
+                    child.update(time, translation, camera, this.opacity);
+                }
+                initialUpdate = false;
             }
-            initialUpdate = false;
         }
     }
 
@@ -152,7 +153,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     }
 
-    protected void updateOpacity(){
+    protected void updateOpacity() {
         if (fadeIn != null)
             this.opacity *= MathUtilsd.lint((float) this.currentDistance, fadeIn.x, fadeIn.y, 0, 1);
         if (fadeOut != null)
@@ -178,7 +179,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     @Override
     public void setFadeIn(double nearPc, double farPc) {
-       fadeIn = new Vector2d(nearPc * Constants.PC_TO_U, farPc * Constants.PC_TO_U);
+        fadeIn = new Vector2d(nearPc * Constants.PC_TO_U, farPc * Constants.PC_TO_U);
     }
 
     public void setFadein(double[] fadein) {
@@ -223,7 +224,6 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         this.positionObjectName = po;
     }
 
-
     public void setCatalogInfoBare(CatalogInfo info) {
         this.catalogInfo = info;
     }
@@ -250,8 +250,8 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     /**
      * Highlight using a plain color
      *
-     * @param hl    Whether to highlight
-     * @param color The plain color
+     * @param hl         Whether to highlight
+     * @param color      The plain color
      * @param allVisible All visible
      */
     public void highlight(boolean hl, float[] color, boolean allVisible) {
@@ -324,13 +324,14 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         return hlcmmax;
     }
 
-    public boolean isHlAllVisible(){
+    public boolean isHlAllVisible() {
         return hlallvisible;
     }
 
     public float getPointscaling() {
         return pointscaling;
     }
+
     public void setPointscaling(float pointscaling) {
         this.pointscaling = pointscaling;
     }

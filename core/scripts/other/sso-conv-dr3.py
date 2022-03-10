@@ -1,23 +1,22 @@
-#!/usr/bin/env python3
+#/usr/bin/env python
 
-import json, io, re, datetime, jdcal, math
+import json, io, re, math
 
 # Max number of asteroids to process
 N_MAX = 180000
+# Ref epoch in jd: Jan 1 2010
+REF_EPOCH = 2455197.5
 # Unit conversion
 AU_TO_KM = 149598000
 Y_TO_D = 365.25 
 # Standard gravitational parameter of the Sun
 GM_SUN = 1.32712440019e20
 
-# Incoming date format
-FMT = "%Y%m%d"
-
 class SSO(object):
     def __init__(self, name, color, epoch, meananomaly, semimajoraxis, eccentricity, argofpericenter, ascendingnode, period, inclination):
         self.name = name
         self.color = color
-        self.parent = "Sun"
+        self.parent = "dr3-asteroids-hook"
         self.impl = "gaiasky.scenegraph.Orbit"
         self.provider = "gaiasky.data.orbit.OrbitalParametersProvider"
         self.ct = [ "Asteroids", "Orbits" ]
@@ -40,11 +39,9 @@ def to_json(line, idx):
     # Designation
     name = values[2]
     color = [0.4, 0.4, 1.0, 0.5]
-    # Epoch in yyyymmdd, convert
-    ymd = values[3]
-    ymd = "20210101"
-    dt = datetime.datetime.strptime(ymd, FMT)
-    epoch = sum(jdcal.gcal2jd(dt.year, dt.month, dt.day))
+    # Epoch in julain days since Jan 1 2010
+    jdjan12010 = values[3]
+    epoch = float(jdjan12010) + REF_EPOCH
     # Mean anomaly [deg]
     meananomaly = float(values[9])
     # Semimajor axis [Km]
@@ -70,7 +67,7 @@ def to_json(line, idx):
 
 with open('/media/tsagrista/Daten/Gaia/data/sso/dr3-sso.csv', 'r') as fr:
     lines = fr.readlines()
-    with open('~/.local/share/gaiasky/data/orbits-asteroids-dr3.json', 'w') as fw:
+    with open('/tmp/sso-dr3.json', 'w') as fw:
         fw.write("{\"objects\" : [\n")
         N = min(N_MAX, len(lines))
         for idx, line in enumerate(lines[1:N]):
