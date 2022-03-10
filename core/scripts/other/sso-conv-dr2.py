@@ -17,7 +17,7 @@ class SSO(object):
     def __init__(self, name, color, epoch, meananomaly, semimajoraxis, eccentricity, argofpericenter, ascendingnode, period, inclination):
         self.name = name
         self.color = color
-        self.parent = "Sol"
+        self.parent = "Sun"
         self.impl = "gaiasky.scenegraph.Orbit"
         self.provider = "gaiasky.data.orbit.OrbitalParametersProvider"
         self.ct = [ "Asteroids", "Orbits" ]
