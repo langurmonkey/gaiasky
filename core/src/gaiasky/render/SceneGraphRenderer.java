@@ -1470,13 +1470,18 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     public void dispose() {
         // Batches, etc.
-        spriteBatch.dispose();
-        fontBatch.dispose();
+        if (spriteBatch != null)
+            spriteBatch.dispose();
+        if (fontBatch != null)
+            fontBatch.dispose();
+
         // Dispose render systems
-        for (IRenderSystem rendSys : renderSystems) {
-            rendSys.dispose();
+        if(renderSystems != null) {
+            for (IRenderSystem rendSys : renderSystems) {
+                rendSys.dispose();
+            }
+            renderSystems.clear();
         }
-        renderSystems.clear();
 
         // Dispose SGRs
         if (sgrList != null) {
