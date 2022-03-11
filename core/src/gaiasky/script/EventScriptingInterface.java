@@ -36,7 +36,7 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.screenshot.ImageRenderer;
 import gaiasky.util.*;
-import gaiasky.util.CatalogInfo.CatalogInfoType;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings.ScreenshotSettings;
 import gaiasky.util.color.ColorUtils;
@@ -2588,15 +2588,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadDataset(String dsName, String absolutePath) {
-        return loadDataset(dsName, absolutePath, CatalogInfoType.SCRIPT, true);
+        return loadDataset(dsName, absolutePath, CatalogInfoSource.SCRIPT, true);
     }
 
     @Override
     public boolean loadDataset(String dsName, String path, boolean sync) {
-        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, sync);
+        return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, sync);
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoType type, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, true);
         } else {
@@ -2606,7 +2606,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, String path, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean loadDataset(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, path, type, datasetOptions, true);
         } else {
@@ -2616,7 +2616,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         }
     }
 
-    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
+    public boolean loadDataset(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         if (sync) {
             return loadDatasetImmediate(dsName, ds, type, datasetOptions, true);
         } else {
@@ -2628,17 +2628,17 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadStarDataset(String dsName, String path, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, 1, new double[] { 0, 0, 0, 0 }, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, 1, new double[] { 0, 0, 0, 0 }, null, null, sync);
     }
 
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, new double[] { 0, 0, 0, 0 }, null, null, sync);
     }
 
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, null, null, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, null, null, sync);
     }
 
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, boolean sync) {
@@ -2647,14 +2647,14 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
 
     @Override
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
+        return loadStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
 
     public boolean loadStarDataset(String dsName, String path, double magnitudeScale, final List<?> labelColor, final List<?> fadeIn, final List<?> fadeOut, boolean sync) {
         return loadStarDataset(dsName, path, magnitudeScale, dArray(labelColor), dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    public boolean loadStarDataset(String dsName, String path, CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadStarDataset(String dsName, String path, CatalogInfoSource type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         DatasetOptions dops = DatasetOptions.getStarDatasetOptions(dsName, magnitudeScale, labelColor, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
@@ -2688,10 +2688,10 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     }
 
     public boolean loadParticleDataset(String dsName, String path, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadParticleDataset(dsName, path, CatalogInfoType.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut, sync);
+        return loadParticleDataset(dsName, path, CatalogInfoSource.SCRIPT, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadParticleDataset(String dsName, String path, CatalogInfoType type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadParticleDataset(String dsName, String path, CatalogInfoSource type, double profileDecay, double[] particleColor, double colorNoise, double[] labelColor, double particleSize, double[] sizeLimits, ComponentType ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         DatasetOptions dops = DatasetOptions.getParticleDatasetOptions(dsName, profileDecay, particleColor, colorNoise, labelColor, particleSize, sizeLimits, ct, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
@@ -2718,7 +2718,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         DatasetOptions dops = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, particleColor.clone(), compType, fadeIn, fadeOut);
-        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, dops, sync);
+        return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, dops, sync);
     }
 
     public boolean loadStarClusterDataset(String dsName, String path, List<?> particleColor, String ct, List<?> fadeIn, List<?> fadeOut, boolean sync) {
@@ -2729,15 +2729,15 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
     public boolean loadStarClusterDataset(String dsName, String path, double[] particleColor, double[] labelColor, String ct, double[] fadeIn, double[] fadeOut, boolean sync) {
         ComponentType compType = ComponentType.valueOf(ct);
         DatasetOptions datasetOptions = DatasetOptions.getStarClusterDatasetOptions(dsName, particleColor, labelColor, compType, fadeIn, fadeOut);
-        return loadDataset(dsName, path, CatalogInfoType.SCRIPT, datasetOptions, sync);
+        return loadDataset(dsName, path, CatalogInfoSource.SCRIPT, datasetOptions, sync);
     }
 
     @Override
     public boolean loadVariableStarDataset(String dsName, String path, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
-        return loadVariableStarDataset(dsName, path, CatalogInfoType.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
+        return loadVariableStarDataset(dsName, path, CatalogInfoSource.SCRIPT, magnitudeScale, labelColor, fadeIn, fadeOut, sync);
     }
 
-    public boolean loadVariableStarDataset(String dsName, String path, CatalogInfoType type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
+    public boolean loadVariableStarDataset(String dsName, String path, CatalogInfoSource type, double magnitudeScale, double[] labelColor, double[] fadeIn, double[] fadeOut, boolean sync) {
         DatasetOptions dops = DatasetOptions.getVariableStarDatasetOptions(dsName, magnitudeScale, labelColor, ComponentType.Stars, fadeIn, fadeOut);
         return loadDataset(dsName, path, type, dops, sync);
     }
@@ -2746,11 +2746,11 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         return loadStarClusterDataset(dsName, path, dArray(particleColor), dArray(labelColor), ct, dArray(fadeIn), dArray(fadeOut), sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoSource type, boolean sync) {
         return loadDatasetImmediate(dsName, path, type, null, sync);
     }
 
-    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, String path, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         Path p = Paths.get(path);
         if (Files.exists(p) && Files.isReadable(p)) {
             try {
@@ -2781,7 +2781,7 @@ public class EventScriptingInterface implements IScriptingInterface, IObserver {
         });
     }
 
-    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoType type, DatasetOptions datasetOptions, boolean sync) {
+    private boolean loadDatasetImmediate(String dsName, DataSource ds, CatalogInfoSource type, DatasetOptions datasetOptions, boolean sync) {
         try {
             logger.info(I18n.txt("notif.catalog.loading", dsName));
 

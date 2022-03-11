@@ -30,7 +30,7 @@ import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.RotationComponent;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.*;
-import gaiasky.util.CatalogInfo.CatalogInfoType;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.camera.Proximity;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.filter.attrib.IAttribute;
@@ -266,7 +266,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
             if (createCatalogInfo) {
                 // Create catalog info and broadcast
-                CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoType.INTERNAL, 1f, this);
+                CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoSource.INTERNAL, 1f, this);
                 ci.nParticles = pointData != null ? pointData.size() : -1;
                 Path df = Path.of(Settings.settings.data.dataFile(datafile));
                 ci.sizeBytes = Files.exists(df) && Files.isRegularFile(df) ? df.toFile().length() : -1;

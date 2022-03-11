@@ -22,7 +22,7 @@ public class CatalogInfo {
     private static int colorIndexSequence = 0;
 
 
-    public enum CatalogInfoType {
+    public enum CatalogInfoSource {
         INTERNAL, LOD, SAMP, SCRIPT, UI
     }
 
@@ -49,12 +49,12 @@ public class CatalogInfo {
     public Filter filter;
 
     // Catalog type
-    public CatalogInfoType type;
+    public CatalogInfoSource type;
 
     // Reference to scene graph object
     public FadeNode object;
 
-    public CatalogInfo(String name, String description, String source, CatalogInfoType type, float hlSizeFactor, FadeNode object) {
+    public CatalogInfo(String name, String description, String source, CatalogInfoSource type, float hlSizeFactor, FadeNode object) {
         super();
         this.name = name;
         this.description = description;

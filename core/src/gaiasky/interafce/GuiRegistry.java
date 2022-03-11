@@ -27,6 +27,7 @@ import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.parse.Parser;
 import gaiasky.util.scene2d.FileChooser;
 import gaiasky.util.scene2d.OwnLabel;
@@ -455,7 +456,7 @@ public class GuiRegistry implements IObserver {
                                         GaiaSky.instance.getExecutorService().execute(() -> {
                                             DatasetOptions datasetOptions = dld.generateDatasetOptions();
                                             // Load dataset
-                                            GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfo.CatalogInfoType.UI, datasetOptions, true);
+                                            GaiaSky.instance.scripting().loadDataset(datasetOptions.catalogName, result.toAbsolutePath().toString(), CatalogInfoSource.UI, datasetOptions, true);
                                             // Select first
                                             CatalogInfo ci = this.catalogManager.get(datasetOptions.catalogName);
                                             if (datasetOptions.type.isSelectable() && ci != null && ci.object != null) {

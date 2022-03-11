@@ -16,7 +16,7 @@ import gaiasky.scenegraph.octreewrapper.AbstractOctreeWrapper;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.scenegraph.particle.IParticleRecord;
 import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogInfo.CatalogInfoType;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
@@ -80,7 +80,7 @@ public class OctreeGroupLoader extends StreamingOctreeLoader {
             // Catalog info
             String name = this.name != null ? this.name : "LOD data";
             String description = this.description != null ? this.description : "Octree-based LOD dataset";
-            CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoType.LOD, 1.5f, octreeWrapper);
+            CatalogInfo ci = new CatalogInfo(name, description, null, CatalogInfoSource.LOD, 1.5f, octreeWrapper);
             ci.nParticles = params.containsKey("nobjects") ? (Long) params.get("nobjects") : -1;
             ci.sizeBytes = params.containsKey("size") ? (Long) params.get("size") : -1;
             EventManager.publish(Event.CATALOG_ADD, this, ci, false);

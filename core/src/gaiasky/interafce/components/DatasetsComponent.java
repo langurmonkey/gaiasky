@@ -18,6 +18,7 @@ import gaiasky.event.IObserver;
 import gaiasky.interafce.ColormapPicker;
 import gaiasky.interafce.ControlsWindow;
 import gaiasky.interafce.DatasetPreferencesWindow;
+import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
@@ -191,7 +192,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(nObjects).left();
         }
 
-        if (ci.object instanceof ParticleGroup) {
+        if (ci.object instanceof ParticleGroup || ci.object instanceof OrbitalElementsGroup) {
             OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.txt("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
             sizeScaling.setName("star brightness");
             sizeScaling.setWidth(320f);

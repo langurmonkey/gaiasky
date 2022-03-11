@@ -790,7 +790,7 @@
       ],
       "description": "Some 14k asteroids and other SSO, based on Gaia DR2 data.",
       "releasenotes" : "- Separate DR2 asteroids from base data pack.",
-      "sha256": "75b58460b719519680aae8f4b1e0d61abd3386ebd0ce44790ee695bea9d7d80f",
+      "sha256": "dda6976e05f843024b7e59e0f8dbe6ddac365a8db49c1c8cdd9cebcf84adb744",
       "file": "@mirror-url@catalog/sso/dr2/v01_20220311/asteroids-dr2.tar.gz"
     },
     {

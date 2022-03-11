@@ -21,6 +21,7 @@ import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.script.EventScriptingInterface;
 import gaiasky.util.*;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.parse.Parser;
 import org.astrogrid.samp.Message;
@@ -231,7 +232,7 @@ public class SAMPClient implements IObserver {
                 try {
                     DatasetOptions datasetOptions = dld.generateDatasetOptions();
                     // Load dataset
-                    boolean loaded = ((EventScriptingInterface) GaiaSky.instance.scripting()).loadDataset(id, dataSource, CatalogInfo.CatalogInfoType.SAMP, datasetOptions, true);
+                    boolean loaded = ((EventScriptingInterface) GaiaSky.instance.scripting()).loadDataset(id, dataSource, CatalogInfoSource.SAMP, datasetOptions, true);
                     if (loaded) {
                         // Select first
                         CatalogInfo ci = catalogManager.get(id);

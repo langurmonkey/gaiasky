@@ -6,6 +6,7 @@ import gaiasky.data.ISceneGraphLoader;
 import gaiasky.event.EventManager;
 import gaiasky.event.Event;
 import gaiasky.util.CatalogInfo;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Logger;
 import uk.ac.starlink.util.DataSource;
 
@@ -72,7 +73,7 @@ public class GenericCatalog extends FadeNode {
 
             // Create catalog info
             if (createCatalogInfo) {
-                CatalogInfo ci = new CatalogInfo(dsName, description, null, CatalogInfo.CatalogInfoType.INTERNAL, 1f, this);
+                CatalogInfo ci = new CatalogInfo(dsName, description, null, CatalogInfoSource.INTERNAL, 1f, this);
                 EventManager.publish(Event.CATALOG_ADD, this, ci, false);
             }
         } catch (Exception e) {

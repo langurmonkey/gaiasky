@@ -8,7 +8,7 @@ package gaiasky.script;
 import gaiasky.data.group.DatasetOptions;
 import gaiasky.scenegraph.IFocus;
 import gaiasky.scenegraph.SceneGraphNode;
-import gaiasky.util.CatalogInfo;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.contrib.postprocess.effects.CubemapProjections;
 
@@ -2153,13 +2153,13 @@ public interface IScriptingInterface {
      * @param dsName  The name of the dataset, used to identify the subsequent operations on the
      *                dataset.
      * @param path    Absolute path (or relative to the working path of Gaia Sky) to the <code>.vot</code> file to load.
-     * @param type    The {@link gaiasky.util.CatalogInfo.CatalogInfoType} object to use as the dataset type.
+     * @param type    The {@link CatalogInfoSource} object to use as the dataset type.
      * @param options The {@link DatasetOptions} object holding the options for this dataset.
      * @param sync    Whether the load must happen synchronously or asynchronously.
      *
      * @return False if the dataset could not be loaded (sync mode). True if it could not be loaded (sync mode), or <code>sync</code> is false.
      */
-    boolean loadDataset(final String dsName, final String path, final CatalogInfo.CatalogInfoType type, final DatasetOptions options, final boolean sync);
+    boolean loadDataset(final String dsName, final String path, final CatalogInfoSource type, final DatasetOptions options, final boolean sync);
 
     /**
      * Loads a star dataset from a VOTable file (<code>.vot</code>).

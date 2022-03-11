@@ -8,9 +8,15 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
+import gaiasky.util.CatalogInfo;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
+import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * This class acts as a group of orbital element objects.
@@ -26,6 +32,9 @@ public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObse
 
         // Check children which need updating every time
         initializeOrbitsWithOrbit();
+
+        // Initialize catalog info if not set
+        initializeCatalogInfo();
 
         EventManager.instance.subscribe(this, Event.GPU_UPDATE_ORBITAL_ELEMENTS);
     }
@@ -50,7 +59,17 @@ public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObse
                 }
             }
         }
+    }
 
+    private void initializeCatalogInfo() {
+        if (this.catalogInfo == null) {
+            // Create catalog info and broadcast
+            CatalogInfo ci = new CatalogInfo(names[0], names[0], null, CatalogInfoSource.INTERNAL, 1f, this);
+            ci.nParticles = this.children != null ? this.children.size : -1;
+
+            // Insert
+            EventManager.publish(Event.CATALOG_ADD, this, ci, false);
+        }
     }
 
     @Override

@@ -12,7 +12,7 @@ import gaiasky.event.EventManager;
 import gaiasky.render.IFadeObject;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
-import gaiasky.util.CatalogInfo.CatalogInfoType;
+import gaiasky.util.CatalogInfo.CatalogInfoSource;
 import gaiasky.util.Constants;
 import gaiasky.util.filter.attrib.IAttribute;
 import gaiasky.util.math.MathUtilsd;
@@ -241,9 +241,13 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         String name = map.get("name");
         String desc = map.get("description");
         String source = map.get("source");
-        CatalogInfoType type = map.get("type") != null ? CatalogInfoType.valueOf(map.get("type")) : CatalogInfoType.INTERNAL;
+        CatalogInfoSource type = map.get("type") != null ? CatalogInfoSource.valueOf(map.get("type")) : CatalogInfoSource.INTERNAL;
         float size = map.get("size") != null ? Parser.parseFloat(map.get("size")) : 1;
+        long sizeBytes = map.get("sizebytes") != null ? Parser.parseLong(map.get("sizebytes")) : -1;
+        long nObjects = map.get("nobjects") != null ? Parser.parseLong(map.get("nobjects")) : -1;
         this.catalogInfo = new CatalogInfo(name, desc, source, type, size, this);
+        this.catalogInfo.sizeBytes = sizeBytes;
+        this.catalogInfo.nParticles = nObjects;
         EventManager.publish(Event.CATALOG_ADD, this, this.catalogInfo, false);
     }
 

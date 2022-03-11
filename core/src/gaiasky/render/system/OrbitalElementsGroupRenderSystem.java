@@ -48,7 +48,7 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
     private int elems01Offset;
     private int elems02Offset;
     private int sizeOffset;
-    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
+    private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.025)), Math.tan(Math.toRadians(1.1)) };
 
     public OrbitalElementsGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
@@ -157,7 +157,7 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
                 shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
-                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f);
+                shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f * oeg.getPointscaling());
                 shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
 
                 // VR scale
