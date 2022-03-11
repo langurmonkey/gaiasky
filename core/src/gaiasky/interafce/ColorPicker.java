@@ -90,38 +90,6 @@ public class ColorPicker extends ColorPickerAbstract {
         newColorRunnable = r;
     }
 
-    private void initColor() {
-        if (color == null || color.length != 4) {
-            color = new float[4];
-        }
-    }
-
-    public void setPickedColor(float[] rgba) {
-        initColor();
-        System.arraycopy(rgba, 0, this.color, 0, rgba.length);
-        super.setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
-    }
-
-    public void setPickedColor(float r, float g, float b, float a) {
-        initColor();
-        color[0] = r;
-        color[1] = g;
-        color[2] = b;
-        color[3] = a;
-        super.setColor(r, g, b, a);
-    }
-
-    public float[] getPickedColor() {
-        return color;
-    }
-
-    public double[] getPickedColorDouble() {
-        double[] c = new double[color.length];
-        for (int i = 0; i < color.length; i++)
-            c[i] = color[i];
-        return c;
-    }
-
     /** A color picker dialog **/
     private class ColorPickerDialog extends GenericDialog {
         private float[] color, colorBak;

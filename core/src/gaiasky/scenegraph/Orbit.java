@@ -654,7 +654,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         super.setVisible(visible, name);
 
         if (change) {
-            EventManager.publish(Event.GPU_UPDATE_ORBITAL_ELEMENTS, this);
+            EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, this);
         }
 
     }

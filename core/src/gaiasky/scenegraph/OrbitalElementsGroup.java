@@ -10,13 +10,9 @@ import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
-import gaiasky.util.Settings;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * This class acts as a group of orbital element objects.
@@ -36,7 +32,7 @@ public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObse
         // Initialize catalog info if not set
         initializeCatalogInfo();
 
-        EventManager.instance.subscribe(this, Event.GPU_UPDATE_ORBITAL_ELEMENTS);
+        EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
     /**
@@ -111,9 +107,19 @@ public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObse
         }
     }
 
+    public void markForUpdate(){
+        EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, this);
+    }
+
+    @Override
+    public void highlight(boolean hl, float[] color, boolean allVisible) {
+        markForUpdate();
+        super.highlight(hl, color, allVisible);
+    }
+
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if (event == Event.GPU_UPDATE_ORBITAL_ELEMENTS) {
+        if (event == Event.GPU_DISPOSE_ORBITAL_ELEMENTS) {
             if (source == this) {
                 initializeOrbitsWithOrbit();
             }

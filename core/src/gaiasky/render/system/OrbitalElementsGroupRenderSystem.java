@@ -24,10 +24,12 @@ import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
+import gaiasky.util.CatalogInfo;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
+import gaiasky.util.color.Colormap;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
@@ -49,12 +51,14 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
     private int elems02Offset;
     private int sizeOffset;
     private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.025)), Math.tan(Math.toRadians(1.1)) };
+    private final Colormap cmap;
 
     public OrbitalElementsGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
-        EventManager.instance.subscribe(this, Event.GPU_UPDATE_ORBITAL_ELEMENTS);
+        cmap = new Colormap();
+        EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
     @Override
@@ -97,6 +101,7 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                 AtomicInteger numVerticesAdded = new AtomicInteger(0);
                 AtomicInteger numParticlesAdded = new AtomicInteger(0);
 
+                CatalogInfo ci = oeg.getCatalogInfo();
                 Array<SceneGraphNode> children = oeg.children;
                 children.forEach(child -> {
                     Orbit orbit = (Orbit) child;
@@ -113,7 +118,8 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                         tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
                         // COLOR
-                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbit.pointColor[0], orbit.pointColor[1], orbit.pointColor[2], orbit.pointColor[3]);
+                        float[] c = oeg.isHighlighted() && ci != null ? ci.getHlColor() : orbit.pointColor;
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(c[0], c[1], c[2], c[3]);
 
                         // ORBIT ELEMENTS 01
                         tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
@@ -128,7 +134,7 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
                         tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
 
                         // SIZE
-                        tempVerts[curr.vertexIdx + sizeOffset] = orbit.pointSize;
+                        tempVerts[curr.vertexIdx + sizeOffset] = orbit.pointSize * (oeg.isHighlighted() && ci != null ? ci.hlSizeFactor : 1);
 
                         curr.vertexIdx += curr.vertexSize;
                         curr.numVertices++;
@@ -189,9 +195,9 @@ public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem 
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event.equals(Event.GPU_UPDATE_ORBITAL_ELEMENTS)) {
+        if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
             if (source instanceof OrbitalElementsGroup) {
-                OrbitalElementsGroup oeg = (OrbitalElementsGroup)source;
+                OrbitalElementsGroup oeg = (OrbitalElementsGroup) source;
                 int offset = getOffset(oeg);
                 if (offset >= 0) {
                     clearMeshData(offset);

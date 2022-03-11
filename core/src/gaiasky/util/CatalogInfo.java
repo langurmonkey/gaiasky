@@ -8,6 +8,7 @@ package gaiasky.util;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.scenegraph.FadeNode;
+import gaiasky.scenegraph.OrbitalElementsGroup;
 import gaiasky.scenegraph.ParticleGroup;
 import gaiasky.scenegraph.octreewrapper.OctreeWrapper;
 import gaiasky.util.Logger.Log;
@@ -129,7 +130,7 @@ public class CatalogInfo {
      */
     public void removeCatalog() {
         if (this.object != null) {
-            if(!isRegular()) {
+            if(!isHighlightable()) {
                 EventManager.publish(Event.SCENE_GRAPH_REMOVE_OBJECT_CMD, this, this.object, true);
             }
             this.object.dispose();
@@ -153,9 +154,16 @@ public class CatalogInfo {
     }
 
     /**
-     * @return True if this is a catalog of stars or particles, false otherwise (star clusters)
+     * @return True if this is a highlightable catalog, false otherwise.
      */
-    public boolean isRegular() {
+    public boolean isHighlightable() {
+        return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper || this.object instanceof OrbitalElementsGroup;
+    }
+
+    /**
+     * @return True if this is a color mappable catalog, false otherwise.
+     */
+    public boolean isColormappable() {
         return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
     }
 

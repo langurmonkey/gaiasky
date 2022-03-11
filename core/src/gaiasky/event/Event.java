@@ -334,14 +334,6 @@ public enum Event {
      */
     DISPLAY_VR_GUI_CMD,
 
-    /**
-     * Mark a {@link VertsObject} (in source) for update with the given render group in [0].
-     */
-    GPU_UPDATE_VERTS_OBJECT,
-    /**
-     * Mark a {@link OrbitalElementsGroup} (in source) for update.
-     */
-    GPU_UPDATE_ORBITAL_ELEMENTS,
 
     /**
      * Mark star points for update, contains the value of the flag in [0].
@@ -354,22 +346,31 @@ public enum Event {
     DISPOSE,
 
     /**
-     * Disposes the source GPU mesh
+     * Dispose the source GPU mesh.
      **/
-    DISPOSE_PARTICLE_GROUP_GPU_MESH,
+    GPU_DISPOSE_PARTICLE_GROUP,
     /**
-     * Disposes the source GPU mesh
+     * Dispose the source GPU mesh.
      **/
-    DISPOSE_STAR_GROUP_GPU_MESH,
+    GPU_DISPOSE_STAR_GROUP,
     /**
-     * Disposes the source GPU mesh
+     * Dispose the source GPU mesh.
      **/
-    DISPOSE_VARIABLE_GROUP_GPU_MESH,
-
+    GPU_DISPOSE_VARIABLE_GROUP,
     /**
-     * Contains the billboard dataset object.
+     * Dispose the source GPU mesh.
      */
-    DISPOSE_BILLBOARD_DATASET_MESHES,
+    GPU_DISPOSE_BILLBOARD_DATASET,
+    /**
+     * Dispose the source GPU mesh.
+     * Mark a {@link VertsObject} (in source) for update with the given render group in [0].
+     */
+    GPU_DISPOSE_VERTS_OBJECT,
+    /**
+     * Dispose the source GPU mesh.
+     * Mark a {@link OrbitalElementsGroup} (in source) for update.
+     */
+    GPU_DISPOSE_ORBITAL_ELEMENTS,
 
     /**
      * Sets the elevation multiplier. Contains the new multiplier in [{@link gaiasky.util.Constants#MIN_ELEVATION_MULT}, {@link gaiasky.util.Constants#MAX_ELEVATION_MULT}].
@@ -788,9 +789,9 @@ public enum Event {
     REBUILD_SHADOW_MAP_DATA_CMD,
 
     /**
-     * Forces recalculation of main GUI window size.
+     * Forces recalculation of main controls window size.
      **/
-    RECALCULATE_OPTIONS_SIZE,
+    RECALCULATE_CONTROLS_WINDOW_SIZE,
     /**
      * Issues the command to enable camera recording. Contains the boolean
      * indicating the state (on/off) and a file name (null for auto-generated).

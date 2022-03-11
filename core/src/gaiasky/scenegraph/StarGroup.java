@@ -979,11 +979,11 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         return labelcolor;
     }
 
-    public void disposeGpuMesh() {
+    public void markForUpdate() {
         if (variableStars) {
-            EventManager.publish(Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, this);
+            EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, this);
         } else {
-            EventManager.publish(Event.DISPOSE_STAR_GROUP_GPU_MESH, this);
+            EventManager.publish(Event.GPU_DISPOSE_STAR_GROUP, this);
         }
     }
 }

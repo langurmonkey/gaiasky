@@ -46,7 +46,7 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
         rand = new Random(123);
         aux1 = new Vector3();
         cmap = new Colormap();
-        EventManager.instance.subscribe(this, Event.DISPOSE_PARTICLE_GROUP_GPU_MESH);
+        EventManager.instance.subscribe(this, Event.GPU_DISPOSE_PARTICLE_GROUP);
     }
 
     @Override
@@ -197,7 +197,7 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
     protected void setInGpu(IRenderable renderable, boolean state) {
         if(inGpu != null) {
             if(inGpu.contains(renderable) && !state) {
-                EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, renderable);
+                EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, renderable);
             }
             if (state) {
                 inGpu.add(renderable);
@@ -209,7 +209,7 @@ public class ParticleGroupRenderSystem extends PointCloudTriRenderSystem impleme
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.DISPOSE_PARTICLE_GROUP_GPU_MESH) {
+        if (event == Event.GPU_DISPOSE_PARTICLE_GROUP) {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);

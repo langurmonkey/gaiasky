@@ -86,7 +86,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
         separatorTextureRegion.getTexture().setWrap(TextureWrap.Repeat, TextureWrap.ClampToEdge);
         this.separator = new TiledDrawable(separatorTextureRegion);
 
-        EventManager.instance.subscribe(this, Event.TIME_STATE_CMD, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_OPTIONS_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
+        EventManager.instance.subscribe(this, Event.TIME_STATE_CMD, Event.GUI_SCROLL_POSITION_CMD, Event.GUI_FOLD_CMD, Event.GUI_MOVE_CMD, Event.RECALCULATE_CONTROLS_WINDOW_SIZE, Event.EXPAND_PANE_CMD, Event.COLLAPSE_PANE_CMD, Event.TOGGLE_EXPANDCOLLAPSE_PANE_CMD, Event.SHOW_MINIMAP_ACTION, Event.TOGGLE_MINIMAP, Event.RECORD_CAMERA_CMD);
     }
 
     public void initialize() {
@@ -451,7 +451,7 @@ public class ControlsWindow extends CollapsibleWindow implements IObserver {
             setPosition(Math.round(x), Math.round(y));
 
             break;
-        case RECALCULATE_OPTIONS_SIZE:
+        case RECALCULATE_CONTROLS_WINDOW_SIZE:
             recalculateSize();
             break;
         case EXPAND_PANE_CMD:

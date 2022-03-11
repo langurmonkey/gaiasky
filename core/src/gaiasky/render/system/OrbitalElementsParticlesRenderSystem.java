@@ -53,7 +53,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
-        EventManager.instance.subscribe(this, Event.GPU_UPDATE_ORBITAL_ELEMENTS);
+        EventManager.instance.subscribe(this, Event.GPU_DISPOSE_ORBITAL_ELEMENTS);
     }
 
     @Override
@@ -186,7 +186,7 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event.equals(Event.GPU_UPDATE_ORBITAL_ELEMENTS)) {
+        if (event.equals(Event.GPU_DISPOSE_ORBITAL_ELEMENTS)) {
             if (source instanceof Orbit)
                 GaiaSky.postRunnable(this::reset);
         }

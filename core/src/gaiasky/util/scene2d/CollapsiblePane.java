@@ -225,7 +225,7 @@ public class CollapsiblePane extends Table {
             expanding = false;
             collapsing = true;
         }
-        EventManager.publish(Event.RECALCULATE_OPTIONS_SIZE, this);
+        EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
     }
 
     public void detach() {

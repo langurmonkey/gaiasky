@@ -52,7 +52,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
         cmap = new Colormap();
         triComponent.setStarTexture(Settings.settings.scene.star.getStarTexture());
 
-        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, Event.STAR_TEXTURE_IDX_CMD);
+        EventManager.instance.subscribe(this, Event.STAR_BRIGHTNESS_CMD, Event.STAR_BRIGHTNESS_POW_CMD, Event.STAR_POINT_SIZE_CMD, Event.STAR_MIN_OPACITY_CMD, Event.GPU_DISPOSE_VARIABLE_GROUP, Event.STAR_TEXTURE_IDX_CMD);
     }
 
     protected void addVertexAttributes(Array<VertexAttribute> attributes) {
@@ -223,7 +223,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
     protected void setInGpu(IRenderable renderable, boolean state) {
         if(inGpu != null) {
             if(inGpu.contains(renderable) && !state) {
-                EventManager.publish(Event.DISPOSE_VARIABLE_GROUP_GPU_MESH, renderable);
+                EventManager.publish(Event.GPU_DISPOSE_VARIABLE_GROUP, renderable);
             }
             if (state) {
                 inGpu.add(renderable);
@@ -252,7 +252,7 @@ public class VariableGroupRenderSystem extends PointCloudTriRenderSystem impleme
             triComponent.updateStarPointSize((float) data[0]);
             triComponent.touchStarParameters(getShaderProgram());
         }
-        case DISPOSE_VARIABLE_GROUP_GPU_MESH -> {
+        case GPU_DISPOSE_VARIABLE_GROUP -> {
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);

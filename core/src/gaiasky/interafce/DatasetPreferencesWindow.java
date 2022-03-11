@@ -164,9 +164,9 @@ public class DatasetPreferencesWindow extends GenericDialog {
 
         HorizontalGroup fadeOutGroup = new HorizontalGroup();
         fadeOutGroup.space(pad5);
-        fadeOutMin = new OwnTextField(fo != null ? String.format("%.1f", fo.x * Constants.U_TO_PC) : "5000", skin);
+        fadeOutMin = new OwnTextField(fo != null ? String.format("%.10f", fo.x * Constants.U_TO_PC) : "5000", skin);
         fadeOutMin.setWidth(tfw);
-        fadeOutMax = new OwnTextField(fo != null ? String.format("%.1f", fo.y * Constants.U_TO_PC) : "10000", skin);
+        fadeOutMax = new OwnTextField(fo != null ? String.format("%.10f", fo.y * Constants.U_TO_PC) : "10000", skin);
         fadeOutMax.setWidth(tfw);
         fadeOutGroup.addActor(new OwnLabel("[", skin));
         fadeOutGroup.addActor(fadeOutMin);

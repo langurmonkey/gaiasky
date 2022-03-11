@@ -165,12 +165,7 @@ public class ColormapPicker extends ColorPickerAbstract {
         newColormapRunnable = r;
     }
 
-    private void initColor() {
-        if (color == null || color.length != 4) {
-            color = new float[4];
-        }
-    }
-
+    @Override
     public void setPickedColor(float[] rgba) {
         catalogInfo.plainColor = true;
 
@@ -179,19 +174,6 @@ public class ColormapPicker extends ColorPickerAbstract {
         System.arraycopy(rgba, 0, this.color, 0, rgba.length);
         super.setColor(rgba[0], rgba[1], rgba[2], rgba[3]);
         super.setDrawable(getDrawable());
-    }
-
-    public void setPickedColor(float r, float g, float b, float a) {
-        initColor();
-        color[0] = r;
-        color[1] = g;
-        color[2] = b;
-        color[3] = a;
-        super.setColor(r, g, b, a);
-    }
-
-    public float[] getPickedColor() {
-        return color;
     }
 
     public void setPickedColormap(Image cmapImageSmall) {

@@ -15,6 +15,7 @@ public class CollapsibleEntry extends OwnButton {
     private Cell<?> contentCell, actorCell;
     private OwnImageButton collapse;
     private Actor title, content;
+    private Runnable expandRunnable, collapseRunnable;
 
     public CollapsibleEntry(Actor title, Actor content, Skin skin, String styleName, boolean changeCursor) {
         super(skin, styleName, changeCursor);
@@ -36,11 +37,15 @@ public class CollapsibleEntry extends OwnButton {
     public void collapse() {
         contentCell.setActor(null);
         me.pack();
+        if(collapseRunnable != null)
+            collapseRunnable.run();
     }
 
     public void expand() {
         contentCell.setActor(content);
         me.pack();
+        if(expandRunnable != null)
+            expandRunnable.run();
     }
 
     private void createActor(Actor title, Skin skin) {
@@ -93,5 +98,13 @@ public class CollapsibleEntry extends OwnButton {
             }
             return false;
         });
+    }
+
+    public void setExpandRunnable(Runnable r){
+        expandRunnable = r;
+    }
+
+    public void setCollapseRunnable(Runnable r) {
+        collapseRunnable = r;
     }
 }

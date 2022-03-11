@@ -7,19 +7,19 @@ package gaiasky.interafce.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.scenes.scene2d.*;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.badlogic.gdx.utils.Align;
 import gaiasky.GaiaSky;
+import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.interafce.ColormapPicker;
-import gaiasky.interafce.ControlsWindow;
-import gaiasky.interafce.DatasetPreferencesWindow;
-import gaiasky.scenegraph.OrbitalElementsGroup;
-import gaiasky.scenegraph.ParticleGroup;
+import gaiasky.interafce.*;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
 
@@ -36,7 +36,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
     private final Map<String, WidgetGroup> groupMap;
     private final Map<String, OwnImageButton[]> imageMap;
-    private final Map<String, ColormapPicker> colorMap;
+    private final Map<String, ColorPickerAbstract> colorMap;
     private final Map<String, DatasetPreferencesWindow> prefsMap;
     private final CatalogManager catalogManager;
 
@@ -92,7 +92,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             dpw = new DatasetPreferencesWindow(ci, skin, stage);
             prefsMap.put(ci.name, dpw);
         }
-        if(!dpw.isVisible() || !dpw.hasParent()) {
+        if (!dpw.isVisible() || !dpw.hasParent()) {
             dpw.setVisible(true);
             dpw.show(stage);
         }
@@ -147,7 +147,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
 
         imageMap.put(ci.name, new OwnImageButton[] { eye, mark });
         controls.addActor(eye);
-        if (ci.isRegular()) {
+        if (ci.isHighlightable()) {
             controls.addActor(mark);
             controls.addActor(prefs);
         }
@@ -157,16 +157,25 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         Table t = new Table(skin);
         t.align(Align.topLeft);
         // Color picker
-        ColormapPicker cp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
-        cp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
-        cp.setNewColorRunnable(() -> ci.setHlColor(cp.getPickedColor()));
-        cp.setNewColormapRunnable(() -> ci.setHlColormap(cp.getPickedCmapIndex(), cp.getPickedCmapAttribute(), cp.getPickedCmapMin(), cp.getPickedCmapMax()));
+        ColorPickerAbstract cp;
+        if (ci.isColormappable()) {
+            ColormapPicker cmp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
+            cmp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
+            cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColor()));
+            cmp.setNewColormapRunnable(() -> ci.setHlColormap(cmp.getPickedCmapIndex(), cmp.getPickedCmapAttribute(), cmp.getPickedCmapMin(), cmp.getPickedCmapMax()));
+            cp = cmp;
+        } else {
+            ColorPicker clp = new ColorPicker(ci.name, ci.hlColor, stage, skin);
+            clp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
+            clp.setNewColorRunnable(() -> ci.setHlColor(clp.getPickedColor()));
+            cp = clp;
+        }
         colorMap.put(ci.name, cp);
 
         OwnLabel nameLabel = new OwnLabel(TextUtils.capString(ci.name, 26), skin, "hud-subheader");
         nameLabel.addListener(new OwnTextTooltip(ci.name, skin));
 
-        if (ci.isRegular()) {
+        if (ci.isHighlightable()) {
             t.add(controls).left().padBottom(pad);
             t.add(cp).right().size(28.8f).padRight(pad6).padBottom(pad).row();
         } else {
@@ -192,7 +201,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             t.add(nObjects).left();
         }
 
-        if (ci.object instanceof ParticleGroup || ci.object instanceof OrbitalElementsGroup) {
+        if (ci.isHighlightable()) {
             OwnSliderPlus sizeScaling = new OwnSliderPlus(I18n.txt("gui.dataset.size"), Constants.MIN_POINT_SIZE_SCALE, Constants.MAX_POINT_SIZE_SCALE, Constants.SLIDER_STEP_TINY, skin);
             sizeScaling.setName("star brightness");
             sizeScaling.setWidth(320f);
@@ -226,6 +235,8 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         catalogWidget.align(Align.topLeft);
         catalogWidget.pad(pad9);
         catalogWidget.setWidth(ControlsWindow.getContentWidth() * 0.94f);
+        catalogWidget.setExpandRunnable(() -> EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this));
+        catalogWidget.setCollapseRunnable(() -> EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this));
         catalogWidget.addListener(new InputListener() {
             @Override
             public boolean handle(com.badlogic.gdx.scenes.scene2d.Event event) {
@@ -247,7 +258,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                     }
                                 });
                                 datasetContext.addItem(visibility);
-                                if (ci.isRegular()) {
+                                if (ci.isHighlightable()) {
                                     // Highlight
                                     boolean currentHighlight = ci.highlighted;
                                     MenuItem highlight = new MenuItem(I18n.txt(currentHighlight ? "gui.deemphasize" : "gui.highlight"), skin, skin.getDrawable(currentHighlight ? "highlight-s-off" : "highlight-s-on"));
@@ -307,7 +318,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 groupMap.remove(ciName);
                 imageMap.remove(ciName);
                 colorMap.remove(ciName);
-                EventManager.publish(gaiasky.event.Event.RECALCULATE_OPTIONS_SIZE, this);
+                EventManager.publish(gaiasky.event.Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
             }
             break;
         case CATALOG_VISIBLE:

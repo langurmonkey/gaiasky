@@ -74,7 +74,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
         meshes = new HashMap<>();
         gpus = new HashMap<>();
 
-        EventManager.instance.subscribe(this, Event.DISPOSE_BILLBOARD_DATASET_MESHES);
+        EventManager.instance.subscribe(this, Event.GPU_DISPOSE_BILLBOARD_DATASET);
     }
 
     @Override
@@ -371,7 +371,7 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
-        if (event == Event.DISPOSE_BILLBOARD_DATASET_MESHES) {
+        if (event == Event.GPU_DISPOSE_BILLBOARD_DATASET) {
             IBillboardDatasetProvider object = (IBillboardDatasetProvider) source;
             disposeMeshes(object);
         }

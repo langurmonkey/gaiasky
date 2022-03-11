@@ -413,7 +413,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         boolean previousVisibility = this.visibilityArray[index] != 0;
         this.visibilityArray[index] = (byte) (visible ? 1 : 0);
         if (previousVisibility != visible) {
-            this.disposeGpuMesh();
+            this.markForUpdate();
         }
     }
 
@@ -1204,8 +1204,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         return false;
     }
 
-    public void disposeGpuMesh(){
-       EventManager.publish(Event.DISPOSE_PARTICLE_GROUP_GPU_MESH, this);
+    public void markForUpdate(){
+       EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, this);
     }
 
     @Override
@@ -1231,13 +1231,13 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     @Override
     public void highlight(boolean hl, float[] color, boolean allVisible) {
-        disposeGpuMesh();
+        markForUpdate();
         super.highlight(hl, color, allVisible);
     }
 
     @Override
     public void highlight(boolean hl, int cmi, IAttribute cma, double cmmin, double cmmax, boolean allVisible) {
-        disposeGpuMesh();
+        markForUpdate();
         super.highlight(hl, cmi, cma, cmmin, cmmax, allVisible);
     }
 

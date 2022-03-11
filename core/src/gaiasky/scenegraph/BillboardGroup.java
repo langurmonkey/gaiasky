@@ -358,7 +358,7 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
             if (reloaded) {
                 GaiaSky.postRunnable(() -> {
                     transformData();
-                    EventManager.publish(Event.DISPOSE_BILLBOARD_DATASET_MESHES, this);
+                    EventManager.publish(Event.GPU_DISPOSE_BILLBOARD_DATASET, this);
                     this.status = LoadStatus.NOT_LOADED;
                 });
             }
