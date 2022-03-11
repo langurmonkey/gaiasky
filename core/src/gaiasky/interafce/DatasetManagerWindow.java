@@ -81,6 +81,7 @@ public class DatasetManagerWindow extends GenericDialog {
         iconMap.put("catalog-star", "icon-elem-stars");
         iconMap.put("catalog-gal", "icon-elem-galaxies");
         iconMap.put("catalog-cluster", "icon-elem-clusters");
+        iconMap.put("catalog-sso", "icon-elem-asteroids");
         iconMap.put("catalog-other", "icon-elem-others");
         iconMap.put("mesh", "icon-elem-meshes");
         iconMap.put("spacecraft", "icon-elem-satellites");
@@ -97,12 +98,13 @@ public class DatasetManagerWindow extends GenericDialog {
             case "catalog-star" -> 2;
             case "catalog-gal" -> 3;
             case "catalog-cluster" -> 4;
-            case "system" -> 5;
-            case "spacecraft" -> 6;
-            case "mesh" -> 7;
-            case "other" -> 8;
-            case "catalog-other" -> 9;
-            default -> 10;
+            case "catalog-sso" -> 5;
+            case "system" -> 6;
+            case "spacecraft" -> 7;
+            case "mesh" -> 8;
+            case "other" -> 9;
+            case "catalog-other" -> 10;
+            default -> 11;
         };
     }
 
