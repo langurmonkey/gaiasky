@@ -60,12 +60,11 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 26,
+      "version": 27,
       "mingsversion": 30200,
-      "size": 68772232,
+      "size": 67871003,
       "check": "data-main.json",
       "data": [
-        "asteroids-dr2.json",
         "asteroids.json",
         "attitudexml",
         "constellations",
@@ -80,7 +79,6 @@
         "moons.json",
         "orbit",
         "orbits-asteroid.json",
-        "orbits-asteroids-dr2.json",
         "orbits-moon.json",
         "orbits-planet.json",
         "orbits-satellite.json",
@@ -108,11 +106,11 @@
         "tex/base/mw-sprites",
         "tex/skybox/gaiasky"
       ],
-      "sha256": "acbb2f6879cc50ac59f247108224bf10dd4a6c95475930e7830c1107fb20108a",
-      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC9 and above. Contains the solar system planets and moons, asteroids, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC9+.\\n- Update milky way to new billboard group infrastructure.\\n- Update materials of Gaia model.",
+      "sha256": "5075eea5764d0e1d8147aa1d2948f827382810f1d0e300439976c258a3ffc17a",
+      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC10 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC10+.\\n- Remove DR2 asteroids, which are now in its own dataset (key: asteroids-dr2).",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v026_20220308/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v027_20220311/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -775,6 +773,25 @@
       "releasenotes" : "Add type to catalog descriptor file",
       "sha256": "c3ffc2a04d02188dd64c139759fb606a870162bbdf6b74a473ada4d11e8d523b",
       "file": "@mirror-url@nebulae/v03_20201216/nebulae.tar.gz"
+    },
+    {
+      "key": "asteroids-dr2",
+      "name": "Asteroids and SSO (Gaia DR2)",
+      "type": "catalog-sso",
+      "version": 1,
+      "mingsversion": 30200,
+      "size": 930272,
+      "nobjects": 14104,
+      "check": "catalog-asteroids-dr2.json",
+      "data": [
+        "catalog-asteroids-dr2.json",
+        "asteroids-dr2.json",
+        "orbits-asteroids-dr2.json"
+      ],
+      "description": "Some 14k asteroids and other SSO, based on Gaia DR2 data.",
+      "releasenotes" : "- Separate DR2 asteroids from base data pack.",
+      "sha256": "75b58460b719519680aae8f4b1e0d61abd3386ebd0ce44790ee695bea9d7d80f",
+      "file": "@mirror-url@catalog/sso/dr2/v01_20220311/asteroids-dr2.tar.gz"
     },
     {
       "name": "gargantua-blackhole",
