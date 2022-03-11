@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package gaiasky;
+package gaiasky.util;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.NumberUtils;
@@ -22,7 +22,7 @@ import com.badlogic.gdx.utils.StringBuilder;
 
 import java.util.Arrays;
 
-/** A resizable, ordered or unordered double array. Avoids the boxing that occurs with ArrayList<Float>. If unordered, this class
+/** A resizable, ordered or unordered double array. Avoids the boxing that occurs with ArrayList<Double>. If unordered, this class
  * avoids a memory copy when removing elements (the last element is moved to the removed element's position).
  * @author Nathan Sweet */
 public class DoubleArray {

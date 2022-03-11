@@ -18,7 +18,6 @@ package gaiasky.util;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.*;
-import gaiasky.DoubleArray;
 
 import java.lang.StringBuilder;
 import java.util.Arrays;
