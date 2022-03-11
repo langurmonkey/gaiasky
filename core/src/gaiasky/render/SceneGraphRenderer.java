@@ -155,9 +155,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         LINE_GPU,
         /**
-         * Particle positions from orbital elements
+         * A particle defined by orbital elements
          **/
-        PARTICLE_ORBIT_ELEMENTS,
+        ORBITAL_ELEMENTS_PARTICLE,
+        /**
+         * A particle group defined by orbital elements
+         **/
+        ORBITAL_ELEMENTS_GROUP,
         /**
          * Transparent additive-blended meshes
          **/
@@ -769,9 +773,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         variableGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // ORBITAL ELEMENTS PARTICLES
-        AbstractRenderSystem orbitElemProc = new OrbitalElementsParticlesRenderSystem(PARTICLE_ORBIT_ELEMENTS, alphas, orbitElemShaders);
-        orbitElemProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
-        orbitElemProc.addPostRunnables(regularBlendR, depthWritesR);
+        AbstractRenderSystem orbitElemParticlesProc = new OrbitalElementsParticlesRenderSystem(ORBITAL_ELEMENTS_PARTICLE, alphas, orbitElemShaders);
+        orbitElemParticlesProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        orbitElemParticlesProc.addPostRunnables(regularBlendR, depthWritesR);
+        // ORBITAL ELEMENTS GROUP
+        AbstractRenderSystem orbitElemGroupProc = new OrbitalElementsGroupRenderSystem(ORBITAL_ELEMENTS_GROUP, alphas, orbitElemShaders);
+        orbitElemGroupProc.addPreRunnables(additiveBlendR, depthTestR, noDepthWritesR);
+        orbitElemGroupProc.addPostRunnables(regularBlendR, depthWritesR);
 
         // MODEL STARS
         AbstractRenderSystem modelStarsProc = new ModelBatchRenderSystem(MODEL_VERT_STAR, alphas, mbVertexLightingStarSurface);
@@ -824,7 +832,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         addRenderSystem(particleGroupProc);
         addRenderSystem(starGroupProc);
         addRenderSystem(variableGroupProc);
-        addRenderSystem(orbitElemProc);
+        addRenderSystem(orbitElemParticlesProc);
+        addRenderSystem(orbitElemGroupProc);
 
         // Diffuse meshes
         addRenderSystem(modelMeshDiffuse);

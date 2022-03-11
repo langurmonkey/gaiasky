@@ -5,6 +5,9 @@
 
 package gaiasky.event;
 
+import gaiasky.scenegraph.OrbitalElementsGroup;
+import gaiasky.scenegraph.VertsObject;
+
 import static gaiasky.util.Settings.*;
 
 /**
@@ -332,9 +335,14 @@ public enum Event {
     DISPLAY_VR_GUI_CMD,
 
     /**
-     * Mark a verts object (source) for update with the given render group in [0].
+     * Mark a {@link VertsObject} (in source) for update with the given render group in [0].
      */
-    MARK_FOR_UPDATE,
+    GPU_UPDATE_VERTS_OBJECT,
+    /**
+     * Mark a {@link OrbitalElementsGroup} (in source) for update.
+     */
+    GPU_UPDATE_ORBITAL_ELEMENTS,
+
     /**
      * Mark star points for update, contains the value of the flag in [0].
      */
@@ -1195,11 +1203,6 @@ public enum Event {
      * Stops the current camera playing operation, if any
      **/
     STOP_CAMERA_PLAY,
-
-    /**
-     * Resets the {@link gaiasky.render.system.OrbitalElementsParticlesRenderSystem}
-     */
-    RESET_ORBITAL_ELEMENTS_SYSTEM,
 
     /**
      * Sets and unsets the target time. Contains a time (set), or nothing

@@ -69,7 +69,7 @@ with open('/media/tsagrista/Daten/Gaia/data/sso/dr3-sso.csv', 'r') as fr:
     lines = fr.readlines()
     with open('/tmp/sso-dr3.json', 'w') as fw:
         fw.write("{\"objects\" : [\n")
-        fw.write("{ \"name\" : \"dr3-asteroids-hook\", \"position\" : [0.0, 0.0, 0.0], \"ct\" : [\"Asteroids\"], \"fadeout\" : [1e-5, 2e-4], \"parent\" : \"Universe\", \"impl\" : \"gaiasky.scenegraph.OrbitalElementsCatalog\" },\n")
+        fw.write("{ \"name\" : \"dr3-asteroids-hook\", \"position\" : [0.0, 0.0, 0.0], \"ct\" : [\"Asteroids\"], \"fadeout\" : [1e-5, 2e-4], \"parent\" : \"Universe\", \"impl\" : \"gaiasky.scenegraph.OrbitalElementsGroup\" },\n")
 
         N = min(N_MAX, len(lines))
         for idx, line in enumerate(lines[1:N]):

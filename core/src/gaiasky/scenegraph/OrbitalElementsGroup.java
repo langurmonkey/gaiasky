@@ -2,31 +2,44 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
-import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
-import gaiasky.render.ComponentTypes.ComponentType;
+import gaiasky.render.IRenderable;
+import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 /**
- * This class acts as a catalog of orbital element objects.
+ * This class acts as a group of orbital element objects.
  * It compiles the orbit objects which are only-body and those which are not, and
  * updates them accordingly to reduce CPU calls.
  */
-public class OrbitalElementsCatalog extends FadeNode implements IObserver {
+public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObserver {
     private Array<Orbit> orbitsWithOrbit;
-    private int rendered = -1;
 
     @Override
     public void doneLoading(AssetManager manager) {
         super.doneLoading(manager);
 
         // Check children which need updating every time
-        orbitsWithOrbit = new Array<>();
+        initializeOrbitsWithOrbit();
+
+        EventManager.instance.subscribe(this, Event.GPU_UPDATE_ORBITAL_ELEMENTS);
+    }
+
+    /**
+     * Gather the children objects that need to be rendered as an orbit line into a list,
+     * for they need to be updated every single frame.
+     */
+    private void initializeOrbitsWithOrbit() {
+        if (orbitsWithOrbit == null) {
+            orbitsWithOrbit = new Array<>();
+        } else {
+            orbitsWithOrbit.clear();
+        }
         if (children != null && children.size > 0) {
             for (SceneGraphNode sgn : children) {
                 if (sgn instanceof Orbit) {
@@ -37,7 +50,14 @@ public class OrbitalElementsCatalog extends FadeNode implements IObserver {
                 }
             }
         }
-        EventManager.instance.subscribe(this, Event.INITIALIZED_INFO);
+
+    }
+
+    @Override
+    protected void addToRenderLists(ICamera camera) {
+        if (this.shouldRender()) {
+            addToRender(this, RenderGroup.ORBITAL_ELEMENTS_GROUP);
+        }
     }
 
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
@@ -55,25 +75,18 @@ public class OrbitalElementsCatalog extends FadeNode implements IObserver {
         updateLocal(time, camera);
 
         if (children != null) {
-            if (rendered > 1) {
-                if (orbitsWithOrbit.isEmpty() || !GaiaSky.instance.isOn(ComponentType.Orbits)) {
-                    children.first().update(time, translation, camera, this.opacity);
-                } else {
-                    for (int i = 0; i < orbitsWithOrbit.size; i++) {
-                        SceneGraphNode child = orbitsWithOrbit.get(i);
-                        child.update(time, translation, camera, this.opacity);
-                    }
+            if (initialUpdate) {
+                // Update all
+                for (int i = 0; i < children.size; i++) {
+                    SceneGraphNode child = children.get(i);
+                    child.update(time, translation, camera, this.opacity);
                 }
-
+                initialUpdate = false;
             } else {
-                if (initialUpdate || GaiaSky.instance.isOn(ct)) {
-                    for (int i = 0; i < children.size; i++) {
-                        SceneGraphNode child = children.get(i);
-                        child.update(time, translation, camera, this.opacity);
-                    }
-                    initialUpdate = false;
-                    if (rendered >= 0)
-                        rendered++;
+                // Update needed
+                for (int i = 0; i < orbitsWithOrbit.size; i++) {
+                    SceneGraphNode child = orbitsWithOrbit.get(i);
+                    child.update(time, translation, camera, this.opacity);
                 }
             }
         }
@@ -81,8 +94,10 @@ public class OrbitalElementsCatalog extends FadeNode implements IObserver {
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if (event == Event.INITIALIZED_INFO) {
-            rendered = 0;
+        if (event == Event.GPU_UPDATE_ORBITAL_ELEMENTS) {
+            if (source == this) {
+                initializeOrbitsWithOrbit();
+            }
         }
     }
 }

@@ -20,6 +20,8 @@ import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.scenegraph.Orbit;
+import gaiasky.scenegraph.OrbitalElementsGroup;
+import gaiasky.scenegraph.SceneGraphNode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.component.OrbitComponent;
 import gaiasky.util.Constants;
@@ -34,10 +36,10 @@ import gaiasky.util.math.MathUtilsd;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Renders single isolated orbits defined with orbital elements.
+ * Renders orbital elements groups as a whole.
  */
-public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSystem implements IObserver {
-    protected static final Log logger = Logger.getLogger(OrbitalElementsParticlesRenderSystem.class);
+public class OrbitalElementsGroupRenderSystem extends PointCloudTriRenderSystem implements IObserver {
+    protected static final Log logger = Logger.getLogger(OrbitalElementsGroupRenderSystem.class);
 
     private final Vector3 aux1;
     private final Matrix4 maux;
@@ -46,10 +48,9 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
     private int elems01Offset;
     private int elems02Offset;
     private int sizeOffset;
-    private boolean forceAdd = false;
     private double[] particleSizeLimits = new double[] { Math.tan(Math.toRadians(0.05)), Math.tan(Math.toRadians(1.0)) };
 
-    public OrbitalElementsParticlesRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
+    public OrbitalElementsGroupRenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders) {
         super(rg, alphas, shaders);
         aux1 = new Vector3();
         maux = new Matrix4();
@@ -82,76 +83,79 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
 
     @Override
     public void renderStud(Array<IRenderable> renderables, ICamera camera, double t) {
-        int n = renderables.size;
-        if (n > 0 && renderables.get(0).getOpacity() > 0) {
-            Orbit first = (Orbit) renderables.get(0);
-            if (forceAdd || !inGpu(first)) {
-                forceAdd = false;
-                curr = meshes.get(addMeshData(n * 4, n * 6));
+        for (IRenderable renderable : renderables) {
+            OrbitalElementsGroup oeg = (OrbitalElementsGroup) renderable;
+            if (!inGpu(oeg)) {
+                int n = oeg.children.size;
+                int offset = addMeshData(n * 4, n * 6);
+                setOffset(oeg, offset);
+                curr = meshes.get(offset);
 
                 ensureTempVertsSize(n * 4 * curr.vertexSize);
                 ensureTempIndicesSize(n * 6);
 
                 AtomicInteger numVerticesAdded = new AtomicInteger(0);
                 AtomicInteger numParticlesAdded = new AtomicInteger(0);
-                renderables.forEach(renderable -> {
-                    Orbit orbitElems = (Orbit) renderable;
 
-                    if (!inGpu(orbitElems)) {
+                Array<SceneGraphNode> children = oeg.children;
+                children.forEach(child -> {
+                    Orbit orbit = (Orbit) child;
+                    OrbitComponent oc = orbit.oc;
 
-                        OrbitComponent oc = orbitElems.oc;
+                    // 4 vertices per particle
+                    for (int vert = 0; vert < 4; vert++) {
+                        // Vertex POSITION
+                        tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
+                        tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
 
-                        // 4 vertices per particle
-                        for (int vert = 0; vert < 4; vert++) {
-                            // Vertex POSITION
-                            tempVerts[curr.vertexIdx + posOffset] = vertPos[vert].getFirst();
-                            tempVerts[curr.vertexIdx + posOffset + 1] = vertPos[vert].getSecond();
+                        // UV coordinates
+                        tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
+                        tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
 
-                            // UV coordinates
-                            tempVerts[curr.vertexIdx + uvOffset] = vertUV[vert].getFirst();
-                            tempVerts[curr.vertexIdx + uvOffset + 1] = vertUV[vert].getSecond();
+                        // COLOR
+                        tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbit.pointColor[0], orbit.pointColor[1], orbit.pointColor[2], orbit.pointColor[3]);
 
-                            // COLOR
-                            tempVerts[curr.vertexIdx + curr.colorOffset] = Color.toFloatBits(orbitElems.pointColor[0], orbitElems.pointColor[1], orbitElems.pointColor[2], orbitElems.pointColor[3]);
+                        // ORBIT ELEMENTS 01
+                        tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
+                        tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
+                        tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
+                        tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
 
-                            // ORBIT ELEMENTS 01
-                            tempVerts[curr.vertexIdx + elems01Offset] = (float) Math.sqrt(oc.mu / Math.pow(oc.semimajoraxis * 1000d, 3d));
-                            tempVerts[curr.vertexIdx + elems01Offset + 1] = (float) oc.epoch;
-                            tempVerts[curr.vertexIdx + elems01Offset + 2] = (float) (oc.semimajoraxis * 1000d); // In metres
-                            tempVerts[curr.vertexIdx + elems01Offset + 3] = (float) oc.e;
+                        // ORBIT ELEMENTS 02
+                        tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
+                        tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
 
-                            // ORBIT ELEMENTS 02
-                            tempVerts[curr.vertexIdx + elems02Offset] = (float) (oc.i * MathUtilsd.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 1] = (float) (oc.ascendingnode * MathUtilsd.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 2] = (float) (oc.argofpericenter * MathUtilsd.degRad);
-                            tempVerts[curr.vertexIdx + elems02Offset + 3] = (float) (oc.meananomaly * MathUtilsd.degRad);
+                        // SIZE
+                        tempVerts[curr.vertexIdx + sizeOffset] = orbit.pointSize;
 
-                            // SIZE
-                            tempVerts[curr.vertexIdx + sizeOffset] = orbitElems.pointSize;
-
-                            curr.vertexIdx += curr.vertexSize;
-                            curr.numVertices++;
-                            numVerticesAdded.incrementAndGet();
-                        }
-                        // Indices
-                        quadIndices(curr);
-                        numParticlesAdded.incrementAndGet();
-
-                        setInGpu(orbitElems, true);
+                        curr.vertexIdx += curr.vertexSize;
+                        curr.numVertices++;
+                        numVerticesAdded.incrementAndGet();
                     }
+                    // Indices
+                    quadIndices(curr);
+                    numParticlesAdded.incrementAndGet();
+
+                    setInGpu(orbit, true);
                 });
                 int count = numVerticesAdded.get() * curr.vertexSize;
+                setCount(oeg, count);
                 curr.mesh.setVertices(tempVerts, 0, count);
                 curr.mesh.setIndices(tempIndices, 0, numParticlesAdded.get() * 6);
+
+                setInGpu(oeg, true);
             }
 
+            curr = meshes.get(getOffset(renderable));
             if (curr != null) {
                 ExtShaderProgram shaderProgram = getShaderProgram();
 
                 shaderProgram.begin();
                 shaderProgram.setUniformMatrix("u_projView", camera.getCamera().combined);
                 shaderProgram.setUniformf("u_camPos", camera.getPos().put(aux1));
-                shaderProgram.setUniformf("u_alpha", alphas[first.ct.getFirstOrdinal()] * first.getOpacity());
+                shaderProgram.setUniformf("u_alpha", alphas[renderable.getComponentType().getFirstOrdinal()] * renderable.getOpacity());
                 shaderProgram.setUniformf("u_falloff", 2.5f);
                 shaderProgram.setUniformf("u_sizeFactor", Settings.settings.scene.star.pointSize * 0.08f);
                 shaderProgram.setUniformf("u_sizeLimits", (float) (particleSizeLimits[0]), (float) (particleSizeLimits[1]));
@@ -181,14 +185,20 @@ public class OrbitalElementsParticlesRenderSystem extends PointCloudTriRenderSys
     public void reset() {
         clearMeshes();
         curr = null;
-        forceAdd = true;
     }
 
     @Override
     public void notify(final Event event, Object source, final Object... data) {
         if (event.equals(Event.GPU_UPDATE_ORBITAL_ELEMENTS)) {
-            if (source instanceof Orbit)
-                GaiaSky.postRunnable(this::reset);
+            if (source instanceof OrbitalElementsGroup) {
+                OrbitalElementsGroup oeg = (OrbitalElementsGroup)source;
+                int offset = getOffset(oeg);
+                if (offset >= 0) {
+                    clearMeshData(offset);
+                }
+                setOffset(oeg, -1);
+                setInGpu(oeg, false);
+            }
         }
     }
 }

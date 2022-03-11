@@ -226,7 +226,7 @@ public class VertsObject extends SceneGraphNode implements IGPUVertsRenderable {
 
     @Override
     public void markForUpdate() {
-        EventManager.publish(Event.MARK_FOR_UPDATE, this, renderGroup);
+        EventManager.publish(Event.GPU_UPDATE_VERTS_OBJECT, this, renderGroup);
     }
 
     public boolean isLine(){

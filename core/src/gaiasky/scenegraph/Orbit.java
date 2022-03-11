@@ -94,6 +94,8 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     // The orientation model
     public OrientationModel model = OrientationModel.DEFAULT;
 
+    public boolean isInOrbitalElementsGroup = false;
+
     /**
      * Refreshing state
      */
@@ -189,6 +191,8 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
             transformFunction = Matrix4d.changeOfBasis(xd, yd, zd);
         }
+
+        isInOrbitalElementsGroup = this.parent != null && this.parent instanceof OrbitalElementsGroup;
     }
 
     public void setPointCloudData(PointCloudData pcd) {
@@ -287,8 +291,8 @@ public class Orbit extends Polyline implements I3DTextRenderable {
                 }
             }
             // Orbital elements renderer
-            if (body == null && oc != null && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
-                addToRender(this, RenderGroup.PARTICLE_ORBIT_ELEMENTS);
+            if (body == null && !isInOrbitalElementsGroup && ct.get(ComponentType.Asteroids.ordinal()) && GaiaSky.instance.isOn(ComponentType.Asteroids)) {
+                addToRender(this, RenderGroup.ORBITAL_ELEMENTS_PARTICLE);
             }
             if (this.forceLabel) {
                 addToRender(this, RenderGroup.FONT_LABEL);
@@ -650,7 +654,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         super.setVisible(visible, name);
 
         if (change) {
-            EventManager.publish(Event.RESET_ORBITAL_ELEMENTS_SYSTEM, this);
+            EventManager.publish(Event.GPU_UPDATE_ORBITAL_ELEMENTS, this);
         }
 
     }

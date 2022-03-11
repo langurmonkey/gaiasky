@@ -37,7 +37,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
     public VertGPURenderSystem(RenderGroup rg, float[] alphas, ExtShaderProgram[] shaders, boolean lines) {
         super(rg, alphas, shaders);
         this.lines = lines;
-        EventManager.instance.subscribe(this, Event.MARK_FOR_UPDATE);
+        EventManager.instance.subscribe(this, Event.GPU_UPDATE_VERTS_OBJECT);
     }
 
     public boolean isLine() {
@@ -209,7 +209,7 @@ public class VertGPURenderSystem<T extends IGPUVertsRenderable> extends Immediat
 
     @Override
     public void notify(Event event, Object source, Object... data) {
-        if(event == Event.MARK_FOR_UPDATE) {
+        if(event == Event.GPU_UPDATE_VERTS_OBJECT) {
             IRenderable renderable = (IRenderable) source;
             RenderGroup rg = (RenderGroup) data[0];
             if(rg == RenderGroup.LINE_GPU || rg == RenderGroup.POINT_GPU) {
