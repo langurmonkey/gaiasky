@@ -2,11 +2,14 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
+import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
+import gaiasky.scenegraph.camera.CameraManager;
+import gaiasky.scenegraph.camera.CameraManager.CameraMode;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
 import gaiasky.util.CatalogInfo.CatalogInfoSource;
@@ -115,6 +118,14 @@ public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObse
     public void highlight(boolean hl, float[] color, boolean allVisible) {
         markForUpdate();
         super.highlight(hl, color, allVisible);
+    }
+
+    @Override
+    public void dispose(){
+        GaiaSky.instance.sceneGraph.remove(this, true);
+        // Unsubscribe from all events
+        EventManager.instance.removeAllSubscriptions(this);
+        EventManager.publish(Event.GPU_DISPOSE_ORBITAL_ELEMENTS, this);
     }
 
     @Override
