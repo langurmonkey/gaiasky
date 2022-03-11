@@ -158,7 +158,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         t.align(Align.topLeft);
         // Color picker
         ColorPickerAbstract cp;
-        if (ci.isColormappable()) {
+        if (ci.hasParticleAttributes()) {
             ColormapPicker cmp = new ColormapPicker(ci.name, ci.hlColor, ci, stage, skin);
             cmp.addListener(new TextTooltip(I18n.txt("gui.tooltip.dataset.highlight.color.select"), skin));
             cmp.setNewColorRunnable(() -> ci.setHlColor(cmp.getPickedColor()));

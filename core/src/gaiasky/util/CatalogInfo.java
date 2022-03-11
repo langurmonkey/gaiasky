@@ -161,9 +161,9 @@ public class CatalogInfo {
     }
 
     /**
-     * @return True if this is a color mappable catalog, false otherwise.
+     * @return True if this catalog's particles have attributes (they are stars), false otherwise.
      */
-    public boolean isColormappable() {
+    public boolean hasParticleAttributes() {
         return this.object instanceof ParticleGroup || this.object instanceof OctreeWrapper;
     }
 

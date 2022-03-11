@@ -82,7 +82,7 @@ public class DatasetPreferencesWindow extends GenericDialog {
         // Highlight size factor
         IValidator pointSizeValidator = new FloatValidator(Constants.MIN_DATASET_SIZE_FACTOR, Constants.MAX_DATASET_SIZE_FACTOR);
         highlightSizeFactor = new OwnTextField(Float.toString(ci.hlSizeFactor), skin, pointSizeValidator);
-        content.add(new OwnLabel(I18n.txt("gui.dataset.highlight.size"), skin)).left().padRight(pad10).padBottom(pad10);
+        content.add(new OwnLabel(I18n.txt("gui.dataset.highlight.size"), skin)).left().padRight(pad10).padBottom(pad15);
         content.add(highlightSizeFactor).left().padRight(pad10).padBottom(pad10).row();
 
         // All visible
@@ -93,13 +93,15 @@ public class DatasetPreferencesWindow extends GenericDialog {
         // Fade
         addFadeAttributes(content);
 
-        // Filters
-        content.add(new OwnLabel(I18n.txt("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad5).row();
-        filterTable = new Table(skin);
-        content.add(filterTable).left().colspan(2).row();
+        if(ci.hasParticleAttributes()) {
+            // Filters
+            content.add(new OwnLabel(I18n.txt("gui.dataset.filter"), skin, "hud-header")).left().colspan(2).padBottom(pad10).padTop(pad15).row();
+            filterTable = new Table(skin);
+            content.add(filterTable).left().colspan(2).row();
 
-        filter = ci.filter != null ? ci.filter.deepCopy() : null;
-        generateFilterTable(filter);
+            filter = ci.filter != null ? ci.filter.deepCopy() : null;
+            generateFilterTable(filter);
+        }
 
     }
 
