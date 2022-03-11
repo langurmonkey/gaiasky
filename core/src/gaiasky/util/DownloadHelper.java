@@ -71,7 +71,7 @@ public class DownloadHelper {
             if (resume) {
                 startSize = to.file().length();
                 request.setHeader("Range", "bytes=" + startSize + "-");
-                logger.info("Resuming download, part file found: " + to);
+                logger.info("Resuming download, part file found: " + to.file().toPath());
             } else {
                 startSize = 0;
             }
@@ -153,7 +153,7 @@ public class DownloadHelper {
                         }
                         is.close();
                         os.close();
-                        logger.info(I18n.txt("gui.download.finished", to.path()));
+                        logger.info(I18n.txt("gui.download.finished", to.file().toPath()));
 
                         // Get digest and run finish runnable
                         if (finish != null && !cancelled) {
@@ -161,7 +161,7 @@ public class DownloadHelper {
                                 // We have only read part of the file, the digest in dis is not valid!
                                 // Compute digest
                                 try {
-                                    logger.info("Recomputing sha156 checksum due to being a resumed download: " + to.path());
+                                    logger.info("Recomputing sha156 checksum due to being a resumed download: " + to.file().toPath());
                                     md.reset();
                                     InputStream fis = to.read();
                                     length = to.length();

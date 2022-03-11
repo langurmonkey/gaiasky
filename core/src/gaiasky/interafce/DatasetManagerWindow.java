@@ -294,9 +294,11 @@ public class DatasetManagerWindow extends GenericDialog {
         catalogsLocGroup.addActor(catalogsLocLabel);
         catalogsLocGroup.addActor(catalogsLocTooltip);
 
-        OwnTextButton dataLocationButton = new OwnTextButton(catLoc, skin);
+        String dataLocationString = Path.of(catLoc).toString();
+        OwnTextButton dataLocationButton = new OwnTextButton(TextUtils.capString(dataLocationString, 85), skin);
+        dataLocationButton.addListener(new OwnTextTooltip(dataLocationString, skin));
         dataLocationButton.pad(buttonPad * 4f);
-        dataLocationButton.setMinWidth(800f);
+        dataLocationButton.setMinWidth(1000f);
 
         dataLocTable.add(catalogsLocGroup).left().padBottom(pad10);
         dataLocTable.add(dataLocationButton).left().padLeft(pad5).padBottom(pad10).row();
