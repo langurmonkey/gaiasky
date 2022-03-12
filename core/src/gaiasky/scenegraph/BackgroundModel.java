@@ -55,7 +55,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
         if (false && this.mc.mtc != null) {
             mc.setType("cube");
-            mc.setParams(Map.of("size", 1e16d, "attributes", 1));
+            mc.setParams(Map.of("size", 1d, "attributes", 1));
             mc.mtc.diffuse = null;
             mc.mtc.setSkybox("data/tex/skybox/gaiasky");
         }
@@ -98,7 +98,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             }
         }
 
-        // Must rotate due to orientation of createCylinder
+        // Must rotate due to orientation of the model
         localTransform.rotate(0, 1, 0, 90);
     }
 

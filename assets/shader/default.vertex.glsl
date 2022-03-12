@@ -13,6 +13,7 @@
 #endif
 
 in vec3 a_position;
+uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
 
 #if defined(colorFlag)
@@ -29,7 +30,6 @@ out vec3 v_normal;
 in vec2 a_texCoord0;
 out vec2 v_texCoords0;
 
-uniform mat4 u_worldTrans;
 uniform float u_vrScale;
 
 #ifdef roughnessFlag

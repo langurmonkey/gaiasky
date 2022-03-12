@@ -2,6 +2,7 @@
 
 // Uniforms
 uniform samplerCube u_environmentCubemap;
+uniform float u_opacity;
 
 // INPUT
 in vec3 v_texCoords;
@@ -10,5 +11,5 @@ in vec3 v_texCoords;
 out vec4 fragColor;
 
 void main() {
-    fragColor = texture(u_environmentCubemap, v_texCoords);
+    fragColor = texture(u_environmentCubemap, v_texCoords) * u_opacity;
 }

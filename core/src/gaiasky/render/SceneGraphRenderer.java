@@ -678,11 +678,9 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
         // SKYBOX - (MW panorama, CMWB)
         AbstractRenderSystem skyboxProc = new ModelBatchRenderSystem(SKYBOX, alphas, mbSkybox);
-        skyboxProc.addPostRunnables(clearDepthR);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
         AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_BG, alphas, mbVertexDiffuse);
-        modelBackgroundProc.addPostRunnables(clearDepthR);
 
         // MODEL GRID - (Ecl, Eq, Gal grids)
         AbstractRenderSystem modelGridsProc = new ModelBatchRenderSystem(MODEL_VERT_GRID, alphas, mbVertexLightingGrid);
