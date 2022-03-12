@@ -10,6 +10,6 @@ uniform mat4 u_projViewTrans;
 
 void main()
 {
-    v_texCoords = aPos;
+    v_texCoords = a_position;
     gl_Position = u_projViewTrans * vec4(a_position, 1.0);
 }

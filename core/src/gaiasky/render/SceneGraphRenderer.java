@@ -215,6 +215,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
          **/
         MODEL_VERT_EARLY,
         /**
+         * A skybox rendered with a cubemap
+         */
+        SKYBOX,
+        /**
          * None
          **/
         NONE;
@@ -396,6 +400,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         manager.load("per-pixel-lighting-opaque", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/normal.vertex.glsl", "shader/opaque.fragment.glsl"));
         manager.load("per-pixel-lighting-opaque-tessellation", TessellationShaderProvider.class, new TessellationShaderProviderLoader.TessellationShaderProviderParameter("shader/tessellation/tess.simple.vertex.glsl", "shader/tessellation/tess.simple.control.glsl", "shader/tessellation/tess.simple.eval.glsl", "shader/tessellation/tess.opaque.fragment.glsl"));
 
+        manager.load("skybox", RelativisticShaderProvider.class, new RelativisticShaderProviderParameter("shader/skybox.vertex.glsl", "shader/skybox.fragment.glsl"));
         manager.load("atmosphere", AtmosphereShaderProvider.class, new AtmosphereShaderProviderParameter("shader/atm.vertex.glsl", "shader/atm.fragment.glsl"));
         manager.load("cloud", GroundShaderProvider.class, new GroundShaderProviderParameter("shader/cloud.vertex.glsl", "shader/cloud.fragment.glsl"));
         manager.load("shader/font.vertex.glsl", ExtShaderProgram.class);
@@ -581,6 +586,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         TessellationShaderProvider perPixelLightingOpaqueTessellation = manager.get("per-pixel-lighting-opaque-tessellation");
 
         // Others
+        IntShaderProvider skybox = manager.get("skybox");
         IntShaderProvider atmosphere = manager.get("atmosphere");
         IntShaderProvider cloud = manager.get("cloud");
 
@@ -607,6 +613,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         mbPixelLightingOpaqueTessellation = new IntModelBatch(perPixelLightingOpaqueTessellation, noSorter);
         mbPixelLightingDepthTessellation = new IntModelBatch(perPixelLightingDepthTessellation, noSorter);
 
+        IntModelBatch mbSkybox = new IntModelBatch(skybox, noSorter);
         IntModelBatch mbAtmosphere = new IntModelBatch(atmosphere, noSorter);
         IntModelBatch mbCloud = new IntModelBatch(cloud, noSorter);
 
@@ -668,6 +675,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         // POINTS
         AbstractRenderSystem pixelStarProc = new StarPointRenderSystem(POINT_STAR, alphas, starPointShaders, ComponentType.Stars);
         pixelStarProc.addPreRunnables(additiveBlendR, noDepthTestR);
+
+        // SKYBOX - (MW panorama, CMWB)
+        AbstractRenderSystem skyboxProc = new ModelBatchRenderSystem(SKYBOX, alphas, mbSkybox);
+        skyboxProc.addPostRunnables(clearDepthR);
 
         // MODEL BACKGROUND - (MW panorama, CMWB)
         AbstractRenderSystem modelBackgroundProc = new ModelBatchRenderSystem(MODEL_BG, alphas, mbVertexDiffuse);
@@ -812,6 +823,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         shapeProc.addPreRunnables(regularBlendR, depthTestR);
 
         // Add components to set
+        addRenderSystem(skyboxProc);
         addRenderSystem(modelBackgroundProc);
         addRenderSystem(modelGridsProc);
         addRenderSystem(pixelStarProc);

@@ -170,17 +170,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(diffuseUnpacked, manager)
-                && isFL(normalUnpacked, manager)
-                && isFL(specularUnpacked, manager)
-                && isFL(emissiveUnpacked, manager)
-                && isFL(ringUnpacked, manager)
-                && isFL(ringnormalUnpacked, manager)
-                && isFL(heightUnpacked, manager)
-                && isFL(roughnessUnapcked, manager)
-                && isFL(metallicUnpacked, manager)
-                && isFL(aoUnapcked, manager)
-                && isFL(skybox, manager);
+        return isFL(diffuseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(emissiveUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager) && isFL(roughnessUnapcked, manager) && isFL(metallicUnpacked, manager) && isFL(aoUnapcked, manager) && isFL(skybox, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -189,7 +179,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         return manager.isLoaded(tex);
     }
 
-    public boolean isFL(SkyboxComponent skybox, AssetManager manager){
+    public boolean isFL(SkyboxComponent skybox, AssetManager manager) {
         return skybox == null || skybox.isLoaded(manager);
 
     }
@@ -202,7 +192,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
-        if(manager == null)
+        if (manager == null)
             return addToLoad(tex, texParams);
 
         if (tex == null)

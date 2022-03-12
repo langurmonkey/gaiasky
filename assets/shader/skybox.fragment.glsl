@@ -7,9 +7,8 @@ uniform samplerCube u_environmentCubemap;
 in vec3 v_texCoords;
 
 // OUTPUT
-out vec4 gl_FragColor;
+out vec4 fragColor;
 
-void main()
-{
-    gl_FragColor = texture(u_environmentCubemap, v_texCoords);
+void main() {
+    fragColor = texture(u_environmentCubemap, v_texCoords);
 }

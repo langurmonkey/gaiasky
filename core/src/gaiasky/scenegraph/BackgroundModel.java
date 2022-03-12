@@ -30,6 +30,8 @@ import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
+import java.util.Map;
+
 /**
  * A skybox object.
  */
@@ -38,7 +40,8 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public ModelComponent mc;
     private boolean label, label2d;
 
-    private RenderGroup renderGroupModel = RenderGroup.MODEL_DIFFUSE;
+    //private RenderGroup renderGroupModel = RenderGroup.SKYBOX;
+    private RenderGroup renderGroupModel = RenderGroup.MODEL_BG;
 
     public BackgroundModel() {
         super();
@@ -49,8 +52,14 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public void initialize() {
         // Force texture loading
         mc.forceInit = true;
-        //mc.setType("cube");
-        //mc.setParams(Map.of("size", 1e16d));
+
+        if (false && this.mc.mtc != null) {
+            mc.setType("cube");
+            mc.setParams(Map.of("size", 1e16d, "attributes", 1));
+            mc.mtc.diffuse = null;
+            mc.mtc.setSkybox("data/tex/skybox/gaiasky");
+        }
+
         mc.initialize(null, 0L);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], 1));
     }
