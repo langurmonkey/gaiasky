@@ -31,8 +31,7 @@ import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;
 
 /**
- * A model which renders as a background, unaffected by the camera. It should
- * usually be a flipped sphere or cube map.
+ * A skybox object.
  */
 public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTextRenderable {
     protected String transformName;
@@ -50,6 +49,8 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public void initialize() {
         // Force texture loading
         mc.forceInit = true;
+        //mc.setType("cube");
+        //mc.setParams(Map.of("size", 1e16d));
         mc.initialize(null, 0L);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], 1));
     }

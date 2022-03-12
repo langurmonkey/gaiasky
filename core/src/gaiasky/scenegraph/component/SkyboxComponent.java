@@ -24,11 +24,11 @@ import gaiasky.util.gdx.OwnCubemap;
 public class SkyboxComponent {
     private static final Log logger = Logger.getLogger(SkyboxComponent.class);
 
-    public static OwnCubemap skybox;
-    protected static boolean skyboxLoad = false;
-    protected static String skyboxBack, skyboxFront, skyboxUp, skyboxDown, skyboxRight, skyboxLeft;
+    public  OwnCubemap skybox;
+    protected  boolean skyboxLoad = false;
+    protected  String skyboxBack, skyboxFront, skyboxUp, skyboxDown, skyboxRight, skyboxLeft;
 
-    public synchronized static void initSkybox() {
+    public synchronized  void initSkybox() {
         if (!skyboxLoad) {
             TextureParameter textureParams = new TextureParameter();
             textureParams.genMipMaps = true;
@@ -57,7 +57,7 @@ public class SkyboxComponent {
         }
     }
 
-    public synchronized static void prepareSkybox() {
+    public synchronized  void prepareSkybox() {
         if (skybox == null) {
             AssetManager m = AssetBean.manager();
             TextureData bk = m.get(skyboxBack, Texture.class).getTextureData();
@@ -76,7 +76,7 @@ public class SkyboxComponent {
      * @param tex
      * @return The actual loaded texture path
      */
-    private static String addToLoad(String tex, TextureParameter texParams) {
+    private  String addToLoad(String tex, TextureParameter texParams) {
         if (tex == null)
             return null;
 

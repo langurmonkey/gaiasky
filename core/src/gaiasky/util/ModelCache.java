@@ -120,19 +120,19 @@ public class ModelCache {
                 // Initialize disc model
 
                 // TOP VERTICES
-                 vt00 = new VertexInfo();
-                vt00.setPos(-diameter2, -diameter2,0);
+                vt00 = new VertexInfo();
+                vt00.setPos(-diameter2, -diameter2, 0);
                 vt00.setNor(0, 1, 0);
                 vt00.setUV(1, 0);
-                 vt01 = new VertexInfo();
-                vt01.setPos(-diameter2,  diameter2, 0);
+                vt01 = new VertexInfo();
+                vt01.setPos(-diameter2, diameter2, 0);
                 vt01.setNor(0, 1, 0);
                 vt01.setUV(1, 1);
-                 vt11 = new VertexInfo();
-                vt11.setPos(diameter2,  diameter2, 0);
+                vt11 = new VertexInfo();
+                vt11.setPos(diameter2, diameter2, 0);
                 vt11.setNor(0, 1, 0);
                 vt11.setUV(0, 1);
-                 vt10 = new VertexInfo();
+                vt10 = new VertexInfo();
                 vt10.setPos(diameter2, -diameter2, 0);
                 vt10.setNor(0, 1, 0);
                 vt10.setUV(0, 0);
@@ -142,15 +142,15 @@ public class ModelCache {
                 vb00.setPos(-diameter2, -diameter2, 0);
                 vb00.setNor(0, 1, 0);
                 vb00.setUV(1, 0);
-                 vb01 = new VertexInfo();
+                vb01 = new VertexInfo();
                 vb01.setPos(-diameter2, diameter2, 0);
                 vb01.setNor(0, 1, 0);
                 vb01.setUV(1, 1);
-                 vb11 = new VertexInfo();
+                vb11 = new VertexInfo();
                 vb11.setPos(diameter2, diameter2, 0);
                 vb11.setNor(0, 1, 0);
                 vb11.setUV(0, 1);
-                 vb10 = new VertexInfo();
+                vb10 = new VertexInfo();
                 vb10.setPos(diameter2, -diameter2, 0);
                 vb10.setNor(0, 1, 0);
                 vb10.setUV(0, 0);
@@ -180,7 +180,7 @@ public class ModelCache {
                 divisions = ((Long) params.get("divisions")).intValue();
                 float innerRad = ((Double) params.get("innerradius")).floatValue();
                 float outerRad = ((Double) params.get("outerradius")).floatValue();
-                boolean sph = params.containsKey("sphere-in-ring")  ? (Boolean) params.get("sphere-in-ring") : true;
+                boolean sph = params.containsKey("sphere-in-ring") ? (Boolean) params.get("sphere-in-ring") : true;
 
                 if (sph) {
                     model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
@@ -203,6 +203,19 @@ public class ModelCache {
                 else
                     model = mb.createCone(width, height, depth, divisions, hDivisions, primitiveType, mat, attributes);
 
+                break;
+            case "cube":
+            case "box":
+                if (params.containsKey("width")) {
+                    width = ((Double) params.get("width")).floatValue();
+                    height = ((Double) params.get("height")).floatValue();
+                    depth = ((Double) params.get("depth")).floatValue();
+                } else {
+                    width = ((Double) params.get("size")).floatValue();
+                    height = width;
+                    depth = width;
+                }
+                model = mb.createBox(width, height, depth, mat, attributes);
                 break;
             }
         }

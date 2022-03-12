@@ -89,6 +89,12 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
     }
 
+    // DEFAULT REFLECTION CUBEMAP
+    public static SkyboxComponent reflectionCubemap;
+    static {
+        reflectionCubemap = new SkyboxComponent();
+    }
+
     // TEXTURES
     public boolean texInitialised, texLoading;
     public String diffuse, specular, normal, emissive, ring, height, ringnormal, roughness, metallic, ao;
@@ -229,7 +235,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
-        SkyboxComponent.prepareSkybox();
+        reflectionCubemap.initSkybox();
         this.material = mat;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
             if (!diffuse.endsWith(Constants.GEN_KEYWORD)) {
@@ -306,8 +312,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
         if (metallic != null || metallicColor != null) {
-            SkyboxComponent.prepareSkybox();
-            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, SkyboxComponent.skybox));
+            reflectionCubemap.prepareSkybox();
+            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, reflectionCubemap.skybox));
         }
         if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD)) {
             if (material.get(TextureAttribute.Reflection) == null) {
