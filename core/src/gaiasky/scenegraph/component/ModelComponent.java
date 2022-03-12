@@ -163,7 +163,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         rec = new RelativisticEffectsComponent();
         vbc = new VelocityBufferComponent();
 
-        MaterialComponent.reflectionCubemap.initSkybox();
+        MaterialComponent.skyboxCubemapReflection.initialize();
     }
 
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc) {
@@ -573,8 +573,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void addCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
             if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
-                MaterialComponent.reflectionCubemap.prepareSkybox();
-                mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, MaterialComponent.reflectionCubemap.skybox));
+                MaterialComponent.skyboxCubemapReflection.prepareSkybox();
+                mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, MaterialComponent.skyboxCubemapReflection.skybox));
             }
         }
     }

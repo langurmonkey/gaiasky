@@ -90,9 +90,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     // DEFAULT REFLECTION CUBEMAP
-    public static SkyboxComponent reflectionCubemap;
+    public static SkyboxComponent skyboxCubemapReflection;
+
     static {
-        reflectionCubemap = new SkyboxComponent();
+        skyboxCubemapReflection = new SkyboxComponent();
     }
 
     // TEXTURES
@@ -114,6 +115,9 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public Vector2 heightSize = new Vector2();
     public float[][] heightMap;
     public NoiseComponent nc;
+
+    // SKYBOX
+    public SkyboxComponent skybox;
 
     /** The actual material **/
     private Material material, ringMaterial;
@@ -155,35 +159,28 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             heightUnpacked = addToLoad(height, getTP(height, true), manager);
         ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
-    }
-
-    public void initialize(String name, Long id) {
-        super.initialize(name, id);
-        // Add textures to load
-        if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
-            diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true));
-        if (normal != null && !normal.endsWith(Constants.GEN_KEYWORD))
-            normalUnpacked = addToLoad(normal, getTP(normal));
-        if (specular != null && !specular.endsWith(Constants.GEN_KEYWORD))
-            specularUnpacked = addToLoad(specular, getTP(specular, true));
-        if (emissive != null && !emissive.endsWith(Constants.GEN_KEYWORD))
-            emissiveUnpacked = addToLoad(emissive, getTP(emissive, true));
-        if (roughness != null && !roughness.endsWith(Constants.GEN_KEYWORD))
-            roughnessUnapcked = addToLoad(roughness, getTP(roughness, true));
-        if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD))
-            metallicUnpacked = addToLoad(metallic, getTP(metallic, true));
-        if (ao != null && !ao.endsWith(Constants.GEN_KEYWORD))
-            aoUnapcked = addToLoad(ao, getTP(ao, true));
-        if (height != null && !height.endsWith(Constants.GEN_KEYWORD))
-            heightUnpacked = addToLoad(height, getTP(height, true));
-        ringUnpacked = addToLoad(ring, getTP(ring, true));
-        ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true));
+        if (skybox != null)
+            skybox.initialize(manager);
 
         this.heightGenerated.set(false);
     }
 
+    public void initialize(String name, Long id) {
+        initialize(name, id, null);
+    }
+
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(diffuseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(emissiveUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager) && isFL(roughnessUnapcked, manager) && isFL(metallicUnpacked, manager) && isFL(aoUnapcked, manager);
+        return isFL(diffuseUnpacked, manager)
+                && isFL(normalUnpacked, manager)
+                && isFL(specularUnpacked, manager)
+                && isFL(emissiveUnpacked, manager)
+                && isFL(ringUnpacked, manager)
+                && isFL(ringnormalUnpacked, manager)
+                && isFL(heightUnpacked, manager)
+                && isFL(roughnessUnapcked, manager)
+                && isFL(metallicUnpacked, manager)
+                && isFL(aoUnapcked, manager)
+                && isFL(skybox, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -192,15 +189,22 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         return manager.isLoaded(tex);
     }
 
+    public boolean isFL(SkyboxComponent skybox, AssetManager manager){
+        return skybox == null || skybox.isLoaded(manager);
+
+    }
+
     /**
      * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
+        if(manager == null)
+            return addToLoad(tex, texParams);
+
         if (tex == null)
             return null;
 
@@ -212,11 +216,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     /**
-     * Adds the texture to load and unpacks any "%QUALITY%" with the current
+     * Adds the texture to load and unpacks any star (*) with the current
      * quality setting.
      *
      * @param tex The texture file to load.
-     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -235,7 +238,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public Material initMaterial(AssetManager manager, Material mat, Material ring, float[] diffuseCol, boolean culling) {
-        reflectionCubemap.initSkybox();
+        skyboxCubemapReflection.initialize();
         this.material = mat;
         if (diffuse != null && material.get(TextureAttribute.Diffuse) == null) {
             if (!diffuse.endsWith(Constants.GEN_KEYWORD)) {
@@ -312,8 +315,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
         }
         if (metallic != null || metallicColor != null) {
-            reflectionCubemap.prepareSkybox();
-            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, reflectionCubemap.skybox));
+            skyboxCubemapReflection.prepareSkybox();
+            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, skyboxCubemapReflection.skybox));
         }
         if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD)) {
             if (material.get(TextureAttribute.Reflection) == null) {
@@ -340,6 +343,10 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 Texture tex = manager.get(aoUnapcked, Texture.class);
                 material.set(new TextureExtAttribute(TextureExtAttribute.AO, tex));
             }
+        }
+        if (skybox != null) {
+            skybox.prepareSkybox();
+            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, skybox.skybox));
         }
         return material;
     }
@@ -708,12 +715,18 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public void setRoughness(String roughness) {
         this.roughness = Settings.settings.data.dataFile(roughness);
     }
+
     public void setRoughness(Double roughness) {
         this.roughnessColor = roughness.floatValue();
     }
 
     public void setAo(String ao) {
         this.ao = Settings.settings.data.dataFile(ao);
+    }
+
+    public void setSkybox(String skybox) {
+        this.skybox = new SkyboxComponent();
+        this.skybox.setLocation(skybox);
     }
 
     public boolean hasHeight() {
