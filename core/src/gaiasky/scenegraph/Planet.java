@@ -83,7 +83,7 @@ public class Planet extends ModelBody implements ILineRenderable {
             ac.print(Logger.getLogger(Planet.class));
         }
         if (clc != null) {
-            clc.initialize(this.getName(), this.getId(), false);
+            clc.initialize(this.getName(), false);
         }
     }
 

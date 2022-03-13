@@ -57,12 +57,14 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
         if (false && this.mc.mtc != null) {
             mc.setType("cube");
-            mc.setParams(Map.of("size", 1d, "attributes", Usage.Position));
+            int attributes = Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates;
+            attributes = 1;
+            mc.setParams(Map.of("size", 1d, "attributes", attributes));
             mc.mtc.diffuse = null;
             mc.mtc.setSkybox("data/tex/skybox/debug");
         }
 
-        mc.initialize(null, 0L);
+        mc.initialize(null);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], 1));
     }
 

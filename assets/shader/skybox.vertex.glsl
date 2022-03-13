@@ -33,7 +33,7 @@ void main() {
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    v_texCoords = pos.xyz;
+    v_texCoords = vec3(-pos.x, pos.y, pos.z);
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 

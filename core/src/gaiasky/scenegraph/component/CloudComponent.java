@@ -78,13 +78,13 @@ public class CloudComponent extends NamedComponent implements IObserver {
     public CloudComponent() {
         localTransform = new Matrix4();
         mc = new ModelComponent(false);
-        mc.initialize(null, 0L);
+        mc.initialize(null);
         aux = new Vector3();
         aux3 = new Vector3d();
     }
 
-    public void initialize(String name, Long id, boolean force) {
-        super.initialize(name, id);
+    public void initialize(String name, boolean force) {
+        super.initialize(name);
         this.initialize(force);
     }
 

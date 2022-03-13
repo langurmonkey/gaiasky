@@ -105,7 +105,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
             }
 
             mc = new ModelComponent(false);
-            mc.initialize(null, 0L);
+            mc.initialize(null);
             DirectionalLight dLight = new DirectionalLight();
             dLight.set(1, 1, 1, 1, 1, 1);
             mc.env = new Environment();

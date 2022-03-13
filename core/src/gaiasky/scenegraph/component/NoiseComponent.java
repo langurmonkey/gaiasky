@@ -27,8 +27,6 @@ import java.util.stream.IntStream;
  * Contains the parameters and functions for procedural elevation
  */
 public class NoiseComponent extends NamedComponent {
-    private static final Log logger = Logger.getLogger(NoiseComponent.class);
-
     public double[] scale = new double[] { 1.0, 1.0, 1.0 };
     public double power = 1.0;
     public int octaves = 4;

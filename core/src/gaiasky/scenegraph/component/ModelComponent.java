@@ -138,8 +138,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void initialize(String name, Long id) {
-        super.initialize(name, id);
+    public void initialize(String name) {
+        super.initialize(name);
         this.initialize(false);
     }
 
@@ -156,7 +156,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
 
         if ((forceInit || !Settings.settings.scene.initialization.lazyTexture) && mtc != null) {
-            mtc.initialize(name, id);
+            mtc.initialize(name);
             mtc.texLoading = true;
         }
 
@@ -294,7 +294,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void touch(Matrix4 localTransform) {
         if (Settings.settings.scene.initialization.lazyTexture && mtc != null && !mtc.texInitialised) {
             if (!mtc.texLoading) {
-                mtc.initialize(name, id, manager);
+                mtc.initialize(name, manager);
                 mtc.texLoading = true;
             } else if (mtc.isFinishedLoading(manager)) {
                 GaiaSky.postRunnable(() -> {

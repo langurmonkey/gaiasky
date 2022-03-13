@@ -54,7 +54,7 @@ public class AtmosphereComponent extends NamedComponent {
     public AtmosphereComponent() {
         localTransform = new Matrix4();
         mc = new ModelComponent(false);
-        mc.initialize(null, 0L);
+        mc.initialize(null);
         aux = new Vector3();
         aux3 = new Vector3d();
         aux1 = new Vector3d();

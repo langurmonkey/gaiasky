@@ -188,7 +188,7 @@ public class Star extends Particle {
         mat.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA));
         Matrix4 modelTransform = new Matrix4();
         mc = new ModelComponent(false);
-        mc.initialize(null, 0L);
+        mc.initialize(null);
         mc.env = new Environment();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
         mc.env.set(new FloatExtAttribute(FloatExtAttribute.Time, 0f));

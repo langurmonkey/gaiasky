@@ -809,7 +809,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             if (materialComponent != null) {
                 materialComponent.disposeTextures(GaiaSky.instance.assetManager);
             }
-            mtc.initialize(target.getName(), target.getId());
+            mtc.initialize(target.getName());
             target.getModelComponent().setMaterial(mtc);
         } else {
             logger.info(I18n.txt("gui.procedural.error.gen", I18n.txt("gui.procedural.surface")));
@@ -827,7 +827,7 @@ public class ProceduralGenerationWindow extends GenericDialog implements IObserv
             if (cloudComponent != null) {
                 cloudComponent.disposeTextures(GaiaSky.instance.assetManager);
             }
-            clc.initialize(target.getName(), target.getId(), false);
+            clc.initialize(target.getName(), false);
             target.setCloud(clc);
             target.initializeClouds(GaiaSky.instance.assetManager);
         } else {

@@ -13,13 +13,11 @@ import java.util.concurrent.TimeUnit;
 
 public class NamedComponent implements IComponent {
     protected String name;
-    protected Long id;
 
     @Override
-    public void initialize(String name, Long id) {
+    public void initialize(String name) {
         if (name != null)
             this.name = name.toLowerCase(Locale.ROOT).replaceAll("\\s+", "_");
-        this.id = id;
     }
 
     protected Map<String, Object> createModelParameters(long quality, double diameter, boolean flip) {

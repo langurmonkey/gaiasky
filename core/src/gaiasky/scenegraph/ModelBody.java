@@ -113,7 +113,7 @@ public abstract class ModelBody extends CelestialBody {
             }
         }
         if (mc != null) {
-            mc.initialize(this.getName(), this.getId());
+            mc.initialize(this.getName());
         }
         setColor2Data();
     }

@@ -138,8 +138,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         EventManager.instance.subscribe(this, Event.ELEVATION_TYPE_CMD, Event.ELEVATION_MULTIPLIER_CMD, Event.TESSELLATION_QUALITY_CMD);
     }
 
-    public void initialize(String name, Long id, AssetManager manager) {
-        super.initialize(name, id);
+    public void initialize(String name, AssetManager manager) {
+        super.initialize(name);
         // Add textures to load
         if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
             diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
@@ -165,8 +165,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         this.heightGenerated.set(false);
     }
 
-    public void initialize(String name, Long id) {
-        initialize(name, id, null);
+    public void initialize(String name) {
+        initialize(name, null);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
