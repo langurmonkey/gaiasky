@@ -8,6 +8,8 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.VertexAttributes;
+import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -55,9 +57,9 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
 
         if (false && this.mc.mtc != null) {
             mc.setType("cube");
-            mc.setParams(Map.of("size", 1d, "attributes", 1));
+            mc.setParams(Map.of("size", 1d, "attributes", Usage.Position));
             mc.mtc.diffuse = null;
-            mc.mtc.setSkybox("data/tex/skybox/gaiasky");
+            mc.mtc.setSkybox("data/tex/skybox/debug");
         }
 
         mc.initialize(null, 0L);
