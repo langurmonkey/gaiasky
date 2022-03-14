@@ -681,7 +681,9 @@ public class GlobalResources {
     }
 
     public static String unpackSkyboxSide(String skyboxLoc, String side) throws RuntimeException {
-        FileHandle loc = Settings.settings.data.dataFileHandle(skyboxLoc);
+        String location = Settings.settings.data.dataFile(skyboxLoc);
+        location = GlobalResources.unpackAssetPath(location);
+        FileHandle loc = Gdx.files.absolute(location);
         FileHandle[] files = loc.list();
         for (FileHandle file : files) {
             if (file.name().contains("_" + side + ".")) {

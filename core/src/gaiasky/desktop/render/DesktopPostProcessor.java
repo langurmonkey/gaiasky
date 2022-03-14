@@ -330,7 +330,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         BackgroundModel bm = new BackgroundModel();
         bm.setName("BlurObject1199");
         bm.setColor(new float[] { 0, 0, 0, 0 });
-        bm.setSize(1e14d);
+        bm.setSize(1d);
         bm.setCt("");
         bm.setLabel(false);
         bm.setParent("Universe");
@@ -340,7 +340,7 @@ public class DesktopPostProcessor implements IPostProcessor, IObserver {
         ModelComponent mc = new ModelComponent(true);
         mc.setType("sphere");
         Map<String, Object> params = new HashMap<>();
-        params.put("quality", 90l);
+        params.put("quality", 50l);
         params.put("diameter", 1.0d);
         params.put("flip", true);
         mc.setParams(params);

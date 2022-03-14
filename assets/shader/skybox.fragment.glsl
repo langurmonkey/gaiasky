@@ -1,6 +1,7 @@
 #version 330 core
 
 // Uniforms
+uniform mat4 u_worldTrans;
 uniform samplerCube u_environmentCubemap;
 uniform float u_opacity;
 

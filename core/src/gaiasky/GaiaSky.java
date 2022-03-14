@@ -716,6 +716,7 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         goHome();
 
         EventManager.publish(Event.INITIALIZED_INFO, this);
+        sgr.setRendering(true);
         initialized = true;
     }
 
@@ -1559,12 +1560,15 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
             postProcessor.doneLoading(assetManager);
             break;
         case REINITIALIZE_RENDERER:
+            sgr.setRendering(false);
             logger.info("Re-initializing main renderer");
             if(sgr != null) {
                 sgr.dispose();
             }
             // Initialize and load
             sgr.doneLoading(assetManager);
+            sgr.resize(graphics.getWidth(), graphics.getHeight(), (int) Math.round(graphics.getWidth() * settings.graphics.backBufferScale), (int) Math.round(graphics.getHeight() * settings.graphics.backBufferScale));
+            sgr.setRendering(true);
             break;
         default:
             break;

@@ -9,8 +9,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.render.IRenderable;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
-import gaiasky.util.Logger;
-import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
 
@@ -66,7 +64,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         }
 
         public void dispose() {
-            mesh.dispose();
+            if (mesh != null)
+                mesh.dispose();
             vertices = null;
             indices = null;
         }
@@ -158,7 +157,7 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
+        if (inGpu != null) {
             if (state) {
                 inGpu.add(renderable);
             } else {
@@ -169,12 +168,11 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
 
     protected void setOffset(IRenderable renderable, int offset) {
         if (offsets != null) {
-            if(offset >= 0) {
+            if (offset >= 0) {
                 offsets.put(renderable, offset);
             } else {
                 offsets.remove(renderable);
             }
-
         }
     }
 
@@ -202,13 +200,8 @@ public abstract class ImmediateModeRenderSystem extends AbstractRenderSystem {
         super.dispose();
 
         inGpu.clear();
-        inGpu = null;
-
         offsets.clear();
-        offsets = null;
-
         counts.clear();
-        counts = null;
 
         clearMeshes();
         tempVerts = null;

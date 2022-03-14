@@ -420,13 +420,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             return false;
         });
 
-        // MOTION BLUR
-        OwnLabel motionBlurLabel = new OwnLabel(I18n.txt("gui.motionblur"), skin);
-        motionBlur = new OwnCheckBox("", skin);
-        motionBlur.setName("motion blur");
-        motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur);
-        motionBlur.setDisabled(safeMode || vr);
-
         // FADE TIME
         OwnLabel fadeTimeLabel = new OwnLabel(I18n.txt("gui.fadetime"), skin, "default");
         IValidator fadeTimeValidator = new LongValidator(Constants.MIN_FADE_TIME_MS, Constants.MAX_FADE_TIME_MS);
@@ -465,8 +458,6 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(lensFlare).left().padBottom(pad5).row();
         graphics.add(lightGlowLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(lightGlow).left().padBottom(pad5).row();
-        graphics.add(motionBlurLabel).left().padRight(pad20).padBottom(pad5);
-        graphics.add(motionBlur).left().padBottom(pad5).row();
         graphics.add(fadeTimeLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(fadeTimeField).left().padRight(pad10).padBottom(pad5);
         graphics.add(fadeTimeTooltip).left().padRight(pad20).padBottom(pad5).row();
@@ -742,6 +733,16 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
             experimental.add(ssrLabel).left().padRight(pad20).padBottom(pad5);
             experimental.add(ssr).left().padRight(pad10).padBottom(pad5);
             experimental.add(ssrTooltip).left().padBottom(pad5).row();
+
+            // MOTION BLUR
+            OwnLabel motionBlurLabel = new OwnLabel(I18n.txt("gui.motionblur"), skin);
+            motionBlur = new OwnCheckBox("", skin);
+            motionBlur.setName("motion blur");
+            motionBlur.setChecked(!safeMode && !vr && settings.postprocess.motionBlur);
+            motionBlur.setDisabled(safeMode || vr);
+
+            experimental.add(motionBlurLabel).left().padRight(pad20).padBottom(pad5);
+            experimental.add(motionBlur).left().padRight(pad10).padBottom(pad5);
 
             // LABELS
             labels.addAll(dynamicResolutionLabel);

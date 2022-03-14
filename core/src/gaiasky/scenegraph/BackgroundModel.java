@@ -42,8 +42,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public ModelComponent mc;
     private boolean label, label2d;
 
-    //private RenderGroup renderGroupModel = RenderGroup.SKYBOX;
-    private RenderGroup renderGroupModel = RenderGroup.MODEL_BG;
+    private RenderGroup renderGroupModel = RenderGroup.SKYBOX;
 
     public BackgroundModel() {
         super();
@@ -54,15 +53,6 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
     public void initialize() {
         // Force texture loading
         mc.forceInit = true;
-
-        if (false && this.mc.mtc != null) {
-            mc.setType("cube");
-            int attributes = Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates;
-            attributes = 1;
-            mc.setParams(Map.of("size", 1d, "attributes", attributes));
-            mc.mtc.diffuse = null;
-            mc.mtc.setSkybox("data/tex/skybox/debug");
-        }
 
         mc.initialize(null);
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, cc[0], cc[1], cc[2], 1));
@@ -102,8 +92,10 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             }
         }
 
-        // Must rotate due to orientation of the model
-        localTransform.rotate(0, 1, 0, 90);
+        // Must rotate due to orientation of the sphere model
+        if(this.mc != null && this.mc.type.equalsIgnoreCase("sphere")) {
+            localTransform.rotate(0, 1, 0, 90);
+        }
     }
 
     @Override
@@ -127,7 +119,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
      */
     @Override
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext rc, RenderGroup group) {
-        mc.update(alpha * cc[3] * opacity * 0.7f);
+        mc.update(alpha * cc[3] * opacity);
         modelBatch.render(mc.instance, mc.env);
     }
 

@@ -285,7 +285,7 @@ void main() {
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
-        reflectionColor = texture(u_environmentCubemap, reflectDir).rgb;
+        reflectionColor = texture(u_environmentCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z)).rgb;
         #ifdef reflectionTextureFlag
             reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
         #elif defined(reflectionColorFlag)

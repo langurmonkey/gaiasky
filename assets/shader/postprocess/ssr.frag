@@ -47,14 +47,14 @@ bool isExponentialStepEnabled = true;
 bool isSamplingEnabled = true;
 
 // Ray-march iterations
-int iterationCount = 50;
+int iterationCount = 60;
 // Number of samples if sampling is enabled
 int sampleCount = 4;
 
 #define M_TO_U 1.0e-9
 #define PC_TO_U 3.08567758149137e7
 
-#define RAY_STEP M_TO_U * 0.06
+#define RAY_STEP M_TO_U * 0.3
 #define DIST_BIAS M_TO_U * 0.005
 
 #include shader/lib_logdepthbuff.glsl

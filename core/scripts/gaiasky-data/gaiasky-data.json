@@ -60,9 +60,10 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 27,
+      "version": 28,
       "mingsversion": 30200,
-      "size": 67871003,
+      "size": 68279525,
+      "nobjects": 53,
       "check": "data-main.json",
       "data": [
         "asteroids.json",
@@ -104,13 +105,17 @@
         "tex/base/static.jpg",
         "tex/base/telescopebeam.png",
         "tex/base/mw-sprites",
-        "tex/skybox/gaiasky"
+        "tex/skybox/gaiasky",
+        "tex/skybox/cmwb-planck-med",
+        "tex/skybox/milkyway-med",
+        "tex/skybox/milkyway-low",
+        "tex/skybox/debug"
       ],
-      "sha256": "5075eea5764d0e1d8147aa1d2948f827382810f1d0e300439976c258a3ffc17a",
-      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC10 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC10+.\\n- Remove DR2 asteroids, which are now in its own dataset (key: asteroids-dr2).",
+      "sha256": "45210fb0a7bb68ad5a089d7888b991b9b945c0b7e2a631da5a3951df0380101c",
+      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC11 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC11+.\\n- Update skyboxes to use cubemaps.\\n- Grids and other background objects have a size of 1.\\n- New cube reflection debug object.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v027_20220311/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v028_20220314/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -135,22 +140,24 @@
     {
       "name": "hi-res-textures",
       "type": "texture-pack",
-      "version": 6,
+      "version": 7,
       "mingsversion": 30200,
-      "size": 277955368,
+      "size": 251953599,
+      "nobjects": 74,
       "check": "hi-res-tex-desc.json",
       "data": [
         "hi-res-tex-desc.json",
         "tex/base/*-high.jpg",
         "tex/base/*-ultra.jpg",
         "tex/base/*-high.png",
-        "tex/base/*-ultra.png"
+        "tex/base/*-ultra.png",
+        "tex/skybox/*-high"
       ],
       "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
-      "releasenotes": "Invert height textures to follow convention.",
-      "sha256": "3f34f19e956f619d44f38a48a8a589ac8c6798e6bd3803a0fcd73081b5337469",
+      "releasenotes": "- Add high-resolution Milky Way skybox.\n- Add high-resolution cosmic microwave background (Planck) skybox.\n- Remove high resolution Milky Way and Planck equirectangular textures.",
+      "sha256": "24e0ee48d62e31be1cd4c4f8dee5c1dce7f64d47cfe1d79449d3abff734d2170",
       "link": "@mirror-url@tex",
-      "file": "@mirror-url@tex/006_20211203/hi-res-texture-pack.tar.gz"
+      "file": "@mirror-url@tex/007_20220314/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "catalog-edr3-default",

@@ -61,6 +61,7 @@ import org.lwjgl.opengl.GL40;
 
 import java.nio.IntBuffer;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static gaiasky.render.SceneGraphRenderer.RenderGroup.*;
 
@@ -324,10 +325,13 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     private AbstractRenderSystem billboardStarsProc;
 
+    private AtomicBoolean rendering;
+
     public SceneGraphRenderer(final VRContext vrContext, final GlobalResources globalResources) {
         super();
         this.vrContext = vrContext;
         this.globalResources = globalResources;
+        this.rendering = new AtomicBoolean(false);
     }
 
     private AssetDescriptor<ExtShaderProgram>[] loadShader(AssetManager manager, String vertexShader, String fragmentShader, String[] names, String[] prepend) {
@@ -892,6 +896,10 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     }
 
+    public synchronized void setRendering(boolean rendering) {
+        this.rendering.set(rendering);
+    }
+
     public Array<Array<IRenderable>> renderLists() {
         return renderLists;
     }
@@ -1179,18 +1187,20 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
 
     @Override
     public void render(final ICamera camera, final double t, final int rw, final int rh, final int tw, final int th, final FrameBuffer fb, final PostProcessBean ppb) {
-        if (sgr == null)
-            initSGR(camera);
+        if (rendering.get()) {
+            if (sgr == null)
+                initSGR(camera);
 
-        // Shadow maps are the same for all
-        renderShadowMap(camera);
+            // Shadow maps are the same for all
+            renderShadowMap(camera);
 
-        // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
-        if (!Settings.settings.program.modeStereo.active && !Settings.settings.program.modeCubemap.active && !Settings.settings.runtime.openVr) {
-            renderGlowPass(camera, glowFb);
+            // In stereo and cubemap modes, the glow pass is rendered in the SGR itself
+            if (!Settings.settings.program.modeStereo.active && !Settings.settings.program.modeCubemap.active && !Settings.settings.runtime.openVr) {
+                renderGlowPass(camera, glowFb);
+            }
+
+            sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
         }
-
-        sgr.render(this, camera, t, rw, rh, tw, th, fb, ppb);
     }
 
     public ISGR getCurrentSGR() {
@@ -1479,14 +1489,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
     }
 
     public void dispose() {
-        // Batches, etc.
-        if (spriteBatch != null)
-            spriteBatch.dispose();
-        if (fontBatch != null)
-            fontBatch.dispose();
-
         // Dispose render systems
-        if(renderSystems != null) {
+        if (renderSystems != null) {
             for (IRenderSystem rendSys : renderSystems) {
                 rendSys.dispose();
             }

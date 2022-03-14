@@ -90,7 +90,6 @@ public class DefaultIntShader extends BaseIntShader {
 
     public static class Inputs {
         public final static Uniform projTrans = new Uniform("u_projTrans");
-        public final static Uniform viewTrans = new Uniform("u_viewTrans");
         public final static Uniform projViewTrans = new Uniform("u_projViewTrans");
         public final static Uniform cameraPosition = new Uniform("u_cameraPosition");
         public final static Uniform cameraDirection = new Uniform("u_cameraDirection");
@@ -104,8 +103,6 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform vrOffset = new Uniform("u_vrOffset");
 
         public final static Uniform worldTrans = new Uniform("u_worldTrans");
-        public final static Uniform viewWorldTrans = new Uniform("u_viewWorldTrans");
-        public final static Uniform projViewWorldTrans = new Uniform("u_projViewWorldTrans");
         public final static Uniform normalMatrix = new Uniform("u_normalMatrix");
         public final static Uniform bones = new Uniform("u_bones");
 
@@ -143,12 +140,6 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, shader.camera.projection);
-            }
-        };
-        public final static Setter viewTrans = new GlobalSetter() {
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, shader.camera.view);
             }
         };
         public final static Setter projViewTrans = new GlobalSetter() {
@@ -191,22 +182,6 @@ public class DefaultIntShader extends BaseIntShader {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, renderable.worldTransform);
-            }
-        };
-        public final static Setter viewWorldTrans = new LocalSetter() {
-            final Matrix4 temp = new Matrix4();
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, temp.set(shader.camera.view).mul(renderable.worldTransform));
-            }
-        };
-        public final static Setter projViewWorldTrans = new LocalSetter() {
-            final Matrix4 temp = new Matrix4();
-
-            @Override
-            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, temp.set(shader.camera.combined).mul(renderable.worldTransform));
             }
         };
         public final static Setter normalMatrix = new LocalSetter() {
@@ -459,7 +434,6 @@ public class DefaultIntShader extends BaseIntShader {
 
     // Global uniforms
     public final int u_projTrans;
-    public final int u_viewTrans;
     public final int u_projViewTrans;
     public final int u_cameraPosition;
     public final int u_cameraDirection;
@@ -475,8 +449,6 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_vrOffset;
     // Object uniforms
     public final int u_worldTrans;
-    public final int u_viewWorldTrans;
-    public final int u_projViewWorldTrans;
     public final int u_normalMatrix;
     public final int u_bones;
     // Material uniforms
@@ -616,7 +588,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_shadowTexture = register(new Uniform("u_shadowTexture"));
         u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
         u_projTrans = register(Inputs.projTrans, Setters.projTrans);
-        u_viewTrans = register(Inputs.viewTrans, Setters.viewTrans);
         u_projViewTrans = register(Inputs.projViewTrans, Setters.projViewTrans);
         u_cameraPosition = register(Inputs.cameraPosition, Setters.cameraPosition);
         u_cameraDirection = register(Inputs.cameraDirection, Setters.cameraDirection);
@@ -630,11 +601,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_vrOffset = register(Inputs.vrOffset, Setters.vrOffset);
         // Object uniforms
         u_worldTrans = register(Inputs.worldTrans, Setters.worldTrans);
-        u_viewWorldTrans = register(Inputs.viewWorldTrans, Setters.viewWorldTrans);
-        u_projViewWorldTrans = register(Inputs.projViewWorldTrans, Setters.projViewWorldTrans);
         u_normalMatrix = register(Inputs.normalMatrix, Setters.normalMatrix);
         u_bones = (renderable.bones != null && config.numBones > 0) ? register(Inputs.bones, new Setters.Bones(config.numBones)) : -1;
-
         u_aoTexture = register(Inputs.aoTexture, Setters.aoTexture);
         u_opacity = register(Inputs.opacity);
         u_diffuseColor = register(Inputs.diffuseColor, Setters.diffuseColor);
@@ -654,7 +622,6 @@ public class DefaultIntShader extends BaseIntShader {
         u_heightSize = register(Inputs.heightSize, Setters.heightSize);
         u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
         u_alphaTest = register(Inputs.alphaTest);
-
         u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights, config.numPointLights)) : -1;
         u_environmentCubemap = environmentCubemap ? register(Inputs.environmentCubemap, Setters.environmentCubemap) : -1;
     }

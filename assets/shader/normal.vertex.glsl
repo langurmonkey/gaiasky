@@ -94,7 +94,6 @@
 
 // Uniforms which are always available
 uniform mat4 u_projViewTrans;
-uniform mat4 u_viewTrans;
 uniform mat4 u_worldTrans;
 uniform mat3 u_normalMatrix;
 uniform float u_vrScale;
@@ -301,7 +300,7 @@ void main() {
 
     #ifdef velocityBufferFlag
     velocityBufferCam(gpos, pos);
-    #endif
+    #endif // velocityBufferFlag
 
     #ifdef shadowMapFlag
 	vec4 spos = u_shadowMapProjViewTrans * pos;
@@ -345,15 +344,15 @@ void main() {
 
     // Camera is at origin, view direction is inverse of vertex position
     #ifdef heightFlag
-    v_data.viewDir = normalize(-pos.xyz - u_vrOffset);
+    v_data.viewDir = normalize(pos.xyz - u_vrOffset);
     #else
-    v_data.viewDir = normalize(normalize(-pos.xyz - u_vrOffset) * TBN);
+    v_data.viewDir = normalize(normalize(pos.xyz - u_vrOffset) * TBN);
     #endif // heightFlag
 
     #ifdef reflectionFlag
     #ifndef normalTextureFlag
         // Only if normal map not present, otherwise we perturb the normal in the fragment shader
-    	v_data.reflect = reflect(normalize(-pos.xyz - u_vrOffset), g_normal);
+    	v_data.reflect = reflect(normalize(pos.xyz - u_vrOffset), g_normal);
     #endif // normalTextureFlag
     #endif // reflectionFlag
 

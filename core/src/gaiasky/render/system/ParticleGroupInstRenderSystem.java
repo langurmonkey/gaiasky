@@ -195,8 +195,8 @@ public class ParticleGroupInstRenderSystem extends InstancedRenderSystem impleme
     }
 
     protected void setInGpu(IRenderable renderable, boolean state) {
-        if(inGpu != null) {
-            if(inGpu.contains(renderable) && !state) {
+        if (inGpu != null) {
+            if (inGpu.contains(renderable) && !state) {
                 EventManager.publish(Event.GPU_DISPOSE_PARTICLE_GROUP, renderable);
             }
             if (state) {
@@ -213,7 +213,8 @@ public class ParticleGroupInstRenderSystem extends InstancedRenderSystem impleme
             IRenderable renderable = (IRenderable) source;
             int offset = getOffset(renderable);
             clearMeshData(offset);
-            inGpu.remove(renderable);
+            if (inGpu != null)
+                inGpu.remove(renderable);
         }
     }
 

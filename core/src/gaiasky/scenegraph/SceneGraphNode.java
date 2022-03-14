@@ -584,6 +584,10 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
         return false;
     }
 
+    public void setKey(String key) {
+        setNamekey(key);
+    }
+
     public void setNamekey(String namekey) {
         this.namekey = namekey;
         updateNames();

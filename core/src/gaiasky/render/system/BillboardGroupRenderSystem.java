@@ -118,12 +118,18 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
     }
 
     private void disposeMeshes(IBillboardDatasetProvider key) {
-        MeshDataWrap[] m = meshes.get(key);
-        for (MeshDataWrap meshData : m) {
-            meshData.meshData.dispose();
+        if (meshes != null && meshes.containsKey(key)) {
+            MeshDataWrap[] m = meshes.get(key);
+            if (m != null && m.length > 0) {
+                for (int i = 0; i < m.length; i++) {
+                    if (m[i] != null && m[i].meshData != null) {
+                        m[i].meshData.dispose();
+                    }
+                }
+                meshes.remove(key);
+                gpus.remove(key);
+            }
         }
-        meshes.remove(key);
-        gpus.remove(key);
     }
 
     private void disposeMeshes() {
@@ -337,7 +343,8 @@ public class BillboardGroupRenderSystem extends PointCloudTriRenderSystem implem
                         switch (dataset.blending) {
                         case ALPHA -> Gdx.gl20.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
                         case ADDITIVE -> Gdx.gl20.glBlendFunc(GL20.GL_ONE, GL20.GL_ONE);
-                        };
+                        }
+                        ;
                         // Depth mask
                         Gdx.gl20.glDepthMask(dataset.depthMask);
 

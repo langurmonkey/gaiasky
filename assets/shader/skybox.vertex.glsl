@@ -9,6 +9,11 @@ out vec3 v_texCoords;
 // Uniforms
 uniform mat4 u_worldTrans;
 uniform mat4 u_projViewTrans;
+uniform float u_vrScale;
+
+#if defined(velocityBufferFlag) || defined(relativisticEffects)
+#include shader/lib_geometry.glsl
+#endif
 
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
@@ -33,7 +38,7 @@ void main() {
     pos.xyz = computeGravitationalWaves(pos.xyz, u_gw, u_gwmat3, u_ts, u_omgw, u_hterms);
     #endif // gravitationalWaves
 
-    v_texCoords = vec3(-pos.x, pos.y, pos.z);
+    v_texCoords = vec3(-a_position.x, a_position.y, a_position.z);
     vec4 gpos = u_projViewTrans * pos;
     gl_Position = gpos;
 

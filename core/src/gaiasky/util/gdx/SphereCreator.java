@@ -70,7 +70,7 @@ public class SphereCreator extends ModelCreator {
                 curr1.uv.set(u, v);
                 tmpIndices.set(tempOffset, builder.vertex(curr1));
                 final int o = tempOffset + s;
-                if ((iv > 0) && (iu > 0)) // FIXME don't duplicate lines and points
+                if ((iv > 0) && (iu > 0))
                     if (!flipNormals) {
                         builder.rect(tmpIndices.get(tempOffset), tmpIndices.get((o - 1) % s), tmpIndices.get((o - (divisionsU + 2)) % s), tmpIndices.get((o - (divisionsU + 1)) % s));
                     } else {

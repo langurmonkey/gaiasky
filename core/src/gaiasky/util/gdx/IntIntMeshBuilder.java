@@ -1061,8 +1061,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
         sphere(matTmp1.idt(), width, height, depth, divisionsU, divisionsV, angleUFrom, angleUTo, angleVFrom, angleVTo);
     }
 
-    private static IntArray tmpIndices;
-
     @Override
     public void sphere(final Matrix4 transform, float width, float height, float depth, int divisionsU, int divisionsV, float angleUFrom, float angleUTo, float angleVFrom, float angleVTo) {
         sphere(transform, width, height, depth, divisionsU, divisionsV, false, angleUFrom, angleUTo, angleVFrom, angleVTo);

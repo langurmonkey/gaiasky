@@ -397,7 +397,7 @@ void main() {
         #endif // roughnessTextureFlag, shininessFlag
 
         #ifdef environmentCubemapFlag
-            reflectionColor = texture(u_environmentCubemap, reflectDir, roughness * 7.0).rgb;
+            reflectionColor = texture(u_environmentCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 7.0).rgb;
         #endif // environmentCubemapFlag
 
         #ifdef reflectionTextureFlag
@@ -429,7 +429,6 @@ void main() {
     // Loop for directional light contributitons
     #ifdef directionalLightsFlag
     vec3 V = viewDir;
-    //float NV = max(0.001, dot(N, V));
     // Loop for directional light contributitons
     for (int i = 0; i < numDirectionalLights; i++) {
         vec3 col = lightCol[i];

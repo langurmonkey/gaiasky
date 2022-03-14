@@ -239,7 +239,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             // We create the model
             int attributes = Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates;
             if(params.containsKey("attributes")) {
-                attributes = (Integer) params.get("attributes");
+                attributes = ((Long) params.get("attributes")).intValue();
             }
             Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, GL20.GL_TRIANGLES);
             model = pair.getFirst();

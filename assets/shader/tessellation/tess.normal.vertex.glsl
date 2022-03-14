@@ -97,6 +97,8 @@ uniform mat4 u_projViewTrans;
 uniform mat4 u_worldTrans;
 uniform mat3 u_normalMatrix;
 uniform float u_vrScale;
+// Use this slot for VROffset
+uniform vec3 u_vrOffset = vec3(0.0);
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -331,12 +333,12 @@ void main() {
 
     // Camera is at origin, view direction is inverse of vertex position
     pushNormal();
-    v_data.viewDir = normalize(-pos.xyz * TBN);
+    v_data.viewDir = normalize((pos.xyz - u_vrOffset) * TBN);
 
     #ifdef environmentCubemapFlag
     #ifndef normalTextureFlag
         // Only if normal map not present, otherwise we perturb the normal in the fragment shader
-    	v_data.reflect = reflect(-pos.xyz, g_normal);
+    	v_data.reflect = reflect(pos.xyz - u_vrOffset, g_normal);
     #endif // normalTextureFlag
     #endif // environmentCubemapFlag
 
