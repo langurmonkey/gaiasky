@@ -783,6 +783,9 @@ public class DefaultIntShader extends BaseIntShader {
                 prefix += "#define environmentCubemapFlag\n";
             }
         }
+        if(attributes.has(CubemapAttribute.DiffuseCubemap)) {
+            prefix += "#define diffuseCubemapFlag\n";
+        }
         if (Settings.settings.postprocess.ssr) {
             prefix += "#define ssrFlag\n";
         }

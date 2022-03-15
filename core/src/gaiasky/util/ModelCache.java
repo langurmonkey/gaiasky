@@ -41,22 +41,22 @@ public class ModelCache {
             switch (shape) {
             case "sphere":
                 int quality = ((Long) params.get("quality")).intValue();
-                float diameter = ((Double) params.get("diameter")).floatValue();
-                Boolean flip = (Boolean) params.get("flip");
+                float diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                Boolean flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createSphere(diameter, diameter, diameter, quality, quality, flip, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
             case "icosphere":
                 int recursion = ((Long) params.get("recursion")).intValue();
-                diameter = ((Double) params.get("diameter")).floatValue();
-                flip = (Boolean) params.get("flip");
+                diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createIcoSphere(diameter / 2, recursion, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
             case "octahedronsphere":
                 int divisions = ((Long) params.get("divisions")).intValue();
-                diameter = ((Double) params.get("diameter")).floatValue();
-                flip = (Boolean) params.get("flip");
+                diameter = params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f;
+                flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
                 model = mb.createOctahedronSphere(diameter / 2, divisions, flip, false, primitiveType, mat, attributes);
                 modelCache.put(key, model);
                 break;
@@ -70,7 +70,7 @@ public class ModelCache {
                 break;
             case "disc":
                 // Prepare model
-                float diameter2 = ((Double) params.get("diameter")).floatValue() / 2f;
+                float diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
                 // Initialize disc model
 
                 // TOP VERTICES
@@ -116,7 +116,7 @@ public class ModelCache {
                 break;
             case "twofacedbillboard":
                 // Prepare model
-                diameter2 = ((Double) params.get("diameter")).floatValue() / 2f;
+                diameter2 = (params.containsKey("diameter") ? ((Double) params.get("diameter")).floatValue() : 1f) / 2f;
                 // Initialize disc model
 
                 // TOP VERTICES
@@ -166,7 +166,7 @@ public class ModelCache {
                 float height = ((Double) params.get("height")).floatValue();
                 float depth = ((Double) params.get("depth")).floatValue();
                 divisions = ((Long) params.get("divisions")).intValue();
-                flip = (Boolean) params.get("flip");
+                flip = params.containsKey("flip") ? (Boolean) params.get("flip") : false;
 
                 model = mb.createCylinder(width, height, depth, divisions, flip, primitiveType, mat, attributes);
 

@@ -28,6 +28,10 @@ uniform vec4 u_diffuseColor;
 uniform sampler2D u_diffuseTexture;
 #endif
 
+#ifdef diffuseCubemapFlag
+uniform samplerCube u_diffuseCubemap;
+#endif
+
 #ifdef specularColorFlag
 uniform vec4 u_specularColor;
 #endif
@@ -134,7 +138,10 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorDiffuseTD(tex, texCoord, defaultValue) defaultValue
 #endif // diffuseTextureFlag && diffuseColorFlag
 
-#if defined(diffuseTextureFlag) || defined(diffuseColorFlag)
+#if defined(diffuseCubemapFlag)
+    #include shader/lib_cubemap.glsl
+    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) texture(u_diffuseCubemap, UVtoXYZ(texCoord))
+#elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
     #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(tex, texCoord, defaultValue)
 #else
     #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor

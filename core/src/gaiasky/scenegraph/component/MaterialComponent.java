@@ -117,7 +117,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public NoiseComponent nc;
 
     // SKYBOX
-    public SkyboxComponent skybox;
+    public SkyboxComponent diffuseCubemap;
 
     /** The actual material **/
     private Material material, ringMaterial;
@@ -159,8 +159,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             heightUnpacked = addToLoad(height, getTP(height, true), manager);
         ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
-        if (skybox != null)
-            skybox.initialize(manager);
+        if (diffuseCubemap != null)
+            diffuseCubemap.initialize(manager);
 
         this.heightGenerated.set(false);
     }
@@ -170,7 +170,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(diffuseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(emissiveUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager) && isFL(roughnessUnapcked, manager) && isFL(metallicUnpacked, manager) && isFL(aoUnapcked, manager) && isFL(skybox, manager);
+        return isFL(diffuseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(emissiveUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager) && isFL(roughnessUnapcked, manager) && isFL(metallicUnpacked, manager) && isFL(aoUnapcked, manager) && isFL(diffuseCubemap, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -334,9 +334,9 @@ public class MaterialComponent extends NamedComponent implements IObserver {
                 material.set(new TextureExtAttribute(TextureExtAttribute.AO, tex));
             }
         }
-        if (skybox != null) {
-            skybox.prepareSkybox();
-            material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, skybox.skybox));
+        if (diffuseCubemap != null) {
+            diffuseCubemap.prepareSkybox();
+            material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.skybox));
         }
         return material;
     }
@@ -714,9 +714,13 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         this.ao = Settings.settings.data.dataFile(ao);
     }
 
+    public void setDiffuseCubemap(String diffuseCubemap) {
+        this.diffuseCubemap = new SkyboxComponent();
+        this.diffuseCubemap.setLocation(diffuseCubemap);
+    }
+
     public void setSkybox(String skybox) {
-        this.skybox = new SkyboxComponent();
-        this.skybox.setLocation(skybox);
+        setDiffuseCubemap(skybox);
     }
 
     public boolean hasHeight() {
