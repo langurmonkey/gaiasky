@@ -16,7 +16,6 @@ import gaiasky.util.I18n;
 import gaiasky.util.Logger;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
-import gaiasky.util.Settings.GraphicsQuality;
 import gaiasky.util.gdx.OwnCubemap;
 
 public class SkyboxComponent {
@@ -39,7 +38,7 @@ public class SkyboxComponent {
             textureParams.minFilter = TextureFilter.MipMapLinearLinear;
             loaded = true;
             try {
-                String skbLoc = location == null ? Settings.settings.data.skyboxLocation : location;
+                String skbLoc = location == null ? Settings.settings.data.reflectionSkyboxLocation : location;
                 logger.info(I18n.txt("notif.loading", "skybox: " + skbLoc));
                 skyboxBack = GlobalResources.unpackSkyboxSide(skbLoc, "bk");
                 skyboxFront = GlobalResources.unpackSkyboxSide(skbLoc, "ft");
@@ -55,7 +54,7 @@ public class SkyboxComponent {
                 addToLoad(skyboxRight, textureParams, manager);
                 addToLoad(skyboxLeft, textureParams, manager);
             } catch (RuntimeException e) {
-                logger.error(e, "Error loading skybox: " + Settings.settings.data.skyboxLocation);
+                logger.error(e, "Error loading skybox: " + Settings.settings.data.reflectionSkyboxLocation);
             }
         }
     }

@@ -17,8 +17,8 @@ data:
   # "autoload-*.json" will also be loaded using the JsonLoader
   dataFiles:
     - data/data-main.json
-  # Location of the skybox within the data folder (data/tex/skybox/[...]/)
-  skyboxLocation: data/tex/skybox/gaiasky/
+  # Location of the skybox used for cubemap reflections within the data folder (data/tex/skybox/[...]/)
+  reflectionSkyboxLocation: data/tex/skybox/gaiasky/
   # Use all terms in position algorithms (VSOP87 and moon coordinates)
   highAccuracy: false
   # Use real attitude or NSL for Gaia

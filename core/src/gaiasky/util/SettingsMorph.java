@@ -159,7 +159,7 @@ public class SettingsMorph {
         }
 
         data.highAccuracy = bool("data.highaccuracy.positions", p);
-        data.skyboxLocation = str("data.skybox.location", p);
+        data.reflectionSkyboxLocation = str("data.skybox.location", p);
         data.realGaiaAttitude = bool("data.attitude.real", p);
         s.data = data;
 

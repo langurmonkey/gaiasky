@@ -165,9 +165,19 @@ public class Settings {
     public static class DataSettings {
         public String location;
         public List<String> dataFiles;
-        public String skyboxLocation;
+        public String reflectionSkyboxLocation;
         public boolean highAccuracy;
         public boolean realGaiaAttitude;
+
+        /**
+         * This method keeps compatibility with older versions of the configuration file where
+         * the setting {@link DataSettings#reflectionSkyboxLocation} was called
+         * <code>skyboxLocation</code>.
+         * @param location The reflection skybox location.
+         */
+        public void setSkyboxLocation(String location) {
+            this.reflectionSkyboxLocation = location;
+        }
 
         public Path dataPath(String path) {
             // Windows does not allow asterisks in paths
