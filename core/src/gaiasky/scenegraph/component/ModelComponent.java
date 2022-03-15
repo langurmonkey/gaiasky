@@ -578,7 +578,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         for (Material mat : materials) {
             if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
                 MaterialComponent.skyboxCubemapReflection.prepareSkybox();
-                mat.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, MaterialComponent.skyboxCubemapReflection.skybox));
+                mat.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, MaterialComponent.skyboxCubemapReflection.skybox));
             }
         }
     }
@@ -586,7 +586,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void removeCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
             if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
-                mat.remove(CubemapAttribute.EnvironmentMap);
+                mat.remove(CubemapAttribute.DiffuseCubemap);
             }
         }
     }

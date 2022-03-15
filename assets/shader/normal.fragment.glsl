@@ -204,7 +204,7 @@ in float v_fadeFactor;
 #endif
 
 #ifdef environmentCubemapFlag
-uniform samplerCube u_environmentCubemap;
+uniform samplerCube u_diffuseCubemap;
 #endif // environmentCubemapFlag
 
 #ifdef reflectionColorFlag
@@ -397,7 +397,7 @@ void main() {
         #endif // roughnessTextureFlag, shininessFlag
 
         #ifdef environmentCubemapFlag
-            reflectionColor = texture(u_environmentCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 7.0).rgb;
+            reflectionColor = texture(u_diffuseCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 7.0).rgb;
         #endif // environmentCubemapFlag
 
         #ifdef reflectionTextureFlag

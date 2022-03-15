@@ -2,7 +2,7 @@
 
 // Uniforms
 uniform mat4 u_worldTrans;
-uniform samplerCube u_environmentCubemap;
+uniform samplerCube u_diffuseCubemap;
 uniform float u_opacity;
 
 // INPUT
@@ -20,7 +20,7 @@ layout (location = 0) out vec4 fragColor;
 #endif
 
 void main() {
-    fragColor = texture(u_environmentCubemap, v_texCoords) * u_opacity;
+    fragColor = texture(u_diffuseCubemap, v_texCoords) * u_opacity;
 
     #ifdef ssrFlag
     ssrBuffers();

@@ -196,7 +196,7 @@ in float o_fadeFactor;
 in vec3 o_normalTan;
 
 #ifdef environmentCubemapFlag
-uniform samplerCube u_environmentCubemap;
+uniform samplerCube u_diffuseCubemap;
 #endif
 
 #ifdef reflectionColorFlag
@@ -285,7 +285,7 @@ void main() {
     // Cubemap
     vec3 reflectionColor = vec3(0.0);
     #ifdef environmentCubemapFlag
-        reflectionColor = texture(u_environmentCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z)).rgb;
+        reflectionColor = texture(u_diffuseCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z)).rgb;
         #ifdef reflectionTextureFlag
             reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
         #elif defined(reflectionColorFlag)

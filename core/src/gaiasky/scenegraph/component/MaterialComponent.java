@@ -306,7 +306,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
         if (metallic != null || metallicColor != null) {
             skyboxCubemapReflection.prepareSkybox();
-            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, skyboxCubemapReflection.skybox));
+            material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, skyboxCubemapReflection.skybox));
         }
         if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD)) {
             if (material.get(TextureAttribute.Reflection) == null) {
@@ -336,7 +336,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         }
         if (skybox != null) {
             skybox.prepareSkybox();
-            material.set(new CubemapAttribute(CubemapAttribute.EnvironmentMap, skybox.skybox));
+            material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, skybox.skybox));
         }
         return material;
     }

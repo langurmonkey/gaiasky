@@ -22,10 +22,10 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.util.gdx.OwnCubemap;
 
 public class CubemapAttribute extends Attribute {
-    public final static String EnvironmentMapAlias = "environmentCubemap";
-    public final static long EnvironmentMap = register(EnvironmentMapAlias);
+    public final static String DiffuseCubemapAlias = "diffuseCubemap";
+    public final static long DiffuseCubemap = register(DiffuseCubemapAlias);
 
-    protected static long Mask = EnvironmentMap;
+    protected static long Mask = DiffuseCubemap;
 
     public final static boolean is(final long mask) {
         return (mask & Mask) != 0;

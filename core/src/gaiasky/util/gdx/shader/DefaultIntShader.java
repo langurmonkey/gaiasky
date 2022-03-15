@@ -132,7 +132,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform dirLights = new Uniform("u_dirLights");
         public final static Uniform pointLights = new Uniform("u_pointLights");
         public final static Uniform spotLights = new Uniform("u_spotLights");
-        public final static Uniform environmentCubemap = new Uniform("u_environmentCubemap");
+        public final static Uniform diffuseCubemap = new Uniform("u_diffuseCubemap");
     }
 
     public static class Setters {
@@ -399,11 +399,11 @@ public class DefaultIntShader extends BaseIntShader {
             }
         }
 
-        public final static Setter environmentCubemap = new LocalSetter() {
+        public final static Setter diffuseCubemap = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(CubemapAttribute.EnvironmentMap)) {
-                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.EnvironmentMap)).textureDescription));
+                if (combinedAttributes.has(CubemapAttribute.DiffuseCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.DiffuseCubemap)).textureDescription));
                 }
             }
         };
@@ -471,9 +471,9 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_heightSize;
     public final int u_tessQuality;
     public final int u_alphaTest;
+    protected final int u_diffuseCubemap;
     // Lighting uniforms
     protected final int u_ambientCubemap;
-    protected final int u_environmentCubemap;
     protected final int u_dirLights0color;
     protected final int u_dirLights0direction;
     protected final int u_dirLights1color;
@@ -512,7 +512,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected int spotLightsSize;
 
     protected final boolean lighting;
-    protected final boolean environmentCubemap;
+    protected final boolean diffuseCubemap;
     protected final boolean shadowMap;
     protected final AmbientCubemap ambientCubemap = new AmbientCubemap();
     protected final DirectionalLight[] directionalLights;
@@ -549,7 +549,7 @@ public class DefaultIntShader extends BaseIntShader {
         this.config = config;
         this.program = shaderProgram;
         this.lighting = renderable.environment != null;
-        this.environmentCubemap = attributes.has(CubemapAttribute.EnvironmentMap) || (lighting && attributes.has(CubemapAttribute.EnvironmentMap));
+        this.diffuseCubemap = attributes.has(CubemapAttribute.DiffuseCubemap) || (lighting && attributes.has(CubemapAttribute.DiffuseCubemap));
         this.shadowMap = lighting && renderable.environment.shadowMap != null;
         this.renderable = renderable;
         attributesMask = attributes.getMask() | optionalAttributes;
@@ -623,7 +623,7 @@ public class DefaultIntShader extends BaseIntShader {
         u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
         u_alphaTest = register(Inputs.alphaTest);
         u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights, config.numPointLights)) : -1;
-        u_environmentCubemap = environmentCubemap ? register(Inputs.environmentCubemap, Setters.environmentCubemap) : -1;
+        u_diffuseCubemap = diffuseCubemap ? register(Inputs.diffuseCubemap, Setters.diffuseCubemap) : -1;
     }
 
     @Override
@@ -779,7 +779,7 @@ public class DefaultIntShader extends BaseIntShader {
         }
         if (attributes.has(ColorAttribute.Reflection) || attributes.has(TextureAttribute.Reflection)) {
             prefix += "#define reflectionFlag\n";
-            if (attributes.has(CubemapAttribute.EnvironmentMap)) {
+            if (attributes.has(CubemapAttribute.DiffuseCubemap)) {
                 prefix += "#define environmentCubemapFlag\n";
             }
         }
