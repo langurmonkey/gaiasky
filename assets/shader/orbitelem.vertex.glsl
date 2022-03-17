@@ -44,7 +44,8 @@ out vec2 v_uv;
 
 // see https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
 vec4 keplerToCartesian() {
-    float musola3 = a_orbitelems01.x;
+    // sqrt(mu/a^3), with a in m
+    float sqrtMuOverA3 = a_orbitelems01.x;
     float epoch = a_orbitelems01.y;
     // Semi-major axis
     float a = a_orbitelems01.z;
@@ -64,7 +65,7 @@ vec4 keplerToCartesian() {
     vec2 deltat_d = ds_mul(ds_add(u_t, -epoch_d), ds_set(D_TO_S));
     float deltat = deltat_d.x;
 
-    float M = M0 + deltat * musola3;
+    float M = M0 + deltat * sqrtMuOverA3;
     
     // 2
     float E = M;

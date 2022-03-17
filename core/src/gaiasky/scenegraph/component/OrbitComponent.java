@@ -89,6 +89,11 @@ public class OrbitComponent {
     // See https://downloads.rene-schwarz.com/download/M001-Keplerian_Orbit_Elements_to_Cartesian_State_Vectors.pdf
     public void loadDataPoint(Vector3d out, double dtDays) {
         double a = semimajoraxis * Nature.KM_TO_M; // km to m
+        if (period > 0.0) {
+            // Compute mu from period and semi-major axis
+            double T = period * Nature.D_TO_S; // d to s
+            this.mu = (4.0 * Math.PI * Math.PI * a * a * a) / (T * T);
+        }
         double M0 = meananomaly * MathUtilsd.degRad;
         double omega_lan = ascendingnode * MathUtilsd.degRad;
         double omega_ap = argofpericenter * MathUtilsd.degRad;
