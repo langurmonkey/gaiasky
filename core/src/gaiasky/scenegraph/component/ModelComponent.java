@@ -10,9 +10,6 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
@@ -28,9 +25,9 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.CubemapAttribute;
-import gaiasky.util.gdx.shader.FloatExtAttribute;
-import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -163,7 +160,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         rec = new RelativisticEffectsComponent();
         vbc = new VelocityBufferComponent();
 
-        MaterialComponent.skyboxCubemapReflection.initialize();
+        MaterialComponent.reflectionCubemap.initialize();
     }
 
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc) {
@@ -173,12 +170,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
     public void doneLoading(AssetManager manager, Matrix4 localTransform, float[] cc, boolean mesh) {
         this.manager = manager;
         this.cc = cc;
-        IntModel model = null;
+        IntModel model;
         if (staticLight) {
-            // Remove dir and global ambient. Add ambient
-            //env.remove(dLight);
-            // Ambient
-
             // If lazy texture init, we turn off the lights until the texture is loaded
             float level = Settings.settings.scene.initialization.lazyTexture ? 0f : staticLightLevel;
             ColorAttribute alight = new ColorAttribute(ColorAttribute.AmbientLight, level, level, level, 1f);
@@ -188,8 +181,8 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
         // CREATE MAIN MODEL INSTANCE
         if (!mesh || !Settings.settings.scene.initialization.lazyMesh) {
-            Pair<IntModel, Map<String, Material>> modmat = initModelFile();
-            model = modmat.getFirst();
+            Pair<IntModel, Map<String, Material>> modelMaterial = initModelFile();
+            model = modelMaterial.getFirst();
             instance = new IntModelInstance(model, localTransform);
             this.modelInitialised = true;
         }
@@ -233,13 +226,13 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
             }
             // Add skybox to materials if reflection present
             if (!Settings.settings.postprocess.ssr) {
-                addCubemapAttribute(model.materials);
+                addReflectionCubemapAttribute(model.materials);
             }
         } else if (type != null) {
-            // We create the model
-            int attributes = Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates;
+            // We actually need to create the model
+            Bits attributes = Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates);
             if(params.containsKey("attributes")) {
-                attributes = ((Long) params.get("attributes")).intValue();
+                attributes = Bits.indexes(((Long) params.get("attributes")).intValue());
             }
             Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel(type, params, attributes, GL20.GL_TRIANGLES);
             model = pair.getFirst();
@@ -431,21 +424,21 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void setFloatExtAttribute(long attrib, float value) {
+    public void setFloatExtAttribute(int attrib, float value) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
                 Material mat = instance.materials.get(i);
                 if (!mat.has(attrib)) {
-                    mat.set(new FloatExtAttribute(attrib, value));
+                    mat.set(new FloatAttribute(attrib, value));
                 } else {
-                    ((FloatExtAttribute) mat.get(attrib)).value = value;
+                    ((FloatAttribute) mat.get(attrib)).value = value;
                 }
             }
         }
     }
 
-    public void setColorAttribute(long attrib, float[] rgba) {
+    public void setColorAttribute(int attrib, float[] rgba) {
         if (instance != null) {
             int n = instance.materials.size;
             for (int i = 0; i < n; i++) {
@@ -574,19 +567,19 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
         }
     }
 
-    public void addCubemapAttribute(Array<Material> materials) {
+    public void addReflectionCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
             if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
-                MaterialComponent.skyboxCubemapReflection.prepareSkybox();
-                mat.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, MaterialComponent.skyboxCubemapReflection.skybox));
+                MaterialComponent.reflectionCubemap.prepareCubemap(manager);
+                mat.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, MaterialComponent.reflectionCubemap.cubemap));
             }
         }
     }
 
-    public void removeCubemapAttribute(Array<Material> materials) {
+    public void removeReflectionCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
             if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
-                mat.remove(CubemapAttribute.DiffuseCubemap);
+                mat.remove(CubemapAttribute.ReflectionCubemap);
             }
         }
     }
@@ -612,10 +605,10 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 boolean active = (Boolean) data[0];
                 if (active) {
                     // Remove cubemap
-                    removeCubemapAttribute(instance.materials);
+                    removeReflectionCubemapAttribute(instance.materials);
                 } else {
                     // Add cubemap
-                    addCubemapAttribute(instance.materials);
+                    addReflectionCubemapAttribute(instance.materials);
                 }
             }
         }

@@ -9,11 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
@@ -28,15 +23,17 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
 import gaiasky.scenegraph.component.RotationComponent;
-import gaiasky.util.GlobalResources;
-import gaiasky.util.ModelCache;
-import gaiasky.util.Pair;
-import gaiasky.util.Settings;
+import gaiasky.util.*;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.math.Quaterniond;
 import gaiasky.util.math.Vector3b;
@@ -97,7 +94,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
     public void initModel() {
         this.localTransform = new Matrix4();
         if (model == null) {
-            Pair<IntModel, Map<String, Material>> m = ModelCache.cache.getModel(modelShape, modelParams, Usage.Position, primitiveType);
+            Pair<IntModel, Map<String, Material>> m = ModelCache.cache.getModel(modelShape, modelParams, Bits.indexes(Usage.Position), primitiveType);
             model = m.getFirst();
             for (Map.Entry<String, Material> material : m.getSecond().entrySet()) {
                 material.getValue().set(new BlendingAttribute(GL20.GL_ONE, GL20.GL_ONE));

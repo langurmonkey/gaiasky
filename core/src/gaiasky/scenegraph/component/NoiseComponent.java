@@ -292,4 +292,8 @@ public class NoiseComponent extends NamedComponent {
         log.debug("Range: " + Arrays.toString(range));
         log.debug("Power: " + power);
     }
+
+    @Override
+    public void dispose() {
+    }
 }

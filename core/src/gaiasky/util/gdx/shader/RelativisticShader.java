@@ -5,8 +5,9 @@
 
 package gaiasky.util.gdx.shader;
 
-import com.badlogic.gdx.graphics.g3d.Attributes;
+import gaiasky.util.Bits;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.attribute.*;
 
 public class RelativisticShader extends DefaultIntShader {
 
@@ -16,9 +17,9 @@ public class RelativisticShader extends DefaultIntShader {
         public final static Uniform velDir = new Uniform("u_velDir");
 
         // Gravitational waves
-        //public final static Uniform hterms = new Uniform("u_hterms");
-        //public final static Uniform gw = new Uniform("u_gw");
-        //public final static Uniform gwmat3 = new Uniform("u_gwmat3");
+        public final static Uniform hterms = new Uniform("u_hterms");
+        public final static Uniform gw = new Uniform("u_gw");
+        public final static Uniform gwmat3 = new Uniform("u_gwmat3");
         public final static Uniform ts = new Uniform("u_ts");
         public final static Uniform omgw = new Uniform("u_omgw");
     }
@@ -32,8 +33,8 @@ public class RelativisticShader extends DefaultIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.Vc))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Vc))).value);
+                if (combinedAttributes.has(FloatAttribute.Vc))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Vc))).value);
             }
         };
 
@@ -49,47 +50,47 @@ public class RelativisticShader extends DefaultIntShader {
                     shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.VelDir))).value);
             }
         };
-        
-        //public final static Setter hTerms = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(Vector4Attribute.Hterms)) {
-        //            float[] val = ((Vector4Attribute) (combinedAttributes.get(Vector4Attribute.Hterms))).value;
-        //            shader.set(inputID, val[0], val[1], val[2], val[3]);
-        //        }
-        //    }
-        //};
+        public final static Setter hTerms = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //public final static Setter gw = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector4Attribute.Hterms)) {
+                    float[] val = ((Vector4Attribute) (combinedAttributes.get(Vector4Attribute.Hterms))).value;
+                    shader.set(inputID, val[0], val[1], val[2], val[3]);
+                }
+            }
+        };
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(Vector3Attribute.Gw))
-        //            shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.Gw))).value);
-        //    }
-        //};
+        public final static Setter gw = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //public final static Setter gwmat3 = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.Gw))
+                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.Gw))).value);
+            }
+        };
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(Matrix3Attribute.Gwmat3))
-        //            shader.set(inputID, ((Matrix3Attribute) (combinedAttributes.get(Matrix3Attribute.Gwmat3))).value);
-        //    }
-        //};
+        public final static Setter gwmat3 = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
+
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Matrix3Attribute.Gwmat3))
+                    shader.set(inputID, ((Matrix3Attribute) (combinedAttributes.get(Matrix3Attribute.Gwmat3))).value);
+            }
+        };
 
         public final static Setter ts = new Setter() {
             @Override
@@ -99,23 +100,23 @@ public class RelativisticShader extends DefaultIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.Ts))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Ts))).value);
+                if (combinedAttributes.has(FloatAttribute.Ts))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Ts))).value);
             }
         };
 
-        //public final static Setter omgw = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+        public final static Setter omgw = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(FloatExtAttribute.Omgw))
-        //            shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Omgw))).value);
-        //    }
-        //};
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(FloatAttribute.Omgw))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Omgw))).value);
+            }
+        };
 
     }
 
@@ -123,11 +124,11 @@ public class RelativisticShader extends DefaultIntShader {
     public final int u_vc;
     public final int u_velDir;
     // Gravitational waves
-    //public final int u_hterms;
-    //public final int u_gw;
-    //public final int u_gwmat3;
+    public final int u_hterms;
+    public final int u_gw;
+    public final int u_gwmat3;
     public final int u_ts;
-    //public final int u_omgw;
+    public final int u_omgw;
 
     public RelativisticShader(final IntRenderable renderable) {
         this(renderable, new Config());
@@ -150,25 +151,25 @@ public class RelativisticShader extends DefaultIntShader {
 
         u_vc = register(Inputs.vc, Setters.vc);
         u_velDir = register(Inputs.velDir, Setters.velDir);
-        
-        //u_hterms = register(Inputs.hterms, Setters.hTerms);
-        //u_gw = register(Inputs.gw, Setters.gw);
-        //u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
+
+        u_hterms = register(Inputs.hterms, Setters.hTerms);
+        u_gw = register(Inputs.gw, Setters.gw);
+        u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
         u_ts = register(Inputs.ts, Setters.ts);
-        //u_omgw = register(Inputs.omgw, Setters.omgw);
+        u_omgw = register(Inputs.omgw, Setters.omgw);
 
     }
 
     public static String createPrefix(final IntRenderable renderable, final Config config) {
         String prefix = DefaultIntShader.createPrefix(renderable, config);
-        final long mask = renderable.material.getMask();
+        final Bits mask = renderable.material.getMask();
         // Special relativity
-        if ((mask & FloatExtAttribute.Vc) == FloatExtAttribute.Vc)
+        if (mask.has(FloatAttribute.Vc))
             prefix += "#define relativisticEffects\n";
         // Gravitational waves
-        //if ((mask & FloatExtAttribute.Omgw) == FloatExtAttribute.Omgw)
-        //    prefix += "#define gravitationalWaves\n";
+        if (mask.has(FloatAttribute.Omgw))
+            prefix += "#define gravitationalWaves\n";
         return prefix;
     }
-    
+
 }

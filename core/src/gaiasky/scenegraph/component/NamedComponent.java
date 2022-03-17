@@ -1,5 +1,6 @@
 package gaiasky.scenegraph.component;
 
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.util.math.MathUtilsd;
 
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class NamedComponent implements IComponent {
+public abstract class NamedComponent implements IComponent, Disposable {
     protected String name;
 
     @Override

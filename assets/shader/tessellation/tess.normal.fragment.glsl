@@ -50,27 +50,28 @@ uniform vec4 u_emissiveColor;
 
 #ifdef emissiveTextureFlag
 uniform sampler2D u_emissiveTexture;
+#include shader/lib_luma.glsl
+#endif
+
+#ifdef reflectionColorFlag
+uniform vec4 u_reflectionColor;
 #endif
 
 #ifdef reflectionTextureFlag
 uniform sampler2D u_reflectionTexture;
 #endif
 
-#if defined(diffuseTextureFlag) || defined(specularTextureFlag)
-#define textureFlag
+#ifdef roughnessTextureFlag
+uniform sampler2D u_roughnessTexture;
 #endif
 
-#if defined(specularTextureFlag) || defined(specularColorFlag)
-#define specularFlag
+#ifdef reflectionCubemapFlag
+uniform samplerCube u_reflectionCubemap;
 #endif
 
-#if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-#define emissiveFlag
+#ifdef shininessFlag
+uniform float u_shininess;
 #endif
-
-#if	defined(ambientLightFlag) || defined(ambientCubemapFlag) || defined(sphericalHarmonicsFlag)
-#define ambientFlag
-#endif //ambientFlag
 
 //////////////////////////////////////////////////////
 ////// SHADOW MAPPING
@@ -114,29 +115,29 @@ float getShadow(vec3 shadowMapUv) {
     return result / 25.0;
 
     // Simple lookup
-    //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
+    //return getShadowness(o_data.shadowMapUv.xy, vec2(0.0), o_data.shadowMapUv.z);
 }
 #endif //shadowMapFlag
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
-    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord) * u_diffuseColor
+    #define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord) * u_diffuseColor
 #elif defined(diffuseTextureFlag)
-    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) texture(tex, texCoord)
+    #define fetchColorDiffuseTD(texCoord, defaultValue) texture(u_diffuseTexture, texCoord)
 #elif defined(diffuseColorFlag)
-    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) u_diffuseColor
+    #define fetchColorDiffuseTD(texCoord, defaultValue) u_diffuseColor
 #else
-    #define fetchColorDiffuseTD(tex, texCoord, defaultValue) defaultValue
+    #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
 #endif // diffuseTextureFlag && diffuseColorFlag
 
 #if defined(diffuseCubemapFlag)
     #include shader/lib_cubemap.glsl
-    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) texture(u_diffuseCubemap, UVtoXYZ(texCoord))
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
-    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(tex, texCoord, defaultValue)
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)
 #else
-    #define fetchColorDiffuse(baseColor, tex, texCoord, defaultValue) baseColor
-#endif // diffuseTextureFlag || diffuseColorFlag
+    #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor
+#endif // diffuseCubemapFlag, diffuseTextureFlag || diffuseColorFlag
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
@@ -148,9 +149,9 @@ float getShadow(vec3 shadowMapUv) {
 #endif // emissiveTextureFlag && emissiveColorFlag
 
 #if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
-    #define fetchColorEmissive(emissiveTex, texCoord) fetchColorEmissiveTD(emissiveTex, texCoord)
+    #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
 #else
-    #define fetchColorEmissive(emissiveTex, texCoord) vec4(0.0, 0.0, 0.0, 0.0)
+    #define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
 #endif // emissiveTextureFlag || emissiveColorFlag
 
 // COLOR SPECULAR
@@ -190,26 +191,18 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 };
 in VertexData o_data;
 
 #ifdef atmosphereGround
 in vec4 o_atmosphereColor;
 in float o_fadeFactor;
-#endif
+#endif // atmosphereGround
+
 in vec3 o_normalTan;
-
-#ifdef environmentCubemapFlag
-uniform samplerCube u_diffuseCubemap;
-#endif
-
-#ifdef reflectionColorFlag
-uniform vec4 u_reflectionColor;
-#endif
-
 
 // OUTPUT
 layout (location = 0) out vec4 fragColor;
@@ -246,12 +239,16 @@ mat3 cotangentFrame(vec3 N, vec3 p, vec2 uv){
 #include shader/lib_velbuffer.frag.glsl
 #endif // velocityBufferFlag
 
+#ifdef ssrFlag
+#include shader/lib_pack.glsl
+#endif // ssrFlag
+
 // MAIN
 void main() {
     vec2 texCoords = o_data.texCoords;
 
-    vec4 diffuse = fetchColorDiffuse(o_data.color, u_diffuseTexture, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
-    vec4 emissive = fetchColorEmissive(u_emissiveTexture, texCoords);
+    vec4 diffuse = fetchColorDiffuse(o_data.color, texCoords, vec4(1.0, 1.0, 1.0, 1.0));
+    vec4 emissive = fetchColorEmissive(texCoords);
     vec3 specular = fetchColorSpecular(texCoords, vec3(0.0, 0.0, 0.0));
     vec3 ambient = o_data.ambientLight;
     #ifdef atmosphereGround
@@ -263,24 +260,27 @@ void main() {
 
     // Alpha value from textures
     float texAlpha = 1.0;
-    #if defined(diffuseTextureFlag)
+    #if defined(diffuseTextureFlag) || defined(diffuseCubemapFlag)
     texAlpha = diffuse.a;
     #elif defined(emissiveTextureFlag)
     texAlpha = luma(emissive.rgb);
     #endif
 
+    vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
     vec3 N = o_normalTan;
     #ifdef normalTextureFlag
-        #ifdef environmentCubemapFlag
+        #ifdef reflectionFlag
             // Perturb the normal to get reflect direction
             pullNormal();
             mat3 TBN = cotangentFrame(g_normal, -o_data.viewDir, texCoords);
-            vec3 reflectDir = normalize(reflect(o_data.fragPosWorld, normalize(TBN * N)));
-        #endif // environmentCubemapFlag
+            normalVector.xyz = TBN * N;
+            vec3 reflectDir = normalize(reflect(o_data.fragPosWorld, normalVector.xyz));
+        #endif // reflectionFlag
     #else
-        #ifdef environmentCubemapFlag
+        normalVector.xyz = o_data.normal;
+        #ifdef reflectionCubemapFlag
             vec3 reflectDir = normalize(o_data.reflect);
-        #endif // environmentCubemapFlag
+        #endif // reflectionCubemapFlag
     #endif // normalTextureFlag
 
     // Shadow
@@ -289,17 +289,50 @@ void main() {
     #else
     float shdw = 1.0;
     #endif
-    // Cubemap
+
+    // Reflection
     vec3 reflectionColor = vec3(0.0);
-    #ifdef environmentCubemapFlag
-        reflectionColor = texture(u_diffuseCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z)).rgb;
+    // Reflection mask
+    #ifdef ssrFlag
+        reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
+    #endif // ssrFlag
+
+    #ifdef reflectionFlag
+        float roughness = 0.0;
+        #if defined(roughnessTextureFlag)
+            roughness = texture(u_roughnessTexture, texCoords).x;
+        #elif defined(shininessFlag)
+            roughness = 1.0 - u_shininess;
+        #endif // roughnessTextureFlag, shininessFlag
+
+        #ifdef reflectionCubemapFlag
+            reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 7.0).rgb;
+        #endif // reflectionCubemapFlag
+
         #ifdef reflectionTextureFlag
-            reflectionColor = reflectionColor * texture(u_reflectionTexture, texCoords).rgb;
+            vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb;
+            reflectionColor = reflectionColor * reflectionStrength;
+            #ifdef ssrFlag
+                vec3 rmc = diffuse.rgb * reflectionStrength;
+                reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
+            #endif // ssrFlag
         #elif defined(reflectionColorFlag)
             reflectionColor = reflectionColor * u_reflectionColor.rgb;
+            #ifdef ssrFlag
+                vec3 rmc = diffuse.rgb * u_reflectionColor.rgb;
+                reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
+            #endif //ssrFlag
         #endif // reflectionColorFlag
-        reflectionColor += reflectionColor * diffuse.rgb;
-    #endif // environmentCubemapFlag
+        #ifdef ssrFlag
+            reflectionColor *= 0.0;
+        #else
+            reflectionColor += reflectionColor * diffuse.rgb;
+        #endif // ssrFlag
+    #endif // reflectionFlag
+    // Reflection mask
+    #ifdef ssrFlag
+    reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
+    #endif // ssrFlag
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);
@@ -322,7 +355,7 @@ void main() {
         }
         // see http://http.developer.nvidia.com/CgTutorial/cg_tutorial_chapter05.html
         vec3 L = o_data.directionalLights[i].direction;
-        vec3 H = normalize(L + V);
+        vec3 H = normalize(L - V);
         float NL = max(0.0, dot(N, L));
         float NH = max(0.0, dot(N, H));
         if (i == 0){
@@ -344,22 +377,21 @@ void main() {
 
     #ifdef atmosphereGround
     #define exposure 4.0
-    fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
-    fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
+        fragColor.rgb += (vec3(1.0) - exp(o_atmosphereColor.rgb * -exposure)) * o_atmosphereColor.a * shdw * o_fadeFactor;
+        fragColor.rgb = applyFog(fragColor.rgb, o_data.viewDir, L0 * -1.0, NL0);
     #endif
 
     // Prevent saturation
     fragColor.rgb = clamp(fragColor.rgb, 0.0, 0.98);
-
     if (fragColor.a <= 0.0) {
         discard;
     }
+    #ifdef ssrFlag
+        normalBuffer = vec4(normalVector.xyz, 1.0);
+    #endif // ssrFlag
+
     // Logarithmic depth buffer
     gl_FragDepth = getDepthValue(u_cameraNearFar.y, u_cameraK);
-
-    #ifdef ssrFlag
-    ssrBuffers();
-    #endif // ssrFlag
 
     #ifdef velocityBufferFlag
     velocityBuffer();

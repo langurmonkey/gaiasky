@@ -369,7 +369,7 @@ out vec3 v_lightDir;
 out vec3 v_lightCol;
 out vec3 v_viewDir;
 
-#ifdef environmentCubemapFlag
+#ifdef reflectionCubemapFlag
 out vec3 v_reflect;
 #endif
 
@@ -430,9 +430,9 @@ void main() {
     pushNormal();
     v_viewDir = -pos.xyz;
 
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     v_reflect = reflect(-v_viewDir, g_normal);
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 
     pushColor(g_color);
     pushTexCoord0(g_texCoord0);

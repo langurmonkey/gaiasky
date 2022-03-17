@@ -1,10 +1,8 @@
+// Including this file requires lib_luma.glsl
+
 struct Normal {
     float t, b, r, l, tl, bl, br, tr;
 };
-
-float luma(vec3 color){
-    return dot(color, vec3(0.2126, 0.7152, 0.0722));
-}
 
 vec2 regular(Normal n){
     float sum0 = n.tr + n.t + n.br;

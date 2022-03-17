@@ -263,9 +263,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 };
 out VertexData v_data;
 
@@ -335,12 +335,12 @@ void main() {
     pushNormal();
     v_data.viewDir = normalize((pos.xyz - u_vrOffset) * TBN);
 
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     #ifndef normalTextureFlag
         // Only if normal map not present, otherwise we perturb the normal in the fragment shader
     	v_data.reflect = reflect(pos.xyz - u_vrOffset, g_normal);
     #endif // normalTextureFlag
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 
     pushColor(g_color);
     pushTexCoord0(g_texCoord0);

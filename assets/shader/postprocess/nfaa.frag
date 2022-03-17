@@ -5,6 +5,7 @@
 // Modified by Sagrista, Toni
 #version 330 core
 
+#include shader/lib_luma.glsl
 #include shader/lib_normal.glsl
 
 uniform sampler2D u_texture0;

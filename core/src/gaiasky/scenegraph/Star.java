@@ -12,11 +12,6 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -27,15 +22,17 @@ import gaiasky.scenegraph.camera.FovCamera;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.scenegraph.camera.NaturalCamera;
 import gaiasky.scenegraph.component.ModelComponent;
-import gaiasky.util.Constants;
-import gaiasky.util.ModelCache;
-import gaiasky.util.Pair;
-import gaiasky.util.Settings;
+import gaiasky.util.*;
 import gaiasky.util.coord.AstroUtils;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.FloatExtAttribute;
+import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 
@@ -177,7 +174,7 @@ public class Star extends Particle {
         params.put("diameter", 1d);
         params.put("flip", false);
 
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
         IntModel model = pair.getFirst();
         Material mat = pair.getSecond().get("base");
         mat.clear();
@@ -191,7 +188,7 @@ public class Star extends Particle {
         mc.initialize(null);
         mc.env = new Environment();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        mc.env.set(new FloatExtAttribute(FloatExtAttribute.Time, 0f));
+        mc.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
         mc.instance = new IntModelInstance(model, modelTransform);
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)
@@ -231,7 +228,7 @@ public class Star extends Particle {
     public void render(IntModelBatch modelBatch, float alpha, double t, RenderingContext renderContext, RenderGroup group) {
         float opacity = (float) MathUtilsd.lint(distToCamera, modelDistance / 50f, modelDistance, 1f, 0f);
         ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(cc[0], cc[1], cc[2], 1f);
-        ((FloatExtAttribute) mc.env.get(FloatExtAttribute.Time)).value = (float) t;
+        ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
         mc.update(alpha * opacity);
         // Local transform
         translation.getMatrix(mc.instance.transform).scl((float) (getRadius() * 2d));

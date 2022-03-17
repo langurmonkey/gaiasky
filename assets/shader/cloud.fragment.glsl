@@ -1,7 +1,5 @@
 #version 330 core
 
-#define TEXTURE_LOD_BIAS 0.0
-
 ////////////////////////////////////////////////////////////////////////////////////
 ////////// POSITION ATTRIBUTE - FRAGMENT
 ////////////////////////////////////////////////////////////////////////////////////
@@ -25,6 +23,10 @@ in float v_alphaTest;
 uniform sampler2D u_diffuseTexture;
 #endif
 
+#ifdef diffuseCubemapFlag
+uniform samplerCube u_diffuseCubemap;
+#endif
+
 #ifdef normalTextureFlag
 uniform sampler2D u_normalTexture;
 #endif
@@ -32,24 +34,25 @@ uniform sampler2D u_normalTexture;
 // AMBIENT LIGHT
 in vec3 v_ambientLight;
 
-float luma(vec3 color){
-    return dot(color, vec3(0.2126, 0.7152, 0.0722));
-}
+#include shader/lib_luma.glsl
 
 // CLOUD TEXTURE
-#if defined(diffuseTextureFlag) && defined(normalTextureFlag)
+#if defined(diffuseCubemapFlag)
+#include shader/lib_cubemap.glsl
+vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
+    return texture(u_diffuseCubemap, UVtoXYZ(texCoord));
+}
+#elif defined(diffuseTextureFlag) && defined(normalTextureFlag)
 // We have clouds and transparency
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
-    vec4 cloud = texture(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
-    vec4 trans = texture(u_normalTexture, texCoord, TEXTURE_LOD_BIAS);
+    vec4 cloud = texture(u_diffuseTexture, texCoord);
+    vec4 trans = texture(u_normalTexture, texCoord);
     return vec4(cloud.rgb, 1.0 - luma(trans.rgb));
 }
 #elif defined(diffuseTextureFlag)
 // Only clouds, we use value as transp
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {
-    vec4 cloud = texture(u_diffuseTexture, texCoord, TEXTURE_LOD_BIAS);
-    // Smooth towards the poles
-    return cloud;
+    return texture(u_diffuseTexture, texCoord);
 }
 #else
 vec4 fetchCloudColor(vec2 texCoord, vec4 defaultValue) {

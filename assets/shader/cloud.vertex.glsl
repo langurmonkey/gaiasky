@@ -326,9 +326,6 @@ void main() {
     
     vec3 viewDir = (u_cameraPosition.xyz - pos.xyz);
     v_viewDir = normalize(viewDir * worldToTangent);
-    #ifdef environmentCubemapFlag
-	v_reflect = reflect(-viewDir, g_normal);
-    #endif // environmentCubemapFlag
 
     pushTexCoord0(g_texCoord0);
 }

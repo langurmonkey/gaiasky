@@ -6,8 +6,6 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.utils.Array;
@@ -17,6 +15,8 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.*;
 import gaiasky.util.coord.Coordinates;
 import gaiasky.util.gdx.IntModelBatch;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.DepthTestAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3d;
 import gaiasky.util.time.ITimeFrameProvider;

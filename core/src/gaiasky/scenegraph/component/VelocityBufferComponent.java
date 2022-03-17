@@ -5,13 +5,13 @@
 
 package gaiasky.scenegraph.component;
 
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import gaiasky.scenegraph.camera.ICamera;
-import gaiasky.util.gdx.shader.Matrix4Attribute;
-import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.Matrix4Attribute;
+import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.util.math.Vector3b;
 
 import java.util.Map;

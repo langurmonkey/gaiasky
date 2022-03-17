@@ -32,9 +32,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 };
 
 // INPUT
@@ -99,9 +99,9 @@ void main(){
     l_data[id].opacity = v_data[id].opacity;
     l_data[id].color = v_data[id].color;
     l_data[id].fragPosWorld = v_data[id].fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     l_data[id].reflect = v_data[id].reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
     l_atmosphereColor[id] = v_atmosphereColor[id];

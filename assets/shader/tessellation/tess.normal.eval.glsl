@@ -55,9 +55,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     vec3 reflect;
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 };
 // INPUT
 in VertexData l_data[gl_MaxPatchVertices];
@@ -168,9 +168,9 @@ void main(void){
     }
     #endif // directionalLightsFlag
     o_data.ambientLight = (u * l_data[0].ambientLight + v * l_data[1].ambientLight + w * l_data[2].ambientLight);
-    #ifdef environmentCubemapFlag
+    #ifdef reflectionCubemapFlag
     o_data.reflect = (u * l_data[0].reflect + v * l_data[1].reflect + w * l_data[2].reflect);
-    #endif // environmentCubemapFlag
+    #endif // reflectionCubemapFlag
 
     #ifdef atmosphereGround
     o_atmosphereColor = (u * l_atmosphereColor[0] + v * l_atmosphereColor[1] + w * l_atmosphereColor[2]);

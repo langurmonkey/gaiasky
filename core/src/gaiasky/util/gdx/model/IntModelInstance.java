@@ -21,7 +21,6 @@
 
 package gaiasky.util.gdx.model;
 
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.model.NodeKeyframe;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
@@ -33,6 +32,7 @@ import com.badlogic.gdx.utils.Pool;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.IntRenderableProvider;
+import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.shader.IntShader;
 
 /** An instance of a {@link IntModel}, allows to specify global transform and modify the materials, as it has a copy of the model's

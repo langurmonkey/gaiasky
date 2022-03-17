@@ -5,8 +5,10 @@
 
 package gaiasky.util.gdx.shader;
 
+import gaiasky.util.Bits;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.model.IntMeshPart;
+import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
 import org.lwjgl.opengl.GL41;
 
 public class TessellationShader extends GroundShader {
@@ -34,9 +36,9 @@ public class TessellationShader extends GroundShader {
 
     public static String createPrefix(final IntRenderable renderable, final TessellationShaderProvider.Config config) {
         String prefix = RelativisticShader.createPrefix(renderable, config);
-        final long mask = renderable.material.getMask();
+        final Bits mask = renderable.material.getMask();
         // Atmosphere ground only if camera height is set
-        if ((mask & AtmosphereAttribute.CameraHeight) == AtmosphereAttribute.CameraHeight)
+        if (mask.has(AtmosphereAttribute.CameraHeight))
             prefix += "#define atmosphereGround\n";
         return prefix;
     }

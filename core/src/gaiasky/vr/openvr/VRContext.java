@@ -10,8 +10,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttribute;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.glutils.PixmapTextureData;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
@@ -21,6 +19,8 @@ import gaiasky.util.Settings;
 import gaiasky.util.gdx.loader.OwnObjLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.*;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.openvr.*;
 

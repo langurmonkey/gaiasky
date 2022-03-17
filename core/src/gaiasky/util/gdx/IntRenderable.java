@@ -17,16 +17,16 @@
 package gaiasky.util.gdx;
 
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
 import gaiasky.util.gdx.model.IntModelInstance;
 import gaiasky.util.gdx.shader.IntShader;
+import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gdx.shader.provider.IntShaderProvider;
 
 /** A Renderable contains all information about a single render instruction (typically a draw call).</p>

@@ -26,11 +26,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.VertexAttributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.model.Animation;
 import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.model.Node;
@@ -44,13 +39,14 @@ import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.*;
+import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.loader.IntModelLoader;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.data.IntModelData;
 import gaiasky.util.gdx.model.data.IntModelMesh;
 import gaiasky.util.gdx.model.data.IntModelMeshPart;
 import gaiasky.util.gdx.model.data.IntModelNode;
-import gaiasky.util.gdx.shader.TextureExtAttribute;
+import gaiasky.util.gdx.shader.attribute.*;
 
 /**
  * This implementation uses {@link IntMesh} and {@link IntMeshPart} instead of {@link Mesh} and {@link MeshPart}.
@@ -323,7 +319,7 @@ public class IntModel implements Disposable {
 					result.set(new TextureAttribute(TextureAttribute.Reflection, descriptor, offsetU, offsetV, scaleU, scaleV));
 					break;
 				case ModelTexture.USAGE_SHININESS:
-					result.set(new TextureAttribute(TextureExtAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));
+					result.set(new TextureAttribute(TextureAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));
 					break;
 				}
 			}

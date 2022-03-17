@@ -12,11 +12,6 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -30,7 +25,8 @@ import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.AtmosphereAttribute;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.*;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -66,7 +62,11 @@ public class CloudComponent extends NamedComponent implements IObserver {
     private Texture cloudTex;
 
     public String cloud, cloudtrans, cloudUnpacked, cloudtransUnpacked;
+
     private Material material;
+
+    // CUBEMAPS
+    public CubemapComponent diffuseCubemap;
 
     private boolean texInitialised, texLoading;
     // Model parameters
@@ -99,18 +99,24 @@ public class CloudComponent extends NamedComponent implements IObserver {
                 if (cloudtransUnpacked != null)
                     logger.info(I18n.txt("notif.loading", cloudtransUnpacked));
             }
+            if (diffuseCubemap != null)
+                diffuseCubemap.initialize(manager);
         }
         this.generated.set(false);
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(cloudUnpacked, manager) && isFL(cloudtransUnpacked, manager);
+        return isFL(cloudUnpacked, manager) && isFL(cloudtransUnpacked, manager) && isFL(diffuseCubemap, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
         if (tex == null)
             return true;
         return manager.isLoaded(tex);
+    }
+
+    public boolean isFL(CubemapComponent cubemap, AssetManager manager) {
+        return cubemap == null || cubemap.isLoaded(manager);
     }
 
     /**
@@ -127,7 +133,7 @@ public class CloudComponent extends NamedComponent implements IObserver {
 
     public void doneLoading(AssetManager manager) {
         this.manager = manager;
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
         IntModel cloudModel = pair.getFirst();
         Material material = pair.getSecond().get("base");
         material.clear();
@@ -184,6 +190,10 @@ public class CloudComponent extends NamedComponent implements IObserver {
             Texture tex = manager.get(cloudtransUnpacked, Texture.class);
             material.set(new TextureAttribute(TextureAttribute.Normal, tex));
         }
+        if (diffuseCubemap != null) {
+            diffuseCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
+        }
         material.set(new BlendingAttribute(1.0f));
         // Do not cull
         material.set(new IntAttribute(IntAttribute.CullFace, 0));
@@ -194,7 +204,6 @@ public class CloudComponent extends NamedComponent implements IObserver {
     }
 
     private synchronized void initializeGenCloudData() {
-
         if (!generated.get()) {
             generated.set(true);
             GaiaSky.instance.getExecutorService().execute(() -> {
@@ -232,14 +241,27 @@ public class CloudComponent extends NamedComponent implements IObserver {
         }
     }
 
-    public void disposeTexture(AssetManager manager, Material material, String name, String nameUnpacked, long texAttribute, Texture tex) {
+    public void disposeTexture(AssetManager manager, Material material, String name, String nameUnpacked, int texAttributeIndex, Texture tex) {
         if (name != null && manager != null && manager.isLoaded(nameUnpacked)) {
-            unload(material, texAttribute);
+            unload(material, texAttributeIndex);
             manager.unload(nameUnpacked);
         }
         if (tex != null) {
-            unload(material, texAttribute);
+            unload(material, texAttributeIndex);
             tex.dispose();
+        }
+    }
+
+    public void disposeCubemap(AssetManager manager, Material mat, int attributeIndex, CubemapComponent cubemap) {
+        if (cubemap != null && cubemap.isLoaded(manager)) {
+            unload(material, attributeIndex);
+            manager.unload(cubemap.cmBack);
+            manager.unload(cubemap.cmFront);
+            manager.unload(cubemap.cmUp);
+            manager.unload(cubemap.cmDown);
+            manager.unload(cubemap.cmRight);
+            manager.unload(cubemap.cmLeft);
+            cubemap.dispose();
         }
     }
 
@@ -251,14 +273,15 @@ public class CloudComponent extends NamedComponent implements IObserver {
     public void disposeTextures(AssetManager manager) {
         disposeTexture(manager, material, cloud, cloudUnpacked, TextureAttribute.Diffuse, cloudTex);
         disposeTexture(manager, material, cloudtrans, cloudtransUnpacked, TextureAttribute.Normal, null);
+        disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
         texLoading = false;
         texInitialised = false;
     }
 
-    private void unload(Material mat, long attrMask) {
+    private void unload(Material mat, int attrIndex) {
         if (mat != null) {
-            Attribute attr = mat.get(attrMask);
-            mat.remove(attrMask);
+            Attribute attr = mat.get(attrIndex);
+            mat.remove(attrIndex);
             if (attr instanceof TextureAttribute) {
                 Texture tex = ((TextureAttribute) attr).textureDescription.texture;
                 tex.dispose();
@@ -300,6 +323,11 @@ public class CloudComponent extends NamedComponent implements IObserver {
 
     public void setNoise(NoiseComponent noise) {
         this.nc = noise;
+    }
+
+    public void setDiffuseCubemap(String diffuseCubemap) {
+        this.diffuseCubemap = new CubemapComponent();
+        this.diffuseCubemap.setLocation(diffuseCubemap);
     }
 
     @Override
@@ -373,5 +401,11 @@ public class CloudComponent extends NamedComponent implements IObserver {
         if (nc != null) {
             nc.print(log);
         }
+    }
+
+    @Override
+    public void dispose() {
+        disposeTextures(manager);
+        EventManager.instance.removeAllSubscriptions(this);
     }
 }

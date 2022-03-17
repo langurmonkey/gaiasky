@@ -8,7 +8,6 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.reflect.ClassReflection;
@@ -38,7 +37,8 @@ import gaiasky.util.format.NumberFormatFactory;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.gdx.shader.FloatExtAttribute;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Matrix4d;
 import gaiasky.util.math.Vector3b;
@@ -385,11 +385,11 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
             mc.setDepthTest(GL20.GL_LEQUAL, false);
         else
             mc.setDepthTest(0, false);
-        mc.setFloatExtAttribute(FloatExtAttribute.TessQuality, scalingFading.getFirst().floatValue());
+        mc.setFloatExtAttribute(FloatAttribute.TessQuality, scalingFading.getFirst().floatValue());
         // Fading in u_heightScale
-        mc.setFloatExtAttribute(FloatExtAttribute.HeightScale, scalingFading.getSecond().floatValue());
+        mc.setFloatExtAttribute(FloatAttribute.HeightScale, scalingFading.getSecond().floatValue());
         // FovFactor
-        mc.setFloatExtAttribute(FloatExtAttribute.Ts, this.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
+        mc.setFloatExtAttribute(FloatAttribute.Ts, this.fovFactor * 0.5f * Settings.settings.scene.lineWidth);
         modelBatch.render(mc.instance, mc.env);
     }
 

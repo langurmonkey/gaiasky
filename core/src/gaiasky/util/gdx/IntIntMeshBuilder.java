@@ -33,6 +33,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.*;
+import gaiasky.util.Bits;
 import gaiasky.util.gdx.ModelCreator.IFace;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
@@ -115,21 +116,21 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
      * @param usage bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal and
      *              TextureCoordinates is supported.
      */
-    public static VertexAttributes createAttributes(long usage) {
+    public static VertexAttributes createAttributes(Bits usage) {
         final Array<VertexAttribute> attrs = new Array<>();
-        if ((usage & Usage.Position) == Usage.Position)
+        if (usage.get(Usage.Position))
             attrs.add(new VertexAttribute(Usage.Position, 3, ShaderProgram.POSITION_ATTRIBUTE));
-        if ((usage & Usage.ColorUnpacked) == Usage.ColorUnpacked)
+        if (usage.get(Usage.ColorUnpacked))
             attrs.add(new VertexAttribute(Usage.ColorUnpacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        if ((usage & Usage.ColorPacked) == Usage.ColorPacked)
+        if (usage.get(Usage.ColorPacked))
             attrs.add(new VertexAttribute(Usage.ColorPacked, 4, ShaderProgram.COLOR_ATTRIBUTE));
-        if ((usage & Usage.Normal) == Usage.Normal)
+        if (usage.get(Usage.Normal))
             attrs.add(new VertexAttribute(Usage.Normal, 3, ShaderProgram.NORMAL_ATTRIBUTE));
-        if ((usage & Usage.Tangent) == Usage.Tangent)
+        if (usage.get(Usage.Tangent))
             attrs.add(new VertexAttribute(Usage.Tangent, 3, ShaderProgram.TANGENT_ATTRIBUTE));
-        if ((usage & Usage.BiNormal) == Usage.BiNormal)
+        if (usage.get(Usage.BiNormal))
             attrs.add(new VertexAttribute(Usage.BiNormal, 3, ShaderProgram.BINORMAL_ATTRIBUTE));
-        if ((usage & Usage.TextureCoordinates) == Usage.TextureCoordinates)
+        if (usage.get(Usage.TextureCoordinates))
             attrs.add(new VertexAttribute(Usage.TextureCoordinates, 2, ShaderProgram.TEXCOORD_ATTRIBUTE + "0"));
         final VertexAttribute[] attributes = new VertexAttribute[attrs.size];
         for (int i = 0; i < attributes.length; i++)
@@ -143,7 +144,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
      *                   and TextureCoordinates is supported.
      */
-    public void begin(final long attributes) {
+    public void begin(final Bits attributes) {
         begin(createAttributes(attributes), 0);
     }
 
@@ -158,7 +159,7 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
      * @param attributes bitwise mask of the {@link com.badlogic.gdx.graphics.VertexAttributes.Usage}, only Position, Color, Normal
      *                   and TextureCoordinates is supported.
      */
-    public void begin(final long attributes, int primitiveType) {
+    public void begin(final Bits attributes, int primitiveType) {
         begin(createAttributes(attributes), primitiveType);
     }
 
@@ -1259,7 +1260,6 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
     @Override
     public void ring(Matrix4 transform, float innerRadius, float outerRadius, int divisions, boolean flipNormals) {
         ring(transform, innerRadius, outerRadius, divisions, flipNormals, 0, 360);
-
     }
 
     @Override
@@ -1282,5 +1282,4 @@ public class IntIntMeshBuilder implements IntMeshPartBuilder {
             rect(tri[0], tri[1], tri[2], tri[3]);
         }
     }
-
 }

@@ -209,6 +209,10 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         this.pos.set(pos[0] * Constants.PC_TO_U, pos[1] * Constants.PC_TO_U, pos[2] * Constants.PC_TO_U);
     }
 
+    public void setPosition(int[] pos) {
+        setPosition(new double[] { pos[0], pos[1], pos[2] });
+    }
+
     /**
      * Sets the position of the label, in parsecs and in the internal reference
      * frame.

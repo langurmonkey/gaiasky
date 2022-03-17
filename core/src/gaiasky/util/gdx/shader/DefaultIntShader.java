@@ -26,10 +26,6 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.environment.AmbientCubemap;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
@@ -39,12 +35,13 @@ import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import gaiasky.GaiaSky;
 import gaiasky.assets.ShaderTemplatingLoader;
+import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.attribute.*;
 
 public class DefaultIntShader extends BaseIntShader {
     public static class Config {
@@ -64,10 +61,6 @@ public class DefaultIntShader extends BaseIntShader {
         public int numSpotLights = 0;
         /** The number of bones to use */
         public int numBones = 0;
-        /**
-         *
-         */
-        public boolean ignoreUnimplemented = true;
         /** Set to 0 to disable culling, -1 to inherit from {@link DefaultIntShader#defaultCullFace} */
         public int defaultCullFace = -1;
         /** Set to 0 to disable depth test, -1 to inherit from {@link DefaultIntShader#defaultDepthFunc} */
@@ -107,7 +100,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform bones = new Uniform("u_bones");
 
         public final static Uniform opacity = new Uniform("u_opacity", BlendingAttribute.Type);
-        public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureExtAttribute.AO);
+        public final static Uniform aoTexture = new Uniform("u_aoTexture", TextureAttribute.AO);
         public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
         public final static Uniform diffuseTexture = new Uniform("u_diffuseTexture", TextureAttribute.Diffuse);
         public final static Uniform specularColor = new Uniform("u_specularColor", ColorAttribute.Specular);
@@ -117,21 +110,23 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform reflectionColor = new Uniform("u_reflectionColor", ColorAttribute.Reflection);
         public final static Uniform reflectionTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
         public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
-        public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureExtAttribute.Roughness);
+        public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureAttribute.Roughness);
 
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
-        public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureExtAttribute.Height);
-        public final static Uniform heightScale = new Uniform("u_heightScale", FloatExtAttribute.HeightScale);
-        public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatExtAttribute.HeightNoiseSize);
+        public final static Uniform heightTexture = new Uniform("u_heightTexture", TextureAttribute.Height);
+        public final static Uniform heightScale = new Uniform("u_heightScale", FloatAttribute.HeightScale);
+        public final static Uniform heightNoiseSize = new Uniform("u_heightNoiseSize", FloatAttribute.HeightNoiseSize);
         public final static Uniform heightSize = new Uniform("u_heightSize", Vector2Attribute.HeightSize);
-        public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatExtAttribute.TessQuality);
+        public final static Uniform tessQuality = new Uniform("u_tessQuality", FloatAttribute.TessQuality);
         public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
-        public final static Uniform time = new Uniform("u_time", FloatExtAttribute.Time);
+        public final static Uniform time = new Uniform("u_time", FloatAttribute.Time);
         public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
         public final static Uniform dirLights = new Uniform("u_dirLights");
         public final static Uniform pointLights = new Uniform("u_pointLights");
         public final static Uniform spotLights = new Uniform("u_spotLights");
+
+        public final static Uniform reflectionCubemap = new Uniform("u_reflectionCubemap");
         public final static Uniform diffuseCubemap = new Uniform("u_diffuseCubemap");
     }
 
@@ -241,14 +236,14 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Setter aoTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.AO))).textureDescription);
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.AO))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
         public final static Setter time = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Time))).value);
+                shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Time))).value);
             }
         };
         public final static Setter diffuseColor = new LocalSetter() {
@@ -312,7 +307,7 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Setter roughnessTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Roughness))).textureDescription);
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Roughness))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -326,22 +321,22 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Setter heightTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureExtAttribute) (combinedAttributes.get(TextureExtAttribute.Height))).textureDescription);
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Height))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
         public final static Setter heightScale = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.HeightScale))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.HeightScale))).value);
+                if (combinedAttributes.has(FloatAttribute.HeightScale))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.HeightScale))).value);
             }
         };
         public final static Setter heightNoiseSize = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.HeightNoiseSize))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.HeightNoiseSize))).value);
+                if (combinedAttributes.has(FloatAttribute.HeightNoiseSize))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.HeightNoiseSize))).value);
             }
         };
         public final static Setter heightSize = new LocalSetter() {
@@ -355,8 +350,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Setter tessQuality = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.TessQuality))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.TessQuality))).value);
+                if (combinedAttributes.has(FloatAttribute.TessQuality))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.TessQuality))).value);
             }
         };
 
@@ -399,6 +394,15 @@ public class DefaultIntShader extends BaseIntShader {
             }
         }
 
+        public final static Setter reflectionCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.ReflectionCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.ReflectionCubemap)).textureDescription));
+                }
+            }
+        };
+
         public final static Setter diffuseCubemap = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
@@ -424,8 +428,6 @@ public class DefaultIntShader extends BaseIntShader {
             defaultFragmentShader = ShaderTemplatingLoader.load(Gdx.files.internal("shader/normal.fragment.glsl"));
         return defaultFragmentShader;
     }
-
-    protected static long implementedFlags = BlendingAttribute.Type | TextureAttribute.Diffuse | ColorAttribute.Diffuse | ColorAttribute.Specular;
 
     /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
     @Deprecated public static int defaultCullFace = GL20.GL_BACK;
@@ -472,6 +474,7 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_tessQuality;
     public final int u_alphaTest;
     protected final int u_diffuseCubemap;
+    protected final int u_reflectionCubemap;
     // Lighting uniforms
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
@@ -512,9 +515,7 @@ public class DefaultIntShader extends BaseIntShader {
     protected int spotLightsSize;
 
     protected final boolean lighting;
-    protected final boolean diffuseCubemap;
     protected final boolean shadowMap;
-    protected final AmbientCubemap ambientCubemap = new AmbientCubemap();
     protected final DirectionalLight[] directionalLights;
     protected final PointLight[] pointLights;
     protected final SpotLight[] spotLights;
@@ -522,11 +523,11 @@ public class DefaultIntShader extends BaseIntShader {
     /** The renderable used to create this shader, invalid after the call to init */
     private IntRenderable renderable;
     /** The attributes that this shader supports */
-    protected final long attributesMask;
+    protected final Bits attributesMask;
     private final long vertexMask;
     protected final Config config;
     /** Attributes which are not required but always supported. */
-    private final static long optionalAttributes = IntAttribute.CullFace | DepthTestAttribute.Type;
+    private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
 
     public DefaultIntShader(final IntRenderable renderable) {
         this(renderable, new Config());
@@ -549,10 +550,9 @@ public class DefaultIntShader extends BaseIntShader {
         this.config = config;
         this.program = shaderProgram;
         this.lighting = renderable.environment != null;
-        this.diffuseCubemap = attributes.has(CubemapAttribute.DiffuseCubemap) || (lighting && attributes.has(CubemapAttribute.DiffuseCubemap));
         this.shadowMap = lighting && renderable.environment.shadowMap != null;
         this.renderable = renderable;
-        attributesMask = attributes.getMask() | optionalAttributes;
+        attributesMask = attributes.getMask().copy().or(optionalAttributes);
         vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked();
 
         this.directionalLights = new DirectionalLight[lighting && config.numDirectionalLights > 0 ? config.numDirectionalLights : 0];
@@ -564,9 +564,6 @@ public class DefaultIntShader extends BaseIntShader {
         this.spotLights = new SpotLight[lighting && config.numSpotLights > 0 ? config.numSpotLights : 0];
         for (int i = 0; i < spotLights.length; i++)
             spotLights[i] = new SpotLight();
-
-        if (!config.ignoreUnimplemented && (implementedFlags & attributesMask) != attributesMask)
-            throw new GdxRuntimeException("Some attributes not implemented yet (" + attributesMask + ")");
 
         // Global uniforms
         u_dirLights0color = register(new Uniform("u_dirLights[0].color"));
@@ -623,7 +620,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
         u_alphaTest = register(Inputs.alphaTest);
         u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights, config.numPointLights)) : -1;
-        u_diffuseCubemap = diffuseCubemap ? register(Inputs.diffuseCubemap, Setters.diffuseCubemap) : -1;
+        u_diffuseCubemap = register(Inputs.diffuseCubemap, Setters.diffuseCubemap);
+        u_reflectionCubemap = register(Inputs.reflectionCubemap, Setters.reflectionCubemap);
     }
 
     @Override
@@ -679,19 +677,18 @@ public class DefaultIntShader extends BaseIntShader {
         return tmpAttributes;
     }
 
-    private static final long combineAttributeMasks(final IntRenderable renderable) {
-        long mask = 0;
+    private static final Bits combineAttributeMasks(final IntRenderable renderable) {
+        Bits mask = Bits.empty();
         if (renderable.environment != null)
-            mask |= renderable.environment.getMask();
+            mask.or(renderable.environment.getMask());
         if (renderable.material != null)
-            mask |= renderable.material.getMask();
+            mask.or(renderable.material.getMask());
         return mask;
     }
 
     public static String createPrefix(final IntRenderable renderable, final Config config) {
         final Attributes attributes = combineAttributes(renderable);
         String prefix = "";
-        final long attributesMask = attributes.getMask();
         final long vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMask();
         if (and(vertexMask, Usage.Position))
             prefix += "#define positionFlag\n";
@@ -725,69 +722,69 @@ public class DefaultIntShader extends BaseIntShader {
             else if (attr.usage == Usage.TextureCoordinates)
                 prefix += "#define texCoord" + attr.unit + "Flag\n";
         }
-        if ((attributesMask & BlendingAttribute.Type) == BlendingAttribute.Type)
+        if (attributes.has(BlendingAttribute.Type))
             prefix += "#define " + BlendingAttribute.Alias + "Flag\n";
-        if ((attributesMask & TextureAttribute.Diffuse) == TextureAttribute.Diffuse) {
+        if (attributes.has(TextureAttribute.Diffuse)) {
             prefix += "#define " + TextureAttribute.DiffuseAlias + "Flag\n";
         }
-        if ((attributesMask & TextureAttribute.Specular) == TextureAttribute.Specular) {
+        if (attributes.has(TextureAttribute.Specular)) {
             prefix += "#define " + TextureAttribute.SpecularAlias + "Flag\n";
         }
-        if ((attributesMask & TextureAttribute.Normal) == TextureAttribute.Normal) {
+        if (attributes.has(TextureAttribute.Normal)) {
             prefix += "#define " + TextureAttribute.NormalAlias + "Flag\n";
         }
-        if ((attributesMask & TextureAttribute.Emissive) == TextureAttribute.Emissive) {
+        if (attributes.has(TextureAttribute.Emissive)) {
             prefix += "#define " + TextureAttribute.EmissiveAlias + "Flag\n";
         }
-        if ((attributesMask & TextureAttribute.Reflection) == TextureAttribute.Reflection) {
+        if (attributes.has(TextureAttribute.Reflection)) {
             prefix += "#define " + TextureAttribute.ReflectionAlias + "Flag\n";
         }
-        if ((attributesMask & TextureExtAttribute.Height) == TextureExtAttribute.Height) {
-            prefix += "#define " + TextureExtAttribute.HeightAlias + "Flag\n";
+        if (attributes.has(TextureAttribute.Height)) {
+            prefix += "#define " + TextureAttribute.HeightAlias + "Flag\n";
         }
-        if ((attributesMask & TextureExtAttribute.AO) == TextureExtAttribute.AO) {
-            prefix += "#define " + TextureExtAttribute.AOAlias + "Flag\n";
+        if (attributes.has(TextureAttribute.AO)) {
+            prefix += "#define " + TextureAttribute.AOAlias + "Flag\n";
         }
-        if ((attributesMask & TextureExtAttribute.Roughness) == TextureExtAttribute.Roughness) {
-            prefix += "#define " + TextureExtAttribute.RoughnessAlias + "Flag\n";
+        if (attributes.has(TextureAttribute.Roughness)) {
+            prefix += "#define " + TextureAttribute.RoughnessAlias + "Flag\n";
         }
-        if ((attributesMask & FloatExtAttribute.Time) == FloatExtAttribute.Time) {
-            prefix += "#define " + FloatExtAttribute.TimeAlias + "Flag\n";
+        if (attributes.has(FloatAttribute.Time)) {
+            prefix += "#define " + FloatAttribute.TimeAlias + "Flag\n";
         }
-        if ((attributesMask & FloatExtAttribute.HeightNoiseSize) == FloatExtAttribute.HeightNoiseSize) {
+        if (attributes.has(FloatAttribute.HeightNoiseSize)) {
             prefix += "#define heightFlag\n";
         }
 
-        if ((attributesMask & TextureAttribute.Ambient) == TextureAttribute.Ambient) {
+        if (attributes.has(TextureAttribute.Ambient)) {
             prefix += "#define " + TextureAttribute.AmbientAlias + "Flag\n";
         }
-        if ((attributesMask & ColorAttribute.Diffuse) == ColorAttribute.Diffuse)
+        if (attributes.has(ColorAttribute.Diffuse))
             prefix += "#define " + ColorAttribute.DiffuseAlias + "Flag\n";
-        if ((attributesMask & ColorAttribute.Specular) == ColorAttribute.Specular)
+        if (attributes.has(ColorAttribute.Specular))
             prefix += "#define " + ColorAttribute.SpecularAlias + "Flag\n";
-        if ((attributesMask & ColorAttribute.Emissive) == ColorAttribute.Emissive)
+        if (attributes.has(ColorAttribute.Emissive))
             prefix += "#define " + ColorAttribute.EmissiveAlias + "Flag\n";
-        if ((attributesMask & ColorAttribute.Reflection) == ColorAttribute.Reflection)
+        if (attributes.has(ColorAttribute.Reflection))
             prefix += "#define " + ColorAttribute.ReflectionAlias + "Flag\n";
-        if ((attributesMask & FloatAttribute.AlphaTest) == FloatAttribute.AlphaTest)
+        if (attributes.has(FloatAttribute.AlphaTest))
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
-        if ((attributesMask & FloatAttribute.Shininess) == FloatAttribute.Shininess)
+        if (attributes.has(FloatAttribute.Shininess))
             prefix += "#define " + FloatAttribute.ShininessAlias + "Flag\n";
 
-        if ((attributesMask & Matrix4Attribute.PrevProjView) == Matrix4Attribute.PrevProjView) {
+        if (attributes.has(Matrix4Attribute.PrevProjView)) {
             prefix += "#define velocityBufferFlag\n";
         }
         if (attributes.has(ColorAttribute.Reflection) || attributes.has(TextureAttribute.Reflection)) {
             prefix += "#define reflectionFlag\n";
-            if (attributes.has(CubemapAttribute.DiffuseCubemap)) {
-                prefix += "#define environmentCubemapFlag\n";
+            if (attributes.has(CubemapAttribute.ReflectionCubemap)) {
+                prefix += "#define reflectionCubemapFlag\n";
             }
         }
-        if(attributes.has(CubemapAttribute.DiffuseCubemap)) {
-            prefix += "#define diffuseCubemapFlag\n";
-        }
-        if (Settings.settings.postprocess.ssr) {
+        if(Settings.settings.postprocess.ssr) {
             prefix += "#define ssrFlag\n";
+        }
+        if (attributes.has(CubemapAttribute.DiffuseCubemap)) {
+            prefix += "#define diffuseCubemapFlag\n";
         }
 
         if (renderable.bones != null && config.numBones > 0)
@@ -797,8 +794,8 @@ public class DefaultIntShader extends BaseIntShader {
 
     @Override
     public boolean canRender(final IntRenderable renderable) {
-        final long renderableMask = combineAttributeMasks(renderable);
-        return (attributesMask == (renderableMask | optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked()) && (renderable.environment != null) == lighting;
+        final Bits renderableMask = combineAttributeMasks(renderable);
+        return attributesMask.equals(renderableMask.or(optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked()) && (renderable.environment != null) == lighting;
     }
 
     @Override
@@ -863,22 +860,20 @@ public class DefaultIntShader extends BaseIntShader {
         boolean depthMask = true;
 
         for (final Attribute attr : attributes) {
-            final long t = attr.type;
-            if (BlendingAttribute.is(t)) {
+            if (BlendingAttribute.is(attr.index)) {
                 context.setBlending(true, ((BlendingAttribute) attr).sourceFunction, ((BlendingAttribute) attr).destFunction);
                 set(u_opacity, ((BlendingAttribute) attr).opacity);
-            } else if ((t & IntAttribute.CullFace) == IntAttribute.CullFace)
+            } else if (attr.has(IntAttribute.CullFace)) {
                 cullFace = ((IntAttribute) attr).value;
-            else if ((t & FloatAttribute.AlphaTest) == FloatAttribute.AlphaTest)
+            } else if (attr.has(FloatAttribute.AlphaTest)) {
                 set(u_alphaTest, ((FloatAttribute) attr).value);
-            else if ((t & DepthTestAttribute.Type) == DepthTestAttribute.Type) {
+            } else if (attr.has(DepthTestAttribute.Type)) {
                 DepthTestAttribute dta = (DepthTestAttribute) attr;
                 depthFunc = dta.depthFunc;
                 depthRangeNear = dta.depthRangeNear;
                 depthRangeFar = dta.depthRangeFar;
                 depthMask = dta.depthMask;
-            } else if (!config.ignoreUnimplemented)
-                throw new GdxRuntimeException("Unknown material attribute: " + attr.toString());
+            }
         }
 
         context.setCullFace(cullFace);

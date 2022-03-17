@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.TextureData;
+import com.badlogic.gdx.utils.Disposable;
 import gaiasky.data.AssetBean;
 import gaiasky.util.GlobalResources;
 import gaiasky.util.I18n;
@@ -18,7 +19,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 import gaiasky.util.gdx.OwnCubemap;
 
-public class CubemapComponent {
+public class CubemapComponent implements Disposable {
     private static final Log logger = Logger.getLogger(CubemapComponent.class);
 
     public OwnCubemap cubemap;
@@ -38,14 +39,16 @@ public class CubemapComponent {
             textureParams.minFilter = TextureFilter.MipMapLinearLinear;
             loaded = true;
             try {
-                String skbLoc = location == null ? Settings.settings.data.reflectionSkyboxLocation : location;
-                logger.info(I18n.txt("notif.loading", "skybox: " + skbLoc));
-                cmBack = GlobalResources.unpackSkyboxSide(skbLoc, "bk", "back", "b");
-                cmFront = GlobalResources.unpackSkyboxSide(skbLoc, "ft", "front", "f");
-                cmUp = GlobalResources.unpackSkyboxSide(skbLoc, "up", "top", "u", "t");
-                cmDown = GlobalResources.unpackSkyboxSide(skbLoc, "dn", "bottom", "d");
-                cmRight = GlobalResources.unpackSkyboxSide(skbLoc, "rt", "right", "r");
-                cmLeft = GlobalResources.unpackSkyboxSide(skbLoc, "lf", "left", "l");
+                String cubemapLocation = location == null ? Settings.settings.data.reflectionSkyboxLocation : location;
+                String cubemapLocationUnapacked = Settings.settings.data.dataFile(cubemapLocation);
+                cubemapLocationUnapacked = GlobalResources.unpackAssetPath(cubemapLocationUnapacked);
+                logger.info(I18n.txt("notif.loading", "cubemap: " + cubemapLocationUnapacked));
+                cmBack = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "bk", "back", "b");
+                cmFront = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "ft", "front", "f");
+                cmUp = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "up", "top", "u", "t");
+                cmDown = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "dn", "bottom", "d");
+                cmRight = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "rt", "right", "r");
+                cmLeft = GlobalResources.resolveCubemapSide(cubemapLocationUnapacked, "lf", "left", "l");
 
                 addToLoad(cmBack, textureParams, manager);
                 addToLoad(cmFront, textureParams, manager);
@@ -71,7 +74,7 @@ public class CubemapComponent {
         }
     }
 
-    public boolean isLoaded(AssetManager manager){
+    public boolean isLoaded(AssetManager manager) {
         return manager.isLoaded(cmBack)
                 && manager.isLoaded(cmFront)
                 && manager.isLoaded(cmUp)
@@ -85,6 +88,7 @@ public class CubemapComponent {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams, AssetManager manager) {
@@ -95,7 +99,7 @@ public class CubemapComponent {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.info(I18n.txt("notif.loading", tex));
+        logger.debug(I18n.txt("notif.loading", tex));
         manager.load(tex, Texture.class, texParams);
 
         return tex;
@@ -106,6 +110,7 @@ public class CubemapComponent {
      * quality setting.
      *
      * @param tex The texture file to load.
+     *
      * @return The actual loaded texture path
      */
     private String addToLoad(String tex, TextureParameter texParams) {
@@ -113,7 +118,7 @@ public class CubemapComponent {
             return null;
 
         tex = GlobalResources.unpackAssetPath(tex);
-        logger.info(I18n.txt("notif.loading", tex));
+        logger.debug(I18n.txt("notif.loading", tex));
         AssetBean.addAsset(tex, Texture.class, texParams);
 
         return tex;
@@ -121,5 +126,15 @@ public class CubemapComponent {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+
+    @Override
+    public void dispose() {
+        if (cubemap != null) {
+            cubemap.dispose();
+            cubemap = null;
+        }
+        loaded = false;
     }
 }

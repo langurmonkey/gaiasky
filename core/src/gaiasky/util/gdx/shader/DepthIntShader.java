@@ -26,12 +26,12 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.attribute.Attributes;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 
 public class DepthIntShader extends DefaultIntShader {
 	public static class Config extends DefaultIntShader.Config {
@@ -123,9 +123,7 @@ public class DepthIntShader extends DefaultIntShader {
 	public boolean canRender (IntRenderable renderable) {
 		final Attributes attributes = combineAttributes(renderable);
 		if (attributes.has(BlendingAttribute.Type)) {
-			if ((attributesMask & BlendingAttribute.Type) != BlendingAttribute.Type)
-				return false;
-			if (attributes.has(TextureAttribute.Diffuse) != ((attributesMask & TextureAttribute.Diffuse) == TextureAttribute.Diffuse))
+			if (!attributes.has(TextureAttribute.Diffuse))
 				return false;
 		}
 		final boolean skinned = ((renderable.meshPart.mesh.getVertexAttributes().getMask() & Usage.BoneWeight) == Usage.BoneWeight);

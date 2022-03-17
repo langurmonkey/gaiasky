@@ -59,6 +59,7 @@ import gaiasky.util.gdx.loader.is.GzipInputStreamProvider;
 import gaiasky.util.gdx.loader.is.RegularInputStreamProvider;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.shader.*;
+import gaiasky.util.gdx.shader.attribute.Attribute;
 import gaiasky.util.gravwaves.RelativisticEffectsManager;
 import gaiasky.util.samp.SAMPClient;
 import gaiasky.util.time.GlobalClock;
@@ -715,6 +716,23 @@ public class GaiaSky implements ApplicationListener, IObserver, IMainRenderer {
         // Go home
         goHome();
 
+        // Log attributes
+        final Task logAttributes = new Task() {
+            @Override
+            public void run() {
+                logger.info("Total number of attributes registered: " + Attribute.getNumAttributes());
+                if (Settings.settings.program.debugInfo) {
+                    logger.debug("Registered attributes:");
+                    Array<String> attributes = Attribute.getTypes();
+                    for (int i = 0; i < attributes.size; i++) {
+                        logger.debug(i + ": " + attributes.get(i));
+                    }
+                }
+            }
+        };
+        Timer.schedule(logAttributes, 5);
+
+        // Initialized
         EventManager.publish(Event.INITIALIZED_INFO, this);
         sgr.setRendering(true);
         initialized = true;

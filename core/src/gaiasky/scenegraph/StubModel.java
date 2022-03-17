@@ -1,9 +1,6 @@
 package gaiasky.scenegraph;
 
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.render.ComponentTypes;
@@ -16,6 +13,9 @@ import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.IntModelBatch;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.Environment;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
 import gaiasky.util.time.ITimeFrameProvider;
 import gaiasky.vr.openvr.VRContext.VRDevice;
 

@@ -680,18 +680,18 @@ public class GlobalResources {
         return GlobalResources.unpackAssetPath(tex, Settings.settings.graphics.quality);
     }
 
-    public static String unpackSkyboxSide(String skyboxLoc, String side) throws RuntimeException {
-        String location = Settings.settings.data.dataFile(skyboxLoc);
-        location = GlobalResources.unpackAssetPath(location);
-        FileHandle loc = Gdx.files.absolute(location);
+    public static String resolveCubemapSide(String baseLocation, String... sideSuffixes) throws RuntimeException {
+        FileHandle loc = Gdx.files.absolute(baseLocation);
         FileHandle[] files = loc.list();
         for (FileHandle file : files) {
-            if (file.name().contains("_" + side + ".")) {
-                // Found!
-                return file.file().getAbsolutePath().replaceAll("\\\\", "/");
+            for(String suffix : sideSuffixes) {
+                if (file.name().contains("_" + suffix + ".")) {
+                    // Found!
+                    return file.file().getAbsolutePath().replaceAll("\\\\", "/");
+                }
             }
         }
-        throw new RuntimeException("Skybox side '" + side + "' not found in folder: " + skyboxLoc);
+        throw new RuntimeException("Cubemap side '" + TextUtils.arrayToStr(sideSuffixes) + "' not found in folder: " + baseLocation);
     }
 
     private static final IntBuffer buf = BufferUtils.newIntBuffer(16);

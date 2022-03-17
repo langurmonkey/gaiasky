@@ -24,16 +24,14 @@ package gaiasky.util.gdx.shader;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.Attribute;
-import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.*;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.attribute.*;
 
 public class AtmosphereShader extends BaseIntShader {
     public static class Config {
@@ -64,8 +62,8 @@ public class AtmosphereShader extends BaseIntShader {
         public final static Uniform cameraPosition = new Uniform("u_cameraPosition");
         public final static Uniform cameraDirection = new Uniform("u_cameraDirection");
         public final static Uniform cameraUp = new Uniform("u_cameraUp");
-        //public final static Uniform cameraNearFar = new Uniform("u_cameraNearFar");
-        //public final static Uniform cameraK = new Uniform("u_cameraK");
+        public final static Uniform cameraNearFar = new Uniform("u_cameraNearFar");
+        public final static Uniform cameraK = new Uniform("u_cameraK");
 
         public final static Uniform worldTrans = new Uniform("u_worldTrans");
         public final static Uniform viewWorldTrans = new Uniform("u_viewWorldTrans");
@@ -99,7 +97,7 @@ public class AtmosphereShader extends BaseIntShader {
         public final static Uniform gw = new Uniform("u_gw");
         public final static Uniform gwmat3 = new Uniform("u_gwmat3");
         public final static Uniform ts = new Uniform("u_ts");
-        //public final static Uniform omgw = new Uniform("u_omgw");
+        public final static Uniform omgw = new Uniform("u_omgw");
 
     }
 
@@ -442,8 +440,8 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.Vc))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Vc))).value);
+                if (combinedAttributes.has(FloatAttribute.Vc))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Vc))).value);
             }
         };
 
@@ -460,46 +458,46 @@ public class AtmosphereShader extends BaseIntShader {
             }
         };
 
-        //public final static Setter hterms = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+        public final static Setter hterms = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(Vector4Attribute.Hterms)) {
-        //            float[] val = ((Vector4Attribute) (combinedAttributes.get(Vector4Attribute.Hterms))).value;
-        //            shader.set(inputID, val[0], val[1], val[2], val[3]);
-        //        }
-        //    }
-        //};
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector4Attribute.Hterms)) {
+                    float[] val = ((Vector4Attribute) (combinedAttributes.get(Vector4Attribute.Hterms))).value;
+                    shader.set(inputID, val[0], val[1], val[2], val[3]);
+                }
+            }
+        };
 
-        //public final static Setter gw = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+        public final static Setter gw = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(Vector3Attribute.Gw))
-        //            shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.Gw))).value);
-        //    }
-        //};
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Vector3Attribute.Gw))
+                    shader.set(inputID, ((Vector3Attribute) (combinedAttributes.get(Vector3Attribute.Gw))).value);
+            }
+        };
 
-        //public final static Setter gwmat3 = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+        public final static Setter gwmat3 = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(Matrix3Attribute.Gwmat3))
-        //            shader.set(inputID, ((Matrix3Attribute) (combinedAttributes.get(Matrix3Attribute.Gwmat3))).value);
-        //    }
-        //};
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(Matrix3Attribute.Gwmat3))
+                    shader.set(inputID, ((Matrix3Attribute) (combinedAttributes.get(Matrix3Attribute.Gwmat3))).value);
+            }
+        };
 
         public final static Setter ts = new Setter() {
             @Override
@@ -509,23 +507,23 @@ public class AtmosphereShader extends BaseIntShader {
 
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                if (combinedAttributes.has(FloatExtAttribute.Ts))
-                    shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Ts))).value);
+                if (combinedAttributes.has(FloatAttribute.Ts))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Ts))).value);
             }
         };
 
-        //public final static Setter omgw = new Setter() {
-        //    @Override
-        //    public boolean isGlobal(BaseIntShader shader, int inputID) {
-        //        return false;
-        //    }
+        public final static Setter omgw = new Setter() {
+            @Override
+            public boolean isGlobal(BaseIntShader shader, int inputID) {
+                return false;
+            }
 
-        //    @Override
-        //    public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-        //        if (combinedAttributes.has(FloatExtAttribute.Omgw))
-        //            shader.set(inputID, ((FloatExtAttribute) (combinedAttributes.get(FloatExtAttribute.Omgw))).value);
-        //    }
-        //};
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(FloatAttribute.Omgw))
+                    shader.set(inputID, ((FloatAttribute) (combinedAttributes.get(FloatAttribute.Omgw))).value);
+            }
+        };
 
     }
 
@@ -545,7 +543,7 @@ public class AtmosphereShader extends BaseIntShader {
         return defaultFragmentShader;
     }
 
-    protected static long implementedFlags = BlendingAttribute.Type | TextureAttribute.Diffuse | ColorAttribute.Diffuse | ColorAttribute.Specular | FloatAttribute.Shininess;
+    protected static Bits implementedFlags = Bits.indexes(BlendingAttribute.Type, TextureAttribute.Diffuse, ColorAttribute.Diffuse, ColorAttribute.Specular, FloatAttribute.Shininess);
 
     /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
     @Deprecated
@@ -594,20 +592,20 @@ public class AtmosphereShader extends BaseIntShader {
     public final int u_vc;
     public final int u_velDir;
     // Gravitational waves
-    //public final int u_hterms;
-    //public final int u_gw;
-    //public final int u_gwmat3;
+    public final int u_hterms;
+    public final int u_gw;
+    public final int u_gwmat3;
     public final int u_ts;
-    //public final int u_omgw;
+    public final int u_omgw;
 
     /** The renderable used to create this shader, invalid after the call to init */
     private IntRenderable renderable;
     /** The attributes that this shader supports */
-    protected final long attributesMask;
+    protected final Bits attributesMask;
     private final long vertexMask;
     protected final Config config;
     /** Material attributes which are not required but always supported. */
-    private final static long optionalAttributes = IntAttribute.CullFace | DepthTestAttribute.Type;
+    private final static Bits optionalAttributes = Bits.indexes(IntAttribute.CullFace, DepthTestAttribute.Type);
 
     public AtmosphereShader(final IntRenderable renderable, final Config config) {
         this(renderable, config, createPrefix(renderable));
@@ -626,10 +624,10 @@ public class AtmosphereShader extends BaseIntShader {
         this.config = config;
         this.program = shaderProgram;
         this.renderable = renderable;
-        attributesMask = attributes.getMask() | optionalAttributes;
+        attributesMask = attributes.getMask().copy().or(optionalAttributes);
         vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked();
 
-        if (!config.ignoreUnimplemented && (implementedFlags & attributesMask) != attributesMask)
+        if (!config.ignoreUnimplemented && (!implementedFlags.copy().or(attributesMask).equals(attributesMask)))
             throw new GdxRuntimeException("Some attributes not implemented yet (" + attributesMask + ")");
 
         // Global uniforms
@@ -671,11 +669,11 @@ public class AtmosphereShader extends BaseIntShader {
         u_vc = register(Inputs.vc, Setters.vc);
         u_velDir = register(Inputs.velDir, Setters.velDir);
 
-        //u_hterms = register(Inputs.hterms, Setters.hterms);
-        //u_gw = register(Inputs.gw, Setters.gw);
-        //u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
+        u_hterms = register(Inputs.hterms, Setters.hterms);
+        u_gw = register(Inputs.gw, Setters.gw);
+        u_gwmat3 = register(Inputs.gwmat3, Setters.gwmat3);
         u_ts = register(Inputs.ts, Setters.ts);
-        //u_omgw = register(Inputs.omgw, Setters.omgw);
+        u_omgw = register(Inputs.omgw, Setters.omgw);
 
     }
 
@@ -700,34 +698,33 @@ public class AtmosphereShader extends BaseIntShader {
         return tmpAttributes;
     }
 
-    private static final long combineAttributeMasks(final IntRenderable renderable) {
-        long mask = 0;
+    private static final Bits combineAttributeMasks(final IntRenderable renderable) {
+        Bits mask = Bits.empty();
         if (renderable.environment != null)
-            mask |= renderable.environment.getMask();
+            mask.or(renderable.environment.getMask());
         if (renderable.material != null)
-            mask |= renderable.material.getMask();
+            mask.or(renderable.material.getMask());
         return mask;
     }
 
     public static String createPrefix(final IntRenderable renderable) {
         final Attributes attributes = combineAttributes(renderable);
         String prefix = "";
-        final long attributesMask = attributes.getMask();
-        if ((attributesMask & AtmosphereAttribute.KmESun) == AtmosphereAttribute.KmESun)
+        if (attributes.has(AtmosphereAttribute.KmESun))
             prefix += "#define atmosphericScattering\n";
         // Atmosphere ground only if camera height is set
-        if ((attributesMask & FloatExtAttribute.Vc) == FloatExtAttribute.Vc)
+        if (attributes.has(FloatAttribute.Vc))
             prefix += "#define relativisticEffects\n";
         // Gravitational waves
-        //if ((attributesMask & FloatExtAttribute.Omgw) == FloatExtAttribute.Omgw)
-        //    prefix += "#define gravitationalWaves\n";
+        if (attributes.has(FloatAttribute.Omgw))
+            prefix += "#define gravitationalWaves\n";
         return prefix;
     }
 
     @Override
     public boolean canRender(final IntRenderable renderable) {
-        final long renderableMask = combineAttributeMasks(renderable);
-        return (attributesMask == (renderableMask | optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked());
+        final Bits renderableMask = combineAttributeMasks(renderable);
+        return attributesMask.equals(renderableMask.or(optionalAttributes)) && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMaskWithSizePacked());
     }
 
     @Override
@@ -787,12 +784,12 @@ public class AtmosphereShader extends BaseIntShader {
 
         currentMaterial = renderable.material;
         for (final Attribute attr : currentMaterial) {
-            final long t = attr.type;
+            final int t = attr.index;
             if (BlendingAttribute.is(t)) {
                 context.setBlending(true, ((BlendingAttribute) attr).sourceFunction, ((BlendingAttribute) attr).destFunction);
-            } else if ((t & IntAttribute.CullFace) == IntAttribute.CullFace)
+            } else if (attr.has(IntAttribute.CullFace))
                 cullFace = ((IntAttribute) attr).value;
-            else if ((t & DepthTestAttribute.Type) == DepthTestAttribute.Type) {
+            else if (attr.has(DepthTestAttribute.Type)) {
                 DepthTestAttribute dta = (DepthTestAttribute) attr;
                 depthFunc = dta.depthFunc;
                 depthRangeNear = dta.depthRangeNear;

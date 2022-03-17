@@ -32,7 +32,7 @@ float luma(vec3 color){
 
 void main(void) {
     float g2 = g * g;
-    float fCos = dot (v3LightPos, v_direction) / length (v_direction);
+    float fCos = dot (-v3LightPos, v_direction) / length (v_direction);
     float fCos2 = fCos * fCos;
     float fRayleighPhase = 0.75 + 0.75 * fCos2;
     float fMiePhase = 1.5 * ((1.0 - g2) / (2.0 + g2)) * (1.0 + fCos2) / pow (1.0 + g2 - 2.0 * g * fCos, 1.5);

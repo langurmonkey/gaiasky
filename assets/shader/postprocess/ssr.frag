@@ -54,7 +54,7 @@ int sampleCount = 4;
 #define M_TO_U 1.0e-9
 #define PC_TO_U 3.08567758149137e7
 
-#define RAY_STEP M_TO_U * 0.3
+#define RAY_STEP M_TO_U * 0.1
 #define DIST_BIAS M_TO_U * 0.005
 
 #include shader/lib_logdepthbuff.glsl
@@ -198,6 +198,6 @@ void main(void) {
     }
     // View normal buffer
     //fragColor = vec4(texture(u_texture2, v_texCoords).xyz, 1.0);
-    // View reflection mask (roughness)
-    //fragColor = vec4(vec3(roughness), 1.0);
+    // View reflection mask
+    //fragColor = vec4(maskColor, 1.0);
 }

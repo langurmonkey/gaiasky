@@ -6,9 +6,9 @@
 package gaiasky.util;
 
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Material;
 import gaiasky.util.gdx.IntMeshPartBuilder.VertexInfo;
 import gaiasky.util.gdx.IntModelBuilder;
+import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.model.IntModel;
 
 import java.util.Collection;
@@ -27,8 +27,7 @@ public class ModelCache {
         mb = new IntModelBuilder();
     }
 
-    public Pair<IntModel, Map<String, Material>> getModel(String shape, Map<String, Object> params, int attributes, int primitiveType) {
-
+    public Pair<IntModel, Map<String, Material>> getModel(String shape, Map<String, Object> params, Bits attributes, int primitiveType) {
         String key = getKey(shape, params, attributes);
         IntModel model = null;
         Map<String, Material> materials = new HashMap<>();
@@ -183,9 +182,9 @@ public class ModelCache {
                 boolean sph = params.containsKey("sphere-in-ring") ? (Boolean) params.get("sphere-in-ring") : true;
 
                 if (sph) {
-                    model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+                    model = ModelCache.cache.mb.createSphereRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, attributes);
                 } else {
-                    model = ModelCache.cache.mb.createRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, Usage.Position | Usage.Normal | Usage.TextureCoordinates);
+                    model = ModelCache.cache.mb.createRing(1, quality, quality, innerRad, outerRad, divisions, primitiveType, mat, ringMat, attributes);
                 }
                 break;
             case "cone":
@@ -224,7 +223,7 @@ public class ModelCache {
         return new Pair<>(model, materials);
     }
 
-    private String getKey(String shape, Map<String, Object> params, int attributes) {
+    private String getKey(String shape, Map<String, Object> params, Bits attributes) {
         StringBuilder key = new StringBuilder(shape + "-" + attributes);
         Set<String> keys = params.keySet();
         Object[] par = keys.toArray();

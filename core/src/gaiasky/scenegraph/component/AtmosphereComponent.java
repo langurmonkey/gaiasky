@@ -7,21 +7,22 @@ package gaiasky.scenegraph.component;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import gaiasky.scenegraph.Planet;
 import gaiasky.scenegraph.SceneGraphNode;
+import gaiasky.util.Bits;
 import gaiasky.util.Constants;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.ModelCache;
 import gaiasky.util.Pair;
 import gaiasky.util.coord.Coordinates;
+import gaiasky.util.gdx.shader.Material;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
-import gaiasky.util.gdx.shader.AtmosphereAttribute;
-import gaiasky.util.gdx.shader.Vector3Attribute;
+import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
 
@@ -67,7 +68,7 @@ public class AtmosphereComponent extends NamedComponent {
 
         Material atmMat;
         if(mc.instance == null) {
-            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal, GL20.GL_TRIANGLES);
+            Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal), GL20.GL_TRIANGLES);
             IntModel atmosphereModel = pair.getFirst();
             atmMat = pair.getSecond().get("base");
 
@@ -307,6 +308,10 @@ public class AtmosphereComponent extends NamedComponent {
         log.debug("eSun: " + m_eSun);
         log.debug("Fog density: " + fogDensity);
         log.debug("Fog color: " + fogColor);
+    }
+
+    @Override
+    public void dispose() {
     }
 }
 

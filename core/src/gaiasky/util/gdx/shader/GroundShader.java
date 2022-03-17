@@ -5,8 +5,11 @@
 
 package gaiasky.util.gdx.shader;
 
-import com.badlogic.gdx.graphics.g3d.Attributes;
+import gaiasky.util.Bits;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.attribute.AtmosphereAttribute;
+import gaiasky.util.gdx.shader.attribute.Attributes;
+import gaiasky.util.gdx.shader.attribute.Vector3Attribute;
 
 public class GroundShader extends RelativisticShader {
 
@@ -354,9 +357,9 @@ public class GroundShader extends RelativisticShader {
 
     public static String createPrefix(final IntRenderable renderable, final Config config) {
         String prefix = RelativisticShader.createPrefix(renderable, config);
-        final long mask = renderable.material.getMask();
+        final Bits mask = renderable.material.getMask();
         // Atmosphere ground only if camera height is set
-        if ((mask & AtmosphereAttribute.CameraHeight) == AtmosphereAttribute.CameraHeight)
+        if (mask.has(AtmosphereAttribute.CameraHeight))
             prefix += "#define atmosphereGround\n";
         return prefix;
     }

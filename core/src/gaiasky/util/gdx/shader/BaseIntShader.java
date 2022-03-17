@@ -22,7 +22,6 @@
 package gaiasky.util.gdx.shader;
 
 import com.badlogic.gdx.graphics.*;
-import com.badlogic.gdx.graphics.g3d.Attributes;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.g3d.utils.TextureDescriptor;
 import com.badlogic.gdx.math.Matrix3;
@@ -33,9 +32,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.IntArray;
 import com.badlogic.gdx.utils.IntIntMap;
+import gaiasky.util.Bits;
 import gaiasky.util.gdx.IntRenderable;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntMeshPart;
+import gaiasky.util.gdx.shader.attribute.Attribute;
+import gaiasky.util.gdx.shader.attribute.Attributes;
 
 /** @author Xoppa A BaseIntShader is a wrapper around a ExtShaderProgram that keeps track of the uniform and attribute locations. It does
  *         not manage the ShaderPogram, you are still responsible for disposing the ExtShaderProgram. */
@@ -68,34 +70,34 @@ public abstract class BaseIntShader implements IntShader {
 
 	public static class Uniform implements Validator {
 		public final String alias;
-		public final long materialMask;
-		public final long environmentMask;
-		public final long overallMask;
+		public final Bits materialMask;
+		public final Bits environmentMask;
+		public final Bits overallMask;
 
-		public Uniform (final String alias, final long materialMask, final long environmentMask, final long overallMask) {
+		public Uniform (final String alias, final Bits materialMask, final Bits environmentMask, final Bits overallMask) {
 			this.alias = alias;
 			this.materialMask = materialMask;
 			this.environmentMask = environmentMask;
 			this.overallMask = overallMask;
 		}
 
-		public Uniform (final String alias, final long materialMask, final long environmentMask) {
-			this(alias, materialMask, environmentMask, 0);
+		public Uniform (final String alias, final Bits materialMask, final Bits environmentMask) {
+			this(alias, materialMask, environmentMask, Bits.empty(128));
 		}
 
-		public Uniform (final String alias, final long overallMask) {
-			this(alias, 0, 0, overallMask);
+		public Uniform (final String alias, final int overallIndex) {
+			this(alias, Bits.empty(128), Bits.empty(128), Bits.indexes(overallIndex));
 		}
 
 		public Uniform (final String alias) {
-			this(alias, 0, 0);
+			this(alias, Bits.empty(128), Bits.empty(128));
 		}
 
 		public boolean validate (final BaseIntShader shader, final int inputID, final IntRenderable renderable) {
-			final long matFlags = (renderable != null && renderable.material != null) ? renderable.material.getMask() : 0;
-			final long envFlags = (renderable != null && renderable.environment != null) ? renderable.environment.getMask() : 0;
-			return ((matFlags & materialMask) == materialMask) && ((envFlags & environmentMask) == environmentMask)
-				&& (((matFlags | envFlags) & overallMask) == overallMask);
+			final Bits matFlags = (renderable != null && renderable.material != null) ? renderable.material.getMask() : Bits.empty();
+			final Bits envFlags = (renderable != null && renderable.environment != null) ? renderable.environment.getMask() : Bits.empty();
+			return ((matFlags.copy().and(materialMask)).equals(materialMask)) && ((envFlags.copy().and(environmentMask)).equals(environmentMask))
+				&& (((matFlags.copy().or(envFlags)).and(overallMask)).equals(overallMask));
 		}
 	}
 

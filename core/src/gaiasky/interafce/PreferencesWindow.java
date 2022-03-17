@@ -314,7 +314,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
                         OwnTextArea noticeHiRes = new OwnTextArea(infoString, skin, "info");
                         noticeHiRes.setDisabled(true);
                         noticeHiRes.setPrefRows(lines1 + 1);
-                        noticeHiRes.setWidth(taWidth);
+                        noticeHiRes.setWidth(600f);
                         noticeHiRes.clearListeners();
                         noticeHiResCell.setActor(noticeHiRes);
                     }
@@ -432,9 +432,7 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         graphics.add(graphicsQuality).left().padRight(pad10).padBottom(pad5);
         graphics.add(gqualityTooltip).left().padBottom(pad5).row();
         noticeHiResCell = graphics.add();
-        noticeHiResCell.colspan(2).left().row();
-        final Cell<Actor> noticeGraphicsCell = graphics.add((Actor) null);
-        noticeGraphicsCell.colspan(2).left().row();
+        noticeHiResCell.colspan(3).left().row();
         graphics.add(aaLabel).left().padRight(pad20).padBottom(pad5);
         graphics.add(aa).left().padRight(pad10).padBottom(pad5);
         graphics.add(aaTooltip).left().padBottom(pad5).row();

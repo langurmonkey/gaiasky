@@ -928,7 +928,9 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
                 double factor = cinematic ? 100 : 1;
                 counterAmount *= factor / ((focus.getDistToCamera() - focus.getRadius()) / focus.getRadius());
             }
-            friction.set(vel).nor().scl(-velocity * counterAmount * dt);
+            double scl = -velocity * counterAmount * dt;
+            if (Double.isFinite(scl))
+                friction.set(vel).nor().scl(scl);
         } else {
             friction.set(force).nor().scl(-forceLen * dt);
         }
@@ -1201,7 +1203,6 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
      * The speed scaling function.
      *
      * @param min The minimum speed.
-     *
      * @return The speed scaling.
      */
     public double speedScaling(double min) {
@@ -1683,7 +1684,7 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
         boolean modeFisheye = Settings.settings.postprocess.fisheye;
         boolean modeVR = Settings.settings.runtime.openVr;
 
-        if(modeStereoVR) {
+        if (modeStereoVR) {
             // No pointer guides or cross-hairs
             return;
         }
@@ -1702,14 +1703,13 @@ public class NaturalCamera extends AbstractCamera implements IObserver {
             shapeRenderer.end();
         }
 
-
         spriteBatch.begin();
 
         boolean decal = modeCubemap || modeStereo || modeFisheye || modeVR;
         float chScale = 1f;
-        if(modeCubemap) {
+        if (modeCubemap) {
             chScale = 4f;
-        } else if(modeFisheye) {
+        } else if (modeFisheye) {
             chScale = 2f;
         }
         // Mark home in ORANGE

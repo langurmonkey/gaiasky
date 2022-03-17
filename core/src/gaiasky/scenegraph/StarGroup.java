@@ -11,12 +11,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
-import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
-import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
@@ -45,8 +39,13 @@ import gaiasky.util.gdx.g2d.ExtSpriteBatch;
 import gaiasky.util.gdx.mesh.IntMesh;
 import gaiasky.util.gdx.model.IntModel;
 import gaiasky.util.gdx.model.IntModelInstance;
+import gaiasky.util.gdx.shader.Environment;
 import gaiasky.util.gdx.shader.ExtShaderProgram;
-import gaiasky.util.gdx.shader.FloatExtAttribute;
+import gaiasky.util.gdx.shader.Material;
+import gaiasky.util.gdx.shader.attribute.BlendingAttribute;
+import gaiasky.util.gdx.shader.attribute.ColorAttribute;
+import gaiasky.util.gdx.shader.attribute.FloatAttribute;
+import gaiasky.util.gdx.shader.attribute.TextureAttribute;
 import gaiasky.util.math.MathUtilsd;
 import gaiasky.util.math.Vector3b;
 import gaiasky.util.math.Vector3d;
@@ -141,7 +140,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         params.put("diameter", 1d);
         params.put("flip", false);
 
-        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Usage.Position | Usage.Normal | Usage.Tangent | Usage.BiNormal | Usage.TextureCoordinates, GL20.GL_TRIANGLES);
+        Pair<IntModel, Map<String, Material>> pair = ModelCache.cache.getModel("sphere", params, Bits.indexes(Usage.Position, Usage.Normal, Usage.Tangent, Usage.BiNormal, Usage.TextureCoordinates), GL20.GL_TRIANGLES);
         IntModel model = pair.getFirst();
         Material mat = pair.getSecond().get("base");
         mat.clear();
@@ -155,7 +154,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
         mc.initialize(null);
         mc.env = new Environment();
         mc.env.set(new ColorAttribute(ColorAttribute.AmbientLight, 1f, 1f, 1f, 1f));
-        mc.env.set(new FloatExtAttribute(FloatExtAttribute.Time, 0f));
+        mc.env.set(new FloatAttribute(FloatAttribute.Time, 0f));
         mc.instance = new IntModelInstance(model, modelTransform);
         // Relativistic effects
         if (Settings.settings.runtime.relativisticAberration)
@@ -378,7 +377,7 @@ public class StarGroup extends ParticleGroup implements ILineRenderable, IStarFo
                 mc.setTransparency(alpha * opacity);
                 float[] col = proximity.updating[0].col;
                 ((ColorAttribute) mc.env.get(ColorAttribute.AmbientLight)).color.set(col[0], col[1], col[2], 1f);
-                ((FloatAttribute) mc.env.get(FloatExtAttribute.Time)).value = (float) t;
+                ((FloatAttribute) mc.env.get(FloatAttribute.Time)).value = (float) t;
                 // Local transform
                 double variableScaling = getVariableSizeScaling(proximity.updating[0].index);
                 mc.instance.transform.idt().translate((float) proximity.updating[0].pos.x, (float) proximity.updating[0].pos.y, (float) proximity.updating[0].pos.z).scl((float) (getRadius(active[0]) * 2d * variableScaling));

@@ -21,10 +21,10 @@
 
 package gaiasky.util.gdx.model;
 
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.utils.ArrayMap;
 import gaiasky.util.gdx.IntRenderable;
+import gaiasky.util.gdx.shader.Material;
 
 /** A combination of {@link IntMeshPart} and {@link Material}, used to represent a {@link IntNode}'s graphical properties. A NodePart is
  * the smallest visible part of a {@link IntModel}, each NodePart implies a render call.
