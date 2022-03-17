@@ -7,8 +7,6 @@ package gaiasky.scenegraph;
 
 import com.badlogic.gdx.assets.AssetManager;
 import gaiasky.GaiaSky;
-import gaiasky.event.Event;
-import gaiasky.event.EventManager;
 import gaiasky.render.IFadeObject;
 import gaiasky.scenegraph.camera.ICamera;
 import gaiasky.util.CatalogInfo;
@@ -115,7 +113,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
         translation.set(parentTransform);
-        Vector3d aux = aux3d1.get();
+        Vector3d aux = D31.get();
 
         if (this.position == null) {
             this.currentDistance = aux.set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();
@@ -139,7 +137,7 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
-        this.distToCamera = this.position == null ? pos.dst(camera.getPos(), aux3b1.get()).doubleValue() : this.position.distToCamera;
+        this.distToCamera = this.position == null ? pos.dst(camera.getPos(), B31.get()).doubleValue() : this.position.distToCamera;
 
         // Opacity
         updateOpacity();
@@ -252,7 +250,6 @@ public class FadeNode extends SceneGraphNode implements IFadeObject {
         this.catalogInfo = new CatalogInfo(name, desc, source, type, size, this);
         this.catalogInfo.sizeBytes = sizeBytes;
         this.catalogInfo.nParticles = nObjects;
-        EventManager.publish(Event.CATALOG_ADD, this, this.catalogInfo, false);
     }
 
     /**

@@ -128,7 +128,7 @@ public class BackgroundModel extends FadeNode implements IModelRenderable, I3DTe
             render2DLabel(batch, shader, rc, sys.fontDistanceField, camera, text(), labelPosition.x.floatValue(), labelPosition.y.floatValue(), labelPosition.z.floatValue());
         } else {
             // 3D distance font
-            Vector3d pos = aux3d1.get();
+            Vector3d pos = D31.get();
             textPosition(camera, pos);
             shader.setUniformf("u_viewAngle", 90f);
             shader.setUniformf("u_viewAnglePow", 1);

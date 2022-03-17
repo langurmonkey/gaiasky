@@ -20,8 +20,8 @@ import gaiasky.data.orbit.IOrbitDataProvider;
 import gaiasky.data.orbit.OrbitFileDataProvider;
 import gaiasky.data.orbit.OrbitalParametersProvider;
 import gaiasky.data.util.PointCloudData;
-import gaiasky.event.EventManager;
 import gaiasky.event.Event;
+import gaiasky.event.EventManager;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
 import gaiasky.render.RenderingContext;
@@ -168,31 +168,39 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             params.orbit = this;
         }
 
-        if (model == OrientationModel.EXTRASOLAR_SYSTEM && transformFunction == null && parent != null) {
-            // Compute new transform function from the orbit's parent position
-            Vector3b barycenter = aux3b1.get();
-            if (parent.coordinates != null) {
-                parent.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), barycenter);
-            } else {
-                parent.getAbsolutePosition(barycenter);
-            }
-
-            // Up
-            Vector3b y = aux3b2.get().set(barycenter).scl(-1).nor();
-            Vector3d yd = y.put(aux3d1.get());
-            // Towards north - intersect y with plane
-            Vector3d zd = aux3d2.get();
-            Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(-1, 0, 0), zd);
-            zd.sub(barycenter).nor();
-            //zd.set(yd).crs(0, 1, 0).nor();
-
-            // Orthogonal to ZY, right-hand system
-            Vector3d xd = aux3d3.get().set(yd).crs(zd);
-
-            transformFunction = Matrix4d.changeOfBasis(xd, yd, zd);
-        }
+        initializeTransformMatrix();
 
         isInOrbitalElementsGroup = this.parent != null && this.parent instanceof OrbitalElementsGroup;
+    }
+
+    public void computeExtrasolarSystemTransformMatrix() {
+        // Compute new transform function from the orbit's parent position
+        Vector3b barycenter = B31.get();
+        if (parent.coordinates != null) {
+            parent.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), barycenter);
+        } else {
+            parent.getAbsolutePosition(barycenter);
+        }
+
+        // Up
+        Vector3b y = B32.get().set(barycenter).scl(1).nor();
+        Vector3d yd = y.put(D31.get());
+        // Towards north - intersect y with plane
+        Vector3d zd = D32.get();
+        Intersectord.lineIntersection(barycenter.put(new Vector3d()), (new Vector3d(yd)), new Vector3d(0, 0, 0), new Vector3d(0, 1, 0), zd);
+        zd.sub(barycenter).nor();
+        //zd.set(yd).crs(0, 1, 0).nor();
+
+        // Orthogonal to ZY, right-hand system
+        Vector3d xd = D33.get().set(yd).crs(zd);
+
+        transformFunction = Matrix4d.changeOfBasis(zd, yd, xd);
+    }
+
+    public void initializeTransformMatrix() {
+        if (model == OrientationModel.EXTRASOLAR_SYSTEM && transformFunction == null && parent != null) {
+            computeExtrasolarSystemTransformMatrix();
+        }
     }
 
     public void setPointCloudData(PointCloudData pcd) {
@@ -210,11 +218,13 @@ public class Orbit extends Polyline implements I3DTextRenderable {
             }
         }
         mustRefresh = providerClass != null && providerClass.equals(OrbitFileDataProvider.class) && body != null && body instanceof Planet && oc.period > 0;
-        orbitTrail = orbitTrail |  mustRefresh | (providerClass != null && providerClass.equals(OrbitalParametersProvider.class));
+        orbitTrail = orbitTrail | mustRefresh | (providerClass != null && providerClass.equals(OrbitalParametersProvider.class));
     }
 
     @Override
     public void updateLocal(ITimeFrameProvider time, ICamera camera) {
+        if (model == OrientationModel.EXTRASOLAR_SYSTEM)
+            computeExtrasolarSystemTransformMatrix();
         super.updateLocal(time, camera);
         // Completion
         if (pointCloudData != null) {
@@ -236,10 +246,12 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         translation.getMatrix(localTransformD);
         if (newMethod) {
             if (transformFunction != null) {
-                localTransformD.mul(transformFunction).rotate(0, 1, 0, 90);
+                localTransformD.mul(transformFunction);
+                localTransformD.rotate(0, 1, 0, 90);
             }
             if (parent.getOrientation() != null) {
-                localTransformD.mul(parent.getOrientation()).rotate(0, 1, 0, 90);
+                localTransformD.mul(parent.getOrientation());
+                localTransformD.rotate(0, 1, 0, 90);
             }
         } else {
             if (transformFunction == null && parent.orientation != null)
@@ -353,7 +365,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
         double len = out.len();
         out.scl(0.9f);
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();
@@ -379,10 +391,10 @@ public class Orbit extends Polyline implements I3DTextRenderable {
      */
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
-            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(aux3d1.get()));
+            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(D31.get()));
         } else {
             // 3D distance font
-            Vector3d pos = aux3d3.get();
+            Vector3d pos = D33.get();
             double dist = textPosition2(camera, pos);
             shader.setUniformf("u_viewAngle", 2f);
             shader.setUniformf("u_viewAnglePow", 1f);
@@ -415,7 +427,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
 
             boolean reverse = GaiaSky.instance.time.getWarpFactor() < 0;
 
-            Vector3d bodyPos = aux3d1.get().setZero();
+            Vector3d bodyPos = D31.get().setZero();
             if (orbitTrail) {
                 float top = alpha;
                 float bottom = 0f;
@@ -625,6 +637,7 @@ public class Orbit extends Polyline implements I3DTextRenderable {
     public void setTrail(Boolean trail) {
         this.orbitTrail = trail;
     }
+
     public void setOrbittrail(Boolean trail) {
         this.orbitTrail = trail;
     }

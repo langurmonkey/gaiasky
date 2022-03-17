@@ -152,9 +152,9 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
         // Update pos, local transform
         this.translation.add(pos);
 
-        this.localTransform.idt().translate(this.translation.put(aux3f1.get())).scl(this.size);
+        this.localTransform.idt().translate(this.translation.put(F31.get())).scl(this.size);
 
-        Vector3d aux = aux3d1.get();
+        Vector3d aux = D31.get();
         this.distToCamera = (float) aux.set(translation).len();
         this.viewAngle = (float) FastMath.atan(size / distToCamera);
         this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
@@ -208,7 +208,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", (float) this.viewAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -250,7 +250,7 @@ public class ShapeObject extends SceneGraphNode implements IFocus, IModelRendera
         out.clamp(0, len - getRadius()).scl(0.9f);
         out.x += getRadius() * 0.5;
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();

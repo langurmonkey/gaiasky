@@ -20,7 +20,7 @@ public class OrbitComponent {
     public String source;
     /** Orbital period in days **/
     public double period;
-    /** Base epoch **/
+    /** Base epoch in julian days **/
     public double epoch;
     /** Semi major axis of the ellipse, a in Km. **/
     public double semimajoraxis;

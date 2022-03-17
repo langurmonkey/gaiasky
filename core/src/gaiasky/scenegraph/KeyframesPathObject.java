@@ -378,13 +378,13 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
         // Update length of orientations
         for (VertsObject vo : orientations) {
-            Vector3d p0 = aux3d1.get();
-            Vector3d p1 = aux3d2.get();
+            Vector3d p0 = D31.get();
+            Vector3d p1 = D32.get();
             PointCloudData p = vo.pointCloudData;
             p0.set(p.x.get(0), p.y.get(0), p.z.get(0));
             p1.set(p.x.get(1), p.y.get(1), p.z.get(1));
 
-            Vector3d c = aux3d3.get().set(camera.getPos());
+            Vector3d c = D33.get().set(camera.getPos());
             double len = Math.max(1e-9, Math.atan(0.03) * c.dst(p0));
 
             Vector3d v = c.set(p1).sub(p0).nor().scl(len);
@@ -399,8 +399,8 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     public IFocus select(int screenX, int screenY, int minPixDist, NaturalCamera camera) {
 
-        Vector3 pos = aux3f1.get();
-        Vector3d aux = aux3d1.get();
+        Vector3 pos = F31.get();
+        Vector3d aux = D31.get();
         for (Keyframe kf : keyframes) {
             Vector3d posd = aux.set(kf.pos).add(camera.getInversePos());
             pos.set(posd.valuesf());
@@ -518,10 +518,10 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     public boolean moveSelection(int screenX, int screenY, NaturalCamera camera) {
         if (selected != null) {
-            double originalDist = aux3d1.get().set(selected.pos).add(camera.getInversePos()).len();
-            Vector3 aux = aux3f1.get().set(screenX, screenY, 0.5f);
+            double originalDist = D31.get().set(selected.pos).add(camera.getInversePos()).len();
+            Vector3 aux = F31.get().set(screenX, screenY, 0.5f);
             camera.getCamera().unproject(aux);
-            Vector3d newLocation = aux3d2.get().set(aux).setLength(originalDist);
+            Vector3d newLocation = D32.get().set(aux).setLength(originalDist);
             selected.pos.set(newLocation).add(camera.getPos());
             selectedKnot.setPoints(selected.pos.values());
             refreshData();
@@ -550,7 +550,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
 
     public boolean rotateAroundCrs(double dx, double dy, NaturalCamera camera) {
         if (selected != null) {
-            Vector3d crs = aux3d1.get().set(selected.dir).crs(selected.up);
+            Vector3d crs = D31.get().set(selected.dir).crs(selected.up);
             selected.dir.rotate(crs, (float) ((dx + dy) * 500d));
             selected.up.rotate(crs, (float) ((dx + dy) * 500d));
             refreshOrientations();
@@ -616,9 +616,9 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     }
 
     private void renderKeyframeLabel(Keyframe kf, ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         getTextPosition(camera, pos, kf);
-        float distToCam = (float) aux3d2.get().set(kf.pos).add(camera.getInversePos()).len();
+        float distToCam = (float) D32.get().set(kf.pos).add(camera.getInversePos()).len();
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1);
         shader.setUniformf("u_thOverFactor", 1);
@@ -659,7 +659,7 @@ public class KeyframesPathObject extends VertsObject implements I3DTextRenderabl
     public void getTextPosition(ICamera cam, Vector3d out, Keyframe kf) {
         kf.pos.put(out).add(cam.getInversePos());
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();

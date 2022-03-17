@@ -124,7 +124,7 @@ public class Invisible extends CelestialBody {
 
     protected void forceUpdateLocalValues(ITimeFrameProvider time) {
         if (time.getHdiff() != 0) {
-            Vector3d aux3 = aux3d1.get();
+            Vector3d aux3 = D31.get();
             // Load the equatorial cartesian coordinates of the object into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 

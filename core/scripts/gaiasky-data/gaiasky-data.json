@@ -60,9 +60,9 @@
       "key" : "default-data",
       "name": "Base data pack",
       "type": "data-pack",
-      "version": 28,
+      "version": 29,
       "mingsversion": 30200,
-      "size": 68279525,
+      "size": 77433617,
       "nobjects": 53,
       "check": "data-main.json",
       "data": [
@@ -109,13 +109,17 @@
         "tex/skybox/cmwb-planck-med",
         "tex/skybox/milkyway-med",
         "tex/skybox/milkyway-low",
-        "tex/skybox/debug"
+        "tex/skybox/debug",
+        "tex/cubemap/earth-day-low",
+        "tex/cubemap/earth-day-med",
+        "tex/cubemap/earth-cloud-low",
+        "tex/cubemap/earth-cloud-med"
       ],
-      "sha256": "45210fb0a7bb68ad5a089d7888b991b9b945c0b7e2a631da5a3951df0380101c",
-      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC11 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
-      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC11+.\\n- Update skyboxes to use cubemaps.\\n- Grids and other background objects have a size of 1.\\n- New cube reflection debug object.",
+      "sha256": "57ec1ef5d827075a565f63594e9ce2cc04f361f8b3ae6b3c4410346610a9159f",
+      "description": "Required data pack.\\nFor Gaia Sky 3.2.0-RC12 and above. Contains the solar system planets and moons, minor planets, satellites, orbits, constellations, the Milky Way, grids, locations and other important objects. Without this data pack Gaia Sky won't start.",
+      "releasenotes": "- WARN: The milky way in this pack will only work with 3.2.0-RC12+.\\n- Add diffuse cubemap textures for Earth day and cloud layers.\\n- Remove old UV equirectangular Earth day and cloud textures.\\n- Adjust Saturn's shadow values to reduce shadow acne.",
       "link": "@mirror-url@basedata",
-      "file": "@mirror-url@basedata/v028_20220314/basedata.tar.gz"
+      "file": "@mirror-url@basedata/v029_20220316/basedata.tar.gz"
     },
     {
       "name": "hi-res-textures",
@@ -138,11 +142,12 @@
       "file": "@mirror-url@tex/005_20200923/hi-res-texture-pack.tar.gz"
     },
     {
-      "name": "hi-res-textures",
+      "key": "hi-res-textures",
+      "name": "High resolution textures",
       "type": "texture-pack",
-      "version": 7,
+      "version": 8,
       "mingsversion": 30200,
-      "size": 251953599,
+      "size": 258264472,
       "nobjects": 74,
       "check": "hi-res-tex-desc.json",
       "data": [
@@ -151,13 +156,16 @@
         "tex/base/*-ultra.jpg",
         "tex/base/*-high.png",
         "tex/base/*-ultra.png",
-        "tex/skybox/*-high"
+        "tex/skybox/*-high",
+        "tex/skybox/*-ultra",
+        "tex/cubemap/*-high",
+        "tex/cubemap/*-ultra"
       ],
-      "description": "High resolution textures - High resolution texture pack including some 4K and 8K textures for planet surfaces and asteroids",
-      "releasenotes": "- Add high-resolution Milky Way skybox.\n- Add high-resolution cosmic microwave background (Planck) skybox.\n- Remove high resolution Milky Way and Planck equirectangular textures.",
-      "sha256": "24e0ee48d62e31be1cd4c4f8dee5c1dce7f64d47cfe1d79449d3abff734d2170",
+      "description": "High resolution texture pack including some 4K and 8K textures and cubemaps for planet surfaces and asteroids",
+      "releasenotes": "- Add high-resolution Earth day and cloud cubemaps.\\n- Remove Earth day and cloud equirectangular textures.",
+      "sha256": "d880a8946e68d1dbfee386634548099201741883fce23db34b8dc677e3d1e49d",
       "link": "@mirror-url@tex",
-      "file": "@mirror-url@tex/007_20220314/hi-res-texture-pack.tar.gz"
+      "file": "@mirror-url@tex/008_20220316/hi-res-texture-pack.tar.gz"
     },
     {
       "name": "catalog-edr3-default",

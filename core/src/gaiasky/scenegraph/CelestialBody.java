@@ -98,7 +98,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         compalpha = alpha;
 
         float size = getFuzzyRenderSize(camera);
-        shader.setUniformf("u_pos", translation.put(aux3f1.get()));
+        shader.setUniformf("u_pos", translation.put(F31.get()));
         shader.setUniformf("u_size", size);
 
         shader.setUniformf("u_color", ccPale[0], ccPale[1], ccPale[2], alpha * opacity);
@@ -135,10 +135,10 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         if (camera.getCurrent() instanceof FovCamera) {
-            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(aux3d1.get()));
+            render2DLabel(batch, shader, rc, sys.font2d, camera, text(), pos.put(D31.get()));
         } else {
             // 3D distance font
-            Vector3d pos = aux3d1.get();
+            Vector3d pos = D31.get();
             textPosition(camera, pos);
             shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) viewAngleApparent);
             shader.setUniformf("u_viewAnglePow", forceLabel ? 1f : getViewAnglePow());
@@ -275,7 +275,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
         double len = out.len();
         out.clamp(0, len - getRadius()).scl(0.9f);
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();
@@ -333,8 +333,8 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
-            Vector3 pos = aux3f1.get();
-            Vector3b aux = aux3b1.get();
+            Vector3 pos = F31.get();
+            Vector3b aux = B31.get();
             Vector3b posd = getAbsolutePosition(aux).add(camera.getInversePos());
             pos.set(posd.valuesf());
 
@@ -372,7 +372,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
-            Vector3b aux = aux3b1.get();
+            Vector3b aux = B31.get();
             Vector3b posb = getAbsolutePosition(aux).add(camera.getInversePos());
 
             if (camera.direction.dot(posb) > 0) {
@@ -380,7 +380,7 @@ public abstract class CelestialBody extends SceneGraphNode implements I3DTextRen
                 // Diminish the size of the star
                 // when we are close by
                 double dist = posb.lend();
-                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.put(aux3d1.get()));
+                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.put(D31.get()));
                 double value = distToLine / dist;
 
                 if (value < 0.01) {

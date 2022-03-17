@@ -43,7 +43,7 @@ public class GenericCatalog extends FadeNode {
 
     @Override
     public void initialize() {
-        initialize(true, true);
+        initialize(provider != null && !provider.isBlank(), true);
     }
 
     public void initialize(boolean dataLoad, boolean createCatalogInfo) {
@@ -73,8 +73,10 @@ public class GenericCatalog extends FadeNode {
 
             // Create catalog info
             if (createCatalogInfo) {
-                CatalogInfo ci = new CatalogInfo(dsName, description, null, CatalogInfoSource.INTERNAL, 1f, this);
-                EventManager.publish(Event.CATALOG_ADD, this, ci, false);
+                if(catalogInfo == null) {
+                    catalogInfo = new CatalogInfo(dsName, description, null, CatalogInfoSource.INTERNAL, 1f, this);
+                }
+                EventManager.publish(Event.CATALOG_ADD, this, catalogInfo, false);
             }
         } catch (Exception e) {
             Logger.getLogger(this.getClass()).error(e);

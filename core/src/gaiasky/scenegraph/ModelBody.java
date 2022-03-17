@@ -147,7 +147,7 @@ public abstract class ModelBody extends CelestialBody {
                             float[] col = nr.getColor();
                             double closestDist = nr.getClosestDistToCamera();
                             float colFactor = (float) Math.pow(MathUtilsd.lint(closestDist, LIGHT_X0, LIGHT_X1, 1.0, 0.0), 2.0);
-                            mc.directional(i).direction.sub(nr.pos.put(aux3f1.get()));
+                            mc.directional(i).direction.sub(nr.pos.put(F31.get()));
                             mc.directional(i).color.set(col[0] * colFactor, col[1] * colFactor, col[2] * colFactor, colFactor);
                         } else {
                             Vector3b campos = camera.getPos();
@@ -260,7 +260,7 @@ public abstract class ModelBody extends CelestialBody {
 
         float size = getFuzzyRenderSize(camera);
 
-        Vector3 bbPos = translation.put(aux3f1.get());
+        Vector3 bbPos = translation.put(F31.get());
         // Get it a tad closer to the camera to prevent occlusion with orbit
         float l = bbPos.len();
         bbPos.nor().scl(l * 0.99f);
@@ -364,8 +364,8 @@ public abstract class ModelBody extends CelestialBody {
      * @return The cartesian position above the surface of this body
      */
     public Vector3b getPositionAboveSurface(double longitude, double latitude, double distance, Vector3b out) {
-        Vector3d aux1 = aux3d1.get();
-        Vector3d aux2 = aux3d2.get();
+        Vector3d aux1 = D31.get();
+        Vector3d aux2 = D32.get();
 
         // Lon/Lat/Radius
         longitude *= MathUtilsd.degRad;
@@ -394,7 +394,7 @@ public abstract class ModelBody extends CelestialBody {
     @Override
     public double getHeight(Vector3b camPos, boolean useFuturePosition) {
         if (useFuturePosition) {
-            Vector3b nextPos = getPredictedPosition(aux3b3.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
+            Vector3b nextPos = getPredictedPosition(B33.get(), GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
             return getHeight(camPos, nextPos);
         } else {
             return getHeight(camPos, null);
@@ -407,11 +407,11 @@ public abstract class ModelBody extends CelestialBody {
         double height = 0;
         if (mc != null && mc.mtc != null && mc.mtc.heightMap != null) {
             double dCam;
-            Vector3b cart = aux3b1.get();
+            Vector3b cart = B31.get();
             if (nextPos != null) {
                 cart.set(nextPos);
                 getPredictedPosition(cart, GaiaSky.instance.time, GaiaSky.instance.getICamera(), false);
-                dCam = aux3d2.get().set(camPos).sub(cart).len();
+                dCam = D32.get().set(camPos).sub(cart).len();
             } else {
                 getAbsolutePosition(cart);
                 dCam = distToCamera;
@@ -430,7 +430,7 @@ public abstract class ModelBody extends CelestialBody {
                 matauxd.set(mataux.getValues());
                 cart.mul(matauxd);
 
-                Vector3d sph = aux3d2.get();
+                Vector3d sph = D32.get();
                 Coordinates.cartesianToSpherical(cart, sph);
 
                 double u = (((sph.x * Nature.TO_DEG) + 270.0) % 360.0) / 360.0;
@@ -506,10 +506,10 @@ public abstract class ModelBody extends CelestialBody {
             if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
                 super.addHit(screenX, screenY, w, h, minPixDist, camera, hits);
             } else {
-                Vector3 auxf = aux3f1.get();
-                Vector3d aux1d = aux3d1.get();
-                Vector3d aux2d = aux3d2.get();
-                Vector3d aux3d = aux3d3.get();
+                Vector3 auxf = F31.get();
+                Vector3d aux1d = D31.get();
+                Vector3d aux2d = D32.get();
+                Vector3d aux3d = D33.get();
 
                 // aux1d contains the position of the body in the camera ref sys
                 aux1d.set(translation);
@@ -542,7 +542,7 @@ public abstract class ModelBody extends CelestialBody {
             if (viewAngleApparent < THRESHOLD_QUAD() * camera.getFovFactor()) {
                 super.addHit(p0, p1, camera, hits);
             } else {
-                Vector3d aux1d = aux3d1.get();
+                Vector3d aux1d = D31.get();
 
                 // aux1d contains the position of the body in the camera ref sys
                 aux1d.set(translation);

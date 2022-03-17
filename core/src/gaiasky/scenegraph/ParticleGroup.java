@@ -575,7 +575,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
      * @param camera The current camera
      */
     public void updateFocus(ICamera camera) {
-        Vector3d aux = aux3d1.get().set(this.focusPosition);
+        Vector3d aux = D31.get().set(this.focusPosition);
         this.focusDistToCamera = aux.sub(camera.getPos()).len();
         this.focusSize = getFocusSize();
         this.focusViewAngle = (float) ((getRadius() / this.focusDistToCamera) / camera.getFovFactor());
@@ -599,7 +599,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         // Dataset label
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -613,11 +613,11 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             for (int i = 0; i < Math.min(50, pointData.size()); i++) {
                 IParticleRecord pb = pointData.get(active[i]);
                 if (pb.names() != null) {
-                    Vector3d lpos = fetchPosition(pb, cPosD, aux3d1.get(), 0);
+                    Vector3d lpos = fetchPosition(pb, cPosD, D31.get(), 0);
                     float distToCamera = (float) lpos.len();
                     float viewAngle = 1e-4f / camera.getFovFactor();
 
-                    textPosition(camera, lpos.put(aux3d1.get()), distToCamera, 0);
+                    textPosition(camera, lpos.put(D31.get()), distToCamera, 0);
 
                     shader.setUniformf("u_viewAngle", viewAngle);
                     shader.setUniformf("u_viewAnglePow", 1f);
@@ -626,7 +626,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                     float textSize = (float) FastMath.tanh(viewAngle) * distToCamera * 1e5f;
                     float alpha = Math.min((float) FastMath.atan(textSize / distToCamera), 1.e-3f);
                     textSize = (float) FastMath.tan(alpha) * distToCamera * 0.5f;
-                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names()[0], lpos.put(aux3d1.get()), distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), this.forceLabel);
+                    render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, pb.names()[0], lpos.put(D31.get()), distToCamera, textScale() * camera.getFovFactor(), textSize * camera.getFovFactor(), this.forceLabel);
                 }
             }
         }
@@ -635,7 +635,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public void textPosition(ICamera cam, Vector3d out, double len, double rad) {
         out.clamp(0, len - rad);
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();
@@ -935,8 +935,8 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             for (int i = 0; i < n; i++) {
                 if (filter(i)) {
                     IParticleRecord pb = pointData.get(i);
-                    Vector3 pos = aux3f1.get();
-                    Vector3d posd = fetchPosition(pb, cPosD, aux3d1.get(), getDeltaYears());
+                    Vector3 pos = F31.get();
+                    Vector3d posd = fetchPosition(pb, cPosD, D31.get(), getDeltaYears());
                     pos.set(posd.valuesf());
 
                     if (camera.direction.dot(posd) > 0) {
@@ -1004,7 +1004,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             for (int i = 0; i < n; i++) {
                 if (filter(i)) {
                     IParticleRecord pb = pointData.get(i);
-                    Vector3d posd = fetchPosition(pb, cPosD, aux3d1.get(), getDeltaYears());
+                    Vector3d posd = fetchPosition(pb, cPosD, D31.get(), getDeltaYears());
                     beamDir.set(p1).sub(p0);
                     if (camera.direction.dot(posd) > 0) {
                         // The star is in front of us
@@ -1012,7 +1012,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
                         // when we are close by
                         double dist = posd.len();
                         double angle = getRadius(i) / dist / camera.getFovFactor();
-                        double distToLine = Intersectord.distanceLinePoint(p0, p1, posd.put(aux3d1.get()));
+                        double distToLine = Intersectord.distanceLinePoint(p0, p1, posd.put(D31.get()));
                         double value = distToLine / dist;
 
                         if (value < 0.01) {
@@ -1076,7 +1076,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         } else {
             focus = pointData.get(focusIndex);
             focusPosition.set(focus.x(), focus.y(), focus.z());
-            Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, aux3d1.get());
+            Vector3d posSph = Coordinates.cartesianToSpherical(focusPosition, D31.get());
             focusPositionSph.set((float) (MathUtilsd.radDeg * posSph.x), (float) (MathUtilsd.radDeg * posSph.y));
             updateFocus(GaiaSky.instance.getICamera());
         }
@@ -1114,7 +1114,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
     public double getCandidateViewAngleApparent() {
         if (candidateFocusIndex >= 0) {
             IParticleRecord candidate = pointData.get(candidateFocusIndex);
-            Vector3d aux = candidate.pos(aux3d1.get());
+            Vector3d aux = candidate.pos(D31.get());
             ICamera camera = GaiaSky.instance.getICamera();
             return (float) ((size * .5e2f / aux.sub(camera.getPos()).len()) / camera.getFovFactor());
         } else {
@@ -1340,7 +1340,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
         for (int i = 0; i < n; i++) {
             IParticleRecord d = pointData.get(i);
             // Pos
-            Vector3d x = aux3d1.get().set(d.x(), d.y(), d.z());
+            Vector3d x = D31.get().set(d.x(), d.y(), d.z());
             metadata[i] = filter(i) ? camPos.dst2d(x) : Double.MAX_VALUE;
         }
     }

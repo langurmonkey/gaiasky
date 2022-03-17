@@ -24,7 +24,7 @@ public class Points extends VertsObject implements IPointRenderable {
     @Override
     public void render(PointRenderSystem renderer, ICamera camera, float alpha) {
         // Render points CPU
-        Vector3d v = aux3d1.get();
+        Vector3d v = D31.get();
         for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
             pointCloudData.loadPoint(v, i);
             v.add(translation);

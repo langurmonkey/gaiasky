@@ -90,10 +90,10 @@ public class Billboard extends ModelBody {
         if (time.getHdiff() != 0 || force) {
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
             // Convert to cartesian coordinates and put them in aux3 vector
-            Vector3d aux3 = aux3d1.get();
+            Vector3d aux3 = D31.get();
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
-            DecalUtils.setBillboardRotation(q, pos.put(aux3d2.get()).nor(), new Vector3d(0, 1, 0));
+            DecalUtils.setBillboardRotation(q, pos.put(D32.get()).nor(), new Vector3d(0, 1, 0));
         }
     }
 

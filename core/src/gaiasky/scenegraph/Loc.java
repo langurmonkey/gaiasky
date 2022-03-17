@@ -82,7 +82,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
             this.opacity = this.getVisibilityOpacityFactor();
 
-            Vector3d aux = aux3d1.get();
+            Vector3d aux = D31.get();
             this.distToCamera = (float) translation.put(aux).len();
             this.viewAngle = (float) FastMath.atan(size / distToCamera);
             this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
@@ -118,7 +118,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
     @Override
     public boolean renderText() {
         if(GaiaSky.instance.isOn(ct) && (viewAngle >= LOWER_LIMIT && viewAngle <= UPPER_LIMIT * Constants.DISTANCE_SCALE_FACTOR || forceLabel)) {
-            Vector3d aux = aux3d1.get();
+            Vector3d aux = D31.get();
             translation.put(aux).scl(-1);
 
             double cosAlpha = aux.add(location3d.x, location3d.y, location3d.z).nor().dot(GaiaSky.instance.cameraManager.getDirection().nor());
@@ -133,7 +133,7 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) (viewAngleApparent * ((ModelBody) parent).locVaMultiplier * Constants.U_TO_KM));
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -220,10 +220,10 @@ public class Loc extends SceneGraphNode implements IFocus, I3DTextRenderable, IL
 
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
 
-        Vector3 v = aux3f1.get();
+        Vector3 v = F31.get();
         pos.put(v);
         camera.getCamera().project(v);
         v.set(v.x + 5, renderer.rc.h() - v.y + 5, v.z);

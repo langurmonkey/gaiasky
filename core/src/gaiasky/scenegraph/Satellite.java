@@ -73,7 +73,7 @@ public abstract class Satellite extends ModelBody {
         if (time.getHdiff() != 0 || force) {
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
             // Convert to cartesian coordinates and put them in aux3 vector
-            Vector3d aux3 = aux3d1.get();
+            Vector3d aux3 = D31.get();
             Coordinates.cartesianToSpherical(pos, aux3);
             posSph.set((float) (Nature.TO_DEG * aux3.x), (float) (Nature.TO_DEG * aux3.y));
 

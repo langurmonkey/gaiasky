@@ -90,7 +90,7 @@ public class SphericalGrid extends BackgroundModel implements IAnnotationsRender
 
         font.setColor(labelcolor[0], labelcolor[1], labelcolor[2], labelcolor[3] * alpha);
 
-        Vector3 vrOffset = aux3f4.get();
+        Vector3 vrOffset = F34.get();
         if (Settings.settings.runtime.openVr) {
             if (camera.getCurrent() instanceof NaturalCamera) {
                 ((NaturalCamera) camera.getCurrent()).vrOffset.put(vrOffset);

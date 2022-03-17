@@ -333,7 +333,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
 
         double friction = (drag * 2e16) * dt;
-        force.add(aux3d1.get().set(vel).scl(-friction));
+        force.add(D31.get().set(vel).scl(-friction));
 
         if (stopping) {
             double speed = vel.len();
@@ -343,7 +343,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
                 force.set(thrust);
             }
 
-            Vector3d nextVel = aux3d3.get().set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
+            Vector3d nextVel = D33.get().set(force).scl(1d / mass).scl(Constants.M_TO_U).scl(dt).add(vel);
 
             if (vel.angle(nextVel) > 90) {
                 setCurrentEnginePower(0);
@@ -358,7 +358,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
         // Integrate other quantities
         // convert metres to internal units so we have the velocity in u/s
-        Vector3d acc = aux3d1.get().set(accel).scl(Constants.M_TO_U);
+        Vector3d acc = D31.get().set(accel).scl(Constants.M_TO_U);
 
         if (Settings.settings.spacecraft.velocityDirection) {
             double velocityLength = vel.len();
@@ -366,17 +366,17 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         }
         vel.add(acc.scl(dt));
 
-        Vector3b velocity = aux3b2.get().set(vel);
-        Vector3b newPosition = aux3b3.get().set(posb).add(velocity.scl(dt));
-        Vector3b pos = posb.put(aux3b4.get());
+        Vector3b velocity = B32.get().set(vel);
+        Vector3b newPosition = B33.get().set(posb).add(velocity.scl(dt));
+        Vector3b pos = posb.put(B34.get());
         // Check collision!
         if (closest != null && closest != this && !this.copy) {
             double twoRadii = closest.getRadius() + this.getRadius();
             // d1 is the new distance to the centre of the object
-            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(aux3d1.get()), newPosition.put(aux3d2.get()), closest.getPos().put(aux3d3.get())) < twoRadii) {
+            if (!vel.isZero() && Intersectord.distanceSegmentPoint(pos.put(D31.get()), newPosition.put(D32.get()), closest.getPos().put(D33.get())) < twoRadii) {
                 logger.info("Crashed against " + closest.getName() + "!");
 
-                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(aux3d1.get()), newPosition.put(aux3d2.get()), closest.getPos().put(aux3d1.get()), twoRadii);
+                Array<Vector3d> intersections = Intersectord.intersectRaySphere(pos.put(D31.get()), newPosition.put(D32.get()), closest.getPos().put(D31.get()), twoRadii);
 
                 // Teleport outside
                 if (intersections.size >= 1) {
@@ -385,7 +385,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
 
                 stopAllMovement();
             } else if (posb.dstd(closest.getPos()) < twoRadii) {
-                posb.set(aux3b1.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), aux3b2.get())));
+                posb.set(B31.get().set(posb).sub(closest.getPos()).nor().scl(posb.dst(closest.getPos(), B32.get())));
             } else {
                 posb.set(newPosition);
             }
@@ -430,7 +430,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
         direction.rotate(up, yawDiff);
 
         // apply pitch
-        Vector3d aux1 = aux3d1.get().set(direction).crs(up);
+        Vector3d aux1 = D31.get().set(direction).crs(up);
         direction.rotate(aux1, pitchDiff);
         up.rotate(aux1, pitchDiff);
 
@@ -487,7 +487,7 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
             yaw = Math.toDegrees(yaw);
         }
         // Update float vectors
-        Vector3b camPos = aux3b1.get().set(pos).add(camera.getInversePos());
+        Vector3b camPos = B31.get().set(pos).add(camera.getInversePos());
         camPos.put(posf);
         direction.put(directionf);
         up.put(upf);
@@ -687,12 +687,12 @@ public class Spacecraft extends GenericSpacecraft implements ILineRenderable, IO
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         // Direction
-        Vector3d d = aux3d1.get().set(direction);
+        Vector3d d = D31.get().set(direction);
         d.nor().scl(.5e-4);
         renderer.addLine(this, posf.x, posf.y, posf.z, posf.x + d.x, posf.y + d.y, posf.z + d.z, 1, 0, 0, 1);
 
         // Up
-        Vector3d u = aux3d1.get().set(up);
+        Vector3d u = D31.get().set(up);
         u.nor().scl(.2e-4);
         renderer.addLine(this, posf.x, posf.y, posf.z, posf.x + u.x, posf.y + u.y, posf.z + u.z, 0, 0, 1, 1);
 

@@ -269,8 +269,8 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         // Compute projection lines to refsys
         if (Settings.settings.program.recursiveGrid.origin.isRefSys() && Settings.settings.program.recursiveGrid.projectionLines && camera.getFocus() != null) {
             IFocus focus = camera.getFocus();
-            Vector3d cpos = aux3d3.get();
-            Vector3d fpos = aux3d4.get();
+            Vector3d cpos = D33.get();
+            Vector3d fpos = D34.get();
             getCFPos(cpos, fpos, camera, focus);
 
             // Line in XZ
@@ -313,7 +313,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         IFocus focus = camera.getFocus();
         localTransform.idt();
 
-        Vector3 vroffset = aux3f4.get();
+        Vector3 vroffset = F34.get();
         float vrScl = 1f;
         if (Settings.settings.runtime.openVr) {
             vrScl = 100f;
@@ -328,15 +328,15 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         if (Settings.settings.program.recursiveGrid.origin.isRefSys() || focus == null) {
             // Coordinate origin - Sun
             if (regime == 1)
-                localTransform.translate(camera.getInversePos().put(aux3f1.get()));
+                localTransform.translate(camera.getInversePos().put(F31.get()));
             else
-                localTransform.translate(camera.getInversePos().put(aux3f1.get()).setLength(vrScl).add(vroffset));
+                localTransform.translate(camera.getInversePos().put(F31.get()).setLength(vrScl).add(vroffset));
         } else {
             // Focus object
             if (regime == 1)
-                localTransform.translate(focus.getAbsolutePosition(aux3b1.get()).sub(camera.getPos()).put(aux3f1.get()));
+                localTransform.translate(focus.getAbsolutePosition(B31.get()).sub(camera.getPos()).put(F31.get()));
             else
-                localTransform.translate(focus.getAbsolutePosition(aux3b1.get()).sub(camera.getPos()).setLength(vrScl).add(vroffset).put(aux3f1.get()));
+                localTransform.translate(focus.getAbsolutePosition(B31.get()).sub(camera.getPos()).setLength(vrScl).add(vroffset).put(F31.get()));
         }
         if (regime == 1)
             localTransform.scl((float) (distToCamera * 0.067d * Constants.AU_TO_U / Constants.DISTANCE_SCALE_FACTOR));
@@ -439,7 +439,7 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         shader.setUniformf("u_thOverFactorScl", 1);
 
         IFocus focus = camera.getFocus();
-        Vector3b v = aux3b1.get().setZero();
+        Vector3b v = B31.get().setZero();
         if (Settings.settings.program.recursiveGrid.origin.isFocus() && focus != null) {
             focus.getAbsolutePosition(v);
         }
@@ -451,13 +451,13 @@ public class RecursiveGrid extends FadeNode implements IModelRenderable, I3DText
         labelPosition.set(0d, 0d, dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max, this.forceLabel);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(D34.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max, this.forceLabel);
 
         // -Z
         labelPosition.set(0d, 0d, -dist);
         labelPosition.mul(coordinateSystemd);
         labelPosition.add(v).sub(camera.getPos());
-        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(aux3d4.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max, this.forceLabel);
+        render3DLabel(batch, shader, sys.fontDistanceField, camera, rc, text, labelPosition.put(D34.get()), distToCamera, textScale(), (float) (dist * 1.5e-3d * camera.getFovFactor()), min, max, this.forceLabel);
     }
 
     /**

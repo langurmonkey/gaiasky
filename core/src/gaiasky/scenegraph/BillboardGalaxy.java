@@ -83,7 +83,7 @@ public class BillboardGalaxy extends Billboard {
 
         float size = (float) (getFuzzyRenderSize(camera) / Constants.DISTANCE_SCALE_FACTOR);
 
-        Vector3 aux = aux3f1.get();
+        Vector3 aux = F31.get();
         shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
 

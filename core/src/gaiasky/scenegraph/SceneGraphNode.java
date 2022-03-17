@@ -41,9 +41,9 @@ import java.util.Map;
 public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwitch {
     public static final String ROOT_NAME = "Universe";
 
-    protected static TLV3D aux3d1 = new TLV3D(), aux3d2 = new TLV3D(), aux3d3 = new TLV3D(), aux3d4 = new TLV3D();
-    protected static TLV3B aux3b1 = new TLV3B(), aux3b2 = new TLV3B(), aux3b3 = new TLV3B(), aux3b4 = new TLV3B();
-    protected static TLV3 aux3f1 = new TLV3(), aux3f2 = new TLV3(), aux3f3 = new TLV3(), aux3f4 = new TLV3(), aux3f5 = new TLV3();
+    protected static TLV3D D31 = new TLV3D(), D32 = new TLV3D(), D33 = new TLV3D(), D34 = new TLV3D();
+    protected static TLV3B B31 = new TLV3B(), B32 = new TLV3B(), B33 = new TLV3B(), B34 = new TLV3B();
+    protected static TLV3 F31 = new TLV3(), F32 = new TLV3(), F33 = new TLV3(), F34 = new TLV3();
 
     /**
      * Inserts the given node into the default scene graph, if it exists.
@@ -1156,7 +1156,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
     }
 
     protected void render2DLabel(ExtSpriteBatch batch, ExtShaderProgram shader, RenderingContext rc, BitmapFont font, ICamera camera, String label, Vector3d pos3d) {
-        Vector3 p = aux3f1.get();
+        Vector3 p = F31.get();
         pos3d.setVector3(p);
 
         camera.getCamera().project(p);
@@ -1195,15 +1195,15 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
 
             float rot = 0;
             if (rc.cubemapSide == CubemapSide.SIDE_UP || rc.cubemapSide == CubemapSide.SIDE_DOWN) {
-                Vector3 v1 = aux3f1.get();
-                Vector3 v2 = aux3f2.get();
+                Vector3 v1 = F31.get();
+                Vector3 v2 = F32.get();
                 camera.getCamera().project(v1.set((float) pos.x, (float) pos.y, (float) pos.z));
                 v1.z = 0f;
                 v2.set(Gdx.graphics.getWidth() / 2f, Gdx.graphics.getHeight() / 2f, 0f);
                 rot = GlobalResources.angle2d(v1, v2) + (rc.cubemapSide == CubemapSide.SIDE_UP ? 90f : -90f);
             }
 
-            shader.setUniformf("u_pos", pos.put(aux3f1.get()));
+            shader.setUniformf("u_pos", pos.put(F31.get()));
 
             // Enable or disable blending
             ((I3DTextRenderable) this).textDepthBuffer();

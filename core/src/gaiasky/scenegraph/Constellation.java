@@ -8,7 +8,6 @@ package gaiasky.scenegraph;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.I3DTextRenderable;
@@ -80,7 +79,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         // Recompute mean position
         posd.setZero();
-        Vector3d p = aux3d1.get();
+        Vector3d p = D31.get();
         int nStars = 0;
         for (IPosition[] line : lines) {
             if (line != null) {
@@ -133,8 +132,8 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
         alpha *= this.alpha * opacity;
 
-        Vector3d p1 = aux3d1.get();
-        Vector3d p2 = aux3d2.get();
+        Vector3d p1 = D31.get();
+        Vector3d p2 = D32.get();
         Vector3b campos = camera.getPos();
 
         for (IPosition[] pair : lines) {
@@ -149,7 +148,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
     }
 
     private void getPosition(IPosition posBean, Vector3b camPos, Vector3d out) {
-        Vector3d vel = aux3d3.get().setZero();
+        Vector3d vel = D33.get().setZero();
         if (posBean.getVelocity() != null && !posBean.getVelocity().hasNaN()) {
             vel.set(posBean.getVelocity()).scl(deltaYears);
         }
@@ -161,7 +160,7 @@ public class Constellation extends FadeNode implements ILineRenderable, I3DTextR
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1);

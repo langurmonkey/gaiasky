@@ -219,7 +219,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
         this.opacity = opacity;
         this.opacity *= this.getVisibilityOpacityFactor();
         if (hasPm) {
-            Vector3d pmv = aux3d1.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
+            Vector3d pmv = D31.get().set(pm).scl(AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y);
             translation.add(pmv);
         }
         distToCamera = translation.lend();
@@ -358,7 +358,7 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
 
     protected void forceUpdateLocalValues(ITimeFrameProvider time, boolean force) {
         if (coordinates != null && (time.getHdiff() != 0 || force)) {
-            Vector3d aux3 = aux3d1.get();
+            Vector3d aux3 = D31.get();
             // Load this objects' equatorial cartesian coordinates into pos
             coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
@@ -394,8 +394,8 @@ public class Particle extends CelestialBody implements IStarFocus, ILineRenderab
      */
     @Override
     public void render(LineRenderSystem renderer, ICamera camera, float alpha) {
-        Vector3 p1 = translation.setVector3(aux3f1.get());
-        Vector3 ppm = aux3f2.get().set(pm).scl((float) Settings.settings.scene.properMotion.number);
+        Vector3 p1 = translation.setVector3(F31.get());
+        Vector3 ppm = F32.get().set(pm).scl((float) Settings.settings.scene.properMotion.number);
         Vector3 p2 = ppm.add(p1);
 
         // Mualpha -> red channel

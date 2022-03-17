@@ -54,7 +54,7 @@ public class Polyline extends VertsObject implements ILineRenderable {
         // Render line CPU
         alpha *= cc[3];
         if (pointCloudData != null && pointCloudData.getNumPoints() > 1) {
-            Vector3d prev = aux3d1.get();
+            Vector3d prev = D31.get();
 
             for (int i = 0; i < pointCloudData.getNumPoints(); i++) {
                 pointCloudData.loadPoint(prev, i);
@@ -67,9 +67,9 @@ public class Polyline extends VertsObject implements ILineRenderable {
             // Render cap if needed
             if (arrowCap) {
                 // Get two last points of line
-                Vector3d p1 = aux3d2.get().set(pointCloudData.getX(0), pointCloudData.getY(0), pointCloudData.getZ(0));
-                Vector3d p2 = aux3d3.get().set(pointCloudData.getX(1), pointCloudData.getY(1), pointCloudData.getZ(1));
-                Vector3d ppm = aux3d4.get().set(p1).sub(p2);
+                Vector3d p1 = D32.get().set(pointCloudData.getX(0), pointCloudData.getY(0), pointCloudData.getZ(0));
+                Vector3d p2 = D33.get().set(pointCloudData.getX(1), pointCloudData.getY(1), pointCloudData.getZ(1));
+                Vector3d ppm = D34.get().set(p1).sub(p2);
                 double p1p2len = ppm.len();
                 p1.sub(camera.getPos());
                 p2.sub(camera.getPos());

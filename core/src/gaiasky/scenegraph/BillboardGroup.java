@@ -216,7 +216,7 @@ public class BillboardGroup extends SceneGraphNode implements I3DTextRenderable,
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);

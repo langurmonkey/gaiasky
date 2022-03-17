@@ -189,12 +189,12 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         // Update pos, local transform
         this.translation.add(pos);
         ySinceEpoch = AstroUtils.getMsSince(time.getTime(), AstroUtils.JD_J2015_5) * Nature.MS_TO_Y;
-        Vector3d pmv = aux3d1.get().set(pm).scl(ySinceEpoch);
+        Vector3d pmv = D31.get().set(pm).scl(ySinceEpoch);
         this.translation.add(pmv);
 
-        this.localTransform.idt().translate(this.translation.put(aux3f1.get())).scl(this.size);
+        this.localTransform.idt().translate(this.translation.put(F31.get())).scl(this.size);
 
-        Vector3d aux = aux3d1.get();
+        Vector3d aux = D31.get();
         this.distToCamera = (float) aux.set(translation).len();
         this.viewAngle = (float) FastMath.atan(size / distToCamera);
         this.viewAngleApparent = this.viewAngle / camera.getFovFactor();
@@ -229,7 +229,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public Vector3b getAbsolutePosition(Vector3b aux) {
         aux.set(pos);
-        Vector3d pmv = aux3d2.get().set(pm).scl(ySinceEpoch);
+        Vector3d pmv = D32.get().set(pm).scl(ySinceEpoch);
         aux.add(pmv);
         SceneGraphNode entity = this;
         while (entity.parent != null) {
@@ -265,7 +265,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
         float fa = (1 - this.fadeAlpha) * 0.6f;
 
-        Vector3 aux = aux3f1.get();
+        Vector3 aux = F31.get();
         shader.setUniformf("u_pos", translation.put(aux));
         shader.setUniformf("u_size", size);
         shader.setUniformf("u_color", cc[0] * fa, cc[1] * fa, cc[2] * fa, cc[3] * alpha * opacity * 6.5f);
@@ -278,7 +278,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
      */
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", forceLabel ? 2f : (float) this.viewAngle * 500f);
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -320,7 +320,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
         double len = out.len();
         out.clamp(0, len - getRadius()).scl(0.9f);
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();
@@ -403,8 +403,8 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
     @Override
     public void addHit(int screenX, int screenY, int w, int h, int pxdist, NaturalCamera camera, Array<IFocus> hits) {
         if (isActive()) {
-            Vector3 pos = aux3f1.get();
-            Vector3b aux = aux3b1.get();
+            Vector3 pos = F31.get();
+            Vector3b aux = B31.get();
             Vector3b posb = getAbsolutePosition(aux).add(camera.posinv);
             pos.set(posb.valuesf());
 
@@ -444,7 +444,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
 
     public void addHit(Vector3d p0, Vector3d p1, NaturalCamera camera, Array<IFocus> hits) {
         if (isActive()) {
-            Vector3b aux = aux3b1.get();
+            Vector3b aux = B31.get();
             Vector3b posb = getAbsolutePosition(aux).add(camera.getInversePos());
 
             if (camera.direction.dot(posb) > 0) {
@@ -452,7 +452,7 @@ public class StarCluster extends SceneGraphNode implements IFocus, IProperMotion
                 // Diminish the size of the star
                 // when we are close by
                 double dist = posb.lend();
-                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.tov3d(aux3d2.get()));
+                double distToLine = Intersectord.distanceLinePoint(p0, p1, posb.tov3d(D32.get()));
                 double value = distToLine / dist;
 
                 if (value < 0.01) {

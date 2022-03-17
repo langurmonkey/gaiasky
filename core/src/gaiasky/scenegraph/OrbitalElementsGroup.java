@@ -20,7 +20,7 @@ import gaiasky.util.time.ITimeFrameProvider;
  * It compiles the orbit objects which are only-body and those which are not, and
  * updates them accordingly to reduce CPU calls.
  */
-public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObserver {
+public class OrbitalElementsGroup extends GenericCatalog implements IRenderable, IObserver {
     private Array<Orbit> orbitsWithOrbit;
 
     @Override
@@ -79,7 +79,7 @@ public class OrbitalElementsGroup extends FadeNode implements IRenderable, IObse
     public void update(ITimeFrameProvider time, final Vector3b parentTransform, ICamera camera, float opacity) {
         this.opacity = opacity;
         translation.set(parentTransform);
-        Vector3d aux = aux3d1.get();
+        Vector3d aux = D31.get();
 
         if (this.position == null) {
             this.currentDistance = aux.set(this.pos).sub(camera.getPos()).len() * camera.getFovFactor();

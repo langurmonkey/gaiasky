@@ -156,9 +156,9 @@ public class Star extends Particle {
         if (!Float.isFinite(this.absmag)) {
             double distPc;
             if(this.coordinates != null) {
-                distPc = this.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), aux3b1.get()).lend() * Constants.U_TO_PC;
+                distPc = this.coordinates.getEquatorialCartesianCoordinates(GaiaSky.instance.time.getTime(), B31.get()).lend() * Constants.U_TO_PC;
             } else {
-                distPc = this.getAbsolutePosition(aux3b1.get()).lend() * Constants.U_TO_PC;
+                distPc = this.getAbsolutePosition(B31.get()).lend() * Constants.U_TO_PC;
             }
             this.absmag = (float) AstroUtils.apparentToAbsoluteMagnitude(distPc, this.appmag);
         }
@@ -237,8 +237,8 @@ public class Star extends Particle {
 
     public void addHit(int screenX, int screenY, int w, int h, int minPixDist, NaturalCamera camera, Array<IFocus> hits) {
         if (checkHitCondition()) {
-            Vector3 pos = aux3f1.get();
-            Vector3b aux = aux3b1.get();
+            Vector3 pos = F31.get();
+            Vector3b aux = B31.get();
             Vector3b posD = getAbsolutePosition(aux).add(camera.getInversePos());
             pos.set(posD.valuesf());
 

@@ -86,15 +86,15 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
 
     private void addCap(Vector3d p0, Vector3d p1, double va, LineRenderSystem renderer, float alpha) {
         // cpos-p0
-        Vector3d cp = aux3d2.get().set(p0);
+        Vector3d cp = D32.get().set(p0);
         // cross(cpos-p0, p0-p1)
-        Vector3d crs = aux3d1.get().set(p1).sub(p0).crs(cp);
+        Vector3d crs = D31.get().set(p1).sub(p0).crs(cp);
 
         double d = p0.len();
         double caplen = FastMath.tan(va) * d;
         crs.setLength(caplen);
-        Vector3d aux0 = aux3d2.get().set(p0).add(crs);
-        Vector3d aux1 = aux3d3.get().set(p0).sub(crs);
+        Vector3d aux0 = D32.get().set(p0).add(crs);
+        Vector3d aux1 = D33.get().set(p0).sub(crs);
         renderer.addLine(this, aux0.x, aux0.y, aux0.z, aux1.x, aux1.y, aux1.z, cc[0], cc[1], cc[2], alpha);
     }
 
@@ -102,7 +102,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
     @Override
     public void render(ExtSpriteBatch batch, ExtShaderProgram shader, FontRenderSystem sys, RenderingContext rc, ICamera camera) {
         // 3D distance font
-        Vector3d pos = aux3d1.get();
+        Vector3d pos = D31.get();
         textPosition(camera, pos);
         shader.setUniformf("u_viewAngle", 90f);
         shader.setUniformf("u_viewAnglePow", 1f);
@@ -210,7 +210,7 @@ public class CosmicRuler extends SceneGraphNode implements I3DTextRenderable, IL
         double len = out.len();
         out.clamp(0, len - getRadius()).scl(0.9f);
 
-        Vector3d aux = aux3d2.get();
+        Vector3d aux = D32.get();
         aux.set(cam.getUp());
 
         aux.crs(out).nor();

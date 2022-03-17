@@ -13,7 +13,6 @@ import gaiasky.GaiaSky;
 import gaiasky.render.ComponentTypes.ComponentType;
 import gaiasky.render.ILineRenderable;
 import gaiasky.render.RenderingContext;
-import gaiasky.render.SceneGraphRenderer;
 import gaiasky.render.SceneGraphRenderer.RenderGroup;
 import gaiasky.render.system.LineRenderSystem;
 import gaiasky.scenegraph.camera.ICamera;
@@ -139,7 +138,7 @@ public class Planet extends ModelBody implements ILineRenderable {
         if (time.getHdiff() == 0) {
             return;
         }
-        Vector3d aux3 = aux3d1.get();
+        Vector3d aux3 = D31.get();
         // Load this object's equatorial cartesian coordinates into pos
         coordinatesTimeOverflow = coordinates.getEquatorialCartesianCoordinates(time.getTime(), pos) == null;
 
@@ -254,10 +253,10 @@ public class Planet extends ModelBody implements ILineRenderable {
 
     @Override
     protected boolean checkClickDistance(int screenX, int screenY, Vector3 pos, NaturalCamera camera, PerspectiveCamera pcamera, double pixelSize) {
-        Vector3 aux1 = aux3f1.get();
-        Vector3 aux2 = aux3f2.get();
-        Vector3 aux3 = aux3f3.get();
-        Vector3 aux4 = aux3f4.get();
+        Vector3 aux1 = F31.get();
+        Vector3 aux2 = F32.get();
+        Vector3 aux3 = F33.get();
+        Vector3 aux4 = F34.get();
         return super.checkClickDistance(screenX, screenY, pos, camera, pcamera, pixelSize) || CameraUtils.intersectScreenSphere(this, camera, screenX, screenY, aux1, aux2, aux3, aux4);
     }
 
