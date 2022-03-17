@@ -50,7 +50,11 @@ def to_json(line, idx):
     # Eccentricity
     eccentricity = float(values[5])
     # Argument of pericenter [deg]
-    argofpericenter = float(values[8])
+    # If the epoch is set, we need to set this to zero
+    if epoch != REF_EPOCH:
+        argofpericenter = 0.0
+    else:
+        argofpericenter = float(values[8])
     # Ascending node [deg]
     ascendingnode = float(values[7])
     # Period in days
