@@ -289,7 +289,31 @@ public class Coordinates {
     }
 
     /**
-     * Transforms from ecliptic to equatorial coordinates
+     * Transforms from spherical equatorial coordinates to spherical galactic coordinates.
+     * @param alpha The right ascension in radians.
+     * @param delta The declination in radians.
+     * @param out The out vector.
+     * @return The out vector with the galactic longitude and latitude, in radians.
+     */
+    public static Vector2d equatorialToGalactic(double alpha, double delta, Vector2d out) {
+        // To equatorial cartesian
+        Vector3d aux = new Vector3d(alpha, delta, 1);
+        sphericalToCartesian(aux, aux);
+
+        // Rotate to galactic cartesian
+        aux.mul(equatorialToGalactic);
+
+        // Back to spherical
+        cartesianToSpherical(aux, aux);
+
+        out.x = aux.x;
+        out.y = aux.y;
+
+        return out;
+    }
+
+    /**
+     * Transforms from spherical ecliptic coordinates to spherical equatorial coordinates.
      *
      * @param vec Vector with ecliptic longitude (&lambda;) and ecliptic
      *            latitude (&beta;) in radians.
@@ -302,7 +326,7 @@ public class Coordinates {
     }
 
     /**
-     * Transforms from ecliptic to equatorial coordinates
+     * Transforms from spherical ecliptic coordinates to spherical equatorial coordinates.
      *
      * @param lambda Ecliptic longitude (&lambda;) in radians.
      * @param beta   Ecliptic latitude (&beta;) in radians.

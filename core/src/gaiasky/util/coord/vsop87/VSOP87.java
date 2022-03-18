@@ -25,8 +25,8 @@ public class VSOP87 {
     private final Map<String, Boolean> tried;
 
     public VSOP87() {
-        elements = new HashMap<String, iVSOP87>();
-        tried = new HashMap<String, Boolean>();
+        elements = new HashMap<>();
+        tried = new HashMap<>();
     }
 
     public iVSOP87 getVOSP87(String cb) {
