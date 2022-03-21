@@ -107,8 +107,8 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform specularTexture = new Uniform("u_specularTexture", TextureAttribute.Specular);
         public final static Uniform emissiveColor = new Uniform("u_emissiveColor", ColorAttribute.Emissive);
         public final static Uniform emissiveTexture = new Uniform("u_emissiveTexture", TextureAttribute.Emissive);
-        public final static Uniform reflectionColor = new Uniform("u_reflectionColor", ColorAttribute.Reflection);
-        public final static Uniform reflectionTexture = new Uniform("u_reflectionTexture", TextureAttribute.Reflection);
+        public final static Uniform metallicColor = new Uniform("u_metallicColor", ColorAttribute.Metallic);
+        public final static Uniform metallicTexture = new Uniform("u_metallicTexture", TextureAttribute.Metallic);
         public final static Uniform shininess = new Uniform("u_shininess", FloatAttribute.Shininess);
         public final static Uniform roughnessTexture = new Uniform("u_roughnessTexture", TextureAttribute.Roughness);
 
@@ -127,7 +127,14 @@ public class DefaultIntShader extends BaseIntShader {
         public final static Uniform spotLights = new Uniform("u_spotLights");
 
         public final static Uniform reflectionCubemap = new Uniform("u_reflectionCubemap");
+
         public final static Uniform diffuseCubemap = new Uniform("u_diffuseCubemap");
+        public final static Uniform normalCubemap = new Uniform("u_normalCubemap");
+        public final static Uniform specularCubemap = new Uniform("u_specularCubemap");
+        public final static Uniform emissionCubemap = new Uniform("u_emissionCubemap");
+        public final static Uniform heightCubemap = new Uniform("u_heightCubemap");
+        public final static Uniform metallicCubemap = new Uniform("u_metallicCubemap");
+        public final static Uniform roughnessCubemap = new Uniform("u_roughnessCubemap");
     }
 
     public static class Setters {
@@ -285,16 +292,16 @@ public class DefaultIntShader extends BaseIntShader {
                 shader.set(inputID, unit);
             }
         };
-        public final static Setter reflectionColor = new LocalSetter() {
+        public final static Setter metallicColor = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                shader.set(inputID, ((ColorAttribute) (combinedAttributes.get(ColorAttribute.Reflection))).color);
+                shader.set(inputID, ((ColorAttribute) (combinedAttributes.get(ColorAttribute.Metallic))).color);
             }
         };
-        public final static Setter reflectionTexture = new LocalSetter() {
+        public final static Setter metallicTexture = new LocalSetter() {
             @Override
             public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
-                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Reflection))).textureDescription);
+                final int unit = shader.context.textureBinder.bind(((TextureAttribute) (combinedAttributes.get(TextureAttribute.Metallic))).textureDescription);
                 shader.set(inputID, unit);
             }
         };
@@ -411,6 +418,54 @@ public class DefaultIntShader extends BaseIntShader {
                 }
             }
         };
+        public final static Setter normalCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.NormalCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.NormalCubemap)).textureDescription));
+                }
+            }
+        };
+        public final static Setter emissiveCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.EmissiveCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.EmissiveCubemap)).textureDescription));
+                }
+            }
+        };
+        public final static Setter specularCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.SpecularCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.SpecularCubemap)).textureDescription));
+                }
+            }
+        };
+        public final static Setter heightCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.HeightCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.HeightCubemap)).textureDescription));
+                }
+            }
+        };
+        public final static Setter metallicCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.MetallicCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.MetallicCubemap)).textureDescription));
+                }
+            }
+        };
+        public final static Setter roughnessCubemap = new LocalSetter() {
+            @Override
+            public void set(BaseIntShader shader, int inputID, IntRenderable renderable, Attributes combinedAttributes) {
+                if (combinedAttributes.has(CubemapAttribute.RoughnessCubemap)) {
+                    shader.set(inputID, shader.context.textureBinder.bind(((CubemapAttribute) combinedAttributes.get(CubemapAttribute.RoughnessCubemap)).textureDescription));
+                }
+            }
+        };
     }
 
     private static String defaultVertexShader = null;
@@ -462,8 +517,8 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_specularTexture;
     public final int u_emissiveColor;
     public final int u_emissiveTexture;
-    public final int u_reflectionColor;
-    public final int u_reflectionTexture;
+    public final int u_metallicColor;
+    public final int u_metallicTexture;
     public final int u_shininess;
     public final int u_roughnessTexture;
     public final int u_normalTexture;
@@ -473,8 +528,14 @@ public class DefaultIntShader extends BaseIntShader {
     public final int u_heightSize;
     public final int u_tessQuality;
     public final int u_alphaTest;
-    protected final int u_diffuseCubemap;
     protected final int u_reflectionCubemap;
+    protected final int u_diffuseCubemap;
+    protected final int u_normalCubemap;
+    protected final int u_specularCubemap;
+    protected final int u_emissiveCubemap;
+    protected final int u_heightCubemap;
+    protected final int u_roughnessCubemap;
+    protected final int u_metallicCubemap;
     // Lighting uniforms
     protected final int u_ambientCubemap;
     protected final int u_dirLights0color;
@@ -608,8 +669,8 @@ public class DefaultIntShader extends BaseIntShader {
         u_specularTexture = register(Inputs.specularTexture, Setters.specularTexture);
         u_emissiveColor = register(Inputs.emissiveColor, Setters.emissiveColor);
         u_emissiveTexture = register(Inputs.emissiveTexture, Setters.emissiveTexture);
-        u_reflectionColor = register(Inputs.reflectionColor, Setters.reflectionColor);
-        u_reflectionTexture = register(Inputs.reflectionTexture, Setters.reflectionTexture);
+        u_metallicColor = register(Inputs.metallicColor, Setters.metallicColor);
+        u_metallicTexture = register(Inputs.metallicTexture, Setters.metallicTexture);
         u_shininess = register(Inputs.shininess, Setters.shininess);
         u_roughnessTexture = register(Inputs.roughnessTexture, Setters.roughnessTexture);
         u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
@@ -620,8 +681,14 @@ public class DefaultIntShader extends BaseIntShader {
         u_tessQuality = register(Inputs.tessQuality, Setters.tessQuality);
         u_alphaTest = register(Inputs.alphaTest);
         u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights, config.numPointLights)) : -1;
-        u_diffuseCubemap = register(Inputs.diffuseCubemap, Setters.diffuseCubemap);
         u_reflectionCubemap = register(Inputs.reflectionCubemap, Setters.reflectionCubemap);
+        u_diffuseCubemap = register(Inputs.diffuseCubemap, Setters.diffuseCubemap);
+        u_normalCubemap = register(Inputs.normalCubemap, Setters.normalCubemap);
+        u_specularCubemap = register(Inputs.specularCubemap, Setters.specularCubemap);
+        u_emissiveCubemap = register(Inputs.emissionCubemap, Setters.emissiveCubemap);
+        u_heightCubemap = register(Inputs.heightCubemap, Setters.heightCubemap);
+        u_roughnessCubemap = register(Inputs.roughnessCubemap, Setters.roughnessCubemap);
+        u_metallicCubemap = register(Inputs.metallicCubemap, Setters.metallicCubemap);
     }
 
     @Override
@@ -736,8 +803,8 @@ public class DefaultIntShader extends BaseIntShader {
         if (attributes.has(TextureAttribute.Emissive)) {
             prefix += "#define " + TextureAttribute.EmissiveAlias + "Flag\n";
         }
-        if (attributes.has(TextureAttribute.Reflection)) {
-            prefix += "#define " + TextureAttribute.ReflectionAlias + "Flag\n";
+        if (attributes.has(TextureAttribute.Metallic)) {
+            prefix += "#define " + TextureAttribute.MetallicAlias + "Flag\n";
         }
         if (attributes.has(TextureAttribute.Height)) {
             prefix += "#define " + TextureAttribute.HeightAlias + "Flag\n";
@@ -764,8 +831,8 @@ public class DefaultIntShader extends BaseIntShader {
             prefix += "#define " + ColorAttribute.SpecularAlias + "Flag\n";
         if (attributes.has(ColorAttribute.Emissive))
             prefix += "#define " + ColorAttribute.EmissiveAlias + "Flag\n";
-        if (attributes.has(ColorAttribute.Reflection))
-            prefix += "#define " + ColorAttribute.ReflectionAlias + "Flag\n";
+        if (attributes.has(ColorAttribute.Metallic))
+            prefix += "#define " + ColorAttribute.MetallicAlias + "Flag\n";
         if (attributes.has(FloatAttribute.AlphaTest))
             prefix += "#define " + FloatAttribute.AlphaTestAlias + "Flag\n";
         if (attributes.has(FloatAttribute.Shininess))
@@ -774,17 +841,47 @@ public class DefaultIntShader extends BaseIntShader {
         if (attributes.has(Matrix4Attribute.PrevProjView)) {
             prefix += "#define velocityBufferFlag\n";
         }
-        if (attributes.has(ColorAttribute.Reflection) || attributes.has(TextureAttribute.Reflection)) {
-            prefix += "#define reflectionFlag\n";
+        if (attributes.has(ColorAttribute.Metallic) || attributes.has(TextureAttribute.Metallic)) {
+            prefix += "#define metallicFlag\n";
             if (attributes.has(CubemapAttribute.ReflectionCubemap)) {
-                prefix += "#define reflectionCubemapFlag\n";
+                prefix += "#define " + CubemapAttribute.ReflectionCubemapAlias + "Flag\n";
             }
         }
-        if(Settings.settings.postprocess.ssr) {
+        if (Settings.settings.postprocess.ssr) {
             prefix += "#define ssrFlag\n";
         }
+
+        boolean cubemap = false;
         if (attributes.has(CubemapAttribute.DiffuseCubemap)) {
-            prefix += "#define diffuseCubemapFlag\n";
+            prefix += "#define " + CubemapAttribute.DiffuseCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (attributes.has(CubemapAttribute.NormalCubemap)) {
+            prefix += "#define " + CubemapAttribute.NormalCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (attributes.has(CubemapAttribute.SpecularCubemap)) {
+            prefix += "#define " + CubemapAttribute.SpecularCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (attributes.has(CubemapAttribute.EmissiveCubemap)) {
+            prefix += "#define " + CubemapAttribute.EmissiveCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (attributes.has(CubemapAttribute.MetallicCubemap)) {
+            prefix += "#define " + CubemapAttribute.MetallicCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (attributes.has(CubemapAttribute.RoughnessCubemap)) {
+            prefix += "#define " + CubemapAttribute.RoughnessCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (attributes.has(CubemapAttribute.HeightCubemap)) {
+            prefix += "#define " + CubemapAttribute.HeightCubemapAlias + "Flag\n";
+            cubemap = true;
+        }
+        if (cubemap) {
+            prefix += "#define cubemapFlag\n";
         }
 
         if (renderable.bones != null && config.numBones > 0)

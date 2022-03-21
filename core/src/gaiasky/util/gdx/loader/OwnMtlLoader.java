@@ -34,7 +34,7 @@ public class OwnMtlLoader {
         Color difcolor = Color.WHITE;
         Color speccolor = Color.WHITE;
         Color emicolor = Color.WHITE;
-        Color reflcolor = Color.BLACK;
+        Color metcolor = Color.BLACK;
         float opacity = 1.f;
         float shininess = 0.f;
         String texDiffuseFilename = null;
@@ -42,7 +42,7 @@ public class OwnMtlLoader {
         String texNormalFilename = null;
         String texSpecularFilename = null;
         String texRoughnessFilename = null;
-        String texReflectionFilename = null;
+        String texMetallicFilename = null;
 
         if (file == null || file.exists() == false) {
             logger.error("ERROR: Material file not found: " + file.name());
@@ -65,7 +65,7 @@ public class OwnMtlLoader {
                 else {
                     final String key = tokens[0].toLowerCase();
                     if (key.equals("newmtl")) {
-                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texReflectionFilename, materials);
+                        addCurrentMat(curMatName, difcolor, speccolor, emicolor, metcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texMetallicFilename, materials);
 
                         if (tokens.length > 1) {
                             curMatName = tokens[1];
@@ -77,15 +77,15 @@ public class OwnMtlLoader {
                         difcolor = Color.WHITE;
                         speccolor = Color.WHITE;
                         emicolor = Color.WHITE;
-                        reflcolor = Color.BLACK;
+                        metcolor = Color.BLACK;
                         texDiffuseFilename = null;
                         texEmissiveFilename = null;
                         texNormalFilename = null;
                         texRoughnessFilename = null;
-                        texReflectionFilename = null;
+                        texMetallicFilename = null;
                         opacity = 1.f;
                         shininess = 0.f;
-                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr")) // diffuse, specular, emissive, reflection
+                    } else if (key.equals("kd") || key.equals("ks") || key.equals("ke") || key.equals("kr") || key.equals("km")) // diffuse, specular, emissive, metallic
                     {
                         float r = Float.parseFloat(tokens[1]);
                         float g = Float.parseFloat(tokens[2]);
@@ -103,9 +103,9 @@ public class OwnMtlLoader {
                         } else if (tokens[0].equalsIgnoreCase("ke")) {
                             emicolor = new Color();
                             emicolor.set(r, g, b, a);
-                        } else if (tokens[0].equalsIgnoreCase("kr")) {
-                            reflcolor = new Color();
-                            reflcolor.set(r, g, b, a);
+                        } else if (tokens[0].equalsIgnoreCase("kr") || tokens[0].equalsIgnoreCase("km")) {
+                            metcolor = new Color();
+                            metcolor.set(r, g, b, a);
                         }
                     } else if (key.equals("tr") || key.equals("d")) {
                         opacity = Float.parseFloat(tokens[1]);
@@ -120,8 +120,8 @@ public class OwnMtlLoader {
                         texNormalFilename = file.parent().child(tokens[1]).path();
                     } else if (key.equals("map_ks")) {
                         texSpecularFilename = file.parent().child(tokens[1]).path();
-                    } else if (key.equals("map_kr")) {
-                        texReflectionFilename = file.parent().child(tokens[1]).path();
+                    } else if (key.equals("map_kr") || key.equals("map_km")) {
+                        texMetallicFilename = file.parent().child(tokens[1]).path();
                     } else if (key.equals("map_ns")) {
                         texRoughnessFilename = file.parent().child(tokens[1]).path();
                     }
@@ -133,12 +133,12 @@ public class OwnMtlLoader {
         }
 
         // last material
-        addCurrentMat(curMatName, difcolor, speccolor, emicolor, reflcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texReflectionFilename, materials);
+        addCurrentMat(curMatName, difcolor, speccolor, emicolor, metcolor, opacity, shininess, texDiffuseFilename, texEmissiveFilename, texNormalFilename, texSpecularFilename, texRoughnessFilename, texMetallicFilename, materials);
 
         return;
     }
 
-    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texSpecularFilename, String texRoughnessFilename, String texReflectionFilename, Array<ModelMaterial> materials) {
+    private void addCurrentMat(String curMatName, Color difcolor, Color speccolor, Color emicolor, Color reflcolor, float opacity, float shininess, String texDiffuseFilename, String texEmissiveFilename, String texNormalFilename, String texSpecularFilename, String texRoughnessFilename, String texMetallicFilename, Array<ModelMaterial> materials) {
         ModelMaterial mat = new ModelMaterial();
         mat.id = curMatName;
         mat.diffuse = new Color(difcolor);
@@ -190,10 +190,10 @@ public class OwnMtlLoader {
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);
         }
-        if (texReflectionFilename != null) {
+        if (texMetallicFilename != null) {
             ModelTexture tex = new ModelTexture();
             tex.usage = ModelTexture.USAGE_REFLECTION;
-            tex.fileName = texReflectionFilename;
+            tex.fileName = texMetallicFilename;
             if (mat.textures == null)
                 mat.textures = new Array<>(1);
             mat.textures.add(tex);

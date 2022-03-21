@@ -137,26 +137,6 @@ uniform mat4 u_shadowMapProjViewTrans;
     const float u_opacity = 1.0;
 #endif
 
-#ifdef diffuseColorFlag
-    uniform vec4 u_diffuseColor;
-#endif
-
-#ifdef diffuseTextureFlag
-    uniform sampler2D u_diffuseTexture;
-#endif
-
-#ifdef specularColorFlag
-    uniform vec4 u_specularColor;
-#endif
-
-#ifdef specularTextureFlag
-    uniform sampler2D u_specularTexture;
-#endif
-
-#ifdef normalTextureFlag
-    uniform sampler2D u_normalTexture;
-#endif
-
 #ifdef bumpTextureFlag
     uniform sampler2D u_bumpTexture;
 #endif

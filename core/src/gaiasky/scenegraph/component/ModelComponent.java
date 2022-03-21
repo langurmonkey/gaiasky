@@ -569,7 +569,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void addReflectionCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
-            if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
+            if (mat.has(ColorAttribute.Metallic) || mat.has(TextureAttribute.Metallic)) {
                 MaterialComponent.reflectionCubemap.prepareCubemap(manager);
                 mat.set(new CubemapAttribute(CubemapAttribute.ReflectionCubemap, MaterialComponent.reflectionCubemap.cubemap));
             }
@@ -578,7 +578,7 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
 
     public void removeReflectionCubemapAttribute(Array<Material> materials) {
         for (Material mat : materials) {
-            if (mat.has(ColorAttribute.Reflection) || mat.has(TextureAttribute.Reflection)) {
+            if (mat.has(ColorAttribute.Metallic) || mat.has(TextureAttribute.Metallic)) {
                 mat.remove(CubemapAttribute.ReflectionCubemap);
             }
         }

@@ -7,13 +7,48 @@ layout (triangles) in;
 #include shader/lib_geometry.glsl
 #endif
 
+#ifdef normalTextureFlag
+uniform sampler2D u_normalTexture;
+#endif
+
+#ifdef normalCubemapFlag
+uniform samplerCube u_normalCubemap;
+#endif
+
+#ifdef heightTextureFlag
+uniform sampler2D u_heightTexture;
+#endif
+
+#ifdef heightCubemapFlag
+uniform samplerCube u_heightCubemap;
+#endif
+
+#ifdef cubemapFlag
+    #include shader/lib_cubemap.glsl
+#endif // cubemapFlag
+
+// COLOR NORMAL
+#ifdef normalCubemapFlag
+    #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
+#elif defined(normalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
+#endif // normal
+
+// HEIGHT
+#ifdef heightCubemapFlag
+    #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
+#elif defined(heightTextureFlag)
+    #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
+#else
+    #define fetchHeight(texCoord) vec4(0.0)
+#endif // height
+
 ////////////////////////////////////////////////////////////////////////////////////
 //////////RELATIVISTIC EFFECTS - VERTEX
 ////////////////////////////////////////////////////////////////////////////////////
 #ifdef relativisticEffects
 #include shader/lib_relativity.glsl
 #endif// relativisticEffects
-
 
 ////////////////////////////////////////////////////////////////////////////////////
 //////////GRAVITATIONAL WAVES - VERTEX
@@ -27,7 +62,6 @@ uniform mat4 u_projViewTrans;
 uniform float u_heightScale;
 uniform float u_heightNoiseSize;
 uniform vec2 u_heightSize;
-uniform sampler2D u_heightTexture;
 uniform float u_vrScale;
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
@@ -76,46 +110,48 @@ out vec3 o_normalTan;
 out vec3 o_fragPosition;
 out float o_fragHeight;
 
-#include shader/lib_sampleheight.glsl
 #ifdef velocityBufferFlag
 #include shader/lib_velbuffer.vert.glsl
 #endif
 
-#ifdef normalTextureFlag
-// Use normal map
-uniform sampler2D u_normalTexture;
-vec3 calcNormal(vec2 p, vec2 dp){
-    return normalize(texture(u_normalTexture, p).rgb * 2.0 - 1.0);
-}
-#else
-// maps the height scale in internal units to a normal strength
-float computeNormalStrength(float heightScale){
-    // to [0,100] km
-    vec2 heightSpanKm = vec2(0.0, 100.0);
-    vec2 span = vec2(0.2, 1.0);
-    heightScale *= u_vrScale * 1e6;
-    heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
-    // normalize to [0,1]
-    heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
-    return span.x + (span.y - span.x) * heightScale;
-}
-// Use height texture for normals
-vec3 calcNormal(vec2 p, vec2 dp){
-    vec4 h;
-    vec2 size = vec2(computeNormalStrength(u_heightScale), 0.0);
-    if (dp.x < 0.0){
-        // Generated height using perlin noise
-        dp = vec2(3e-4);
+#if defined(normalCubemapFlag) || defined(normalTextureFlag)
+    // Use normal map
+    vec3 calcNormal(vec2 p, vec2 dp) {
+        return normalize(fetchColorNormal(p).rgb * 2.0 - 1.0);
     }
-    h.x = sampleHeight(u_heightTexture, vec2(p.x - dp.x, p.y)).r;
-    h.y = sampleHeight(u_heightTexture, vec2(p.x + dp.x, p.y)).r;
-    h.z = sampleHeight(u_heightTexture, vec2(p.x, p.y - dp.y)).r;
-    h.w = sampleHeight(u_heightTexture, vec2(p.x, p.y + dp.y)).r;
-    vec3 va = normalize(vec3(size.xy, h.x - h.y));
-    vec3 vb = normalize(vec3(size.yx, h.z - h.w));
-    vec3 n = cross(va, vb);
-    return normalize(n);
-}
+#elif defined(heightCubemapFlag) || defined(heightTextureFlag)
+    // maps the height scale in internal units to a normal strength
+    float computeNormalStrength(float heightScale){
+        // to [0,100] km
+        vec2 heightSpanKm = vec2(0.0, 100.0);
+        vec2 span = vec2(0.2, 1.0);
+        heightScale *= u_vrScale * 1e6;
+        heightScale = clamp(heightScale, heightSpanKm.x, heightSpanKm.y);
+        // normalize to [0,1]
+        heightScale = (heightSpanKm.y - heightScale) / (heightSpanKm.y - heightSpanKm.x);
+        return span.x + (span.y - span.x) * heightScale;
+    }
+    // Use height texture for normals
+    vec3 calcNormal(vec2 p, vec2 dp){
+        vec4 h;
+        vec2 size = vec2(computeNormalStrength(u_heightScale), 0.0);
+        if (dp.x < 0.0){
+            // Generated height using perlin noise
+            dp = vec2(3e-4);
+        }
+        h.x = fetchHeight(vec2(p.x - dp.x, p.y)).r;
+        h.y = fetchHeight(vec2(p.x + dp.x, p.y)).r;
+        h.z = fetchHeight(vec2(p.x, p.y - dp.y)).r;
+        h.w = fetchHeight(vec2(p.x, p.y + dp.y)).r;
+        vec3 va = normalize(vec3(size.xy, h.x - h.y));
+        vec3 vb = normalize(vec3(size.yx, h.z - h.w));
+        vec3 n = cross(va, vb);
+        return normalize(n);
+    }
+#else
+    vec3 calcNormal(vec2 p, vec2 dp){
+        return vec3(0.0);
+    }
 #endif // normalTextureFlag
 
 void main(void){
@@ -133,7 +169,7 @@ void main(void){
     o_data.normal = normalize(u * l_data[0].normal + v * l_data[1].normal + w * l_data[2].normal);
 
     // Use height texture to move vertex along normal
-    float h = 1.0 - sampleHeight(u_heightTexture, o_data.texCoords).r;
+    float h = fetchHeight(o_data.texCoords).r;
     o_fragHeight = h * u_heightScale;
     vec3 dh = o_data.normal * o_fragHeight;
     pos += vec4(dh, 0.0);

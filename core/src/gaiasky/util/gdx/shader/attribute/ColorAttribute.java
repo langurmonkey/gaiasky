@@ -17,7 +17,6 @@
 package gaiasky.util.gdx.shader.attribute;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class ColorAttribute extends Attribute {
     public final static String DiffuseAlias = "diffuseColor";
@@ -28,8 +27,8 @@ public class ColorAttribute extends Attribute {
     public static final int Ambient = register(AmbientAlias);
     public final static String EmissiveAlias = "emissiveColor";
     public static final int Emissive = register(EmissiveAlias);
-    public final static String ReflectionAlias = "reflectionColor";
-    public static final int Reflection = register(ReflectionAlias);
+    public final static String MetallicAlias = "metallicColor";
+    public static final int Metallic = register(MetallicAlias);
     public final static String AmbientLightAlias = "ambientLightColor";
     public static final int AmbientLight = register(AmbientLightAlias);
     public final static String FogAlias = "fogColor";
@@ -59,12 +58,12 @@ public class ColorAttribute extends Attribute {
         return new ColorAttribute(Specular, r, g, b, a);
     }
 
-    public final static ColorAttribute createReflection(final Color color) {
-        return new ColorAttribute(Reflection, color);
+    public final static ColorAttribute createMetallic(final Color color) {
+        return new ColorAttribute(Metallic, color);
     }
 
-    public final static ColorAttribute createReflection(float r, float g, float b, float a) {
-        return new ColorAttribute(Reflection, r, g, b, a);
+    public final static ColorAttribute createMetallic(float r, float g, float b, float a) {
+        return new ColorAttribute(Metallic, r, g, b, a);
     }
 
     public final static ColorAttribute createEmissive(final Color color) {

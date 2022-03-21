@@ -267,7 +267,7 @@ public class IntModel implements Disposable {
 		if (mtl.diffuse != null) result.set(new ColorAttribute(ColorAttribute.Diffuse, mtl.diffuse));
 		if (mtl.specular != null) result.set(new ColorAttribute(ColorAttribute.Specular, mtl.specular));
 		if (mtl.emissive != null) result.set(new ColorAttribute(ColorAttribute.Emissive, mtl.emissive));
-		if (mtl.reflection != null) result.set(new ColorAttribute(ColorAttribute.Reflection, mtl.reflection));
+		if (mtl.reflection != null) result.set(new ColorAttribute(ColorAttribute.Metallic, mtl.reflection));
 		if (mtl.shininess > 0f) result.set(new FloatAttribute(FloatAttribute.Shininess, mtl.shininess));
 		if (mtl.opacity != 1.f) result.set(new BlendingAttribute(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA, mtl.opacity));
 
@@ -316,7 +316,7 @@ public class IntModel implements Disposable {
 					result.set(new TextureAttribute(TextureAttribute.Emissive, descriptor, offsetU, offsetV, scaleU, scaleV));
 					break;
 				case ModelTexture.USAGE_REFLECTION:
-					result.set(new TextureAttribute(TextureAttribute.Reflection, descriptor, offsetU, offsetV, scaleU, scaleV));
+					result.set(new TextureAttribute(TextureAttribute.Metallic, descriptor, offsetU, offsetV, scaleU, scaleV));
 					break;
 				case ModelTexture.USAGE_SHININESS:
 					result.set(new TextureAttribute(TextureAttribute.Roughness, descriptor, offsetU, offsetV, scaleU, scaleV));

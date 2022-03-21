@@ -40,8 +40,16 @@ uniform vec4 u_specularColor;
 uniform sampler2D u_specularTexture;
 #endif
 
+#ifdef specularCubemapFlag
+uniform samplerCube u_specularCubemap;
+#endif
+
 #ifdef normalTextureFlag
 uniform sampler2D u_normalTexture;
+#endif
+
+#ifdef normalCubemapFlag
+uniform samplerCube u_normalCubemap;
 #endif
 
 #ifdef emissiveColorFlag
@@ -53,16 +61,36 @@ uniform sampler2D u_emissiveTexture;
 #include shader/lib_luma.glsl
 #endif
 
-#ifdef reflectionColorFlag
-uniform vec4 u_reflectionColor;
+#ifdef emissiveCubemapFlag
+uniform samplerCube u_emissiveCubemap;
 #endif
 
-#ifdef reflectionTextureFlag
-uniform sampler2D u_reflectionTexture;
+#ifdef metallicColorFlag
+uniform vec4 u_metallicColor;
+#endif
+
+#ifdef metallicTextureFlag
+uniform sampler2D u_metallicTexture;
+#endif
+
+#ifdef metallicCubemapFlag
+uniform samplerCube u_metallicCubemap;
 #endif
 
 #ifdef roughnessTextureFlag
 uniform sampler2D u_roughnessTexture;
+#endif
+
+#ifdef roughnessCubemapFlag
+uniform samplerCube u_roughnessCubemap;
+#endif
+
+#ifdef heightTextureFlag
+uniform sampler2D u_heightTexture;
+#endif
+
+#ifdef heightCubemapFlag
+uniform samplerCube u_heightCubemap;
 #endif
 
 #ifdef reflectionCubemapFlag
@@ -73,7 +101,7 @@ uniform samplerCube u_reflectionCubemap;
 uniform float u_shininess;
 #endif
 
-#ifdef heightTextureFlag
+#if defined(heightTextureFlag) || defined(heightCubemapFlag)
 #define heightFlag
 #endif //heightTextureFlag
 
@@ -121,7 +149,11 @@ float getShadow(vec3 shadowMapUv) {
     // Simple lookup
     //return getShadowness(v_data.shadowMapUv.xy, vec2(0.0), v_data.shadowMapUv.z);
 }
-#endif //shadowMapFlag
+#endif // shadowMapFlag
+
+#ifdef cubemapFlag
+    #include shader/lib_cubemap.glsl
+#endif // cubemapFlag
 
 // COLOR DIFFUSE
 #if defined(diffuseTextureFlag) && defined(diffuseColorFlag)
@@ -132,16 +164,15 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorDiffuseTD(texCoord, defaultValue) u_diffuseColor
 #else
     #define fetchColorDiffuseTD(texCoord, defaultValue) defaultValue
-#endif // diffuseTextureFlag && diffuseColorFlag
+#endif // diffuse
 
 #if defined(diffuseCubemapFlag)
-    #include shader/lib_cubemap.glsl
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * texture(u_diffuseCubemap, UVtoXYZ(texCoord))
 #elif defined(diffuseTextureFlag) || defined(diffuseColorFlag)
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor * fetchColorDiffuseTD(texCoord, defaultValue)
 #else
     #define fetchColorDiffuse(baseColor, texCoord, defaultValue) baseColor
-#endif // diffuseCubemapFlag, diffuseTextureFlag || diffuseColorFlag
+#endif // diffuse
 
 // COLOR EMISSIVE
 #if defined(emissiveTextureFlag) && defined(emissiveColorFlag)
@@ -150,16 +181,20 @@ float getShadow(vec3 shadowMapUv) {
     #define fetchColorEmissiveTD(tex, texCoord) texture(tex, texCoord)
 #elif defined(emissiveColorFlag)
     #define fetchColorEmissiveTD(tex, texCoord) u_emissiveColor
-#endif // emissiveTextureFlag && emissiveColorFlag
+#endif // emissive
 
-#if defined(emissiveTextureFlag) || defined(emissiveColorFlag)
+#ifdef emissiveCubemapFlag
+    #define fetchColorEmissive(texCoord) texture(u_emissiveCubemap, UVtoXYZ(texCoord))
+#elif defined(emissiveTextureFlag) || defined(emissiveColorFlag)
     #define fetchColorEmissive(texCoord) fetchColorEmissiveTD(u_emissiveTexture, texCoord)
 #else
     #define fetchColorEmissive(texCoord) vec4(0.0, 0.0, 0.0, 0.0)
-#endif // emissiveTextureFlag || emissiveColorFlag
+#endif // emissive
 
 // COLOR SPECULAR
-#if defined(specularTextureFlag) && defined(specularColorFlag)
+#ifdef specularCubemapFlag
+    #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularCubemap, UVtoXYZ(texCoord))
+#elif defined(specularTextureFlag) && defined(specularColorFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb * u_specularColor.rgb
 #elif defined(specularTextureFlag)
     #define fetchColorSpecular(texCoord, defaultValue) texture(u_specularTexture, texCoord).rgb
@@ -168,6 +203,36 @@ float getShadow(vec3 shadowMapUv) {
 #else
     #define fetchColorSpecular(texCoord, defaultValue) defaultValue
 #endif // specular
+
+// COLOR NORMAL
+#ifdef normalCubemapFlag
+    #define fetchColorNormal(texCoord) texture(u_normalCubemap, UVtoXYZ(texCoord))
+#elif defined(normalTextureFlag)
+    #define fetchColorNormal(texCoord) texture(u_normalTexture, texCoord)
+#endif // normal
+
+// COLOR METALLIC
+#ifdef metallicCubemapFlag
+    #define fetchColorMetallic(texCoord) texture(u_metallicCubemap, UVtoXYZ(texCoord))
+#elif defined(metallicTextureFlag)
+    #define fetchColorMetallic(texCoord) texture(u_metallicTexture, texCoord)
+#elif defined(metallicColorFlag)
+    #define fetchColorMetallic(texCoord) u_metallicColor
+#endif // metallic
+
+// COLOR ROUGHNESS
+#ifdef roughnessCubemapFlag
+    #define fetchColorRoughness(texCoord) texture(u_roughnessCubemap, UVtoXYZ(texCoord))
+#elif defined(roughnessTextureFlag)
+    #define fetchColorRoughness(texCoord) texture(u_roughnessTexture, texCoord)
+#endif // roughness
+
+// HEIGHT
+#ifdef heightCubemapFlag
+    #define fetchHeight(texCoord) texture(u_heightCubemap, UVtoXYZ(texCoord))
+#elif defined(heightTextureFlag)
+    #define fetchHeight(texCoord) texture(u_heightTexture, texCoord)
+#endif // height
 
 #if defined(numDirectionalLights) && (numDirectionalLights > 0)
 #define directionalLightsFlag
@@ -195,9 +260,9 @@ struct VertexData {
     vec3 shadowMapUv;
     #endif // shadowMapFlag
     vec3 fragPosWorld;
-    #ifdef reflectionFlag
+    #ifdef metallicFlag
     vec3 reflect;
-    #endif // reflectionFlag
+    #endif // metallicFlag
 };
 in VertexData v_data;
 
@@ -215,16 +280,15 @@ layout (location = 0) out vec4 fragColor;
 
 #define saturate(x) clamp(x, 0.0, 1.0)
 
+
+
 #ifdef heightFlag
-uniform sampler2D u_heightTexture;
 uniform float u_heightScale;
 uniform vec2 u_heightSize;
 uniform float u_heightNoiseSize;
 
 #define KM_TO_U 1.0E-6
 #define HEIGHT_FACTOR 70.0
-
-#include shader/lib_sampleheight.glsl
 
 vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
     // number of depth layers
@@ -242,13 +306,13 @@ vec2 parallaxMapping(vec2 texCoords, vec3 viewDir) {
 
     // get initial values
     vec2  currentTexCoords     = texCoords;
-    float currentDepthMapValue = sampleHeight(u_heightTexture, currentTexCoords).r;
+    float currentDepthMapValue = fetchHeight(currentTexCoords).r;
 
     while(currentLayerDepth < currentDepthMapValue){
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
         // get depthmap value at current texture coordinates
-        currentDepthMapValue = sampleHeight(u_heightTexture, currentTexCoords).r;
+        currentDepthMapValue = fetchHeight(currentTexCoords).r;
         // get depth of next layer
         currentLayerDepth += layerDepth;
     }
@@ -347,10 +411,10 @@ void main() {
     #endif
 
     vec4 normalVector = vec4(0.0, 0.0, 0.0, 1.0);
-    #ifdef normalTextureFlag
+    #if defined(normalTextureFlag) || defined(normalCubemapFlag)
         // Normal in tangent space
-        vec3 N = normalize(vec3(texture(u_normalTexture, texCoords).xyz * 2.0 - 1.0));
-		#ifdef reflectionFlag
+        vec3 N = normalize(vec3(fetchColorNormal(texCoords) * 2.0 - 1.0));
+		#ifdef metallicFlag
             // Perturb the normal to get reflect direction
             pullNormal();
             #ifndef heightFlag
@@ -358,14 +422,14 @@ void main() {
             #endif // heighFlag
             normalVector.xyz = TBN * N;
             vec3 reflectDir = normalize(reflect(v_data.fragPosWorld, normalVector.xyz));
-		#endif // reflectionFlag
+		#endif // metallicFlag
     #else
 	    // Normal in tangent space
 	    vec3 N = vec3(0.0, 0.0, 1.0);
         normalVector.xyz = v_data.normal;
-		#ifdef reflectionFlag
+		#ifdef metallicFlag
 			vec3 reflectDir = normalize(v_data.reflect);
-        #endif // reflectionFlag
+        #endif // metallicFlag
     #endif // normalTextureFlag
 
     // Shadow
@@ -382,38 +446,28 @@ void main() {
         reflectionMask = vec4(0.0, 0.0, 0.0, 1.0);
     #endif // ssrFlag
 
-    #ifdef reflectionFlag
+    #ifdef metallicFlag
         float roughness = 0.0;
-        #if defined(roughnessTextureFlag)
-            roughness = texture(u_roughnessTexture, texCoords).x;
+        #if defined(roughnessTextureFlag) || defined(roughnessCubemapFlag)
+            roughness = fetchColorRoughness(texCoords).x;
         #elif defined(shininessFlag)
             roughness = 1.0 - u_shininess;
-        #endif // roughnessTextureFlag, shininessFlag
+        #endif // roughness, shininessFlag
 
         #ifdef reflectionCubemapFlag
             reflectionColor = texture(u_reflectionCubemap, vec3(-reflectDir.x, reflectDir.y, reflectDir.z), roughness * 7.0).rgb;
         #endif // reflectionCubemapFlag
 
-        #ifdef reflectionTextureFlag
-            vec3 reflectionStrength = texture(u_reflectionTexture, texCoords).rgb;
-            reflectionColor = reflectionColor * reflectionStrength;
-            #ifdef ssrFlag
-                vec3 rmc = diffuse.rgb * reflectionStrength;
-                reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
-            #endif // ssrFlag
-        #elif defined(reflectionColorFlag)
-            reflectionColor = reflectionColor * u_reflectionColor.rgb;
-            #ifdef ssrFlag
-                vec3 rmc = diffuse.rgb * u_reflectionColor.rgb;
-                reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
-            #endif //ssrFlag
-        #endif // reflectionColorFlag
+        vec3 metallicColor = fetchColorMetallic(texCoords).rgb;
+        reflectionColor = reflectionColor * metallicColor;
         #ifdef ssrFlag
+            vec3 rmc = diffuse.rgb * metallicColor;
+            reflectionMask = vec4(rmc.r, pack2(rmc.gb), roughness, 1.0);
             reflectionColor *= 0.0;
         #else
             reflectionColor += reflectionColor * diffuse.rgb;
         #endif // ssrFlag
-    #endif // reflectionFlag
+    #endif // metallicFlag
 
     vec3 shadowColor = vec3(0.0);
     vec3 diffuseColor = vec3(0.0);

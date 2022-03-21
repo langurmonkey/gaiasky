@@ -35,14 +35,12 @@ public class TextureAttribute extends Attribute {
 	public final static int Ambient = register(AmbientAlias);
 	public final static String EmissiveAlias = "emissiveTexture";
 	public final static int Emissive = register(EmissiveAlias);
-	public final static String ReflectionAlias = "reflectionTexture";
-	public final static int Reflection = register(ReflectionAlias);
+	public final static String MetallicAlias = "metallicTexture";
+	public final static int Metallic = register(MetallicAlias);
 	public final static String AOAlias = "AOTexture";
 	public final static int AO = register(AOAlias);
-
 	public final static String RoughnessAlias = "roughnessTexture";
 	public final static int Roughness = register(RoughnessAlias);
-
 	public final static String HeightAlias = "heightTexture";
 	public final static int Height = register(HeightAlias);
 
@@ -93,14 +91,23 @@ public class TextureAttribute extends Attribute {
 	public static TextureAttribute createEmissive (final TextureRegion region) {
 		return new TextureAttribute(Emissive, region);
 	}
-	
+
+	public static TextureAttribute createMetallic (final Texture texture) {
+		return new TextureAttribute(Metallic, texture);
+	}
+
 	public static TextureAttribute createReflection (final Texture texture) {
-		return new TextureAttribute(Reflection, texture);
+		return createMetallic(texture);
 	}
-	
+
+	public static TextureAttribute createMetallic (final TextureRegion region) {
+		return new TextureAttribute(Metallic, region);
+	}
+
 	public static TextureAttribute createReflection (final TextureRegion region) {
-		return new TextureAttribute(Reflection, region);
+		return createMetallic(region);
 	}
+
 	public static TextureAttribute createHeight(final Texture texture) {
 		return new TextureAttribute(Height, texture);
 	}

@@ -110,7 +110,7 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     public NoiseComponent nc;
 
     // CUBEMAPS
-    public CubemapComponent diffuseCubemap;
+    public CubemapComponent diffuseCubemap, specularCubemap, normalCubemap, emissiveCubemap, heightCubemap, roughnessCubemap, metallicCubemap;
 
     /** The actual material **/
     private Material material, ringMaterial;
@@ -133,7 +133,8 @@ public class MaterialComponent extends NamedComponent implements IObserver {
 
     public void initialize(String name, AssetManager manager) {
         super.initialize(name);
-        // Add textures to load
+
+        // Regular textures
         if (diffuse != null && !diffuse.endsWith(Constants.GEN_KEYWORD))
             diffuseUnpacked = addToLoad(diffuse, getTP(diffuse, true), manager);
         if (normal != null && !normal.endsWith(Constants.GEN_KEYWORD))
@@ -154,8 +155,22 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             ringUnpacked = addToLoad(ring, getTP(ring, true), manager);
         if (ringnormal != null)
             ringnormalUnpacked = addToLoad(ringnormal, getTP(ringnormal, true), manager);
+
+        // Cubemaps
         if (diffuseCubemap != null)
             diffuseCubemap.initialize(manager);
+        if (normalCubemap != null)
+            normalCubemap.initialize(manager);
+        if (specularCubemap != null)
+            specularCubemap.initialize(manager);
+        if (emissiveCubemap != null)
+            emissiveCubemap.initialize(manager);
+        if (heightCubemap != null)
+            heightCubemap.initialize(manager);
+        if (roughnessCubemap != null)
+            roughnessCubemap.initialize(manager);
+        if (metallicCubemap != null)
+            metallicCubemap.initialize(manager);
 
         this.heightGenerated.set(false);
     }
@@ -165,7 +180,23 @@ public class MaterialComponent extends NamedComponent implements IObserver {
     }
 
     public boolean isFinishedLoading(AssetManager manager) {
-        return isFL(diffuseUnpacked, manager) && isFL(normalUnpacked, manager) && isFL(specularUnpacked, manager) && isFL(emissiveUnpacked, manager) && isFL(ringUnpacked, manager) && isFL(ringnormalUnpacked, manager) && isFL(heightUnpacked, manager) && isFL(roughnessUnapcked, manager) && isFL(metallicUnpacked, manager) && isFL(aoUnapcked, manager) && isFL(diffuseCubemap, manager);
+        return isFL(diffuseUnpacked, manager)
+                && isFL(normalUnpacked, manager)
+                && isFL(specularUnpacked, manager)
+                && isFL(emissiveUnpacked, manager)
+                && isFL(ringUnpacked, manager)
+                && isFL(ringnormalUnpacked, manager)
+                && isFL(heightUnpacked, manager)
+                && isFL(roughnessUnapcked, manager)
+                && isFL(metallicUnpacked, manager)
+                && isFL(aoUnapcked, manager)
+                && isFL(diffuseCubemap, manager)
+                && isFL(normalCubemap, manager)
+                && isFL(emissiveCubemap, manager)
+                && isFL(specularCubemap, manager)
+                && isFL(roughnessCubemap, manager)
+                && isFL(metallicCubemap, manager)
+                && isFL(heightCubemap, manager);
     }
 
     public boolean isFL(String tex, AssetManager manager) {
@@ -303,14 +334,14 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             }
         }
         if (metallic != null && !metallic.endsWith(Constants.GEN_KEYWORD)) {
-            if (material.get(TextureAttribute.Reflection) == null) {
+            if (material.get(TextureAttribute.Metallic) == null) {
                 Texture tex = manager.get(metallicUnpacked, Texture.class);
-                material.set(new TextureAttribute(TextureAttribute.Reflection, tex));
+                material.set(new TextureAttribute(TextureAttribute.Metallic, tex));
             }
         }
         if (metallicColor != null) {
             // Reflective color
-            material.set(new ColorAttribute(ColorAttribute.Reflection, metallicColor[0], metallicColor[1], metallicColor[2], 1f));
+            material.set(new ColorAttribute(ColorAttribute.Metallic, metallicColor[0], metallicColor[1], metallicColor[2], 1f));
         }
         if (roughness != null && material.get(TextureAttribute.Roughness) == null) {
             if (!roughness.endsWith(Constants.GEN_KEYWORD)) {
@@ -332,6 +363,31 @@ public class MaterialComponent extends NamedComponent implements IObserver {
             diffuseCubemap.prepareCubemap(manager);
             material.set(new CubemapAttribute(CubemapAttribute.DiffuseCubemap, diffuseCubemap.cubemap));
         }
+        if (normalCubemap != null) {
+            normalCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.NormalCubemap, normalCubemap.cubemap));
+        }
+        if (emissiveCubemap != null) {
+            emissiveCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.EmissiveCubemap, emissiveCubemap.cubemap));
+        }
+        if (specularCubemap != null) {
+            specularCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.SpecularCubemap, specularCubemap.cubemap));
+        }
+        if (roughnessCubemap != null) {
+            roughnessCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.RoughnessCubemap, roughnessCubemap.cubemap));
+        }
+        if (metallicCubemap != null) {
+            metallicCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.MetallicCubemap, metallicCubemap.cubemap));
+        }
+        if (heightCubemap != null) {
+            heightCubemap.prepareCubemap(manager);
+            material.set(new CubemapAttribute(CubemapAttribute.HeightCubemap, heightCubemap.cubemap));
+        }
+
         return material;
     }
 
@@ -716,9 +772,33 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         this.ao = Settings.settings.data.dataFile(ao);
     }
 
-    public void setDiffuseCubemap(String diffuseCubemap) {
+    public void setDiffuseCubemap(String cubemap) {
         this.diffuseCubemap = new CubemapComponent();
-        this.diffuseCubemap.setLocation(diffuseCubemap);
+        this.diffuseCubemap.setLocation(cubemap);
+    }
+    public void setNormalCubemap(String cubemap) {
+        this.normalCubemap = new CubemapComponent();
+        this.normalCubemap.setLocation(cubemap);
+    }
+    public void setSpecularCubemap(String cubemap) {
+        this.specularCubemap = new CubemapComponent();
+        this.specularCubemap.setLocation(cubemap);
+    }
+    public void setEmissiveColormap(String cubemap) {
+        this.emissiveCubemap = new CubemapComponent();
+        this.emissiveCubemap.setLocation(cubemap);
+    }
+    public void setHeightCubemap(String cubemap) {
+        this.heightCubemap = new CubemapComponent();
+        this.heightCubemap.setLocation(cubemap);
+    }
+    public void setMetallicCubemap(String cubemap) {
+        this.metallicCubemap = new CubemapComponent();
+        this.metallicCubemap.setLocation(cubemap);
+    }
+    public void setRoughnessCubemap(String cubemap) {
+        this.roughnessCubemap = new CubemapComponent();
+        this.roughnessCubemap.setLocation(cubemap);
     }
 
     public void setReflectionCubemap(String reflectionCubemap) {
@@ -771,10 +851,16 @@ public class MaterialComponent extends NamedComponent implements IObserver {
         disposeTexture(manager, ringMaterial, ring, ringUnpacked, TextureAttribute.Diffuse, null);
         disposeTexture(manager, ringMaterial, ringnormal, ringnormalUnpacked, TextureAttribute.Normal, null);
         disposeTexture(manager, material, height, heightUnpacked, TextureAttribute.Height, heightTex);
-        disposeTexture(manager, material, metallic, metallicUnpacked, TextureAttribute.Reflection, null);
+        disposeTexture(manager, material, metallic, metallicUnpacked, TextureAttribute.Metallic, null);
         disposeTexture(manager, material, roughness, roughnessUnapcked, TextureAttribute.Roughness, null);
         disposeTexture(manager, material, ao, aoUnapcked, TextureAttribute.AO, null);
         disposeCubemap(manager, material, CubemapAttribute.DiffuseCubemap, diffuseCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.NormalCubemap, normalCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.EmissiveCubemap, emissiveCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.SpecularCubemap, specularCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.RoughnessCubemap, roughnessCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.MetallicCubemap, metallicCubemap);
+        disposeCubemap(manager, material, CubemapAttribute.HeightCubemap, heightCubemap);
         texLoading = false;
         texInitialised = false;
     }

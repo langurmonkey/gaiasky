@@ -27,19 +27,29 @@ public class CubemapAttribute extends Attribute {
     public final static String DiffuseCubemapAlias = "diffuseCubemap";
     public final static int DiffuseCubemap = register(DiffuseCubemapAlias);
 
-    protected static long Mask = DiffuseCubemap;
+    public final static String NormalCubemapAlias = "normalCubemap";
+    public final static int NormalCubemap = register(NormalCubemapAlias);
 
-    public final static boolean is(final long mask) {
-        return (mask & Mask) != 0;
-    }
+    public final static String EmissiveCubemapAlias = "emissiveCubemap";
+    public final static int EmissiveCubemap = register(EmissiveCubemapAlias);
+
+    public final static String SpecularCubemapAlias = "specularCubemap";
+    public final static int SpecularCubemap = register(SpecularCubemapAlias);
+
+    public final static String RoughnessCubemapAlias = "roughnessCubemap";
+    public final static int RoughnessCubemap = register(RoughnessCubemapAlias);
+
+    public final static String MetallicCubemapAlias = "metallicCubemap";
+    public final static int MetallicCubemap = register(MetallicCubemapAlias);
+
+    public final static String HeightCubemapAlias = "heightCubemap";
+    public final static int HeightCubemap = register(HeightCubemapAlias);
 
     public final TextureDescriptor<OwnCubemap> textureDescription;
 
     public CubemapAttribute(final int index) {
         super(index);
         textureDescription = new TextureDescriptor<>();
-        if (!is(index))
-            throw new GdxRuntimeException("Invalid type specified");
     }
 
     public <T extends OwnCubemap> CubemapAttribute(final int index, final TextureDescriptor<T> textureDescription) {
