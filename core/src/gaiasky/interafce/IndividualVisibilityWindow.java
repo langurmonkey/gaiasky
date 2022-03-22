@@ -51,7 +51,7 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
         // Pack
         pack();
 
-        EventManager.instance.subscribe(this, Event.PER_OBJECT_VISIBILITY_CMD);
+        EventManager.instance.subscribe(this, Event.PER_OBJECT_VISIBILITY_CMD, Event.CATALOG_VISIBLE);
     }
 
     @Override
@@ -167,7 +167,14 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
 
                 cb.addListener((event) -> {
                     if (event instanceof ChangeListener.ChangeEvent && objMap.containsKey(name)) {
-                        GaiaSky.postRunnable(() -> EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, cb, obj, obj.getName(), cb.isChecked()));
+                        GaiaSky.postRunnable(() -> {
+                            EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, cb, obj, obj.getName(), cb.isChecked());
+                            // Meshes are single objects but also catalogs!
+                            // Connect to catalog visibility
+                            if (obj instanceof MeshObject) {
+                                EventManager.publish(Event.CATALOG_VISIBLE, cb, obj.getName(), cb.isChecked());
+                            }
+                        });
                         return true;
                     }
                     return false;
@@ -300,7 +307,19 @@ public class IndividualVisibilityWindow extends GenericDialog implements IObserv
             String name = (String) data[1];
             boolean checked = (Boolean) data[2];
             // Update checkbox if necessary
-            if (currentCt != null && obj.hasCt(currentCt)) {
+            if (obj != null && currentCt != null && obj.hasCt(currentCt)) {
+                CheckBox cb = cbMap.get(name);
+                if (cb != null && source != cb) {
+                    cb.setProgrammaticChangeEvents(false);
+                    cb.setChecked(checked);
+                    cb.setProgrammaticChangeEvents(true);
+                }
+            }
+        } else if (event == Event.CATALOG_VISIBLE) {
+            String name = (String) data[0];
+            boolean checked = (Boolean) data[1];
+            IVisibilitySwitch obj = GaiaSky.instance.sceneGraph.getNode(name);
+            if (obj != null && obj instanceof MeshObject && currentCt != null && obj.hasCt(currentCt)) {
                 CheckBox cb = cbMap.get(name);
                 if (cb != null && source != cb) {
                     cb.setProgrammaticChangeEvents(false);

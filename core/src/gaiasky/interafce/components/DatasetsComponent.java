@@ -7,6 +7,7 @@ package gaiasky.interafce.components;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.graphics.Mesh;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -20,6 +21,8 @@ import gaiasky.event.Event;
 import gaiasky.event.EventManager;
 import gaiasky.event.IObserver;
 import gaiasky.interafce.*;
+import gaiasky.scenegraph.IVisibilitySwitch;
+import gaiasky.scenegraph.MeshObject;
 import gaiasky.util.*;
 import gaiasky.util.scene2d.*;
 
@@ -47,7 +50,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         imageMap = new HashMap<>();
         colorMap = new HashMap<>();
         prefsMap = new HashMap<>();
-        EventManager.instance.subscribe(this, gaiasky.event.Event.CATALOG_ADD, gaiasky.event.Event.CATALOG_REMOVE, gaiasky.event.Event.CATALOG_VISIBLE, gaiasky.event.Event.CATALOG_HIGHLIGHT);
+        EventManager.instance.subscribe(this, Event.CATALOG_ADD, Event.CATALOG_REMOVE, Event.CATALOG_VISIBLE, Event.CATALOG_HIGHLIGHT);
     }
 
     @Override
@@ -71,7 +74,10 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             if (source != eye) {
                 eye.setCheckedNoFire(!visible);
             }
-            EventManager.publish(gaiasky.event.Event.CATALOG_VISIBLE, this, ci.name, visible);
+            EventManager.publish(Event.CATALOG_VISIBLE, this, ci.name, visible);
+            if(ci.object != null && ci.object instanceof MeshObject) {
+                EventManager.publish(Event.PER_OBJECT_VISIBILITY_CMD, this, ci.object, ci.object.getName(), visible);
+            }
         }
     }
 
@@ -80,7 +86,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
             if (source != mark) {
                 mark.setCheckedNoFire(highlight);
             }
-            EventManager.publish(gaiasky.event.Event.CATALOG_HIGHLIGHT, this, ci, highlight);
+            EventManager.publish(Event.CATALOG_HIGHLIGHT, this, ci, highlight);
         }
     }
 
@@ -139,7 +145,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
         rubbish.addListener(event -> {
             if (event instanceof ChangeEvent) {
                 // Remove dataset
-                EventManager.publish(gaiasky.event.Event.CATALOG_REMOVE, this, ci.name);
+                EventManager.publish(Event.CATALOG_REMOVE, this, ci.name);
                 return true;
             }
             return false;
@@ -284,7 +290,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                                 delete.addListener(new ChangeListener() {
                                     @Override
                                     public void changed(ChangeEvent event, Actor actor) {
-                                        EventManager.publish(gaiasky.event.Event.CATALOG_REMOVE, this, ci.name);
+                                        EventManager.publish(Event.CATALOG_REMOVE, this, ci.name);
                                     }
                                 });
                                 datasetContext.addItem(delete);
@@ -318,7 +324,7 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 groupMap.remove(ciName);
                 imageMap.remove(ciName);
                 colorMap.remove(ciName);
-                EventManager.publish(gaiasky.event.Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
+                EventManager.publish(Event.RECALCULATE_CONTROLS_WINDOW_SIZE, this);
             }
             break;
         case CATALOG_VISIBLE:
@@ -328,6 +334,18 @@ public class DatasetsComponent extends GuiComponent implements IObserver {
                 boolean visible = (Boolean) data[1];
                 OwnImageButton eye = imageMap.get(ciName)[0];
                 eye.setCheckedNoFire(!visible);
+            }
+            break;
+        case PER_OBJECT_VISIBILITY_CMD:
+            ui = source == this;
+            if (!ui) {
+                IVisibilitySwitch obj = (IVisibilitySwitch) data[0];
+                String name = (String) data[1];
+                boolean checked = (Boolean) data[2];
+                if (obj instanceof MeshObject) {
+                    OwnImageButton eye = imageMap.get(name)[0];
+                    eye.setCheckedNoFire(!checked);
+                }
             }
             break;
         case CATALOG_HIGHLIGHT:

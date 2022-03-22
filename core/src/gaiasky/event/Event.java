@@ -1273,6 +1273,7 @@ public enum Event {
     TOGGLE_UPDATEPAUSE,
 
     /**
+     * Toggle the visibility of a component type.
      * Contains the name of the type and a boolean with the state (on/off).
      **/
     TOGGLE_VISIBILITY_CMD,

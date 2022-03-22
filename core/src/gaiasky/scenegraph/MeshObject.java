@@ -35,7 +35,7 @@ import gaiasky.util.time.ITimeFrameProvider;
 
 import java.util.Locale;
 
-public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRenderable {
+public class MeshObject extends GenericCatalog implements IModelRenderable, I3DTextRenderable {
 
     private enum MeshShading {
         REGULAR,
@@ -67,6 +67,7 @@ public class MeshObject extends FadeNode implements IModelRenderable, I3DTextRen
     }
 
     public void initialize() {
+        super.initialize(false, true);
         if (mc != null) {
             mc.initialize(true);
         }

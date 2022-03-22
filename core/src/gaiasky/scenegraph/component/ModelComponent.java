@@ -348,8 +348,9 @@ public class ModelComponent extends NamedComponent implements Disposable, IObser
                 if (material.get(TextureAttribute.Ambient) == null && material.get(TextureAttribute.Diffuse) == null) {
                     material.set(new ColorAttribute(ColorAttribute.Diffuse, cc[0], cc[1], cc[2], cc[3]));
                     material.set(new ColorAttribute(ColorAttribute.Ambient, cc[0], cc[1], cc[2], cc[3]));
-                    if (!culling)
+                    if (!culling) {
                         material.set(new IntAttribute(IntAttribute.CullFace, GL20.GL_NONE));
+                    }
                 }
             }
         }
