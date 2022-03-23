@@ -100,14 +100,14 @@ public class WelcomeGui extends AbstractGui {
             else if (vrStatus.equals(VRStatus.ERROR_RENDERMODEL))
                 GaiaSky.postRunnable(() -> GuiUtils.addNoVRDataExit(skin, ui));
         } else if (Settings.settings.program.net.slave.active || GaiaSky.instance.isHeadless()) {
-            // If slave or headless, data load can start
+            // If we are a slave or running headless, data load can start
             gaiaSky();
         } else {
             // Otherwise, check for updates, etc.
             clearGui();
 
             dataDescriptor = Gdx.files.absolute(SysUtils.getTempDir(Settings.settings.data.location) + "/gaiasky-data.json");
-            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, null, null, (digest) -> GaiaSky.postRunnable(() -> {
+            DownloadHelper.downloadFile(Settings.settings.program.url.dataDescriptor, dataDescriptor, Settings.settings.program.offlineMode, null, null, (digest) -> GaiaSky.postRunnable(() -> {
                 // Data descriptor ok. Skip welcome screen only if flag and base data present
                 if (skipWelcome && baseDataPresent()) {
                     gaiaSky();
@@ -117,7 +117,11 @@ public class WelcomeGui extends AbstractGui {
             }), () -> {
                 // Fail?
                 downloadError = true;
-                logger.error(I18n.txt("gui.welcome.error.nointernet"));
+                if(Settings.settings.program.offlineMode){
+                    logger.error(I18n.txt("gui.welcome.error.offlinemode"));
+                } else {
+                    logger.error(I18n.txt("gui.welcome.error.nointernet"));
+                }
                 if (baseDataPresent()) {
                     // Go on all in
                     GaiaSky.postRunnable(() -> GuiUtils.addNoConnectionWindow(skin, ui, () -> buildWelcomeUI()));

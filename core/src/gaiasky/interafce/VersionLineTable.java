@@ -88,5 +88,14 @@ public class VersionLineTable extends Table {
             add(safeMode).bottom().left().padRight(pad32);
         }
 
-    }
+        // Offline mode
+        if(settings.program.offlineMode) {
+            OwnLabel offlineMode = new OwnLabel(TextUtils.surroundBrackets(I18n.txt("gui.system.offlinemode")), skin, "hud-med");
+            offlineMode.setColor(ColorUtils.gRedC);
+            offlineMode.addListener(new OwnTextTooltip(I18n.txt("gui.system.offlinemode.tooltip"), skin));
+            add(offlineMode).bottom().left().padRight(pad32);
+        }
+
+
+}
 }

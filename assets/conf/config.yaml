@@ -270,6 +270,8 @@ program:
   safeMode: false
   # Print debug information to the terminal
   debugInfo: false
+  # Offline mode: never attempt any connection - disables updates and dataset downloads
+  offlineMode: false
   # Whether to display the HUD
   hud: false
   # Save all procedurally-generated textures to the data folder
@@ -390,7 +392,7 @@ program:
     # Data repository location
     dataMirror: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/
     # Data descriptor file location
-    dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030000.json
+    dataDescriptor: https://gaia.ari.uni-heidelberg.de/gaiasky/files/repository/gaiasky-data-030200.json
 
 #
 # Controls configuration

@@ -23,19 +23,32 @@ public class GuiUtils {
     }
 
     public static void addNoConnectionWindow(Skin skin, Stage stage, Runnable ok) {
-        GenericDialog exitw = new GenericDialog(I18n.txt("notif.error", I18n.txt("gui.download.noconnection.title")), skin, stage) {
+        String title = I18n.txt("notif.error", I18n.txt("gui.download.noconnection.title"));
+        if (Settings.settings.program.offlineMode) {
+            title = I18n.txt("gui.system.offlinemode");
+        }
+        GenericDialog dialog = new GenericDialog(title, skin, stage) {
 
             @Override
             protected void build() {
-                OwnLabel info = new OwnLabel(I18n.txt("gui.download.noconnection.continue"), skin);
-                Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
-                content.add(info).pad(10).row();
-                content.add(manualDownload).pad(10);
+                String text;
+                if (Settings.settings.program.offlineMode) {
+                    OwnLabel info = new OwnLabel(I18n.txt("gui.download.offlinemode.continue"), skin);
+                    content.add(info).pad(pad10).row();
+                    Link docs = new Link(I18n.txt("gui.wiki.moreinfo"), skin, Settings.DOCUMENTATION + "/Config-file.html");
+                    content.add(docs).pad(pad10).padTop(pad15).row();
+                } else {
+                    OwnLabel info = new OwnLabel(I18n.txt("gui.download.noconnection.continue"), skin);
+                    content.add(info).pad(pad10).row();
+                    Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", Settings.settings.program.url.dataMirror);
+                    content.add(manualDownload).pad(pad10);
+                }
+
             }
 
             @Override
             protected void accept() {
-                if(ok != null){
+                if (ok != null) {
                     ok.run();
                 }
             }
@@ -50,10 +63,10 @@ public class GuiUtils {
 
         };
 
-        exitw.setAcceptText(I18n.txt("gui.ok"));
-        exitw.setCancelText(null);
-        exitw.buildSuper();
-        exitw.show(stage);
+        dialog.setAcceptText(I18n.txt("gui.ok"));
+        dialog.setCancelText(null);
+        dialog.buildSuper();
+        dialog.show(stage);
     }
 
     public static void addNoConnectionExit(Skin skin, Stage stage) {
@@ -61,7 +74,13 @@ public class GuiUtils {
 
             @Override
             protected void build() {
-                OwnLabel info = new OwnLabel(I18n.txt("gui.download.noconnection"), skin);
+                String text;
+                if (Settings.settings.program.offlineMode) {
+                    text = I18n.txt("gui.download.offlinemode");
+                } else {
+                    text = I18n.txt("gui.download.noconnection");
+                }
+                OwnLabel info = new OwnLabel(text, skin);
                 OwnLabel gsExit = new OwnLabel(I18n.txt("notif.gaiasky.exit"), skin);
                 Link manualDownload = new Link(I18n.txt("gui.download.manual"), skin, "link", "https://gaia.ari.uni-heidelberg.de/gaiasky/files/autodownload");
                 content.add(info).left().pad(10).row();
@@ -158,11 +177,11 @@ public class GuiUtils {
         exitw.show(stage);
     }
 
-    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, Skin skin){
+    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, Skin skin) {
         return getTooltipHorizontalGroup(actor, tooltipText, 12.8f, skin);
     }
 
-    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, float space, Skin skin){
+    public static HorizontalGroup getTooltipHorizontalGroup(Actor actor, String tooltipText, float space, Skin skin) {
         HorizontalGroup hg = new HorizontalGroup();
         hg.space(space);
         hg.addActor(actor);
@@ -172,8 +191,8 @@ public class GuiUtils {
         return hg;
     }
 
-    public static HorizontalGroup tooltipHg(Actor actor, String key, Skin skin){
-       return getTooltipHorizontalGroup(actor, I18n.txt(key), 12.8f, skin);
+    public static HorizontalGroup tooltipHg(Actor actor, String key, Skin skin) {
+        return getTooltipHorizontalGroup(actor, I18n.txt(key), 12.8f, skin);
     }
 
 }

@@ -111,32 +111,36 @@ public class WikiInfoWindow extends GenericDialog {
         request.setUrl(url);
         request.setTimeOut(5000);
 
-        Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
-            @Override
-            public void handleHttpResponse(Net.HttpResponse httpResponse) {
-                if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
-                    // Ok
-                    JsonValue root = reader.parse(httpResponse.getResultAsString());
-                    listener.ok(root);
-                } else {
-                    // Ko with code
-                    listener.ko(httpResponse.getStatus().toString());
+        if(Settings.settings.program.offlineMode) {
+            listener.ko(I18n.txt("gui.system.offlinemode.tooltip"));
+        } else {
+            Gdx.net.sendHttpRequest(request, new HttpResponseListener() {
+                @Override
+                public void handleHttpResponse(Net.HttpResponse httpResponse) {
+                    if (httpResponse.getStatus().getStatusCode() == HttpStatus.SC_OK) {
+                        // Ok
+                        JsonValue root = reader.parse(httpResponse.getResultAsString());
+                        listener.ok(root);
+                    } else {
+                        // Ko with code
+                        listener.ko(httpResponse.getStatus().toString());
+                    }
+
                 }
 
-            }
+                @Override
+                public void failed(Throwable t) {
+                    // Failed
+                    listener.ko();
+                }
 
-            @Override
-            public void failed(Throwable t) {
-                // Failed
-                listener.ko();
-            }
-
-            @Override
-            public void cancelled() {
-                // Cancelled
-                listener.ko();
-            }
-        });
+                @Override
+                public void cancelled() {
+                    // Cancelled
+                    listener.ko();
+                }
+            });
+        }
     }
 
     private class WikiDataListener {

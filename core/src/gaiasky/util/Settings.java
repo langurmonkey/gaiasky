@@ -734,6 +734,7 @@ public class Settings {
         // Flag to mark whether safe mode is activated via command line argument
         @JsonIgnore public boolean safeModeFlag;
         public boolean debugInfo;
+        public boolean offlineMode;
         public boolean hud;
         public boolean saveProceduralTextures = false;
         public MinimapSettings minimap;

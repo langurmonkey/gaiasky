@@ -34,7 +34,7 @@ public class DownloadHelper {
      * progress {@link ProgressRunnable} while downloading, and running the finish {@link java.lang.Runnable}
      * when finished.
      */
-    public static HttpRequest downloadFile(String url, FileHandle to, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
+    public static HttpRequest downloadFile(String url, FileHandle to, boolean offlineMode, ProgressRunnable progressDownload, ProgressRunnable progressHashResume, ChecksumRunnable finish, Runnable fail, Runnable cancel) {
 
         if (url.startsWith("file://")) {
             // Local file!
@@ -76,7 +76,13 @@ public class DownloadHelper {
                 startSize = 0;
             }
 
-            sendRequest(request, url, resume, to, startSize, progressDownload, progressHashResume, finish, fail, cancel);
+            if (offlineMode) {
+                if (fail != null) {
+                    fail.run();
+                }
+            } else {
+                sendRequest(request, url, resume, to, startSize, progressDownload, progressHashResume, finish, fail, cancel);
+            }
 
             return request;
         }

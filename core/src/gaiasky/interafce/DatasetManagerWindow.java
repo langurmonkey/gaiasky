@@ -371,14 +371,19 @@ public class DatasetManagerWindow extends GenericDialog {
             Cell left = content.add().top().left().padRight(pad20);
             Cell right = content.add().top().left();
 
-            reloadLeftPane(left, right, dataDescriptor, mode, width);
-            reloadRightPane(right, selectedDataset[mode.ordinal()], mode);
+            int datasets = reloadLeftPane(left, right, dataDescriptor, mode, width);
+            if (datasets > 0) {
+                reloadRightPane(right, selectedDataset[mode.ordinal()], mode);
+            } else {
+                content.clear();
+                content.add(new OwnLabel(I18n.txt("gui.dschooser.nodatasets"), skin)).center().padTop(mode == DatasetMode.AVAILABLE ? 0 : pad20 * 2f).row();
+            }
 
         }
         me.pack();
     }
 
-    private void reloadLeftPane(Cell left, Cell right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
+    private int reloadLeftPane(Cell left, Cell right, DataDescriptor dataDescriptor, DatasetMode mode, float width) {
         Table leftTable = new Table(skin);
         leftTable.align(Align.topRight);
         leftScroll = new OwnScrollPane(leftTable, skin, "minimalist-nobg");
@@ -401,6 +406,7 @@ public class DatasetManagerWindow extends GenericDialog {
         // Current selected datasets
         java.util.List<String> currentSetting = Settings.settings.data.dataFiles;
 
+        int added = 0;
         for (DatasetType type : dataDescriptor.types) {
             List<DatasetDesc> datasets = type.datasets;
             List<DatasetDesc> filtered = datasets.stream().filter(d -> mode == DatasetMode.AVAILABLE ? !d.exists : true).collect(Collectors.toList());
@@ -634,6 +640,7 @@ public class DatasetManagerWindow extends GenericDialog {
 
                     // Create watcher
                     watchers.add(new DatasetWatcher(dataset, progress, installOrSelect instanceof OwnTextIconButton ? (OwnTextIconButton) installOrSelect : null, null, null));
+                    added++;
                 }
             }
         }
@@ -643,6 +650,8 @@ public class DatasetManagerWindow extends GenericDialog {
         leftScroll.setScrollX(scroll[mode.ordinal()][0]);
         leftScroll.setScrollY(scroll[mode.ordinal()][1]);
         left.setActor(leftScroll);
+
+        return added;
     }
 
     private void reloadRightPane(Cell cell, DatasetDesc dataset, DatasetMode mode) {
@@ -658,7 +667,6 @@ public class DatasetManagerWindow extends GenericDialog {
             OwnLabel l = new OwnLabel(I18n.txt("gui.download.noselected"), skin);
             t.add(l).center().padTop(pad20 * 3);
         } else {
-
             // Type icon
             String dType = dataset != null && dataset.type != null ? dataset.type : "other";
             Image typeImage = new OwnImage(skin.getDrawable(getIcon(dType)));
@@ -985,7 +993,7 @@ public class DatasetManagerWindow extends GenericDialog {
         };
 
         // Download
-        final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, progressDownload, progressHashResume, finish, fail, cancel);
+        final Net.HttpRequest request = DownloadHelper.downloadFile(url, tempDownload, Settings.settings.program.offlineMode, progressDownload, progressHashResume, finish, fail, cancel);
         GaiaSky.postRunnable(() -> EventManager.publish(Event.DATASET_DOWNLOAD_START_INFO, this, dataset.key, request));
         currentDownloads.put(dataset.key, new Pair<>(dataset, request));
 
@@ -1029,6 +1037,7 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the file size
      *
      * @param inputFilePath A file
+     *
      * @return The size in bytes
      */
     private long fileSize(String inputFilePath) {
@@ -1039,7 +1048,9 @@ public class DatasetManagerWindow extends GenericDialog {
      * Returns the GZ uncompressed size
      *
      * @param inputFilePath A gzipped file
+     *
      * @return The uncompressed size in bytes
+     *
      * @throws IOException If the file failed to read
      */
     private long fileSizeGZUncompressed(String inputFilePath) throws IOException {
