@@ -1367,5 +1367,22 @@ return true;</property>
       <postInstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/post-install.sh")}</postInstallScript>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
+    <windowsArchive name="Windows Archive" id="951">
+      <exclude>
+        <entry location="gaiasky.6.gz" />
+        <entry location="gs_icon.svg" />
+        <entry location="gaiasky.appdata.xml" />
+        <entry location="gaiasky-appimage.desktop" />
+        <entry location="AppRun" />
+        <entry location="gs_icon.png" />
+        <entry location="gaiasky.desktop" />
+        <entry location="rest-static" />
+        <entry location="gaiasky" />
+      </exclude>
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
+    </windowsArchive>
   </mediaSets>
+  <buildIds>
+    <mediaSet refId="951" />
+  </buildIds>
 </install4j>
