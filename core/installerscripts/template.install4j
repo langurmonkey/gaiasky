@@ -1368,6 +1368,9 @@ return true;</property>
       <preUninstallScript>${compiler:file("@gs-git-folder@/core/installerscripts/pre-uninstall.sh")}</preUninstallScript>
     </linuxRPM>
     <windowsArchive name="Windows Archive" id="951">
+      <excludedLaunchers>
+        <launcher id="573" />
+      </excludedLaunchers>
       <exclude>
         <entry location="gaiasky.6.gz" />
         <entry location="gs_icon.svg" />
@@ -1379,8 +1382,18 @@ return true;</property>
         <entry location="rest-static" />
         <entry location="gaiasky" />
       </exclude>
-      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" overrideJdkRelease="true" />
     </windowsArchive>
+    <unixArchive name="Unix Archive" id="952">
+      <excludedLaunchers>
+        <launcher id="573" />
+      </excludedLaunchers>
+      <exclude>
+        <entry location="AppRun" />
+        <entry location="gaiasky.cmd" />
+      </exclude>
+      <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" overrideJdkRelease="true" />
+    </unixArchive>
   </mediaSets>
   <buildIds>
     <mediaSet refId="951" />
