@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="9.0.5" transformSequenceNumber="9">
-  <directoryPresets config="@gs-git-folder@/assets/img" />
+<install4j version="9.0.6" transformSequenceNumber="9">
+  <directoryPresets config="@gs-git-folder@/assets/cert/cert.pfx" />
   <application name="Gaia Sky" applicationId="8310-5272-6362-8592" mediaDir="./" compression="9" shortName="gaiasky" publisher="ARI - ZAH - Universität Heidelberg" publisherWeb="https://www.zah.uni-heidelberg.de/gaia/outreach/gaiasky" version="@version-tag@" allPathsRelative="true" macVolumeId="c3380c949a34b4f7" javaMinVersion="11">
     <languages>
       <principalLanguage id="en" customLocalizationFile="@gs-git-folder@/core/installerscripts/install4j.utf8" />
     </languages>
+    <codeSigning windowsEnabled="true" windowsPkcs12File="@gs-git-folder@/assets/cert/cert.pfx" />
     <jreBundles jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" />
   </application>
   <files defaultOverwriteMode="1" defaultUninstallMode="2" preserveSymlinks="false">
@@ -1321,7 +1322,7 @@ return true;</property>
       </exclude>
       <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" usePack200="false" overrideJdkRelease="true" />
     </macos>
-    <unixInstaller name="Unix Installer" id="28">
+    <unixInstaller name="Unix Installer" id="28" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>
@@ -1384,7 +1385,7 @@ return true;</property>
       </exclude>
       <jreBundle jdkProviderId="AdoptOpenJDK" release="17/jdk-17+35" overrideJdkRelease="true" />
     </windowsArchive>
-    <unixArchive name="Unix Archive" id="952">
+    <unixArchive name="Unix Archive" id="952" mediaFileName="${compiler:sys.shortName}_linux_${compiler:sys.version}">
       <excludedLaunchers>
         <launcher id="573" />
       </excludedLaunchers>

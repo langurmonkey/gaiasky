@@ -512,6 +512,11 @@ task prepareInstall4jScript(dependsOn: 'createTar' , description: "Prepares the 
 task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs the install4j task to create the installers") {
     dependsOn 'prepareInstall4jScript'
 
+    if (project.hasProperty("winKeystorePassword")) {
+        winKeystorePassword = project.ext.winKeystorePassword
+    } else {
+        println("WARN: Please specify the kesytore password for signing Windows packages!")
+    }
     projectFile = file("$packageDir/" + project.distName + ".install4j")
     variables = [majorVersion: project.tag, build: project.rev]
     release = project.tag
