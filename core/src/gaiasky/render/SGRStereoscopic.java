@@ -30,10 +30,7 @@ import gaiasky.util.gdx.contrib.postprocess.effects.AnaglyphEffect;
 import gaiasky.util.gdx.contrib.postprocess.filters.Copy;
 import gaiasky.util.math.Vector3d;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Renders all the 3D/stereoscopic modes. Renders basically two scenes, one for
@@ -95,8 +92,8 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
         EventManager.instance.subscribe(this, Event.FRAME_SIZE_UPDATE, Event.SCREENSHOT_SIZE_UPDATE);
     }
 
-    public void updateAnaglyphMode(){
-        if(anaglyphEffect != null) {
+    public void updateAnaglyphMode() {
+        if (anaglyphEffect != null) {
             anaglyphEffect.setAnaglyphMode(Settings.settings.program.modeStereo.profile.getAnaglyphModeInteger());
         }
     }
@@ -349,7 +346,7 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
     }
 
     private int getKey(int w, int h, int extra) {
-        return w * 100 + h * 10 + extra;
+        return 31 * (31 * h + w) + extra;
     }
 
     private FrameBuffer getFrameBuffer(int w, int h, int extra) {
@@ -380,12 +377,12 @@ public class SGRStereoscopic extends SGRAbstract implements ISGR, IObserver {
                 fb3D.put(keyFull, new FrameBuffer(Format.RGB888, w, h, true));
             }
 
-            Iterator<Map.Entry<Integer, FrameBuffer>> iter = fb3D.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<Integer, FrameBuffer> entry = iter.next();
+            Iterator<Map.Entry<Integer, FrameBuffer>> iterator = fb3D.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<Integer, FrameBuffer> entry = iterator.next();
                 if (entry.getKey() != keyHalf && entry.getKey() != keyFull) {
                     entry.getValue().dispose();
-                    iter.remove();
+                    iterator.remove();
                 }
             }
         }
