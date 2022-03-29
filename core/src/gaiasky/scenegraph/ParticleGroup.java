@@ -171,6 +171,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
 
     // Minimum amount of time [ms] between two update calls
     protected static final double UPDATE_INTERVAL_MS = 1500;
+    protected static final double UPDATE_INTERVAL_MS_2 = UPDATE_INTERVAL_MS * 2;
 
     // Metadata, for sorting - holds distances from each particle to the camera, squared
     protected double[] metadata;
@@ -1059,7 +1060,7 @@ public class ParticleGroup extends FadeNode implements I3DTextRenderable, IFocus
             if (updaterTask != null && pointData.size() > 0 && pointData.get(0).names() != null) {
                 final Vector3b currentCameraPos = (Vector3b) data[0];
                 long t = TimeUtils.millis() - lastSortTime;
-                if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS * 2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
+                if (!updating && this.opacity > 0 && (t > UPDATE_INTERVAL_MS_2 || (lastSortCameraPos.dst(currentCameraPos) > CAM_DX_TH && t > UPDATE_INTERVAL_MS))) {
                     updating = GaiaSky.instance.getExecutorService().execute(updaterTask);
                 }
             }
