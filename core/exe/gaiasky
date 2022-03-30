@@ -27,6 +27,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     elif [[ -f "$GSDIR/../../PlugIns/jre.bundle/Contents/Home/bin/java" ]]; then
         # Check out this other location...
         JAVA="$GSDIR/../../PlugIns/jre.bundle/Contents/Home/bin/java"
+    elif [[ "$JAVA_HOME" != "" ]]; then
+        # Use $JAVA_HOME
+        JAVA="$JAVA_HOME/bin/java"
     else
         # Just use default java installation, hopefully it's 11+
         JAVA="java"
@@ -35,7 +38,7 @@ elif [[ "$JAVA_HOME" != "" ]]; then
     # Use $JAVA_HOME
     JAVA="$JAVA_HOME/bin/java"
 else
-    # Use system default
+    # Use java in path, if any
     JAVA="java"
 fi
 

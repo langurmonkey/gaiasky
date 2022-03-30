@@ -6,7 +6,7 @@
   <url type="bugtracker">https://gitlab.com/langurmonkey/gaiasky/-/issues</url>
   
   <name>Gaia Sky</name>
-  <summary>Open Source 3D universe simulator for desktop and VR with support for more than a billion objects</summary>
+  <summary>3D universe simulator for desktop and VR with support for more than a billion objects</summary>
   
   <metadata_license>CC-BY-SA-4.0</metadata_license>
   <project_license>MPL-2.0</project_license>
@@ -37,7 +37,7 @@
   <screenshots>
     <screenshot type="default">
       <caption>View from the Gaia spacecraft</caption>
-      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20201125/00000.jpg</image>
+      <image>https://gaia.ari.uni-heidelberg.de/gaiasky/files/screenshots/20220303/00000.jpg</image>
     </screenshot>
     <screenshot>
       <caption>Earthrise</caption>
