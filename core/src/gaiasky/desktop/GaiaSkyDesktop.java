@@ -438,7 +438,8 @@ public class GaiaSkyDesktop implements IObserver {
             Settings.settings.graphics.resolution[0] = w;
             Settings.settings.graphics.resolution[1] = h;
         }
-        cfg.setWindowedMode(w, h);
+        if (cfg != null)
+            cfg.setWindowedMode(w, h);
     }
 
     private void runGaiaSky(final Lwjgl3ApplicationConfiguration cfg) {
@@ -457,7 +458,7 @@ public class GaiaSkyDesktop implements IObserver {
         Lwjgl3ApplicationConfiguration cfg = new Lwjgl3ApplicationConfiguration();
         cfg.setHdpiMode(HdpiMode.Pixels);
         cfg.useVsync(true);
-        cfg.setWindowedMode(1300, 450);
+        configureWindowSize(cfg);
         cfg.setResizable(false);
         cfg.setTitle(title);
 
