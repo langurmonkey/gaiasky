@@ -527,7 +527,7 @@ public class GlyphLayout implements Poolable {
      * @author Nathan Sweet
      */
     static public class GlyphRun implements Poolable {
-        public Array<Glyph> glyphs = new Array();
+        public Array<Glyph> glyphs = new Array<>();
         /**
          * Contains glyphs.size+1 entries: First entry is X offset relative to the drawing position. Subsequent entries are the X
          * advance relative to previous glyph position. Last entry is the width of the last glyph.

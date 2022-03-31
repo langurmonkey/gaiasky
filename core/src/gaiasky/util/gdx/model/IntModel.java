@@ -65,17 +65,17 @@ import gaiasky.util.gdx.shader.attribute.*;
  * @author badlogic, xoppa */
 public class IntModel implements Disposable {
 	/** the materials of the model, used by nodes that have a graphical representation **/
-	public final Array<Material> materials = new Array();
+	public final Array<Material> materials = new Array<>();
 	/** root nodes of the model **/
-	public final Array<IntNode> nodes = new Array();
+	public final Array<IntNode> nodes = new Array<>();
 	/** animations of the model, modifying node transformations **/
-	public final Array<IntAnimation> animations = new Array();
+	public final Array<IntAnimation> animations = new Array<>();
 	/** the meshes of the model **/
-	public final Array<IntMesh> meshes = new Array();
+	public final Array<IntMesh> meshes = new Array<>();
 	/** parts of meshes, used by nodes that have a graphical representation **/
-	public final Array<IntMeshPart> meshParts = new Array();
+	public final Array<IntMeshPart> meshParts = new Array<>();
 	/** Array of disposable resources like textures or meshes the Model is responsible for disposing **/
-	protected final Array<Disposable> disposables = new Array();
+	protected final Array<Disposable> disposables = new Array<>();
 
 	/** Constructs an empty model. Manual created models do not manage their resources by default. Use
 	 * {@link #manageDisposable(Disposable)} to add resources to be managed by this model. */
@@ -285,7 +285,7 @@ public class IntModel implements Disposable {
 					disposables.add(texture);
 				}
 
-				TextureDescriptor descriptor = new TextureDescriptor(texture);
+				TextureDescriptor<Texture> descriptor = new TextureDescriptor<>(texture);
 				descriptor.minFilter = texture.getMinFilter();
 				descriptor.magFilter = texture.getMagFilter();
 				descriptor.uWrap = texture.getUWrap();

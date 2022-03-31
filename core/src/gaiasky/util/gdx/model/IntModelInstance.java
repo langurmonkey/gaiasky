@@ -49,11 +49,11 @@ public class IntModelInstance implements IntRenderableProvider {
 
 	/** the materials of the model, used by nodes that have a graphical representation FIXME not sure if superfluous, allows
 	 * modification of materials without having to traverse the nodes **/
-	public final Array<Material> materials = new Array();
+	public final Array<Material> materials = new Array<>();
 	/** root nodes of the model **/
-	public final Array<IntNode> nodes = new Array();
+	public final Array<IntNode> nodes = new Array<>();
 	/** animations of the model, modifying node transformations **/
-	public final Array<IntAnimation> animations = new Array();
+	public final Array<IntAnimation> animations = new Array<>();
 	/** the {@link IntModel} this instances derives from **/
 	public final IntModel model;
 	/** the world transform **/

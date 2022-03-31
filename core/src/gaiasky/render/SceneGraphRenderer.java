@@ -1273,8 +1273,8 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
         }
     }
 
-    private boolean isInstance(IRenderSystem process, Class<? extends IRenderSystem>... systemClasses) {
-        for (Class<? extends IRenderSystem> systemClass : systemClasses) {
+    private boolean isInstance(IRenderSystem process, Class<?>... systemClasses) {
+        for (Class<?> systemClass : systemClasses) {
             if (systemClass.isInstance(process))
                 return true;
         }
@@ -1289,7 +1289,7 @@ public class SceneGraphRenderer extends AbstractRenderer implements IProcessRend
      * @param renderContext The render context.
      * @param systemClasses The classes.
      */
-    protected void renderSystems(ICamera camera, double t, RenderingContext renderContext, Class<? extends IRenderSystem>... systemClasses) {
+    protected void renderSystems(ICamera camera, double t, RenderingContext renderContext, Class<?>... systemClasses) {
         // Update time difference since last update
         for (ComponentType ct : ComponentType.values()) {
             alphas[ct.ordinal()] = calculateAlpha(ct, t);

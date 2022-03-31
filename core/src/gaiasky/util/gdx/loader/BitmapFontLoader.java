@@ -54,7 +54,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
 
 	@Override
 	public Array<AssetDescriptor> getDependencies (String fileName, FileHandle file, BitmapFontParameter parameter) {
-		Array<AssetDescriptor> deps = new Array();
+		Array<AssetDescriptor> deps = new Array<>();
 		if (parameter != null && parameter.bitmapFontData != null) {
 			data = parameter.bitmapFontData;
 			return deps;
@@ -62,7 +62,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
 
 		data = new BitmapFontData(file, parameter != null && parameter.flip);
 		if (parameter != null && parameter.atlasName != null) {
-			deps.add(new AssetDescriptor(parameter.atlasName, TextureAtlas.class));
+			deps.add(new AssetDescriptor<>(parameter.atlasName, TextureAtlas.class));
 		} else {
 			for (int i = 0; i < data.getImagePaths().length; i++) {
 				String path = data.getImagePath(i);
@@ -76,7 +76,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
 					textureParams.magFilter = parameter.magFilter;
 				}
 
-				AssetDescriptor descriptor = new AssetDescriptor(resolved, Texture.class, textureParams);
+				AssetDescriptor descriptor = new AssetDescriptor<>(resolved, Texture.class, textureParams);
 				deps.add(descriptor);
 			}
 		}
@@ -100,7 +100,7 @@ public class BitmapFontLoader extends AsynchronousAssetLoader<BitmapFont, Bitmap
 			return new BitmapFont(file, region);
 		} else {
 			int n = data.getImagePaths().length;
-			Array<TextureRegion> regs = new Array(n);
+			Array<TextureRegion> regs = new Array<>(n);
 			for (int i = 0; i < n; i++) {
 				regs.add(new TextureRegion(manager.get(data.getImagePath(i), Texture.class)));
 			}

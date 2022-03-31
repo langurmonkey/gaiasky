@@ -721,6 +721,7 @@ public class SceneGraphNode implements IStarContainer, IPosition, IVisibilitySwi
      *
      * @return The copied object.
      */
+    @SuppressWarnings("unchecked")
     public <T extends SceneGraphNode> T getSimpleCopy() {
         T copy = null;
         try {

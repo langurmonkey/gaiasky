@@ -40,11 +40,9 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Represents a single star. Currently, only the Sun uses this class.
- *
- * @deprecated Move Sun to star group
+ * Represents a single star. Used for star systems with single star objects having
+ * children nodes.
  */
-@Deprecated
 public class Star extends Particle {
 
     /** Model used to represent the star **/
