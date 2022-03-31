@@ -515,13 +515,17 @@ task install4jMedia(type: com.install4j.gradle.Install4jTask, description: "Runs
     if (project.hasProperty("winKeystorePassword")) {
         winKeystorePassword = project.ext.winKeystorePassword
     } else {
-        println("WARN: Please specify the kesytore password for signing Windows packages!")
+        if(gradle.startParameter.taskNames.contains("core:pack")){
+            throw new GradleException("Please specify the kesytore password for signing Windows packages:\ngradlew core:pack -PwinKeystorePassword=yourpass")
+        }
     }
+
     projectFile = file("$packageDir/" + project.distName + ".install4j")
     variables = [majorVersion: project.tag, build: project.rev]
     release = project.tag
 
     doLast {
+
         println("Install4j script location:")
         println("$packageDir/" + project.distName + ".install4j")
     }
