@@ -8,6 +8,8 @@ package gaiasky.desktop.render;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Graphics.DisplayMode;
 import com.badlogic.gdx.Graphics.Monitor;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Graphics;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Window;
 import gaiasky.GaiaSky;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
@@ -18,7 +20,7 @@ import gaiasky.util.Logger.Log;
 import gaiasky.util.Settings;
 
 /**
- * Manages screen mode changes (fullscreen, windowed)
+ * Manages screen mode (fullscreen, windowed) and screen resolution updates.
  */
 public class ScreenModeCmd implements IObserver {
     private static final Log logger = Logger.getLogger(ScreenModeCmd.class);

@@ -94,13 +94,21 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
     private boolean lensflareBak, lightGlowBak, debugInfoBak;
     private Settings settings;
 
+    // This flag is active when the dialog is called from the welcome screen
+    private boolean welcomeScreen = false;
+
     public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources) {
+       this(stage,skin, globalResources, false);
+    }
+
+    public PreferencesWindow(final Stage stage, final Skin skin, final GlobalResources globalResources, final boolean welcomeScreen) {
         super(I18n.txt("gui.settings") + " - " + Settings.settings.version.version + " - " + I18n.txt("gui.build", Settings.settings.version.build), skin, stage);
 
         this.settings = Settings.settings;
         this.contents = new Array<>();
         this.labels = new Array<>();
         this.globalResources = globalResources;
+        this.welcomeScreen = welcomeScreen;
 
         this.nf3 = NumberFormatFactory.getFormatter("0.000");
 
@@ -1690,11 +1698,13 @@ public class PreferencesWindow extends GenericDialog implements IObserver {
         // Add to content
         contentDataTable.add(titleGeneralData).left().padBottom(pad10).row();
         contentDataTable.add(highAccuracyPositionsLabel).left().padBottom(pad20);
-        contentDataTable.add(highAccuracyPositions).left().padBottom(pad20);
+        contentDataTable.add(highAccuracyPositions).left().padRight(pad20).padBottom(pad20);
         contentDataTable.add(highAccTooltip).left().padBottom(pad20).row();
-        contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
-        contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
-        contentDataTable.add(dataDownload).left().colspan(3);
+        if(!welcomeScreen) {
+            contentDataTable.add(titleData).left().colspan(3).padBottom(pad10).row();
+            contentDataTable.add(dataSourceInfo).left().colspan(3).padBottom(pad5).row();
+            contentDataTable.add(dataDownload).left().colspan(3);
+        }
 
         /*
          * ==== GAIA ====

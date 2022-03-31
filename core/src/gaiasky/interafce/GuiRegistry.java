@@ -353,10 +353,12 @@ public class GuiRegistry implements IObserver {
                 removeModeChangePopup();
                 break;
             case SHOW_ABOUT_ACTION:
-                if (aboutWindow == null)
+                if (aboutWindow == null) {
                     aboutWindow = new AboutWindow(ui, skin);
-                if (!aboutWindow.isVisible() || !aboutWindow.hasParent())
+                }
+                if (!aboutWindow.isVisible() || !aboutWindow.hasParent()) {
                     aboutWindow.show(ui);
+                }
                 break;
             case SHOW_PREFERENCES_ACTION:
                 Array<Actor> prefs = getElementsOfType(PreferencesWindow.class);
@@ -364,8 +366,9 @@ public class GuiRegistry implements IObserver {
                     if (preferencesWindow == null) {
                         preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources());
                     }
-                    if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent())
+                    if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
                         preferencesWindow.show(ui);
+                    }
                 } else {
                     // Close current windows
                     for (Actor pref : prefs) {
@@ -386,10 +389,12 @@ public class GuiRegistry implements IObserver {
                 break;
             case SHOW_SLAVE_CONFIG_ACTION:
                 if (MasterManager.hasSlaves()) {
-                    if (slaveConfigWindow == null)
+                    if (slaveConfigWindow == null) {
                         slaveConfigWindow = new SlaveConfigWindow(ui, skin);
-                    if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent())
+                    }
+                    if (!slaveConfigWindow.isVisible() || !slaveConfigWindow.hasParent()) {
                         slaveConfigWindow.show(ui);
+                    }
                 }
                 break;
             case SHOW_LOAD_CATALOG_ACTION:

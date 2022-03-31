@@ -32,6 +32,7 @@ import gaiasky.GaiaSky;
 import gaiasky.desktop.util.SysUtils;
 import gaiasky.event.Event;
 import gaiasky.event.EventManager;
+import gaiasky.scenegraph.camera.CameraManager;
 import gaiasky.util.*;
 import gaiasky.util.Logger.Log;
 import gaiasky.util.color.ColorUtils;
@@ -41,6 +42,7 @@ import gaiasky.util.datadesc.DatasetDesc;
 import gaiasky.util.i18n.I18n;
 import gaiasky.util.scene2d.OwnLabel;
 import gaiasky.util.scene2d.OwnTextIconButton;
+import gaiasky.util.scene2d.OwnTextTooltip;
 import gaiasky.vr.openvr.VRStatus;
 
 import java.nio.file.Files;
@@ -60,6 +62,7 @@ public class WelcomeGui extends AbstractGui {
     private final boolean skipWelcome;
 
     protected DatasetManagerWindow ddw;
+    private PreferencesWindow preferencesWindow;
 
     private FileHandle dataDescriptor;
 
@@ -118,7 +121,7 @@ public class WelcomeGui extends AbstractGui {
             }), () -> {
                 // Fail?
                 downloadError = true;
-                if(Settings.settings.program.offlineMode){
+                if (Settings.settings.program.offlineMode) {
                     logger.error(I18n.txt("gui.welcome.error.offlinemode"));
                 } else {
                     logger.error(I18n.txt("gui.welcome.error.nointernet"));
@@ -320,8 +323,38 @@ public class WelcomeGui extends AbstractGui {
         // Version line table
         Table topLeft = new VersionLineTable(skin);
 
+        // Bottom icons
+        OwnTextIconButton quit = new OwnTextIconButton("", skin, "quit");
+        quit.addListener(new OwnTextTooltip(I18n.txt("gui.exit"), skin, 10));
+        quit.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.exit();
+            }
+        });
+        OwnTextIconButton preferences = new OwnTextIconButton("", skin, "preferences");
+        preferences.addListener(new OwnTextTooltip(I18n.txt("gui.preferences"), skin, 10));
+        preferences.addListener(new ClickListener() {
+            public void clicked(InputEvent event, float x, float y) {
+                if (preferencesWindow == null) {
+                    preferencesWindow = new PreferencesWindow(ui, skin, GaiaSky.instance.getGlobalResources(), true);
+                }
+                if (!preferencesWindow.isVisible() || !preferencesWindow.hasParent()) {
+                    preferencesWindow.show(ui);
+                }
+            }
+        });
+        preferences.pack();
+        quit.setSize(preferences.getWidth(), preferences.getWidth());
+        HorizontalGroup bottomRight = new HorizontalGroup();
+        bottomRight.space(pad18);
+        bottomRight.addActor(preferences);
+        bottomRight.addActor(quit);
+        bottomRight.setFillParent(true);
+        bottomRight.bottom().right().pad(pad28);
+
         ui.addActor(center);
         ui.addActor(topLeft);
+        ui.addActor(bottomRight);
         ui.addActor(popupInterface);
 
         if (!baseDataPresent) {
@@ -366,6 +399,7 @@ public class WelcomeGui extends AbstractGui {
                 }
             }
         }
+        EventManager.instance.subscribe(this, Event.UI_RELOAD_CMD, Event.UI_SCALE_CMD);
     }
 
     private void ensureBaseDataEnabled(DataDescriptor dd) {
@@ -386,6 +420,7 @@ public class WelcomeGui extends AbstractGui {
     }
 
     private void gaiaSky() {
+        EventManager.instance.removeAllSubscriptions(this);
         ensureBaseDataEnabled(serverDatasets);
 
         if (popupInterface != null) {
@@ -549,6 +584,30 @@ public class WelcomeGui extends AbstractGui {
     @Override
     protected void rebuildGui() {
 
+    }
+
+    @Override
+    public void notify(final Event event, Object source, final Object... data) {
+        switch (event) {
+        case UI_RELOAD_CMD -> {
+            GaiaSky.postRunnable(() -> {
+                GlobalResources globalResources = GaiaSky.instance.getGlobalResources();
+                // Reinitialise GUI system
+                globalResources.updateSkin();
+                GenericDialog.updatePads();
+                // UI theme reload broadcast
+                EventManager.publish(Event.UI_THEME_RELOAD_INFO, this, globalResources.getSkin());
+                EventManager.publish(Event.POST_POPUP_NOTIFICATION, this, I18n.txt("notif.ui.reload"));
+                // Reload window
+                this.skin = globalResources.getSkin();
+                reloadView();
+            });
+        }
+        case UI_SCALE_CMD -> {
+            float uiScale = (Float) data[0];
+            this.updateUnitsPerPixel(1f / uiScale);
+        }
+        }
     }
 
 }
